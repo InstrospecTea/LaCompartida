@@ -560,34 +560,6 @@ class Gasto extends Objeto {
 			return $total;
 		}
 	}
-
-	public function get_usuarios($tipo = 0) {
-		$criteria = new Criteria($this->sesion);
-		$criteria->add_select('U.id_usuario')
-				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
-				->add_from('usuario U')
-				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
-		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
-
-		if ($tipo == 1) {
-			$criteria->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario');
-			$criteria->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'SOC'"));
-		}
-
-		try {
-			$result = $criteria->run();
-			$rows = array();
-
-			foreach ($result as $key => $value) {
-				$rows[$value['id_usuario']] = $value['nombre'];
-			}
-
-			return $rows;
-
-		} catch (Exception $e) {
-			echo "Error: {$e} {$criteria->__toString()}";
-		}
-	}
 }
 
 if (!class_exists('ListaGastos')) {

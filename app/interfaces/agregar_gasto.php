@@ -9,6 +9,7 @@ $id_usuario = isset($id_usuario) ? $id_usuario : $sesion->usuario->fields['id_us
 
 $gasto = new Gasto($sesion);
 $ingreso = new Gasto($sesion);
+$usuario = new UsuarioExt($sesion);
 
 if ($id_gasto != '') {
 	$gasto->Load($id_gasto);
@@ -732,7 +733,7 @@ $Form = new Form;
 					<?php echo __('Ordenado por'); ?>
 				</td>
 				<td align=left><!-- Nuevo Select -->
-					<?php echo $Form->select('id_usuario_orden', $gasto->get_usuarios(), $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
+					<?php echo $Form->select('id_usuario_orden', $usuario->get_usuarios_gatos(), $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
 				</td>
 			</tr>
 		<?php } ?>
@@ -741,7 +742,7 @@ $Form = new Form;
 				<?php echo __('Ingresado por'); ?>
 			</td>
 			<td align=left><!-- Nuevo Select -->
-				<?php echo $Form->select('id_usuario', $gasto->get_usuarios(), isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
+				<?php echo $Form->select('id_usuario', $usuario->get_usuarios_gatos(), isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
 			</td>
 		</tr>
 	</table>

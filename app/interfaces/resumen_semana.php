@@ -6,54 +6,7 @@ require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $Form = new Form($sesion);
-
-function get_usuarios($id_area_usuario, $permisos, $permiso_cobranza, $sesion) {
-	$criteria = new Criteria($sesion);
-	$criteria->add_select('U.id_usuario')
-			->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
-			->add_from('usuario U')
-			->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
-			->add_restriction(CriteriaRestriction::equals('U.visible', 1))
-			->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
-	 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
-
-	if (! empty($id_area_usuario)) {
-		$criteria->add_restriction(CriteriaRestriction::equals('U.id_area_usuario', mysql_real_escape_string($id_area_usuario)));
-	}
-
-	if (! $permisos->fields['permitido'] || ! $permiso_cobranza->fields['permitido']) {
-		$clauses = array();
-
-		$revisor = new Criteria($sesion);
-		$revisor->add_select('id_revisado')
-				->add_from('usuario_revisor')
-				->add_restriction(CriteriaRestriction::equals('id_revisor', $sesion->usuario->fields['id_usuario']));
-		$result = $revisor->run();
-
-		$rows = array();
-		foreach ($result as $revisado) {
-			$rows[] = $revisado['id_revisado'];
-		}
-
-		$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
-
-		$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
-	}
-
-	try {
-		$result = $criteria->run();
-		$rows = array();
-
-		foreach ($result as $key => $value) {
-			$rows[$value['id_usuario']] = $value['nombre'];
-		}
-
-		return $rows;
-
-	} catch (Exception $e) {
-		echo "Error: {$e} {$criteria->__toString()}";
-	}
-}
+$usuario = new UsuarioExt($sesion);
 
 // Revisamos si el usuario tiene categoría de revisor.
 $params_array['codigo_permiso'] = 'REV';
@@ -73,7 +26,7 @@ if ($opcion == 'eliminar') { #ELIMINAR TRABAJO
 		unset($t);
 	}
 } elseif ($opcion == 'filtro_usuarios') {
-	die(json_encode(UtilesApp::utf8izar(get_usuarios($id_area_usuario, $permisos, $permiso_cobranza, $sesion))));
+	die(json_encode(UtilesApp::utf8izar($usuario->get_usuarios_resumen_semana($id_area_usuario, $permisos, $permiso_cobranza, $sesion))));
 }
 
 $pagina->titulo = __('Resumen semana');
@@ -108,7 +61,7 @@ $style = $diseno_nuevo ? 'style="border: 1px solid #BDBDBD;"' : '';
 					<tr>
 						<td align="right"><?php echo __('Usuario') ?>: </td>
 						<td align="left"><!-- Nuevo Select -->
-							<?php echo $Form->select('usuarios[]', get_usuarios($id_area_usuario, $permisos, $permiso_cobranza, $sesion), $usuarios, array('empty' => FALSE, 'style' => 'width: 300px', 'multiple' => 'multiple', 'size' => '10')); ?>
+							<?php echo $Form->select('usuarios[]', $usuario->get_usuarios_resumen_semana($id_area_usuario, $permisos, $permiso_cobranza, $sesion), $usuarios, array('empty' => FALSE, 'style' => 'width: 300px', 'multiple' => 'multiple', 'size' => '10')); ?>
 						</td>
 					</tr>
 					<tr>

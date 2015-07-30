@@ -633,13 +633,13 @@ function Refrescar() {
                 <tr>
                     <td align=right><?php echo __('Encargado comercial') ?>&nbsp;</td>
                     <td colspan=2 align=left><!-- Nuevo Select -->
-                    	<?php echo $Form->select('id_usuario_responsable', $gasto->get_usuarios(1), $id_usuario_responsable, array('empty' => __('Cualquiera'), 'style' => 'width: 200px')); ?>
+                    	<?php echo $Form->select('id_usuario_responsable', $usuario->get_usuarios_gatos(1), $id_usuario_responsable, array('empty' => __('Cualquiera'), 'style' => 'width: 200px')); ?>
                     </td>
                 </tr>
                 <tr>
                     <td align=right><?php echo __('Ordenado por') ?></td>
                     <td align=left colspan=3><!-- Nuevo Select -->
-						<?php echo $Form->select('id_usuario_orden', $gasto->get_usuarios(), $id_usuario_orden, array('empty' => __('Ninguno'), 'style' => 'width: 200px')); ?>
+						<?php echo $Form->select('id_usuario_orden', $usuario->get_usuarios_gatos(), $id_usuario_orden, array('empty' => __('Ninguno'), 'style' => 'width: 200px')); ?>
                     </td>
                 </tr>
 				<?php if (Conf::GetConf($sesion, 'TipoGasto')) { ?>

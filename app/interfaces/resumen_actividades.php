@@ -15,31 +15,7 @@ $sesion = new Sesion(array('REP'));
 
 $pagina = new Pagina($sesion);
 $Form = new Form($sesion);
-
-function get_usuarios($sesion) {
-	$criteria = new Criteria($sesion);
-	$criteria->add_select('U.id_usuario')
-			->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
-			->add_from('usuario U')
-	 		->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
-			->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
-			->add_restriction(CriteriaRestriction::equals('U.visible', 1))
-	 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
-
-	try {
-		$result = $criteria->run();
-		$rows = array();
-
-		foreach ($result as $key => $value) {
-			$rows[$value['id_usuario']] = $value['nombre'];
-		}
-
-		return $rows;
-
-	} catch (Exception $e) {
-		echo "Error: {$e} {$criteria->__toString()}";
-	}
-}
+$usuario = new UsuarioExt($sesion);
 
 $pagina->titulo = __('Resumen actividades profesionales');
 
@@ -642,7 +618,7 @@ $agrupadores = explode('-', $vista);
 					</tr>
 					<tr valign=top>
 						<td rowspan="2" align=left><!-- Nuevo Select -->
-							<?php echo $Form->select('usuariosF[]', get_usuarios($sesion), $usuariosF, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple', 'size' => '6')); ?>
+							<?php echo $Form->select('usuariosF[]', $usuario->get_usuarios_resumen_actividades(), $usuariosF, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple', 'size' => '6')); ?>
 						<td rowspan="2" align=left>
 							<?php
 							if (Conf::GetConf($sesion, 'CodigoSecundario')) {

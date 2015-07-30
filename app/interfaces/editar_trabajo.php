@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('PRO', 'REV', 'SEC'));
 $pagina = new Pagina($sesion);
 //ini_set('display_errors','On');
+$usuario = new UsuarioExt($sesion);
 $t = new Trabajo($sesion);
 $permiso_revisor = $sesion->usuario->Es('REV');
 $permiso_cobranza = $sesion->usuario->Es('COB');
@@ -712,7 +713,6 @@ $duracion_cobrada = '';
 							<?php
 							$duracion_editable = $nuevo || $sesion->usuario->fields['id_usuario'] == $id_usuario;
 							if (!$duracion_editable) {
-								$usuario = new UsuarioExt($sesion);
 								$duracion_editable = $usuario->LoadSecretario($id_usuario, $sesion->usuario->fields['id_usuario']);
 							}
 
@@ -811,7 +811,7 @@ $duracion_cobrada = '';
 				&nbsp;&nbsp;&nbsp;&nbsp;
 				<!-- Nuevo Select -->
 				<?php
-				$usuarios = $t->get_usuarios_editar_trabajo($id_usuario, $permiso_revisor);
+				$usuarios = $usuario->get_usuarios_editar_trabajo($id_usuario, $permiso_revisor);
 
 				if (sizeof($usuarios) > 1 || $permiso_secretaria) {
 					echo __('Usuario');

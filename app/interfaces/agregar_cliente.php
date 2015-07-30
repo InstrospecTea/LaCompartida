@@ -11,6 +11,7 @@ $contrato = new Contrato($Sesion);
 $archivo = new Archivo($Sesion);
 $Form = new Form();
 $SelectHelper = new FormSelectHelper();
+$usuario = new UsuarioExt($Sesion);
 
 $CodigoClienteAsuntoModificable = (boolean) Conf::GetConf($Sesion, 'CodigoClienteAsuntoModificable');
 
@@ -311,7 +312,7 @@ if (Conf::GetConf($Sesion, 'VerCampoUsuarioEncargado') != 1) {
 			$segmento_usuario_encargado .= '</td>';
 			$segmento_usuario_encargado .= '<td class="al"> <!-- Nuevo Select -->';
 			$id_default = $cliente->fields['id_usuario_encargado'] ? $cliente->fields['id_usuario_encargado'] : $id_usuario_encargado;
-			$segmento_usuario_encargado .= $Form->select('id_usuario_encargado', $cliente->get_usuarios($id_usuario, $permisos->fields['permitido']), $id_default, array('empty' => '', 'style' => 'width: 170px'));
+			$segmento_usuario_encargado .= $Form->select('id_usuario_encargado', $usuario->get_usuarios_agregar_cliente($id_usuario, $permisos->fields['permitido']), $id_default, array('empty' => '', 'style' => 'width: 170px'));
 			$segmento_usuario_encargado .= '</td>';
 			$segmento_usuario_encargado .= '</tr>';
 			$validar_usuario_encargado = true;

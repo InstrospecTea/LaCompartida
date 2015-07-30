@@ -970,39 +970,6 @@ class Cliente extends Objeto {
 
 		return (int) $result['total'];
 	}
-
-	public function get_usuarios($id_usuario, $permitido) {
-		$criteria = new Criteria($this->sesion);
-		$criteria->add_select('U.id_usuario')
-				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
-				->add_from('usuario U')
-				->add_left_join_with('usuario_secretario US', 'U.id_usuario = US.id_profesional')
-				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
-				->add_restriction(CriteriaRestriction::equals('U.activo', 1))
-		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
-
-		if (! $permitido) {
-			$clauses[] = CriteriaRestriction::equals('US.id_secretario', $sesion->usuario->fields['id_usuario']);
-			$clauses[] = CriteriaRestriction::in('U.id_usuario', array($id_usuario, $this->sesion->usuario->fields['id_usuario']));
-			$criteria->add_restriction(
-				CriteriaRestriction::or_clause($clauses)
-			);
-		}
-
-		try {
-			$result = $criteria->run();
-			$rows = array();
-
-			foreach ($result as $key => $value) {
-				$rows[$value['id_usuario']] = $value['nombre'];
-			}
-
-			return $rows;
-
-		} catch (Exception $e) {
-			echo "Error: {$e} {$criteria->__toString()}";
-		}
-	}
 }
 
 class ListaClientes extends Lista {
