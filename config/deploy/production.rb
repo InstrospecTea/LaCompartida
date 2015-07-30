@@ -1,7 +1,8 @@
 require 'capistrano/cli'
+
 load 'config/cap_notify'
 load 'config/cap_shared'
-load 'config/cap_servers'
+load 'config/cap_servers_production'
 
 set :current_stage, "production"
 set :notify_emails, notify_emails << "areacomercial@lemontech.cl"
@@ -15,6 +16,9 @@ proceed = STDIN.gets[0..0] rescue nil
 exit unless proceed == 'y' || proceed == 'Y'
 
 set :branch, "master"
+# TODO CHANGE BRANCH!!!!!!!!!!!!
+set :branch, "feature/migration_nginx"
+
 set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}"
 set :deploy_to, "#{base_directory}/#{file_path}"
 
@@ -25,7 +29,7 @@ namespace :deploy do
     Notifier.deploy_notification(self).deliver
   end
 
-  task :run_udpates do
+  task :run_updates do
     update_database(self)
   end
 
@@ -39,7 +43,7 @@ namespace :deploy do
 
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
-  after "deploy", 'deploy:send_notification'
-  after "deploy", "deploy:run_udpates"
+  # after "deploy", 'deploy:send_notification'
+  # after "deploy", "deploy:run_updates"
 
 end
