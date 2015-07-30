@@ -5,6 +5,7 @@ $sesion = new Sesion(array('OFI'));
 $pagina = new Pagina($sesion);
 $gasto = new Gasto($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+$usuario = new UsuarioExt($sesion);
 
 $conf_nuevo_modulo_gastos = Conf::GetConf($sesion, 'NuevoModuloGastos') == '0' ? false : true;
 $conf_codigo_secundario = Conf::GetConf($sesion, 'CodigoSecundario') == '0' ? false : true;
