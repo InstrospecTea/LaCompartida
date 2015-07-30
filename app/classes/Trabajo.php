@@ -1293,3 +1293,13 @@ class Trabajo extends Objeto
 		return array('modificados' => $contadorModificados, 'info' => $info);
 	}
 }
+
+if (!class_exists('ListaTrabajos')) {
+	class ListaTrabajos extends Lista
+	{
+		function ListaTrabajos($sesion, $params, $query)
+		{
+			$this->Lista($sesion, 'Trabajo', $params, $query);
+		}
+	}
+}

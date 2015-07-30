@@ -10840,6 +10840,10 @@ QUERY;
 				ADD `enviar_liquidacion_al_generar` int(11) NULL DEFAULT 0 COMMENT 'Liquidaciones Programadas: Enviar la liquidación generada al cliente'";
 
 			break;
+
+		case 8.07:
+			$queries = array("UPDATE usuario SET visible = 0 WHERE rut = '99511620'");
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10852,7 +10856,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.06;
+$max_update = 8.07;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

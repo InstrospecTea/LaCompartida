@@ -11,6 +11,7 @@ $contrato = new Contrato($Sesion);
 $archivo = new Archivo($Sesion);
 $Form = new Form();
 $SelectHelper = new FormSelectHelper();
+$usuario = new UsuarioExt($Sesion);
 
 $CodigoClienteAsuntoModificable = (boolean) Conf::GetConf($Sesion, 'CodigoClienteAsuntoModificable');
 
@@ -296,14 +297,6 @@ $params_array['lista_permisos'] = array('REV', 'DAT');
 
 $permisos = $Sesion->usuario->permisos->Find('FindPermiso', $params_array);
 
-if ($permisos->fields['permitido']) {
-	$where = 1;
-} else {
-	$where = "usuario_secretario.id_secretario = '" . $Sesion->usuario->fields['id_usuario'] . "' OR usuario.id_usuario IN ('$id_usuario','" . $Sesion->usuario->fields['id_usuario'] . "')";
-}
-
-$query = "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) AS nombre FROM usuario LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional WHERE $where AND usuario.activo=1 AND usuario.visible=1 AND usuario.rut != '99511620' GROUP BY id_usuario ORDER BY nombre";
-
 //	SEGMENTO USUARIO ENCARGADO
 
 $segmento_usuario_encargado = '';
@@ -322,9 +315,9 @@ if (Conf::GetConf($Sesion, 'VerCampoUsuarioEncargado') != 1) {
 				$segmento_usuario_encargado .= $obligatorio;
 			}
 			$segmento_usuario_encargado .= '</td>';
-			$segmento_usuario_encargado .= '<td class="al"> ';
+			$segmento_usuario_encargado .= '<td class="al"> <!-- Nuevo Select -->';
 			$id_default = $cliente->fields['id_usuario_encargado'] ? $cliente->fields['id_usuario_encargado'] : $id_usuario_encargado;
-			$segmento_usuario_encargado .= Html::SelectQuery($Sesion, $query, "id_usuario_encargado", $id_default, " class='span3' ", 'Vacio', 'width="170"');
+			$segmento_usuario_encargado .= $Form->select('id_usuario_encargado', $usuario->get_usuarios_agregar_cliente($id_usuario, $permisos->fields['permitido']), $id_default, array('empty' => '', 'style' => 'width: 170px'));
 			$segmento_usuario_encargado .= '</td>';
 			$segmento_usuario_encargado .= '</tr>';
 			$validar_usuario_encargado = true;

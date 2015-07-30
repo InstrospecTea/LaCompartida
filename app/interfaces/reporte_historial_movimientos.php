@@ -158,7 +158,7 @@ $pagina->PrintTop();
 					<td class="buscadorlabel">
 						<?php echo __('Usuario') ?>
 					</td>
-					<td align='left' colspan="2">
+					<td align='left' colspan="2"><!-- Nuevo Select -->
 						<?php echo $form->select('id_usuario', $sesion->usuario->ListarActivos('', 'PRO'), $id_usuario, array('empty' => 'Cualquiera', 'style' => 'width:440px;')); ?>
 					</td>
 				</tr>
