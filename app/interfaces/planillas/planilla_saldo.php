@@ -3,7 +3,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 require_once APPPATH . '/app/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
-$Form = new Form();
+$Form = new Form($Sesion);
 
 $tipos_liquidacion = array(
 	1 => __('Honorarios'),
@@ -517,10 +517,8 @@ $Pagina->PrintTop($popup);
 							<td align="right">
 								<label for="encargado_comercial"><?php echo __('Encargado Comercial') ?></label>
 							</td>
-							<td colspan="2" align="left">
-								<?php
-								echo Html::SelectQuery($Sesion, UsuarioExt::QueryComerciales(), 'encargado_comercial', $_REQUEST['encargado_comercial'], '', __('Cualquiera'));
-								?>
+							<td colspan="2" align="left"><!-- Nuevo Select -->
+						        <?php echo $Form->select('encargado_comercial', UsuarioExt::QueryComerciales($Sesion), $_REQUEST['encargado_comercial'], array('empty' => __('Cualquiera'))); ?>
 							</td>
 						</tr>
 						<tr>

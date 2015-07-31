@@ -811,9 +811,9 @@ if (count($giros) > 0) {
 														<td align="right">
 <?php echo __('Usuario responsable'); ?>
 														</td>
-														<td align="left">
+														<td align="left"><!-- Nuevo Select -->
 <?php
-echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_encargado', $Asunto->fields['id_encargado'], '', 'Seleccione', '200px');
+echo $Form->select('id_encargado', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado'], array('empty' => __('Seleccione'), 'style' => 'width: 200px'));
 if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 	echo $obligatorio;
 }
@@ -825,8 +825,8 @@ if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 															<td align="right">
 	<?php echo __('Encargado 2'); ?>
 															</td>
-															<td align="left">';
-	<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_encargado2', $Asunto->fields['id_encargado2'], '', 'Seleccione', '200'); ?>
+															<td align="left">'<!-- Nuevo Select -->
+<?php echo $Form->select('id_encargado2', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado2'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
 															</td>
 													</tr>';
 <?php } ?>

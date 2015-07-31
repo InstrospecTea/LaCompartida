@@ -542,7 +542,7 @@ $pagina->PrintTop($popup);
 									<td class="buscadorlabel">
 										<?php echo __('Responsable Asunto'); ?>
 									</td>
-									<td align="left" colspan="3">
+									<td align="left" colspan="3"><!-- Nuevo Select -->
 										<?php echo $Form->select('id_encargado_asunto', $sesion->usuario->ListarActivos('', true), $id_encargado_asunto, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
 									</td>
 								</tr>
@@ -551,7 +551,7 @@ $pagina->PrintTop($popup);
 									<td class="buscadorlabel">
 										<?php echo __('Encargado Comercial') ?>
 									</td>
-									<td align="left" colspan="3">
+									<td align="left" colspan="3"><!-- Nuevo Select -->
 										<?php echo $Form->select('id_encargado_comercial', $sesion->usuario->ListarActivos('', 'SOC'), $id_encargado_comercial, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
 									</td>
 								</tr>
@@ -560,13 +560,14 @@ $pagina->PrintTop($popup);
 									<td class="buscadorlabel">
 										<?php echo __('Usuario') ?>
 									</td>
-									<td align="left" colspan="3">
+									<td align="left" colspan="3"><!-- Nuevo Select -->
 										<?php
-										if ($p_revisor) {
-											$where_usuario = '';
-										} else {
+										$where_usuario = '';
+
+										if (! $p_revisor) {
 											$where_usuario = "AND {$sesion->usuario->tabla}.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor={$sesion->usuario->fields['id_usuario']}) OR usuario.id_usuario={$sesion->usuario->fields['id_usuario']}";
 										}
+										
 										echo $Form->select('id_usuario', $sesion->usuario->ListarActivos($where_usuario, 'PRO'), $id_usuario, array('empty' => 'Todos', 'style' => 'width: 200px'));
 										?>
 									</td>

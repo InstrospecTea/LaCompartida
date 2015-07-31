@@ -8,6 +8,7 @@
 
 	$pagina = new Pagina($sesion);
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+	$Form = new Form($sesion);
 
 	if($xls)
 	{
@@ -848,10 +849,8 @@ $hoy = date("Y-m-d");
 		<td rowspan="2" colspan="2" align=left>
 			<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
 		</td>
-		<td rowspan="2" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
-				FROM usuario JOIN usuario_permiso USING(id_usuario)
-				WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
+		<td rowspan="2" align=left><!-- Nuevo Select -->
+            <?php echo $Form->select('socios[]', UsuarioExt::QueryComerciales($sesion), $socios, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple', 'size' => '6')); ?>
 		</td>
 		<td rowspan="2" align=left>
 			<?=Html::SelectQuery($sesion,"SELECT codigo_estado_cobro AS estado FROM prm_estado_cobro ORDER BY orden ASC", "estados[]", $estados,"class=\"selectMultiple\" multiple size=6 ","","200"); ?></td>
