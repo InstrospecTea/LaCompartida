@@ -8,5 +8,3 @@ RewriteBase /
 RewriteCond %{REQUEST_URI} (.+)/(\w+)$
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^   %1/index.php [QSA,L]
-
-# MIGRATED!
