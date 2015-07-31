@@ -961,7 +961,7 @@ class UsuarioExt extends Usuario {
 				->add_from('usuario U')
 				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
 				->add_left_join_with('usuario_secretario US', 'US.id_profesional = U.id_usuario')
-				->add_restriction(CriteriaRestriction::equal('U.visible', 1))
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
 		 		->add_grouping('U.id_usuario')
 		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
 
