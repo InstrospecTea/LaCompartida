@@ -516,10 +516,8 @@ if (!$popup) {
 										<div id="filtrosimple">
 											<div id="profesional" style="float:left;display:inline-block;" >
 												<b><?php echo __('Profesional') ?>:</b><br/>
-												<?php
-												$query = "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC";
-												echo Html::SelectQuery($sesion, $query, "usuarios[]", $usuarios, '', "Todos", "200");
-												?>
+								                <!-- Nuevo Select -->
+								                <?php echo $Form->select('usuarios[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
 											</div>
 											<div id="cliente" style="float:right;padding-right:10px;display:inline-block;" >
 												<b><?php echo __('Cliente') ?>:</b><br/>

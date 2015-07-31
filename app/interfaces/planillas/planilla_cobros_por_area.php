@@ -5,6 +5,7 @@
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+	$Form = new Form($sesion);
 
 	if($xls)
 	{
@@ -412,8 +413,8 @@ $ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingre
 			<td align=right>
 				<?php echo __("Encargado")?>:
 			</td>
-			<td align=left>
-				<?php echo Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
+				<td align=left><!-- Nuevo Select -->
+					<?php echo $Form->select('usuarios[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6')); ?>
 			</td>
 		</tr>
 		<tr>

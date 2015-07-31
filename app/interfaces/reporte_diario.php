@@ -3,6 +3,7 @@ require_once dirname(__FILE__).'/../conf.php';
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
+$Form = new Form($sesion);
 
 /*
  * Debe tener habilitado la Conf ReportesAvanzados para acceder a este reporte.
@@ -367,7 +368,9 @@ if(!$popup)
 	</tr>
 	<tr>
 		<td align=left>
-			<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"","Todos","200"); ?>	 </td>
+			<!-- Nuevo Select -->
+            <?php echo $Form->select('usuarios[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
+		</td>
 		</td>
 		<td align=left>
 			<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientes[]",$clientes,"","Todos","200"); ?>

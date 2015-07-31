@@ -1,5 +1,11 @@
 # Changelog
 
+## [Release 15.15.0](https://github.com/LemontechSA/ttb/pull/1063)
+Thursday 2015, July 30th.
+* [Unificación de select usuarios](https://github.com/LemontechSA/ttb/pull/1057)
+* [Código de asunto secundario sólo si hay configuración](https://github.com/LemontechSA/ttb/pull/1054)
+* [Diferencia cambios agregar cliente](https://github.com/LemontechSA/ttb/pull/1051)
+
 ## Hotfix 15.14.3
 Thursday 2015, July 30th.
 * **Fix:** [corregir suma subtotal asuntos en reporte excel liquidación](https://github.com/LemontechSA/ttb/pull/1061)
