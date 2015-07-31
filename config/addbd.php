@@ -1,7 +1,10 @@
 <?php
 
 list($subdominio)=explode('.',$_SERVER['HTTP_HOST']);
-ini_set('error_log', "/var/www/html/logs/{$subdominio}_error_log.log");
+
+// This is for keep order in the logs folder
+$firstLetters = substr($subdominio, 0, 3);
+ini_set('error_log', "/var/www/html/logs/{$firstLetters}/{$subdominio}_error_log.log");
 
 if( $_SERVER['REMOTE_ADDR'] == '152.231.82.18' && $subdominio == 'palcantarcol' ) {
 	ini_set('display_errors', 'On');
