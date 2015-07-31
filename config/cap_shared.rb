@@ -17,7 +17,7 @@ set :application, "time_tracking"
 set :stages, %w(local feature release production)
 set :ssh_options, { :forward_agent => true }
 set :use_sudo, false
-set :keep_releases, 2
+set :keep_releases, 5
 set :scm, :git
 set :git_enable_submodules, 1
 set :repository, "git@github.com:LemontechSA/ttb.git"

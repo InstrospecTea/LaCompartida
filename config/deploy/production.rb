@@ -41,9 +41,14 @@ namespace :deploy do
     end
   end
 
+  task :invalidate_opcache, :role => :web do
+      run "curl 'http://localhost/time_tracking/admin/opcache.php?invalidate-cache-plz&json'"
+  end
+
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
   # after "deploy", 'deploy:send_notification'
   # after "deploy", "deploy:run_updates"
+  after "deploy", "deploy:invalidate_opcache"
 
 end
