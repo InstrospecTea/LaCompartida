@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.15.1
+Friday 2015, July 31th.
+* **Fix:** [se cambia condición para traer listado alumnos, antes != 1 ahora = 1](https://github.com/LemontechSA/ttb/pull/1064)
+
 ## [Release 15.15.0](https://github.com/LemontechSA/ttb/pull/1063)
 Thursday 2015, July 30th.
 * [Unificación de select usuarios](https://github.com/LemontechSA/ttb/pull/1057)
