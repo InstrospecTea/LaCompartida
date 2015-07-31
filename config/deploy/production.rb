@@ -8,12 +8,12 @@ set :current_stage, "production"
 set :notify_emails, notify_emails << "areacomercial@lemontech.cl"
 
 # Prompt to make really sure we want to deploy into prouction
-puts "\n\e[0;31m   ######################################################################"
-puts "   #\n   #       Are you REALLY sure you want to deploy to #{current_stage}?"
-puts "   #\n   #               Enter y/N + enter to continue\n   #"
-puts "   ######################################################################\e[0m\n"
-proceed = STDIN.gets[0..0] rescue nil
-exit unless proceed == 'y' || proceed == 'Y'
+puts "   ######################################################################".red
+puts "   #       Are you REALLY sure you want to deploy to '".red + current_stage.white + "'?".red
+puts "   ######################################################################".red
+
+proceed = ask_option ["Y", "N"]
+exit unless proceed == 'Y'
 
 set :branch, "master"
 # TODO CHANGE BRANCH!!!!!!!!!!!!
@@ -30,7 +30,15 @@ namespace :deploy do
   end
 
   task :run_updates do
-    update_database(self)
+    puts " ".white.on_red*50
+    puts " * Now I want mark the clients to update later... ".white.on_red
+    puts " * Can I?                                         ".white.on_red
+    puts " ".white.on_red*50
+
+    sure = ask_option ["Y", "N"]
+
+    update_database(self) if sure == 'Y'
+    puts " OK NO :( ".yellow if sure == 'N'
   end
 
   task :finalize_update, :except => { :no_release => true } do
@@ -47,8 +55,8 @@ namespace :deploy do
 
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
-  # after "deploy", 'deploy:send_notification'
-  # after "deploy", "deploy:run_updates"
+  after "deploy", 'deploy:send_notification'
+  after "deploy", "deploy:run_updates"
   after "deploy", "deploy:invalidate_opcache"
 
 end
