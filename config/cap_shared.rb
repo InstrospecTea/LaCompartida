@@ -31,6 +31,7 @@ set :deploy_dir_name, "deploy"
 set :virtual_directory, "/var/www/virtual"
 set :file_path, "#{deploy_dir_name}/#{application}"
 set :deploy_to, "#{base_directory}/#{file_path}"
+set :nginx_root, "#{base_directory}/timebilling"
 
 namespace :composer do
   desc "Setup composer dir and install"

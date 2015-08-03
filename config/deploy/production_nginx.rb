@@ -2,7 +2,7 @@ require 'capistrano/cli'
 
 load 'config/cap_notify'
 load 'config/cap_shared'
-load 'config/cap_servers'
+load 'config/cap_servers_production'
 
 set :current_stage, "production"
 set :notify_emails, notify_emails << "areacomercial@lemontech.cl"
@@ -16,6 +16,8 @@ proceed = ask_option ["Y", "N"]
 exit unless proceed == 'Y'
 
 set :branch, "master"
+# TODO CHANGE BRANCH!!!!!!!!!!!!
+set :branch, "feature/migration_nginx"
 
 set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}"
 set :deploy_to, "#{base_directory}/#{file_path}"
@@ -47,9 +49,14 @@ namespace :deploy do
     end
   end
 
+  task :invalidate_opcache, :role => :web do
+      run "curl 'http://localhost/time_tracking/admin/opcache.php?invalidate-cache-plz&json'"
+  end
+
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
   after "deploy", 'deploy:send_notification'
   after "deploy", "deploy:run_updates"
+  after "deploy", "deploy:invalidate_opcache"
 
 end
