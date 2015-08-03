@@ -13,7 +13,7 @@ if ($_REQUEST['accion'] == 'listaadelanto') {
 	$Adelanto = new Adelanto($sesion);
 	$Adelanto->Fill($_REQUEST);
 	$query = $Adelanto->searchQuery();
-	$query .= " LIMIT {$limitdesde}, {$limitcantidad}";
+	//$query .= " LIMIT {$limitdesde}, {$limitcantidad}";
 
 	try {
 		$resp = $sesion->pdodbh->query($query);
