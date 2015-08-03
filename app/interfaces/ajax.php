@@ -458,9 +458,10 @@ if ($accion == "consistencia_cliente_asunto") {
 
 	if (!empty($id_contrato)) {
 		$query_contrato .= " AND contrato.id_contrato = {$id_contrato}";
+	} else {
+		$query_contrato .= " AND contrato.id_contrato = cliente.id_contrato";
 	}
-
-	$query_contrato .= " LIMIT 1";
+	
 	$resp = mysql_query($query_contrato, $sesion->dbh) or Utiles::errorSQL($query_contrato, __FILE__, __LINE__, $sesion->dbh);
 
 	for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
