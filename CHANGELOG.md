@@ -1,5 +1,10 @@
 # Changelog
 
+## [Release 15.16.0](https://github.com/LemontechSA/ttb/pull/1068)
+Tuesday 2015, August 4th.
+* [Migration nginx](https://github.com/LemontechSA/ttb/pull/1065)
+* [Adelantos orden cronologico](https://github.com/LemontechSA/ttb/pull/1060)
+
 ## Hotfix 15.15.2
 Monday 2015, August 1st.
 * **Fix:** [Se corrige query para traer datos de factura correspondiente](https://github.com/LemontechSA/ttb/pull/1064)
