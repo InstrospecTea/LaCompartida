@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.15.2
+Monday 2015, August 1st.
+* **Fix:** [Se corrige query para traer datos de factura correspondiente](https://github.com/LemontechSA/ttb/pull/1064)
+
 ## Hotfix 15.15.1
 Friday 2015, July 31th.
 * **Fix:** [se cambia condición para traer listado alumnos, antes != 1 ahora = 1](https://github.com/LemontechSA/ttb/pull/1064)
