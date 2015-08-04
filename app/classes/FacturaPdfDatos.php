@@ -63,9 +63,17 @@ class FacturaPdfDatos extends Objeto {
 
 		$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 		$idioma->Load( $cobro->fields['codigo_idioma'] );
+		
+		if ($idioma->fields['codigo_idioma'] == 'en') {
+			global $_LANG ;
+			include('../lang/en.php');
+			$codigo = 'en_US';
+		} else if ($idioma->fields['codigo_idioma'] == 'es') {
+			$codigo = 'es';
+		}
 
 		$Cliente = new Cliente($this->sesion);
-    $Cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
+    	$Cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 
 		$chargingBusiness = new ChargingBusiness($this->sesion);
 		$coiningBusiness = new CoiningBusiness($this->sesion);
@@ -94,14 +102,14 @@ class FacturaPdfDatos extends Objeto {
 		}
 
 		if (empty($monto_parte_decimal)) {
-			$monto_en_palabra_cero_cien = mb_strtoupper($monto_palabra->ValorEnLetras($monto_parte_entera, $factura->fields['id_moneda'], $glosa_moneda_cero_cien, $glosa_moneda_plural_cero_cien, true), 'ISO-8859-1');
-			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, 'es'));
+			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, $codigo));
 			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
+			$monto_en_palabra_cero_cien = $monto_total_palabra_fix;
 		} else {
-			$monto_en_palabra_cero_cien = mb_strtoupper($monto_palabra->ValorEnLetras($monto_total_factura, $factura->fields['id_moneda'], $glosa_moneda, $glosa_moneda_plural, true), 'ISO-8859-1');
-			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, 'es'));
-			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal * $fix_decimal, 'es'));
-			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1') . ' CON ' . $monto_palabra_parte_decimal . ' CENTAVOS';
+			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, $codigo));
+			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal * $fix_decimal, $codigo));
+			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1') . ' ' . __('CON') . ' ' . $monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
+			$monto_en_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' ' . ($monto_parte_decimal * $fix_decimal) . '/100 ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
 		}
 
 		// Segmento Glosa Detraccion Solicitado por @gtigre para Hernandez
@@ -225,14 +233,7 @@ class FacturaPdfDatos extends Objeto {
 			'moneda_honorarios' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_gastos_con_iva' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_gastos_sin_iva' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
-			'monto_en_palabra' => strtoupper(
-					$monto_palabra->ValorEnLetras(
-						$factura->fields['total'],
-						$factura->fields['id_moneda'],
-						__($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda']),
-						__($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural'])
-					)
-				),
+			'monto_en_palabra' => $monto_en_palabra_cero_cien,
 			'monto_total_palabra' => $monto_total_palabra_fix,
 			'monto_en_palabra_cero_cien' => $monto_en_palabra_cero_cien,
 			'porcentaje_impuesto' => $factura->fields['porcentaje_impuesto']."%",
