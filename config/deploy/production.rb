@@ -2,7 +2,7 @@ require 'capistrano/cli'
 
 load 'config/cap_notify'
 load 'config/cap_shared'
-load 'config/cap_servers'
+load 'config/cap_servers_production'
 
 set :current_stage, "production"
 set :notify_emails, notify_emails << "areacomercial@lemontech.cl"
@@ -24,7 +24,13 @@ namespace :deploy do
 
   desc "Send email notification"
   task :send_notification do
-    Notifier.deploy_notification(self).deliver
+    puts " ".white.on_red*50
+    puts " * I like emails send emails... Can I notify all the people?!... ".white.on_red
+    puts " ".white.on_red*50
+
+    sure = ask_option ["Y", "N"]
+
+    Notifier.deploy_notification(self).deliver if sure == 'Y'
   end
 
   task :run_updates do

@@ -1,4 +1,5 @@
 require 'capistrano/cli'
+
 load 'config/cap_notify'
 load 'config/cap_shared'
 load 'config/cap_servers_production'
