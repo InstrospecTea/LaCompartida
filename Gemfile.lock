@@ -136,3 +136,6 @@ DEPENDENCIES
   railsless-deploy
   rspec
   rvm-capistrano
+
+BUNDLED WITH
+   1.10.2

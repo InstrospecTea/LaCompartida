@@ -16,6 +16,8 @@ proceed = ask_option ["Y", "N"]
 exit unless proceed == 'Y'
 
 set :branch, "master"
+# TODO CHANGE BRANCH!!!!!!!!!!!!
+set :branch, "feature/migration_nginx"
 
 set :file_path, "#{deploy_dir_name}/#{application}/#{current_stage}"
 set :deploy_to, "#{base_directory}/#{file_path}"
@@ -24,13 +26,7 @@ namespace :deploy do
 
   desc "Send email notification"
   task :send_notification do
-    puts " ".white.on_red*50
-    puts " * I like emails send emails... Can I notify all the people?!... ".white.on_red
-    puts " ".white.on_red*50
-
-    sure = ask_option ["Y", "N"]
-
-    Notifier.deploy_notification(self).deliver if sure == 'Y'
+    Notifier.deploy_notification(self).deliver
   end
 
   task :run_updates do
@@ -53,9 +49,14 @@ namespace :deploy do
     end
   end
 
+  task :invalidate_opcache, :role => :web do
+      run "curl 'http://localhost/time_tracking/admin/opcache.php?invalidate-cache-plz&json'"
+  end
+
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
   after "deploy", 'deploy:send_notification'
   after "deploy", "deploy:run_updates"
+  after "deploy", "deploy:invalidate_opcache"
 
 end
