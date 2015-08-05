@@ -63,7 +63,7 @@ class FacturaPdfDatos extends Objeto {
 
 		$idioma = new Objeto($this->sesion,'','','prm_idioma','codigo_idioma');
 		$idioma->Load( $cobro->fields['codigo_idioma'] );
-		
+
 		if ($idioma->fields['codigo_idioma'] == 'en') {
 			global $_LANG ;
 			include('../lang/en.php');
@@ -235,9 +235,9 @@ class FacturaPdfDatos extends Objeto {
 			'moneda_honorarios' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_gastos_con_iva' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_gastos_sin_iva' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
-			'monto_en_palabra' => $monto_en_palabra_cero_cien,
-			'monto_total_palabra' => $monto_total_palabra_fix,
-			'monto_en_palabra_cero_cien' => $monto_en_palabra_cero_cien,
+			'monto_en_palabra' => mb_strtoupper($monto_en_palabra_cero_cien, 'ISO-8859-1'),
+			'monto_total_palabra' => mb_strtoupper($monto_total_palabra_fix, 'ISO-8859-1'),
+			'monto_en_palabra_cero_cien' => mb_strtoupper($monto_en_palabra_cero_cien, 'ISO-8859-1'),
 			'porcentaje_impuesto' => $factura->fields['porcentaje_impuesto']."%",
 			'moneda_subtotal' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_iva' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
