@@ -198,12 +198,12 @@ class FacturaPdfDatos extends Objeto {
 					$idioma->fields['separador_decimales'],
 					$idioma->fields['separador_miles']
 				),
-			'monto_descuento_honorarios' => number_format(
+			'monto_descuento_honorarios' => ($discount > 0) ? number_format(
 					-1 * $discount,
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
 					$idioma->fields['separador_decimales'],
 					$idioma->fields['separador_miles']
-				),
+				) : NULL,
 			'monto_subtotal_honorarios' => number_format(
 					$detail->get('subtotal_honorarios'),
 					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
@@ -223,13 +223,14 @@ class FacturaPdfDatos extends Objeto {
 					$idioma->fields['separador_miles']
 				),
 			'monto_gastos_con_y_sin_iva' => number_format(
-          $factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
-          $arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
-          $idioma->fields['separador_decimales'],
-          $idioma->fields['separador_miles']
-        ),
+					$factura->fields['subtotal_gastos'] + $factura->fields['subtotal_gastos_sin_impuesto'],
+					$arreglo_monedas[$factura->fields['id_moneda']]['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+				),
 			'moneda_subtotal_honorarios' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
-			'moneda_descuento_honorarios' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
+			'glosa_descuento' => ($discount > 0) ? __('Descuento') . ':' : ' ',
+			'moneda_descuento_honorarios' => ($discount > 0) ? $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'] : NULL,
 			'moneda_honorarios' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_gastos_con_iva' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_gastos_sin_iva' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
