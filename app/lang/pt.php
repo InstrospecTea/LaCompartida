@@ -190,6 +190,8 @@ $_LANG['Modificación de Trâmite'] = 'Modificar Trâmite';
 $_LANG['Ingresar como trabajo'] = 'Adicionar como trabalho';
 $_LANG['Cantidad de repeticiones'] = 'Quantidade de repetições';
 $_LANG['Valor según tarifa'] = 'Valor segundo a tarifa';
+
+// Resumen
 $_LANG['Resumen semana'] = 'Resumo da semana';
 $_LANG['Tipo de Dato'] = 'Tipo de dado';
 $_LANG['Haga clic en el botón derecho sobre algún trabajo para modificarlo'] = 'Clique com o botao direito sobre algum trabalho para o modificar';
@@ -198,6 +200,39 @@ $_LANG['Martes'] = 'Terça';
 $_LANG['Miércoles'] = 'Quarta';
 $_LANG['Jueves'] = 'Quinta';
 $_LANG['Viernes'] = 'Sexta';
+
+// Tareas
+$_LANG['Tareas en que soy Reponsable'] = 'Tarefas que sou responsável';
+$_LANG['Tareas en que soy Mandante'] = 'Tarefas em que sou o mandente';
+$_LANG['Tareas en que soy Revisor'] = 'Tarefas em que sou revisor';
+$_LANG['Tareas en las que no estoy relacionado.'] = 'Tarefas as quais estou relacionado';
+$_LANG['Clientes en los que soy encargado'] = 'Clientes sob minha responsabilidade';
+$_LANG['Incluir Tareas Históricas'] = 'Incluir tarefas históricas';
+$_LANG['Plazo desde'] = 'Prazo de';
+$_LANG['Plazo hasta'] = 'Prazo até';
+$_LANG['Exportar a Excel'] = 'Exportar para o Excel';
+$_LANG['Detalle'] = 'Detalhes';
+$_LANG['Fecha de Entrega'] = 'Data de entrega';
+$_LANG['Prioridad'] = 'Prioridade';
+$_LANG['Usuario Responsable'] = 'Usuário responsável';
+$_LANG['Usuario Revisor'] = 'Usuário revisor';
+$_LANG['Usuario Mandante'] = 'Usuário mandente';
+$_LANG['Duración Estimada'] = 'Duração Estimada';
+$_LANG['Duración Ingresada'] = 'Duração inserida';
+
+// Pre-Liquidaciones
+$_LANG['Proceso masivo de emisión de cobros'] = 'Processo massivo de planilha e pré-liquidações';
+$_LANG['Encargado comercial'] = 'Responsável comercial';
+$_LANG['Tipo de Liquidación'] = 'Tipo de liquidação';
+
+// Solicitudes de Adelanto
+$_LANG['Solicitudes de Adelanto'] = 'Solicitações de Adiantamento';
+$_LANG['solicitud adelanto'] = 'solicitação de adiantamento';
+$_LANG['Solicitud de Adelanto'] = 'Solicitação de adiantamento';
+$_LANG['N° Solicitud'] = 'Número de solicitação';
+$_LANG['Si Ud. selecciona el assunto, se considerarán los assuntos que se cobrarán en la misma carta.'] = 'Se selecionar o assunto, serão considerados os assuntos que se cobraram na mesma carta';
+$_LANG['Usuario solicitante'] = 'Usuário solicitante';
+$_LANG['Descargar Excel'] = 'Download para Excel';
 
 // Actividades
 $_LANG['Actividad'] = 'Atividade';

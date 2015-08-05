@@ -177,7 +177,7 @@ class UtilesApp extends Utiles {
 			<td>&nbsp;</td>
 			<td colspan="3">
 				<em>
-					<?php echo __('Si Ud. selecciona el') . ' ' . __('asunto') . ', ' . __('se considerarán los') . ' ' . __('asuntos') . ' ' . __('que se cobrarán en la misma carta.'); ?>
+					<?php echo __(__('Si Ud. selecciona el') . ' ' . __('asunto') . ', ' . __('se considerarán los') . ' ' . __('asuntos') . ' ' . __('que se cobrarán en la misma carta.')); ?>
 				</em>
 			</td>
 		</tr>

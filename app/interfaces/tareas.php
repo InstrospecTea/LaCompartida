@@ -285,7 +285,7 @@ if ($orden_click) {
 							</tr>
 							<tr>
 								<td align='right'>
-									Cliente:
+									<?php echo __('Cliente')?>:
 								</td>
 								<td align='left' colspan='4'>
 									<?php
@@ -306,7 +306,7 @@ if ($orden_click) {
 								</td>
 							</tr>
 							<tr>
-								<td align='right'>Asunto:</td>
+								<td align='right'><?php echo __('Asunto')?>:</td>
 								<td align='left' colspan='4'>
 									<?php
 										if (Conf::GetConf($Sesion,'CodigoSecundario')) {
@@ -318,7 +318,7 @@ if ($orden_click) {
 								</td>
 							</tr>
 							<tr class='expandido' <?php echo $expandido?>>
-								<td align='right'>Usuario:</td>
+								<td align='right'><?php echo __('Usuario')?>:</td>
 								<td align='left' colspan='4'>
 									<?php echo  Html::SelectQuery($Sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_involucrado", $id_usuario_involucrado,"", __('Cualquiera'),'170'); ?>
 								</td>
@@ -388,9 +388,9 @@ if ($orden_click) {
 							<tr>
 								<td>&nbsp;</td>
 								<td align='left' colspan='2'>
-									<input type='submit' value='Buscar' class='btn'  onclick="return Validar();" >
+									<input type='submit' value='<?php echo __('Buscar')?>' class='btn'  onclick="return Validar();" >
 									&nbsp;
-									<input type='submit' value='Exportar a Excel' class='btn' onclick="return Excel();" >
+									<input type='submit' value='<?php echo __('Exportar a Excel')?>' class='btn' onclick="return Excel();" >
 								</td>
 								<td align='right'>
 									<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="NuevaTarea()" title="Agregar Tarea"><?php echo __('Agregar')?> <?php echo __('tarea')?></a>
