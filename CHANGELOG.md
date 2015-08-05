@@ -2,7 +2,7 @@
 
 ## Hotfix 15.16.3
 Wednesday 2015, August 5th
-* **Feature:** [Enviar el código del cliente como identificador único a FacturaciónCL](https://github.com/LemontechSA/ttb/pull/)
+* **Feature:** [Enviar el código del cliente como identificador único a FacturaciónCL](https://github.com/LemontechSA/ttb/pull/1071)
 
 ## Hotfix 15.16.2
 Wednesday 2015, August 5th
