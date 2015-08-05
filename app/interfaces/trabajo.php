@@ -149,21 +149,21 @@ $where .= " AND usuario.visible = 1";
 			callback: function(key, options) {},
 			items: {
 				"edit": {
-					name: "Editar",
+					name: "<?php echo __('Editar') ?>",
 					icon: "edit",
 					callback: function(key, options) {
 						OpcionesTrabajo(trabajoid, '', '')
 					}
 				},
 				"paste": {
-					name: "Ingresar como nueva hora",
+					name: "<?php echo __('Ingresar como nueva hora') ?>",
 					icon: "paste",
 					callback: function(key, options) {
 						OpcionesTrabajo(trabajoid,'nuevo','');
 					}
 				},
 				"delete": {
-					name: "Eliminar",
+					name: "<?php echo __('Eliminar') ?>",
 					icon: "delete",
 					callback: function(key, options) {
 						if (confirm('<?php echo __("¿Desea eliminar este trabajo?") ?>')) {
@@ -173,7 +173,7 @@ $where .= " AND usuario.visible = 1";
 				},
 				"sep1": "---------",
 				"quit": {
-					name: "Cancelar",
+					name: "<?php echo __('Cancelar') ?>",
 					icon: "quit"
 				}
 			}
@@ -190,7 +190,7 @@ $where .= " AND usuario.visible = 1";
 			callback: function(key, options) {},
 			items: {
 				"paste": {
-					name: "Ingresar como nueva hora",
+					name: "<?php echo __('Ingresar como nueva hora') ?>",
 					icon: "paste",
 					callback: function(key, options) {
 						OpcionesTrabajo(trabajoid, 'nuevo', '');
@@ -221,7 +221,7 @@ $where .= " AND usuario.visible = 1";
 			},
 			items: {
 				"add": {
-					name: "Nueva hora",
+					name: "<?php echo __('Nueva hora') ?>",
 					icon: "add"
 				}
 			}

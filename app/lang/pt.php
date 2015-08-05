@@ -511,3 +511,8 @@ $_LANG['Editar seleccionados'] = 'Editar selecionados';
 $_LANG['Editar trabajos de todo el listado'] = 'Editar trabalhos de toda a lista';
 $_LANG['(se modificará la duración cobrable de los trabajos seleccionados)'] = '(Se modificará a duração cobrável dos trabalhos selecionados)';
 $_LANG['Eliminar trabajos'] = 'Eliminar trabalhos';
+
+$_LANG['Editar'] = 'Editar';
+$_LANG['Ingresar como nueva hora'] = 'Adicionar como nova hora';
+$_LANG['Nueva hora'] = 'Nova hora';
+
