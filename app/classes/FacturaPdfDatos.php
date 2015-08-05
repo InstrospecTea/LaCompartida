@@ -156,6 +156,7 @@ class FacturaPdfDatos extends Objeto {
 		$discount = $detail->get('descuento_honorarios');
 
 		$datos = array(
+			'numero' => $factura->fields['numero'],
 			'glosa_cliente' => $Cliente->fields['glosa_cliente'],
 			'glosa_asuntos' => implode(', ', $cobro->glosa_asuntos),
 			'razon_social' => $factura->fields['cliente'],
