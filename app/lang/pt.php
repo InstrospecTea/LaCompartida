@@ -448,3 +448,37 @@ $_LANG['Títulos de Marcas'] = 'Jantar de negócios';
 $_LANG['Traducciones'] = 'Traduções';
 $_LANG['Transferencia de Vehículos'] = 'Aluguel de veículo';
 $_LANG['Transporte Aéreo'] = 'Transporte Aéreo';
+
+/* Gerenciamento de Fatura PDF */
+$_LANG['Mantención factura PDF'] = 'Gerenciamento de Fatura PDF';
+$_LANG['Compañía'] = 'Escritório';
+$_LANG['Tipo documento legal:'] = 'Tipo de documento legal:';
+$_LANG['Tipo dato:'] = 'Tipo de dado:';
+$_LANG['Guardar'] = 'Guardar';
+$_LANG['Imprimir Documento'] = 'Imprimir documento';
+$_LANG['Posición'] = 'Posicao';
+$_LANG['Horizontal'] = 'Horizontal';
+$_LANG['Vertical'] = 'Vertical';
+$_LANG['Ancho'] = 'Largura';
+$_LANG['Alto'] = 'Altura';
+$_LANG['Tipografía'] = 'Tipografia';
+$_LANG['Estilo'] = 'Estilo';
+$_LANG['Mayúscula'] = 'Letra Maiúscula';
+$_LANG['Alineación'] = 'Alinhamento';
+$_LANG['Tamaño'] = 'Tamanho';
+$_LANG['Vista Previa: las cajas en torno al texto son puramente referenciales'] = 'Vista prévia: as caixas em torno do texto sao puramente referenciais';
+
+/* Reporte Historial Movimientos */
+$_LANG['Auditoría'] = 'Auditoria';
+$_LANG['Consideraciones'] = 'Considerações';
+$_LANG['Antes de filtrar'] = 'Antes de filtrar';
+$_LANG['debe siempre'] = 'você deve sempre';
+$_LANG['establecer o el inicio o el fin del rango de fechas a consultar. El rango de fecha se completará según lo definido, 31 días hacia adelante o hacia atrás, dependiendo de si ha seleccionado la fecha desde o la fecha hasta, respectivamente.'] = 'definir o início ou o final do intervalo de datas para consultar. O intervalo de datas serão concluídos de acordo com o escolhido anteriormente, 31 dias para a frente ou para trás, dependendo se você selecionou a ?data de? ou ?data até?, respectivamente.';
+$_LANG['Además'] = 'Além disso';
+$_LANG['debe filtrar por al menos uno'] = 'deverá filtrar ao menos um';
+$_LANG['de los siguientes datos:'] = 'dos seguintes dados:';
+$_LANG['o Nº de'] = 'pu número de';
+$_LANG['No es posible'] = 'Não é possível';
+$_LANG['realizar consultas por un rango superior a 31 días.'] = 'pesquisar um período superior a 31 dias.';
+$_LANG['Dato'] = 'Dado';
+
