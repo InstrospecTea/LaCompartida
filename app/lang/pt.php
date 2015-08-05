@@ -481,4 +481,8 @@ $_LANG['o Nº de'] = 'pu número de';
 $_LANG['No es posible'] = 'Não é possível';
 $_LANG['realizar consultas por un rango superior a 31 días.'] = 'pesquisar um período superior a 31 dias.';
 $_LANG['Dato'] = 'Dado';
+$_LANG['Acción'] = 'Ação';
+$_LANG['Código'] = 'Código';
+$_LANG['Cobro'] = 'Número da liquidação';
+$_LANG['Descargar'] = 'Download';
 
