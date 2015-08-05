@@ -353,6 +353,7 @@ EOF;
 			),
 			'receptor' => array(
 				'rut' => $Factura->fields['RUT_cliente'],
+				'codigo' => $Factura->fields['codigo_cliente'],
 				'razon_social' => UtilesApp::transliteration($Factura->fields['cliente']),
 				'giro' => UtilesApp::transliteration($Factura->fields['giro_cliente']),
 				'direccion' => UtilesApp::transliteration($Factura->fields['direccion_cliente']),
