@@ -53,9 +53,15 @@ namespace :deploy do
     end
   end
 
+  # the next task is only for new servers (servers with role nginx)
+  task :invalidate_opcache do
+      run "curl 'http://localhost/time_tracking/admin/opcache.php?invalidate-cache-plz&json'", :roles => [:nginx]
+  end
+
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
   after "deploy", 'deploy:send_notification'
   after "deploy", "deploy:run_updates"
+  after "deploy", "deploy:invalidate_opcache"
 
 end
