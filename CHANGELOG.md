@@ -1,5 +1,12 @@
 # Changelog
 
+## Hotfix 15.16.2
+Wednesday 2015, August 5th
+* **Fix:** [Corregir encoding monto en palabras](https://github.com/LemontechSA/ttb/pull/1070)
+* **Feature:** [Se agrega tag "Nro Factura" en PDF Factura](https://github.com/LemontechSA/ttb/pull/1070)
+* **Feature:** [Se corrige traducción al ingles del monto en palabras](https://github.com/LemontechSA/ttb/pull/1070)
+* **Feature:** [Condicionar despliegue del descuento en la factura PDF](https://github.com/LemontechSA/ttb/pull/1070)
+
 ## Hotfix 15.16.1
 Wednesday 2015, August 5th
 * **Fix:** [Se agrega tarea de capistrano para invalidación de opcache](https://github.com/LemontechSA/ttb/pull/1069)
