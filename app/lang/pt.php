@@ -473,7 +473,6 @@ $_LANG['Mantención factura PDF'] = 'Gerenciamento de Fatura PDF';
 $_LANG['Compañía'] = 'Escritório';
 $_LANG['Tipo documento legal:'] = 'Tipo de documento legal:';
 $_LANG['Tipo dato:'] = 'Tipo de dado:';
-$_LANG['Guardar'] = 'Guardar';
 $_LANG['Imprimir Documento'] = 'Imprimir documento';
 $_LANG['Posición'] = 'Posicao';
 $_LANG['Horizontal'] = 'Horizontal';
