@@ -175,10 +175,29 @@ $_LANG['monto según horas no cobradas'] = 'quantia segundo horas não cobradas';
 
 // Trámites
 $_LANG['Trámite'] = 'Trâmite';
+$_LANG['trámite'] = 'trâmite';
 $_LANG['Trámites'] = 'Trâmites';
+$_LANG['trámites'] = 'trâmites';
 $_LANG['Nombre Trámite'] = 'Nome do trâmite';
 $_LANG['Tarifa en'] = 'Tarifa em';
 $_LANG['Valores Tarifa Standard'] = 'Valores Tarifa Padrão';
+$_LANG['Cualquiera'] = 'Qualquer';
+$_LANG['Responsable Asunto'] = 'Responsável Assunto';
+$_LANG['Fecha desde'] = 'Data de';
+$_LANG['Fecha hasta'] = 'Data até';
+$_LANG['Agregando nuevo Trâmite'] = 'Adicionando novo Trâmite';
+$_LANG['Modificación de Trâmite'] = 'Modificar Trâmite';
+$_LANG['Ingresar como trabajo'] = 'Adicionar como trabalho';
+$_LANG['Cantidad de repeticiones'] = 'Quantidade de repetições';
+$_LANG['Valor según tarifa'] = 'Valor segundo a tarifa';
+$_LANG['Resumen semana'] = 'Resumo da semana';
+$_LANG['Tipo de Dato'] = 'Tipo de dado';
+$_LANG['Haga clic en el botón derecho sobre algún trabajo para modificarlo'] = 'Clique com o botao direito sobre algum trabalho para o modificar';
+$_LANG['Lunes'] = 'Segunda';
+$_LANG['Martes'] = 'Terça';
+$_LANG['Miércoles'] = 'Quarta';
+$_LANG['Jueves'] = 'Quinta';
+$_LANG['Viernes'] = 'Sexta';
 
 // Actividades
 $_LANG['Actividad'] = 'Atividade';
@@ -486,3 +505,10 @@ $_LANG['Código'] = 'Código';
 $_LANG['Cobro'] = 'Número da liquidação';
 $_LANG['Descargar'] = 'Download';
 
+/* Revisar Horas */
+$_LANG['Seleccionar todo'] = 'Selecionar';
+$_LANG['Desmarcar todo'] = 'Desmarcar tudo';
+$_LANG['Editar seleccionados'] = 'Editar selecionados';
+$_LANG['Editar trabajos de todo el listado'] = 'Editar trabalhos de toda a lista';
+$_LANG['(se modificará la duración cobrable de los trabajos seleccionados)'] = '(Se modificará a duração cobrável dos trabalhos selecionados)';
+$_LANG['Eliminar trabajos'] = 'Eliminar trabalhos';

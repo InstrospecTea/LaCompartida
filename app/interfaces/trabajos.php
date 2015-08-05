@@ -742,14 +742,14 @@ $pagina->PrintTop($popup);
 	<?php $b->Imprimir('', array('check_trabajo')); //Excluyo Checktrabajo); ?>
 	<form>
 		<center>
-			<a href="#" onclick="seleccionarTodo(true); return false;">Seleccionar todo</a>
+			<a href="#" onclick="seleccionarTodo(true); return false;"><?php echo __('Seleccionar todo') ?></a>
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<a href="#" onclick="seleccionarTodo(false); return false;">Desmarcar todo</a>
+			<a href="#" onclick="seleccionarTodo(false); return false;"><?php echo __('Desmarcar todo') ?></a>
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trabajos">Editar seleccionados</a>
+			<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trabajos"><?php echo __('Editar seleccionados') ?></a>
 			<br />
 			<input type='hidden' name='where_query_listado_completo' id='where_query_listado_completo' value='<?php echo urlencode(base64_encode($where)) ?>'>
-			<a href="#" onclick="EditarTodosLosArchivos(); return false;" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
+			<a href="#" onclick="EditarTodosLosArchivos(); return false;" title="Editar trabajos de todo el listado"><?php echo __('Editar trabajos de todo el listado') ?></a>
 			<br />
 			<br />
 			<?php echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('id' => 'descargapro')); ?>

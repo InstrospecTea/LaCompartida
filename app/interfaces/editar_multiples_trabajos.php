@@ -311,7 +311,7 @@ else
 					<td colspan=2></td>
 					<td colspan=3 align=left>
 						<a onclick="return confirm('<?php echo __('¿Desea eliminar estos trabajos?'); ?>')" href="?opcion=eliminar&ids=<?php echo "$ids&popup=$popup"; ?>">
-							<span style="border: 1px solid black; background-color: #ff0000;color:#FFFFFF;\">&nbsp;Eliminar trabajos&nbsp;</span>
+							<span style="border: 1px solid black; background-color: #ff0000;color:#FFFFFF;\">&nbsp;<?php echo __('Eliminar trabajos') ?>&nbsp;</span>
 						</a>
 					</td>
 				</tr>
