@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.16.1
+Wednesday 2015, August 5th
+* **Fix:** [Se agrega tarea de capistrano para invalidación de opcache](https://github.com/LemontechSA/ttb/pull/1069)
+
 ## [Release 15.16.0](https://github.com/LemontechSA/ttb/pull/1068)
 Tuesday 2015, August 4th.
 * [Migration nginx](https://github.com/LemontechSA/ttb/pull/1065)
