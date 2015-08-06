@@ -326,6 +326,72 @@ $_LANG['Si Ud. selecciona el assunto, se considerarán los assuntos que se cobrar
 $_LANG['Usuario solicitante'] = 'Usuário solicitante';
 $_LANG['Descargar Excel'] = 'Download para Excel';
 
+// Adelantos
+$_LANG['Revisar Adelantos'] = 'Revisar adiantamentos';
+$_LANG['N° Adelanto'] = 'Número do adiantamento';
+$_LANG['Documento de Adelanto'] = 'Documento de adiantamento';
+$_LANG['Información de Documento'] = 'Informação do documento';
+$_LANG['N° Operación'] = 'Número da Operação';
+$_LANG['Para el pago de honorarios'] = 'Para o pagamento de Honorário';
+$_LANG['Para el pago de gastos'] = 'Para pagamento de gastos';
+
+// Reportes - General
+$_LANG['Resumen actividades profesionales'] = 'Resumo das atividades profissionais';
+$_LANG['Periodo'] = 'Período';
+$_LANG['Generar planilla'] = 'Gerar Planilha';
+$_LANG['Generar Gráfico'] = 'Gerar Gráfico';
+$_LANG['Resumen - '] = 'Resumo - ';
+$_LANG['en vista por'] = 'vistos por';
+$_LANG['Hrs.'] = 'Horas';
+$_LANG['profesional'] = 'profissional';
+$_LANG['glosa_asunto'] = 'assunto';
+
+// Reportes - Específicos
+$_LANG['Reporte de Ventas'] = 'Relatório de Vendas';
+$_LANG['Horas por facturar'] = 'Horas a faturar';
+$_LANG['Reporte Hitos'] = 'Relatório de conquistas';
+$_LANG['Cobros por Area'] = 'Liquidações por área';
+$_LANG['Cobrança por facturar'] = 'Liquidações a faturar';
+$_LANG['Reporte Deuda cliente'] = 'Relatório de dívida de cliente';
+$_LANG['Histórico de Tipo de Cambio'] = 'Histórico de tipo de câmbio';
+$_LANG['Ciclo de Facturación'] = 'Cliclo de faturamento';
+
+$_LANG['Usuario vacaciones'] = 'Usuários férias';
+$_LANG['Rendimiento profesionales'] = 'Rendimento dos profissionais';
+$_LANG['Gr&aacute;fico profesionales'] = 'Gráfico de profissionais';
+$_LANG['Demora ingreso de horas por profesional'] = 'Demora de ingresso de horas por profissional';
+$_LANG['Producción por Periodo'] = 'Produção por período';
+
+$_LANG['Varios'] = 'Variados';
+$_LANG['Gráfico por Período'] = 'Gráfico por renda';
+$_LANG['Profesional v/s Cliente'] = 'Profissional vs. Cliente';
+$_LANG['Reporte gen&eacute;rico'] = 'Relatório Genérico';
+
+$_LANG['Avanzados'] = 'Avançados';
+$_LANG['Reportes Avanzados'] = 'Relatórios avançados';
+$_LANG['Reporte costos'] = 'Relatório de custos';
+$_LANG['Reporte financiero'] = 'Relatório financeiro';
+$_LANG['Participacion Abogado'] = 'Participaçao advogado';
+$_LANG['Reporte consolidado'] = 'Relatório consolidado';
+$_LANG['Reporte anual'] = 'Relatório anual';
+
+$_LANG['Experimentales'] = 'Experimentais';
+$_LANG['Reporte Diario'] = 'Relatório Diário';
+$_LANG['Reporte Alertas'] = 'Relatório de alertas';
+$_LANG['Reporte Saldo Clientes'] = 'Relatório de saldo dos clientes';
+$_LANG['Reporte Antigüedad Deudas Clientes'] = 'Relatório  idade de dívida dos clientes';
+$_LANG['Reporte Producción por Profesional'] = 'Relatório de produção por profissional';
+
+// Reportes Consolidados
+$_LANG['Fecha generación'] = 'Data de generaçao';
+
+// Biblioteca
+$_LANG['Archivo'] = 'Arquivo';
+$_LANG['Nº Carpeta'] = 'Número da Pasta';
+$_LANG['Grupo Cliente'] = 'Grupo de Cliente';
+$_LANG['Ubicación'] = 'Localização';
+$_LANG['Agregar carpeta'] = 'Adicionar Pasta';
+
 // Actividades
 $_LANG['Actividad'] = 'Atividade';
 $_LANG['Actividades'] = 'Atividades';

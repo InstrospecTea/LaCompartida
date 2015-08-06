@@ -209,7 +209,7 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 					<legend><?php echo __('Filtros') ?></legend>
 					<table style="border: 0px solid black" width='720px'>
 						<tr>
-							<td align="right"><label for="id_documento">N° Adelanto</label></td>
+							<td align="right"><label for="id_documento"><?php echo __('N° Adelanto') ?></label></td>
 							<td align="left">
 								<input type="text" size="6" name="id_documento" id="id_documento" value="<?php echo $id_documento ?>">
 							</td>
