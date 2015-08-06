@@ -276,7 +276,7 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 			}
 			?>
 			<td colspan="<?php echo $colspan ?>"></td><td  align=left>
-				<input type=checkbox id=usar_tarifa_previa value='1' <?php $usar_tarifa_previa ? 'checked' : '' ?> /> copiando la actual
+				<input type=checkbox id=usar_tarifa_previa value='1' <?php $usar_tarifa_previa ? 'checked' : '' ?> /> <?php echo __('copiando la actual') ?>
 			</td>
 		</tr>
 		<?php } ?>

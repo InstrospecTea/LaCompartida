@@ -220,9 +220,9 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 						<?php
 					} else {
 						?>
-						<td align="right">Nueva <?php echo __('Tarifa'); ?></td>
+						<td align="right"><?php echo __('Nueva ' . __('Tarifa')); ?></td>
 						<td align="left">
-							<input type="text" name="glosa_tramite_tarifa" value="<?php echo $tramite_tarifa->fields['glosa_tramite_tarifa']; ?>" <?php echo $active; ?> placeholder="Nombre">
+							<input type="text" name="glosa_tramite_tarifa" value="<?php echo $tramite_tarifa->fields['glosa_tramite_tarifa']; ?>" <?php echo $active; ?> placeholder="<?php echo __('Nombre') ?>">
 							<label><input type="checkbox" name="tarifa_defecto" value="1" <?php echo $tramite_tarifa->fields['tarifa_defecto'] ? 'checked' : ''; ?>> <?php echo __('Defecto')?></label>
 						</td>
 						<?php

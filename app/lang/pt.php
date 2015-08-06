@@ -265,7 +265,7 @@ $_LANG['Con Fecha posterior a:'] = 'Com data posterior a:';
 $_LANG['Descargar Excel de todos los clientes'] = 'Download em Excel de todos os clientes';
 $_LANG['Ingreso'] = 'Ingresso';
 $_LANG['N°'] = 'No';
-$_LANG['N° Factura'] = 'No Facura';
+$_LANG['N° Factura'] = 'No Fatura';
 $_LANG['Balance cuenta corriente'] = 'Balanço de conta corrente';
 
 // Factura Pago
@@ -274,8 +274,48 @@ $_LANG['Descripción Recaudación'] = 'Descricao do Recolhimento';
 $_LANG['Concepto'] = 'Conceito';
 $_LANG['Fecha inicio pago'] = 'Data de inicio de pagamento';
 $_LANG['Fecha fin pago'] = 'Data de fim de pagamento';
+$_LANG['Pago de Documentos Tributarios'] = 'Pagamento de documentos tributários';
 $_LANG['N° Cuenta'] = 'Número da Conta';
 $_LANG['N° Cobro'] = 'Número da liquidação';
+$_LANG['Fecha factura'] = 'Data de Fatura';
+$_LANG['Abogado'] = 'Abvogado';
+$_LANG['Concepto Pago'] = 'Conceito Pagamento';
+$_LANG['Descripción Pago'] = 'Descrição Pagamento';
+$_LANG['Fecha pago'] = 'Data de pagamento';
+$_LANG['Monto Factura'] = 'Quantia Fatura';
+$_LANG['Monto Aporte'] = 'Quantidade aportado';
+$_LANG['Saldo Factura'] = 'Saldo da Fatura';
+
+// Factura
+$_LANG['Grupo Ventas'] = 'Grupo Vendas';
+$_LANG['Fecha Inicio'] = 'Data inicial';
+$_LANG['Fecha Fin'] = 'Data final';
+$_LANG['Documentos Tributarios'] = 'Documentos Tributários';
+$_LANG['Destinatario Documento'] = 'Destinatário Documento';
+$_LANG['Fecha Documento'] = 'Data do Documento';
+$_LANG['Datos Documento'] = 'Dados do Documentos';
+$_LANG['Socio a cargo'] = 'Sócio encargado';
+$_LANG['Nº Liquidación'] = 'No liquidação';
+$_LANG['Pagos'] = 'Pagamentos';
+$_LANG['Opciones'] = 'Opçoes';
+$_LANG['IVA'] = 'Imposto';
+$_LANG['Últ. Pago'] = 'Últimos Pagamento';
+
+// Tarifas 
+$_LANG['Ingreso de Tarifas'] = 'Inserção de Tarifas';
+$_LANG['copiando la actual'] = 'Copiando a atual';
+
+// Tipo de Cambio
+$_LANG['Tipo de Cambio'] = 'Tipo de Câmbio';
+$_LANG['Tasa'] = 'Taxa';
+$_LANG['Decimales'] = 'Casas Decimais';
+
+// Tarifa Trámites
+$_LANG['Ingreso de Tarifas de Trámites'] = 'Inserção de Tarifas de trâmite';
+$_LANG['Nueva Tarifa'] = 'Nova Tarifa';
+$_LANG['Tramite'] = 'Trâmite';
+$_LANG[''] = '';
+$_LANG[''] = '';
 
 // Solicitudes de Adelanto
 $_LANG['Solicitudes de Adelanto'] = 'Solicitações de Adiantamento';

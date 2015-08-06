@@ -88,7 +88,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	$x_pag = 12;
 	$b = new Buscador($Sesion, $query, "Objeto", $desde, $x_pag, $orden);
 	$b->nombre = "busc_facturas";
-	$b->titulo = "Pago de Documentos Tributarios <br />" . $glosa_monto_saldo_total;
+	$b->titulo = __("Pago de Documentos Tributarios") . "<br />" . $glosa_monto_saldo_total;
 	$b->AgregarEncabezado("fecha_factura", __('Fecha factura'), "align=right nowrap");
 	$b->AgregarEncabezado("tipo", __('Tipo'), "align=center width=40px");
 	$b->AgregarFuncion(__('N°'), "NumeroFactura", "align='right' width='30px'");
@@ -101,12 +101,12 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 	$b->AgregarEncabezado("nombre_banco", __('Banco'), "align=center");
 	$b->AgregarEncabezado("numero_cuenta", __('Cuenta'), "align=center");
 	$b->AgregarEncabezado("fecha_pago", __('Fecha pago'), "width=60px ");
-	$b->AgregarFuncion("Monto Factura", "MontoTotalFactura", "align=right nowrap");
+	$b->AgregarFuncion(__("Monto Factura"), "MontoTotalFactura", "align=right nowrap");
 	//$b->AgregarFuncion("Monto Pago", "MontoTotalPago", "align=right nowrap");
-	$b->AgregarFuncion("Monto Aporte", "MontoAporte", "align=right nowrap");
+	$b->AgregarFuncion(__("Monto Aporte"), "MontoAporte", "align=right nowrap");
 
-	$b->AgregarFuncion("Saldo Factura", "SaldoFactura", "align=right nowrap");
-	$b->AgregarFuncion("Saldo Pago", "SaldoPago", "align=right nowrap");
+	$b->AgregarFuncion(__("Saldo Factura"), "SaldoFactura", "align=right nowrap");
+	$b->AgregarFuncion(__("Saldo Pago"), "SaldoPago", "align=right nowrap");
 	$b->AgregarFuncion(__('Opción'), "Opciones", "align=right nowrap");
 	$b->color_mouse_over = "#bcff5c";
 	//$b->funcionTR = "funcionTR";
