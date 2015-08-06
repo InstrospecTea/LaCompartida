@@ -1011,11 +1011,11 @@ if ($proceso !== false) {
 			<tr>
 				<td align="center" colspan="2">
 					<?php
-					echo $Form->button(__('Asuntos por') . ' ' . __('cobrar'), array('onclick' => "GeneraCobros(this.form, 'asuntos_liquidar', false)"));
-					echo $Form->button(__('Generar borradores').' '.__('masivamente'), array('onclick' => "GeneraCobros(this.form, 'genera', false)"));
+					echo $Form->button(__(__('Asuntos por') . ' ' . __('cobrar')), array('onclick' => "GeneraCobros(this.form, 'asuntos_liquidar', false)"));
+					echo $Form->button(__(__('Generar borradores').' '.__('masivamente')), array('onclick' => "GeneraCobros(this.form, 'genera', false)"));
 					echo $Form->button(__('Excel borradores'), array('onclick' => "GeneraCobros(this.form, 'excel', false)"));
 					echo $Form->button(__('Descargar borradores'), array('onclick' => "ImpresionCobros(true, false)"));
-					echo $Form->button(__('Emitir cobros').' '.__('masivamente'), array('onclick' => "GeneraCobros(this.form, 'emitir', false)"));
+					echo $Form->button(__(__('Emitir cobros').' '.__('masivamente')), array('onclick' => "GeneraCobros(this.form, 'emitir', false)"));
 					?>
 				</td>
 			</tr>

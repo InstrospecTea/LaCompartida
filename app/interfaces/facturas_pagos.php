@@ -419,7 +419,7 @@ else
 <?php echo __('Tipo de Documento') ?>
 				</td>
 				<td align=left >
-<?php echo Html::SelectQuery($Sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal_buscado', $tipo_documento_legal_buscado, '', 'Cualquiera', 150); ?>
+<?php echo Html::SelectQuery($Sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal_buscado', $tipo_documento_legal_buscado, '', __('Cualquiera'), 150); ?>
 				</td>
 				<td align=right width="25%">
 <?php echo __('Grupo Ventas') ?>
@@ -435,9 +435,9 @@ else
 				<td align=left>
 <?php
 if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
-	echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado[]", $id_estado, ' multiple size="5" onchange="mostrarAccionesEstado(this.form)"', 'Cualquiera', "190");
+	echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado[]", $id_estado, ' multiple size="5" onchange="mostrarAccionesEstado(this.form)"', __('Cualquiera'), "190");
 } else {
-	echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $id_estado, ' onchange="mostrarAccionesEstado(this.form)"', 'Cualquiera', "150");
+	echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $id_estado, ' onchange="mostrarAccionesEstado(this.form)"', __('Cualquiera'), "150");
 }
 ?>
 				</td>
@@ -447,7 +447,7 @@ if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 					<?php echo __('Moneda') ?>
 				</td>
 				<td align=left>
-<?php echo Html::SelectQuery($Sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY glosa_moneda ASC", "id_moneda", $id_moneda, '', 'Cualquiera', "150"); ?>
+<?php echo Html::SelectQuery($Sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY glosa_moneda ASC", "id_moneda", $id_moneda, '', __('Cualquiera'), "150"); ?>
 				</td>
 			</tr>
 			<tr>
@@ -475,9 +475,9 @@ if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 				<td align=left>
 <?php
 if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
-	echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto[]", $id_concepto, ' multiple size="5" ', 'Cualquiera', "190");
+	echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto[]", $id_concepto, ' multiple size="5" ', __('Cualquiera'), "190");
 } else {
-	echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto", $id_concepto, '', 'Cualquiera', "150");
+	echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto", $id_concepto, '', __('Cualquiera'), "150");
 }
 ?>
 				</td>
@@ -502,9 +502,9 @@ if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 				<td align=left>
 <?php
 if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
-	echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco[]", $id_banco, ' multiple size="5" onchange="CargarCuenta(\'id_banco[]\',\'id_cuenta[]\', true);"', 'Cualquiera', "190");
+	echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco[]", $id_banco, ' multiple size="5" onchange="CargarCuenta(\'id_banco[]\',\'id_cuenta[]\', true);"', __('Cualquiera'), "190");
 } else {
-	echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $id_banco, ' onchange="CargarCuenta(\'id_banco\',\'id_cuenta\', false);"', 'Cualquiera', "190");
+	echo Html::SelectQuery($Sesion, "SELECT id_banco, nombre FROM prm_banco ORDER BY orden", "id_banco", $id_banco, ' onchange="CargarCuenta(\'id_banco\',\'id_cuenta\', false);"', __('Cualquiera'), "190");
 }
 ?>
 				</td>
@@ -523,13 +523,13 @@ if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 				, CONCAT( cuenta_banco.numero,
 					 IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
 				FROM cuenta_banco
-									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta[]", $id_cuenta, ' multiple size="5" ', "Cualquiera", "150");
+									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta[]", $id_cuenta, ' multiple size="5" ', __("Cualquiera"), "150");
 } else {
 	echo Html::SelectQuery($Sesion, "SELECT cuenta_banco.id_cuenta
 									, CONCAT( cuenta_banco.numero,
 										 IF( prm_moneda.glosa_moneda IS NOT NULL , CONCAT(' (',prm_moneda.glosa_moneda,')'),  '' ) ) AS NUMERO
 									FROM cuenta_banco
-									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta", $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"', "Cualquiera", "150");
+									LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cuenta_banco.id_moneda $where_banco ", "id_cuenta", $id_cuenta, 'onchange="SetBanco(\'id_cuenta\',\'id_banco\');"', __("Cualquiera"), "150");
 }
 ?>
 				</td>

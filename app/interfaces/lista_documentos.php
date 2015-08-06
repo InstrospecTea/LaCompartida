@@ -98,8 +98,8 @@
 			$b->AgregarEncabezado("nombre_cliente",__('Cliente'));
 		$b->AgregarEncabezado("fecha",__('Fecha'));
 		$b->AgregarEncabezado("glosa_documento",__('Descripción'), "align=left");
-		$b->AgregarFuncion("Egreso","Monto","align=right nowrap");
-		$b->AgregarFuncion("Ingreso","Ingreso","align=right nowrap");
+		$b->AgregarFuncion(__("Egreso"),"Monto","align=right nowrap");
+		$b->AgregarFuncion(__("Ingreso"),"Ingreso","align=right nowrap");
 		$b->AgregarFuncion(__('Opción'),"Opciones","align=right nowrap");
 		$b->color_mouse_over = "#bcff5c";
 

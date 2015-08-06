@@ -224,6 +224,58 @@ $_LANG['Duración Ingresada'] = 'Duração inserida';
 $_LANG['Proceso masivo de emisión de cobros'] = 'Processo massivo de planilha e pré-liquidações';
 $_LANG['Encargado comercial'] = 'Responsável comercial';
 $_LANG['Tipo de Liquidación'] = 'Tipo de liquidação';
+$_LANG['Asuntos por cobrar'] = 'Assuntos por cobrar';
+$_LANG['Generar borradores cobrar'] = 'Gerar rascunhos';
+$_LANG['Excel borradores'] = 'Rascunho em Excel';
+$_LANG['Descargar borradores'] = 'Baixar rascunhos';
+$_LANG['Emitir cobros masivamente'] = 'Emissão de cobrança';
+$_LANG['Último Cobro'] = 'Última cobrança';
+$_LANG['Acuerdo'] = 'Acordo';
+$_LANG['Opción'] = 'Opção';
+
+// Rastremento do Pagamento
+$_LANG['Periodo creación'] = 'Período de criação';
+$_LANG['Descargar Liquidaciones'] = 'Fazer download dos Pagamentos';
+$_LANG['Estado de Número da liquidação'] = 'Estado de pagamento';
+$_LANG['Otro rango'] = 'Outra categoria';
+$_LANG['Tiene Honorarios'] = 'Há Honorários';
+$_LANG['Tiene Gastos'] = 'Há Gastos';
+$_LANG['Tiene Trâmites'] = 'Há Trâmites';
+$_LANG['Hay Adelantos disponibles'] = 'Há Adiantamento disponíveis';
+$_LANG['Seguimiento de cobros'] = 'Rastremento de Pagamento';
+$_LANG['Nº Cobro'] = 'Número de cobrança';
+$_LANG['Nº Factura'] = 'Número de Fatura';
+$_LANG['Descripción del cobro'] = 'Descrição do Pagamento';
+
+// Gastos
+$_LANG['Cobrado'] = 'Faturado';
+$_LANG['Ordenado por'] = 'Organizado por';
+$_LANG['Clientes activos'] = 'Clientes ativos';
+$_LANG['Descargar Resumen Excel'] = 'Download do resumo em Excel';
+$_LANG['Ingreso de Gastos'] = 'Inserção de gastos';
+$_LANG['Información de gasto'] = 'Informação de gastos';
+$_LANG['Proveedor'] = 'Provedor';
+$_LANG['Monto cobrable'] = 'Moeda';
+$_LANG['N° OT'] = 'Número OT';
+$_LANG['Con Impuesto'] = 'Com imposto';
+$_LANG['Ingresado por'] = 'Inserido por';
+
+// Cuenta Corriente
+$_LANG['Con Fecha posterior a:'] = 'Com data posterior a:';
+$_LANG['Descargar Excel de todos los clientes'] = 'Download em Excel de todos os clientes';
+$_LANG['Ingreso'] = 'Ingresso';
+$_LANG['N°'] = 'No';
+$_LANG['N° Factura'] = 'No Facura';
+$_LANG['Balance cuenta corriente'] = 'Balanço de conta corrente';
+
+// Factura Pago
+$_LANG['Revisar Pago de Documentos Tributarios'] = 'Revisar Pagamento de Documentos tributários';
+$_LANG['Descripción Recaudación'] = 'Descricao do Recolhimento';
+$_LANG['Concepto'] = 'Conceito';
+$_LANG['Fecha inicio pago'] = 'Data de inicio de pagamento';
+$_LANG['Fecha fin pago'] = 'Data de fim de pagamento';
+$_LANG['N° Cuenta'] = 'Número da Conta';
+$_LANG['N° Cobro'] = 'Número da liquidação';
 
 // Solicitudes de Adelanto
 $_LANG['Solicitudes de Adelanto'] = 'Solicitações de Adiantamento';
