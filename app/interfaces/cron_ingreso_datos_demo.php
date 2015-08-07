@@ -1,41 +1,33 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
-
 set_time_limit(0);
 
-/*
-	Valores necesarios:
-	fecha_ini
-	fecha_fin
-	max_dia
-	porcentaje */
-
 if ($argv[1] != 'ambienteprueba' && !isset($_GET['ambienteprueba'])) {
-	die('Error ' . $argv[1] . $_GET['ambienteprueba']);
+	exit('Error ' . $argv[1] . $_GET['ambienteprueba']);
 }
 
 $sesion = new Sesion(null, true);
 $sesion->usuario = new Usuario($sesion, '99511620');
 
 if (Conf::EsAmbientePrueba()) {
-	$query = "UPDATE contrato SET usa_impuesto_separado = '" . Conf::GetConf($sesion, 'UsarImpuestoSeparado') . "', usa_impuesto_gastos = '" . Conf::GetConf($sesion, 'UsarImpuestoPorGastos') . "'";
+	$query = "UPDATE contrato
+		SET usa_impuesto_separado = '" . Conf::GetConf($sesion, 'UsarImpuestoSeparado') . "',
+		usa_impuesto_gastos = '" . Conf::GetConf($sesion, 'UsarImpuestoPorGastos') . "'";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
-	echo '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
-
-	$fecha_fin = date("Y-m-d", time());
-	$fecha_ini = date("Y-m-d", mktime(0, 0, 0, date("m", time()), 1, date("Y", time()) - 1));
+	$fecha_fin = date('Y-m-d', time());
+	$fecha_ini = date('Y-m-d', mktime(0, 0, 0, date('m', time()), 1, date('Y', time()) - 1));
 	$max_dia = 5;
 
-	echo 'fecha_ini: ' . $fecha_ini . '<br>fecha_fin: ' . $fecha_fin . '<br>';
-
+	Debug::pr("fecha_ini: {$fecha_ini}");
+	Debug::pr("fecha_fin: {$fecha_fin}");
 
 	$acciones = array('Conversación con', 'Escribir correo electronico para', 'Reunión con', 'Almuerzo con', 'Escribir correo electronico para');
 	$personas = array('Gerente General', 'jefe de proyecto', 'contador', 'equipo de ventas');
 	$addicional = array('para revisión de proyecto', 'con respecto a problemas', 'relacionados al proyecto', 'para plantear soluciones');
 
-	$descripcion_trabajos_grandes = array('Análisis promesa de equipo. Reunión con CL y MC para definir escritura.',
+	$descripcion_trabajos_grandes = array(
+		'Análisis promesa de equipo. Reunión con CL y MC para definir escritura.',
 		'Reunión con ICC y SI para definir escritura.',
 		'Reunión con EG y FLL para definir escritura.',
 		'Redacción de contrato y análisis antecedentes legales de sociedad.',
@@ -161,19 +153,21 @@ if (Conf::EsAmbientePrueba()) {
 		'Tribunales seguimiento caso 948-22',
 	);
 
-	$duraciones_trabajos_grandes = array('01:10:00', '01:20:00', '01:30:00', '01:40:00', '01:50:00', '02:00:00', '02:10:00', '02:20:00', '02:30:00',
+	$duraciones_trabajos_grandes = array(
+		'01:10:00', '01:20:00', '01:30:00', '01:40:00', '01:50:00', '02:00:00', '02:10:00', '02:20:00', '02:30:00',
 		'02:40:00', '02:50:00', '03:00:00', '03:10:00', '03:20:00', '03:30:00', '03:40:00', '03:50:00', '04:00:00',
 		'04:10:00', '04:20:00', '04:30:00', '04:40:00', '04:50:00', '05:00:00', '05:10:00', '05:20:00', '05:30:00',
 		'05:40:00', '05:50:00', '06:00:00', '06:20:00', '06:40:00', '06:40:00', '07:00:00', '07:20:00', '07:40:00',
-		'08:00:00');
+		'08:00:00'
+	);
 
 	$duracion_subtract = array('00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:10:00', '00:20:00', '00:30:00', '00:40:00', '00:50:00', '01:00:00');
 
-	list($anio, $mes, $dia) = split("-", $fecha_ini);
+	list($anio, $mes, $dia) = split('-', $fecha_ini);
 	$fecha_mk_ini = mktime(0, 0, 0, $mes, $dia, $anio);
 	$fecha = $fecha_mk_ini;
 
-	list($anio_fin, $mes_fin, $dia_fin) = split("-", $fecha_fin);
+	list($anio_fin, $mes_fin, $dia_fin) = split('-', $fecha_fin);
 	$fecha_mk_fin = mktime(0, 0, 0, $mes_fin, $dia_fin, $anio_fin);
 
 	$query = "SELECT codigo_asunto FROM asunto WHERE activo = 1";
@@ -181,17 +175,23 @@ if (Conf::EsAmbientePrueba()) {
 
 	$i = 0;
 	$asuntos = array();
+
 	while (list($asunto) = mysql_fetch_array($resp)) {
 		$asuntos[$i] = $asunto;
 		$i++;
 	}
 
+	if (empty($asuntos)) {
+		Debug::pr('No hay asuntos activos');
+		exit;
+	}
 
 	$query = "SELECT id_usuario FROM usuario WHERE activo = 1";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 	$j = 0;
 	$usuarios = array();
+
 	while (list($usuario) = mysql_fetch_array($resp)) {
 		$usuarios[$j] = $usuario;
 		$numero_asuntos = rand(5, 7);
@@ -201,18 +201,19 @@ if (Conf::EsAmbientePrueba()) {
 			for ($i = 0; $i < $numero_asuntos; $i++) {
 				$usuario_asunto[$usuario][$i] = $asuntos[$merk[$i]];
 			}
-		} else
+		} else {
 			$usuario_asunto[$usuario] = $asuntos;
+		}
 	}
-
 
 	$i = 0;
 
 	while ($fecha <= $fecha_mk_fin) {
-		$fecha_trabajo = date("Y-m-d", $fecha);
+		$fecha_trabajo = date('Y-m-d', $fecha);
 		$i++;
 		$values = array();
-		if (date("w", $fecha) != 0 && date("w", $fecha) != 6) {
+
+		if (date('w', $fecha) != 0 && date('w', $fecha) != 6) {
 			for ($cont_usu = 0; $cont_usu < count($usuarios); $cont_usu++) {
 				$almuerzo = false;
 				$duracion_en_este_dia = '00:00:00';
@@ -226,22 +227,23 @@ if (Conf::EsAmbientePrueba()) {
 						$asunto_index = array_rand($usuario_asunto[$usuario], 1);
 						$asunto = $usuario_asunto[$usuario][$asunto_index];
 
-
 						$accion_index = array_rand($acciones, 1);
+
 						if ($accion_index == 3) {
-							if ($almuerzo)
+							if ($almuerzo) {
 								$accion_index = 1;
-							else {
+							} else {
 								$almuerzo = true;
 							}
 						}
-						$accion = $acciones[$accion_index];
 
+						$accion = $acciones[$accion_index];
 
 						$person_index = array_rand($personas, 1);
 						$person = $personas[$person_index];
 						$add_index = array_rand($addicional, 1);
 						$add = $addicional[$add_index];
+
 						if (( $accion_index == 3 && ( $add_index == 1 || $add_index == 2 ) ) || ( $person_index == 1 && ( $add_index == 0 || $add_index == 2) )) {
 							$descripcion_trabajo = $accion . ' ' . $person;
 						} else {
@@ -267,15 +269,13 @@ if (Conf::EsAmbientePrueba()) {
 								break;
 						}
 
-
 						if (Utiles::time2decimal(Utiles::add_hora($duracion_en_este_dia, $duracion)) < $horas_maximas) {
-							$values[] = "(2,'$fecha_trabajo', '$asunto', '$descripcion_trabajo', '$duracion', '$duracion_cobrada', $usuario)";
-							//$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+							$values[] = "(2, '{$fecha_trabajo}', '{$asunto}', '{$descripcion_trabajo}', '{$duracion}', '{$duracion_cobrada}', {$usuario})";
 							$duracion_en_este_dia = Utiles::add_hora($duracion_en_este_dia, $duracion);
 						}
+
 						$cont_trabajos++;
 						$cont_trabajos_total++;
-						//echo 'fecha: '.$fecha_trabajo.'<br>asunto: '.$asunto.'<br>usuario: '.$usuario.'<br>descripcion: '.$descripcion_trabajo.'<br>duracion: '.$duracion.'<br>Duracion total: '.$duracion_en_este_dia.'<br><br>query:  '.$query.'<br><br><br>';
 					} else {
 						$usuario = $usuarios[$cont_usu];
 						$asunto_index = array_rand($usuario_asunto[$usuario], 1);
@@ -291,11 +291,10 @@ if (Conf::EsAmbientePrueba()) {
 						$duracion_cobrada = Utiles::subtract_hora($duracion, $duracion_subtract[$duracion_subtract_index]);
 
 						if (Utiles::time2decimal(Utiles::add_hora($duracion_en_este_dia, $duracion)) < $horas_maximas) {
-							$values[] = "(2,'$fecha_trabajo', '$asunto', '$descripcion_trabajo', '$duracion', '$duracion_cobrada', $usuario)";
-							//$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+							$values[] = "(2, '{$fecha_trabajo}', '{$asunto}', '{$descripcion_trabajo}', '{$duracion}', '{$duracion_cobrada}', {$usuario})";
 							$duracion_en_este_dia = Utiles::add_hora($duracion_en_este_dia, $duracion);
 						}
-						//echo 'fecha: '.$fecha_trabajo.'<br>cliente: '.$cliente.'<br>asunto: '.$asunto.'<br>usuario: '.$usuario.'<br>descripcion: '.$descripcion_trabajo.'<br>duracion: '.$duracion.'<br>Duracion total: '.$duracion_en_este_dia.'<br><br>query:  '.$query.'<br><br><br>';
+
 						$cont_trabajos_total++;
 					}
 				}
@@ -303,20 +302,20 @@ if (Conf::EsAmbientePrueba()) {
 		}
 
 		if (count($values) > 0) {
-			echo "Insertando " . count($values) . " trabajos para el día " . date('d-m-Y', $fecha) . "<br />";
-			$query = "INSERT INTO trabajo(id_moneda,fecha,codigo_asunto,descripcion,duracion,duracion_cobrada,id_usuario) VALUES ";
+			Debug::pr('Insertando ' . count($values) . ' trabajos para el día ' . date('d-m-Y', $fecha));
+
+			$query = "INSERT INTO trabajo(id_moneda, fecha,codigo_asunto, descripcion, duracion, duracion_cobrada, id_usuario) VALUES ";
 			$resp = mysql_query($query . implode(',', $values)) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		}
 
-		list($anio, $mes, $dia) = split("-", $fecha_trabajo);
+		list($anio, $mes, $dia) = split('-', $fecha_trabajo);
 		$fecha = mktime(0, 0, 0, $mes, $dia + 1, $anio);
 	}
 
-	echo '---------------------------- Trabajos ingresados!! --------------------------------<br><br>';
+	Debug::pr('---------------------------- Trabajos ingresados!! --------------------------------');
 
-
-
-	$descripciones_gastos = array('Archivo Judicial',
+	$descripciones_gastos = array(
+		'Archivo Judicial',
 		'Arriendo Casilla Banco',
 		'Biblioteca del Congreso',
 		'Certificados',
@@ -349,19 +348,17 @@ if (Conf::EsAmbientePrueba()) {
 		'Títulos de Marcas',
 		'Traducciones',
 		'Transferencia de Vehículos',
-		'Transporte Aéreo');
+		'Transporte Aéreo'
+	);
 
-
-
-
-	list($anio, $mes, $dia) = split("-", $fecha_ini);
+	list($anio, $mes, $dia) = split('-', $fecha_ini);
 	$fecha_mk_ini = mktime(0, 0, 0, $mes, $dia, $anio);
 	$fecha = $fecha_mk_ini;
 
-	list($anio_fin, $mes_fin, $dia_fin) = split("-", $fecha_fin);
+	list($anio_fin, $mes_fin, $dia_fin) = split('-', $fecha_fin);
 	$fecha_mk_fin = mktime(0, 0, 0, $mes_fin, $dia_fin, $anio_fin);
 
-	$query = "SELECT codigo_asunto FROM asunto";
+	$query = "SELECT codigo_asunto FROM asunto WHERE activo = 1";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 	$i = 0;
@@ -373,14 +370,14 @@ if (Conf::EsAmbientePrueba()) {
 
 	$i = 0;
 	while ($fecha <= $fecha_mk_fin) {
-		$fecha_para_pasar = date("Y-m-d", $fecha);
+		$fecha_para_pasar = date('Y-m-d', $fecha);
 		$values = array();
 
 		$i++;
 		for ($j = 0; $j < count($asuntos); $j++) {
 			$codigo_asunto = $asuntos[$j];
 
-			$query = "SELECT codigo_cliente FROM asunto WHERE codigo_asunto = '$codigo_asunto'";
+			$query = "SELECT codigo_cliente FROM asunto WHERE codigo_asunto = '{$codigo_asunto}'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::erroSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			list($codigo_cliente) = mysql_fetch_array($resp);
 
@@ -395,79 +392,87 @@ if (Conf::EsAmbientePrueba()) {
 				$descripcion_index = array_rand($descripciones_gastos, 1);
 				$descripcion = $descripciones_gastos[$descripcion_index];
 
-				$fecha_gasto = date("Y-m", $fecha) . '-' . sprintf("%02d", rand(1, 28));
+				$fecha_gasto = date('Y-m', $fecha) . '-' . sprintf('%02d', rand(1, 28));
 
-				while (date("w", strtotime($fecha_gasto)) == 0 || date("w", strtotime($fecha_gasto)) == 6) {
-					$fecha_gasto = date("Y-m", $fecha) . '-' . rand(1, 28);
+				while (date('w', strtotime($fecha_gasto)) == 0 || date('w', strtotime($fecha_gasto)) == 6) {
+					$fecha_gasto = date('Y-m', $fecha) . '-' . rand(1, 28);
 				}
 
 				$fecha_ingreso = $fecha_gasto . ' 00:00:00';
 
-				//echo 'codigo_cliente: '.$codigo_cliente.'<br>codigo_asunto: '.$codigo_asunto.'<br>fecha_ingreso: '.$fecha_ingreso.'<br>ingreso: '.$ingreso.'<br>egreso: '.$egreso.'<br>monto cobrable: '.$monto_cobrable.'<br>descripcion: '.$descripcion.'<br>query: '.$query.'<br><br><br>';
 				$values[] = "( '$codigo_cliente', '$codigo_asunto', '$fecha_ingreso', 2, $ingreso, $egreso, $monto_cobrable, '$descripcion' )";
 				$cont_gastos++;
 			}
 		}
 
 		if (count($values) > 0) {
-			echo "Insertando " . count($values) . " gastos para el día " . date('d-m-Y', $fecha) . "<br />";
+			Debug::pr('Insertando ' . count($values) . ' gastos para el día ' . date('d-m-Y', $fecha));
 			$query = "INSERT INTO cta_corriente( codigo_cliente, codigo_asunto, fecha, id_moneda, ingreso, egreso, monto_cobrable, descripcion ) VALUES ";
 			$resp = mysql_query($query . implode(',', $values), $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		}
 
-		list($anio, $mes, $dia) = split("-", $fecha_para_pasar);
+		list($anio, $mes, $dia) = split('-', $fecha_para_pasar);
 		$fecha = mktime(0, 0, 0, $mes + 1, $dia, $anio);
 	}
-	echo '---------------------Gastos ingresados!!---------------------------<br><br>';
+
+	Debug::pr('---------------------Gastos ingresados!!---------------------------');
 
 	if (method_exists('Conf', 'EsAmbientePrueba') && Conf::EsAmbientePrueba()) {
-		$fecha_fin = date("Y-m-d", mktime(0, 0, 0, date("m", time()), date("d", time()) - 5, date("Y", time())));
-		$fecha_ini = date("Y-m-d", mktime(0, 0, 0, date("m", time()), 1, date("Y", time()) - 1));
+		$fecha_fin = date('Y-m-d', mktime(0, 0, 0, date('m', time()), date('d', time()) - 5, date('Y', time())));
+		$fecha_ini = date('Y-m-d', mktime(0, 0, 0, date('m', time()), 1, date('Y', time()) - 1));
 
 		/* Creacion de cobros automaticos */
 
-		if (method_exists('Conf', 'TieneTablaVisitante') && Conf::TieneTablaVisitante())
+		if (method_exists('Conf', 'TieneTablaVisitante') && Conf::TieneTablaVisitante()) {
 			$query_usuario = "SELECT id_usuario FROM usuario WHERE id_visitante > 0 ORDER BY id_usuario LIMIT 1";
-		else
+		} else {
 			$query_usuario = "SELECT id_usuario FROM usuario ORDER BY id_usuario LIMIT 1";
+		}
+
 		$resp_usuario = mysql_query($query_usuario, $sesion->dbh) or Utiles::errorSQL($query_usuario, __FILE__, __LINE__, $sesion->dbh);
 		list($id_usuario_cobro) = mysql_fetch_array($resp_usuario);
 
-		list($anio_ini, $mes_ini, $dia_ini) = split("-", $fecha_ini);
+		list($anio_ini, $mes_ini, $dia_ini) = split('-', $fecha_ini);
 		$fecha_mk_ini = mktime(0, 0, 0, $mes_ini, $dia_ini, $anio_ini);
 
-		list($anio_fin, $mes_fin, $dia_fin) = split("-", $fecha_fin);
+		list($anio_fin, $mes_fin, $dia_fin) = split('-', $fecha_fin);
 		$fecha_mk_fin = mktime(0, 0, 0, $mes_fin, $dia_fin, $anio_fin);
 		$fecha_fin_restriccion = mktime(0, 0, 0, $mes_fin - 1, $dia_fin, $anio_fin);
 
 		while ($fecha_mk_ini < $fecha_fin_restriccion) {
-			$fecha_mk_fin_periodo = mktime(0, 0, 0, date("m", $fecha_mk_ini) + 1, date("d", $fecha_mk_ini), date("Y", $fecha_mk_ini));
+			$fecha_mk_fin_periodo = mktime(0, 0, 0, date('m', $fecha_mk_ini) + 1, date('d', $fecha_mk_ini), date('Y', $fecha_mk_ini));
 
-			$end_date = date("Y-m-d", $fecha_mk_fin_periodo);
-			$start_date = date("Y-m-d", $fecha_mk_ini);
+			$end_date = date('Y-m-d', $fecha_mk_fin_periodo);
+			$start_date = date('Y-m-d', $fecha_mk_ini);
 
 			$query = "SELECT
-									contrato.id_contrato,
-									COUNT(trabajo.id_trabajo) AS cont
-								FROM contrato
-								LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato
-								LEFT JOIN trabajo ON trabajo.codigo_asunto = asunto.codigo_asunto
-								WHERE
-									contrato.activo = 'SI'
-									AND trabajo.fecha < '{$end_date}'
-									AND trabajo.fecha > '{$start_date}'
-								GROUP BY contrato.id_contrato
-								HAVING cont > 0";
+					contrato.id_contrato,
+					COUNT(trabajo.id_trabajo) AS cont
+				FROM contrato
+				LEFT JOIN asunto ON asunto.id_contrato = contrato.id_contrato
+				LEFT JOIN trabajo ON trabajo.codigo_asunto = asunto.codigo_asunto
+				WHERE
+					contrato.activo = 'SI'
+					AND asunto.activo = 1
+					AND trabajo.fecha < '{$end_date}'
+					AND trabajo.fecha > '{$start_date}'
+				GROUP BY contrato.id_contrato
+				HAVING cont > 0";
+
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
 			while (list($id_contrato, $cont) = mysql_fetch_array($resp)) {
-				echo 'id_contrato: ' . $id_contrato . '<br>';
-				echo 'fecha_periodo_ini: ' . Utiles::fecha2sql($start_date) . '<br>';
-				echo 'fecha_periodo_fin: ' . Utiles::fecha2sql($end_date) . '<br><br>';
+				Debug::pr('id_contrato: ' . $id_contrato);
+				Debug::pr('fecha_periodo_ini: ' . Utiles::fecha2sql($start_date));
+				Debug::pr('fecha_periodo_fin: ' . Utiles::fecha2sql($end_date));
+
 				$cobro = new Cobro($sesion);
 				$id_proceso_nuevo = $cobro->GeneraProceso();
 				$id_cobro = $cobro->PrepararCobro($start_date, $end_date, $id_contrato, false, $id_proceso_nuevo);
 				$cobro->Load($id_cobro);
-				echo 'id_cobro: ' . $id_cobro . '<br><br>-----------------------------------<br><br>';
+
+				Debug::pr('id_cobro: ' . $id_cobro);
+
 				$cobro->GuardarCobro(true);
 				$cobro->Edit('fecha_emision', date('Y-m-d H:i:s'));
 				$cobro->Edit('estado', 'EMITIDO');
@@ -477,15 +482,18 @@ if (Conf::EsAmbientePrueba()) {
 				$cobro->Edit('fecha_emision', date('Y-m-d H:i:s', $fecha_mk_fin_periodo));
 
 				$historial_comentario = __('COBRO EMITIDO');
-				##Historial##
+
+				// Historial
 				$his = new Observacion($sesion);
 				$his->Edit('fecha', date('Y-m-d H:i:s'));
 				$his->Edit('comentario', $historial_comentario);
+
 				if (!$sesion->usuario->fields['id_usuario']) {
 					$his->Edit('id_usuario', $id_usuario_cobro);
 				} else {
 					$his->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
 				}
+
 				$his->Edit('id_cobro', $cobro->fields['id_cobro']);
 				$his->Write();
 				$cobro->Write();
@@ -495,7 +503,7 @@ if (Conf::EsAmbientePrueba()) {
 
 				$documento = new Documento($sesion);
 				$documento->LoadByCobro($id_cobro);
-				$documento->Edit('fecha', date("Y-m-d", $fecha_mk_fin_periodo));
+				$documento->Edit('fecha', date('Y-m-d', $fecha_mk_fin_periodo));
 				$documento->Write();
 
 				if ($fecha_mk_fin_periodo < $fecha_fin_restriccion - 5184000 || rand(0, 100) < 80) {
@@ -506,15 +514,15 @@ if (Conf::EsAmbientePrueba()) {
 				if ($fecha_mk_fin_periodo < $fecha_fin_restriccion - 7776000 || ( $cobro->fields['estado'] == 'ENVIADO AL CLIENTE' && rand(0, 100) < 60 )) {
 					$multiplicador = -1.0;
 					$documento_pago = new Documento($sesion);
-					$documento_pago->Edit("monto", number_format($documento->fields['monto'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda']]['cifras_decimales'], ".", ""));
-					$documento_pago->Edit("monto_base", number_format($documento->fields['monto_base'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda_base']]['cifras_decimales'], ".", ""));
-					$documento_pago->Edit("saldo_pago", number_format($documento->fields['monto'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda']]['cifras_decimales'], ".", ""));
-					$documento_pago->Edit("id_cobro", $cobro->fields['id_cobro']);
+					$documento_pago->Edit('monto', number_format($documento->fields['monto'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda']]['cifras_decimales'], ".", ""));
+					$documento_pago->Edit('monto_base', number_format($documento->fields['monto_base'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda_base']]['cifras_decimales'], '.', ''));
+					$documento_pago->Edit('saldo_pago', number_format($documento->fields['monto'] * $multiplicador, $cobro_moneda->moneda[$documento->fields['id_moneda']]['cifras_decimales'], '.', ''));
+					$documento_pago->Edit('id_cobro', $cobro->fields['id_cobro']);
 					$documento_pago->Edit('tipo_doc', 'T');
-					$documento_pago->Edit("id_moneda", $documento->fields['id_moneda']);
-					$documento_pago->Edit("fecha", date("Y-m-d", $fecha_mk_fin_periodo + 172800));
-					$documento_pago->Edit("glosa_documento", 'Pago de Cobro N°' . $cobro->fields['id_cobro']);
-					$documento_pago->Edit("codigo_cliente", $documento->fields['codigo_cliente']);
+					$documento_pago->Edit('id_moneda', $documento->fields['id_moneda']);
+					$documento_pago->Edit('fecha', date('Y-m-d', $fecha_mk_fin_periodo + 172800));
+					$documento_pago->Edit('glosa_documento', 'Pago de Cobro N°' . $cobro->fields['id_cobro']);
+					$documento_pago->Edit('codigo_cliente', $documento->fields['codigo_cliente']);
 					$documento_pago->Write();
 
 					$neteo_documento = new NeteoDocumento($sesion);
@@ -536,9 +544,7 @@ if (Conf::EsAmbientePrueba()) {
 		}
 	}
 
-	echo '<br>---------Ingreso finalizado!--------<br>';
+	Debug::pr('---------Ingreso finalizado!--------');
 } else {
-
-	echo '<!-- Denegado ' . Conf::EsAmbientePrueba() . '_' . BACKUP . '-->';
+	Debug::pr('Denegado ' . Conf::EsAmbientePrueba() . '_' . BACKUP);
 }
-?>
