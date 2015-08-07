@@ -55,7 +55,7 @@ if (!$filtros_check) {
 }
 
 /* Se crea el reporte según el Input del usuario */
-$reporte = new Reporte($sesion);
+$reporte = new ReporteCriteria($sesion);
 $dato = $tipo_dato;
 $filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 	'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
@@ -67,7 +67,7 @@ $r = $reporte->toBars();
 
 /* * REPORTE COMPARADO* */
 if ($tipo_dato_comparado) {
-	$reporte_c = new Reporte($sesion);
+	$reporte_c = new ReporteCriteria($sesion);
 	$dato = $tipo_dato_comparado;
 	$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 		'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',

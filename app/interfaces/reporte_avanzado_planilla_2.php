@@ -7,7 +7,7 @@
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
-	
+
 	$agrupadores = explode('-',$vista);
 
 	$pagina->PrintTop(1);
@@ -66,26 +66,26 @@ td.segundo
 {
 	background-color:#d2d2ee;
 	font-size:90%;
-	 <? if( sizeof($agrupadores) <5 ) echo "display:none;"   ?> 
+	 <? if( sizeof($agrupadores) <5 ) echo "display:none;"   ?>
 }
 td.tercer
 {
 	font-size:84%;
 	background-color:#d9d9f2;
-	 <? if( sizeof($agrupadores) <4 ) echo "display:none;"   ?> 
+	 <? if( sizeof($agrupadores) <4 ) echo "display:none;"   ?>
 }
 td.cuarto
 {
 	font-size:80%;
 	background-color:#e5e5f5;
-	 <? if( sizeof($agrupadores) <3 ) echo "display:none;"   ?> 
+	 <? if( sizeof($agrupadores) <3 ) echo "display:none;"   ?>
 
 }
 td.quinto
 {
 	font-size:76%;
 	background-color:#f1f1f9;
-	 <? if( sizeof($agrupadores) <2 ) echo "display:none;"   ?> 
+	 <? if( sizeof($agrupadores) <2 ) echo "display:none;"   ?>
 
 }
 td.sexto
@@ -135,19 +135,19 @@ span.indefinido { color: #550000; }
 
 <?
 	/*Se crea el reporte según el Input del usuario*/
-	$reporte = new Reporte($sesion);
-	
+	$reporte = new ReporteCriteria($sesion);
+
 	/*USUARIOS*/
 	$users = explode(",",$usuarios);
-	if(!is_array($users))	
+	if(!is_array($users))
 		$users = array($users);
 	foreach($users as $usuario)
 		if($usuario)
 			$reporte->addFiltro('usuario','id_usuario',$usuario);
-		
+
 	/*CLIENTES*/
 	$clients = explode(",",$clientes);
-	if(!is_array($clients))	
+	if(!is_array($clients))
 		$clients = array($clients);
 
 	foreach($clients as $cliente)
@@ -156,14 +156,14 @@ span.indefinido { color: #550000; }
 
 	/*AREAS*/
 	$areas = explode(",",$areas_asunto);
-	if(!is_array($areas))	
+	if(!is_array($areas))
 		$areas = array($areas);
 	foreach($areas as $area)
 		if($area)
 			$reporte->addFiltro('asunto','id_area_proyecto',$area);
 	/*TIPOS*/
 	$tipos = explode(",",$tipos_asunto);
-	if(!is_array($tipos))	
+	if(!is_array($tipos))
 		$tipos = array($tipos);
 	foreach($tipos as $tipo)
 		if($tipo)
@@ -171,23 +171,23 @@ span.indefinido { color: #550000; }
 
 	/*AREAS USUARIO*/
 	$areas_usuario = explode(",",$areas_usuario);
-	if(!is_array($areas_usuario))	
+	if(!is_array($areas_usuario))
 		$areas_usuario = array($areas_usuario);
 	foreach($areas_usuario as $area_usuario)
 		if($area_usuario)
 			$reporte->addFiltro('usuario','id_area_usuario',$area_usuario);
-	
+
 	/*CATEGORIAS USUARIO*/
 	$categorias_usuario = explode(",",$categorias_usuario);
-	if(!is_array($categorias_usuario))	
+	if(!is_array($categorias_usuario))
 		$categorias_usuario = array($categorias_usuario);
 	foreach($categorias_usuario as $categoria_usuario)
 		if($categoria_usuario)
 			$reporte->addFiltro('usuario','id_categoria_usuario',$categoria_usuario);
 
-	$reporte->id_moneda = $id_moneda;	
+	$reporte->id_moneda = $id_moneda;
 	$reporte->addRangoFecha($fecha_ini,$fecha_fin);
-	
+
 	if($campo_fecha)
 		$reporte->setCampoFecha($campo_fecha);
 
@@ -201,7 +201,7 @@ span.indefinido { color: #550000; }
 
 	if($tipo_dato_comparado)
 	{
-		$reporte = new Reporte($sesion);
+		$reporte = new ReporteCriteria($sesion);
 		foreach($users as $usuario)
 			if($usuario)
 				$reporte->addFiltro('trabajo','id_usuario',$usuario);
@@ -222,7 +222,7 @@ span.indefinido { color: #550000; }
 				$reporte->addFiltro('usuario','id_categoria_usuario',$categoria_usuario);
 
 
-		$reporte->id_moneda = $id_moneda;	
+		$reporte->id_moneda = $id_moneda;
 		$reporte->addRangoFecha($fecha_ini,$fecha_fin);
 		$reporte->setTipoDato($tipo_dato_comparado);
 		$reporte->setVista($vista);
@@ -262,7 +262,7 @@ span.indefinido { color: #550000; }
 	<table border=1 cellpadding="3" class="planilla" id ="tabla_planilla" style="width:99%" >
 	<tbody>
 	<tr>
-		<td colspan=5 style='font-size:90%; font-weight:bold' align=center> 
+		<td colspan=5 style='font-size:90%; font-weight:bold' align=center>
 			<?=$titulo_reporte?>
 		</td>
 		<td colspan=3 >
@@ -322,7 +322,7 @@ span.indefinido { color: #550000; }
 			$u .= "'\" ";
 
 			if($valor === '99999!*')
-				$u .= " title = \"".__("Valor Indeterminado: el denominador de la fórmula es 0.")."\" class = \"indefinido\"  "; 
+				$u .= " title = \"".__("Valor Indeterminado: el denominador de la fórmula es 0.")."\" class = \"indefinido\"  ";
 			$u.= ">".$valor."</a>";
 			return $u;
 		}
@@ -347,7 +347,7 @@ span.indefinido { color: #550000; }
 		function celda_campo($orden,$filas,$valor)
 		{
 			echo "<td class=\"".$orden." campo\" rowspan=".$filas;
-			
+
 			if($valor == __('Indefinido'))
 				echo "> <span title = \"".__("Agrupador no existe, o no está definido para estos datos.")."\" class=\"indefinido\" ";
 			echo " >".$valor;
@@ -370,8 +370,8 @@ span.indefinido { color: #550000; }
 			echo "</td>";
 		}
 		echo	"</tr>";
-		
-		/*Iteración principal de Tabla. Se recorren las 4 profundidades del arreglo resultado */ 		
+
+		/*Iteración principal de Tabla. Se recorren las 4 profundidades del arreglo resultado */
 		echo "<tr class=\"primera\">";
 		foreach($r as $k_a => $a)
 		{
@@ -415,7 +415,7 @@ span.indefinido { color: #550000; }
 												echo "<td class=\"quinto valor\" rowspan=".$e['filas']." > ";
 													echo celda_valor($e,array($a,$b,$c,$d,$e),$r_c[$k_a][$k_b][$k_c][$k_d][$k_e]);
 												echo " </td>";
-												
+
 												foreach($e as $k_f => $f)
 												{
 													if(is_array($f))
@@ -424,7 +424,7 @@ span.indefinido { color: #550000; }
 														echo "<td class=\"sexto valor\" rowspan=".$f['filas']." > ";
 															echo celda_valor($f,array($a,$b,$c,$d,$e,$f),$r_c[$k_a][$k_b][$k_c][$k_d][$k_e][$k_f]);
 														echo " </td>";
-														echo "</tr> <tr class=\"no_primera\"> ";													
+														echo "</tr> <tr class=\"no_primera\"> ";
 													}
 												}
 											}
