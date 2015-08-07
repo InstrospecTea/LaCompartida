@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.16.4
+Friday 2015, August 7th
+* **Fix:** [Carga de datos DEMO con asuntos activos](https://github.com/LemontechSA/ttb/pull/1072)
+
 ## Hotfix 15.16.3
 Wednesday 2015, August 5th
 * **Feature:** [Enviar el código del cliente como identificador único a FacturaciónCL](https://github.com/LemontechSA/ttb/pull/1071)
