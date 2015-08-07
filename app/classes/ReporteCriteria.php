@@ -2196,9 +2196,7 @@ class ReporteCriteria {
 		$Criteria->add_restriction($this->getWhere($type));
 		$this->setGroup($Criteria, $type);
 		$this->setOrder($Criteria, $type);
-		$query = $Criteria->get_plain_query();
-		pr($query);
-		return $query;
+		return $Criteria->get_plain_query();
 	}
 
 }
