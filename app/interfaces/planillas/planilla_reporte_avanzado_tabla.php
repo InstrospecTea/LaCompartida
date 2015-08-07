@@ -41,7 +41,7 @@ if ($filtros_check) {
 $titulo_reporte = __('Resumen - ') . ' ' . __($tipo_dato) . ' ' . __('en vista por') . ' ' . __($agrupadores[0]);
 
 $dato = $tipo_dato;
-$reporte = new Reporte($sesion);
+$reporte = new ReporteCriteria($sesion);
 $filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 	'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
 	'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
