@@ -11,6 +11,7 @@ if (!class_exists('Cobro')) {
 		var $ArrayFacturasDelContrato = array();
 		var $ArrayTotalesDelContrato = array();
 		var $ArrayStringFacturasDelContrato = array();
+		public $mensajes = '';
 
 		const PROCESS_NAME = 'GeneracionMasivaCobros';
 
@@ -1936,19 +1937,19 @@ if (!class_exists('Cobro')) {
 
 		/**
 		 * Asocia los trabajos al cobro que se está creando
-		 * @param type $fecha_ini
-		 * @param type $fecha_fin
-		 * @param type $id_contrato
-		 * @param boolean $emitir_obligatoriamente
-		 * @param type $id_proceso
-		 * @param type $monto
-		 * @param type $id_cobro_pendiente
-		 * @param type $con_gastos
-		 * @param type $solo_gastos
-		 * @param type $incluye_gastos
-		 * @param type $incluye_honorarios
-		 * @param type $cobro_programado
-		 * @return integer id del cobro generado.
+		 * @param $fecha_ini
+		 * @param $fecha_fin
+		 * @param $id_contrato
+		 * @param $emitir_obligatoriamente
+		 * @param $id_proceso
+		 * @param string $monto
+		 * @param string $id_cobro_pendiente
+		 * @param bool|false $con_gastos
+		 * @param bool|false $solo_gastos
+		 * @param bool|true $incluye_gastos
+		 * @param bool|true $incluye_honorarios
+		 * @param bool|false $cobro_programado
+		 * @return mixed id del cobro generado.
 		 */
 		function PrepararCobro($fecha_ini, $fecha_fin, $id_contrato, $emitir_obligatoriamente, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
 			$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
@@ -2309,8 +2310,12 @@ if (!class_exists('Cobro')) {
 							$his->Edit('id_cobro', $this->fields['id_cobro']);
 							$his->Write();
 						}
-
-						$this->GuardarCobro($emitir);
+						$resultado_guardar = $this->GuardarCobro($emitir);
+						if (!empty($resultado_guardar)) {
+							$this->mensajes .= $resultado_guardar;
+						}
+					} else {
+						$this->mensajes .= "No se han podido asociar los trabajos al cobro";
 					}
 				} // END cobro
 			} // END contrato
