@@ -70,9 +70,10 @@ if ($individual && $id_contrato) {
 	$id_cobro_pendiente = !is_null($id_cobro_pendiente) ? $id_cobro_pendiente : '';
 	$monto = !is_null($monto) ? $monto : '';
 	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios);
-
+	$mensajes = $Cobro->mensajes;
 	Log::write(" |- #{$newcobro}", Cobro::PROCESS_NAME);
 	Log::write(' |- SetIncluirEnCierre', Cobro::PROCESS_NAME);
+	Log::write(' |- Mensajes:' . $mensajes, Cobro::PROCESS_NAME);
 	$Contrato->SetIncluirEnCierre($Sesion);
 
 	if (isset($_GET['generar_silenciosamente']) && $_GET['generar_silenciosamente'] == 1) {
@@ -82,7 +83,7 @@ if ($individual && $id_contrato) {
 		unset($Sesion);
 		unset($Cobro);
 		unset($Contrato);
-		die(json_encode(array('proceso' => $id_proceso_nuevo, 'cobro' => $newcobro)));
+		die(json_encode(array('proceso' => $id_proceso_nuevo, 'cobro' => $newcobro, 'mensajes' => $mensajes)));
 	} else {
 		Log::write(' |- redirect', Cobro::PROCESS_NAME);
 		Log::write(' ----', Cobro::PROCESS_NAME);
