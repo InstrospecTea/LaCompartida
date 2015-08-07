@@ -3,25 +3,33 @@
 /**
  * Clase GeneracionMasivaCobros
  * Realiza las llamadas de generación masiva de cobros en background.
+ * @property BloqueoProceso $BloqueoProceso
+ * @property CobroQuery $CobroQuery
  */
 class GeneracionMasivaCobros extends AppShell {
 
 	private $status = array(
-		'proceso' => '',
-		'hh' => '',
-		'gg' => '',
-		'mixtas' => '',
-		'error' => ''
+			'proceso' => '',
+			'hh' => '',
+			'gg' => '',
+			'mixtas' => '',
+			'error' => '',
+			'mensajes' => ''
 	);
 	private $generated = array(
-		'hh' => 0,
-		'gg' => 0,
-		'mixtas' => 0
+			'hh' => 0,
+			'gg' => 0,
+			'mixtas' => 0
 	);
 	private $errors = array(
-		'hh' => 0,
-		'gg' => 0,
-		'mixtas' => 0
+			'hh' => 0,
+			'gg' => 0,
+			'mixtas' => 0
+	);
+	private $messages = array(
+			'hh' => array(),
+			'gg' => array(),
+			'mixtas' => array()
 	);
 
 	public function main() {
@@ -87,6 +95,10 @@ class GeneracionMasivaCobros extends AppShell {
 		}
 	}
 
+	/**
+	 * Procesa las liquidaciones por contrato
+	 * @param $contratos
+	 */
 	private function contracts($contratos) {
 		$processing = 0;
 		// quitar contratos HITOS
@@ -118,6 +130,10 @@ class GeneracionMasivaCobros extends AppShell {
 		$this->status('proceso', "$msg_procesando.");
 	}
 
+	/**
+	 * Procesa las liquidaciones por cliente
+	 * @param $contratos
+	 */
 	private function clients($contratos) {
 		$processing = 0;
 		$clientes = array();
@@ -156,58 +172,84 @@ class GeneracionMasivaCobros extends AppShell {
 		$this->status('proceso', "Se $msg_procesando de {$total_clientes}.");
 	}
 
+	/**
+	 * Genera liquidaciónes de gastos
+	 * @param $id_contrato
+	 */
 	private function generaGG($id_contrato) {
 		try {
 			$datos_cobro = array(
-				'id_contrato' => $id_contrato,
-				'incluye_honorarios' => 0,
-				'incluye_gastos' => 1
+					'id_contrato' => $id_contrato,
+					'incluye_honorarios' => 0,
+					'incluye_gastos' => 1
 			);
 			$post_data = array_merge($this->data['form'], $datos_cobro);
 			$result = $this->post($post_data);
 			if (!empty($result['cobro'])) {
-				$this->generated['gg'] += empty($result['cobro']) ? 0 : 1;
+				$this->generated['gg'] += 1;
+			}
+			if (!empty($result['mensajes'])) {
+				array_push($this->messages['gg'] ,$result['mensajes']);
+				++$this->errors['gg'];
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaGG: ' . $e->getMessage());
 			++$this->errors['gg'];
+			array_push($this->messages['gg'], $e->getMessage());
+			$this->status('mensajes', $e->getMessage());
 		}
+		$mensajes = $this->getMessage('gg');
 		$msg_generado = $this->sp(
-			$this->generated['gg'], 'Se ha generado 1 liquidación de gastos', "Se han generado {$this->generated['gg']} liquidaciones de gastos", 'No se han generado liquidaciones de gastos'
+				$this->generated['gg'], 'Se ha generado 1 liquidación de gastos', "Se han generado {$this->generated['gg']} liquidaciones de gastos", 'No se han generado liquidaciones de gastos'
 		);
 		$msg_error = $this->sp($this->errors['gg'], '1 con error', "{$this->errors['gg']} con errores", 'sin errores');
-		$this->status('gg', "$msg_generado. ($msg_error)");
+		$this->status('gg', "$msg_generado. ($msg_error $mensajes)");
 	}
 
+	/**
+	 * Genera liquidaciones de honorarios
+	 * @param $id_contrato
+	 */
 	private function generaHH($id_contrato) {
 		try {
 			$datos_cobro = array(
-				'id_contrato' => $id_contrato,
-				'incluye_honorarios' => 1,
-				'incluye_gastos' => 0
+					'id_contrato' => $id_contrato,
+					'incluye_honorarios' => 1,
+					'incluye_gastos' => 0
 			);
 			$post_data = array_merge($this->data['form'], $datos_cobro);
 			$result = $this->post($post_data);
 			if (!empty($result['cobro'])) {
-				$this->generated['hh'] += empty($result['cobro']) ? 0 : 1;
+				$this->generated['hh'] += 1;
+			}
+			if (!empty($result['mensajes'])) {
+				array_push($this->messages['hh'] ,$result['mensajes']);
+				++$this->errors['hh'];
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaHH: ' . $e->getMessage());
 			++$this->errors['hh'];
+			array_push($this->messages['hh'], $e->getMessage());
+			$this->status('mensajes', $e->getMessage());
 		}
+		$mensajes = $this->getMessage('hh');
 		$msg_generado = $this->sp(
-			$this->generated['hh'], 'Se ha generado 1 liquidación de honorarios', "Se han generado {$this->generated['hh']} liquidaciones de honorarios", 'No se han generado liquidaciones de honorarios'
+				$this->generated['hh'], 'Se ha generado 1 liquidación de honorarios', "Se han generado {$this->generated['hh']} liquidaciones de honorarios", 'No se han generado liquidaciones de honorarios'
 		);
 		$msg_error = $this->sp($this->errors['hh'], '1 con error', "{$this->errors['hh']} con errores", 'sin errores');
-		$this->status('hh', "$msg_generado. ($msg_error)");
+		$this->status('hh', "$msg_generado. ($msg_error $mensajes)");
 	}
 
+	/**
+	 * Genera liquidaciones mixtas
+	 * @param $id_contrato
+	 */
 	private function generaMIXTAS($id_contrato) {
 		try {
 			$datos_cobro = array(
-				'id_contrato' => $id_contrato,
-				'incluye_honorarios' => 1,
-				'incluye_gastos' => 1,
+					'id_contrato' => $id_contrato,
+					'incluye_honorarios' => 1,
+					'incluye_gastos' => 1,
 			);
 			if ($this->data['solo'] == 'honorarios') {
 				$datos_cobro = array_merge($datos_cobro, array('incluye_honorarios' => 1, 'incluye_gastos' => 0));
@@ -220,15 +262,22 @@ class GeneracionMasivaCobros extends AppShell {
 			if (!empty($result['cobro'])) {
 				$this->generated['mixtas'] += empty($result['cobro']) ? 0 : 1;
 			}
+			if (!empty($result['mensajes'])) {
+				array_push($this->messages['mixtas'] ,$result['mensajes']);
+				++$this->errors['mixtas'];
+			}
 		} catch (Exception $e) {
 			$this->log('Error generaMIXTAS: ' . $e->getMessage());
 			++$this->errors['mixtas'];
+			array_push($this->messages['mixtas'], $e->getMessage());
+			$this->status('mensajes', $e->getMessage());
 		}
 		$msg_generado = $this->sp(
-			$this->generated['mixtas'], 'Se ha generado 1 liquidación mixta', "Se han generado {$this->generated['mixtas']} liquidaciones mixtas", 'No se han generado liquidaciones mixtas'
+				$this->generated['mixtas'], 'Se ha generado 1 liquidación mixta', "Se han generado {$this->generated['mixtas']} liquidaciones mixtas", 'No se han generado liquidaciones mixtas'
 		);
+		$mensajes = $this->getMessage('mixtas');
 		$msg_error = $this->sp($this->errors['mixtas'], '1 con error', "{$this->errors['mixtas']} con errores", 'sin errores');
-		$this->status('mixtas', "$msg_generado. ($msg_error)");
+		$this->status('mixtas', "$msg_generado. ($msg_error $mensajes)");
 	}
 
 	/**
@@ -261,8 +310,9 @@ class GeneracionMasivaCobros extends AppShell {
 
 	/**
 	 * Envía una llamada POST a una URL.
-	 * @param type $post_data
-	 * @return boolean
+	 * @param mixed $post_data
+	 * @return bool
+	 * @throws Exception
 	 */
 	private function post($post_data) {
 		try {
@@ -291,7 +341,7 @@ class GeneracionMasivaCobros extends AppShell {
 			$header = substr($response, 0, $header_size);
 			$body = substr($response, $header_size);
 			curl_close($ch);
-
+			$this->log($body);
 			if ($http_code == 200) {
 				return json_decode(trim($body), true);
 			}
@@ -317,12 +367,26 @@ class GeneracionMasivaCobros extends AppShell {
 	 * @param string $singular mensaje que devuelve si el valor es igual a 1
 	 * @param string $plural mensaje que devuelve si el valor es distinto a 1
 	 * @param string $cero @opcional mensaje que devuelve si el valor es cero, si no viene utiliza el mensaje plural.
+	 * @return string
 	 */
 	private function sp($valor, $singular, $plural, $cero = '') {
 		if (empty($cero) && $valor == 0) {
 			$valor = 2;
 		}
 		return $valor == 0 ? $cero : ($valor == 1 ? $singular : $plural);
+	}
+
+	/**
+	 * Obtiene los mensajes según el tipo
+	 * @param $key tipo
+	 * @return string mensaje
+	 */
+	private function getMessage($key) {
+		$message = '';
+		if (!empty($this->messages[$key])) {
+			$message = implode(', ', $this->messages[$key]);
+		}
+		return $message;
 	}
 
 }
