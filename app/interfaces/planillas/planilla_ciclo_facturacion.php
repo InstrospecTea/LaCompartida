@@ -90,7 +90,7 @@ if ($xls) {
 		$fecha_hasta = $ft[2] . "/" . $ft[1] . "/" . $ft[0];
 
 		$ws1->write($filas, 1, __('Periodo desde:'), $formato_encabezado2);
-		$ws1->write($filas, 2, $fecha_desde . " hasta " . $fecha_hasta, $formato_encabezado2);
+		$ws1->write($filas, 2, $fecha_desde . __(" Hasta ") . $fecha_hasta, $formato_encabezado2);
                 $ws1->write($filas, 3, '', $formato_encabezado2);
                 $ws1->write($filas, 4, '', $formato_encabezado2);
 	} elseif (isset($_POST['fecha1'])) {

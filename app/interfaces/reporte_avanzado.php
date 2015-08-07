@@ -1091,12 +1091,12 @@ if (!$popup) {
 								<td align="center" colspan="5">
 									<br/>
 									<?php
-									echo $Form->icon_button('Planilla', 'code', array('name' => 'runreporte', 'id' => 'runreporte', 'class' => 'submit_buttons', 'rel' => 'planilla'));
+									echo $Form->icon_button(__('Planilla'), 'code', array('name' => 'runreporte', 'id' => 'runreporte', 'class' => 'submit_buttons', 'rel' => 'planilla'));
 									echo $Form->icon_button('Excel', 'xls', array('name' => 'excel', 'id' => 'excel', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'excel');", 'class' => 'submit_buttons', 'rel' => 'excel'));
 									echo $Form->icon_button('Dispersión', 'icon-chart', array('name' => 'dispersion', 'id' => 'dispersion', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'dispersion');", 'class' => 'submit_buttons', 'rel' => 'dispersion'));
 									echo $Form->icon_button('Tabla', 'icon-table', array('name' => 'tabla', 'id' => 'tabla', 'title' => 'Genera un Documento Excel con una tabla cruzada.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'tabla');", 'class' => 'submit_buttons', 'rel' => 'tabla'));
 									echo $Form->icon_button('Barras', 'icon-bar', array('name' => 'barras', 'id' => 'barras', 'title' => 'Despliega un Gráfico de Barras, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'barra');", 'class' => 'submit_buttons', 'rel' => 'barras'));
-									echo $Form->icon_button('Gráfico Torta', 'pie-chart', array('name' => 'circular', 'id' => 'circular', 'title' => 'Despliega un Gráfico de Torta, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'circular');", 'class' => 'submit_buttons', 'rel' => 'torta'));
+									echo $Form->icon_button(__('Gráfico Torta'), 'pie-chart', array('name' => 'circular', 'id' => 'circular', 'title' => 'Despliega un Gráfico de Torta, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'circular');", 'class' => 'submit_buttons', 'rel' => 'torta'));
 									echo $Form->script();
 									?>
 								</td>

@@ -80,7 +80,7 @@
 		$ws1->setColumn( 3, 3, 20.00);
 		$ws1->setColumn( 4, 4, 20.00);
 		$ws1->setColumn( 5, 5, 20.00);
-		$ws1->write(0, 0, 'Listado de tipo de cambio', $encabezado);
+		$ws1->write(0, 0, __('Listado de tipo de cambio'), $encabezado);
 		$ws1->mergeCells (0, 0, 0, 8);
 		$info_usr1 = str_replace('<br>',' - ',$PdfLinea1);
 		$ws1->write(2, 0, utf8_decode($info_usr1), $encabezado);
