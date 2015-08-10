@@ -77,7 +77,7 @@ class WsFacturacionNubox extends WsFacturacion{
 		} else {
 			$error = __('Ocurrió un error al emitir el documento.');
 		}
-		$error .= "\n \nInformaciï¿½n de Nubox:\n";
+		$error .= "\n \nInformación de Nubox:\n";
 		$pattern = '/Errores encontrados:\nLinea (.?).(.*)Fin fase/si';
 		preg_match_all($pattern, $result['Descripcion'], $error_description);
 		$error .= utf8_decode($error_description[2][0]);
