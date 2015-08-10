@@ -519,8 +519,8 @@
 									$ws1->write($filas-1, $col_valor_usuario[$data['id']], '', $titulo_filas);
 									$ws1->write($filas-1, $col_valor_moneda_usuario[$data['id']], '', $titulo_filas);
 									$ws1->write($filas, $col_usuario[$data['id']], 'Horas', $i%2==0 ? $titulo_filas_color : $titulo_filas);
-									$ws1->write($filas, $col_tarifa_usuario[$data['id']], 'Hora vendida', $i%2==0 ? $titulo_filas_color : $titulo_filas);
-									$ws1->write($filas, $col_tarifa_estandar_usuario[$data['id']], 'Tarifa estandar', $i%2==0 ? $titulo_filas_color : $titulo_filas);
+									$ws1->write($filas, $col_tarifa_usuario[$data['id']], __('Hora vendida'), $i%2==0 ? $titulo_filas_color : $titulo_filas);
+									$ws1->write($filas, $col_tarifa_estandar_usuario[$data['id']], __('Tarifa estandar'), $i%2==0 ? $titulo_filas_color : $titulo_filas);
 									$ws1->write($filas, $col_valor_usuario[$data['id']], 'Aporte', $i%2==0 ? $titulo_filas_color : $titulo_filas);
 									$ws1->write($filas, $col_valor_moneda_usuario[$data['id']], $moneda_reporte->fields['simbolo'], $i%2==0 ? $titulo_filas_color : $titulo_filas);
 							$i++;

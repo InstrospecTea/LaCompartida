@@ -31,6 +31,18 @@ $_LANG['Guardar'] = 'Salvar';
 $_LANG['Ingreso de'] = 'Inserção de';
 $_LANG['Ingrese'] = 'Preencha';
 $_LANG['Administración'] = 'Administracao';
+$_LANG['Enero'] = 'Janeiro';
+$_LANG['Febrero'] = 'Fevereiro';
+$_LANG['Marzo'] = 'Março';
+//$_LANG['Abril'] = 'Abril';
+$_LANG['Mayo'] = 'Maio';
+$_LANG['Junio'] = 'Junho';
+$_LANG['Julio'] = 'Julho';
+//$_LANG['Agosto'] = 'Agosto';
+$_LANG['Septiembre'] = 'Setembro';
+$_LANG['Octubre'] = 'Outubro';
+$_LANG['Noviembre'] = 'Novembro';
+$_LANG['Diciembre'] = 'Dezembro';
 
 // Clientes
 $_LANG['Nombre Cliente'] = 'Nome do Cliente';
@@ -142,7 +154,6 @@ $_LANG['Fecha último cobro'] = 'Data do último pagamento';
 $_LANG['Fecha de creación'] = 'Data de criação';
 
 // Asuntos
-$_LANG['Horas Trabajadas'] = 'Horas trabalhadas';
 $_LANG['Horas a cobrar'] = 'Horas por facturar';
 $_LANG['Fecha último cobro'] = 'Data de último pagamento';
 $_LANG['Fecha de creación'] = 'Data de criação';
@@ -425,7 +436,7 @@ $_LANG['Desglosar monto por monedas'] = 'Separar valores por moeda';
 
 // Reporte Hitos
 $_LANG['Considerar sólo hitos cobrados'] = 'Considerar apenas conquistas cobradas';
-$_LANG['Reporte Hitos'] = 'Reporte de Conquistas';
+$_LANG['Reporte Hitos'] = 'Relatório de Conquistas';
 $_LANG['Fecha Creación : '] = 'Data de criação: ';
 $_LANG['Periodo : Desde '] = 'Período : De ';
 $_LANG[' Hasta '] = ' até ';
@@ -474,7 +485,7 @@ $_LANG['REPORTE LIQUIDACIONES'] = 'Relatório  de Pagamentos';
 
 // Reporte Deuda Cliente
 $_LANG['REPORTE DEUDA CLIENTE'] = 'Relatório de dívidas do cliente';
-$_LANG['Reporte Deuda Cliente'] = 'Reporte de Dívidas';
+$_LANG['Reporte Deuda Cliente'] = 'Relatório de Dívidas';
 $_LANG['Monedas'] = 'Moeda';
 $_LANG['Desglosar por moneda'] = 'Separar por moeda';
 $_LANG['Desglosar por encargado comercial'] = 'Separar por responsável comercial';
@@ -514,11 +525,11 @@ $_LANG['Año en curso'] = 'Ano em curso';
 $_LANG['Emisión'] = 'Emissão';
 $_LANG['Facturación'] = 'Faturamento';
 $_LANG['Gráfico Torta'] = 'Gráfico Pizza';
-$_LANG['PERIODO RESUMEN'] = 'PERIODO RESUMO';
+$_LANG['PERIODO RESUMEN'] = 'PERÍODO RESUMO';
 $_LANG['FECHA REPORTE'] = 'DATA DO RELATÓRIO';
 
 // Reporte costo por profesional
-$_LANG['Reporte costo por profesional'] = 'Reporte de custo por profissional';
+$_LANG['Reporte costo por profesional'] = 'Relatório de custo por profissional';
 $_LANG['Solo profesionales'] = 'Apenas profissionais';
 $_LANG['Descargar excel anual'] = 'Fazer download de Excel anual';
 
@@ -539,8 +550,164 @@ $_LANG['Margen bruto'] = 'Margem bruta';
 $_LANG['Porcentaje margen'] = 'Porcentagem margem';
 
 // Reporte Participación Abogado
-$_LANG['REPORTE PARTICIPACIÓN ABOGADO'] = 'Reporte Participação Advogados';
-$_LANG['Reporte Participación Abogados'] = 'Reporte Participação Advogados';
+$_LANG['REPORTE PARTICIPACIÓN ABOGADO'] = 'Relatório Participação Advogados';
+$_LANG['Reporte Participación Abogados'] = 'Relatório Participação Advogados';
+$_LANG['Hrs. Trabajadas'] = 'Hrs. Trabalhadas';
+$_LANG['Hrs. Cobradas'] = 'Hrs. Faturadas';
+$_LANG['Total Cobro Original'] = 'Total Pagamento Original';
+$_LANG['Total según tarifa estandar'] = 'Total segundo tarifa padrão';
+$_LANG['Honorarios según tarifa estándar'] = 'Honorários segundo tarifa padrão';
+$_LANG['Rendimiento'] = 'Faturamento';
+$_LANG['Total facturado'] = 'Total faturado';
+$_LANG['Honorarios'] = 'Honorários';
+$_LANG['Fecha Revisión'] = 'Data de Revisão';
+$_LANG['Fecha Emisión'] = 'Data de Emissão';
+$_LANG['Fecha Corte'] = 'Data de Corte';
+$_LANG['Fecha Envío al Cliente'] = 'Data de Envio ao Cliente';
+$_LANG['Honorarios pagados'] = 'Honorários pagos';
+$_LANG['Gastos pagados'] = 'Gastos pagos';
+$_LANG['Cliente Asuntos'] = 'Cliente Assuntos';
+//$_LANG['Nota Cobro'] = '';
+
+// Reportes Consolidados
+$_LANG['Reportes año '] = 'Relatórios ano ';
+$_LANG['Mes'] = 'Mês';
+$_LANG['mes'] = 'mês';
+$_LANG['Generar'] = 'Gerar';
+
+// Reporte Anual
+$_LANG['Reporte Anual'] = 'Relatório Anual';
+$_LANG['Generar Excel'] = 'Gerar Excel';
+$_LANG['Año'] = 'Ano';
+$_LANG['año'] = 'ano';
+$_LANG['Horas Declaradas Corregidas por Forma de Cobro'] = 'Horas Declaradas Corrigidas por Forma de Pagamento';
+$_LANG['FECHA REPORTE'] = 'Data de Relatório';
+//$_LANG['desagregadas por mes'] = '';
+$_LANG['SUMA FIJA'] = 'Soma Fixa';
+$_LANG['Porcentaje'] = 'Porcentagem';
+$_LANG['RETAINER PRORRATEO'] = 'RETAINER Pró-Rateio';
+$_LANG['NO COBRABLE'] = 'Não Cobrável';
+
+// Reporte Usuario Vacaciones
+$_LANG['Reporte Usuario Vacaciones'] = 'Relatório de Usuários de Férias';
+$_LANG['Cantidad de días'] = 'Quantidade de dias';
+$_LANG['Lista de vacaciones de Usuarios'] = 'Lista de férias de Usuários';
+
+// Reporte Resumen Profesional
+$_LANG['Reporte Resumen Profesional'] = 'Relatório de Resumo Profissional';
+$_LANG['Forma Tarificación'] = 'Forma de Cobrança';
+$_LANG['REPORTE RENDIMIENTO PROFESIONALES'] = 'Relatório Rendimento Profissional';
+$_LANG['PERIODO'] = 'PERÍODO';
+$_LANG['Hrs. por Liquidar'] = 'Horas a liquidar';
+$_LANG['Hrs. Castigadas'] = 'Horas castigadas';
+$_LANG['Hrs. no Cobrables'] = 'Horas não faturadas';
+$_LANG['monto_facturado'] = 'Quantia Faturada';
+$_LANG['Cliente - Asunto'] = 'Cliente - Assunto';
+
+// Reporte Gráfico Usuarios
+$_LANG['Reporte Gráfico Usuarios'] = 'Relatório Gráficos Usuários';
+$_LANG['Horas trabajadas'] = 'Horas Trabalhadas';
+$_LANG['Proyecto'] = 'Projeto';
+
+// Demora ingreso de horas
+$_LANG['Demora ingreso de horas'] = 'Demora Ingresso de Horas';
+$_LANG['Demora Ingreso Horas'] = 'Demora Ingresso de Horas';
+$_LANG['Mayor'] = 'Maior';
+//$_LANG['Menor'] = 'Menor';
+$_LANG['Promedio'] = 'Média';
+$_LANG['N° Trabajos'] = 'N° Trabalhos';
+$_LANG['Reporte sobre la demora en el ingreso de horas'] = 'Relatório sobre a demora no ingresso de horas';
+$_LANG['Trabajos desde: '] = 'Trabalhos desde: ';
+$_LANG['Trabajos hasta: '] = 'Trabalhos até: ';
+
+// Demora Ingresso de Horas
+$_LANG['Reporte de Producción por Periodo'] = 'Relatório de Produção por período';
+$_LANG['Mostrar valores en'] = 'Mostrar valores em';
+$_LANG['Visualizar en Moneda'] = 'Visualizar em moeda';
+
+// Reporte Gráfico por Período
+$_LANG['Reporte Gráfico por Período'] = 'Reporte Grafico por período';
+$_LANG['Desde'] = 'De';
+$_LANG['Hasta'] = 'Até';
+$_LANG['Con'] = 'Com';
+$_LANG['Simple'] = 'Simples';
+$_LANG['Desglose profesional'] = 'Organizado por profissional';
+$_LANG['Desglose cliente'] = 'Organizado por cliente';
+$_LANG['Trabajadas'] = 'Trabalhadas';
+$_LANG['Cobrables'] = 'Cobráveis';
+$_LANG['No Cobrables'] = 'Não Cobráveis';
+
+// Reporte Profesional v/s Cliente
+$_LANG['Reporte Profesional v/s Cliente'] = 'Relatório Profissional vs. Cliente';
+$_LANG['Profesional vs. Asunto'] = 'Profissional vs. Assunto';
+$_LANG['Profesional vs. Cliente'] = 'Profissional vs. Cliente';
+$_LANG['Horas por Cliente'] = 'Horas por cliente';
+$_LANG['hasta'] = 'até';
+$_LANG['Valor según tarifa contrato'] = 'Valor segundo tarifa de contrato';
+$_LANG['Valor según tarifa por defecto'] = 'Valor segundo tarifa padrão';
+$_LANG['Valor Tasas/HH según tarifa contrato'] = 'Valor Taxas/HH segundo tarifa de contrato';
+$_LANG['Valor Tasas/HH según tarifa por defecto'] = 'Valor Taxas/HH segundo tarifa padrão';
+
+// Reporte genérico
+$_LANG['Reporte genérico'] = 'Relatório Genérico';
+$_LANG['Dimensión 1'] = 'Dimensão 1';
+$_LANG['Dimensión 2'] = 'Dimensão 2';
+
+// Resumen actividades profesionales
+$_LANG['Periodo de'] = 'Período de';
+$_LANG['horas_trabajadas'] = 'Horas Trabalhadas';
+$_LANG['horas_cobrables'] = 'Horas faturáveis';
+$_LANG['horas_no_cobrables'] = 'Horas não facturáveis';
+$_LANG['horas_castigadas'] = 'Horas castigadas';
+$_LANG['horas_visibles'] = 'Horas faturáveis corrigidas';
+$_LANG['horas_cobradas'] = 'Horas liquidadas';
+$_LANG['horas_por_cobrar'] = 'Horas Pendentes a liquidar';
+$_LANG['horas_pagadas'] = 'Horas pagas';
+$_LANG['horas_por_pagar'] = 'Horas a pagar';
+$_LANG['horas_incobrables'] = 'Horas não faturadas';
+$_LANG['valor_cobrado'] = 'Valor faturado';
+$_LANG['valor_por_cobrar'] = 'Valor por faturar';
+$_LANG['valor_pagado'] = 'Valor pago';
+$_LANG['valor_por_pagar'] = 'Valor por pago';
+$_LANG['valor_incobrable'] = 'Valor não faturado';
+$_LANG['rentabilidad'] = 'Rentabilidade';
+$_LANG['valor_hora'] = 'Valor hora';
+$_LANG['diferencia_valor_estandar'] = 'Diferença valor padrão';
+$_LANG['valor_estandar'] = 'Valor padrão';
+$_LANG['glosa_cliente'] = 'Cliente';
+$_LANG['id_cobro'] = 'Nr. Da Cobrança';
+$_LANG['forma_cobro'] = 'Forma de Cobrança';
+$_LANG['categoria_usuario'] = 'Categoria Profissional';
+$_LANG['area_usuario'] = 'Área Profissional';
+$_LANG['glosa_grupo_cliente'] = 'Grupo';
+$_LANG['id_usuario_responsable'] = 'Responsavel comercial';
+
+// Reporte Alertas
+$_LANG['Reporte de Alertas'] = 'Relatório de Alertas';
+$_LANG['Ver todas las Alertas de Acuerdos comerciales'] = 'Ver todos os alertas de Acordo comerciais';
+$_LANG['Ver Alertas sobrepasadas de Acuerdos comerciales'] = 'Ver alertas Expirados de acordos comerciais';
+
+// Reporte Saldo
+$_LANG['Reporte Saldo'] = 'Relatório de Saldo';
+$_LANG['Mostrar Montos en'] = 'Mostrar quantia em';
+$_LANG['Mostrar liquidaciones y adelantos sin saldo'] = 'Mostrar liquidações e adiantamentos sem saldo';
+$_LANG['Mostrar detalle del saldo'] = 'Mostrar detalhes do saldo';
+$_LANG['Ocultar clientes sin saldo'] = 'Ocultar clientes sem saldo';
+$_LANG['Adelantos no utilizados'] = 'Adiantados não utilizados';
+$_LANG['Gastos por liquidar'] = 'Gastos por liquidar';
+$_LANG['Liquidaciones por pagar'] = 'Liquidações por pagar';
+
+// Reporte Antigüedad Deudas Clientes
+$_LANG['Considerar sólo monto facturado'] = 'Considerar apenas quantia faturada';
+$_LANG['Incluir totales normales y vencidos'] = 'Incluir totais normais e vencidos';
+$_LANG['Desglosar reporte'] = 'Ordenar relatório';
+$_LANG['Incluir encargado comercial'] = 'Incluir responsável comercial';
+$_LANG['Sólo Honorarios'] = 'Apenas honorários';
+$_LANG['Sólo Gastos'] = 'Apenas gastos';
+$_LANG['Sólo Mixtas (Honorarios y Gastos)'] = 'Apenas mistas (Honorários e gastos)';
+$_LANG['días'] = 'dias';
+
+
 
 // Biblioteca
 $_LANG['Archivo'] = 'Arquivo';
