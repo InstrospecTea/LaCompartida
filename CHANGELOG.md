@@ -1,7 +1,7 @@
 # Changelog
 
 ## Hotfix 15.16.6
-Monday 2015, August 8th
+Monday 2015, August 10th
 * **Fix:** [Dejando de enviar mail de problemas en el envío a los administradores del tenant](https://github.com/LemontechSA/ttb/pull/1076)
 
 ## Hotfix 15.16.5
