@@ -30,7 +30,7 @@ class WsFacturacionNubox extends WsFacturacion{
 
 	/**
 	 *
-	 * @param string $archivo contenido CSV que se enviará
+	 * @param string $archivo contenido CSV que se enviarï¿½
 	 * @param int $opcionFolios
 	 * @param int $opcionRutClienteExiste
 	 * @param int $opcionRutClienteNoExiste
@@ -56,7 +56,7 @@ class WsFacturacionNubox extends WsFacturacion{
 				$respuesta = $this->Client->CargarYEmitir2($datos);
 			} catch (SoapFault $sf) {
 				Log::write($sf->__toString(), 'FacturacionElectronicaNubox');
-				throw new Exception('Ocurrió un error al generar el documento.');
+				throw new Exception('Ocurriï¿½ un error al generar el documento.');
 			}
 			$sxmle = new SimpleXMLElement($respuesta->CargarYEmitir2Result->any);
 			$xml = self::XML2Array($sxmle);
@@ -73,11 +73,11 @@ class WsFacturacionNubox extends WsFacturacion{
 
 	private function extraerError($result) {
 		if ($result['Resultado'] == 'C1') {
-			$error = __('Ocurrió un error al generar el documento. Por favor verifique que todos los datos del Documento sean correctos.');
-		} else { 			
-			$error = __('Ocurrió un error al emitir el documento.');
+			$error = __('Ocurriï¿½ un error al generar el documento. Por favor verifique que todos los datos del Documento sean correctos.');
+		} else {
+			$error = __('Ocurriï¿½ un error al emitir el documento.');
 		}
-		$error .= "\n \nInformación de Nubox:\n";
+		$error .= "\n \nInformaciï¿½n de Nubox:\n";
 		$pattern = '/Errores encontrados:\nLinea (.?).(.*)Fin fase/si';
 		preg_match_all($pattern, $result['Descripcion'], $error_description);
 		$error .= utf8_decode($error_description[2][0]);
@@ -95,7 +95,7 @@ class WsFacturacionNubox extends WsFacturacion{
 		try {
 			$pdf = $this->Client->ObtenerPDF($datos)->ObtenerPDFResult;
 		} catch (SoapFault $sf) {
-			$this->setError(1, __("Nubox: El archivo no se puede descargar en este momento; Por favor intente más tarde. DTE ID: {$id}"));
+			$this->setError(1, __("Nubox: El archivo no se puede descargar en este momento; Por favor intente mï¿½s tarde. DTE ID: {$id}"));
 			Log::write($sf->getMessage(), 'FacturacionElectronicaNubox');
 		}
 		return $pdf;
@@ -115,9 +115,35 @@ class WsFacturacionNubox extends WsFacturacion{
 		);
 
 		try {
-			$loginClient = new SoapClient($this->url_login, array('trace' => 0));
-			$resultado = $loginClient->Autenticar($login);
+			/* Debido a la actualizaciÃ³n de OpenSSL a la versiÃ³n 3
+			// Por parte de los prestadores de servicio, y la actualizaciÃ³n
+			// de la librerÃ­a en los servidores de producciÃ³n *(OpenSSL 1.0.2d 9 Jul 2015)*
+			// se necesita crear un contexto de flujo, con el cual se utilice de forma
+			// explÃ­cita un cipher de ssl. Si no se agrega este contexto en la
+			// instancia de SoapClient utilizada, este simplemente rechaza la
+			// peticiÃ³n, indicando que no puede consultar al servidor.
+			// Leer: http://php.net/manual/es/class.soapclient.php#115736
+			//
+			// A partir de PHP 5.5.0 existe la posibilidad de pasarle el parÃ¡metro
+			// `ssl_method = SOAP_SSL_METHOD_SSLv3`... pero eso queda para el futuro,
+			// cuando TTB utilice PHP 5.5.x :)
+			*/
+			$stream_context = stream_context_create(array(
+				'ssl' => array(
+					'ciphers' => 'RC4-SHA'
+				)
+			));
+
+			$opts = array(
+				'trace'          => 0,
+				'stream_context' => $stream_context,
+			);
+
+			$loginClient = new SoapClient($this->url_login, $opts);
+
+			$resultado   = $loginClient->Autenticar($login);
 			$this->token = $resultado->AutenticarResult;
+
 		} catch (Exception $se) {
 			$this->setError(530, __('Acceso denegado.'));
 			return false;
