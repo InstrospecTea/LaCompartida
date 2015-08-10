@@ -1,5 +1,18 @@
 # Changelog
 
+## Hotfix 15.16.5
+Friday 2015, August 7th
+* **Fix:** [Corrección despliegue de datos según filtros en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1075)
+
+## Hotfix 15.16.4
+Friday 2015, August 7th
+* **Fix:** [Carga de datos DEMO con asuntos activos](https://github.com/LemontechSA/ttb/pull/1072)
+* **Fix:** [Configurar locale (formato decimal) al guardar datos](https://github.com/LemontechSA/ttb/pull/1072)
+
+## Hotfix 15.16.3
+Wednesday 2015, August 5th
+* **Feature:** [Enviar el código del cliente como identificador único a FacturaciónCL](https://github.com/LemontechSA/ttb/pull/1071)
+
 ## Hotfix 15.16.2
 Wednesday 2015, August 5th
 * **Fix:** [Corregir encoding monto en palabras](https://github.com/LemontechSA/ttb/pull/1070)

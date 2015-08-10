@@ -8,6 +8,7 @@ class ReporteCriteria {
 	public $sesion = null;
 	// Arreglos con filtros
 	public $filtros = array();
+	public $parametros = array();
 	public $filtros_especiales = array();
 	public $rango = array();
 	// Arreglo de datos
@@ -1108,6 +1109,7 @@ class ReporteCriteria {
 
 	//Indica el Simbolo asociado al tipo de dato.
 	public function setFiltros($filtros) {
+		$this->parametros = $filtros;
 		if ($filtros['clientes']) {
 			foreach ($filtros['clientes'] as $cliente) {
 				if ($cliente) {
@@ -2085,12 +2087,13 @@ class ReporteCriteria {
 	private function getWhere($type) {
 		if ($type == TIPO_TRABAJOS) {
 			unset($this->filtros['tramite.cobrable']);
-			$this->campo_fecha = "trabajo.fecha";
+			$this->campo_fecha = "trabajo.fecha"; # set as default
 		}
 		if ($type == TIPO_TRAMITES) {
 			unset($this->filtros['trabajo.cobrable']);
-			$this->campo_fecha = "tramite.fecha";
+			$this->campo_fecha =  "tramite.fecha";  # set as default
 		}
+		$this->setCampoFecha($this->parametros['campo_fecha']);  # set the real
 		$and_wheres = array();
 		foreach ($this->filtros as $campo => $filtro) {
 			foreach ($filtro as $booleano => $valor) {

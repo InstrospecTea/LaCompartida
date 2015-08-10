@@ -11,14 +11,14 @@
 
     $pagina = new Pagina( $sesion );
 
-	if(!is_array($usuarios))	
+	if(!is_array($usuarios))
 		$usuarios = array($usuarios);
-	
-	if(!is_array($clientes))	
+
+	if(!is_array($clientes))
 		$clientes = array($clientes);
 
 	$vista_cliente = "glosa_cliente-profesional-profesional-profesional-profesional-profesional";
-	$vista_empleado = "profesional-glosa_cliente-glosa_cliente-glosa_cliente-glosa_cliente-glosa_cliente"; 
+	$vista_empleado = "profesional-glosa_cliente-glosa_cliente-glosa_cliente-glosa_cliente-glosa_cliente";
 	$vista_asunto = "glosa_cliente-codigo_asunto-glosa_asunto-glosa_asunto-glosa_asunto-glosa_asunto";
 
 	switch($tipo_reporte)
@@ -53,7 +53,7 @@
 		foreach($usuarios as $usuario)
 			if($usuario)
 				$reporte[$dato]->addFiltro('trabajo','id_usuario',$usuario);
-		
+
 		$reporte[$dato]->addRangoFecha($fecha_ini,$fecha_fin);
 		$reporte[$dato]->setVista($vista);
 
@@ -68,7 +68,7 @@
 			$resultado[$dato] = $reporte[$dato]->toArray();
 		else
 			echo "error";
-	}	
+	}
 
     $wb = new Spreadsheet_Excel_Writer();
 
@@ -96,35 +96,35 @@
 									'Border' => 1,
 									'Color' => 'black'));
 		$txt_opcion->setTextWrap();
-		
+
 		$txt_valor =& $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'right',
 									'Border' => 1,
 									'Color' => 'black'));
 		$txt_valor->setTextWrap();
-		
+
 		$txt_derecha =& $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'right',
 									'Border' => 1,
 									'Color' => 'black'));
 		$txt_derecha->setTextWrap();
-		
+
 		$fecha =& $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'center',
 									'Border' => 1,
 									'Color' => 'black'));
 		$fecha->setTextWrap();
-		
+
 		$numeros =& $wb->addFormat(array('Size' => 12,
 									'VAlign' => 'top',
 									'Align' => 'right',
 									'Border' => 1,
 									'Color' => 'black'));
 		$numeros->setNumFormat("0");
-									
+
 		$titulo_filas =& $wb->addFormat(array('Size' => 12,
 									'Align' => 'center',
 									'Bold' => '1',
@@ -138,7 +138,7 @@
 										'Border' => 1,
 										'Color' => 'black'));
 		$formato_moneda->setNumFormat("#,##0.00");
-	
+
 
 
 
@@ -162,7 +162,7 @@
 	$ws1->mergeCells($fila,1,$fila,3);
 	$ws1->write($fila,1,$titulo_reporte,$titulo);
 
-	$fila += 2;  
+	$fila += 2;
 
 	$ws1->write($fila, 0, __('PERIODO RESUMEN').":", $titulo);
     $ws1->mergeCells($fila,1,$fila,2);
@@ -181,7 +181,7 @@
 
 	$fila+= 2;
 
-	
+
 	//VISTA cliente y profesional usan Arreglo de Barras.
 	if($vista == $vista_empleado || $vista == $vista_cliente)
 	{
@@ -201,7 +201,7 @@
 		$i = 0;
 		foreach($resultado['horas_trabajadas'] as $campo)
 		{
-			if(is_array($campo))		
+			if(is_array($campo))
 			{
 					$ws1->write($fila+$i, $columna, $campo['label'], $txt_opcion);
 					$i++;
@@ -213,8 +213,8 @@
 			$i=0;
 			foreach($resultado[$dato] as $campo)
 			{
-				if(is_array($campo))		
-				{	
+				if(is_array($campo))
+				{
 					$ws1->write($fila+$i, $columna + 1 + $col , $campo['valor'], $numeros);
 					$i++;
 				}
@@ -243,7 +243,7 @@
 		$ws1->write($fila-1,$columna,__("Cliente"), $encabezado);
 		$ws1->mergeCells($fila-1,$columna+1,$fila-1,$columna+2);
 		$ws1->write($fila-1,$columna+1,__("Asunto"), $encabezado);
-		
+
 		//TITULOS
 		foreach($datos as $col => $dato)
 		{
@@ -261,7 +261,7 @@
 				$ws1->write($fila_a, $col_a, $k_a, $txt_opcion);
 				extender($fila_a, $col_a, $a['filas']);
 				$col_a++;
-	
+
 				$fila_b = $fila_a;
 				foreach($a as $k_b => $b)
 				{
@@ -277,16 +277,16 @@
 						{
 							if(is_array($c))
 							{
-								$col_c = $col_b;	
+								$col_c = $col_b;
 								$ws1->write($fila_c, $col_c, $k_c, $txt_opcion);
 								$col_c++;
 
 								foreach($datos as $dato)
 								{
-									$ws1->writeNumber($fila_c, $col_c, $resultado[$dato][$k_a][$k_b][$k_c]['valor'], $numeros);	
+									$ws1->writeNumber($fila_c, $col_c, $resultado[$dato][$k_a][$k_b][$k_c]['valor'], $numeros);
 									$col_c++;
 								}
-								
+
 								$fila_c += $c['filas'];
 							}
 						}
@@ -301,7 +301,7 @@
 		$col++;
 		foreach($datos as $dato)
 		{
-			$ws1->writeNumber($fila_a, $col, $resultado[$dato]['total'], $numeros);	
+			$ws1->writeNumber($fila_a, $col, $resultado[$dato]['total'], $numeros);
 			$col++;
 		}
 	}
