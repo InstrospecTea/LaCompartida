@@ -10844,6 +10844,14 @@ QUERY;
 		case 8.07:
 			$queries = array("UPDATE usuario SET visible = 0 WHERE rut = '99511620'");
 			break;
+
+		case 8.08:
+			$queries = array(
+				"INSERT INTO `configuracion` 
+				(`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
+				('FacturacionGastosCobrado', 'NO', 'Define la opción por defecto para desplegar los cobros', 'select;Todos;SI;NO', 2, -1);");
+
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10856,7 +10864,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.07;
+$max_update = 8.08;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

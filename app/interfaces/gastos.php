@@ -9,6 +9,7 @@ $usuario = new UsuarioExt($sesion);
 
 $conf_nuevo_modulo_gastos = Conf::GetConf($sesion, 'NuevoModuloGastos') == '0' ? false : true;
 $conf_codigo_secundario = Conf::GetConf($sesion, 'CodigoSecundario') == '0' ? false : true;
+$selected_cobrado = Conf::GetConf($sesion, 'FacturacionGastosCobrado');
 
 set_time_limit(300);
 
@@ -590,7 +591,7 @@ function Refrescar() {
                 <tr>
                     <td align=right><?php echo __('Cobrado') ?></td>
                     <td align='left'>
-						<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", isset($cobrado) ? $cobrado : 'NO', '', 'Todos', '60') ?>
+						<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", isset($cobrado) ? $cobrado : $selected_cobrado, '', 'Todos', '60') ?>
                     </td>
                     <td align="left" nowrap>
 						<?php echo __('id_cobro') ?>&nbsp;
