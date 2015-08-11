@@ -1719,7 +1719,7 @@ class ReporteCriteria {
 		$values = array(
 			"estandar" => array(
 				"tarifa" => array(
-					TIPO_TRABAJOS => 'tarifa_hh_estandar',
+					TIPO_TRABAJOS =>  'tarifa_hh_estandar',
 					TIPO_TRAMITES => 'tarifa_tramite_estandar'
 				),
 				"div_thh" => array(
@@ -1730,17 +1730,17 @@ class ReporteCriteria {
 			),
 			"cliente" => array(
 				"tarifa" => array(
-					TIPO_TRABAJOS => "IF(cobro.forma_cobro = 'FLAT FEE', tarifa_hh_estandar, tarifa_hh)",
-					TIPO_TRAMITES => "IF(cobro.forma_cobro = 'FLAT FEE', tarifa_tramite_estandar, tarifa_tramite)"
+					TIPO_TRABAJOS => "tarifa_hh",
+					TIPO_TRAMITES => "tarifa_tramite"
 				),
 				"div_thh" => array(
-					TIPO_TRABAJOS => "IF(cobro.forma_cobro = 'FLAT FEE',
-															IF(cobro.monto_thh_estandar > 0, cobro.monto_thh_estandar,
-																IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1)),
-																	IF(cobro.monto_thh > 0,
-																		cobro.monto_thh, IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1)
-																	)
-														)",
+					TIPO_TRABAJOS => "IF(cobro.monto_thh > 0,
+                                            cobro.monto_thh,
+                                            IF(cobro.monto_trabajos > 0,
+                                                cobro.monto_trabajos,
+                                                1
+                                            )
+                                        )",
 					TIPO_TRAMITES => "IF(cobro.monto_tramites > 0, cobro.monto_tramites, 1)"
 				)
 			),
