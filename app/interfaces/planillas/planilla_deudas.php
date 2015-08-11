@@ -78,7 +78,7 @@ $Pagina->PrintTop();
 								<?php echo __('Encargado Comercial') ?>
 							</td>
 							<td align='left' colspan="2">
-								<?php echo  Html::SelectQuery($sesion, $query_usuario, "id_encargado_comercial", $id_encargado_comercial, "", "Ninguno","width=100px")  ?>
+								<?php echo  Html::SelectQuery($sesion, $query_usuario, "id_encargado_comercial", $id_encargado_comercial, "", __("Ninguno"),"width=100px")  ?>
 							</td>
 						</tr>
 

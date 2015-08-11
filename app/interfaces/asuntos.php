@@ -169,7 +169,7 @@ $Form = new Form;
 						<b><?php echo __('Grupo'); ?></b>&nbsp;
 					</td>
 					<td class="al">
-						<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), 'id_grupo_cliente', $id_grupo_cliente, '', 'Ninguno', '280px'); ?>
+						<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), 'id_grupo_cliente', $id_grupo_cliente, '', __('Ninguno'), '280px'); ?>
 					</td>
 				</tr>
 				<tr>

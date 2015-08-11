@@ -602,7 +602,7 @@ $pagina->PrintTop($popup);
 						<?php echo __('Grupo Cliente')?>
 					</td>
 					<td align="left">
-						<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo", $id_grupo, "", "Ninguno","width=100px")  ?>
+						<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo", $id_grupo, "", __("Ninguno"),"width=100px")  ?>
 					</td>
 				</tr>
 
@@ -611,7 +611,7 @@ $pagina->PrintTop($popup);
 						<?php echo __('Encargado Comercial') ?>
 					</td>
 					<td align='left' colspan="2">
-						<?php echo Html::SelectArrayDecente($sesion->usuario->ListarActivos('', 'SOC'), 'id_encargado_comercial', $id_encargado_comercial, '', 'Ninguno', '100px'); ?>
+						<?php echo Html::SelectArrayDecente($sesion->usuario->ListarActivos('', 'SOC'), 'id_encargado_comercial', $id_encargado_comercial, '', __('Ninguno'), '100px'); ?>
 					</td>
 				</tr>
 
@@ -677,7 +677,7 @@ $pagina->PrintTop($popup);
 												LEFT JOIN prm_area_usuario AS padre ON area.id_padre = padre.id
 												ORDER BY  IFNULL(padre.glosa, area.glosa), padre.glosa, area.glosa ASC ';
 							}
-							echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario, "", "Ninguna")
+							echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario, "", __("Ninguna"))
 							?>
 					</td>
 				</tr>

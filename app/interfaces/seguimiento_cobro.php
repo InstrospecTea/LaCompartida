@@ -716,7 +716,7 @@ $pagina->PrintTop();
 				</td>
 				<td align="left" colspan="2">
 					<?php $GrupoCliente = new GrupoCliente($sesion); ?>
-					<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
+					<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), "id_grupo_cliente", $id_grupo_cliente, "", __("Ninguno"), '280px') ?>
 				</td>
 			</tr>
 

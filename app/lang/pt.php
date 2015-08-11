@@ -43,6 +43,10 @@ $_LANG['Septiembre'] = 'Setembro';
 $_LANG['Octubre'] = 'Outubro';
 $_LANG['Noviembre'] = 'Novembro';
 $_LANG['Diciembre'] = 'Dezembro';
+$_LANG['Ninguno'] = 'Nenhum';
+$_LANG['ninguno'] = 'nenhum';
+$_LANG['Ninguna'] = 'Nenhum';
+$_LANG['ninguna'] = 'nenhum';
 
 // Clientes
 $_LANG['Nombre Cliente'] = 'Nome do Cliente';
@@ -1032,4 +1036,7 @@ $_LANG['Eliminar trabajos'] = 'Eliminar trabalhos';
 $_LANG['Editar'] = 'Editar';
 $_LANG['Ingresar como nueva hora'] = 'Adicionar como nova hora';
 $_LANG['Nueva hora'] = 'Nova hora';
-
+$_LANG['Total horas trabajadas'] = 'Total horas trabalhadas';
+$_LANG['Total horas cobrables corregidas'] = 'Total horas faturáveis corrigidas';
+$_LANG['Hrs Trab./Cobro.'] = 'Horas trabalhadas / Cobradas';
+$_LANG['Hrs trab.'] = 'Horas trabalhadas';
