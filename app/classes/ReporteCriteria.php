@@ -1637,6 +1637,7 @@ class ReporteCriteria {
 				if ($type == TIPO_COBROS) {
 					$column_value = 'cobro.estado';
 				}
+				break;
 			case 'forma_cobro':
 				if ($type == TIPO_TRABAJOS) {
 					$column_value = "IFNULL(cobro.forma_cobro, 'Indefinido')";
