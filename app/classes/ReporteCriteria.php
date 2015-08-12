@@ -1766,35 +1766,38 @@ class ReporteCriteria {
 		$monto_trabajado_estandar = $values["monto_trabajado_estandar"][$type];
 
 		if ($type == TIPO_TRABAJOS) {
+			$trabajos_amount = "((documento.monto_trabajos / documento.subtotal_honorarios) * documento.subtotal_sin_descuento)"
+
 			$monto_por_pagar_parcial = "SUM(({$tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-						* ((documento.monto_trabajos * cobro_moneda_documento.tipo_cambio)
+						* (({$trabajos_amount} * cobro_moneda_documento.tipo_cambio)
 							/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
 						* (documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
 
 			$monto_honorarios = "SUM(({$tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-										* ((documento.monto_trabajos * cobro_moneda_documento.tipo_cambio)
+										* (({$trabajos_amount} * cobro_moneda_documento.tipo_cambio)
 										/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
 										* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
 
 			if ($this->tipo_dato == 'valor_por_cobrar') {
 				$monto_honorarios = "SUM((({$tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
-											* (cobro.monto_trabajos / {$div_thh}))
+											* ({$trabajos_amount} / {$div_thh}))
 											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
 			}
 		}
 		if ($type == TIPO_TRAMITES) {
+			$tramites_amount = "((documento.monto_tramites / documento.subtotal_honorarios) * documento.subtotal_sin_descuento)"
 			$monto_por_pagar_parcial = "SUM(({$tarifa})
-						* ((documento.monto_tramites * cobro_moneda_documento.tipo_cambio)
+						* (({$tramites_amount} * cobro_moneda_documento.tipo_cambio)
 							/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
 						* (documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
 
 			$monto_honorarios = "SUM(({$tarifa})
-										* ((documento.monto_tramites * cobro_moneda_documento.tipo_cambio)
+										* (({$tramites_amount} * cobro_moneda_documento.tipo_cambio)
 											/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
 										* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
 			if ($this->tipo_dato == 'valor_por_cobrar') {
 				$monto_honorarios = "SUM(((tarifa_tramite)
-											* (cobro.monto_tramites / {$div_thh}))
+											* ({$tramites_amount} / {$div_thh}))
 											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
 			}
 		}
