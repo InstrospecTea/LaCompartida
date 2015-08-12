@@ -1766,7 +1766,7 @@ class ReporteCriteria {
 		$monto_trabajado_estandar = $values["monto_trabajado_estandar"][$type];
 
 		if ($type == TIPO_TRABAJOS) {
-			$trabajos_amount = "((documento.monto_trabajos / IF(documento.subtotal_honorarios > 0, (documento.subtotal_sin_descuento + documento.descuento_honorarios), 1)) * documento.subtotal_sin_descuento)";
+			$trabajos_amount = "((documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
 			$monto_por_pagar_parcial = "SUM(({$tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
 						* (({$trabajos_amount} * cobro_moneda_documento.tipo_cambio)
 							/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
@@ -1785,7 +1785,7 @@ class ReporteCriteria {
 		}
 
 		if ($type == TIPO_TRAMITES) {
-			$tramites_amount = "((documento.monto_tramites / IF(documento.subtotal_honorarios > 0, documento.subtotal_honorarios, 1)) * documento.subtotal_sin_descuento)";
+			$tramites_amount = "((documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
 			$monto_por_pagar_parcial = "SUM(({$tarifa})
 						* (({$tramites_amount} * cobro_moneda_documento.tipo_cambio)
 							/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
