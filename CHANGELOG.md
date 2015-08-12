@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.16.8
+Wednesday 2015, August 12th
+* **Fix:** [Corregir reporte avanzado al seleccionar los montos segun proporcionalidad para cobros FLAT FEE](https://github.com/LemontechSA/ttb/pull/1082)
+
 ## Hotfix 15.16.7
 Tuesday 2015, August 11th
 * **Fix:** [Evita mostrar la forma_cobro en vez del estado del cobro en reportes avanzados](https://github.com/LemontechSA/ttb/pull/1081)
