@@ -1363,7 +1363,7 @@ class ReporteCriteria {
 				if ($type == TIPO_COBROS) {
 					$column_value = $undefined;
 				}
-			 	break;
+				break;
 			case "username":
 				if ($type == TIPO_TRABAJOS) {
 					$column_value = 'usuario.username';
@@ -1374,7 +1374,7 @@ class ReporteCriteria {
 				if ($type == TIPO_COBROS) {
 					$column_value = $undefined;
 				}
-			 	break;
+				break;
 			case "id_usuario":
 				if ($type == TIPO_TRABAJOS) {
 					$column_value = 'usuario.id_usuario';
@@ -1385,18 +1385,18 @@ class ReporteCriteria {
 				if ($type == TIPO_COBROS) {
 					$column_value = -1;
 				}
-			 	break;
+				break;
 			case "id_cliente":
 				$column_value = 'cliente.id_cliente';
-			 	break;
+				break;
 			case "codigo_cliente":
 				$column_value = 'cliente.codigo_cliente';
-			 	break;
+				break;
 			case "glosa_cliente":
 				$column_value = 'cliente.glosa_cliente';
-			 	break;
+				break;
 			case "codigo_cliente_secundario":
-			 	if (in_array('codigo_cliente_secundario', $this->agrupador)) {
+				if (in_array('codigo_cliente_secundario', $this->agrupador)) {
 					$column_value = 'cliente.codigo_cliente_secundario';
 				}
 				break;
@@ -1412,15 +1412,15 @@ class ReporteCriteria {
 						$column_value = $undefined;
 					}
 				}
-			 	break;
+				break;
 			case "glosa_asunto":
 				$column_value = 'asunto.glosa_asunto';
-			 	break;
+				break;
 			case "glosa_asunto_con_codigo":
-			 	$column_value = "CONCAT({$this->dato_codigo_asunto}, ': ', asunto.glosa_asunto)";
-			 	break;
+				$column_value = "CONCAT({$this->dato_codigo_asunto}, ': ', asunto.glosa_asunto)";
+				break;
 			case "codigo_asunto":
-			 	if ($type == TIPO_TRABAJOS) {
+				if ($type == TIPO_TRABAJOS) {
 						$column_value = $this->dato_codigo_asunto;
 				}
 				if ($type == TIPO_TRAMITES) {
@@ -1432,7 +1432,7 @@ class ReporteCriteria {
 				break;
 			case "area_usuario":
 				if (in_array('area_usuario', $this->agrupador)) {
-				 	if ($type == TIPO_TRABAJOS) {
+					if ($type == TIPO_TRABAJOS) {
 						$column_value = 'IFNULL(prm_area_usuario.glosa,\'-\')';
 					}
 					if ($type == TIPO_TRAMITES) {
@@ -1444,7 +1444,7 @@ class ReporteCriteria {
 				}
 			case "categoria_usuario":
 				if (in_array('categoria_usuario', $this->agrupador)) {
-				 	if ($type == TIPO_TRABAJOS) {
+					if ($type == TIPO_TRABAJOS) {
 						$column_value = 'IFNULL(prm_categoria_usuario.glosa_categoria,\'-\')';
 					}
 					if ($type == TIPO_TRAMITES) {
@@ -1689,7 +1689,7 @@ class ReporteCriteria {
 				}
 				break;
 			default:
-			 	$column_value = "'La columna {$key} no está definida'";
+				$column_value = "'La columna {$key} no está definida'";
 
 		}
 		return $column_value;
@@ -1719,12 +1719,12 @@ class ReporteCriteria {
 		$values = array(
 			"estandar" => array(
 				"tarifa" => array(
-					TIPO_TRABAJOS =>  'tarifa_hh_estandar',
+					TIPO_TRABAJOS => 'tarifa_hh_estandar',
 					TIPO_TRAMITES => 'tarifa_tramite_estandar'
 				),
 				"div_thh" => array(
-					TIPO_TRABAJOS => "IF(cobro.monto_thh_estandar > 0, cobro.monto_thh_estandar,
-															IF(cobro.monto_trabajos > 0, cobro.monto_trabajos,1))",
+					TIPO_TRABAJOS => "IF(cobro.monto_thh > 0, cobro.monto_thh,
+															IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1))",
 					TIPO_TRAMITES =>  "IF(cobro.monto_tramites > 0, cobro.monto_tramites, 1)"
 				)
 			),
@@ -1734,13 +1734,8 @@ class ReporteCriteria {
 					TIPO_TRAMITES => "tarifa_tramite"
 				),
 				"div_thh" => array(
-					TIPO_TRABAJOS => "IF(cobro.monto_thh > 0,
-                                            cobro.monto_thh,
-                                            IF(cobro.monto_trabajos > 0,
-                                                cobro.monto_trabajos,
-                                                1
-                                            )
-                                        )",
+					TIPO_TRABAJOS => "IF(cobro.monto_thh > 0, cobro.monto_thh,
+															IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1))",
 					TIPO_TRAMITES => "IF(cobro.monto_tramites > 0, cobro.monto_tramites, 1)"
 				)
 			),
