@@ -1778,6 +1778,7 @@ class ReporteCriteria {
 										* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
 
 			if ($this->tipo_dato == 'valor_por_cobrar') {
+				$trabajos_amount = "((cobro.monto_trabajos / (cobro.monto_trabajos + cobro.monto_tramites)) * cobro.monto_subtotal)";
 				$monto_honorarios = "SUM((({$tarifa} * TIME_TO_SEC(duracion_cobrada) / 3600)
 											* ({$trabajos_amount} / {$div_thh}))
 											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
@@ -1796,6 +1797,7 @@ class ReporteCriteria {
 											/ ({$div_thh} * cobro_moneda_cobro.tipo_cambio))
 										* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
 			if ($this->tipo_dato == 'valor_por_cobrar') {
+				$tramites_amount = "((cobro.monto_tramites / (cobro.monto_trabajos + cobro.monto_tramites)) * cobro.monto_subtotal)";
 				$monto_honorarios = "SUM(((tarifa_tramite)
 											* ({$tramites_amount} / {$div_thh}))
 											* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
