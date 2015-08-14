@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.16.9
+Tuesday 2015, August 13th
+* **Fix:** [Corrige reporte avanzado monto por cobrar](https://github.com/LemontechSA/ttb/pull/1083)
+
 ## Hotfix 15.16.8
 Wednesday 2015, August 12th
 * **Fix:** [Corregir reporte avanzado al seleccionar los montos segun proporcionalidad para cobros FLAT FEE](https://github.com/LemontechSA/ttb/pull/1082)
