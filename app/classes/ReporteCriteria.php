@@ -509,6 +509,7 @@ class ReporteCriteria {
 				$Criteria->add_select('0', $this->tipo_dato);
 				break;
 		}
+
 		$Criteria->add_from('cobro')
 			->add_left_join_with('cobro_asunto',
 				CriteriaRestriction::equals('cobro.id_cobro', 'cobro_asunto.id_cobro'))
@@ -568,10 +569,9 @@ class ReporteCriteria {
 		/* WHERE SIN USUARIOS NI TRABAJOS */
 		unset($this->filtros['trabajo.cobrable']);
 		unset($this->filtros['tramite.cobrable']);
-		unset($this->filtros['trabajo.id_usuario']);
 
-		unset($this->filtros['asunto.id_area_proyecto']);
-		unset($this->filtros['asunto.id_tipo_asunto']);
+		// todo crear método que identifique cuando ejectuar la query cobro
+		unset($this->filtros['trabajo.id_usuario']);
 
 		$and_wheres = array(
 			$this->getWhere(TIPO_COBROS),
@@ -645,6 +645,7 @@ class ReporteCriteria {
 		// Obtiene todos los datos para Cobros
 		// En caso de filtrar por área o categoría de usuario no se toman en cuenta los cobros sin horas.
 		$cobroquery = $this->cobroQuery();
+
 		if (
 			$this->requiereMoneda($this->tipo_dato)
 			&& $this->tipo_dato != 'valor_hora'
@@ -2096,6 +2097,7 @@ class ReporteCriteria {
 		}
 		$this->setCampoFecha($this->parametros['campo_fecha']);  # set the real
 		$and_wheres = array();
+
 		foreach ($this->filtros as $campo => $filtro) {
 			foreach ($filtro as $booleano => $valor) {
 				if ($booleano == 'positivo') {
@@ -2119,6 +2121,7 @@ class ReporteCriteria {
 				}
 			}
 		}
+
 		//Añado el periodo determinado
 		if ($type == TIPO_TRABAJOS || $type == TIPO_TRAMITES) {
 			$campo_fecha = $this->campo_fecha;
