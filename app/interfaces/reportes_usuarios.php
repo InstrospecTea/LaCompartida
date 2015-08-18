@@ -3,6 +3,7 @@
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
+	$Form = new Form($sesion);
 
     if($id_usuario == "")
         $id_usuario = $sesion->usuario->fields['id_usuario'];
@@ -35,8 +36,8 @@
 		<td align=right>
 			<?=__('Usuario')?>
 		</td>
-		<td align=left>
-			<?= Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "id_usuario", $id_usuario) ?>
+		<td align=left><!-- Nuevo Select -->
+			<?php echo $Form->select('id_usuario', $sesion->usuario->ListarActivos('', 'PRO'), $id_usuario, array('empty' => FALSE, 'style' => 'width: 200px')); ?>
 		</td>
 	</tr>
 	<tr>

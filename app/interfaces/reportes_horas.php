@@ -8,6 +8,7 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $fecha_desde = $fecha_anio_desde . '-' . sprintf('%02d', $fecha_mes_desde) . '-01';
 $fecha_hasta = $fecha_anio_hasta . '-' . sprintf('%02d', $fecha_mes_hasta) . '-31';
+$Form = new Form($sesion);
 
 $pagina->titulo = __('Reporte Gráfico por Período');
 $pagina->PrintTop();
@@ -184,7 +185,8 @@ jQuery(document).ready(function() {
                 <?php echo __('Profesionales') ?>
             </td>
             <td align="left">
-                <?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]", $usuarios, "class=\"selectMultiple\" multiple size=6 ", "", "200"); ?>
+                <!-- Nuevo Select -->
+                <?php echo $Form->select('usuarios[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple','multiple' => 'multiple','size' => '6')); ?>
             </td>
         </tr>
         <tr>

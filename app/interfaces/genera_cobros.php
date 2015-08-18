@@ -889,19 +889,17 @@ if ($proceso !== false) {
 						</tr>
 						<tr>
 							<td align=right><b><?php echo __('Encargado comercial') ?>&nbsp;</b></td>
-							<td colspan=2 align=left>
-								<?php echo Html::SelectArrayDecente($sesion->usuario->ListarActivos('', 'SOC'), 'id_usuario', $id_usuario, '', __('Cualquiera'), '210px') ?>
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso ?>' >
+							<td colspan=2 align=left><!-- Nuevo Select -->
+								<?php echo $Form->select('id_usuario', $sesion->usuario->ListarActivos('', 'SOC'), $id_usuario, array('empty' => __('Cualquiera'), 'style' => 'width: 210px')); ?>
+								<input type="hidden" size="6" name="id_proceso" id="id_proceso" value='<?php echo $id_proceso ?>' >
 							</td>
 						</tr>
 						<?php if (Conf::GetConf($sesion, 'EncargadoSecundario')) { ?>
 							<tr>
 								<td align=right><b><?php echo __('Encargado Secundario') ?>&nbsp;</b></td>
-								<td colspan=2 align=left>
-									<?php echo Html::SelectArrayDecente($sesion->usuario->ListarActivos(), 'id_usuario_secundario', $id_usuario_secundario, '', __('Cualquiera'), '210px') ?>
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									<input type=hidden size=6 name=id_proceso id=id_proceso value='<?php echo $id_proceso ?>' >
+								<td colspan=2 align=left><!-- Nuevo Select -->
+									<?php echo $Form->select('id_usuario_secundario', $sesion->usuario->ListarActivos(), $id_usuario_secundario, array('empty' => __('Cualquiera'), 'style' => 'width: 210px')); ?>
+									<input type="hidden" size="6" name="id_proceso" id="id_proceso" value='<?php echo $id_proceso ?>' >
 								</td>
 							</tr>
 							<?php

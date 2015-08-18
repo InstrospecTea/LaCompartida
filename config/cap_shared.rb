@@ -17,7 +17,7 @@ set :application, "time_tracking"
 set :stages, %w(local feature release production)
 set :ssh_options, { :forward_agent => true }
 set :use_sudo, false
-set :keep_releases, 2
+set :keep_releases, 5
 set :scm, :git
 set :git_enable_submodules, 1
 set :repository, "git@github.com:LemontechSA/ttb.git"
@@ -31,6 +31,7 @@ set :deploy_dir_name, "deploy"
 set :virtual_directory, "/var/www/virtual"
 set :file_path, "#{deploy_dir_name}/#{application}"
 set :deploy_to, "#{base_directory}/#{file_path}"
+set :nginx_root, "#{base_directory}/timebilling"
 
 namespace :composer do
   desc "Setup composer dir and install"

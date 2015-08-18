@@ -74,7 +74,7 @@ class WsFacturacionNubox extends WsFacturacion{
 	private function extraerError($result) {
 		if ($result['Resultado'] == 'C1') {
 			$error = __('Ocurrió un error al generar el documento. Por favor verifique que todos los datos del Documento sean correctos.');
-		} else { 			
+		} else {
 			$error = __('Ocurrió un error al emitir el documento.');
 		}
 		$error .= "\n \nInformación de Nubox:\n";
@@ -115,9 +115,35 @@ class WsFacturacionNubox extends WsFacturacion{
 		);
 
 		try {
-			$loginClient = new SoapClient($this->url_login, array('trace' => 0));
-			$resultado = $loginClient->Autenticar($login);
+			/* Debido a la actualización de OpenSSL a la versión 3
+			// Por parte de los prestadores de servicio (Nubox), y la actualización
+			// de la librería en los servidores de producción *(OpenSSL 1.0.2d 9 Jul 2015)*
+			// se necesita crear un contexto de flujo, con el cual se utilice de forma
+			// explícita un cipher de ssl (RC4-SHA). Si no se agrega este contexto en la
+			// instancia de SoapClient utilizada, este simplemente rechaza la
+			// petición, indicando que no puede consultar al servidor.
+			// Leer: http://php.net/manual/es/class.soapclient.php#115736
+			//
+			// A partir de PHP 5.5.0 existe la posibilidad de pasarle el parámetro
+			// `ssl_method = SOAP_SSL_METHOD_SSLv3`... pero eso queda para el futuro,
+			// cuando TTB utilice PHP 5.5.x :)
+			*/
+			$stream_context = stream_context_create(array(
+				'ssl' => array(
+					'ciphers' => 'RC4-SHA'
+				)
+			));
+
+			$opts = array(
+				'trace'          => 0,
+				'stream_context' => $stream_context,
+			);
+
+			$loginClient = new SoapClient($this->url_login, $opts);
+
+			$resultado   = $loginClient->Autenticar($login);
 			$this->token = $resultado->AutenticarResult;
+
 		} catch (Exception $se) {
 			$this->setError(530, __('Acceso denegado.'));
 			return false;

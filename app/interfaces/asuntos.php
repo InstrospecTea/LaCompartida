@@ -205,8 +205,8 @@ $Form = new Form;
 					<td class="ar" style="font-weight:bold;">
 						<?php echo __('Usuario'); ?>
 					</td>
-					<td class="al" colspan="3">
-						<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos(), 'id_usuario', $id_usuario, '', 'Todos', '300px'); ?>
+					<td class="al" colspan="3"><!-- Nuevo Select -->
+                    	<?php echo $Form->select('id_usuario', $Sesion->usuario->ListarActivos(), $id_usuario, array('empty' => __('Todos'), 'style' => 'width: 300px')); ?>
 					</td>
 				</tr>
 				<tr>

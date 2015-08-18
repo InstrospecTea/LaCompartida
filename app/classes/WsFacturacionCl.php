@@ -47,6 +47,7 @@ class WsFacturacionCl extends WsFacturacion {
 				),
 				'Receptor' => array(
 					'RUTRecep' => $dataFactura['receptor']['rut'],
+					'CdgIntRecep' => $dataFactura['receptor']['codigo'],
 					'RznSocRecep' => $dataFactura['receptor']['razon_social'],
 					'GiroRecep' => $dataFactura['receptor']['giro'],
 					'CorreoRecep' => $dataFactura['receptor']['correo'],

@@ -14,7 +14,8 @@ require_once Conf::ServerDir() . '/classes/Reporte.php';
 $sesion = new Sesion(array('REP'));
 
 $pagina = new Pagina($sesion);
-
+$Form = new Form($sesion);
+$usuario = new UsuarioExt($sesion);
 
 $pagina->titulo = __('Resumen actividades profesionales');
 
@@ -616,8 +617,8 @@ $agrupadores = explode('-', $vista);
 							<b><?php echo __('Periodo') ?>:</b>&nbsp;&nbsp;<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;<span style='font-size:9px'><label for="rango"><?php echo __('Otro rango') ?></label></span></td>
 					</tr>
 					<tr valign=top>
-						<td rowspan="2" align=left>
-							<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]", $usuariosF, "class=\"selectMultiple\" multiple size=6 ", "", "200"); ?>	  </td>
+						<td rowspan="2" align=left><!-- Nuevo Select -->
+							<?php echo $Form->select('usuariosF[]', $usuario->get_usuarios_resumen_actividades(), $usuariosF, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple', 'size' => '6')); ?>
 						<td rowspan="2" align=left>
 							<?php
 							if (Conf::GetConf($sesion, 'CodigoSecundario')) {

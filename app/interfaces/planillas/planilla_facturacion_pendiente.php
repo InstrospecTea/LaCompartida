@@ -9,6 +9,7 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 $AtacheSecundarioSoloAsunto = Conf::GetConf($sesion, 'AtacheSecundarioSoloAsunto');
+$Form = new Form($sesion);
 
 if ($AtacheSecundarioSoloAsunto) {
 
@@ -731,10 +732,8 @@ $pagina->PrintTop();
 		<tr>
 			<td style="text-align:center;" colspan="<?php echo $AtacheSecundarioSoloAsunto ? 2 : 5; ?>">
 				Filtrar por <?php printf('%s<br/>(%s)<br/>', __('Encargado Comercial'), __('Opcional')); ?>
-				<?php
-				$usuarios = $sesion->usuario->ListarActivos('', 'SOC');
-				echo Html::SelectArrayDecente($usuarios, 'socios[]', $socios, 'class="selectMultiple" multiple size="12" ', '', '260px');
-				?>
+				<!-- Nuevo Select -->
+				<?php echo $Form->select('socios[]', $sesion->usuario->ListarActivos('', 'SOC'), $socios, array('empty' => FALSE, 'style' => 'width: 260px', 'class' => 'selectMultiple','multiple' => 'multiple','size' => '12')); ?>
 			</td>
 			<?php if ($AtacheSecundarioSoloAsunto) { ?>
 				<td>&nbsp;</td>
