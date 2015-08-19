@@ -986,6 +986,8 @@ if ($proceso !== false) {
 					<label for="opc_ver_cobrable"><?php echo __('Mostrar trabajos no visibles') ?></label>
 					<input type="checkbox" name="opc_ver_asuntos_separados" id="opc_ver_asuntos_separados" <?php echo Conf::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?> value="1" />
 					<label for="opc_ver_asuntos_separados"><?php echo __('Ver asuntos por separado') ?></label>
+					<input type="checkbox" name="opc_mostrar_asuntos_cobrables_sin_horas" id="opc_mostrar_asuntos_cobrables_sin_horas" value="1" />
+					<label for="opc_mostrar_asuntos_cobrables_sin_horas"><?php echo __('Mostrar Asuntos Cobrables Sin Horas') ?></label>
 					<?php
 					$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
 
