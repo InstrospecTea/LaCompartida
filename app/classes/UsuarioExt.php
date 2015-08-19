@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Usuario.php';
 require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 require_once Conf::ServerDir() . '/../app/classes/Tarifa.php';
+require_once Conf::ServerDir() . '/../app/classes/Criteria.php';
 
 define('CONCAT_RUT_DV_USUARIO', 'CONCAT(rut,IF(dv_rut="" OR dv_rut IS NULL, "", CONCAT("-", dv_rut)))');
 
@@ -778,12 +779,362 @@ class UsuarioExt extends Usuario {
 		return parent::Write();
 	}
 
-	public static function QueryComerciales() {
-		return "SELECT
-						usuario.id_usuario,
-						CONCAT_WS(' ', apellido1, apellido2, ',' , nombre)
-					FROM usuario INNER JOIN usuario_permiso USING(id_usuario)
-					WHERE codigo_permiso = 'SOC' ORDER BY apellido1";
+	public static function QueryComerciales($sesion, $codigo_permiso = 'SOC') {
+		$criteria = new Criteria($sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_inner_join_with('usuario_permiso UP', 'U.id_usuario = UP.id_usuario')
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
+				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'{$codigo_permiso}'"))
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	/**
+	 *
+	 * Retorna listado de usuarios según los parámetros dados
+	 *
+	 * @param int $id_usuario id del usuario
+	 * @param bool $permitido variable para saber si el usaurio tiene permisos de 'REV' ^ 'DAT'
+	 *
+	 * @return array $rows contiene un arreglo con los usuarios según la query previa
+	 */
+	public function get_usuarios_agregar_cliente($id_usuario, $permitido) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_left_join_with('usuario_secretario US', 'U.id_usuario = US.id_profesional')
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
+				->add_restriction(CriteriaRestriction::equals('U.activo', 1))
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		if (! $permitido) {
+			$clauses[] = CriteriaRestriction::equals('US.id_secretario', $sesion->usuario->fields['id_usuario']);
+			$clauses[] = CriteriaRestriction::in('U.id_usuario', array($id_usuario, $this->sesion->usuario->fields['id_usuario']));
+			$criteria->add_restriction(
+				CriteriaRestriction::or_clause($clauses)
+			);
+		}
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	/**
+	 *
+	 * Retorna listado de usuarios según los parámetros dados
+	 *
+	 * @param int $tipo condición para saber si se debe hacer cruce con tabla usuario_permiso, codigo_permiso = 'SOC'
+	 *
+	 * @return array $rows contiene un arreglo con los usuarios según la query previa
+	 */
+	public function get_usuarios_gatos($tipo = 0) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		if ($tipo == 1) {
+			$criteria->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario');
+			$criteria->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'SOC'"));
+		}
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	/**
+	 *
+	 * Retorna listado de usuarios según los parámetros dados
+	 *
+	 * @param int $id_usuario id del usuario
+	 * @param bool $permiso_revisor indica si el usuario tiene permisos de REV
+	 *
+	 * @return array $rows contiene un arreglo con los usuarios según la query previa
+	 */
+	public function get_usuarios_editar_trabajo($id_usuario, $permiso_revisor) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
+				->add_left_join_with('usuario_secretario US', 'US.id_profesional = U.id_usuario')
+				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
+		 		->add_grouping('U.id_usuario')
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		$clauses = array();
+		$clauses[] = CriteriaRestriction::equals('U.visible', 1);
+		$clauses[] = CriteriaRestriction::equals('U.id_usuario', $id_usuario);
+
+		$criteria->add_restriction(
+			CriteriaRestriction::or_clause($clauses)
+		);
+
+		$clauses = array();
+
+		if (! $permiso_revisor) {
+			$revisor = new Criteria($this->sesion);
+			$revisor->add_select('id_revisado')
+					->add_from('usuario_revisor')
+					->add_restriction(CriteriaRestriction::equals('id_revisor', $this->sesion->usuario->fields['id_usuario']));
+			$result = $revisor->run();
+
+			$rows = array();
+			foreach ($result as $revisado) {
+				$rows[] = $revisado['id_revisado'];
+			}
+
+			$clauses[] = CriteriaRestriction::in('U.id_usuario', array($id_usuario, $this->sesion->usuario->fields['id_usuario']));
+			$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
+
+			$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
+		}
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	/**
+	 *
+	 * Retorna listado de usuarios según los parámetros dados
+	 *
+	 * @param int $id_usuario id del usuario
+	 * @param array $permitido indica si el usuario tiene permisos REV
+	 *
+	 * @return array $rows contiene un arreglo con los usuarios según la query previa
+	 */
+	public function get_usuarios_trabajo($id_usuario, $permitido) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
+				->add_left_join_with('usuario_secretario US', 'US.id_profesional = U.id_usuario')
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
+		 		->add_grouping('U.id_usuario')
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		$clauses = array();
+
+		if ($permitido) {
+			$criteria->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"));
+		} else {
+			$clauses[] = CriteriaRestriction::equals('US.id_secretario', $sesion->usuario->fields['id_usuario']);
+			$clauses[] = CriteriaRestriction::in('U.id_usuario', array($id_usuario, $this->sesion->usuario->fields['id_usuario']));
+			$criteria->add_restriction(
+				CriteriaRestriction::or_clause($clauses)
+			);
+		}
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	/**
+	 *
+	 * Retorna listado de usuarios según los parámetros dados
+	 *
+	 * @param bool $revisor indica si el usuario tiene permisos de REV
+	 *
+	 * @return array $rows contiene un arreglo con los usuarios según la query previa
+	 */
+	public function get_usuarios_trabajos($revisor) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
+				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		$clauses = array();
+
+		if (! $revisor) {
+			$revisor = new Criteria($this->sesion);
+			$revisor->add_select('id_revisado')
+					->add_from('usuario_revisor')
+					->add_restriction(CriteriaRestriction::equals('id_revisor', $this->sesion->usuario->fields['id_usuario']));
+			$result = $revisor->run();
+
+			$rows = array();
+			foreach ($result as $revisado) {
+				$rows[] = $revisado['id_revisado'];
+			}
+
+			$clauses[] = CriteriaRestriction::equals('U.id_usuario', $this->sesion->usuario->fields['id_usuario']);
+			$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
+
+			$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
+		}
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	/**
+	 * resumen_actividades.php
+	 *
+	 * Retorna listado de usuarios 
+	 *
+	 * @return array $rows contiene un arreglo con los usuarios según la query previa
+	 */
+	public function get_usuarios_resumen_actividades() {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+		 		->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
+				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	/**
+	 * resumen_semana.php
+	 *
+	 * Retorna listado de usuarios según los parámetros dados
+	 *
+	 * @param int $id_area_usuario id del área a la que pertenece el usuario
+	 * @param bool $permisos indica si el usuario tiene permisos de REV
+	 * @param bool $permiso_cobranza indica si el usuario tiene permisos de COB
+	 * @param array $sesion variables de sesión
+	 *
+	 * @return array $rows contiene un arreglo con los usuarios según la query previa
+	 */
+	public function get_usuarios_resumen_semana($id_area_usuario, $permisos, $permiso_cobranza, $sesion) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
+				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
+				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		if (! empty($id_area_usuario)) {
+			$criteria->add_restriction(CriteriaRestriction::equals('U.id_area_usuario', mysql_real_escape_string($id_area_usuario)));
+		}
+
+		if (! $permisos->fields['permitido'] || ! $permiso_cobranza->fields['permitido']) {
+			$clauses = array();
+
+			$revisor = new Criteria($sesion);
+			$revisor->add_select('id_revisado')
+					->add_from('usuario_revisor')
+					->add_restriction(CriteriaRestriction::equals('id_revisor', $sesion->usuario->fields['id_usuario']));
+			$result = $revisor->run();
+
+			$rows = array();
+			foreach ($result as $revisado) {
+				$rows[] = $revisado['id_revisado'];
+			}
+
+			$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
+
+			$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
+		}
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
 	}
 
 	public function Guardar($datos, &$pagina = null, $validaciones_segun_config = false) {
@@ -832,16 +1183,14 @@ class UsuarioExt extends Usuario {
 	 */
 	public function ListarActivos($where = '', $con_permisos = false) {
 		$Objeto = new Objeto($this->sesion, '', '', $this->tabla, $this->campo_id, $this->campo_glosa);
-		if (!$this->Es('SADM')) {
-			$and = "AND usuario.rut != '99511620'";
-		}
+		
 		$permisos = '';
 		if ($con_permisos !== false) {
 			$and_permisos = $con_permisos === true ? '' : "AND usuario_permiso.codigo_permiso = '{$con_permisos}'";
 			$permisos = "INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario {$and_permisos}";
 		}
 		$query_extra = "$permisos
-						WHERE usuario.activo = 1
+						WHERE usuario.activo = 1 AND usuario.visible = 1
 							$where
 							$and
 						ORDER BY usuario.apellido1";

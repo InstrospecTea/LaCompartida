@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('PRO', 'REV', 'SEC'));
 $pagina = new Pagina($sesion);
+$Form = new Form;
 $pagina->titulo = __('Ingreso/Modificación de') . ' ' . __('Trabajos');
 $pagina->PrintTop($popup);
 
@@ -64,15 +65,6 @@ if ($semana == "") {
 $dias = array(__("Lunes"), __("Martes"), __("Miércoles"), __("Jueves"), __("Viernes"), __("Sábado"), __("Domingo"));
 $tip_anterior = Html::Tooltip("<b>" . __('Semana anterior') . ":</b><br>" . Utiles::sql3fecha($semana_anterior, '%d de %B de %Y'));
 $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Utiles::sql3fecha($semana_siguiente, '%d de %B de %Y'));
-
-#agregado para el nuevo select
-if ($p_revisor->fields['permitido']) {
-	$where = "usuario.visible = 1 AND usuario_permiso.codigo_permiso = 'PRO'";
-} else {
-	$where = "usuario_secretario.id_secretario = '{$sesion->usuario->fields['id_usuario']}' OR usuario.id_usuario IN ('{$id_usuario}', '{$sesion->usuario->fields['id_usuario']}')";
-}
-
-$where .= " AND usuario.visible = 1";
 ?>
 
 <style type="text/css">
@@ -492,17 +484,12 @@ $where .= " AND usuario.visible = 1";
 									<img src='<?php echo Conf::ImgDir() . "/izquierda.gif"; ?>' <?php echo $tip_anterior; ?> class='mano_on' onclick="CambiaSemana('<?php echo $semana_anterior; ?>')">
 								<?php } ?>
 							</td>
-							<td align='center'>
+							<td align='center'><!-- Nuevo Select -->
 								<?php
 									if ($p_revisor->fields['permitido']) {
+										$usuario = new UsuarioExt($sesion);
 										echo (__('Usuario') . "&nbsp;");
-										echo Html::SelectQuery($sesion,
-											"SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) AS nombre
-											FROM usuario
-												JOIN usuario_permiso USING(id_usuario)
-												LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
-											WHERE {$where} GROUP BY id_usuario ORDER BY nombre"
-										, "id_usuario", $id_usuario, "onchange='Refrescar();'", '', "170");
+										echo $Form->select('id_usuario', $usuario->get_usuarios_trabajo($id_usuario, $p_revisor->fields['permitido']), $id_usuario, array('empty' => FALSE, 'style' => 'width: 170px', 'onchange' => 'Refrescar()'));
 									} else {
 										echo '<input type="hidden" id="id_usuario" value="' . $id_usuario . '"/>';
 									}

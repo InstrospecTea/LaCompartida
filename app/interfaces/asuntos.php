@@ -12,11 +12,11 @@ $PrmTipoProyecto = new PrmTipoProyecto($Sesion);
  * Configuraciones utilizadas en la interfaz
  */
 
-# Descripción = Habilita autocompletador de asuntos.
+// Descripción = Habilita autocompletador de asuntos.
 $selectclienteasuntoespecial = Conf::GetConf($Sesion, 'SelectClienteAsuntoEspecial') == '1' ? true : false;
 
-# Descripcion = El ambiente del cliente utiliza un codigo personalizado para...
-# manejo de codígos de cliente y asunto en interfaces.
+// Descripcion = El ambiente del cliente utiliza un codigo personalizado para...
+// manejo de codígos de cliente y asunto en interfaces.
 $usocodigosecundario = Conf::GetConf($Sesion, 'CodigoSecundario') == '1' ? true : false;
 
 $Html = new \TTB\Html;
@@ -205,8 +205,8 @@ $Form = new Form;
 					<td class="ar" style="font-weight:bold;">
 						<?php echo __('Usuario'); ?>
 					</td>
-					<td class="al" colspan="3">
-						<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos(), 'id_usuario', $id_usuario, '', 'Todos', '300px'); ?>
+					<td class="al" colspan="3"><!-- Nuevo Select -->
+                    	<?php echo $Form->select('id_usuario', $Sesion->usuario->ListarActivos(), $id_usuario, array('empty' => __('Todos'), 'style' => 'width: 300px')); ?>
 					</td>
 				</tr>
 				<tr>

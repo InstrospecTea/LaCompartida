@@ -2,9 +2,7 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('TAR'));
-
 $Pagina = new Pagina($Sesion);
-
 $tarifa = new Tarifa($Sesion);
 
 if ($opc == 'eliminar') {
@@ -23,26 +21,14 @@ if ($opc == 'eliminar') {
 	}
 }
 
-if (!empty($id_tarifa_edicion) && !$tarifa->Load($id_tarifa_edicion)) {
+if (!isset($id_tarifa_edicion) && !isset($nueva)) {
 	$tarifa->LoadDefault();
-	$Pagina->Redirect('agregar_tarifa.php?id_tarifa_edicion=' . $tarifa->fields['id_tarifa']);
+	$id_tarifa_edicion = $tarifa->fields['id_tarifa'];
 }
 
-/* * * *
- * NOTA: ¿Por qué existió esto?, ¿Cuándo hace sentido tratar de borrar todas las tarifas?,
- *       ¿No sería mas correcto tratar de borrar las que no estén asociadas a algún contrato?
- * * * *
-if ($opc != 'guardar') {
-	$query = "SELECT id_tarifa FROM tarifa WHERE guardado=0";
-	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-
-	while (list($id) = mysql_fetch_array($resp)) {
-		$tarifa_eliminar = new Tarifa($Sesion);
-		$tarifa_eliminar->loadById($id);
-		$tarifa_eliminar->Eliminar();
-	}
+if (!empty($id_tarifa_edicion) && !$tarifa->Load($id_tarifa_edicion)) {
+	$Pagina->AddError(__('Esta tarifa no existe'));
 }
-/* */
 
 if ($id_tarifa_previa && !$id_tarifa_edicion && $opc != 'guardar') {
 	$query = "INSERT INTO tarifa(fecha_creacion) VALUES(NOW())";
@@ -83,7 +69,6 @@ if ($id_nuevo && $opc != 'guardar') {
 }
 
 if ($opc == 'guardar') {
-
 	if (empty($glosa_tarifa)) {
 		$Pagina->AddError(__('Debe definir un nombre para la tarifa.'));
 	} else {
@@ -93,8 +78,6 @@ if ($opc == 'guardar') {
 		if ($tarifa_defecto) {
 			$tarifa->TarifaDefecto($tarifa->fields['id_tarifa']);
 			$tarifa->Edit('tarifa_defecto', '1');
-		} else {
-			$tarifa->Edit('tarifa_defecto', '0');
 		}
 
 		if (empty($glosa_tarifa)) {
@@ -125,11 +108,8 @@ if ($opc == 'guardar') {
 	}
 }
 
-
 $Pagina->titulo = __('Ingreso de Tarifas');
-
 $Pagina->PrintTop($popup);
-
 $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 ?>
 
@@ -222,13 +202,12 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 		element = document.getElementById('usar_tarifa_previa');
 		if (element && element.checked)
 		{
-			self.location.href = 'agregar_tarifa.php?popup=<?php echo $popup ?>&id_tarifa_previa=' + id;
+			self.location.href = 'agregar_tarifa.php?nueva=true&popup=<?php echo $popup ?>&id_tarifa_previa=' + id;
 		}
 		else {
-			self.location.href = 'agregar_tarifa.php?popup=<?php echo $popup ?>';
+			self.location.href = 'agregar_tarifa.php?nueva=true&popup=<?php echo $popup ?>';
 		}
 	}
-
 </script>
 
 <style>
@@ -268,7 +247,7 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 			?>
 			<td style="text-align:left;vertical-align: middle;" colspan="2"> <?php echo __('Nombre') ?>: <input style="width:200px;" type=text name="glosa_tarifa" value='<?php echo $tarifa->fields['glosa_tarifa'] ?>' <?php echo $active ?>> </td>
 
-			<td style="text-align:right;vertical-align: middle;"> <?php echo __('Defecto') ?>: <input type=checkbox name=tarifa_defecto value='1' <?php echo $tarifa->fields['tarifa_defecto'] ? 'checked' : '' ?>></td>
+			<td style="text-align:right;vertical-align: middle;"> <?php echo __('Defecto') ?>: <input type=checkbox name=tarifa_defecto value='1' <?php echo $tarifa->fields['tarifa_defecto'] ? 'checked readonly onclick="return false"' : '' ?>></td>
 		</tr>
 		<tr>
 			<td colspan="<?php echo $colspan ?>" align=right>&nbsp;</td>
@@ -304,10 +283,7 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 	</table>
 	<br>
 
-
-
 	<?php
-	/* self.location.href= */
 	######## MONEDAS #########
 	$lista_monedas = new ListaObjetos($Sesion, '', "SELECT * from prm_moneda Order by id_moneda ASC");
 	$td_moneda = '';
@@ -362,8 +338,6 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 			$money = $lista_monedas->Get($j);
 			$glosa_moneda = preg_replace("/ó/", "o", $money->fields['glosa_moneda']);
 
-			#echo "comienzo<br>".$id_moneda."<br>".$money->fields['id_moneda']."<br>".$id_categoria_usuario_tarifa."<br>".$id_categoria_usuario."<br>";
-
 			if ($id_moneda == $money->fields['id_moneda'] && $id_categoria_usuario_tarifa == $id_categoria_usuario) {
 				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][" . $money->fields['id_moneda'] . "]' value='" . $valor . "' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria',this.value,'$glosa_moneda','$valor');\"></td> \n";
 				list($id_categoria_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp_categoria);
@@ -376,7 +350,6 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 	$cont = $tab; // deja tabindex equal al maximo de la tabla de categorias para que no se interfere con la tabla de usuarios
 	########## USUARIO TARIFA ###########
 	$td_tarifas = '';
-	//$cont = 0;
 	$where = '1';
 	if ($id_tarifa_edicion) {
 		$where .= " AND usuario_tarifa.id_tarifa = '$id_tarifa_edicion'";
@@ -458,5 +431,4 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 	</td></tr></table>
 	<br>
 <?php
-//include('ajax/tarifas_duplicadas.php');
 $Pagina->PrintBottom($popup);

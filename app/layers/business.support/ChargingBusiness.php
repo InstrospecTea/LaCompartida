@@ -13,7 +13,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	/**
 	 * Elimina un cobro
 	 * @param type $id_cobro
-	 * @throw Exceptions
+	 * @throws Exception
 	 */
 	public function delete($id_cobro) {
 		$this->loadService('Charge');
@@ -63,16 +63,16 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 			$this->overrideDocument();
 
-			$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = $id_cobro";
+			$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = '$id_cobro'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = $id_cobro";
+			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-			$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
+			$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-			$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = $id_cobro";
+			$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 			$CobroAsunto = new CobroAsunto($this->sesion);
@@ -360,9 +360,11 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 	/**
 	 * Obtiene la instancia de {@link WorkFee} que representa los parámetros de búsqueda ingresados.
-	 * @param   $workId
-	 * @param   $currencyId
-	 * @return
+	 * @param $workId
+	 * @param $currencyId
+	 * @return WorkFee
+	 * @throws Exception
+	 * @throws UtilityException
 	 */
 	public function getWorkFee($workId, $currencyId) {
 		$searchCriteria = new SearchCriteria('WorkFee');

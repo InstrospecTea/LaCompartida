@@ -18,13 +18,13 @@ namespace :deploy do
 
   desc "Send email notification"
   task :send_notification do
-    Notifier.deploy_notification(self).deliver 
+    Notifier.deploy_notification(self).deliver
   end
 
   task :stablish_symlinks do
     update_symlinks(self)
   end
- 
+
   task :finalize_update, :except => { :no_release => true } do
     transaction do
       run "chmod -R g+w #{releases_path}/#{release_name}"
@@ -32,7 +32,7 @@ namespace :deploy do
       run "echo 'branch: #{branch}' >> #{releases_path}/#{release_name}/environment.txt"
     end
   end
- 
+
   before "deploy:update_code", "deploy:setup"
   after "deploy:update", "deploy:cleanup"
   after "deploy", 'deploy:send_notification'

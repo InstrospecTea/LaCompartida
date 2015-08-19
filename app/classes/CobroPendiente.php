@@ -28,42 +28,86 @@ class CobroPendiente extends Objeto {
 		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	}
 
-	#funcion que se corre una vez al mes por cron para generar los nuevos
-	function GenerarCobrosPeriodicos($sesion) {
-		$query = "SELECT id_contrato,periodo_intervalo,periodo_repeticiones,monto,
-							forma_cobro
-							FROM contrato
-							WHERE contrato.activo='SI'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		while($contrato = mysql_fetch_array($resp)) {
-			#se saca la ultima fecha en la lista del contrato
-			$query2 = "SELECT SQL_CALC_FOUND_ROWS fecha_cobro
-						FROM cobro_pendiente
-						WHERE id_contrato='".$contrato['id_contrato']."' AND hito = 0 ORDER BY fecha_cobro DESC LIMIT 1";
-			$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
-			list($ultima_fecha) = mysql_fetch_array($resp2);
+	/**
+	 * Funcion que se corre una vez al mes por cron para generar las nuevas liquidaciones programados
+	 * considerando las siguientes reglas:
+	 *
+	 * - Se considerán los contratos activos que tengan liquidaciones programadas (con una fecha de inicio)
+	 * - Solo se podrá generar un máximo de 2 liquidaciones pendientes de facturar
+	 * - Solo se podrá generar un máximo de liquidaciones pendientes de acuerdo a las repeticiones configuradas
+	 * - No se generarán liquidaciones con mas de 2 meses de anticipación
+	 * - No se consideran los cobros pendientes de HITOS
+	 *
+	 * @param $Sesion
+	 */
+	function GenerarCobrosPeriodicos($Sesion) {
 
-			#cantidad de cobros pendientes
-			$query3 = "SELECT FOUND_ROWS()";
-			$resp3 = mysql_query($query3, $sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$sesion->dbh);
-			list($numero_pendientes) = mysql_fetch_array($resp3);
+		$query = "SELECT
+				c.id_contrato,
+				c.periodo_fecha_inicio,
+				c.periodo_intervalo,
+				c.periodo_repeticiones,
+				c.enviar_liquidacion_al_generar,
+				c.monto,
+				c.forma_cobro,
+				GREATEST(MAX(cp.fecha_cobro), c.periodo_fecha_inicio) AS ultima_fecha,
+				SUM(IF(cp.id_contrato IS NOT NULL AND cp.id_cobro IS NOT NULL, 1, 0)) AS pendientes_cobrados,
+				SUM(IF(cp.id_contrato IS NOT NULL, 1, 0)) AS pendientes_totales
+			FROM contrato c
+			LEFT JOIN cobro_pendiente cp
+				ON cp.id_contrato = c.id_contrato
+				AND cp.hito = 0
+			WHERE c.activo = 'SI'
+				AND c.forma_cobro != 'HITOS'
+				-- REF: https://dev.mysql.com/doc/refman/5.5/en/sql-mode.html#sqlmode_no_zero_date
+				AND c.periodo_fecha_inicio != '0000-00-00'
+				AND DATE(c.periodo_fecha_inicio) IS NOT NULL
+			GROUP BY c.id_contrato";
 
-			#datos del siguiente cobro pendiente por contrato
-			if($numero_pendientes > 0
-					&& $contrato['periodo_repeticiones']==0
-					&& $contrato['periodo_intervalo']!=0
-					&& ($numero_pendientes*$contrato['periodo_intervalo']) < 24) {
-				$numero_pendientes++;
-				$siguiente_fecha = strtotime(date("Y-m-d", strtotime($ultima_fecha)) . " +".$contrato['periodo_intervalo']." month");
-				$monto_cobro_pendiente = (($contrato['forma_cobro']=='FLAT FEE' || $contrato['forma_cobro']=='RETAINER') ? $contrato['monto'] : '');
-				$dateSiguienteFecha = date('Y-m-d',$siguiente_fecha);
-				$query4 = "INSERT INTO cobro_pendiente (id_contrato,fecha_cobro,descripcion,monto_estimado)
-							VALUES ('{$contrato['id_contrato']}','$dateSiguienteFecha',
-							'Cobro N° $numero_pendientes',
-							'$monto_cobro_pendiente')";
-				mysql_query($query4, $sesion->dbh) or Utiles::errorSQL($query4,__FILE__,__LINE__,$sesion->dbh);
+		$result = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+		while ($contrato = mysql_fetch_array($result)) {
+			$MAX_PENDING_MONTH_DIFF = 2;
+			$MAX_PENDING_UNBILLED = 2;
+
+			$max_pending_totals = $contrato['periodo_repeticiones'] > 0 ? $contrato['periodo_repeticiones'] : INF;
+
+			$pending_total = $contrato['pendientes_totales'];
+			$pending_billed = $contrato['pendientes_cobrados'];
+			$pending_unbilled = $pending_total - $pending_billed;
+
+			$today = date_create('now');
+			$months = $contrato['periodo_intervalo'];
+
+			if ($pending_total == 0) {
+				// Si no tiene pendientes creo el primero para la fecha de inicio
+				$next_date = date_create($contrato['periodo_fecha_inicio']);
+			} else {
+				// De lo contrario, ocupo la siguiente fecha desde la última
+				$next_date = date_create($contrato['ultima_fecha']);
+				date_add($next_date, date_interval_create_from_date_string("+{$months} months"));
+			}
+
+			$interval_diff = date_diff($today, $next_date);
+			$months_diff = $interval_diff->m;
+
+			if ($pending_total < $max_pending_totals
+					&& $pending_unbilled < $MAX_PENDING_UNBILLED
+					&& $months_diff < $MAX_PENDING_MONTH_DIFF) {
+
+				$next_date = date_format($next_date, 'Y-m-d');
+				$next_description = __('Cobro') . " N° " . ($pending_total + 1);
+				$next_amount = in_array($contrato['forma_cobro'], array('FLAT FEE', 'RETAINER')) ? $contrato['monto'] : 0;
+
+				$CobroPendiente = new CobroPendiente($Sesion);
+				$CobroPendiente->Edit("id_contrato", $contrato['id_contrato']);
+				$CobroPendiente->Edit("fecha_cobro", $next_date);
+				$CobroPendiente->Edit("descripcion", $next_description);
+				$CobroPendiente->Edit("monto_estimado", $next_amount);
+				$CobroPendiente->Edit("hito", '0');
+				$CobroPendiente->Write();
 			}
 		}
+
 		return true;
 	}
 
@@ -175,5 +219,23 @@ class CobroPendiente extends Objeto {
 		}
 
 		return $cliente_hitos;
+	}
+
+	/**
+	 * Obtiene el primer registro de pago pendiente para el cobro
+	 * @param $id_cobro
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function LoadFirstByIdCobro($id_cobro) {
+		$result = array();
+		$Criteria = new Criteria($this->sesion);
+		$Criteria->add_select('fecha_cobro')->add_select('monto_estimado')->add_select('descripcion')->add_select('observaciones')->add_select('id_contrato')->add_from('cobro_pendiente');
+		$Criteria->add_restriction(CriteriaRestriction::and_clause(array("id_cobro = $id_cobro", "hito = 1")))->add_limit(1);
+		$cobro_pendiente = $Criteria->run();
+		if (count($cobro_pendiente) > 0) {
+			$result = $cobro_pendiente[0];
+		}
+		return $result;
 	}
 }

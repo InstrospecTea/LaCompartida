@@ -6,6 +6,7 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 
 $pagina->titulo = __('Reporte Anual');
+$Form = new Form($sesion);
 
 
 $hoy = date("Y-m-d");
@@ -58,8 +59,8 @@ $pagina->PrintTop($popup);
                 </td>
             </tr>
             <tr valign=top>
-                <td rowspan="2" align=left>
-                    <?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]", $usuariosF, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>	  </td>
+                <td rowspan="2" align=left><!-- Nuevo Select -->
+                    <?php echo $Form->select('usuariosF[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuariosF, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple', 'size' => '5')); ?>
                 <td rowspan="2" align=left>
                     <?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]", $clientesF, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
                 </td>

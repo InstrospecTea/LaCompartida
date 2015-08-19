@@ -5,6 +5,7 @@ $sesion = new Sesion(array('OFI'));
 $pagina = new Pagina($sesion);
 $gasto = new Gasto($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
+$usuario = new UsuarioExt($sesion);
 
 $conf_nuevo_modulo_gastos = Conf::GetConf($sesion, 'NuevoModuloGastos') == '0' ? false : true;
 $conf_codigo_secundario = Conf::GetConf($sesion, 'CodigoSecundario') == '0' ? false : true;
@@ -631,12 +632,14 @@ function Refrescar() {
                 </tr>
                 <tr>
                     <td align=right><?php echo __('Encargado comercial') ?>&nbsp;</td>
-                    <td colspan=2 align=left><?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2,',',nombre) as nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE codigo_permiso='SOC' ORDER BY nombre", "id_usuario_responsable", $id_usuario_responsable, '', __('Cualquiera'), '200') ?>
+                    <td colspan=2 align=left><!-- Nuevo Select -->
+                    	<?php echo $Form->select('id_usuario_responsable', $usuario->get_usuarios_gatos(1), $id_usuario_responsable, array('empty' => __('Cualquiera'), 'style' => 'width: 200px')); ?>
+                    </td>
                 </tr>
                 <tr>
                     <td align=right><?php echo __('Ordenado por') ?></td>
-                    <td align=left colspan=3>
-						<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(' ', apellido1,apellido2,',',nombre) FROM usuario ORDER BY apellido1", "id_usuario_orden", $id_usuario_orden, "", __('Ninguno'), '200'); ?>
+                    <td align=left colspan=3><!-- Nuevo Select -->
+						<?php echo $Form->select('id_usuario_orden', $usuario->get_usuarios_gatos(), $id_usuario_orden, array('empty' => __('Ninguno'), 'style' => 'width: 200px')); ?>
                     </td>
                 </tr>
 				<?php if (Conf::GetConf($sesion, 'TipoGasto')) { ?>

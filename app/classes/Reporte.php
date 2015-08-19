@@ -124,7 +124,7 @@ class Reporte {
    * @param $dato_extra Datos extras (usado para determinar si mostrar trabajos sin horas castigadas)
    * @return void sólo asigna los filtros necesarios según tipo de dato
    */
-  public function setTipoDato($nombre, $dato_extra) {
+  public function setTipoDato($nombre, $dato_extra = null) {
     $this->tipo_dato = $nombre;
     switch ($nombre) {
       case "costo":
@@ -605,7 +605,7 @@ class Reporte {
             ' . (in_array('dia_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\')) as dia_emision,' : '') . '
             ' . (in_array('mes_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%m-%Y\')) as mes_emision,' : '') . '
             IFNULL(cobro.id_cobro,\'Indefinido\') as id_cobro,
-            
+
             IFNULL(cobro.id_estudio, IFNULL(estudio_contrato.id_estudio,  \'Indefinido\')) as id_estudio,
             IFNULL(prm_estudio.glosa_estudio, IFNULL(estudio_contrato.glosa_estudio,  \'Indefinido\')) as glosa_estudio,
 
@@ -648,11 +648,11 @@ class Reporte {
     // D : monto total de trabajos (tarifa del cliente)
 
     if ($this->proporcionalidad == 'estandar') {
-      $s_tarifa = 'tarifa_hh_estandar';
-      $s_monto_thh = $s_monto_thh_estandar;
-    } else {
       $s_tarifa = "IF(cobro.forma_cobro='FLAT FEE',tarifa_hh_estandar,tarifa_hh)";
       $s_monto_thh = "IF(cobro.forma_cobro='FLAT FEE'," . $s_monto_thh_estandar . "," . $s_monto_thh_simple . ")";
+    } else {
+      $s_tarifa = "tarifa_hh";
+      $s_monto_thh = $s_monto_thh_simple;
     }
 
     $monto_estandar = "SUM(
@@ -827,7 +827,7 @@ class Reporte {
     $join_por_cobrar .= "usuario_tarifa.id_usuario = trabajo.id_usuario
               AND usuario_tarifa.id_moneda = contrato.id_moneda
               {$join_tarifa}
-            LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = " . 
+            LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = " .
                 (($this->tipo_dato == 'valor_trabajado_estandar') ? 'trabajo' : 'contrato') . ".id_moneda
             LEFT JOIN prm_moneda AS moneda_display ON moneda_display.id_moneda = '{$this->id_moneda}'";
 

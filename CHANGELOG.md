@@ -1,5 +1,109 @@
 # Changelog
 
+## Hotfix 15.16.11
+Tuesday 2015, August 18th
+* **Feature:** [Agrega mensaje en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1086)
+
+## Hotfix 15.16.10
+Friday 2015, August 14th
+* **Fix:** [Corregir asignación de filtros al generar query de cobro en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1084)
+
+## Hotfix 15.16.9
+Tuesday 2015, August 13th
+* **Fix:** [Corrige reporte avanzado monto por cobrar](https://github.com/LemontechSA/ttb/pull/1083)
+
+## Hotfix 15.16.8
+Wednesday 2015, August 12th
+* **Fix:** [Corregir reporte avanzado al seleccionar los montos segun proporcionalidad para cobros FLAT FEE](https://github.com/LemontechSA/ttb/pull/1082)
+
+## Hotfix 15.16.7
+Tuesday 2015, August 11th
+* **Fix:** [Evita mostrar la forma_cobro en vez del estado del cobro en reportes avanzados](https://github.com/LemontechSA/ttb/pull/1081)
+
+## Hotfix 15.16.6
+Monday 2015, August 10th
+* **Fix:** [Dejando de enviar mail de problemas en el envío a los administradores del tenant](https://github.com/LemontechSA/ttb/pull/1076)
+
+## Hotfix 15.16.5
+Friday 2015, August 7th
+* **Fix:** [Corrección despliegue de datos según filtros en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1075)
+
+## Hotfix 15.16.4
+Friday 2015, August 7th
+* **Fix:** [Carga de datos DEMO con asuntos activos](https://github.com/LemontechSA/ttb/pull/1072)
+* **Fix:** [Configurar locale (formato decimal) al guardar datos](https://github.com/LemontechSA/ttb/pull/1072)
+
+## Hotfix 15.16.3
+Wednesday 2015, August 5th
+* **Feature:** [Enviar el código del cliente como identificador único a FacturaciónCL](https://github.com/LemontechSA/ttb/pull/1071)
+
+## Hotfix 15.16.2
+Wednesday 2015, August 5th
+* **Fix:** [Corregir encoding monto en palabras](https://github.com/LemontechSA/ttb/pull/1070)
+* **Feature:** [Se agrega tag "Nro Factura" en PDF Factura](https://github.com/LemontechSA/ttb/pull/1070)
+* **Feature:** [Se corrige traducción al ingles del monto en palabras](https://github.com/LemontechSA/ttb/pull/1070)
+* **Feature:** [Condicionar despliegue del descuento en la factura PDF](https://github.com/LemontechSA/ttb/pull/1070)
+
+## Hotfix 15.16.1
+Wednesday 2015, August 5th
+* **Fix:** [Se agrega tarea de capistrano para invalidación de opcache](https://github.com/LemontechSA/ttb/pull/1069)
+
+## [Release 15.16.0](https://github.com/LemontechSA/ttb/pull/1068)
+Tuesday 2015, August 4th.
+* [Migration nginx](https://github.com/LemontechSA/ttb/pull/1065)
+* [Adelantos orden cronologico](https://github.com/LemontechSA/ttb/pull/1060)
+
+## Hotfix 15.15.2
+Monday 2015, August 1st.
+* **Fix:** [Se corrige query para traer datos de factura correspondiente](https://github.com/LemontechSA/ttb/pull/1064)
+
+## Hotfix 15.15.1
+Friday 2015, July 31th.
+* **Fix:** [se cambia condición para traer listado alumnos, antes != 1 ahora = 1](https://github.com/LemontechSA/ttb/pull/1064)
+
+## [Release 15.15.0](https://github.com/LemontechSA/ttb/pull/1063)
+Thursday 2015, July 30th.
+* [Unificación de select usuarios](https://github.com/LemontechSA/ttb/pull/1057)
+* [Código de asunto secundario sólo si hay configuración](https://github.com/LemontechSA/ttb/pull/1054)
+* [Diferencia cambios agregar cliente](https://github.com/LemontechSA/ttb/pull/1051)
+
+## Hotfix 15.14.3
+Thursday 2015, July 30th.
+* **Fix:** [corregir suma subtotal asuntos en reporte excel liquidación](https://github.com/LemontechSA/ttb/pull/1061)
+
+## Hotfix 15.14.2
+Tuesday 2015, July 28th.
+* **Fix:** [Corregir calculo intervalo de duración al guardar trabajos mediante API](https://github.com/LemontechSA/ttb/pull/1058)
+
+## Hotfix 15.14.1
+Friday 2015, July 24th.
+* **Fix:** [Doblecero en factura PDF](https://github.com/LemontechSA/ttb/pull/1056)
+
+## [Release 15.14.0](https://github.com/LemontechSA/ttb/pull/1055)
+Thursday 2015, July 23th.
+* [Reporte Avanzado corrección trámites](https://github.com/LemontechSA/ttb/pull/1048)
+* [Panama](https://github.com/LemontechSA/ttb/pull/927)
+
+## Hotfix 15.13.1
+Wednesday 2015, July 22th.
+* **Feature:** [Agregar monto al contrato en integración con moreno baldivieso](https://github.com/LemontechSA/ttb/pull/1053)
+
+## [Release 15.13.0](https://github.com/LemontechSA/ttb/pull/1050)
+Wednesday 2015, July 15th.
+* **Feature:** [Corregir link de tarifas](https://github.com/LemontechSA/ttb/pull/1047)
+* **Feature:** [Hitos en cobro Twig](https://github.com/LemontechSA/ttb/pull/1046)
+* **Feature:** [Factura Colombia](https://github.com/LemontechSA/ttb/pull/1043)
+* **Feature:** [Ajuste a la generación de liquidaciones](https://github.com/LemontechSA/ttb/pull/1042)
+* **Feature:** [Filtro grupo cliente](https://github.com/LemontechSA/ttb/pull/1040)
+
+## Hotfix 15.12.18
+Tuesday 2015, July 14th.
+* **Fix:** [Corregir separación hora/minuto al sumar la duración cobrable](https://github.com/LemontechSA/ttb/pull/1049)
+
+## Hotfix 15.12.17
+Thursday 2015, July 9th.
+* **Fix:** [Eliminar trabajos, trámites y gastos que no existen en olap_liquidaciones](https://github.com/LemontechSA/ttb/pull/1045)
+
 ## Hotfix 15.12.16
 Wednesday 2015, July 1th.
 * **Feature:** [Corregir comportamiento selector de rangos al buscar liquidaciones](https://github.com/LemontechSA/ttb/pull/1041)

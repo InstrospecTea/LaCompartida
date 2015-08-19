@@ -26,10 +26,8 @@
       </tr>
       <tr>
         <th align="right"><?php echo __('Abogado') ?></th>
-        <td colspan="2" align="left">
-          <?php
-          echo $this->Form->select('id_usuario', $this->Session->usuario->ListarActivos('', 'PRO'), $this->data['id_usuario'], array('empty' => __('Todos')));
-          ?>
+        <td colspan="2" align="left"><!-- Nuevo Select -->
+          <?php echo $this->Form->select('id_usuario', $this->Session->usuario->ListarActivos('', 'PRO'), $this->data['id_usuario'], array('empty' => __('Todos'))); ?>
         </td>
       </tr>
       <tr>

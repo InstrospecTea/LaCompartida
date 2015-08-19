@@ -13,7 +13,18 @@ class WsFacturacion {
 	protected $errorMessage;
 
 	public function __construct() {
-		$this->Client = new SoapClient($this->url, array('trace' => 1));
+		$stream_context = stream_context_create(array(
+			'ssl' => array(
+				'ciphers' => 'RC4-SHA'
+			)
+		));
+
+		$opts = array(
+			'trace'          => 0,
+			'stream_context' => $stream_context,
+		);
+
+		$this->Client = new SoapClient($this->url, $opts);
 	}
 
 	/**

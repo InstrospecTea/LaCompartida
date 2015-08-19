@@ -8,6 +8,7 @@
 	set_time_limit(300);
 
 	$pagina = new Pagina($sesion);
+	$Form = new Form($sesion);
 	/*Genera Excel*/
 	if($xls)
 	{
@@ -470,10 +471,8 @@
 		</td>
 	</tr>
 	<tr>
-		<td align=center colspan=2>
-			<?=Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ', apellido1, apellido2, ', ', nombre)
-				FROM usuario JOIN usuario_permiso USING(id_usuario)
-				WHERE codigo_permiso='SOC' ORDER BY apellido1", "socios[]", $socios, "class=\"selectMultiple\" multiple size=5 ", "", "200"); ?>
+		<td align=center colspan=2><!-- Nuevo Select -->
+            <?php echo $Form->select('socios[]', UsuarioExt::QueryComerciales($sesion), $socios, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple', 'size' => '5')); ?>
 		</td>
 	</tr>
 	<tr valign=top>

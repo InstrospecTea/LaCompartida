@@ -559,6 +559,7 @@ class Factura extends Objeto {
 
 	function GeneraHTMLFactura($id_formato_factura = null) {
 		$this->template_data['UsuarioActual'] = $this->sesion->usuario->fields;
+		$this->template_data['Factura'] = $this->fields;
 
 		if ($this->fields['id_moneda'] != 2 && ( ( method_exists('Conf', 'InfoBancariaCYC') && Conf::InfoBancariaCYC() ) || ( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'InfoBancariaCYC') ) )) {
 			$templateData = UtilesApp::TemplateFactura($this->sesion, 2);
@@ -620,6 +621,24 @@ class Factura extends Objeto {
 
 		if ($cobro->Load($this->fields['id_cobro'])) {
 			$this->template_data['Cobro'] = $cobro->fields;
+
+			$Contrato = new Contrato($this->sesion);
+			$Contrato->Load($cobro->fields['id_contrato']);
+
+			if ($Contrato->Loaded()) {
+				$this->template_data['Contrato'] = $Contrato->fields;
+				// buscar datos del banco y cuenta
+				$CuentaBanco = new CuentaBanco($this->sesion);
+				$CuentaBanco->Load($Contrato->fields['id_cuenta']);
+				if ($CuentaBanco->Loaded()) {
+					$this->template_data['CuentaBanco'] = $Contrato->fields;
+					$PrmBanco = new PrmBanco($this->sesion);
+					$PrmBanco->Load($CuentaBanco->fields['id_banco']);
+					if ($PrmBanco->Loaded()) {
+						$this->template_data['Banco'] = $PrmBanco->fields;
+					}
+				}
+			}
 
 			global $x_detalle_profesional;
 			global $x_resumen_profesional;
@@ -1569,7 +1588,7 @@ class Factura extends Objeto {
 					$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, $code));
 					$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, $code));
 					$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' . __('CON') . ' ' . $monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
-					$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' ' . (empty($total_parte_decimal) ? '0' : $total_parte_decimal) . '/100 ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8');
+					$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' ' . (empty($total_parte_decimal) ? '00' : $total_parte_decimal) . '/100 ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8');
 				} else {
 					$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
 					$monto_total_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang, true));

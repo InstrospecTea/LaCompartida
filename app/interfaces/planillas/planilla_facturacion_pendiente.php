@@ -9,6 +9,7 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 $AtacheSecundarioSoloAsunto = Conf::GetConf($sesion, 'AtacheSecundarioSoloAsunto');
+$Form = new Form($sesion);
 
 if ($AtacheSecundarioSoloAsunto) {
 
@@ -366,6 +367,7 @@ if ($xls) {
 	$resp = mysql_query($update2, $sesion->dbh);
 	$resp = mysql_query($update3, $sesion->dbh);
 
+	ReporteContrato::QueriesPrevias($sesion);
 	$ReporteContrato = new ReporteContrato($sesion, false, $separar_asuntos, $fecha1, $fecha2, $AtacheSecundarioSoloAsunto);
 
 	//Quiero saber cuando se actualizó el olap por ultima vez
@@ -730,10 +732,8 @@ $pagina->PrintTop();
 		<tr>
 			<td style="text-align:center;" colspan="<?php echo $AtacheSecundarioSoloAsunto ? 2 : 5; ?>">
 				Filtrar por <?php printf('%s<br/>(%s)<br/>', __('Encargado Comercial'), __('Opcional')); ?>
-				<?php
-				$usuarios = $sesion->usuario->ListarActivos('', 'SOC');
-				echo Html::SelectArrayDecente($usuarios, 'socios[]', $socios, 'class="selectMultiple" multiple size="12" ', '', '260px');
-				?>
+				<!-- Nuevo Select -->
+				<?php echo $Form->select('socios[]', $sesion->usuario->ListarActivos('', 'SOC'), $socios, array('empty' => FALSE, 'style' => 'width: 260px', 'class' => 'selectMultiple','multiple' => 'multiple','size' => '12')); ?>
 			</td>
 			<?php if ($AtacheSecundarioSoloAsunto) { ?>
 				<td>&nbsp;</td>

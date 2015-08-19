@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 require_once APPPATH . '/app/classes/Reportes/SimpleReport.php';
 
 $Sesion = new Sesion(array('REP'));
+$Form = new Form($Sesion);
 
 $tipos_liquidacion = array(
 	1 => __('Honorarios'),
@@ -115,6 +116,12 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$where_gastos .= " AND contrato.id_usuario_responsable = '$encargado_comercial'";
 		$where_adelantos .= " AND contrato.id_usuario_responsable = '$encargado_comercial'";
 		$where_liquidaciones .= " AND contrato.id_usuario_responsable = '$encargado_comercial'";
+	}
+
+	if (!empty($id_grupo_cliente)) {
+		$where_gastos .= " AND cliente.id_grupo_cliente = '{$id_grupo_cliente}'";
+		$where_adelantos .= " AND cliente.id_grupo_cliente = '{$id_grupo_cliente}'";
+		$where_liquidaciones .= " AND cliente.id_grupo_cliente = '{$id_grupo_cliente}'";
 	}
 
 	if (!empty($tipo_liquidacion)) { //1-2 = honorarios-gastos, 3 = mixtas
@@ -490,6 +497,14 @@ $Pagina->PrintTop($popup);
 						</tr>
 						<tr>
 							<td align="right">
+								<?php echo __('Grupo Cliente'); ?>
+							</td>
+							<td colspan="2" align="left">
+								<?php echo $Form->select('id_grupo_cliente', GrupoCliente::obtenerGruposSelect($Sesion), $id_grupo_cliente); ?>
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
 								<label for="moneda_mostrar"><?php echo __('Mostrar Montos en') ?></label>
 							</td>
 							<td colspan="2" align="left">
@@ -502,10 +517,8 @@ $Pagina->PrintTop($popup);
 							<td align="right">
 								<label for="encargado_comercial"><?php echo __('Encargado Comercial') ?></label>
 							</td>
-							<td colspan="2" align="left">
-								<?php
-								echo Html::SelectQuery($Sesion, UsuarioExt::QueryComerciales(), 'encargado_comercial', $_REQUEST['encargado_comercial'], '', __('Cualquiera'));
-								?>
+							<td colspan="2" align="left"><!-- Nuevo Select -->
+						        <?php echo $Form->select('encargado_comercial', UsuarioExt::QueryComerciales($Sesion), $_REQUEST['encargado_comercial'], array('empty' => __('Cualquiera'))); ?>
 							</td>
 						</tr>
 						<tr>

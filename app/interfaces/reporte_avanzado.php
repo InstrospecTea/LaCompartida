@@ -84,7 +84,8 @@ $tipos_de_dato = array(
 	'valor_trabajado_estandar',
 	//'rentabilidad_base',
 	'costo',
-	'costo_hh'
+	'costo_hh',
+	'valor_tramites'
 );
 
 if ($debug == 1) {
@@ -191,7 +192,7 @@ $ReporteAvanzado = new ReporteAvanzado($sesion);
 $ReporteAvanzado->comparar = $comparar;
 $ReporteAvanzado->tipo_dato_comparado = $tipo_dato_comparado;
 $ReporteAvanzado->tipo_dato = empty($tipo_dato) ? null : $tipo_dato;
-$ReporteAvanzado->proporcionalidad = $proporcionalidad;
+$ReporteAvanzado->proporcionalidad = empty($proporcionalidad) ? "cliente" : $proporcionalidad;
 $ReporteAvanzado->id_moneda = $id_moneda;
 
 $ReporteAvanzado->glosa_dato['codigo_asunto'] = "Código " . __('Asunto');
@@ -207,6 +208,7 @@ $ReporteAvanzado->glosa_dato['horas_por_pagar'] = __("Horas Cobradas que aún no 
 $ReporteAvanzado->glosa_dato['horas_incobrables'] = __("Horas en Cobros Incobrables");
 $ReporteAvanzado->glosa_dato['valor_por_cobrar'] = __("Valor monetario estimado que corresponde a cada Profesional en horas por cobrar");
 $ReporteAvanzado->glosa_dato['valor_cobrado'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro ya Emitido");
+$ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario de trámites que corresponde a cada Profesional, en un Cobro ya Emitido");
 $ReporteAvanzado->glosa_dato['valor_incobrable'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable");
 $ReporteAvanzado->glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado");
 $ReporteAvanzado->glosa_dato['valor_por_pagar'] = __("Valor Cobrado que aún no ha sido pagado");
@@ -391,6 +393,14 @@ if (!$popup) {
 }
 ?>
 
+<table class="alerta" width="90%" style="margin-bottom: 10px;">
+	<tr>
+		<td style="font-size:13px !important;">
+			<strong>Estimado usuario:</strong> Durante esta semana estamos mejorando el m&oacute;dulo de reportes avanzados, por lo tanto recomendamos no hacer uso de dichos reportes hasta nuevo aviso. De antemano muchas gracias por su comprensi&oacute;n.
+		</td>
+	</tr>
+</table>
+
 <form method="post" name="formulario" action="" id="formulario" autocomplete="off">
 	<input type="hidden" name="opc" id="opc" value="print">
 	<input type="hidden" name="debug" id="debug" value="<?php echo $debug; ?>">
@@ -514,10 +524,8 @@ if (!$popup) {
 										<div id="filtrosimple">
 											<div id="profesional" style="float:left;display:inline-block;" >
 												<b><?php echo __('Profesional') ?>:</b><br/>
-												<?php
-												$query = "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC";
-												echo Html::SelectQuery($sesion, $query, "usuarios[]", $usuarios, '', "Todos", "200");
-												?>
+								                <!-- Nuevo Select -->
+								                <?php echo $Form->select('usuarios[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
 											</div>
 											<div id="cliente" style="float:right;padding-right:10px;display:inline-block;" >
 												<b><?php echo __('Cliente') ?>:</b><br/>

@@ -696,6 +696,12 @@ $Form->defaultLabel = false;
 				<input type="text" name="giro_cliente" value="<?php echo $factura->loaded() ? $factura->fields['giro_cliente'] : $contrato->fields['factura_giro']; ?>" id="giro_cliente" size="70" maxlength="255" />
 			</td>
 		</tr>
+		<tr>
+			<td align="right" colspan="1"><?php echo __('País'); ?></td>
+			<td align="left" colspan="3">
+				<?php echo Html::SelectQuery($sesion, PrmPais::SearchQuery(), 'dte_id_pais', $factura->fields['dte_id_pais'] ? $factura->fields['dte_id_pais'] : $contrato->fields['id_pais'], 'class ="span3"', 'Vacio', 160); ?>
+			</td>
+		</tr>
 		<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_metodo_pago') : false; ?>
 		<tr>
 			<td align="right"><?php echo __('Condición de Pago') ?></td>

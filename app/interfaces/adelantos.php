@@ -90,31 +90,55 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 			}
 		});
 
+		/**
+		 * Plugin order by date
+		 */
+		jQuery.extend( jQuery.fn.dataTableExt.oSort, {
+		    "date-pre": function ( a ) {
+		        if (a == null || a == "") {
+		            return 0;
+		        }
+		        var ukDatea = a.split('-');
+		        return (ukDatea[2] + ukDatea[1] + ukDatea[0]) * 1;
+		    },
+		 
+		    "date-asc": function ( a, b ) {
+		        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+		    },
+		 
+		    "date-desc": function ( a, b ) {
+		        return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+		    }
+		} );
+
 		jQuery('#boton_buscar').click(function() {
 			var tablagastos=   jQuery('#tablon').hide().dataTable({
-				"fnPreDrawCallback": function( oSettings ) {
-					jQuery('#tablon').fadeTo('fast',0.1);
-
-				},
-				"bDestroy": true,
-				"bServerSide": true,
-				"oLanguage": {"sProcessing": "Procesando...", "sLengthMenu": "Mostrar _MENU_ registros",
-					"sZeroRecords": "No se encontraron resultados", "sInfo": "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
-					"sInfoEmpty": "Mostrando desde 0 hasta 0 de 0 registros", "sInfoFiltered": "(filtrado de _MAX_ registros en total)",
-					"sInfoPostFix": "", "sSearch": "Filtrar:", "sUrl": "", "oPaginate": {"sPrevious": "Anterior", "sNext": "Siguiente"}
-				},
 				"bFilter": false,
+				"bDeferRender": true,
+				"iDisplayLength": 25,
+				"aLengthMenu": [[25,50, 150, 300,500, -1], [25,50, 150, 300,500, "Todo"]],
+				"bDestroy": true,
 				"bProcessing": true,
 				"sAjaxSource": "ajax/ajax_adelantos.php?accion=listaadelanto&where=1&" + jQuery('#form_adelantos').serialize(),
+				"aaSorting": [[2,'desc']],
+				"sPaginationType": "full_numbers",
+				"sDom":  'T<"top"ip>rt<"bottom">',
 				"bJQueryUI": true,
-				"bDeferRender": true,
-				"fnServerData": function ( sSource, aoData, fnCallback ) {
-					jQuery.ajax( {	"dataType": 'json', "type": "POST", "url": sSource, "data": aoData,
-						"success": fnCallback,
-						"complete" :function() {
-							jQuery('#tablon').fadeTo(0, 1);
-						}
-					})
+				"oTableTools": {
+					"sSwfPath": "",
+					"aButtons": []
+				},
+				"oLanguage": {
+						"sProcessing": "Procesando...", 
+						"sLengthMenu": "Mostrar _MENU_ registros",
+						"sZeroRecords": "No se encontraron resultados", "sInfo": 
+						"Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
+						"sInfoEmpty": "Mostrando desde 0 hasta 0 de 0 registros", 
+						"sInfoFiltered": "(filtrado de _MAX_ registros en total)",
+						"sInfoPostFix": "", "sSearch": 
+						"Filtrar:", "sUrl": "", 
+						"oPaginate": {"sPrevious": "Anterior", "sNext": "Siguiente"
+					}
 				},
 				"aoColumnDefs": [
 					{"sClass": "alignleft", "aTargets": [1, 3]},
@@ -123,6 +147,7 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 					{"sClass": "marginleft", "aTargets": [1, 3]},
 					{"sWidth": "60px", "aTargets": [0, 2, 5, 4, 5]},
 					{"bVisible": false, "aTargets": [7]},
+					{"sType": "date", "aTargets": [2]},
 					{"fnRender": function ( o, val ) {
 							return o.aData[6]+'<br>'+ o.aData[3];
 						},
@@ -160,14 +185,13 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 						"aTargets": [6]
 					}
 				],
-				"aaSorting": [[0,'desc']],
-				"iDisplayLength": 25,
-				"aLengthMenu": [[25,50, 150, 300,500, -1], [25,50, 150, 300,500, "Todo"]],
-				"sPaginationType": "full_numbers",
-				"sDom":  'T<"top"ip>rt<"bottom">',
-				"oTableTools": {
-					"sSwfPath": "",
-					"aButtons": []
+				"fnServerData": function ( sSource, aoData, fnCallback ) {
+					jQuery.ajax( {	"dataType": 'json', "type": "POST", "url": sSource, "data": aoData,
+						"success": fnCallback,
+						"complete" :function() {
+							jQuery('#tablon').fadeTo(0, 1);
+						}
+					})
 				}
 			}).show();
 		});
@@ -239,6 +263,14 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 								<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda", "moneda_adelanto", $moneda_adelanto, "", __('Todas'), ''); ?>
 							</td>
 							<td></td>
+						</tr>
+						<tr>
+							<td align="right" width="30%">
+								<?php echo __('Grupo Cliente'); ?>
+							</td>
+							<td colspan="3" align="left">
+								<?php echo $Form->select('id_grupo_cliente', GrupoCliente::obtenerGruposSelect($sesion), $id_grupo_cliente); ?>
+							</td>
 						</tr>
 						<tr>
 							<td align=right>

@@ -3,6 +3,7 @@ require_once dirname(__FILE__).'/../conf.php';
 
 $Sesion = new Sesion(array('REP'));
 $Pagina = new Pagina($Sesion);
+$Form = new Form($Sesion);
 $id_usuario = $Sesion->usuario->fields['id_usuario'];
 
 if ($fecha1 != '') {
@@ -34,8 +35,8 @@ $Pagina->PrintTop();
 		<td align="right">
 			<?php echo __('Profesionales')?>
 		</td>
-		<td align="left">
-			<?php echo Html::SelectQuery($Sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"multiple size=7","","200"); ?>
+		<td align="left"><!-- Nuevo Select -->
+			<?php echo $Form->select('usuarios[]', $Sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => FALSE, 'style' => 'width: 200px', 'multiple' => 'multiple','size' => '7')); ?>
 		</td>
 	</tr>
 	<tr>

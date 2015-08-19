@@ -56,7 +56,7 @@ if ($opc == 'imprimir_factura') {
 	$factura_pdf_datos->generarFacturaPDF($id_factura);
 }
 
-$pagina->titulo = __('Mantenciï¿½n factura PDF');
+$pagina->titulo = __('Mantención factura PDF');
 $pagina->PrintTop();
 ?>
 
@@ -560,7 +560,7 @@ $pagina->PrintTop();
 <table width="90%" border="0">
 	<tr>
 		<td style="text-align:right;vertical-align: middle;">
-<?php echo __('Companï¿½a'); ?>
+<?php echo __('Compañía'); ?>
 		</td>
 		<td align="left">
 <?php echo Html::SelectArray($estudios_array, 'select_id_estudio', $id_estudio, 'id="select_id_estudio" onchange="" style="width:100px;"'); ?>

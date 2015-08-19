@@ -78,10 +78,9 @@ if ($id_asunto > 0) {
 
 if ($codigo_cliente != '' && !$Cliente->Loaded()) {
 	$Cliente->LoadByCodigo($codigo_cliente);
-
 	$loaded = Conf::GetConf($Sesion, 'CodigoSecundario') ?
-					$Cliente->LoadByCodigoSecundario($codigo_cliente) :
-					$Cliente->LoadByCodigo($codigo_cliente);
+		$Cliente->LoadByCodigoSecundario($codigo_cliente) :
+		$Cliente->LoadByCodigo($codigo_cliente);
 
 	if ($loaded) {
 		$codigo_cliente = $Cliente->fields['codigo_cliente'];
@@ -151,7 +150,7 @@ if ($opcion == 'guardar') {
 		if (Conf::GetConf($Sesion, 'CodigoSecundario') || !empty($codigo_asunto_secundario)) {
 			$Asunto->Edit("codigo_asunto_secundario", $codigo_cliente_secundario . '-' . strtoupper($codigo_asunto_secundario));
 		} else {
-			$Asunto->Edit("codigo_asunto_secundario", $codigo_asunto);
+			$Asunto->Edit("codigo_asunto_secundario", null);
 		}
 
 		if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
@@ -190,6 +189,7 @@ if ($opcion == 'guardar') {
 		$Asunto->Edit("cotizado_con", $cotizado_con);
 		$Asunto->Edit("fono_contacto", $fono_contacto);
 		$Asunto->Edit("email_contacto", $email_contacto);
+		$Asunto->Edit("actividades_obligatorias", $actividades_obligatorias ? '1' : '0');
 		$Asunto->Edit("activo", intval($activo), true);
 
 		if (!$activo) {
@@ -207,7 +207,7 @@ if ($opcion == 'guardar') {
 		$Asunto->Edit("limite_monto", $asunto_limite_monto);
 
 		if ($cobro_independiente) {
-			#CONTRATO
+			// CONTRATO
 			if ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) {
 				$contrato->Load($Asunto->fields['id_contrato']);
 			} else if ($Asunto->fields['id_contrato_indep'] > 0 && ($Asunto->fields['id_contrato_indep'] != $Cliente->fields['id_contrato'])) {
@@ -245,14 +245,15 @@ if ($opcion == 'guardar') {
 
 			if ($contrato->Write()) {
 
-				#Subiendo Archivo
+				// Subiendo Archivo
 				if (!empty($archivo_data)) {
 					$archivo->Edit('id_contrato', $contrato->fields['id_contrato']);
 					$archivo->Edit('descripcion', $descripcion);
 					$archivo->Edit('archivo_data', $archivo_data);
 					$archivo->Write();
 				}
-				#cobro pendiente
+
+				// Cobro pendiente
 				CobroPendiente::EliminarPorContrato($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 				for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
 					$CobroPendiente = new CobroPendiente($Sesion);
@@ -344,6 +345,30 @@ if ($opcion == 'guardar') {
 
 		if ($enviar_mail && $MailAsuntoNuevo) {
 			EnviarEmail($Asunto);
+		}
+	}
+
+	$errors = $Pagina->GetErrors();
+	if (empty($errors)) {
+		$NuevoCliente = new Cliente($Sesion);
+		if ($nuevo_codigo_cliente_secundario != '') {
+			$NuevoCliente->LoadByCodigoSecundario($nuevo_codigo_cliente_secundario);
+			$nuevo_codigo_cliente = $NuevoCliente->fields['codigo_cliente'];
+		} else {
+			$NuevoCliente = new Cliente($Sesion);
+			$NuevoCliente->LoadByCodigo($nuevo_codigo_cliente);
+		}
+		if ($NuevoCliente->Loaded()) {
+			$response = $Asunto->CambiaCliente($NuevoCliente);
+			if (!empty($response['errors'])) {
+				$Pagina->AddError($response['errors']);
+			} else {
+				if (!empty($response['Client'])) {
+					$NuevoCliente = $response['Client'];
+					$Cliente = $response['Client'];
+					$Pagina->AddInfo("El asunto fue asociado al cliente: <b>{$Cliente->fields['glosa_cliente']}</b>");
+				}
+			}
 		}
 	}
 }
@@ -599,18 +624,24 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 														<td align="right">
 															<?php echo __('Código'); ?>
 														</td>
-														<td align="left">
-															<input id="codigo_asunto" name="codigo_asunto" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?> size="10" maxlength="10" value="<?php echo $Asunto->fields['codigo_asunto'] ?>" onchange="this.value = this.value.toUpperCase(); <?php echo !$Asunto->Loaded() ? 'CheckCodigo();' : ''; ?>"/>
-															&nbsp;&nbsp;&nbsp;
+													<td align="left">
+														<input id="codigo_asunto"
+														       name="codigo_asunto" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?>
+														       size="10" maxlength="10" value="<?php echo $Asunto->fields['codigo_asunto'] ?>"
+														       onchange="this.value = this.value.toUpperCase(); <?php echo !$Asunto->Loaded() ? 'CheckCodigo();' : ''; ?>"/>
+														&nbsp;&nbsp;&nbsp;
+														<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) { ?>
 															<?php echo __('Código secundario'); ?>
 															<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;">&nbsp;&nbsp;<?php echo !empty($Cliente->fields['codigo_cliente_secundario']) ? "{$Cliente->fields['codigo_cliente_secundario']}-" : ''; ?></div>
-															<input id="codigo_asunto_secundario" name="codigo_asunto_secundario" size="15" maxlength="20" value="<?php echo array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario'])); ?>" onchange='this.value=this.value.toUpperCase();' style='text-transform: uppercase;'/>
-															<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) { ?>
-																<span style="color:#FF0000; font-size:10px">*</span>
-															<?php } else { ?>
-																<span style='font-size:10px'>(<?php echo __('Opcional'); ?>)</span>
-															<?php } ?>
-														</td>
+															<input id="codigo_asunto_secundario" name="codigo_asunto_secundario" size="15"
+															       maxlength="20"
+															       value="<?php echo array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario'])); ?>"
+															       onchange='this.value=this.value.toUpperCase();'
+															       style='text-transform: uppercase;'/>
+															<span style="color:#FF0000; font-size:10px">*</span>
+														<?php } ?>
+													</td>
+
 												</tr>
 																<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
 													<tr>
@@ -646,9 +677,11 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 																	}
 																} else {
 																	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+																		$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'nuevo_codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' class="nuevo_codigo_cliente secundario" ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
 																		$_codigo_cliente = $Cliente->fields['codigo_cliente_secundario'];
 																		$_name = 'codigo_cliente_secundario';
 																	} else {
+																		$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'nuevo_codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' class="nuevo_codigo_cliente" ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
 																		$_codigo_cliente = ($Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente']);
 																		$_name = 'codigo_cliente';
 																	}
@@ -656,8 +689,17 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 																	echo '<input type="text" id="glosa_' . $_name . '" name="glosa_' . $_name . '" size="45" value="' . $Cliente->fields['glosa_cliente'] . '" readonly="readonly">';
 																	echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $_codigo_cliente . '">';
 																}
-																?>
+
+																if ($Asunto->Loaded()) {
+ 																?>
+																<a href='#' id='change_client'><img src='//static.thetimebilling.com/images/editar_on.gif' border='0' title='Cambiar Cliente'></a>
 																<span style="color:#FF0000; font-size:10px">*</span>
+																<div id="nuevo_codigo" class="hidden" style="padding: 5px 0px 5px 5px; background-color: yellowgreen">Asociar a cliente</br>
+																<?php echo $input_cliente; ?>
+																</div>
+																<?php 
+																}
+																?>
 														</td>
 												</tr>
 
@@ -769,9 +811,9 @@ if (count($giros) > 0) {
 														<td align="right">
 <?php echo __('Usuario responsable'); ?>
 														</td>
-														<td align="left">
+														<td align="left"><!-- Nuevo Select -->
 <?php
-echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_encargado', $Asunto->fields['id_encargado'], '', 'Seleccione', '200px');
+echo $Form->select('id_encargado', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado'], array('empty' => __('Seleccione'), 'style' => 'width: 200px'));
 if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 	echo $obligatorio;
 }
@@ -783,8 +825,8 @@ if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 															<td align="right">
 	<?php echo __('Encargado 2'); ?>
 															</td>
-															<td align="left">';
-	<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_encargado2', $Asunto->fields['id_encargado2'], '', 'Seleccione', '200'); ?>
+															<td align="left">'<!-- Nuevo Select -->
+<?php echo $Form->select('id_encargado2', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado2'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
 															</td>
 													</tr>';
 <?php } ?>
@@ -832,6 +874,9 @@ if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 																&nbsp;&nbsp;&nbsp;
 																<label for="cobrable"><?php echo __('Cobrable') ?></label>
 																<input  type="checkbox" name="cobrable" id="cobrable" value="1" <?php echo $Asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo!$Asunto->Loaded() ? 'checked' : '' ?>  />
+																&nbsp;&nbsp;&nbsp;
+																<label for="actividades_obligatorias"><?php echo __('Actividades obligatorias') ?></label>
+																<input type="checkbox" id="actividades_obligatorias" name="actividades_obligatorias" value="1" <?php echo $Asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
 														</td>
 												</tr>
 										</table>
@@ -866,53 +911,53 @@ if ($Sesion->usuario->Es('SASU')) {
 										</tr>
 								</table>
 
-								<br/>
-								<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
-<?php
-if (!$Sesion->usuario->Es('SASU')) {
-	$contrato_nuevo = $Asunto->fields['id_contrato_indep'] == 0;
-	$cliente = &$Cliente;
-	require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
-}
-?>
-								</div>
+				<br/>
+				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
+					<?php
+						if (!$Sesion->usuario->Es('SASU')) {
+							$contrato_nuevo = $Asunto->fields['id_contrato_indep'] == 0;
+							$cliente = &$Cliente;
+							require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
+						}
+					?>
+				</div>
 
-								<br/>
-								<fieldset class="border_plomo tb_base">
-										<legend><?php echo __('Alertas') . ' ' . __('Asunto') ?></legend>
-										<p>&nbsp;<?php echo __('El sistema enviará un email de alerta al encargado si se superan estos límites:') ?></p>
-										<table>
-												<tr>
-														<td align=right>
-																<input name="asunto_limite_hh" value="<?php echo $Asunto->fields['limite_hh'] ? $Asunto->fields['limite_hh'] : '0' ?>" title="<?php echo __('Total de Horas') ?>" size=5 />
-														</td>
-														<td colspan=3 align=left>
-																<span title="<?php echo __('Total de Horas') ?>"><?php echo __('Límite de horas') ?></span>
-														</td>
-														<td align=right>
-																<input name="asunto_limite_monto" value="<?php echo $Asunto->fields['limite_monto'] ? $Asunto->fields['limite_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>" size=5 />
-														</td>
-														<td colspan=3 align=left>
-																<span title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>"><?php echo __('Límite de monto') ?></span>
-														</td>
-												</tr>
-												<tr>
-														<td align=right>
-																<input name="asunto_alerta_hh" value="<?php echo $Asunto->fields['alerta_hh'] ? $Asunto->fields['alerta_hh'] : '0' ?>" title="<?php echo __('Total de Horas en trabajos no cobrados') ?>" size=5 />
-														</td>
-														<td colspan=3 align=left>
-																<span title="<?php echo __('Total de Horas en trabajos no cobrados') ?>"><?php echo __('horas no cobradas') ?></span>
-														</td>
-														<td align=right>
-																<input name="asunto_alerta_monto" value="<?php echo $Asunto->fields['alerta_monto'] ? $Asunto->fields['alerta_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>" size=5 />
-														</td>
-														<td colspan=3 align=left>
-																<span title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>"><?php echo __('monto según horas no cobradas') ?></span>
-														</td>
-												</tr>
-										</table>
-								</fieldset>
-								<br>
+				<br/>
+				<fieldset class="border_plomo tb_base">
+					<legend><?php echo __('Alertas') . ' ' . __('Asunto') ?></legend>
+					<p>&nbsp;<?php echo __('El sistema enviará un email de alerta al encargado si se superan estos límites:') ?></p>
+					<table>
+						<tr>
+							<td align=right>
+								<input name="asunto_limite_hh" value="<?php echo $Asunto->fields['limite_hh'] ? $Asunto->fields['limite_hh'] : '0' ?>" title="<?php echo __('Total de Horas') ?>" size=5 />
+							</td>
+							<td colspan=3 align=left>
+								<span title="<?php echo __('Total de Horas') ?>"><?php echo __('Límite de horas') ?></span>
+							</td>
+							<td align=right>
+								<input name="asunto_limite_monto" value="<?php echo $Asunto->fields['limite_monto'] ? $Asunto->fields['limite_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>" size=5 />
+							</td>
+							<td colspan=3 align=left>
+								<span title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>"><?php echo __('Límite de monto') ?></span>
+							</td>
+						</tr>
+						<tr>
+							<td align=right>
+								<input name="asunto_alerta_hh" value="<?php echo $Asunto->fields['alerta_hh'] ? $Asunto->fields['alerta_hh'] : '0' ?>" title="<?php echo __('Total de Horas en trabajos no cobrados') ?>" size=5 />
+							</td>
+							<td colspan=3 align=left>
+								<span title="<?php echo __('Total de Horas en trabajos no cobrados') ?>"><?php echo __('horas no cobradas') ?></span>
+							</td>
+							<td align=right>
+								<input name="asunto_alerta_monto" value="<?php echo $Asunto->fields['alerta_monto'] ? $Asunto->fields['alerta_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>" size=5 />
+							</td>
+							<td colspan=3 align=left>
+								<span title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>"><?php echo __('monto según horas no cobradas') ?></span>
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+				<br>
 
 								<!-- GUARDAR -->
 								<fieldset class="border_plomo tb_base">
@@ -948,6 +993,19 @@ jQuery('document').ready(function () {
 	jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function () {
 		CambioEncargadoSegunCliente(jQuery(this).val());
 	});
+
+	jQuery('#change_client').click(function() {
+		var $ = jQuery;
+		var input_nuevo_codigo = $('input.nuevo_codigo_cliente');
+		var select_nuevo_codigo = $('select.nuevo_codigo_cliente');
+		var secundario = input_nuevo_codigo.hasClass('secundario') ? '_secundario' : '';
+		var codigo_cliente = $('#campo_codigo_cliente' + secundario).val();
+		var glosa_cliente = $('#glosa_codigo_cliente' + secundario).val();
+		$('#nuevo_codigo').toggleClass('hidden');
+		input_nuevo_codigo.val(codigo_cliente);
+		select_nuevo_codigo.val(codigo_cliente);
+	});
+
 });
 
 function CambioEncargadoSegunCliente(idcliente) {
