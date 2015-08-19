@@ -128,6 +128,10 @@ $formato_encabezado = & $wb->addFormat(array('Size' => 10,
 			'Align' => 'left',
 			'Bold' => 1,
 			'Color' => 'black'));
+$formato_encabezado2 = & $wb->addFormat(array('Size' => 10,
+			'VAlign' => 'middle',
+			'Align' => 'left',
+			'Color' => 'black'));
 $formato_encabezado_derecha = & $wb->addFormat(array('Size' => 10,
 			'VAlign' => 'top',
 			'Align' => 'right',
@@ -1110,7 +1114,8 @@ foreach ($chargeResults as $charge) {
 		list($cont_tramites) = mysql_fetch_array($resp_cont_tramites);
 
 		/*
-		 *  Si el asunto tiene trabajos y/o trámites imprime su resumen
+		 * Si el asunto tiene trabajos y/o trámites imprime su resumen,
+		 * sino muestra el asunto con un texto indicando que no existen cobros asociados al asunto.
 		 */
 
 		if (($cont_trabajos + $cont_tramites) > 0) {
@@ -1645,6 +1650,27 @@ foreach ($chargeResults as $charge) {
 				$col_formula_temp = Utiles::NumToColumnaExcel($col_valor_trabajo);
 				$ws->writeFormula($filas, $col_valor_trabajo, "=SUM($col_formula_temp$fila_inicio_tramites:$col_formula_temp$filas)", $formato_moneda_gastos_total);
 
+				$filas += 2;
+			}
+		} else {
+			$cobro_tiene_trabajos = true;
+			if ($opc_ver_asuntos_separados) {
+				/*
+				 *	Indicar en una linea que los asuntos se muestran por separado y lluego
+				 *	esconder la columna para que no ensucia la vista.
+				 */
+
+				$ws->write($filas, $col_fecha_ini, 'asuntos_separado', $formato_encabezado);
+				$ws->write(++$filas, $col_abogado, $asunto->fields['codigo_asunto'], $formato_encabezado);
+				$ws->setRow($filas - 1, 0, 0, 1);
+				$ws->write($filas, $col_fecha_ini, __('Asunto') . ': ', $formato_encabezado);
+				if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
+					$ws->write($filas, $col_descripcion, $asunto->fields['codigo_asunto_secundario'] . ' - ' . $asunto->fields['glosa_asunto'], $formato_encabezado);
+				} else {
+					$ws->write($filas, $col_descripcion, $asunto->fields['glosa_asunto'], $formato_encabezado);
+				}
+				$filas += 2;
+				$ws->write($filas++, $col_descripcion, 'No existen trabajos asociados a este asunto.', $formato_encabezado2);
 				$filas += 2;
 			}
 		}
