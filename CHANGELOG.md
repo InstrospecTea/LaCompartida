@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.16.11
+Tuesday 2015, August 18th
+* **Feature:** [Agrega mensaje en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1086)
+
 ## Hotfix 15.16.10
 Friday 2015, August 14th
 * **Fix:** [Corregir asignación de filtros al generar query de cobro en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1084)
