@@ -75,12 +75,14 @@ if ($minutos == 10) {
 	if ($log_correo['total'] > 0) {
 		$dbName = Conf::dbName();
 		$mensaje = "<b>Atención:</b> Se encontraron {$log_correo['total']} correos con errores para el cliente '$dbName'";
+		$enviarMailAdmins = false; // No se envía este mail a los adminstradores del tenant
 
 		Utiles::EnviarMail(
 			$Sesion,
 			array(array('nombre' => 'Administrador', 'mail' => 'correosmalos@thetimebilling.com')),
 			"$dbName: {$log_correo['total']} correos con errores",
-			$mensaje
+			$mensaje,
+			$enviarMailAdmins
 		);
 
 		if ($debug === true) {
