@@ -9,7 +9,7 @@ $usuario = new UsuarioExt($sesion);
 
 $conf_nuevo_modulo_gastos = Conf::GetConf($sesion, 'NuevoModuloGastos') == '0' ? false : true;
 $conf_codigo_secundario = Conf::GetConf($sesion, 'CodigoSecundario') == '0' ? false : true;
-$selected_cobrado = Conf::GetConf($sesion, 'FacturacionGastosCobrado') == '' ? 'NO' : Conf::GetConf($sesion, 'FacturacionGastosCobrado');
+$selected_cobrado = Conf::GetConf($sesion, 'FiltroFacturacionGastosCobrado') == '' ? 'NO' : Conf::GetConf($sesion, 'FiltroFacturacionGastosCobrado');
 
 set_time_limit(300);
 

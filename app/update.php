@@ -10847,10 +10847,9 @@ QUERY;
 
 		case 8.08:
 			$queries = array(
-				"INSERT INTO `configuracion` 
-				(`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
-				('FacturacionGastosCobrado', 'NO', 'Define la opción por defecto para desplegar los cobros', 'select;Todos;SI;NO', 2, -1);");
-
+				"INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+				VALUES ('FiltroFacturacionGastosCobrado', 'NO', 'Define la opción por defecto para desplegar en filtro 'Cobrado' al revisar gastos', 'select;Todos;SI;NO', 2, -1);"
+			);
 			break;
 	}
 
