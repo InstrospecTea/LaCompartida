@@ -10870,7 +10870,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.08;
+$max_update = 8.09;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
