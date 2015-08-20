@@ -1,5 +1,11 @@
 # Changelog
 
+## [Release 15.17.0](https://github.com/LemontechSA/ttb/pull/1087)
+Thursday 2015, August 20th.
+* **Feature:** [Correcciones en reporte de Facturas Pago](https://github.com/LemontechSA/ttb/pull/1085)
+* **Feature:** [Impresión Reporte General IRU Abogados](https://github.com/LemontechSA/ttb/pull/1080)
+* **Feature:** [Opción Módulo Gastos](https://github.com/LemontechSA/ttb/pull/1079)
+
 ## Hotfix 15.16.11
 Tuesday 2015, August 18th
 * **Feature:** [Agrega mensaje en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1086)
