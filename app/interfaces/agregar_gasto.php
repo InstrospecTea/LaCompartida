@@ -126,7 +126,7 @@ if ($opcion == "guardar") {
 		}
 
 		$gasto->Edit("fecha", Utiles::fecha2sql($fecha));
-		$gasto->Edit("id_usuario", $id_usuario);
+		$gasto->Edit("id_usuario", !empty($id_usuario) ? $id_usuario : "NULL");
 		$gasto->Edit("descripcion", $descripcion);
 		$gasto->Edit("id_glosa_gasto", (!empty($glosa_gasto) && $glosa_gasto != -1) ? $glosa_gasto : "NULL");
 		$gasto->Edit("id_moneda", $id_moneda);
