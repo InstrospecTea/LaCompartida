@@ -5474,7 +5474,7 @@ class NotaCobro extends Cobro {
 					/*
 					  Gastos implementado
 					 */
-					if ($this->fields['opc_ver_gastos'] != 0) {
+					if (($this->fields['opc_ver_gastos'] != 0) || ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1)) {
 						/*
 						  Revisar si se trate sobre el nuevo template
 						 */
@@ -5574,7 +5574,7 @@ class NotaCobro extends Cobro {
 					#especial mb
 					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
 
-					if ($cont_trabajos > 0 || $cont_hitos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ( $cont_gastos > 0 && $templateNotaCobroGastosSeparados ) || Conf::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites')) {
+					if ($cont_trabajos > 0 || $cont_hitos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ( $cont_gastos > 0 && $templateNotaCobroGastosSeparados ) || Conf::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites') || ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1)) {
 						$html .= $row;
 					}
 

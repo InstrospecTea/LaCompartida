@@ -10851,6 +10851,12 @@ QUERY;
 				VALUES ('FiltroFacturacionGastosCobrado', 'NO', 'Define la opción por defecto para desplegar en filtro 'Cobrado' al revisar gastos', 'select;Todos;SI;NO', 2, -1);"
 			);
 			break;
+
+		case 8.09:
+			$queries = array(
+				"ALTER TABLE `cobro` ADD `opc_mostrar_asuntos_cobrables_sin_horas` TINYINT(1)  UNSIGNED  NOT NULL  DEFAULT '0'  AFTER `opc_ver_asuntos_separados`;"
+			);
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10863,7 +10869,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.08;
+$max_update = 8.09;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
