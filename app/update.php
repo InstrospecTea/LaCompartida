@@ -10849,7 +10849,6 @@ QUERY;
 				VALUES ('FiltroFacturacionGastosCobrado', 'NO', 'Define la opción por defecto para desplegar en filtro Cobrado al revisar gastos', 'select;Todos;SI;NO', 2, -1);"
 			);
 			break;
-
 		case 8.09:
 			if (!ExisteCampo('cta_corriente', 'cuenta_gasto', $dbh)) {
 				$queries[] = "ALTER TABLE `cta_corriente` ADD COLUMN `cuenta_gasto` VARCHAR(100) DEFAULT NULL;";
@@ -10858,6 +10857,12 @@ QUERY;
 				$queries[] = "ALTER TABLE `cta_corriente` ADD COLUMN `detraccion` VARCHAR(100) DEFAULT NULL;";
 			}
 			break;
+		case 8.10:
+			$queries = array(
+					"ALTER TABLE `factura` ADD `id_documento_referencia` TINYINT(1)  UNSIGNED  NULL  DEFAULT NULL  AFTER `dte_comentario`;",
+					"ALTER TABLE `factura` ADD `folio_documento_referencia` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `id_documento_referencia`;",
+					"ALTER TABLE `factura` ADD `fecha_documento_referencia` DATE  NULL  DEFAULT NULL  AFTER `folio_documento_referencia`;"
+				);
 	}
 
 	if (!empty($queries)) {
@@ -10870,7 +10875,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.09;
+$max_update = 8.10;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
