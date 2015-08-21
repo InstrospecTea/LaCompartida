@@ -125,9 +125,8 @@ if ($opcion == "guardar") {
 			}
 		}
 
-
 		$gasto->Edit("fecha", Utiles::fecha2sql($fecha));
-		$gasto->Edit("id_usuario", $id_usuario);
+		$gasto->Edit("id_usuario", !empty($id_usuario) ? $id_usuario : "NULL");
 		$gasto->Edit("descripcion", $descripcion);
 		$gasto->Edit("id_glosa_gasto", (!empty($glosa_gasto) && $glosa_gasto != -1) ? $glosa_gasto : "NULL");
 		$gasto->Edit("id_moneda", $id_moneda);
@@ -137,6 +136,8 @@ if ($opcion == "guardar") {
 		$gasto->Edit("id_usuario_orden", (!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
 		$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
 		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
+		$gasto->Edit("cuenta_gasto", $cuenta_gasto ? $cuenta_gasto : "NULL");
+		$gasto->Edit("detraccion", $detraccion ? $detraccion : "NULL");
 
 		if ($id_tipo_documento_asociado) {
 			$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado);
@@ -510,6 +511,41 @@ $Form = new Form;
 			</tr>
 		<?php } ?>
 
+		<?php
+			/**
+			 * La cuenta de gasto se utiliza en algunos estudios para indicar el centro de costo al cual irán los gastos en su contabilidad
+			 */
+			$PrmCodigo = new PrmCodigo($sesion);
+			$cuenta_gasto_array = $PrmCodigo->Listar("WHERE grupo = 'CUENTA_GASTO' ORDER BY id_codigo ASC");
+			if (count($cuenta_gasto_array) > 0) {
+		?>
+			<tr>
+				<td align="right">
+					<?php echo __('Cuenta de Gasto'); ?>
+				</td>
+				<td align="left">
+					<?php echo Html::SelectArrayDecente($cuenta_gasto_array, 'cuenta_gasto', $gasto->fields['cuenta_gasto'], '', '', ''); ?>
+				</td>
+			</tr>
+		<?php } ?>
+
+		<?php
+			/**
+			 * La detracción se utiliza en Perú para posteriores cálculo de impuestos
+			 */
+			$detraccion_array = $PrmCodigo->Listar("WHERE grupo = 'DETRACCION' ORDER BY id_codigo ASC");
+			if (count($detraccion_array) > 0) {
+		?>
+			<tr>
+				<td align="right">
+					<?php echo __('Detracción'); ?>
+				</td>
+				<td align="left">
+					<?php echo Html::SelectArrayDecente($detraccion_array, 'detraccion', $gasto->fields['detraccion'], '', '', ''); ?>
+				</td>
+			</tr>
+		<?php } ?>
+
 		<tr>
 			<td align="right">
 				<?php echo __('Proveedor'); ?>
@@ -645,7 +681,7 @@ $Form = new Form;
 				<td align="right">
 					<?php echo __('Fecha Documento'); ?>
 				</td>
-				<td>
+				<td align="left">
 					<input type="text" name="fecha_factura_asociada" class="fechadiff" value="<?php echo ($gasto->fields['fecha_factura'] && $gasto->fields['fecha_factura'] != 'NULL') ? Utiles::sql2date($gasto->fields['fecha_factura']) : '' ?>" id="fecha_factura_asociada" size="11" maxlength="10" />
 				</td>
 			</tr>

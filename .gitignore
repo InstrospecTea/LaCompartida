@@ -204,3 +204,5 @@ vendor/**/
 vagrant/.vagrant
 vagrant/machines/
 Vagrantfile
+
+tags
