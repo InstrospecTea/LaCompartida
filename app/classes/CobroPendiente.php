@@ -162,7 +162,7 @@ class CobroPendiente extends Objeto {
 			cobro_pendiente
 			LEFT JOIN contrato ON cobro_pendiente.id_contrato = contrato.id_contrato
 			LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
-			LEFT JOIN prm_moneda ON contrato.id_moneda = prm_moneda.id_moneda
+			LEFT JOIN prm_moneda ON contrato.id_moneda_monto = prm_moneda.id_moneda
 			LEFT JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
 			LEFT JOIN asunto ON contrato.id_contrato = asunto.id_contrato
 		WHERE
