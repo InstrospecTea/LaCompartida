@@ -5462,6 +5462,13 @@ class NotaCobro extends Cobro {
 							$row = str_replace('%TRABAJOS_TOTAL%', '', $row);
 						}
 						$row = str_replace('%DETALLE_PROFESIONAL%', $this->GenerarDocumento2($parser, 'DETALLE_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+					} else if ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1) {
+						$row = str_replace('%espacio_trabajo%', '', $row);
+						$row = str_replace('%DETALLE_PROFESIONAL%', '', $row);
+						$row = str_replace('%servicios%', 'No existen trabajos asociados a este asunto.', $row);
+						$row = str_replace('%TRABAJOS_ENCABEZADO%', '', $row);
+						$row = str_replace('%TRABAJOS_FILAS%', '', $row);
+						$row = str_replace('%TRABAJOS_TOTAL%', '', $row);
 					} else {
 						$row = str_replace('%espacio_trabajo%', '', $row);
 						$row = str_replace('%DETALLE_PROFESIONAL%', '', $row);
@@ -5474,7 +5481,7 @@ class NotaCobro extends Cobro {
 					/*
 					  Gastos implementado
 					 */
-					if (($this->fields['opc_ver_gastos'] != 0) || ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1)) {
+					if ($this->fields['opc_ver_gastos'] != 0) {
 						/*
 						  Revisar si se trate sobre el nuevo template
 						 */
