@@ -516,6 +516,7 @@ if ($opc == 'buscar') {
 						text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:180px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  />';
 						text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:180px;">Agrupar borradores por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" />';
 						text_window += '<br><label for="cobrosencero_descargar_borradores" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo 'Incluir ' . __('cobros') . ' de monto cero'; ?>:</label><?php echo $Form->checkbox('cobrosencero_descargar_borradores', 1, $cobrosencero_chk); ?>';
+						text_window += '<br><label for="mostrar_asuntos_cobrables_sin_horas_borradores" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar Asuntos Cobrables Sin Horas') ?>:</label><?php echo $Form->checkbox('mostrar_asuntos_cobrables_sin_horas_borradores', 1); ?>';
 						text_window += '</div>';
 					}
 
@@ -551,6 +552,9 @@ if ($opc == 'buscar') {
 										}
 										if (jQuery('#cobrosencero_descargar_borradores').is(':checked')) {
 											jQuery('#cobrosencero').val(1);
+										}
+										if (jQuery('#mostrar_asuntos_cobrables_sin_horas_borradores').is(':checked')) {
+											jQuery('#mostrar_asuntos_cobrables_sin_horas').val(1);
 										}
 										ImpresionCobros(false, opciones, id_formato);
 										jQuery(this).dialog("close");
@@ -852,7 +856,7 @@ if ($proceso !== false) {
 	<?php
 	echo $Form->hidden('opc', '');
 	echo $Form->hidden('cobrosencero', 0);
-	echo $Form->hidden('cobros_en_revision', 0);
+	echo $Form->hidden('mostrar_asuntos_cobrables_sin_horas', 0);
 	?>
 	<!-- Calendario DIV -->
 	<div id="calendar-container" style="width:221px; position:absolute; display:none;">

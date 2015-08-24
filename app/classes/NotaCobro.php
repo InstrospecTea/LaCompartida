@@ -1174,7 +1174,7 @@ class NotaCobro extends Cobro {
 		return compact('moneda_cliente_cambio', 'moneda_cli', 'lang', 'html2', 'idioma', 'cliente', 'moneda', 'moneda_base', 'trabajo', 'profesionales', 'gasto', 'totales', 'tipo_cambio_moneda_total', 'asunto');
 	}
 
-	function GeneraHTMLCobro($masivo = false, $formato = '', $funcion = '') {
+	function GeneraHTMLCobro($masivo = false, $formato = '', $funcion = '', $mostrar_asuntos_cobrables_sin_horas = FALSE) {
 		global $masi;
 		$masi = $masivo;
 
@@ -1246,7 +1246,7 @@ class NotaCobro extends Cobro {
 		$facturasRS = $this->FacturasDelContrato($this->sesion, $nuevomodulofactura);
 		$totalescontrato = $this->TotalesDelContrato($facturasRS, $nuevomodulofactura, $this->fields['id_cobro']);
 
-		return $this->$generador($parser, 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
+		return $this->$generador($parser, 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto, $mostrar_asuntos_cobrables_sin_horas);
 	}
 
 	public function iniciales($nombre_encargado) {
@@ -3949,7 +3949,7 @@ class NotaCobro extends Cobro {
 		return $html;
 	}
 
-	function GenerarDocumento2($parser, $theTag = 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) {
+	function GenerarDocumento2($parser, $theTag = 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto, $mostrar_asuntos_cobrables_sin_horas = FALSE) {
 
 		global $contrato;
 		global $cobro_moneda;
@@ -3962,6 +3962,7 @@ class NotaCobro extends Cobro {
 
 		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
+		$this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] = $mostrar_asuntos_cobrables_sin_horas ? TRUE : $this->fields['opc_mostrar_asuntos_cobrables_sin_horas'];
 
 		if (!isset($parser->tags[$theTag])) {
 			return;
@@ -11448,7 +11449,7 @@ class NotaCobro extends Cobro {
 		return $detalle_modalidad;
 	}
 
-	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas, $id_formato = null) {
+	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas, $id_formato = null, $mostrar_asuntos_cobrables_sin_horas = FALSE) {
 		global $_LANG;
 		$carta_multiple = null;
 
@@ -11539,7 +11540,7 @@ class NotaCobro extends Cobro {
 			}
 
 			$NotaCobro->LoadAsuntos();
-			$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
+			$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato, NULL, $mostrar_asuntos_cobrables_sin_horas);
 
 			if (empty($html)) {
 				continue;
