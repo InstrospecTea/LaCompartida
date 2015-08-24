@@ -1950,7 +1950,7 @@ if (!class_exists('Cobro')) {
 		 * @param type $cobro_programado
 		 * @return integer id del cobro generado.
 		 */
-		function PrepararCobro($fecha_ini, $fecha_fin, $id_contrato, $emitir_obligatoriamente, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
+		function PrepararCobro($fecha_ini, $fecha_fin, $id_contrato, $emitir_obligatoriamente, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false, $cobros_en_revision = FALSE) {
 			$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 			$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
 
@@ -2030,6 +2030,10 @@ if (!class_exists('Cobro')) {
 					}
 
 					$this->Edit('id_usuario', $id_usuario_cobro);
+
+					if ($cobros_en_revision) {
+						$this->Edit('estado', 'EN REVISION');
+					}
 
 					$this->Edit('codigo_cliente', $Contrato->fields['codigo_cliente']);
 					$this->Edit('id_contrato', $Contrato->fields['id_contrato']);

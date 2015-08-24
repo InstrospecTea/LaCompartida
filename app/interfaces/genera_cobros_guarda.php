@@ -22,6 +22,12 @@ if (isset($_POST['cobrosencero']) && $_POST['cobrosencero'] == 1) {
 	$incluir_cobros_en_cero = true;
 }
 
+// Setea estado como 'En Revisión'
+$cobros_en_revision = FALSE;
+if (isset($_POST['cobros_en_revision']) && $_POST['cobros_en_revision'] == 1) {
+	$cobros_en_revision = TRUE;
+}
+
 if (!$incluir_cobros_en_cero && isset($_GET['generar_silenciosamente'])) {
 	$forzar = false;
 } else {
@@ -69,7 +75,7 @@ if ($individual && $id_contrato) {
 
 	$id_cobro_pendiente = !is_null($id_cobro_pendiente) ? $id_cobro_pendiente : '';
 	$monto = !is_null($monto) ? $monto : '';
-	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios);
+	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios, FALSE, $cobros_en_revision);
 
 	Log::write(" |- #{$newcobro}", Cobro::PROCESS_NAME);
 	Log::write(' |- SetIncluirEnCierre', Cobro::PROCESS_NAME);
