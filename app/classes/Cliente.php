@@ -603,6 +603,16 @@ class Cliente extends Objeto {
 			$this->error = __('No se puede eliminar un') . ' ' . __('cliente') . ' ' . __('que tiene un') . ' ' . __('documento') . ' ' . __('asociado.');
 			return false;
 		}
+
+		# Valida que el cliente no tenga contratos asociados
+		$query = "SELECT COUNT(*) FROM contrato WHERE codigo_cliente = '" . $this->fields['codigo_cliente'] . "'";
+		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		list($count) = mysql_fetch_array($resp);
+		if ($count > 0) {
+			$this->error = __('No se puede eliminar un') . ' ' . __('cliente') . ' ' . __('que tenga') . ' ' . __('contratos asociados.');
+			return false;
+		}
+
 		$query = "DELETE modificaciones_contrato FROM modificaciones_contrato JOIN contrato USING(id_contrato) WHERE contrato.codigo_cliente = '" . $this->fields['codigo_cliente'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 

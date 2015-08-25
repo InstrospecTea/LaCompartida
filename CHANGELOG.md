@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.17.1
+Tuesday 2015, August 25th
+* **Fix:** [Se corrige error SQL, no validaba que el cliente a eliminar tuviera contratos asociados.](https://github.com/LemontechSA/ttb/pull/)
+
 ## [Release 15.17.0](https://github.com/LemontechSA/ttb/pull/1087)
 Thursday 2015, August 20th.
 * **Feature:** [Correcciones en reporte de Facturas Pago](https://github.com/LemontechSA/ttb/pull/1085)
