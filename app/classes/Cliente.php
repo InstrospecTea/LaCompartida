@@ -613,7 +613,7 @@ class Cliente extends Objeto {
 
 		try {
 			$result = $criteria->run();
-			if (sizeof($result[0]['total']) > 0) {
+			if ($result[0]['total'] > 0) {
 				$this->error = __('No se puede eliminar un') . ' ' . __('cliente') . ' ' . __('que tiene') . ' ' . __('documentos') . ' ' . __('asociados.');
 				return false;
 			}
