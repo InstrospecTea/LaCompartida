@@ -604,15 +604,23 @@ class Cliente extends Objeto {
 			return false;
 		}
 
-		# Valida que el cliente no tenga contratos asociados
-		$query = "SELECT COUNT(*) FROM contrato WHERE codigo_cliente = '" . $this->fields['codigo_cliente'] . "'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($count) = mysql_fetch_array($resp);
-		if ($count > 0) {
-			$this->error = __('No se puede eliminar un') . ' ' . __('cliente') . ' ' . __('que tenga') . ' ' . __('contratos asociados.');
-			return false;
-		}
+		# Valida si existen documentos asociados al cliente.
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('COUNT(*)', 'total')
+				->add_from('archivo A')
+				->add_inner_join_with('contrato C', 'A.id_contrato IN (C.id_contrato)')
+				->add_restriction(CriteriaRestriction::equals('C.codigo_cliente', $this->fields['codigo_cliente']));
 
+		try {
+			$result = $criteria->run();
+			if (sizeof($result[0]['total']) > 0) {
+				$this->error = __('No se puede eliminar un') . ' ' . __('cliente') . ' ' . __('que tiene') . ' ' . __('documentos') . ' ' . __('asociados.');
+				return false;
+			}
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+		
 		$query = "DELETE modificaciones_contrato FROM modificaciones_contrato JOIN contrato USING(id_contrato) WHERE contrato.codigo_cliente = '" . $this->fields['codigo_cliente'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
