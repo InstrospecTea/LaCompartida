@@ -1079,6 +1079,34 @@ foreach ($chargeResults as $charge) {
 
 	$cont_asuntos = 0;
 
+	# Sección para determinar si es necesario mostrar los asuntos que son cobrados sin horas
+	$detalle_en_asuntos = FALSE;
+
+	$criteria = new Criteria($sesion);
+	$criteria->add_select('COUNT(*)', 'total')
+			->add_from('tramite')
+			->add_restriction(CriteriaRestriction::in('codigo_asunto', $cobro->asuntos));
+
+	try {
+		$result = $criteria->run();
+		$detalle_en_asuntos = ($result[0]['total'] == 0 ? FALSE : TRUE);
+	} catch (Exception $e) {
+		echo "Error: {$e} {$criteria->__toString()}";
+	}
+
+	$criteria = new Criteria($sesion);
+	$criteria->add_select('COUNT(*)', 'total')
+			->add_from('trabajo')
+			->add_restriction(CriteriaRestriction::in('codigo_asunto', $cobro->asuntos));
+
+	try {
+		$result = $criteria->run();
+		$detalle_en_asuntos = (($result[0]['total'] == 0 ? FALSE : TRUE) || $detalle_en_asuntos);
+	} catch (Exception $e) {
+		echo "Error: {$e} {$criteria->__toString()}";
+	}
+	# Fin
+
 	/*
 	 *  Bucle sobre todos los asuntos de este cobro
 	 */
@@ -1090,7 +1118,7 @@ foreach ($chargeResults as $charge) {
 		$codigo_asunto_secundario = $asunto->CodigoACodigoSecundario($cobro->asuntos[$cont_asuntos]);
 
 		$where_trabajos = " 1 ";
-		if ($opc_ver_asuntos_separados || $opc_mostrar_asuntos_cobrables_sin_horas) {
+		if ($opc_ver_asuntos_separados || ($opc_mostrar_asuntos_cobrables_sin_horas && ! $detalle_en_asuntos)) {
 			$where_trabajos .= " AND trabajo.codigo_asunto ='" . $asunto->fields['codigo_asunto'] . "' ";
 		}
 		if (!$opc_ver_columna_cobrable) {
@@ -1105,7 +1133,7 @@ foreach ($chargeResults as $charge) {
 		list($cont_trabajos) = mysql_fetch_array($resp_cont_trabajos);
 
 		$where_tramites = " 1 ";
-		if ($opc_ver_asuntos_separados || $opc_mostrar_asuntos_cobrables_sin_horas) {
+		if ($opc_ver_asuntos_separados || ($opc_mostrar_asuntos_cobrables_sin_horas && ! $detalle_en_asuntos)) {
 			$where_tramites .= " AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "' ";
 		}
 
@@ -1120,7 +1148,7 @@ foreach ($chargeResults as $charge) {
 
 		if (($cont_trabajos + $cont_tramites) > 0) {
 			$cobro_tiene_trabajos = true;
-			if ($opc_ver_asuntos_separados || $opc_mostrar_asuntos_cobrables_sin_horas) {
+			if ($opc_ver_asuntos_separados || ($opc_mostrar_asuntos_cobrables_sin_horas && ! $detalle_en_asuntos)) {
 				/*
 				 *	Indicar en una linea que los asuntos se muestran por separado y lluego
 				 *	esconder la columna para que no ensucia la vista.
@@ -1652,7 +1680,7 @@ foreach ($chargeResults as $charge) {
 
 				$filas += 2;
 			}
-		} else if ($opc_mostrar_asuntos_cobrables_sin_horas){
+		} else if ($opc_mostrar_asuntos_cobrables_sin_horas && ! $detalle_en_asuntos){
 			$cobro_tiene_trabajos = true;
 			$ws->write($filas, $col_fecha_ini, 'asuntos_separado', $formato_encabezado);
 			$ws->write(++$filas, $col_abogado, $asunto->fields['codigo_asunto'], $formato_encabezado);
@@ -1672,7 +1700,7 @@ foreach ($chargeResults as $charge) {
 		 *	Si no salga del while
 		 */
 
-		if ($opc_ver_asuntos_separados || $opc_mostrar_asuntos_cobrables_sin_horas) {
+		if ($opc_ver_asuntos_separados || ($opc_mostrar_asuntos_cobrables_sin_horas && ! $detalle_en_asuntos)) {
 			$cont_asuntos++;
 		} else {
 			break;

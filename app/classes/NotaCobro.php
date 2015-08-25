@@ -20,6 +20,7 @@ class NotaCobro extends Cobro {
 	var $carta_id = 'id_formato';
 	var $carta_formato = 'cobro_template';
 	var $siguiente = array();
+	var $detalle_en_asuntos = FALSE;
 	public $secciones = array(
 		'INFORME' => array(
 			'CLIENTE' => 'CLIENTE / GenerarSeccionCliente',
@@ -1245,8 +1246,43 @@ class NotaCobro extends Cobro {
 		$nuevomodulofactura = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
 		$facturasRS = $this->FacturasDelContrato($this->sesion, $nuevomodulofactura);
 		$totalescontrato = $this->TotalesDelContrato($facturasRS, $nuevomodulofactura, $this->fields['id_cobro']);
+		$this->querys_detalle_en_asuntos();
 
 		return $this->$generador($parser, 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto, $mostrar_asuntos_cobrables_sin_horas);
+	}
+
+	private function querys_detalle_en_asuntos() {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('COUNT(*)', 'total')
+				->add_from('tramite')
+				->add_restriction(CriteriaRestriction::in('codigo_asunto', $this->asuntos));
+
+		try {
+			$result = $criteria->run();
+			$this->set_detalle_en_asuntos($result[0]['total'] == 0 ? FALSE : TRUE);
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('COUNT(*)', 'total')
+				->add_from('trabajo')
+				->add_restriction(CriteriaRestriction::in('codigo_asunto', $this->asuntos));
+
+		try {
+			$result = $criteria->run();
+			$this->set_detalle_en_asuntos(($result[0]['total'] == 0 ? FALSE : TRUE) || $this->get_detalle_en_asuntos());
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	private function set_detalle_en_asuntos($detalle_en_asuntos) {
+		$this->detalle_en_asuntos = $detalle_en_asuntos;
+	}
+
+	private function get_detalle_en_asuntos() {
+		return $this->detalle_en_asuntos;
 	}
 
 	public function iniciales($nombre_encargado) {
@@ -5582,7 +5618,7 @@ class NotaCobro extends Cobro {
 					#especial mb
 					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
 
-					if ($cont_trabajos > 0 || $cont_hitos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ( $cont_gastos > 0 && $templateNotaCobroGastosSeparados ) || Conf::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites') || ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1)) {
+					if ($cont_trabajos > 0 || $cont_hitos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ( $cont_gastos > 0 && $templateNotaCobroGastosSeparados ) || Conf::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites') || ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1 && ! $this->get_detalle_en_asuntos())) {
 						$html .= $row;
 					}
 
