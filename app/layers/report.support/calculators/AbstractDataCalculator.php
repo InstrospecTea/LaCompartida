@@ -91,8 +91,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	}
 
-	function getBaseWorkQuery($Criteria) {
-		$Criteria->add_select('*');
+	function getBaseWorkQuery(Criteria $Criteria) {
 		$Criteria->add_from('trabajo');
 		$this->addFiltersToCriteria($Criteria);
 		$this->addGroupersToCriteria($Criteria);

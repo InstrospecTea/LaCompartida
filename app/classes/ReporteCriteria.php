@@ -630,6 +630,8 @@ class ReporteCriteria {
 
 		$this->row = array();
 
+		echo $this->getQuery(TIPO_TRABAJOS); exit;
+
 		// Obtiene todos los datos para Trabajos
 		$resp = mysql_unbuffered_query($this->getQuery(TIPO_TRABAJOS), $this->sesion->dbh) or Utiles::errorSQL($this->getQuery(TIPO_TRABAJOS), __FILE__, __LINE__, $this->sesion->dbh);
 		while ($row = mysql_fetch_assoc($resp)) {
