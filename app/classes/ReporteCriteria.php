@@ -1981,7 +1981,7 @@ class ReporteCriteria {
 	}
 
 	//SELECT en string de Query. Elige el tipo de dato especificado.
-	private function setSELECT($Criteria, $type) {
+	private function setSelect($Criteria, $type) {
 
 		$this->addCommonColumnsToCriteria($Criteria, $type);
 
