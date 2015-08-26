@@ -108,6 +108,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	function getBaseChargeQuery($Criteria) {
+		$Criteria->add_select('*');
 		$Criteria->add_from('cobro');
 		$this->addFiltersToCriteria($Criteria);
 		$this->addGroupersToCriteria($Criteria);

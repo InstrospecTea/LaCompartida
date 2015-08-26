@@ -630,7 +630,31 @@ class ReporteCriteria {
 
 		$this->row = array();
 
-		echo $this->getQuery(TIPO_TRABAJOS); exit;
+		// Esto debe
+		if ($this->tipo_dato == 'valor_cobrado') {
+			$filtersFields = array();
+			$grouperFields = array();
+			$selectFields = array();
+
+			$proportionality = 'cliente';
+
+			$calculator = new BilledAmountDataCalculator(
+				$this->sesion,
+				$filtersFields,
+				$grouperFields,
+				$selectFields,
+				$this->id_moneda,
+				$this->proporcionalidad
+			);
+
+			$this->row = $calculator->calculate();
+
+			# $calculator->getWorksCriteria()
+			$criteria = $calculator->getChargesCriteria();
+			pr($criteria->get_plain_query());
+
+			return;
+		}
 
 		// Obtiene todos los datos para Trabajos
 		$resp = mysql_unbuffered_query($this->getQuery(TIPO_TRABAJOS), $this->sesion->dbh) or Utiles::errorSQL($this->getQuery(TIPO_TRABAJOS), __FILE__, __LINE__, $this->sesion->dbh);
