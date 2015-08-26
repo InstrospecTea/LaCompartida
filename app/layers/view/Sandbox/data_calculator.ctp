@@ -2,26 +2,28 @@
 
 	echo "Probar aqui";
 
-	$filtersFields = array();
-	$grouperFields = array();
-	$selectFields = array();
+	$reporte = new ReporteCriteria($this->Session);
 
-	$currencyId = 1;
-	$proportionality = 'cliente';
-
-	$calculator = new BilledAmountDataCalculator(
-		$this->Session,
-		$filtersFields,
-		$grouperFields,
-		$selectFields,
-		$currencyId,
-		$proportionality
+	$filtros = array(
+		'fecha_ini' => '2014-01-01',
+		'fecha_fin' => '2015-01-01',
+		'campo_fecha' => 'cobro',
+		'dato' => 'valor_cobrado',
+		'prop' => 'cliente',
+		'vista' => 'glosa_cliente',
+		'id_moneda' => 1
 	);
 
-	$calculator->calculate();
+	$reporte->setFiltros($filtros);
 
-	$Criteria = $calculator->getWorksCriteria();
+	$reporte->Query();
 
-	pr($Criteria->get_plain_query());
+	$r = $reporte->toArray();
+
+	pr($r);
+
+	// $Criteria = $calculator->getWorksCriteria();
+
+	// pr($Criteria->get_plain_query());
 
 ?>
