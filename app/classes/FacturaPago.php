@@ -125,8 +125,8 @@ class FacturaPago extends Objeto {
 				'title' => 'Subtotal Honorarios',
 				'extras' =>
 				array(
-					'symbol' => 'simbolo',
-					'subtotal' => 'simbolo'
+					'symbol' => 'simbolo_factura',
+					'subtotal' => 'simbolo_factura'
 				),
 			),
 			array(
@@ -135,8 +135,8 @@ class FacturaPago extends Objeto {
 				'title' => 'Descuento Honorarios',
 				'extras' =>
 				array(
-					'symbol' => 'simbolo',
-					'subtotal' => 'simbolo'
+					'symbol' => 'simbolo_factura',
+					'subtotal' => 'simbolo_factura'
 				),
 			),
 			array(
@@ -844,7 +844,7 @@ class FacturaPago extends Objeto {
 			LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
 			LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
 			WHERE $where
-			GROUP BY factura.id_factura";
+			GROUP BY fp.id_factura_pago";
 	}
 
 	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
