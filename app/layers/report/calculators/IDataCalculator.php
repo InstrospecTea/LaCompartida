@@ -3,16 +3,35 @@
 interface IDataCalculator() {
 
 	/**
-	 * Obtiene los agrupadores por los cuales se podrán filtrar y posteriormente agrupar
+	 * Obtiene los agrupadores por los cuales se podrán agrupar y ordenar
 	 * @return array
 	 */
 	function getAllowedGroupers();
+
+	/**
+	 * Obtiene los filtros por los cuales se podrá filtrar
+	 * @return array
+	 */
+	function getAllowedFilters();
+
+	/**
+	 * Obtiene los agrupadores por los cuales no se podrán filtrar
+	 * @return array
+	 */
+	function getNotAllowedFilters();
+
+	/**
+	 * Obtiene los agrupadores por los cuales no se podrán agrupar y ordenar
+	 * @return array
+	 */
+	function getNotAllowedGroupers();
 
 	/**
 	 * Obtiene los filtros por los cuales se podrá filtra
 	 * @return array
 	 */
 	function getAllowedFilters();
+
 
 	/**
 	 * Construye la query de trabajos

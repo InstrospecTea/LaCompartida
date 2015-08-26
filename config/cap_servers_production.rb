@@ -1,4 +1,4 @@
-# require 'aws-sdk'
+require 'aws-sdk'
 
 ec2 = AWS::EC2.new(
   :access_key_id     => "AKIAJSLZNMWQ3H3BN3WA",
@@ -11,7 +11,7 @@ instances = ec2.instances
     .tagged('app')
     .tagged_values('ttb-c')
     .each { |instance|
+        puts "#{instance.dns_name} #{instance.tags.username}"
         roles = instance.tags.roles.split(',').map &:to_sym
-        server instance.dns_name, *roles, {:user => instance.tags.username, :port => 22}
+        # server instance.dns_name, *roles, {:user => instance.tags.username, :port => 22}
     }
-
