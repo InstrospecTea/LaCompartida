@@ -307,7 +307,7 @@ if ($print) {
 		$cobros[] = $cobro['id_cobro'];
 	}
 
-	$query = "UPDATE cobro SET estado = 'EN REVISION' WHERE id_cobro IN (" . implode(', ', $cobros) . ");";
+	$query = "UPDATE cobro SET estado = 'EN REVISION' WHERE estado IN ('CREADO', 'EN REVISION') AND id_cobro IN (" . implode(', ', $cobros) . ");";
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 
 	$url .= '&cobros_en_revision=1';
