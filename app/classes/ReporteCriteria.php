@@ -630,6 +630,7 @@ class ReporteCriteria {
 
 		$this->row = array();
 
+		// Esto debe
 		if ($this->tipo_dato == 'valor_cobrado') {
 			$filtersFields = array();
 			$grouperFields = array();
@@ -647,6 +648,11 @@ class ReporteCriteria {
 			);
 
 			$this->row = $calculator->calculate();
+
+			# $calculator->getWorksCriteria()
+			$criteria = $calculator->getChargesCriteria();
+			pr($criteria->get_plain_query());
+
 			return;
 		}
 
@@ -1977,7 +1983,7 @@ class ReporteCriteria {
 	}
 
 	//SELECT en string de Query. Elige el tipo de dato especificado.
-	private function setSELECT($Criteria, $type) {
+	private function setSelect($Criteria, $type) {
 
 		$this->addCommonColumnsToCriteria($Criteria, $type);
 
