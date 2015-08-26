@@ -666,6 +666,8 @@ class ReporteCriteria {
 		// En caso de filtrar por área o categoría de usuario no se toman en cuenta los cobros sin horas.
 		$cobroquery = $this->cobroQuery();
 
+		pr($cobroquery);
+
 		if (
 			$this->requiereMoneda($this->tipo_dato)
 			&& $this->tipo_dato != 'valor_hora'

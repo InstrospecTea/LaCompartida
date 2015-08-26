@@ -56,7 +56,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $selectFields) {
 		$this->Session = $Session;
-		$this->filtersFields = $filterFields;
+		$this->filtersFields = $filtersFields;
 		$this->grouperFields = $grouperFields;
 		$this->selectFields = $selectFields;
 	}
@@ -79,39 +79,51 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		return $this->ErrandsCriteria;
 	}
 
-	function addFiltersToCriteria($Criteria) {
-
+	function addFiltersToCriteria($Criteria, $type) {
+		foreach ($this->filtersFields as $key => $value) {
+			$class_prefix = ucwords($key);
+			try {
+				$reflectedClass = new ReflectionClass("{$class_prefix}Filter");
+				$reflectedMethod = new ReflectionMethod(
+					"{$class_prefix}Filter",
+					"translateFor{$type}"
+				);
+				$Criteria = $reflectedMethod->invokeArgs(
+					$reflectedClass->newInstance($value),
+					array($Criteria)
+				);
+			} catch (ReflectionException $Exception) {
+				pr($Exception->getMessage());
+				die("The translater for filter $class_prefix does not exist");
+			}
+		}
 	}
 
-	function addChargesFiltersToCriteria($Criteria) {
-
-	}
-
-	function addGroupersToCriteria($Criteria) {
+	function addGroupersToCriteria($Criteria, $type) {
 
 	}
 
 	function getBaseWorkQuery($Criteria) {
 		$Criteria->add_select('*');
 		$Criteria->add_from('trabajo');
-		$this->addFiltersToCriteria($Criteria);
-		$this->addGroupersToCriteria($Criteria);
+		$this->addFiltersToCriteria($Criteria, 'Works');
+		$this->addGroupersToCriteria($Criteria, 'Works');
 		// Incluir joins necesarios para trabajo
 		// $Criteria->add_from
 	}
 
 	function getBaseErrandQuery($Criteria) {
 		$Criteria->add_from('tramite');
-		$this->addFiltersToCriteria($Criteria);
-		$this->addGroupersToCriteria($Criteria);
+		$this->addFiltersToCriteria($Criteria, 'Errands');
+		$this->addGroupersToCriteria($Criteria, 'Errands');
 		// Incluir joins necesarios para tramites
 		// $Criteria->add_from
 	}
 
 	function getBaseChargeQuery($Criteria) {
 		$Criteria->add_from('cobro');
-		$this->addFiltersToCriteria($Criteria);
-		$this->addGroupersToCriteria($Criteria);
+		$this->addFiltersToCriteria($Criteria, 'Charges');
+		$this->addGroupersToCriteria($Criteria, 'Charges');
 		// Incluir joins necesarios para cobro
 		// $Criteria->add_from
 	}
@@ -135,6 +147,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->getBaseChargeQuery($Criteria);
 		$this->getReportChargeQuery($Criteria);
 		$this->ChargesCriteria = $Criteria;
+		return $this->ChargesCriteria;
 	}
 
 	function getAllowedFilters() {
