@@ -62,8 +62,14 @@ class Form {
 				$op_attr = array(
 					'value' => $value
 				);
-				if ("$value" == "$selected") {
-					$op_attr['selected'] = true;
+				if (is_array($selected)) {
+					if (in_array($value, $selected)) {
+						$op_attr['selected'] = true;
+					}
+				} else {
+					if ("$value" == "$selected") {
+						$op_attr['selected'] = true;
+					}
 				}
 				$html .= $this->Html->tag('option', $text, $op_attr);
 			}

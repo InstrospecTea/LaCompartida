@@ -1,5 +1,41 @@
 # Changelog
 
+## Hotfix 15.17.1
+Tuesday 2015, August 25th
+* **Fix:** [Se corrige error SQL, no validaba que el cliente a eliminar tuviera contratos asociados.](https://github.com/LemontechSA/ttb/pull/1090)
+
+## [Release 15.17.0](https://github.com/LemontechSA/ttb/pull/1087)
+Thursday 2015, August 20th.
+* **Feature:** [Correcciones en reporte de Facturas Pago](https://github.com/LemontechSA/ttb/pull/1085)
+* **Feature:** [Impresión Reporte General IRU Abogados](https://github.com/LemontechSA/ttb/pull/1080)
+* **Feature:** [Opción Módulo Gastos](https://github.com/LemontechSA/ttb/pull/1079)
+* **Feature:** [Usar moneda_monto en lugar de moneda_contrato para la alerta de hito ](https://github.com/LemontechSA/ttb/pull/1078)
+* **Feature:** [Primera versión integración gastos PRC](https://github.com/LemontechSA/ttb/pull/1044)
+
+## Hotfix 15.16.11
+Tuesday 2015, August 18th
+* **Feature:** [Agrega mensaje en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1086)
+
+## Hotfix 15.16.10
+Friday 2015, August 14th
+* **Fix:** [Corregir asignación de filtros al generar query de cobro en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1084)
+
+## Hotfix 15.16.9
+Tuesday 2015, August 13th
+* **Fix:** [Corrige reporte avanzado monto por cobrar](https://github.com/LemontechSA/ttb/pull/1083)
+
+## Hotfix 15.16.8
+Wednesday 2015, August 12th
+* **Fix:** [Corregir reporte avanzado al seleccionar los montos segun proporcionalidad para cobros FLAT FEE](https://github.com/LemontechSA/ttb/pull/1082)
+
+## Hotfix 15.16.7
+Tuesday 2015, August 11th
+* **Fix:** [Evita mostrar la forma_cobro en vez del estado del cobro en reportes avanzados](https://github.com/LemontechSA/ttb/pull/1081)
+
+## Hotfix 15.16.6
+Monday 2015, August 10th
+* **Fix:** [Dejando de enviar mail de problemas en el envío a los administradores del tenant](https://github.com/LemontechSA/ttb/pull/1076)
+
 ## Hotfix 15.16.5
 Friday 2015, August 7th
 * **Fix:** [Corrección despliegue de datos según filtros en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1075)
