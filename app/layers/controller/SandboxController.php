@@ -24,6 +24,12 @@ class SandboxController extends AbstractController {
 		$this->info('Esto es un sandbox... de gato!');
 	}
 
+	public function data_calculator() {
+		$this->loadModel('BilledAmountDataCalculator');
+		$this->info('Calculator.. woh wo ooo .. calculator!');
+	}
+
+
 	public function report() {
 		$this->loadBusiness('Sandboxing');
 		$report = $this->SandboxingBusiness->report($this->data);

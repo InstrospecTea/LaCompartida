@@ -27,11 +27,3 @@
 	}
 
 }
-
-
-
-new BilledValueDataCalculator(
-	array(
-		array('trabajo.cobrable', 1),
-	)
-)

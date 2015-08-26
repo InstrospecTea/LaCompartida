@@ -50,9 +50,9 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	private $grouperFields = array();
 	private $selectFields = array();
 
-	private $WorksCrietria;
-	private $ErrandsCrietria;
-	private $ChargesCrietria;
+	private $WorksCriteria;
+	private $ErrandsCriteria;
+	private $ChargesCriteria;
 
 	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $selectFields) {
 		$this->Session = $Session;
@@ -65,6 +65,18 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->buildWorkQuery();
 		$this->buildErrandQuery();
 		$this->buildChargeQuery();
+	}
+
+	public function getWorksCriteria() {
+		return $this->WorksCriteria;
+	}
+
+	public function getChargesCriteria() {
+		return $this->ChargesCriteria;
+	}
+
+	public function getErrandsCriteria() {
+		return $this->ErrandsCriteria;
 	}
 
 	function addFiltersToCriteria($Criteria) {
@@ -80,6 +92,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	function getBaseWorkQuery($Criteria) {
+		$Criteria->add_select('*');
 		$Criteria->add_from('trabajo');
 		$this->addFiltersToCriteria($Criteria);
 		$this->addGroupersToCriteria($Criteria);
@@ -107,21 +120,21 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$Criteria = new Criteria($this->Session);
 		$this->getBaseWorkQuery($Criteria);
 		$this->getReportWorkQuery($Criteria);
-		$this->WorksCrietria = $Criteria;
+		$this->WorksCriteria = $Criteria;
 	}
 
 	function buildErrandQuery() {
 		$Criteria = new Criteria($this->Session);
 		$this->getBaseErrandQuery($Criteria);
 		$this->getReportErrandQuery($Criteria);
-		$this->ErrandsCrietria = $Criteria;
+		$this->ErrandsCriteria = $Criteria;
 	}
 
 	function buildChargeQuery() {
 		$Criteria = new Criteria($this->Session);
 		$this->getBaseChargeQuery($Criteria);
 		$this->getReportChargeQuery($Criteria);
-		$this->ChargesCrietria = $Criteria;
+		$this->ChargesCriteria = $Criteria;
 	}
 
 	function getAllowedFilters() {

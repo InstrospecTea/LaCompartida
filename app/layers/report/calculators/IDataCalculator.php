@@ -1,6 +1,6 @@
 <?php
 
-interface IDataCalculator() {
+interface IDataCalculator {
 
 	/**
 	 * Obtiene los agrupadores por los cuales se podrán agrupar y ordenar
@@ -25,13 +25,6 @@ interface IDataCalculator() {
 	 * @return array
 	 */
 	function getNotAllowedGroupers();
-
-	/**
-	 * Obtiene los filtros por los cuales se podrá filtra
-	 * @return array
-	 */
-	function getAllowedFilters();
-
 
 	/**
 	 * Construye la query de trabajos
