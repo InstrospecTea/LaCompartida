@@ -18,7 +18,7 @@ $imprimir_cartas = $opcion[0] == 'cartas';
 $agrupar_cartas = $opcion[1] == 'agrupar';
 
 $incluir_cobros_en_cero = false;
-if (isset($_POST['cobrosencero']) && $_POST['cobrosencero'] == 1) {
+if ((isset($_POST['cobrosencero']) && $_POST['cobrosencero'] == 1) || (isset($_GET['cobrosencero']) && $_GET['cobrosencero'] == 1)) {
 	$incluir_cobros_en_cero = true;
 }
 
@@ -113,7 +113,7 @@ if ($codigo_asunto && !$id_contrato) {
 	$id_contrato = $Contrato->fields['id_contrato'];
 }
 
-if ($print || $emitir) {
+if ($print || $emitir || $en_revision) {
 	$where = 1;
 	$join_cobro_cliente = '';
 
@@ -247,7 +247,7 @@ if ($print) {
 		FROM cobro
 			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
 			LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
-		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION')";
+		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
 
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 
@@ -288,4 +288,28 @@ if ($print) {
 	} else {
 		$Pagina->Redirect($url);
 	}
+} else if ($en_revision) {
+	$Cobro = new Cobro($Sesion);
+	$errores_cobro = array();
+	$total_cobros_procesados = 0;
+	$total_cobros_emitidos = 0;
+
+	$query = "SELECT
+			cobro.id_cobro
+		FROM cobro
+			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+			LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
+		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
+	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+	
+	$cobros = array();
+	while ($cobro = mysql_fetch_array($resp)) {
+		$cobros[] = $cobro['id_cobro'];
+	}
+
+	$query = "UPDATE cobro SET estado = 'EN REVISION' WHERE id_cobro IN (" . implode(', ', $cobros) . ");";
+	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+
+	$url .= '&cobros_en_revision=1';
+	echo json_encode(array('url_redirect' => $url));
 }

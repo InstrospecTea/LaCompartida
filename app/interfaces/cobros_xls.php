@@ -1081,10 +1081,10 @@ foreach ($chargeResults as $charge) {
 
 	# Sección para determinar si es necesario mostrar los asuntos que son cobrados sin horas
 	$detalle_en_asuntos = FALSE;
-
 	$criteria = new Criteria($sesion);
 	$criteria->add_select('COUNT(*)', 'total')
 			->add_from('tramite')
+			->add_restriction(CriteriaRestriction::equals('id_cobro', $cobro->fields['id_cobro']))
 			->add_restriction(CriteriaRestriction::in('codigo_asunto', $cobro->asuntos));
 
 	try {
@@ -1097,6 +1097,21 @@ foreach ($chargeResults as $charge) {
 	$criteria = new Criteria($sesion);
 	$criteria->add_select('COUNT(*)', 'total')
 			->add_from('trabajo')
+			->add_restriction(CriteriaRestriction::equals('id_cobro', $cobro->fields['id_cobro']))
+			->add_restriction(CriteriaRestriction::equals('id_tramite', 0))
+			->add_restriction(CriteriaRestriction::in('codigo_asunto', $cobro->asuntos));
+
+	try {
+		$result = $criteria->run();
+		$detalle_en_asuntos = (($result[0]['total'] == 0 ? FALSE : TRUE) || $detalle_en_asuntos);
+	} catch (Exception $e) {
+		echo "Error: {$e} {$criteria->__toString()}";
+	}
+
+	$criteria = new Criteria($sesion);
+	$criteria->add_select('COUNT(*)', 'total')
+			->add_from('cta_corriente')
+			->add_restriction(CriteriaRestriction::equals('id_cobro', $cobro->fields['id_cobro']))
 			->add_restriction(CriteriaRestriction::in('codigo_asunto', $cobro->asuntos));
 
 	try {

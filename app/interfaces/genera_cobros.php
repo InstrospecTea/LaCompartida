@@ -44,6 +44,9 @@ if ($opc == 'asuntos_liquidar') {
 	else if ($cobros_emitidos) {
 		$pagina->AddInfo(__('Cobros emitidos con &eacute;xito'));
 	}
+	else if ($cobros_en_revision) {
+		$pagina->AddInfo(__('Cobros cambiados a EN REVISION con &eacute;xito'));
+	}
 	if ($codigo_cliente_secundario) {
 		$cliente = new Cliente($sesion);
 		$cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
@@ -67,7 +70,7 @@ if ($opc == 'asuntos_liquidar') {
 
 	###### BUSCADOR ######
 	$CobroQuery = new CobroQuery($sesion);
-	$query = $CobroQuery->genera_cobros($_POST);
+	$query = $CobroQuery->genera_cobros(($_POST['opc'] == 'buscar') ? $_POST : $_GET);
 	$x_pag = 20;
 	$orden = 'cliente.glosa_cliente, asunto_lista';
 	$b = new Buscador($sesion, $query, "Contrato", $desde, $x_pag, $orden);
@@ -366,9 +369,65 @@ if ($opc == 'buscar') {
 			jQuery.get('ajax.php?accion=existen_borradores', function(response) {
 				if (response)
 				{
-					form.action = 'genera_cobros.php';
-					form.opc.value = 'excel';
-					form.submit();
+					// No se pueden descargar los borradores si existe un proceso de generación de cobros pendiente
+					if (ProcessLock()) {
+						return;
+					}
+
+					var text_window = '<strong><center><?php echo __('A continuación se generarán los borradores del periodo que ha seleccionado.') ?><br><br><?php echo __('¿Desea descargar los cobros del periodo?') ?><center></strong><br><br>';
+
+					var largoHH = arrayHH.length;
+					var largoMIXTAS = arrayMIXTAS.length;
+					var largototal = largoHH + largoMIXTAS;
+					var largoClientes = arrayClientes.length;
+					if (largototal == 0 || largoClientes == 0) {
+						text_window += '<strong><center>No hay datos para los filtros que Ud. ha seleccionado</center></strong>';
+					} else {
+						text_window += '<div style="padding-left:40px; text-align:left; color:red; ">';
+						text_window += '<br><label for="form_horas_trabajadas" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar horas trabajadas') ?>:</label><input type="checkbox" name="form_horas_trabajadas" id="form_horas_trabajadas" value="1" />';
+						text_window += '<br><label for="form_horas_visibles" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar trabajos no visibles') ?>:</label><input type="checkbox" name="form_horas_visibles" id="form_horas_visibles" value="1" />';
+						text_window += '<br><label for="form_asuntos_separados" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Ver asuntos por separado') ?>:</label><input type="checkbox" name="form_asuntos_separados" id="form_asuntos_separados" value="1" <?php echo Conf::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?>>';
+						text_window += '<br><label for="form_asuntos_sin_horas" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar Asuntos Cobrables Sin Horas') ?>:</label><input type="checkbox" name="form_asuntos_sin_horas" id="form_asuntos_sin_horas" value="1" />';
+						text_window += '</div>';
+					}
+
+					if (jQuery('#advertencia_descargar_borradores').length > 0) {
+						jQuery('#advertencia_descargar_borradores').remove();
+					}
+
+					jQuery('<p/>')
+							.attr('id', 'advertencia_excel_borradores')
+							.attr('title', 'Advertencia - Excel Borradores')
+							.html(text_window)
+							.dialog({
+								resizable: true,
+								height: 'auto',
+								width: 500,
+								modal: true,
+								close: function(ev, ui) {
+									interrumpeproceso = 1;
+								},
+								open: function() {
+									jQuery('.ui-dialog-title').addClass('ui-icon-warning');
+									jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+								},
+								buttons: {
+									"<?php echo __('Descargar') ?>": function() {
+										jQuery("#opc_ver_horas_trabajadas").val(jQuery("#form_horas_trabajadas").is(":checked") ? '1' : '0');
+										jQuery("#opc_ver_cobrable").val(jQuery("#form_horas_visibles").is(":checked") ? '1' : '0');
+										jQuery("#opc_ver_asuntos_separados").val(jQuery("#form_asuntos_separados").is(":checked") ? '1' : '0');
+										jQuery("#opc_mostrar_asuntos_cobrables_sin_horas").val(jQuery("#form_asuntos_sin_horas").is(":checked") ? '1' : '0');
+
+										form.action = 'genera_cobros.php';
+										form.opc.value = 'excel';
+										form.submit();
+									},
+									"<?php echo __('Cancelar') ?>": function() {
+										jQuery(this).dialog('close');
+										return false;
+									}
+								}
+							});
 				} else {
 					alert('No existen ' + "<?php echo __('borradores') ?>" + ' en el sistema.');
 					return false;
@@ -413,6 +472,7 @@ if ($opc == 'buscar') {
 						},
 						"<?php echo __('Continuar'); ?>": function() {
 							form.action = 'genera_cobros_guarda.php?emitir=true&return_json=true';
+							jQuery("#cobrosencero").val(0);
 							jQuery('.ui-dialog-buttonpane button:contains("<?php echo __('Cancelar'); ?>")').button().hide();
 							jQuery('.ui-dialog-buttonpane button:contains("<?php echo __('Continuar'); ?>")').button().hide();
 							jQuery('.ui-dialog-buttonpane').hide();
@@ -473,6 +533,79 @@ if ($opc == 'buscar') {
 						}
 					}
 				});
+		} else if (desde == 'en_revision') {
+			if (jQuery('#modal_en_revision_cobros').length == 1) {
+				jQuery('#modal_en_revision_cobros').remove();
+			}
+
+			jQuery('<div/>')
+				.attr('id', 'modal_en_revision_cobros')
+				.attr('title', "<?php echo __('ALERTA'); ?>")
+				.append(
+					jQuery('<div/>')
+						.attr('id', 'modal_en_revision_cobros_resumen')
+						.css({'text-align':'center', 'padding':'10px', 'font-size':'12px'})
+						.append(jQuery('<div/>').html("<?php echo __('Ud. está realizando un cambio masivo de estado a los cobros, asegúrese de haber verificado sus datos o cobros en proceso.') ?>"))
+						.append(
+							jQuery('<div/>')
+							.html("<br><b><?php echo __('¿Desea cambiar el estado de los cobros a EN REVISION?'); ?></b><br><br>" +
+								'<label for="cobrosencero_cobros_en_revision" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo 'Incluir ' . __('cobros') . ' de monto cero'; ?>:</label><?php echo $Form->checkbox('cobrosencero_cobros_en_revision', 1, $cobrosencero_chk); ?>')
+						)
+				)
+				.dialog({
+					width: 400,
+					height: 'auto',
+					modal: true,
+					closeOnEscape: false,
+					dialogClass: 'no-close',
+					draggable: false,
+					resizable: false,
+					open: function() {
+						jQuery('.ui-dialog-title').addClass('ui-icon-warning');
+						jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
+					},
+					buttons: {
+						"<?php echo __('Cancelar'); ?>": function() {
+							jQuery(this).dialog('close');
+						},
+						"<?php echo __('Continuar'); ?>": function() {
+							form.action = 'genera_cobros_guarda.php?en_revision=true&return_json=true';
+							if (jQuery('#cobrosencero_cobros_en_revision').is(':checked')) {
+								jQuery("#cobrosencero").val(1);
+							};
+
+							jQuery('.ui-dialog-buttonpane button:contains("<?php echo __('Cancelar'); ?>")').button().hide();
+							jQuery('.ui-dialog-buttonpane button:contains("<?php echo __('Continuar'); ?>")').button().hide();
+							jQuery('.ui-dialog-buttonpane').hide();
+
+							jQuery('#modal_en_revision_cobros_resumen')
+								.html('')
+								.append(
+									jQuery('<div/>')
+										.css({'font-weight':'bold', 'margin-bottom':'15px'})
+										.html("Emitiendo <?php echo __('cobros'); ?>")
+								)
+								.append(jQuery('<div/>').html('Procure no cerrar la pestaña actual de su navegador.'));
+
+							jQuery('#modal_en_revision_cobros_resumen')
+								.append(
+									jQuery('<div/>')
+										.css({'margin':'10px auto', 'width':'100px', 'background':'url(https://static.thetimebilling.com/images/loading_bar.gif) no-repeat'})
+										.html('&nbsp;')
+								);
+
+							jQuery.ajax({
+								url: form.action,
+								data: jQuery('#form_busca').serialize()
+							}).fail(function(data) {
+								alert(data);
+							}).complete(function(data) {
+								var data = jQuery.parseJSON(data.responseText);
+								window.location.href = data.url_redirect;
+							});
+						}
+					}
+				});
 		} else if (desde == 'asuntos_liquidar') {
 			form.action = 'genera_cobros.php';
 			form.opc.value = 'asuntos_liquidar';
@@ -526,7 +659,7 @@ if ($opc == 'buscar') {
 
 					jQuery('<p/>')
 							.attr('id', 'advertencia_descargar_borradores')
-							.attr('title', 'Advertencia')
+							.attr('title', 'Advertencia - Descargar Borradores')
 							.html(text_window)
 							.dialog({
 								resizable: true,
@@ -953,7 +1086,7 @@ if ($proceso !== false) {
 								<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type="text" class="fechadiff"  name="fecha_fin" value="<?php echo!$fecha_fin ? date('d-m-Y') : $fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
 							</td>
 							<?php
-							if (empty($_POST) || $_POST['activo'] == 1) {
+							if (empty($_POST) || $_POST['activo'] == 1 || $_GET['activo'] == 1) {
 								$activo_chk = true;
 							} else {
 								$activo_chk = false;
@@ -979,23 +1112,16 @@ if ($proceso !== false) {
 	<?php if ($opc == 'buscar') { ?>
 		<table width="820">
 			<tr>
-				<td align="right" width="680">
-					<a href="javascript:void(0);" style="color: #990000; font-size: 9px; font-weight: normal;" onclick="ToggleDiv('opciones_excel');"><?php echo __('opciones excel') ?></a>
-				</td>
 				<td align="right" nowrap>
 					<?php echo __('Idioma') ?>: <?php echo Html::SelectQuery($sesion, "SELECT codigo_idioma,glosa_idioma FROM prm_idioma ORDER BY glosa_idioma", "lang", $cobro->fields['codigo_idioma'] != '' ? $cobro->fields['codigo_idioma'] : $contrato->fields['codigo_idioma'], '', '', 80); ?>
 				</td>
 			</tr>
 			<tr>
 				<td align="center" id="opciones_excel" colspan="2" style="display: none; font-size: 10px;">
-					<input type="checkbox" name="opc_ver_horas_trabajadas" id="opc_ver_horas_trabajadas" value="1" />
-					<label for="opc_ver_horas_trabajadas"><?php echo __('Mostrar horas trabajadas') ?></label>
-					<input type="checkbox" name="opc_ver_cobrable" id="opc_ver_cobrable" value="1" />
-					<label for="opc_ver_cobrable"><?php echo __('Mostrar trabajos no visibles') ?></label>
-					<input type="checkbox" name="opc_ver_asuntos_separados" id="opc_ver_asuntos_separados" <?php echo Conf::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?> value="1" />
-					<label for="opc_ver_asuntos_separados"><?php echo __('Ver asuntos por separado') ?></label>
-					<input type="checkbox" name="opc_mostrar_asuntos_cobrables_sin_horas" id="opc_mostrar_asuntos_cobrables_sin_horas" value="1" />
-					<label for="opc_mostrar_asuntos_cobrables_sin_horas"><?php echo __('Mostrar Asuntos Cobrables Sin Horas') ?></label>
+					<input type="hidden" name="opc_ver_horas_trabajadas" id="opc_ver_horas_trabajadas" value="1" />
+					<input type="hidden" name="opc_ver_cobrable" id="opc_ver_cobrable" value="1" />
+					<input type="hidden" name="opc_ver_asuntos_separados" id="opc_ver_asuntos_separados" <?php echo Conf::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?> value="1" />
+					<input type="hidden" name="opc_mostrar_asuntos_cobrables_sin_horas" id="opc_mostrar_asuntos_cobrables_sin_horas" value="1" />
 					<?php
 					$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
 
@@ -1024,6 +1150,7 @@ if ($proceso !== false) {
 					echo $Form->button(__('Excel borradores'), array('onclick' => "GeneraCobros(this.form, 'excel', false)"));
 					echo $Form->button(__('Descargar borradores'), array('onclick' => "ImpresionCobros(true, false)"));
 					echo $Form->button(__('Emitir cobros').' '.__('masivamente'), array('onclick' => "GeneraCobros(this.form, 'emitir', false)"));
+					echo $Form->button(__('Dejar coboros con estado EN REVISION'), array('onclick' => "GeneraCobros(this.form, 'en_revision', false)"));
 					?>
 				</td>
 			</tr>

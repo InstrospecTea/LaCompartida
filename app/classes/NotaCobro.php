@@ -8,6 +8,7 @@ class NotaCobro extends Cobro {
 	// Twig, the flexible, fast, and secure template language for PHP
 	protected $twig;
 	protected $template_data;
+	private $detalle_en_asuntos = FALSE;
 
 	var $asuntos = array();
 	var $x_resultados = array();
@@ -20,7 +21,6 @@ class NotaCobro extends Cobro {
 	var $carta_id = 'id_formato';
 	var $carta_formato = 'cobro_template';
 	var $siguiente = array();
-	var $detalle_en_asuntos = FALSE;
 	public $secciones = array(
 		'INFORME' => array(
 			'CLIENTE' => 'CLIENTE / GenerarSeccionCliente',
@@ -1246,15 +1246,26 @@ class NotaCobro extends Cobro {
 		$nuevomodulofactura = Conf::GetConf($this->sesion, 'NuevoModuloFactura');
 		$facturasRS = $this->FacturasDelContrato($this->sesion, $nuevomodulofactura);
 		$totalescontrato = $this->TotalesDelContrato($facturasRS, $nuevomodulofactura, $this->fields['id_cobro']);
+
+		$this->set_detalle_en_asuntos(FALSE);
 		$this->querys_detalle_en_asuntos();
 
 		return $this->$generador($parser, 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto, $mostrar_asuntos_cobrables_sin_horas);
 	}
 
+	/**
+	 *
+	 * Función para determinar si se debe mostrar o no los asuntos cobrados sin horas,
+	 * esto se muestra sólo cuando no hay detalle acerca de algún otro asunto.
+	 * Las querys determinan si los asuntos tienen información a ser mostrada, en caso
+	 * que así sea no se muestran los asuntos cobrables sin hora, en caso contrario sí.
+	 *
+	 */
 	private function querys_detalle_en_asuntos() {
 		$criteria = new Criteria($this->sesion);
 		$criteria->add_select('COUNT(*)', 'total')
 				->add_from('tramite')
+				->add_restriction(CriteriaRestriction::equals('id_cobro', $this->fields['id_cobro']))
 				->add_restriction(CriteriaRestriction::in('codigo_asunto', $this->asuntos));
 
 		try {
@@ -1267,6 +1278,21 @@ class NotaCobro extends Cobro {
 		$criteria = new Criteria($this->sesion);
 		$criteria->add_select('COUNT(*)', 'total')
 				->add_from('trabajo')
+				->add_restriction(CriteriaRestriction::equals('id_cobro', $this->fields['id_cobro']))
+				->add_restriction(CriteriaRestriction::equals('id_tramite', 0))
+				->add_restriction(CriteriaRestriction::in('codigo_asunto', $this->asuntos));
+
+		try {
+			$result = $criteria->run();
+			$this->set_detalle_en_asuntos(($result[0]['total'] == 0 ? FALSE : TRUE) || $this->get_detalle_en_asuntos());
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('COUNT(*)', 'total')
+				->add_from('cta_corriente')
+				->add_restriction(CriteriaRestriction::equals('id_cobro', $this->fields['id_cobro']))
 				->add_restriction(CriteriaRestriction::in('codigo_asunto', $this->asuntos));
 
 		try {
@@ -1277,11 +1303,21 @@ class NotaCobro extends Cobro {
 		}
 	}
 
-	private function set_detalle_en_asuntos($detalle_en_asuntos) {
+	/**
+	 *
+	 * Setea valor a variable $detalle_en_asuntos
+	 *
+	 * @param $detalle_en_asunto valor a setear en variable 
+	 */
+	public function set_detalle_en_asuntos($detalle_en_asuntos) {
 		$this->detalle_en_asuntos = $detalle_en_asuntos;
 	}
 
-	private function get_detalle_en_asuntos() {
+	/**
+	 *
+	 * @return valor variable $detalle_en_asunto
+	 */
+	public function get_detalle_en_asuntos() {
 		return $this->detalle_en_asuntos;
 	}
 
