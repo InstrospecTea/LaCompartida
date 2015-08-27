@@ -70,6 +70,18 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->buildWorkQuery();
 		$this->buildErrandQuery();
 		$this->buildChargeQuery();
+
+		$results = array();
+
+		// if (!empty($this->WorksCriteria)) {
+		// 	$results = array_merge($results, $this->WorksCriteria->run());
+		// }
+
+		if (!empty($this->ChargesCriteria)) {
+			$results = array_merge($results, $this->ChargesCriteria->run());
+		}
+		pr($results[0]);
+		return $results;
 	}
 
 	public function getWorksCriteria() {
@@ -173,7 +185,6 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	function getBaseChargeQuery($Criteria) {
-		$Criteria->add_select('*');
 		$Criteria->add_from('cobro');
 		$this->addFiltersToCriteria($Criteria, 'Charges');
 		$this->addGroupersToCriteria($Criteria, 'Charges');
