@@ -66,7 +66,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OCRD.U_MonTarifa AS 'charging_data_currency_rate',
 				OCRD.U_MonHonor AS 'charging_data_currency_fees',
 				OCRD.U_MonGastos AS 'charging_data_currency_expenses',
-				OPRJ.U_MonedaTarifa AS 'project_chargind_data_currency',
+				OPRJ.U_MonedaTarifa AS 'agreement_charging_data_currency',
 				(CASE
 					WHEN (OPRJ.U_FormaCobro = '1') THEN 'TASA'
 					WHEN (OPRJ.U_FormaCobro = '2') THEN 'RETAINER'
@@ -177,13 +177,13 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					if ($CurrencyRate->Loaded()) {
 						$currency_rate_id = $CurrencyRate->fields['id_moneda'];
 					}
-				}
-
-				// If the currency of the project exists, then we must use it.
-				if (!$this->_empty($client['project_chargind_data_currency'])) {
-					$CurrencyRate->LoadByCode($client['project_chargind_data_currency']);
-					if ($CurrencyRate->Loaded()) {
-						$currency_rate_id = $CurrencyRate->fields['id_moneda'];
+				} else {
+					// If the currency of the agreement exists, then we must use it.
+					if (!$this->_empty($client['agreement_charging_data_currency'])) {
+						$CurrencyRate->LoadByCode($client['agreement_charging_data_currency']);
+						if ($CurrencyRate->Loaded()) {
+							$currency_rate_id = $CurrencyRate->fields['id_moneda'];
+						}
 					}
 				}
 
