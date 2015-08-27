@@ -207,11 +207,16 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			CriteriaRestriction::equals('asuntos_cobro.id_cobro', 'cobro.id_cobro')
 		);
 
+		$and_wheres = array(
+			CriteriaRestriction::equals('cobro.incluye_honorarios', '1'),
+			CriteriaRestriction::greater_than('cobro.monto_subtotal', '0'),
+			CriteriaRestriction::equals('cobro.monto_thh', '0'),
+			CriteriaRestriction::equals('cobro.monto_tramites', '0')
+		);
+		$Criteria->add_restriction(CriteriaRestriction::and_clause($and_wheres));
 
 		$this->addFiltersToCriteria($Criteria, 'Charges');
 		$this->addGroupersToCriteria($Criteria, 'Charges');
-		// Incluir joins necesarios para cobro
-		// $Criteria->add_from
 	}
 
 	function buildWorkQuery() {
