@@ -60,10 +60,9 @@
 	function getReportChargeQuery($Criteria) {
 		$monto_subtotal = '
 			(1 / IFNULL(asuntos_cobro.total_asuntos, 1)) *
-			SUM((cobro.monto_subtotal)
-					* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-					/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-				)
+			SUM(cobro.monto_subtotal
+				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+			)
 		';
 
 		$Criteria->add_select($monto_subtotal, 'valor_cobrado');
