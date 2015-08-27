@@ -21,9 +21,3 @@
 	$r = $reporte->toArray();
 
 	pr($r);
-
-	// $Criteria = $calculator->getWorksCriteria();
-
-	// pr($Criteria->get_plain_query());
-
-?>

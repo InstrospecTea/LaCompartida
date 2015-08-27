@@ -12,5 +12,9 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 		$this->proportionality = $proportionality;
 	}
 
+	public function getProportionality() {
+		return $this->proportionality;
+	}
+
 
 }

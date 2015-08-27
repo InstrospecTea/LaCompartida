@@ -649,7 +649,9 @@ class ReporteCriteria {
 
 			$this->row = $calculator->calculate();
 
-			# $calculator->getWorksCriteria()
+			$criteria_works = $calculator->getWorksCriteria();
+			pr($criteria_works->get_plain_query());
+
 			$criteria = $calculator->getChargesCriteria();
 			pr($criteria->get_plain_query());
 
