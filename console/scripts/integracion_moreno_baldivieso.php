@@ -323,6 +323,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$MatterAgreement->Edit('forma_cobro', $billing_form);
 					$MatterAgreement->Edit('id_tarifa', $rate_id);
 					$MatterAgreement->Edit('id_moneda', $currency_rate_id);
+					$MatterAgreement->Edit('id_moneda_monto', $currency_rate_id);
 					$MatterAgreement->Edit('opc_moneda_total', $currency_fees_id);
 					$MatterAgreement->Edit('opc_moneda_gastos', $currency_expenses_id);
 					$MatterAgreement->Edit('id_usuario_modificador', $modifier_user_id);
