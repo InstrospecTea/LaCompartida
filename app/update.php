@@ -10858,6 +10858,10 @@ QUERY;
 				$queries[] = "ALTER TABLE `cta_corriente` ADD COLUMN `detraccion` VARCHAR(100) DEFAULT NULL;";
 			}
 			break;
+
+		case 8.10:
+			$queries = array("ALTER TABLE `factura_cobro` CHANGE `id_documento` `id_documento` INT(11)  NULL  DEFAULT NULL;");
+			break;
 	}
 
 	if (!empty($queries)) {
