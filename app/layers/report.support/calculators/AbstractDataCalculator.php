@@ -17,6 +17,11 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'fecha_fin'
 	);
 
+	private $dependantFilters = array(
+		'fecha_ini',
+		'fecha_fin'
+	);
+
 	private $allowedGroupers = array(
 		'area_asunto',
 		'area_usuario',
@@ -46,7 +51,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'username'
 	);
 
-	private $filterFields = array();
+	private $filtersFields = array();
 	private $grouperFields = array();
 	private $selectFields = array();
 
@@ -56,7 +61,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $selectFields) {
 		$this->Session = $Session;
-		$this->filtersFields = $filterFields;
+		$this->filtersFields = $filtersFields;
 		$this->grouperFields = $grouperFields;
 		$this->selectFields = $selectFields;
 	}
@@ -79,30 +84,90 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		return $this->ErrandsCriteria;
 	}
 
-	function addFiltersToCriteria($Criteria) {
-
+	function addGroupersToCriteria(Criteria $Criteria, $type) {
+		foreach ($this->grouperFields as $groupField) {
+			$class_prefix = $this->getClassPrefix($groupField);
+			try {
+				$reflectedClass = new ReflectionClass("{$class_prefix}Grouper");
+				$reflectedMethod = new ReflectionMethod(
+					"{$class_prefix}Grouper",
+					"translateFor{$type}"
+				);
+				$Criteria = $reflectedMethod->invokeArgs(
+					$reflectedClass->newInstance(),
+					array($Criteria)
+				);
+			} catch (ReflectionException $Exception) {
+				throw new ReportException($Exception->getMessage());
+			}
+		}
+		return $Criteria;
 	}
 
-	function addChargesFiltersToCriteria($Criteria) {
-
+	function addFiltersToCriteria($Criteria, $type) {
+		foreach ($this->filtersFields as $key => $value) {
+			if (!$this->isDependantFilter($key)) {
+				$class_prefix = $this->getClassPrefix($key);
+				try {
+					$reflectedClass = new ReflectionClass("{$class_prefix}Filter");
+					$reflectedMethod = new ReflectionMethod(
+						"{$class_prefix}Filter",
+						"translateFor{$type}"
+					);
+					if ($reflectedClass->getParentClass()->getName() == 'AbstractUndependantFilterTranslator') {
+						$Criteria = $reflectedMethod->invokeArgs(
+							$reflectedClass->newInstance($value),
+							array($Criteria)
+						);
+					}
+					if ($reflectedClass->getParentClass()->getName() == 'AbstractDependantFilterTranslator') {
+						$reflectedAbstractMethod = new ReflectionMethod(
+							"{$class_prefix}Filter",
+							"getNameOfDependantFilters"
+						);
+						$dependantFilters = $reflectedAbstractMethod->invokeArgs(
+							null,
+							array()
+						);
+						$dependantParameters = array();
+						foreach ($dependantFilters as $filter) {
+							$dependantParameters[$filter] = $this->filtersFields[$filter];
+						}
+						$Criteria = $reflectedMethod->invokeArgs(
+							$reflectedClass->newInstance($value, $dependantParameters),
+							array($Criteria)
+						);
+					}
+				} catch (ReflectionException $Exception) {
+					throw new ReportException($Exception->getMessage());
+				}
+			}
+		}
+		return $Criteria;
 	}
 
-	function addGroupersToCriteria($Criteria) {
-
+	function getClassPrefix($key) {
+		$words = explode('_', $key);
+		$camelizedWords = array();
+		foreach ($words as $word) {
+			$camelizedWords[] = ucwords($word);
+		}
+		$constructedKey = implode('', $camelizedWords);
+		return $constructedKey;
 	}
 
 	function getBaseWorkQuery(Criteria $Criteria) {
 		$Criteria->add_from('trabajo');
-		$this->addFiltersToCriteria($Criteria);
-		$this->addGroupersToCriteria($Criteria);
+		$this->addFiltersToCriteria($Criteria, 'Works');
+		$this->addGroupersToCriteria($Criteria, 'Works');
 		// Incluir joins necesarios para trabajo
 		// $Criteria->add_from
 	}
 
 	function getBaseErrandQuery($Criteria) {
 		$Criteria->add_from('tramite');
-		$this->addFiltersToCriteria($Criteria);
-		$this->addGroupersToCriteria($Criteria);
+		$this->addFiltersToCriteria($Criteria, 'Errands');
+		$this->addGroupersToCriteria($Criteria, 'Errands');
 		// Incluir joins necesarios para tramites
 		// $Criteria->add_from
 	}
@@ -110,8 +175,8 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	function getBaseChargeQuery($Criteria) {
 		$Criteria->add_select('*');
 		$Criteria->add_from('cobro');
-		$this->addFiltersToCriteria($Criteria);
-		$this->addGroupersToCriteria($Criteria);
+		$this->addFiltersToCriteria($Criteria, 'Charges');
+		$this->addGroupersToCriteria($Criteria, 'Charges');
 		// Incluir joins necesarios para cobro
 		// $Criteria->add_from
 	}
@@ -135,6 +200,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->getBaseChargeQuery($Criteria);
 		$this->getReportChargeQuery($Criteria);
 		$this->ChargesCriteria = $Criteria;
+		return $this->ChargesCriteria;
 	}
 
 	function getAllowedFilters() {
@@ -149,6 +215,10 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		 	$this->allowedGroupers,
 		 	$this->notAllowedGroupers()
 		 );
+	}
+
+	function isDependantFilter($key) {
+		return in_array($key, $this->dependantFilters);
 	}
 
 }
