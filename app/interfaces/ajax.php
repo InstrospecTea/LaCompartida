@@ -451,17 +451,17 @@ if ($accion == "consistencia_cliente_asunto") {
 										FROM contrato
 											INNER JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente WHERE 1 ";
 
-	if (!empty($codigo_cliente)) {
-		$codigo_cliente_key = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
-		$query_contrato .= " AND cliente.{$codigo_cliente_key} = '{$codigo_cliente}'";
-	}
-
 	if (!empty($id_contrato)) {
 		$query_contrato .= " AND contrato.id_contrato = {$id_contrato}";
 	} else {
 		$query_contrato .= " AND contrato.id_contrato = cliente.id_contrato";
+
+		if (!empty($codigo_cliente)) {
+			$codigo_cliente_key = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
+			$query_contrato .= " AND cliente.{$codigo_cliente_key} = '{$codigo_cliente}'";
+		}
 	}
-	
+
 	$resp = mysql_query($query_contrato, $sesion->dbh) or Utiles::errorSQL($query_contrato, __FILE__, __LINE__, $sesion->dbh);
 
 	for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {

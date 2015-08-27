@@ -1090,11 +1090,20 @@ $Form->defaultLabel = false;
 					var campos = response.split('~');
 					if (response.indexOf('VACIO') != -1)
 					{
-						//dejamos los campos en blanco.
-						rut.value = '';
-						direccion_cliente.value = '';
+						// Dejamos los campos en blanco.
 						cliente.value = '';
-						alert('No existen <?php echo __('cobros'); ?> para este cliente.');
+						direccion_cliente.value = '';
+						rut.value = '';
+						comuna_cliente.value = '';
+						ciudad_cliente.value = '';
+						<?php if (Conf::GetConf($sesion, 'RegionCliente')) { ?>
+							factura_region.value = '';
+						<?php } ?>
+						giro_cliente.value = '';
+						factura_codigopostal.value = '';
+						if (dte_id_pais) {
+							dte_id_pais.value = '';
+						}
 					}
 					else
 					{
@@ -1137,7 +1146,7 @@ $Form->defaultLabel = false;
 								ciudad_cliente.value = '';
 							}
 
-							//Estado
+							// Región
 							<?php if (Conf::GetConf($sesion, 'RegionCliente')) { ?>
 								if(valores[5] != ''){
 									factura_region.value = valores[5]
