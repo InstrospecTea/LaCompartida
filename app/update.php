@@ -10863,6 +10863,17 @@ QUERY;
 					"ALTER TABLE `factura` ADD `folio_documento_referencia` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `id_documento_referencia`;",
 					"ALTER TABLE `factura` ADD `fecha_documento_referencia` DATE  NULL  DEFAULT NULL  AFTER `folio_documento_referencia`;"
 				);
+
+			$query = "SELECT archivo_nombre FROM prm_plugin WHERE activo = 1 AND archivo_nombre IN ('facturacion_electronica_nubox.php', 'facturacion_electronica_cl.php');";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+			$archivo = mysql_fetch_array($resp);
+			if ($archivo['archivo_nombre'] == 'facturacion_electronica_nubox.php') {
+				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES ('PRM_FACTURA_CL_DR', '801', 'Orden Compra')";
+			} else if ($archivo['archivo_nombre'] == 'facturacion_electronica_cl.php') {
+				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES ('PRM_FACTURA_CL_DR', '', '')";
+			}
+			break;
 	}
 
 	if (!empty($queries)) {
