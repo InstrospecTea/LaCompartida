@@ -1,10 +1,12 @@
 <?php
 
-interface IFilterTranslator {
+interface IGrouperTranslator {
 
-    function setFilterData($data);
+    function getGroupField();
 
-    function getFilterData();
+    function getSelectField();
+
+    function getOrderField();
 
     function translateForCharges(Criteria $criteria);
 
@@ -12,5 +14,4 @@ interface IFilterTranslator {
 
     function translateForWorks(Criteria $criteria);
 
-    function getFieldName();
 }

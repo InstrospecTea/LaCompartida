@@ -17,6 +17,11 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'fecha_fin'
 	);
 
+	private $dependantFilters = array(
+		'fecha_ini',
+		'fecha_fin'
+	);
+
 	private $allowedGroupers = array(
 		'area_asunto',
 		'area_usuario',
@@ -46,7 +51,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'username'
 	);
 
-	private $filterFields = array();
+	private $filtersFields = array();
 	private $grouperFields = array();
 	private $selectFields = array();
 
@@ -79,28 +84,76 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		return $this->ErrandsCriteria;
 	}
 
-	function addFiltersToCriteria($Criteria, $type) {
-		foreach ($this->filtersFields as $key => $value) {
-			$class_prefix = ucwords($key);
+	function addGroupersToCriteria(Criteria $Criteria, $type) {
+		foreach ($this->grouperFields as $groupField) {
+			$class_prefix = $this->getClassPrefix($groupField);
 			try {
-				$reflectedClass = new ReflectionClass("{$class_prefix}Filter");
+				$reflectedClass = new ReflectionClass("{$class_prefix}Grouper");
 				$reflectedMethod = new ReflectionMethod(
-					"{$class_prefix}Filter",
+					"{$class_prefix}Grouper",
 					"translateFor{$type}"
 				);
 				$Criteria = $reflectedMethod->invokeArgs(
-					$reflectedClass->newInstance($value),
+					$reflectedClass->newInstance(),
 					array($Criteria)
 				);
 			} catch (ReflectionException $Exception) {
-				pr($Exception->getMessage());
-				die("The translater for filter $class_prefix does not exist");
+				throw new ReportException($Exception->getMessage());
 			}
 		}
+		return $Criteria;
 	}
 
-	function addGroupersToCriteria($Criteria, $type) {
+	function addFiltersToCriteria($Criteria, $type) {
+		foreach ($this->filtersFields as $key => $value) {
+			if (!$this->isDependantFilter($key)) {
+				$class_prefix = $this->getClassPrefix($key);
+				try {
+					$reflectedClass = new ReflectionClass("{$class_prefix}Filter");
+					$reflectedMethod = new ReflectionMethod(
+						"{$class_prefix}Filter",
+						"translateFor{$type}"
+					);
+					if ($reflectedClass->getParentClass()->getName() == 'AbstractUndependantFilterTranslator') {
+						$Criteria = $reflectedMethod->invokeArgs(
+							$reflectedClass->newInstance($value),
+							array($Criteria)
+						);
+					}
+					if ($reflectedClass->getParentClass()->getName() == 'AbstractDependantFilterTranslator') {
+						$reflectedAbstractMethod = new ReflectionMethod(
+							"{$class_prefix}Filter",
+							"getNameOfDependantFilters"
+						);
+						$dependantFilters = $reflectedAbstractMethod->invokeArgs(
+							null,
+							array()
+						);
+						$dependantParameters = array();
+						foreach ($dependantFilters as $filter) {
+							$dependantParameters[$filter] = $this->filtersFields[$filter];
+						}
+						$Criteria = $reflectedMethod->invokeArgs(
+							$reflectedClass->newInstance($value, $dependantParameters),
+							array($Criteria)
+						);
+					}
+				} catch (ReflectionException $Exception) {
+					throw new ReportException($Exception->getMessage());
+				}
+			}
+		}
+		return $Criteria;
+	}
 
+	function getClassPrefix($key) {
+		$words = explode('_', $key);
+		$camelizedWords = array();
+		foreach ($words as $word) {
+			$camelizedWords[] = ucwords($word);
+		}
+		$constructedKey = implode('', $camelizedWords);
+		return $constructedKey;
 	}
 
 	function getBaseWorkQuery(Criteria $Criteria) {
@@ -162,6 +215,10 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		 	$this->allowedGroupers,
 		 	$this->notAllowedGroupers()
 		 );
+	}
+
+	function isDependantFilter($key) {
+		return in_array($key, $this->dependantFilters);
 	}
 
 }

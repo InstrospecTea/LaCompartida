@@ -1,6 +1,6 @@
 <?php
 
-class ClientesFilter extends AbstractFilterTranslator {
+class ClientesFilter extends AbstractUndependantFilterTranslator {
 
     function getFieldName() {
         return 'cliente.codigo_cliente';

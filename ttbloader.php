@@ -99,6 +99,14 @@ function autocargattb($class_name) {
 
         require_once dirname(__FILE__) . '/app/layers/report/filters/' . $class_name . '.php';
 
+    } else if (is_readable(dirname(__FILE__) . '/app/layers/report.support/groupers/' . $class_name . '.php')) {
+
+        require_once dirname(__FILE__) . '/app/layers/report.support/groupers/' . $class_name . '.php';
+
+    } else if (is_readable(dirname(__FILE__) . '/app/layers/report/groupers/' . $class_name . '.php')) {
+
+        require_once dirname(__FILE__) . '/app/layers/report/groupers/' . $class_name . '.php';
+
     } else {
 
 		return false;

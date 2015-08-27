@@ -187,8 +187,14 @@ class Criteria {
 			$join_table = implode(' AS ', $join_table);
 		}
 		$new_clause = " $join_type JOIN $join_table ON $join_condition ";
-		$this->join_clauses[] = $new_clause;
+		if (!$this->check_if_exists($this->join_clauses, $new_clause)) {
+			$this->join_clauses[] = $new_clause;
+		}
 		return $this;
+	}
+
+	private function check_if_exists($source, $new_value) {
+		return in_array($new_value, $source);
 	}
 
 	/**
@@ -294,7 +300,7 @@ class Criteria {
 				$this->ordering_clauses[] = $order;
 			}
 		} else {
-			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido "'. $order_criteria. '".');
+			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido "'. $ordering_criteria. '".');
 		}
 
 		return $this;
@@ -311,7 +317,7 @@ class Criteria {
 			$this->order_criteria = $ordering_criteria;
 			return $this;
 		} else {
-			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido '. $order_criteria. '.');
+			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido '. $ordering_criteria. '.');
 		}
 	}
 

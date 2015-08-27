@@ -19,8 +19,15 @@
 	$reporte->Query();
 
 	$r = $reporte->toArray();
+	$calculator = new BilledAmountDataCalculator(
+		$this->Session,
+		array('clientes' => array('1', '2'), 'campo_fecha' => 'trabajo', 'fecha_fin' => '123q23123'),
+		array('area_asunto'),
+		array('1')
+	);
 
 	pr($r);
+	pr($calculator->buildChargeQuery()->get_plain_query());
 
 	// $Criteria = $calculator->getWorksCriteria();
 

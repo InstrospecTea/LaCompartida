@@ -1,6 +1,6 @@
 <?php
 
-abstract class AbstractFilterTranslator implements IFilterTranslator {
+abstract class AbstractUndependantFilterTranslator extends BaseFilterTranslator implements IUndependantFilterTranslator {
 	public function __construct($data) {
         $this->setFilterData($data);
     }
