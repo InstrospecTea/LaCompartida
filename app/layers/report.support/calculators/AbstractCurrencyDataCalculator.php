@@ -10,13 +10,6 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
   }
 
   function addCurrencyToQuery(Criteria $Criteria) {
-    $Criteria
-      ->add_select('cobro_moneda.id_moneda')
-      ->add_select('cobro_moneda.tipo_cambio')
-      ->add_select('cobro_moneda_base.id_moneda')
-      ->add_select('cobro_moneda_base.tipo_cambio')
-      ->add_select('cobro_moneda_cobro.id_moneda')
-      ->add_select('cobro_moneda_cobro.tipo_cambio');
 
     $Criteria->add_left_join_with(array('prm_moneda', 'moneda_base'), CriteriaRestriction::equals('moneda_base.moneda_base', 1));
 

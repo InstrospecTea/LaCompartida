@@ -186,6 +186,28 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	function getBaseChargeQuery($Criteria) {
 		$Criteria->add_from('cobro');
+
+		$Criteria
+			->add_left_join_with('cobro_asunto',
+				CriteriaRestriction::equals('cobro.id_cobro', 'cobro_asunto.id_cobro'))
+			->add_left_join_with('asunto',
+				CriteriaRestriction::equals('cobro_asunto.codigo_asunto', 'asunto.codigo_asunto'))
+			->add_grouping('asunto.id_asunto')
+			->add_grouping('cobro.id_cobro');
+
+		$SubCriteria = new Criteria();
+		$SubCriteria->add_from('cobro_asunto')
+			->add_select('id_cobro')
+			->add_select('count(codigo_asunto)', 'total_asuntos')
+			->add_grouping('id_cobro');
+
+		$Criteria->add_left_join_with_criteria(
+			$SubCriteria,
+			'asuntos_cobro',
+			CriteriaRestriction::equals('asuntos_cobro.id_cobro', 'cobro.id_cobro')
+		);
+
+
 		$this->addFiltersToCriteria($Criteria, 'Charges');
 		$this->addGroupersToCriteria($Criteria, 'Charges');
 		// Incluir joins necesarios para cobro

@@ -64,21 +64,8 @@
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
 		';
-
+		$Criteria->add_select('cobro.id_cobro');
 		$Criteria->add_select($monto_subtotal, 'valor_cobrado');
-
-		$SubCriteria = new Criteria();
-
-		$SubCriteria->add_from('cobro_asunto')
-			->add_select('id_cobro')
-			->add_select('count(codigo_asunto)', 'total_asuntos')
-			->add_grouping('id_cobro');
-
-		$Criteria->add_left_join_with_criteria(
-			$SubCriteria,
-			'asuntos_cobro',
-			CriteriaRestriction::equals('asuntos_cobro.id_cobro', 'cobro.id_cobro')
-		);
 
 	}
 
