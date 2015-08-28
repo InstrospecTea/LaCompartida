@@ -37,7 +37,7 @@
 
 	function getReportErrandQuery($Criteria) {
 		$rate = $this->getErrandsFeeField();
-		$amount = $this->getErrandsProporcionalityAmountField();
+		$amount = $this->getErrandsProportionalityAmountField();
 		$billed_amount =  "SUM(
 			({$rate})
 			*
