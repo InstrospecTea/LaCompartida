@@ -130,7 +130,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 					"translateFor{$type}"
 				);
 				$Criteria = $reflectedMethod->invokeArgs(
-					$reflectedClass->newInstance(),
+					$reflectedClass->newInstance($this->Session),
 					array($Criteria)
 				);
 			} catch (ReflectionException $Exception) {
