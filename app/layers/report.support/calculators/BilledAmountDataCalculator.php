@@ -51,11 +51,11 @@
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
-		$Criteria->add_select($monto_honorarios, 'valor_cobrado');
+		$Criteria->add_select($billed_amount, 'valor_cobrado');
 	}
 
 	function getReportChargeQuery($Criteria) {
-		$monto_subtotal = '
+		$billed_amount = '
 			(1 / IFNULL(asuntos_cobro.total_asuntos, 1)) *
 			SUM(cobro.monto_subtotal
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
@@ -64,7 +64,7 @@
 		$Criteria->add_select(
 			'cobro.id_cobro'
 		)->add_select(
-			$monto_subtotal,
+			$billed_amount,
 			'valor_cobrado'
 		);
 	}
