@@ -1,32 +1,35 @@
-<?php
+	<?php
 
-class CampoFechaFilter extends AbstractDependantFilterTranslator {
+	class CampoFechaFilter extends AbstractDependantFilterTranslator {
 
-    function getParentFilter() {
-        return $this->parent;
-    }
+	function getParentFilter() {
+		return $this->parent;
+	}
 
-    function setParentFilterData($data) {
-        $this->parent = $data;
-    }
+	function setParentFilterData($data) {
+		$this->parent = $data;
+	}
 
-    static function getNameOfDependantFilters() {
-        return array('fecha_ini', 'fecha_fin');
-    }
+	static function getNameOfDependantFilters() {
+		return array('fecha_ini', 'fecha_fin');
+	}
 
-    function translateForCharges(Criteria $criteria) {
-        return $criteria;
-    }
+	function translateForCharges(Criteria $Criteria) {
+		return $Criteria;
+	}
 
-    function translateForErrands(Criteria $criteria) {
-        return $criteria;
-    }
+	function translateForErrands(Criteria $Criteria) {
+		return $Criteria;
+	}
 
-    function translateForWorks(Criteria $criteria) {
-        return $criteria;
-    }
+	function translateForWorks(Criteria $Criteria) {
+		$filters = $this->getFilterData();
+		$Criteria->add_restriction(CriteriaRestriction::between('trabajo.fecha', "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']}'"));
 
-    function getFieldName() {
-        // TODO: Implement getFieldName() method.
-    }
+		return $Criteria;
+	}
+
+	function getFieldName() {
+		// TODO: Implement getFieldName() method.
+	}
 }
