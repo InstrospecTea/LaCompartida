@@ -144,7 +144,6 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	function addFiltersToCriteria($Criteria, $type) {
-        pr($this->filtersFields);
 		foreach ($this->filtersFields as $key => $value) {
 			if (!$this->isDependantFilter($key)) {
 				$class_prefix = $this->getClassPrefix($key);

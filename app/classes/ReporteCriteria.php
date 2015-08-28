@@ -637,7 +637,8 @@ class ReporteCriteria {
 				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
 				'fecha_fin' => Utiles::fecha2sql($this->parametros['fecha_fin'])
 			);
-			$grouperFields = array();
+
+			$grouperFields = explode('-', $this->vista);
 			$selectFields = array();
 
 			$proportionality = 'cliente';
