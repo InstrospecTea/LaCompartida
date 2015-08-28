@@ -143,6 +143,9 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	function addFiltersToCriteria($Criteria, $type) {
 		foreach ($this->filtersFields as $key => $value) {
+			if (empty($value)) {
+				continue;
+			}
 			if (!$this->isDependantFilter($key)) {
 				$class_prefix = $this->getClassPrefix($key);
 				try {
@@ -310,7 +313,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	function cancelQuery($kind) {
 		foreach ($this->filtersFields as $key => $value) {
-			if (in_array($key, $this->queryCancelatorsFilters[$kind])) {
+			if (in_array($key, $this->queryCancelatorsFilters[$kind]) && !empty($value)) {
 				return true;
 			}
 		}
