@@ -18,7 +18,7 @@ class ClientesFilter extends AbstractUndependantFilterTranslator {
 			)
 		)->add_left_join_with(
 			'cliente', CriteriaRestriction::equals(
-				'contrato.codigo_cliente', 'cliente.codigo_cliente'
+				'cliente.codigo_cliente', 'contrato.codigo_cliente'
 			)
 		);
 	}

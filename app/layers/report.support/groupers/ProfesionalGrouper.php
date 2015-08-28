@@ -2,10 +2,8 @@
 
 class ProfesionalGrouper extends AbstractGrouperTranslator {
 
-	private $uniqueField = "id_usuario";
-
 	function getGroupField() {
-		return 'id_usuario';
+		return 'usuario.id_usuario';
 	}
 
 	function getSelectField() {
@@ -28,7 +26,7 @@ class ProfesionalGrouper extends AbstractGrouperTranslator {
 	function translateForErrands(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'profesional')
-			->add_grouping($this->getSelectField())
+			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with(
 			'usuario',
@@ -44,7 +42,7 @@ class ProfesionalGrouper extends AbstractGrouperTranslator {
 	function translateForWorks(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'profesional')
-			->add_grouping($this->getSelectField())
+			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with(
 			'usuario',

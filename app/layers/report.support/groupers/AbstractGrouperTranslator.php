@@ -9,10 +9,18 @@ abstract class AbstractGrouperTranslator  implements IGrouperTranslator {
 	}
 
 	function getUserField() {
+		return $this->getUserFieldBy('usuario');
+	}
+
+	function getUserAcountManagerField() {
+		return $this->getUserFieldBy('usuario_responsable');
+	}
+
+	function getUserFieldBy($table) {
 		if (Conf::GetConf($this->Session, 'UsaUsernameEnTodoElSistema')) {
-			return "usuario.username";
+			return "{$table}.username";
 		}
-		return "CONCAT_WS(' ', usuario.nombre, usuario.apellido1, LEFT(usuario.apellido2, 1))";
+		return "CONCAT_WS(' ', {$table}.nombre, {$table}.apellido1, LEFT({$table}.apellido2, 1))";
 	}
 
 	function getUndefinedField() {

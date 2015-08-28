@@ -692,19 +692,6 @@ class ReporteCriteria {
 
 			$this->row = $calculator->calculate();
 
-			$criteria = $calculator->getWorksCriteria();
-			if (!empty($criteria)) {
-				pr($criteria->get_plain_query());
-			}
-			$criteria = $calculator->getErrandsCriteria();
-			if (!empty($criteria)) {
-				pr($criteria->get_plain_query());
-			}
-			$criteria = $calculator->getChargesCriteria();
-			if (!empty($criteria)) {
-				pr($criteria->get_plain_query());
-			}
-
 			return;
 		}
 

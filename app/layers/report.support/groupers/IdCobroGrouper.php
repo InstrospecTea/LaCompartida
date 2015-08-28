@@ -19,7 +19,7 @@ class IdCobroGrouper extends AbstractGrouperTranslator {
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'id_cobro')
-			->add_grouping($this->getSelectField())
+			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField());
 
 		return $Criteria;
@@ -28,7 +28,7 @@ class IdCobroGrouper extends AbstractGrouperTranslator {
 	function translateForErrands(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'id_cobro')
-			->add_grouping($this->getSelectField())
+			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField());
 
 		return $Criteria;
@@ -38,7 +38,7 @@ class IdCobroGrouper extends AbstractGrouperTranslator {
 	function translateForWorks(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'id_cobro')
-			->add_grouping($this->getSelectField())
+			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField());
 
 		return $Criteria;

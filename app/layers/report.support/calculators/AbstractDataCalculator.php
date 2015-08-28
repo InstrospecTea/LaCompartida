@@ -98,10 +98,17 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$results = array();
 
 		if (!empty($this->WorksCriteria)) {
+			pr($this->WorksCriteria->get_plain_query());
 			$results = array_merge($results, $this->WorksCriteria->run());
 		}
 
+		if (!empty($this->ErrandsCriteria)) {
+			pr($this->ErrandsCriteria->get_plain_query());
+			$results = array_merge($results, $this->ErrandsCriteria->run());
+		}
+
 		if (!empty($this->ChargesCriteria)) {
+			pr($this->ChargesCriteria->get_plain_query());
 			$results = array_merge($results, $this->ChargesCriteria->run());
 		}
 
@@ -217,7 +224,11 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 		$Criteria
 			->add_left_join_with(
-				'cobro', CriteriaRestriction::equals('cobro.id_cobro', 'tramite.id_cobro')
+				'cobro',
+				CriteriaRestriction::equals(
+					'cobro.id_cobro',
+					'tramite.id_cobro'
+				)
 			);
 
 		$this->addFiltersToCriteria($Criteria, 'Errands');
