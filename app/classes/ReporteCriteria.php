@@ -19,7 +19,7 @@ class ReporteCriteria {
 	public $vista;
 	// Arreglo con resultados
 	public $row;
-	// String con el ï¿½ltimo error
+	// String con el último error
 	public $error = '';
 	// El orden de los agrupadores
 	public $agrupador = array();
@@ -73,7 +73,7 @@ class ReporteCriteria {
 		'valor_por_pagar' => null,
 		'valor_por_pagar_parcial' => null,
 		'valor_trabajado_estandar' => null,
-		'valor_tramites' => null
+		'valor_tramites' => 'BilledErrandsAmount'
 	);
 
 	const TIPO_TRABAJOS = 0;
@@ -132,11 +132,11 @@ class ReporteCriteria {
 	 *
 	 * +-- horas_trabajadas: Total de Horas Trabajadas
 	 * |  +-- horas_cobrables: Total de Horas Trabajadas en asuntos Facturables
-	 * |  |  +-- horas_visibles: Horas que ve el Cliente en nota de liquidaciï¿½n (tras revisiï¿½n)
+	 * |  |  +-- horas_visibles: Horas que ve el Cliente en nota de liquidación (tras revisión)
 	 * |  |  |  +-- horas_cobradas: Horas Visibles en Liquidaciones que ya fueron Emitidas
 	 * |  |  |  |  +-- horas_pagadas: Horas Cobradas en Cobros con estado Pagado
-	 * |  |  |  |  \-- horas_por_pagar: Horas Cobradas que aï¿½n no han sido pagadas
-	 * |  |  |  +-- horas_por_cobrar: Horas Visibles que aï¿½n no se Emiten al Cliente
+	 * |  |  |  |  \-- horas_por_pagar: Horas Cobradas que aún no han sido pagadas
+	 * |  |  |  +-- horas_por_cobrar: Horas Visibles que aún no se Emiten al Cliente
 	 * |  |  |  \-- horas_incobrables: Horas en Cobros Incobrables
 	 * |  |  \-- horas_castigadas: Diferencia de Horas Cobrables con las Horas que ve el cliente en nota de Cobro
 	 * |  \-- horas_no_cobrables: Total de Horas Trabajadas en asuntos no Facturables
@@ -144,26 +144,26 @@ class ReporteCriteria {
 	 * +-- valor_trabajado: (no implementado)
 	 * |  +-- valor_cobrable: (no implementado)
 	 * |  |  +-- valor_visible: (no implementado)
-	 * |  |  |  +-- valor_cobrado: Valor monetario que corresponde a cada Profesional, en una Liquidaciï¿½n ya Emitida
-	 * |  |  |  +-- valor_tramites: Valor monetario de trï¿½mites que corresponde a cada Profesional, en una Liquidaciï¿½n ya Emitida
+	 * |  |  |  +-- valor_cobrado: Valor monetario que corresponde a cada Profesional, en una Liquidación ya Emitida
+	 * |  |  |  +-- valor_tramites: Valor monetario de trámites que corresponde a cada Profesional, en una Liquidación ya Emitida
 	 * |  |  |  |  +-- valor_pagado: Valor Cobrado que ha sido Pagado
-	 * |  |  |  |  \-- valor_por_pagar: Valor Cobrado que aï¿½n no ha sido pagado
+	 * |  |  |  |  \-- valor_por_pagar: Valor Cobrado que aún no ha sido pagado
 	 * |  |  |  +-- valor_por_cobrar: Valor monetario estimado que corresponde a cada Profesional en horas por cobrar
 	 * |  |  |  \-- valor_incobrable: Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable
 	 * |  |  +-- valor_castigado: (no implementado)
 	 * |  +-- valor_no_cobrable: (no implementado)
-	 * +-- valor_trabajado_estandar: Horas Trabajadas por THH Estï¿½ndar, para todo Trabajo
-	 * +-- valor_estandar: Valor Cobrado, si se hubiera usado THH Estï¿½ndar
-	 * +-- diferencia_valor_estandar: Valor Cobrado - Valor Estï¿½ndar
+	 * +-- valor_trabajado_estandar: Horas Trabajadas por THH Estándar, para todo Trabajo
+	 * +-- valor_estandar: Valor Cobrado, si se hubiera usado THH Estándar
+	 * +-- diferencia_valor_estandar: Valor Cobrado - Valor Estándar
 	 * +-- valor_hora: Valor Cobrado / Horas Cobradas
-	 * +-- rentabilidad_base: Valor Cobrado / Valor Trabajado Estï¿½ndar
-	 * +-- rentabilidad: Valor Cobrado / Valor Estï¿½ndar
+	 * +-- rentabilidad_base: Valor Cobrado / Valor Trabajado Estándar
+	 * +-- rentabilidad: Valor Cobrado / Valor Estándar
 	 * +-- costo: Costo para la firma, por concepto de sueldos
 	 * \-- costo_hh: Costo HH para la firma, por concepto de sueldos
 	 *
 	 * @param $nombre String tipo de dato a considerar en el reporte
 	 * @param $dato_extra Datos extras (usado para determinar si mostrar trabajos sin horas castigadas)
-	 * @return void sï¿½lo asigna los filtros necesarios segï¿½n tipo de dato
+	 * @return void sólo asigna los filtros necesarios según tipo de dato
 	 */
 	public function setTipoDato($nombre, $dato_extra = null) {
 		$this->tipo_dato = $nombre;
@@ -380,7 +380,7 @@ class ReporteCriteria {
 		}
 	}
 
-	//Establece la vista: los agrupadores (y su orden) son la base para la construcciï¿½n de arreglos de resultado.
+	//Establece la vista: los agrupadores (y su orden) son la base para la construcción de arreglos de resultado.
 	public function setVista($vista) {
 		$this->vista = $vista;
 		$this->agrupador = array();
@@ -420,7 +420,7 @@ class ReporteCriteria {
 		return "CONCAT_WS(' ', {$tabla}.nombre, {$tabla}.apellido1, LEFT({$tabla}.apellido2, 1))";
 	}
 
-	public function cobroQuery() { //Query que aï¿½ade rows para los datos de Cobros emitidos que no cuentan Trabajos
+	public function cobroQuery() { //Query que añade rows para los datos de Cobros emitidos que no cuentan Trabajos
 		if (empty($this->id_agrupador_cobro)) {
 			return 0;
 		}
@@ -602,7 +602,7 @@ class ReporteCriteria {
 		unset($this->filtros['trabajo.cobrable']);
 		unset($this->filtros['tramite.cobrable']);
 
-		// todo crear mï¿½todo que identifique cuando ejectuar la query cobro
+		// todo crear método que identifique cuando ejectuar la query cobro
 		unset($this->filtros['trabajo.id_usuario']);
 
 		$and_wheres = array(
@@ -677,8 +677,8 @@ class ReporteCriteria {
 				'encargados' => nil,
 				'estado_cobro' => nil
 			);
-            
-            $grouperFields = $this->agrupador;
+
+			$grouperFields = $this->agrupador;
 			$calculator_name = $this->newCalculation[$this->tipo_dato];
 			$reflectedClass = new ReflectionClass("{$calculator_name}DataCalculator");
 			$calculator = $reflectedClass->newInstance(
@@ -691,6 +691,19 @@ class ReporteCriteria {
 
 			$this->row = $calculator->calculate();
 
+			$criteria = $calculator->getWorksCriteria();
+			if (!empty($criteria)) {
+				pr($criteria->get_plain_query());
+			}
+			$criteria = $calculator->getErrandsCriteria();
+			if (!empty($criteria)) {
+				pr($criteria->get_plain_query());
+			}
+			$criteria = $calculator->getChargesCriteria();
+			if (!empty($criteria)) {
+				pr($criteria->get_plain_query());
+			}
+
 			return;
 		}
 
@@ -700,14 +713,14 @@ class ReporteCriteria {
 			$this->row[] = $row;
 		}
 
-		// Obtiene todos los datos para Trï¿½mites
+		// Obtiene todos los datos para trámites
 		$resp = mysql_unbuffered_query($this->getQuery(TIPO_TRAMITES), $this->sesion->dbh) or Utiles::errorSQL($this->getQuery(TIPO_TRAMITES), __FILE__, __LINE__, $this->sesion->dbh);
 		while ($row = mysql_fetch_assoc($resp)) {
 			$this->row[] = $row;
 		}
 
 		// Obtiene todos los datos para Cobros
-		// En caso de filtrar por ï¿½rea o categorï¿½a de usuario no se toman en cuenta los cobros sin horas.
+		// En caso de filtrar por área o categoría de usuario no se toman en cuenta los cobros sin horas.
 		$cobroquery = $this->cobroQuery();
 
 		if (
@@ -729,7 +742,7 @@ class ReporteCriteria {
 
 	/*
 		Constructor de Arreglo Resultado. TIPO BARRAS.
-		Entrega un arreglo lineal de Indices, Valores y Labels. Ademï¿½s indica Total.
+		Entrega un arreglo lineal de Indices, Valores y Labels. Además indica Total.
 	 */
 
 	public function toBars() {
@@ -738,7 +751,7 @@ class ReporteCriteria {
 		$data['total_divisor'] = 0;
 		$data['barras'] = 0;
 
-		/* El id debe ser unico para el dato, porque se agruparï¿½ el valor bajo ese nombre en el arreglo de datos */
+		/* El id debe ser unico para el dato, porque se agrupará el valor bajo ese nombre en el arreglo de datos */
 		if ($this->agrupador[0] == 'id_usuario_responsable') {
 			$id = 'id_usuario_responsable';
 			$label = 'nombre_usuario_responsable';
@@ -801,7 +814,7 @@ class ReporteCriteria {
 		return $data;
 	}
 
-	//Arregla espacios vacï¿½os en Barras: retorna data con los labels extra de data2.
+	//Arregla espacios vacíos en Barras: retorna data con los labels extra de data2.
 	public function fixBar($data, $data2) {
 		foreach ($data2 as $k => $d) {
 			if (!isset($data[$k])) {
@@ -837,7 +850,7 @@ class ReporteCriteria {
 		return $agrupador;
 	}
 
-	/* Constructor de Arreglo Cruzado: Sï¿½lo vista Cliente o Profesional */
+	/* Constructor de Arreglo Cruzado: sólo vista Cliente o Profesional */
 
 	public function toCross() {
 		$r = array();
@@ -943,7 +956,7 @@ class ReporteCriteria {
 
 	/*
 		Constructor de Arreglo Resultado. TIPO PLANILLA.
-		Entrega un arreglo con profundidad 4, de Indices, Valores y Labels. Ademï¿½s indica Total para cada subgrupo.
+		Entrega un arreglo con profundidad 4, de Indices, Valores y Labels. Además indica Total para cada subgrupo.
 	 */
 
 	public function toArray() {
@@ -1113,7 +1126,7 @@ class ReporteCriteria {
 		$a['filtro_valor'] = $b['filtro_valor'];
 	}
 
-	//Arregla espacios vacï¿½os en Arreglos. Retorna data con los campos extra en data2 (rellenando con 0).
+	//Arregla espacios vacíos en Arreglos. Retorna data con los campos extra en data2 (rellenando con 0).
 	public static function fixArray($data, $data2) {
 		foreach ($data2 as $ag1 => $a) {
 			if (is_array($a)) {
@@ -1292,7 +1305,7 @@ class ReporteCriteria {
 		return "%";
 	}
 
-	//Indica el tipo de dato (No especifica moneda: se usa para simple comparaciï¿½n entre datos).
+	//Indica el tipo de dato (No especifica moneda: se usa para simple comparación entre datos).
 	public static function sTipoDato($tipo_dato) {
 		switch ($tipo_dato) {
 			case "horas_trabajadas":
@@ -1328,7 +1341,7 @@ class ReporteCriteria {
 		return "%";
 	}
 
-	//Indica la Moneda, de ser necesaria. Se usa para aï¿½adir a un string, si lo necesita.
+	//Indica la Moneda, de ser necesaria. Se usa para añadir a un string, si lo necesita.
 	public static function unidad($tipo_dato, $sesion, $id_moneda = '1') {
 		switch ($tipo_dato) {
 			case "valor_por_cobrar":
@@ -1414,7 +1427,7 @@ class ReporteCriteria {
 
 	private function rightValueForColumn($key, $type) {
 		if (!in_array($key, $this->columns)) {
-			return "'La columna {$key} no estï¿½ en el arreglo de columnas'";
+			return "'La columna {$key} no está en el arreglo de columnas'";
 		}
 		$column_value = null;
 		$undefined = $this->undefined_value;
@@ -1754,7 +1767,7 @@ class ReporteCriteria {
 				}
 				break;
 			default:
-				$column_value = "'La columna {$key} no estï¿½ definida'";
+				$column_value = "'La columna {$key} no está definida'";
 
 		}
 		return $column_value;
@@ -1928,7 +1941,7 @@ class ReporteCriteria {
 				break;
 			case 'valor_por_cobrar':
 				if ($type == TIPO_TRABAJOS) {
-					//Si el trabajo estï¿½ en cobro CREADO, se usa la formula de ese cobro. Si no estï¿½, se usa la tarifa de la moneda del contrato, y se convierte segï¿½n el tipo de cambio actual de la moneda que se estï¿½ mostrando.
+					//Si el trabajo está en cobro CREADO, se usa la formula de ese cobro. Si no está, se usa la tarifa de la moneda del contrato, y se convierte según el tipo de cambio actual de la moneda que se está mostrando.
 					$Criteria->add_select("IF( cobro.id_cobro IS NOT NULL, {$monto_honorarios},
 						SUM(
 							usuario_tarifa.tarifa
@@ -2186,7 +2199,7 @@ class ReporteCriteria {
 			}
 		}
 
-		//Aï¿½ado el periodo determinado
+		//Añado el periodo determinado
 		if ($type == TIPO_TRABAJOS || $type == TIPO_TRAMITES) {
 			$campo_fecha = $this->campo_fecha;
 			$campo_fecha_2 = $this->campo_fecha_2;
@@ -2224,7 +2237,7 @@ class ReporteCriteria {
 		return CriteriaRestriction::and_clause($and_wheres);
 	}
 
-	//GROUP BY en string de Query. Agrupa segï¿½n la vista. (arreglo de agrupadores se usa al construir los arreglos de resultados.
+	//GROUP BY en string de Query. Agrupa según la vista. (arreglo de agrupadores se usa al construir los arreglos de resultados.
 	private function setGroup($Criteria) {
 		if (!$this->vista) {
 			$Criteria
