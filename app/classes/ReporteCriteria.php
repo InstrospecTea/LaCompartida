@@ -44,6 +44,38 @@ class ReporteCriteria {
 
 	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
 
+	private $newCalculation = array(
+		'valor_cobrado' => 'BilledAmount',
+		'horas_castigadas' => null,
+		'horas_cobrables' => null,
+		'horas_cobradas' => null,
+		'horas_convenio' => null,
+		'horas_incobrables' => null,
+		'horas_no_cobrables' => null,
+		'horas_pagadas' => null,
+		'horas_por_cobrar' => null,
+		'horas_por_pagar' => null,
+		'horas_spot' => null,
+		'horas_trabajadas' => null,
+		'horas_visibles' => null,
+		'costo' => null,
+		'costo_hh' => null,
+		'diferencia_valor_estandar' => null,
+		'rentabilidad' => null,
+		'rentabilidad_base' => null,
+		'valor_cobrado_no_estandar' => null,
+		'valor_estandar' => null,
+		'valor_hora' => null,
+		'valor_incobrable' => null,
+		'valor_pagado' => null,
+		'valor_pagado_parcial' => null,
+		'valor_por_cobrar' => null,
+		'valor_por_pagar' => null,
+		'valor_por_pagar_parcial' => null,
+		'valor_trabajado_estandar' => null,
+		'valor_tramites' => null
+	);
+
 	const TIPO_TRABAJOS = 0;
 	const TIPO_TRAMITES = 1;
 	const TIPO_COBROS = 2;
@@ -627,11 +659,11 @@ class ReporteCriteria {
 	//Ejecuta la Query y guarda internamente las filas de resultado.
 	public function Query() {
 		$stringquery = "";
-
 		$this->row = array();
 
-		// Esto debe
-		if ($this->tipo_dato == 'valor_cobrado') {
+		if (array_key_exists($this->tipo_dato, $this->newCalculation)) {
+			pr("NEW CALCULATION");
+
 			$filtersFields = array(
 				'campo_fecha' => $this->parametros['campo_fecha'],
 				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
@@ -641,9 +673,9 @@ class ReporteCriteria {
 			$grouperFields = explode('-', $this->vista);
 			$selectFields = array();
 
-			$proportionality = 'cliente';
-
-			$calculator = new BilledAmountDataCalculator(
+			$calculator_name = $this->newCalculation[$this->tipo_dato];
+			$reflectedClass = new ReflectionClass("{$calculator_name}DataCalculator");
+			$calculator = $reflectedClass->newInstance(
 				$this->sesion,
 				$filtersFields,
 				$grouperFields,
@@ -654,9 +686,7 @@ class ReporteCriteria {
 
 			$this->row = $calculator->calculate();
 
-			$criteria_works = $calculator->getWorksCriteria();
-			pr($criteria_works->get_plain_query());
-
+			pr($calculator->getWorksCriteria()->get_plain_query());
 			$criteria = $calculator->getChargesCriteria();
 			if (!empty($criteria)) {
 				pr($criteria->get_plain_query());
@@ -664,6 +694,7 @@ class ReporteCriteria {
 
 			return;
 		}
+		pr("OLD CALCULATION");
 
 		// Obtiene todos los datos para Trabajos
 		$resp = mysql_unbuffered_query($this->getQuery(TIPO_TRABAJOS), $this->sesion->dbh) or Utiles::errorSQL($this->getQuery(TIPO_TRABAJOS), __FILE__, __LINE__, $this->sesion->dbh);
@@ -680,8 +711,6 @@ class ReporteCriteria {
 		// Obtiene todos los datos para Cobros
 		// En caso de filtrar por área o categoría de usuario no se toman en cuenta los cobros sin horas.
 		$cobroquery = $this->cobroQuery();
-
-		pr($cobroquery);
 
 		if (
 			$this->requiereMoneda($this->tipo_dato)
