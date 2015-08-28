@@ -95,9 +95,6 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->buildErrandQuery();
 		$this->buildChargeQuery();
 
-		pr($this->WorksCriteria->get_plain_query());
-		pr($this->ErrandsCriteria->get_plain_query());
-		pr($this->ChargesCriteria->get_plain_query());
 		$results = array();
 
 		if (!empty($this->WorksCriteria)) {
@@ -137,7 +134,8 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 					array($Criteria)
 				);
 			} catch (ReflectionException $Exception) {
-				throw new ReportException($Exception->getMessage());
+				// por ahora lo dejamos pasar hasta que tengamos los groupers implementados
+				// throw new ReportException($Exception->getMessage());
 			}
 		}
 		return $Criteria;
