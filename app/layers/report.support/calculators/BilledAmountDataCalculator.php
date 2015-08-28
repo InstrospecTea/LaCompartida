@@ -70,7 +70,6 @@
 			)
 		';
 		$Criteria
-			->add_select('cobro.id_cobro')
 			->add_select(
 				$billed_amount,
 				'valor_cobrado'

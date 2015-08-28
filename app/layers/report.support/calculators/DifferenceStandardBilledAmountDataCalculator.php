@@ -83,7 +83,6 @@
     $standard_amount = '0';
 
     $Criteria
-      ->add_select('cobro.id_cobro')
       ->add_select(
         "({$billed_amount}) - ({$standard_amount})",
         'diferencia_valor_estandar'
