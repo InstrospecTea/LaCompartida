@@ -15,7 +15,6 @@
 	}
 
 	function getReportWorkQuery(Criteria $Criteria) {
-
 		$values = array(
 			'estandar' => array(
 				'tarifa' => 'tarifa_hh_estandar',
@@ -45,18 +44,61 @@
 		$Criteria->add_select($monto_honorarios, 'valor_cobrado');
 
 		// joins
-		$Criteria
-			->add_left_join_with(
-                'cobro',
-                CriteriaRestriction::equals(
-                    'cobro.id_cobro',
-                    'trabajo.id_cobro'
-                )
+		$Criteria->add_left_join_with(
+            'cobro',
+            CriteriaRestriction::equals(
+                'cobro.id_cobro',
+                'trabajo.id_cobro'
+            )
+		)->add_left_join_with(
+			'documento', 
+			CriteriaRestriction::and(
+				CriteriaRestriction::equals(
+					'documento.id_cobro',
+					'cobro.id_cobro'
+				),
+				CriteriaRestriction::equals(
+					'documento.tipo_doc',
+					"'N'"
+				)
 			)
-			->add_left_join_with('documento', "documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N'")
-			->add_left_join_with('documento_moneda AS cobro_moneda_documento', 'cobro_moneda_documento.id_documento = documento.id_documento AND cobro_moneda_documento.id_moneda = documento.id_moneda')
-			->add_left_join_with('documento_moneda AS cobro_moneda', 'cobro_moneda.id_documento = documento.id_documento AND cobro_moneda.id_moneda = 1')
-			->add_left_join_with('documento_moneda AS cobro_moneda_cobro', 'cobro_moneda_cobro.id_documento = documento.id_documento AND cobro_moneda_cobro.id_moneda = cobro.id_moneda');
+		)->add_left_join_with(
+			'documento_moneda AS cobro_moneda_documento', 
+			CriteriaRestriction::and(
+				CriteriaRestriction::equals(
+					'cobro_moneda_documento.id_documento',
+					'documento.id_documento'
+				),
+				CriteriaRestriction::equals(
+					'cobro_moneda_documento.id_moneda',
+					'documento.id_moneda'
+				)
+			)
+		)->add_left_join_with(
+			'documento_moneda AS cobro_moneda',
+			CriteriaRestriction::and(
+				CriteriaRestriction::equals(
+					'cobro_moneda.id_documento',
+					'documento.id_documento'
+				),
+				CriteriaRestriction::and(
+					'cobro_moneda.id_moneda',
+					1
+				)
+			)
+		)->add_left_join_with(
+			'documento_moneda AS cobro_moneda_cobro',
+			CriteriaRestriction::and(
+				CriteriaRestriction::equals(
+					'cobro_moneda_cobro.id_documento',
+					'documento.id_documento'
+				),
+				CriteriaRestriction::equals(
+					'cobro_moneda_cobro.id_moneda',
+					'cobro.id_moneda'
+				)
+			)
+		);
 	}
 
 	function getReportErrandQuery($Criteria) {
@@ -70,9 +112,12 @@
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
 		';
-		$Criteria->add_select('cobro.id_cobro');
-		$Criteria->add_select($monto_subtotal, 'valor_cobrado');
-
+		$Criteria->add_select(
+			'cobro.id_cobro'
+		)->add_select(
+			$monto_subtotal,
+			'valor_cobrado'
+		);
 	}
 
 }
