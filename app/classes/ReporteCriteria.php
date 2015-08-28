@@ -632,7 +632,7 @@ class ReporteCriteria {
 
 		// Esto debe
 		if ($this->tipo_dato == 'valor_cobrado') {
-			$filtersFields = array();
+			$filtersFields = $this->parametros;
 			$grouperFields = array();
 			$selectFields = array();
 
