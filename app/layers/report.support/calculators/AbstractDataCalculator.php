@@ -179,7 +179,8 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 						);
 					}
 				} catch (ReflectionException $Exception) {
-					throw new ReportException($Exception->getMessage());
+					// Dejando pasasr ya que la clase no está implementada
+					// throw new ReportException($Exception->getMessage());
 				}
 			}
 		}
@@ -304,18 +305,9 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	function cancelQuery($kind) {
 		foreach ($this->filtersFields as $key => $value) {
-			if (in_array($key, $queryCancelatorsFilters[$kind])) {
+			if (in_array($key, $this->queryCancelatorsFilters[$kind])) {
 				return true;
 			}
-		}
-		$chargeFiltersCount = 0;
-		foreach ($this->filtersFields as $key => $value) {
-			if (in_array($key, $this->chargeGroupers)) {
-				$chargeFiltersCount++;
-			}
-		}
-		if ($chargeFiltersCount == 0) {
-			return true;
 		}
 		return false;
 	}
