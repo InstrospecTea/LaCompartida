@@ -667,7 +667,15 @@ class ReporteCriteria {
 			$filtersFields = array(
 				'campo_fecha' => $this->parametros['campo_fecha'],
 				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
-				'fecha_fin' => Utiles::fecha2sql($this->parametros['fecha_fin'])
+				'fecha_fin' => Utiles::fecha2sql($this->parametros['fecha_fin']),
+				'clientes' => nil,
+				'usuarios' => nil,
+				'tipos_asunto' => nil,
+				'areas_asunto' => nil,
+				'areas_usuario' => nil,
+				'categorias_usuario' => nil,
+				'encargados' => nil,
+				'estado_cobro' => nil
 			);
 
 			$grouperFields = array();
