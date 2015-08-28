@@ -1154,7 +1154,7 @@ if (!class_exists('Cobro')) {
 					$tramite->Edit('tarifa_tramite_estandar', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar']);
 
 					if (!$tramite->Write()) {
-						return 'Error, trámite #' . $tramite->fields['id_tramite'] . ' no se pudo guardar';
+						return "Error, trámite #{$tramite->fields['id_tramite']} no se pudo guardar (Cobro {$this->fields['id_cobro']})";
 					}
 				}
 			}
@@ -1317,7 +1317,7 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $moneda_del_cobro->fields['cifras_decimales'], '.', ''));
 					if (!$trabajo->Write()) {
-						return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
+						return "Error, trabajo #{$trabajo->fields['id_trabajo']} no se pudo guardar (Cobro {$this->fields['id_cobro']})";
 					}
 				} #End for cobros
 			}
@@ -1371,7 +1371,7 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $moneda_del_cobro->fields['cifras_decimales'], '.', ''));
 					if (!$trabajo->Write(false)) {
-						return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
+						return "Error, trabajo #{$trabajo->fields['id_trabajo']} no se pudo guardar (Cobro {$this->fields['id_cobro']})";
 					}
 				}
 			}
@@ -2315,7 +2315,7 @@ if (!class_exists('Cobro')) {
 							$this->mensajes .= $resultado_guardar;
 						}
 					} else {
-						$this->mensajes .= "No se han podido asociar los trabajos al cobro";
+						$this->mensajes .= "No se han podido generar el cobro para el cliente {$Contrato->fields['codigo_cliente']}";
 					}
 				} // END cobro
 			} // END contrato
