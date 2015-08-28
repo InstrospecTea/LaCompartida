@@ -37,30 +37,30 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 	}
 
 	function translateForCharges(Criteria $Criteria) {
-		$filters = $this->getFilterData();
+		// $filters = $this->getFilterData();
 
-		if ($this->getParentFilter() != 'trabajo') {
-			$field_name = $this->getFieldName();
-		} else {
-			$field_name = 'cobro.fecha_fin';
-		}
+		// if ($this->getParentFilter() != 'trabajo') {
+		// 	$field_name = $this->getFieldName();
+		// } else {
+		// 	$field_name = 'cobro.fecha_fin';
+		// }
 
-		if ($this->getParentFilter() == 'cobro') {
-			$Criteria->add_restriction(
-				CriteriaRestriction::or_clause(
-					$Criteria->add_restriction(CriteriaRestriction::between($field_name, "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'")),
-					CriteriaRestriction::and_clause(
-						CriteriaRestriction::or_clause(
-							CriteriaRestriction::is_null($field_name),
-							CriteriaRestriction::equals($field_name, "'00-00-0000'")
-						),
-						CriteriaRestriction::between('cobro.fecha_creacion', "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'")
-					)
-				)
-			);
-		} else {
-			$Criteria->add_restriction(CriteriaRestriction::between($field_name, "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'"));
-		}
+		// if ($this->getParentFilter() == 'cobro') {
+		// 	$Criteria->add_restriction(
+		// 		CriteriaRestriction::or_clause(
+		// 			$Criteria->add_restriction(CriteriaRestriction::between($field_name, "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'")),
+		// 			CriteriaRestriction::and_clause(
+		// 				CriteriaRestriction::or_clause(
+		// 					CriteriaRestriction::is_null($field_name),
+		// 					CriteriaRestriction::equals($field_name, "'00-00-0000'")
+		// 				),
+		// 				CriteriaRestriction::between('cobro.fecha_creacion', "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'")
+		// 			)
+		// 		)
+		// 	);
+		// } else {
+		// 	$Criteria->add_restriction(CriteriaRestriction::between($field_name, "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'"));
+		// }
 
 		return $Criteria;
 	}
