@@ -170,18 +170,29 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	function getBaseWorkQuery(Criteria $Criteria) {
 		$Criteria->add_from('trabajo');
+
+		$Criteria->add_left_join_with(
+				'cobro',
+				CriteriaRestriction::equals(
+						'cobro.id_cobro',
+						'trabajo.id_cobro'
+				)
+		);
+
 		$this->addFiltersToCriteria($Criteria, 'Works');
 		$this->addGroupersToCriteria($Criteria, 'Works');
-		// Incluir joins necesarios para trabajo
-		// $Criteria->add_from
 	}
 
 	function getBaseErrandQuery($Criteria) {
 		$Criteria->add_from('tramite');
+
+		$Criteria
+			->add_left_join_with(
+				'cobro', CriteriaRestriction::equals('cobro.id_cobro', 'tramite.id_cobro')
+			);
+
 		$this->addFiltersToCriteria($Criteria, 'Errands');
 		$this->addGroupersToCriteria($Criteria, 'Errands');
-		// Incluir joins necesarios para tramites
-		// $Criteria->add_from
 	}
 
 	function getBaseChargeQuery($Criteria) {
@@ -243,15 +254,15 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	function getAllowedFilters() {
 		 return array_diff(
-		 	$this->allowedFilters,
-		 	$this->notAllowedFilters()
+			$this->allowedFilters,
+			$this->notAllowedFilters()
 		 );
 	}
 
 	function getAllowedGroupers() {
 		 return array_diff(
-		 	$this->allowedGroupers,
-		 	$this->notAllowedGroupers()
+			$this->allowedGroupers,
+			$this->notAllowedGroupers()
 		 );
 	}
 

@@ -16,5 +16,39 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 		return $this->proportionality;
 	}
 
+	function getWorksFeeField() {
+		$proporcionality = $this->getProportionality();
+		if ($proporcionality == PROPRTIONALITY_ESTANDAR)  {
+			return 'trabajo.tarifa_hh_estandar';
+		} else {
+			return 'trabajo.tarifa_hh';
+		}
+	}
 
+	function getWorksProporcionalityAmountField() {
+		$proporcionality = $this->getProportionality();
+		if ($proporcionality == PROPRTIONALITY_ESTANDAR)  {
+			return 'monto_thh_estandar';
+		} else {
+			return 'monto_thh';
+		}
+	}
+
+	function getErrandsFeeField() {
+		$proporcionality = $this->getProportionality();
+		if ($proporcionality == PROPRTIONALITY_ESTANDAR)  {
+			return 'tramite.tarifa_tramite_estandar';
+		} else {
+			return 'tramite.tarifa_tramite';
+		}
+	}
+
+	function getErrandsProporcionalityAmountField() {
+		$proporcionality = $this->getProportionality();
+		if ($proporcionality == PROPRTIONALITY_ESTANDAR)  {
+			return 'monto_tramites';
+		} else {
+			return 'monto_tramites';
+		}
+	}
 }
