@@ -58,31 +58,6 @@ if( !isset($memcache) || !is_object($memcache) ) {
 	$memcache->connect('ttbcache.tmcxaq.0001.use1.cache.amazonaws.com', 11211);
 }
 
-if (!function_exists('decrypt')) {
-	function decrypt($msg, $k) {
-
-		$msg = base64_decode($msg);
-		$k = substr($k, 0, 32);
-		# open cipher module (do not change cipher/mode)
-		if (!$td = mcrypt_module_open('rijndael-256', '', 'ctr', ''))
-			return false;
-
-		$iv = substr($msg, 0, 32); // extract iv
-		$mo = strlen($msg) - 32; // mac offset
-		$em = substr($msg, $mo); // extract mac
-		$msg = substr($msg, 32, strlen($msg) - 64); // extract ciphertext
-
-		if (@mcrypt_generic_init($td, $k, $iv) !== 0)
-			return false;
-
-		$msg = mdecrypt_generic($td, $msg);
-		$msg = unserialize($msg);
-		mcrypt_generic_deinit($td);
-		mcrypt_module_close($td);
-		return $msg;
-	}
-}
-
 use Aws\Common\Aws;
 use Aws\DynamoDb\Exception\DynamoDbException;
 
@@ -160,11 +135,3 @@ $_SERVER['ROOTDIR'] = ROOTDIR;
 $_SERVER['DBUSER']  = DBUSER;
 $_SERVER['DBHOST']  = DBHOST;
 $_SERVER['DBNAME']  = DBNAME;
-
-if (!function_exists('apache_setenv')) {
-	function apache_setenv() {
-		return;
-	}
-}
-
-
