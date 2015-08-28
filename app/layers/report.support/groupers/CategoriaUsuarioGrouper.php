@@ -1,17 +1,17 @@
 <?php
 
-class AreaUsuarioGrouper extends AbstractGrouperTranslator {
+class CategoriaUsuarioGrouper extends AbstractGrouperTranslator {
 
 	function getGroupField() {
-		return 'prm_area_usuario.glosa';
+		return 'prm_categoria_usuario.glosa_categoria';
 	}
 
 	function getSelectField() {
-		return 'IFNULL(prm_area_usuario.glosa,\'-\')';
+		return 'prm_categoria_usuario.glosa_categoria';
 	}
 
 	function getOrderField() {
-		return 'prm_area_usuario.glosa';
+		return 'prm_categoria_usuario.glosa_categoria';
 	}
 
 	/**
@@ -21,18 +21,18 @@ class AreaUsuarioGrouper extends AbstractGrouperTranslator {
 	function translateForCharges(Criteria $criteria) {
 		return $criteria->add_select(
 			sprintf("'%s'", 'Indefinido'),
-			"'prm_area_usuario.glosa'"
+			"'prm_categoria_usuario.glosa_categoria'"
 		)->add_ordering(
-			"'prm_area_usuario.glosa'"
+			"'prm_categoria_usuario.glosa_categoria'"
 		)->add_grouping(
-			"'prm_area_usuario.glosa'"
+			"'prm_categoria_usuario.glosa_categoria'"
 		);
 	}
 
 	function translateForErrands(Criteria $criteria) {
 		return $criteria->add_select(
 			$this->getSelectField(),
-			"'prm_area_usuario.glosa'"
+			"'prm_categoria_usuario.glosa_categoria'"
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
@@ -44,10 +44,10 @@ class AreaUsuarioGrouper extends AbstractGrouperTranslator {
 				'tramite.id_usuario'
 			)
 		)->add_left_join_with(
-			'prm_area_usuario',
+			'prm_categoria_usuario',
 			CriteriaRestriction::equals(
-				'prm_area_usuario.id',
-				'usuario.id_area_usuario'
+				'prm_categoria_usuario.id_categoria_usuario',
+				'usuario.id_categoria_usuario'
 			)
 		);
 	}
@@ -55,7 +55,7 @@ class AreaUsuarioGrouper extends AbstractGrouperTranslator {
 	function translateForWorks(Criteria $criteria) {
 		return $criteria->add_select(
 			$this->getSelectField(),
-			"'prm_area_usuario.glosa'"
+			"'prm_categoria_usuario.glosa_categoria'"
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
@@ -67,10 +67,10 @@ class AreaUsuarioGrouper extends AbstractGrouperTranslator {
 				'trabajo.id_usuario'
 			)
 		)->add_left_join_with(
-			'prm_area_usuario',
+			'prm_categoria_usuario',
 			CriteriaRestriction::equals(
-				'prm_area_usuario.id',
-				'usuario.id_area_usuario'
+				'prm_categoria_usuario.id_categoria_usuario',
+				'usuario.id_categoria_usuario'
 			)
 		);
 	}

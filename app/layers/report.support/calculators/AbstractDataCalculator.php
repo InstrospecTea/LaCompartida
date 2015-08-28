@@ -75,22 +75,19 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'glosa_grupo_cliente',
 		'glosa_cliente',
 		'glosa_estudio'
-
 	);
 
 	private $filtersFields = array();
 	private $grouperFields = array();
-	private $selectFields = array();
 
 	private $WorksCriteria;
 	private $ErrandsCriteria;
 	private $ChargesCriteria;
 
-	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $selectFields) {
+	public function __construct(Sesion $Session, $filtersFields, $grouperFields) {
 		$this->Session = $Session;
 		$this->filtersFields = $filtersFields;
 		$this->grouperFields = $grouperFields;
-		$this->selectFields = $selectFields;
 	}
 
 	public function calculate() {
@@ -98,6 +95,9 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->buildErrandQuery();
 		$this->buildChargeQuery();
 
+		pr($this->WorksCriteria->get_plain_query());
+		pr($this->ErrandsCriteria->get_plain_query());
+		pr($this->ChargesCriteria->get_plain_query());
 		$results = array();
 
 		if (!empty($this->WorksCriteria)) {
