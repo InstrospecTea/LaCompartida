@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.17.4
+Thursday 2015, August 28th
+* **Fix:** [Corrige la carga de datos del contrato al crear una factura](https://github.com/LemontechSA/ttb/pull/1096)
+
 ## Hotfix 15.17.3
 Thursday 2015, August 27th
 * **Fix:** [Se corrige moeda tarifa en integración Moreno Baldivieso](https://github.com/LemontechSA/ttb/pull/1094)
