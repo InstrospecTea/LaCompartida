@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.17.3
+Thursday 2015, August 27th
+* **Fix:** [Se corrige moeda tarifa en integración Moreno Baldivieso](https://github.com/LemontechSA/ttb/pull/1094)
+
 ## Hotfix 15.17.2
 Wednesday 2015, August 26th
 * **Fix:** [Se corrige generación de excel de facturas pago](https://github.com/LemontechSA/ttb/pull/1093)
