@@ -2,16 +2,16 @@
 
 interface IGrouperTranslator {
 
-    function getGroupField();
+	function getGroupField();
 
-    function getSelectField();
+	function getSelectField();
 
-    function getOrderField();
+	function getOrderField();
 
-    function translateForCharges(Criteria $criteria);
+	function translateForCharges(Criteria $criteria);
 
-    function translateForErrands(Criteria $criteria);
+	function translateForErrands(Criteria $criteria);
 
-    function translateForWorks(Criteria $criteria);
+	function translateForWorks(Criteria $criteria);
 
 }

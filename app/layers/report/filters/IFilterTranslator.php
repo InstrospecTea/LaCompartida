@@ -2,15 +2,15 @@
 
 interface IFilterTranslator {
 
-    function setFilterData($data);
+	function setFilterData($data);
 
-    function getFilterData();
+	function getFilterData();
 
-    function translateForCharges(Criteria $criteria);
+	function translateForCharges(Criteria $criteria);
 
-    function translateForErrands(Criteria $criteria);
+	function translateForErrands(Criteria $criteria);
 
-    function translateForWorks(Criteria $criteria);
+	function translateForWorks(Criteria $criteria);
 
-    function getFieldName();
+	function getFieldName();
 }

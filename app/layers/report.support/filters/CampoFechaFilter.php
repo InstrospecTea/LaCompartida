@@ -1,6 +1,6 @@
-	<?php
+<?php
 
-	class CampoFechaFilter extends AbstractDependantFilterTranslator {
+class CampoFechaFilter extends AbstractDependantFilterTranslator {
 
 	function getParentFilter() {
 		return $this->parent;
