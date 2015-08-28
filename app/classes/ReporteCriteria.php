@@ -2173,6 +2173,7 @@ class ReporteCriteria {
 			unset($this->filtros['trabajo.cobrable']);
 			$this->campo_fecha =  "tramite.fecha";  # set as default
 		}
+
 		$this->setCampoFecha($this->parametros['campo_fecha']);  # set the real
 		$and_wheres = array();
 
@@ -2208,6 +2209,7 @@ class ReporteCriteria {
 			$campo_fecha = $this->campo_fecha_cobro;
 			$campo_fecha_2 = $this->campo_fecha_cobro_2;
 		}
+
 		if (!empty($this->rango)) {
 			$ini = Utiles::fecha2sql($this->rango['fecha_ini']);
 			$fin = Utiles::fecha2sql($this->rango['fecha_fin']) . ' 23:59:59';
