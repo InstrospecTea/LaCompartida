@@ -46,7 +46,13 @@
 
 		// joins
 		$Criteria
-			->add_left_join_with('cobro', 'trabajo.id_cobro = cobro.id_cobro')
+			->add_left_join_with(
+                'cobro',
+                CriteriaRestriction::equals(
+                    'cobro.id_cobro',
+                    'trabajo.id_cobro'
+                )
+			)
 			->add_left_join_with('documento', "documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N'")
 			->add_left_join_with('documento_moneda AS cobro_moneda_documento', 'cobro_moneda_documento.id_documento = documento.id_documento AND cobro_moneda_documento.id_moneda = documento.id_moneda')
 			->add_left_join_with('documento_moneda AS cobro_moneda', 'cobro_moneda.id_documento = documento.id_documento AND cobro_moneda.id_moneda = 1')

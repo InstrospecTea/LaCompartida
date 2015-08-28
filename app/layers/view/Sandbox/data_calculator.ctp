@@ -24,6 +24,11 @@
 		array('clientes' => array('1', '2'), 'campo_fecha' => 'trabajo', 'fecha_fin' => '123q23123'),
 		array('area_asunto'),
 		array('1')
+		array('clientes' => array('000002'), 'campo_fecha' => 'trabajo', 'fecha_fin' => '123q23123'),
+		array('area_asunto','area_usuario'),
+		array('1'),
+		1,
+		'estandar'
 	);
 
 	pr($r);

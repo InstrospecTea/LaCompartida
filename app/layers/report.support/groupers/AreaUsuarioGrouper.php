@@ -1,87 +1,94 @@
 <?php
 
-class AreaAsuntoGrouper extends AbstractGrouperTranslator {
+class AreaUsuarioGrouper extends AbstractGrouperTranslator {
 
     function getGroupField() {
-        return 'prm_area_proyecto.glosa';
+        return 'prm_area_usuario.glosa';
     }
 
     function getSelectField() {
-        return 'prm_area_proyecto.glosa';
+        return 'IFNULL(prm_area_usuario.glosa,\'-\')';
     }
 
     function getOrderField() {
-        return 'prm_area_proyecto.glosa';
+        return 'prm_area_usuario.glosa';
     }
 
+    /**
+     * TODO: Hay un undefined acá, segun la documentación, pero no se si aplica porque puedo llegar por los usuarios de
+     * los trabajos del cobro.
+     **/
     function translateForCharges(Criteria $criteria) {
         return $criteria->add_select(
-            $this->getSelectField()
+            $this->getSelectField(),
+            "'prm_area_usuario.glosa'"
         )->add_ordering(
             $this->getOrderField()
         )->add_grouping(
             $this->getGroupField()
         )->add_left_join_with(
-            'cobro_asunto',
+            'trabajo',
             CriteriaRestriction::equals(
-                'cobro_asunto.id_cobro',
+                'trabajo.id_cobro',
                 'cobro.id_cobro'
             )
         )->add_left_join_with(
-            'asunto',
+            'usuario',
             CriteriaRestriction::equals(
-                'asunto.codigo_asunto',
-                'cobro_asunto.codigo_asunto'
+                'usuario.id_usuario',
+                'trabajo.id_usuario'
             )
         )->add_left_join_with(
-            'prm_area_proyecto',
+            'prm_area_usuario',
             CriteriaRestriction::equals(
-                'prm_area_proyecto.id_area_proyecto',
-                'asunto.id_area_proyecto'
+                'prm_area_usuario.id',
+                'usuario.id_area_usuario'
             )
         );
     }
 
     function translateForErrands(Criteria $criteria) {
         return $criteria->add_select(
-            $this->getSelectField()
+            $this->getSelectField(),
+            'prm_area_usuario.glosa'
         )->add_ordering(
             $this->getOrderField()
         )->add_grouping(
             $this->getGroupField()
         )->add_left_join_with(
-            'asunto',
+            'usuario',
             CriteriaRestriction::equals(
-                'asunto.codigo_asunto',
-                'tramite.codigo_asunto'
+                'usuario.id_usuario',
+                'tramite.id_usuario'
             )
         )->add_left_join_with(
-            'prm_area_proyecto',
+            'prm_area_usuario',
             CriteriaRestriction::equals(
-                'prm_area_proyecto.id_area_proyecto',
-                'asunto.id_area_proyecto'
+                'prm_area_usuario.id',
+                'usuario.id_area_usuario'
             )
         );
     }
 
     function translateForWorks(Criteria $criteria) {
         return $criteria->add_select(
-            $this->getSelectField()
+            $this->getSelectField(),
+            'prm_area_usuario.glosa'
         )->add_ordering(
             $this->getOrderField()
         )->add_grouping(
             $this->getGroupField()
         )->add_left_join_with(
-            'asunto',
+            'usuario',
             CriteriaRestriction::equals(
-                'asunto.codigo_asunto',
-                'trabajo.codigo_asunto'
+                'usuario.id_usuario',
+                'trabajo.id_usuario'
             )
         )->add_left_join_with(
-            'prm_area_proyecto',
+            'prm_area_usuario',
             CriteriaRestriction::equals(
-                'prm_area_proyecto.id_area_proyecto',
-                'asunto.id_area_proyecto'
+                'prm_area_usuario.id',
+                'usuario.id_area_usuario'
             )
         );
     }

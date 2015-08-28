@@ -189,9 +189,9 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 		$Criteria
 			->add_left_join_with('cobro_asunto',
-				CriteriaRestriction::equals('cobro.id_cobro', 'cobro_asunto.id_cobro'))
+				CriteriaRestriction::equals('cobro_asunto.id_cobro','cobro.id_cobro'))
 			->add_left_join_with('asunto',
-				CriteriaRestriction::equals('cobro_asunto.codigo_asunto', 'asunto.codigo_asunto'))
+				CriteriaRestriction::equals('asunto.codigo_asunto','cobro_asunto.codigo_asunto'))
 			->add_grouping('asunto.id_asunto')
 			->add_grouping('cobro.id_cobro');
 
