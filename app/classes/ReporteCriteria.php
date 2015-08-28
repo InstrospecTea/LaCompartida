@@ -60,11 +60,11 @@ class ReporteCriteria {
 		'horas_visibles' => null,
 		'costo' => null,
 		'costo_hh' => null,
-		'diferencia_valor_estandar' => null,
+		'diferencia_valor_estandar' => 'DifferenceStandardBilledAmount',
 		'rentabilidad' => null,
 		'rentabilidad_base' => null,
 		'valor_cobrado_no_estandar' => null,
-		'valor_estandar' => null,
+		'valor_estandar' => 'StandardBilledAmount',
 		'valor_hora' => null,
 		'valor_incobrable' => null,
 		'valor_pagado' => null,
@@ -669,14 +669,14 @@ class ReporteCriteria {
 				'campo_fecha' => $this->parametros['campo_fecha'],
 				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
 				'fecha_fin' => Utiles::fecha2sql($this->parametros['fecha_fin']),
-				'clientes' => nil,
-				'usuarios' => nil,
-				'tipos_asunto' => nil,
-				'areas_asunto' => nil,
-				'areas_usuario' => nil,
-				'categorias_usuario' => nil,
-				'encargados' => nil,
-				'estado_cobro' => nil
+				'clientes' => null,
+				'usuarios' => null,
+				'tipos_asunto' => null,
+				'areas_asunto' => null,
+				'areas_usuario' => null,
+				'categorias_usuario' => null,
+				'encargados' => null,
+				'estado_cobro' => null
 			);
 
 			$grouperFields = $this->agrupador;
