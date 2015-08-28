@@ -28,7 +28,11 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	private $dependantFilters = array(
 		'fecha_ini',
-		'fecha_fin'
+		'fecha_fin',
+		'dato',
+		'prop',
+		'vista',
+		'id_moneda'
 	);
 
 	private $allowedGroupers = array(
@@ -140,6 +144,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	function addFiltersToCriteria($Criteria, $type) {
+        pr($this->filtersFields);
 		foreach ($this->filtersFields as $key => $value) {
 			if (!$this->isDependantFilter($key)) {
 				$class_prefix = $this->getClassPrefix($key);
@@ -268,7 +273,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	function buildChargeQuery() {
-		if (!$this->cancelQuery('charge') {
+		if (!$this->cancelQuery('charge')) {
 			$Criteria = new Criteria($this->Session);
 			$this->getBaseChargeQuery($Criteria);
 			$this->getReportChargeQuery($Criteria);
@@ -299,13 +304,13 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	function cancelQuery($kind) {
 		foreach ($this->filtersFields as $key => $value) {
-			if in_array($key, $queryCancelatorsFilters[$kind]) {
+			if (in_array($key, $queryCancelatorsFilters[$kind])) {
 				return true;
 			}
 		}
 		$chargeFiltersCount = 0;
 		foreach ($this->filtersFields as $key => $value) {
-			if in_array($key, $this->chargeGroupers) {
+			if (in_array($key, $this->chargeGroupers)) {
 				$chargeFiltersCount++;
 			}
 		}

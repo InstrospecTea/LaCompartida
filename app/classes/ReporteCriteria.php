@@ -633,7 +633,7 @@ class ReporteCriteria {
 		// Esto debe
 		if ($this->tipo_dato == 'valor_cobrado') {
 			$filtersFields = $this->parametros;
-			$grouperFields = array();
+			$grouperFields = array('area_asunto');
 			$selectFields = array();
 
 			$proportionality = 'cliente';
@@ -653,7 +653,9 @@ class ReporteCriteria {
 			pr($criteria_works->get_plain_query());
 
 			$criteria = $calculator->getChargesCriteria();
-			pr($criteria->get_plain_query());
+			if (!empty($criteria)) {
+				pr($criteria->get_plain_query());
+			}
 
 			return;
 		}
