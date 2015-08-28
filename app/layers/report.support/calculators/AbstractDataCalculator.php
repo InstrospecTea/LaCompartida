@@ -17,6 +17,15 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'fecha_fin'
 	);
 
+	private $queryCancelatorsFilters = array(
+		'charge' => array(
+			'areas_usuario',
+			'categorias_usuario'
+		),
+		'errand' => array(),
+		'work' => array()
+	);
+
 	private $dependantFilters = array(
 		'fecha_ini',
 		'fecha_fin'
@@ -49,6 +58,20 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'solicitante',
 		'tipo_asunto',
 		'username'
+	);
+
+	private $chargeGroupers = array(
+		'area_asunto',
+		'tipo_asunto',
+		'glosa_asunto',
+		'glosa_asunto_con_codigo',
+		'glosa_cliente_asunto',
+		'profesional',
+		'username',
+		'glosa_grupo_cliente',
+		'glosa_cliente',
+		'glosa_estudio'
+
 	);
 
 	private $filtersFields = array();
@@ -245,10 +268,14 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	function buildChargeQuery() {
-		$Criteria = new Criteria($this->Session);
-		$this->getBaseChargeQuery($Criteria);
-		$this->getReportChargeQuery($Criteria);
-		$this->ChargesCriteria = $Criteria;
+		if (!$this->cancelQuery('charge') {
+			$Criteria = new Criteria($this->Session);
+			$this->getBaseChargeQuery($Criteria);
+			$this->getReportChargeQuery($Criteria);
+			$this->ChargesCriteria = $Criteria;
+		} else {
+			$this->ChargesCriteria = null;
+		}
 		return $this->ChargesCriteria;
 	}
 
@@ -268,6 +295,24 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	function isDependantFilter($key) {
 		return in_array($key, $this->dependantFilters);
+	}
+
+	function cancelQuery($kind) {
+		foreach ($this->filtersFields as $key => $value) {
+			if in_array($key, $queryCancelatorsFilters[$kind]) {
+				return true;
+			}
+		}
+		$chargeFiltersCount = 0;
+		foreach ($this->filtersFields as $key => $value) {
+			if in_array($key, $this->chargeGroupers) {
+				$chargeFiltersCount++;
+			}
+		}
+		if ($chargeFiltersCount == 0) {
+			return true;
+		}
+		return false;
 	}
 
 }
