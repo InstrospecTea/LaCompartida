@@ -32,7 +32,8 @@
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
-		$Criteria->add_select($billed_amount, 'valor_cobrado');
+		$Criteria
+			->add_select($billed_amount, 'valor_cobrado');
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))

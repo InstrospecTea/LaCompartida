@@ -634,8 +634,8 @@ class ReporteCriteria {
 		if ($this->tipo_dato == 'valor_cobrado') {
 			$filtersFields = array(
 				'campo_fecha' => $this->parametros['campo_fecha'],
-				'fecha_ini' => $this->parametros['fecha_ini'],
-				'fecha_fin' => $this->parametros['fecha_fin']
+				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
+				'fecha_fin' => Utiles::fecha2sql($this->parametros['fecha_fin'])
 			);
 			$grouperFields = array();
 			$selectFields = array();
