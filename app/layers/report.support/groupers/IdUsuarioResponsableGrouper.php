@@ -7,7 +7,9 @@ class IdUsuarioResponsableGrouper extends AbstractGrouperTranslator {
 	}
 
 	function getSelectField() {
-		return $this->getUserAcountManagerField();
+		$selectField = $this->getUserAcountManagerField();
+		$selectValue = "IF(usuario_responsable.id_usuario IS NULL, 'Sin Resposable', {$selectField})";
+		return $selectValue;
 	}
 
 	function getOrderField() {
