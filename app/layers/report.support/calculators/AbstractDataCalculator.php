@@ -75,7 +75,6 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'glosa_grupo_cliente',
 		'glosa_cliente',
 		'glosa_estudio'
-
 	);
 
 	private $filtersFields = array();
@@ -96,6 +95,9 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->buildErrandQuery();
 		$this->buildChargeQuery();
 
+		pr($this->WorksCriteria->get_plain_query());
+		pr($this->ErrandsCriteria->get_plain_query());
+		pr($this->ChargesCriteria->get_plain_query());
 		$results = array();
 
 		if (!empty($this->WorksCriteria)) {
