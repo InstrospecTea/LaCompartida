@@ -14,16 +14,19 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 		return array('fecha_ini', 'fecha_fin');
 	}
 
-	function translateForCharges(Criteria $criteria) {
-		return $criteria;
+	function translateForCharges(Criteria $Criteria) {
+		return $Criteria;
 	}
 
-	function translateForErrands(Criteria $criteria) {
-		return $criteria;
+	function translateForErrands(Criteria $Criteria) {
+		return $Criteria;
 	}
 
-	function translateForWorks(Criteria $criteria) {
-		return $criteria;
+	function translateForWorks(Criteria $Criteria) {
+		$filters = $this->getFilterData();
+		$Criteria->add_restriction(CriteriaRestriction::between('trabajo.fecha', "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']}'"));
+
+		return $Criteria;
 	}
 
 	function getFieldName() {

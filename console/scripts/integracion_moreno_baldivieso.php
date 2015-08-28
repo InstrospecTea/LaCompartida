@@ -66,6 +66,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OCRD.U_MonTarifa AS 'charging_data_currency_rate',
 				OCRD.U_MonHonor AS 'charging_data_currency_fees',
 				OCRD.U_MonGastos AS 'charging_data_currency_expenses',
+				OPRJ.U_MonedaTarifa AS 'agreement_charging_data_currency',
 				(CASE
 					WHEN (OPRJ.U_FormaCobro = '1') THEN 'TASA'
 					WHEN (OPRJ.U_FormaCobro = '2') THEN 'RETAINER'
@@ -175,6 +176,14 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$CurrencyRate->LoadByCode($client['charging_data_currency_rate']);
 					if ($CurrencyRate->Loaded()) {
 						$currency_rate_id = $CurrencyRate->fields['id_moneda'];
+					}
+				} else {
+					// If the currency of the agreement exists, then we must use it.
+					if (!$this->_empty($client['agreement_charging_data_currency'])) {
+						$CurrencyRate->LoadByCode($client['agreement_charging_data_currency']);
+						if ($CurrencyRate->Loaded()) {
+							$currency_rate_id = $CurrencyRate->fields['id_moneda'];
+						}
 					}
 				}
 
@@ -314,6 +323,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$MatterAgreement->Edit('forma_cobro', $billing_form);
 					$MatterAgreement->Edit('id_tarifa', $rate_id);
 					$MatterAgreement->Edit('id_moneda', $currency_rate_id);
+					$MatterAgreement->Edit('id_moneda_monto', $currency_rate_id);
 					$MatterAgreement->Edit('opc_moneda_total', $currency_fees_id);
 					$MatterAgreement->Edit('opc_moneda_gastos', $currency_expenses_id);
 					$MatterAgreement->Edit('id_usuario_modificador', $modifier_user_id);
