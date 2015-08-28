@@ -291,11 +291,19 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		);
 	}
 
+	function getNotAllowedFilters() {
+		return array();
+	}
+
 	function getAllowedGroupers() {
 		return array_diff(
 			$this->allowedGroupers,
 			$this->notAllowedGroupers()
 		);
+	}
+
+	function getNotAllowedGroupers() {
+		return array();
 	}
 
 	function isDependantFilter($key) {

@@ -2,18 +2,6 @@
 
  class BilledAmountDataCalculator extends AbstractProportionalDataCalculator {
 
-	function getNotAllowedFilters() {
-		return array(
-			'estado_cobro'
-		);
-	}
-
-	function getNotAllowedGroupers() {
-		return array(
-			'categoria_usuario'
-		);
-	}
-
 	function getReportWorkQuery(Criteria $Criteria) {
 		$rate = $this->getWorksFeeField();
 		$amount = $this->getWorksProportionalityAmountField();
@@ -25,7 +13,7 @@
 				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
 				*
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-	 		)
+			)
 			/
 			cobro.{$amount}
 		)
@@ -50,13 +38,18 @@
 				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
 				*
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-	 		)
+			)
 			/ cobro.{$amount}
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
-		$Criteria->add_select($billed_amount, 'valor_cobrado');
+		$Criteria
+			->add_select($billed_amount, 'valor_cobrado');
+
+		$Criteria
+			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
 	}
 
 	function getReportChargeQuery($Criteria) {
@@ -66,12 +59,15 @@
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
 		';
-		$Criteria->add_select(
-			'cobro.id_cobro'
-		)->add_select(
-			$billed_amount,
-			'valor_cobrado'
-		);
+		$Criteria
+			->add_select('cobro.id_cobro')
+			->add_select(
+				$billed_amount,
+				'valor_cobrado'
+			);
+
+		$Criteria
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
 	}
 
 }
