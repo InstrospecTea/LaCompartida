@@ -7,8 +7,8 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 
 	private $proportionality;
 
-	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $selectFields, $currencyId, $proportionality) {
-		parent::__construct($Session, $filtersFields, $grouperFields, $selectFields, $currencyId);
+	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $currencyId, $proportionality) {
+		parent::__construct($Session, $filtersFields, $grouperFields, $currencyId);
 		$this->proportionality = $proportionality;
 	}
 

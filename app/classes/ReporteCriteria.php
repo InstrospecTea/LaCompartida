@@ -671,7 +671,6 @@ class ReporteCriteria {
 			);
 
 			$grouperFields = array();
-			$selectFields = array();
 
 			$calculator_name = $this->newCalculation[$this->tipo_dato];
 			$reflectedClass = new ReflectionClass("{$calculator_name}DataCalculator");
@@ -679,7 +678,6 @@ class ReporteCriteria {
 				$this->sesion,
 				$filtersFields,
 				$grouperFields,
-				$selectFields,
 				$this->id_moneda,
 				$this->proporcionalidad
 			);

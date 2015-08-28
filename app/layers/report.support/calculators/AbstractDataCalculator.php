@@ -80,17 +80,15 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	private $filtersFields = array();
 	private $grouperFields = array();
-	private $selectFields = array();
 
 	private $WorksCriteria;
 	private $ErrandsCriteria;
 	private $ChargesCriteria;
 
-	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $selectFields) {
+	public function __construct(Sesion $Session, $filtersFields, $grouperFields) {
 		$this->Session = $Session;
 		$this->filtersFields = $filtersFields;
 		$this->grouperFields = $grouperFields;
-		$this->selectFields = $selectFields;
 	}
 
 	public function calculate() {
@@ -144,7 +142,6 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	function addFiltersToCriteria($Criteria, $type) {
-        pr($this->filtersFields);
 		foreach ($this->filtersFields as $key => $value) {
 			if (!$this->isDependantFilter($key)) {
 				$class_prefix = $this->getClassPrefix($key);
