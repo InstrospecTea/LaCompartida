@@ -80,7 +80,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		if (!empty($this->ChargesCriteria)) {
 			$results = array_merge($results, $this->ChargesCriteria->run());
 		}
-		pr($results[0]);
+
 		return $results;
 	}
 
@@ -172,11 +172,11 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$Criteria->add_from('trabajo');
 
 		$Criteria->add_left_join_with(
-				'cobro',
-				CriteriaRestriction::equals(
-						'cobro.id_cobro',
-						'trabajo.id_cobro'
-				)
+			'cobro',
+			CriteriaRestriction::equals(
+				'cobro.id_cobro',
+				'trabajo.id_cobro'
+			)
 		);
 
 		$this->addFiltersToCriteria($Criteria, 'Works');
@@ -253,17 +253,17 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	function getAllowedFilters() {
-		 return array_diff(
+		return array_diff(
 			$this->allowedFilters,
 			$this->notAllowedFilters()
-		 );
+		);
 	}
 
 	function getAllowedGroupers() {
-		 return array_diff(
+		return array_diff(
 			$this->allowedGroupers,
 			$this->notAllowedGroupers()
-		 );
+		);
 	}
 
 	function isDependantFilter($key) {

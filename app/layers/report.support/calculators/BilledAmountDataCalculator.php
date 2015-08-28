@@ -30,7 +30,7 @@
 			cobro.{$amount}
 		)
 		*
-		(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
+		(1 / cobro_moneda.tipo_cambio)";
 
 		$Criteria->add_select($billed_amount, 'valor_cobrado');
 	}
