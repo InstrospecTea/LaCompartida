@@ -2,8 +2,8 @@
 
 abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCalculator {
 
-	const PROPRTIONALITY_CLIENT = 'cliente';
-	const PROPRTIONALITY_STANDARD = 'estandar';
+	const PROPORTIONALITY_CLIENT = 'cliente';
+	const PROPORTIONALITY_STANDARD = 'estandar';
 
 	private $proportionality;
 
@@ -17,17 +17,17 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	}
 
 	function getWorksFeeField() {
-		$proporcionality = $this->getProportionality();
-		if ($proporcionality == PROPRTIONALITY_ESTANDAR)  {
+		$proportionality = $this->getProportionality();
+		if ($proportionality == PROPORTIONALITY_STANDARD)  {
 			return 'trabajo.tarifa_hh_estandar';
 		} else {
 			return 'trabajo.tarifa_hh';
 		}
 	}
 
-	function getWorksProporcionalityAmountField() {
-		$proporcionality = $this->getProportionality();
-		if ($proporcionality == PROPRTIONALITY_ESTANDAR)  {
+	function getWorksProportionalityAmountField() {
+		$proportionality = $this->getProportionality();
+		if ($proportionality == PROPORTIONALITY_STANDARD)  {
 			return 'monto_thh_estandar';
 		} else {
 			return 'monto_thh';
@@ -35,17 +35,17 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	}
 
 	function getErrandsFeeField() {
-		$proporcionality = $this->getProportionality();
-		if ($proporcionality == PROPRTIONALITY_ESTANDAR)  {
+		$proportionality = $this->getProportionality();
+		if ($proportionality == PROPORTIONALITY_STANDARD)  {
 			return 'tramite.tarifa_tramite_estandar';
 		} else {
 			return 'tramite.tarifa_tramite';
 		}
 	}
 
-	function getErrandsProporcionalityAmountField() {
-		$proporcionality = $this->getProportionality();
-		if ($proporcionality == PROPRTIONALITY_ESTANDAR)  {
+	function getErrandsProportionalityAmountField() {
+		$proportionality = $this->getProportionality();
+		if ($proportionality == PROPORTIONALITY_STANDARD)  {
 			return 'monto_tramites';
 		} else {
 			return 'monto_tramites';

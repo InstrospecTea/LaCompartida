@@ -15,12 +15,11 @@
 	}
 
 	function getReportWorkQuery(Criteria $Criteria) {
+		$rate = $this->getWorksFeeField();
+		$amount = $this->getWorksProportionalityAmountField();
 
-		$tarifa = $this->getWorksFeeField();
-		$monto_prorrata = $this->getWorksProporcionalityAmountField();
-
-		$monto_honorarios = "SUM(
-			({$tarifa} * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
+		$billed_amount = "SUM(
+			({$rate} * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
 			*
 			(
 				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
@@ -28,12 +27,12 @@
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
 	 		)
 			/
-			cobro.{$monto_prorrata}
+			cobro.{$amount}
 		)
 		*
 		(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
 
-		$Criteria->add_select($monto_honorarios, 'valor_cobrado');
+		$Criteria->add_select($billed_amount, 'valor_cobrado');
 	}
 
 	function getReportErrandQuery($Criteria) {
