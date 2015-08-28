@@ -661,7 +661,8 @@ class ReporteCriteria {
 		$stringquery = "";
 		$this->row = array();
 
-		if (array_key_exists($this->tipo_dato, $this->newCalculation)) {
+		if (array_key_exists($this->tipo_dato, $this->newCalculation)
+				&& !empty($this->newCalculation[$this->tipo_dato])) {
 			pr("NEW CALCULATION");
 
 			$filtersFields = array(
