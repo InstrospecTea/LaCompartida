@@ -60,7 +60,7 @@ class ReporteCriteria {
 		'horas_visibles' => null,
 		'costo' => null,
 		'costo_hh' => null,
-		'diferencia_valor_estandar' => null,
+		'diferencia_valor_estandar' => 'DifferenceStandardBilledAmount',
 		'rentabilidad' => null,
 		'rentabilidad_base' => null,
 		'valor_cobrado_no_estandar' => null,
