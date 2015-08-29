@@ -19,6 +19,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	private $queryCancelatorsFilters = array(
 		'charge' => array(
+			'usuarios',
 			'areas_usuario',
 			'categorias_usuario'
 		),
