@@ -32,7 +32,6 @@ class IdCobroGrouper extends AbstractGrouperTranslator {
 			->add_ordering($this->getOrderField());
 
 		return $Criteria;
-		return $Criteria;
 	}
 
 	function translateForWorks(Criteria $Criteria) {
