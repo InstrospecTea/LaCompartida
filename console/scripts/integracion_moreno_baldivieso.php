@@ -29,7 +29,6 @@ class IntegracionMorenoBaldivieso extends AppShell {
 	}
 
 	public function main() {
-		$clients = array();
 
 		$this->debug('Start: ' . date('Y-m-d H:i:s'));
 
@@ -62,10 +61,11 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OCPR.Tel1 AS 'applicant_phone',
 				OCPR.E_MailL AS 'applicant_email',
 				OPRJ.U_Tarifa AS 'charging_data_rate',
-				OPRJ.U_TarPlana AS 'charging_data_flat_rate',
-				OCRD.U_MonTarifa AS 'charging_data_currency_rate',
-				OCRD.U_MonHonor AS 'charging_data_currency_fees',
+				OPRJ.U_MontoFijo AS 'charging_data_flat_rate',
+				OPRJ.U_MonedaTarifa AS 'charging_data_currency_rate',
 				OCRD.U_MonGastos AS 'charging_data_currency_expenses',
+				OPRJ.U_HorasRetainer AS 'charging_data_retainer_hours',
+				(CASE WHEN (OPRJ.U_Y = 'Y') THEN 1 ELSE 0 END) AS 'charging_data_as_independent',
 				(CASE
 					WHEN (OPRJ.U_FormaCobro = '1') THEN 'TASA'
 					WHEN (OPRJ.U_FormaCobro = '2') THEN 'RETAINER'
@@ -107,11 +107,37 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$ClientAgreement = new Contrato($this->Session);
 				$Client->loadByCodigoSecundario($client['client_code']);
 
+				// Find a currency rate, if not exist select one by default
+				$CurrencyRate = new Moneda($this->Session);
+				$currency_rate_id = null;
+				if (!$this->_empty($client['charging_data_currency_rate'])) {
+					$CurrencyRate->LoadByCode($client['charging_data_currency_rate']);
+					if ($CurrencyRate->Loaded()) {
+						$currency_rate_id = $CurrencyRate->fields['id_moneda'];
+					}
+				}
+
+				if ($this->_empty($currency_rate_id)) {
+					$currency_rate_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
+				}
+
+				$CurrencyExpenses = new Moneda($this->Session);
+				$currency_expenses_id = null;
+				if (!$this->_empty($client['charging_data_currency_expenses'])) {
+					$CurrencyExpenses->LoadByCode($client['charging_data_currency_expenses']);
+					if ($CurrencyExpenses->Loaded()) {
+						$currency_expenses_id = $CurrencyExpenses->fields['id_moneda'];
+					}
+				}
+
+				if ($this->_empty($currency_expenses_id)) {
+					$currency_expenses_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
+				}
+
 				if (!$Client->Loaded()) {
 					// New client
 					$Client->Edit('codigo_cliente', $Client->AsignarCodigoCliente());
 					$Client->Edit('codigo_cliente_secundario', $client['client_code']);
-					$Client->Edit('id_moneda', $client_currency);
 					$Client->Edit('id_usuario_encargado', $client_user_manager_id);
 				}
 
@@ -138,6 +164,10 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 					$ClientAgreement->Edit('monto', $client['amount']);
 					$ClientAgreement->Edit('id_usuario_modificador', $modifier_user_id);
+					$ClientAgreement->Edit('id_moneda', $currency_rate_id);
+					$ClientAgreement->Edit('id_moneda_monto', $currency_rate_id);
+					$ClientAgreement->Edit('opc_moneda_total', $currency_rate_id);
+					$ClientAgreement->Edit('opc_moneda_gastos', $currency_expenses_id);
 
 					if ($ClientAgreement->Write()) {
 						if ($this->_empty($Client->fields['id_contrato'])) {
@@ -168,20 +198,6 @@ class IntegracionMorenoBaldivieso extends AppShell {
 
 				$rate_id = $Rate->Loaded() ? $Rate->fields['id_tarifa'] : 1;
 
-				// Find a currency rate, if not exist select one by default
-				$CurrencyRate = new Moneda($this->Session);
-				$currency_rate_id = null;
-				if (!$this->_empty($client['charging_data_currency_rate'])) {
-					$CurrencyRate->LoadByCode($client['charging_data_currency_rate']);
-					if ($CurrencyRate->Loaded()) {
-						$currency_rate_id = $CurrencyRate->fields['id_moneda'];
-					}
-				}
-
-				if ($this->_empty($currency_rate_id)) {
-					$currency_rate_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
-				}
-
 				// If flat rate is greater than zero
 				$charging_data_flat_rate = floatval($client['charging_data_flat_rate']);
 				if ($charging_data_flat_rate > 0) {
@@ -197,32 +213,6 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				$language = $this->_empty($client['language']) ? 1 : $client['language'];
 				$chargeable = $this->_empty($client['chargeable']) ? 1 : $client['chargeable']; // Chargeable by default
 				$separate_settlements = 1; // Separate settlements by default
-
-				$CurrencyFees = new Moneda($this->Session);
-				$currency_fees_id = null;
-				if (!$this->_empty($client['charging_data_currency_fees'])) {
-					$CurrencyFees->LoadByCode($client['charging_data_currency_fees']);
-					if ($CurrencyFees->Loaded()) {
-						$currency_fees_id = $CurrencyFees->fields['id_moneda'];
-					}
-				}
-
-				if ($this->_empty($currency_fees_id)) {
-					$currency_fees_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
-				}
-
-				$CurrencyExpenses = new Moneda($this->Session);
-				$currency_expenses_id = null;
-				if (!$this->_empty($client['charging_data_currency_expenses'])) {
-					$CurrencyExpenses->LoadByCode($client['charging_data_currency_expenses']);
-					if ($CurrencyExpenses->Loaded()) {
-						$currency_expenses_id = $CurrencyExpenses->fields['id_moneda'];
-					}
-				}
-
-				if ($this->_empty($currency_expenses_id)) {
-					$currency_expenses_id = !$this->_empty($currency_base_id) ? $currency_base_id : 1;
-				}
 
 				$ProjectArea = new AreaProyecto($this->Session);
 				$ProjectArea->LoadByGlosa($client['matter_area']);
@@ -314,7 +304,8 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$MatterAgreement->Edit('forma_cobro', $billing_form);
 					$MatterAgreement->Edit('id_tarifa', $rate_id);
 					$MatterAgreement->Edit('id_moneda', $currency_rate_id);
-					$MatterAgreement->Edit('opc_moneda_total', $currency_fees_id);
+					$MatterAgreement->Edit('id_moneda_monto', $currency_rate_id);
+					$MatterAgreement->Edit('opc_moneda_total', $currency_rate_id);
 					$MatterAgreement->Edit('opc_moneda_gastos', $currency_expenses_id);
 					$MatterAgreement->Edit('id_usuario_modificador', $modifier_user_id);
 
