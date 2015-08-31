@@ -26,7 +26,7 @@ class StandardBilledAmountDataCalculator extends AbstractCurrencyDataCalculator 
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
 		$standard_amount = "
-			SUM(tarifa_hh_estandar * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
+			SUM(trabajo.tarifa_hh_estandar * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
 			*
 			(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
 
@@ -55,7 +55,7 @@ class StandardBilledAmountDataCalculator extends AbstractCurrencyDataCalculator 
 	 */
 	function getReportErrandQuery($Criteria) {
 		$standard_amount = "
-			SUM(tarifa_tramite_estandar)
+			SUM(tramite.tarifa_tramite_estandar)
 			*
 			(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
 
