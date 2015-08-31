@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.17.5
+Monday 2015, August 31th
+* **Fix:** [Se crea validación de cobros al cargar Excel](https://github.com/LemontechSA/ttb/pull/1099)
+
 ## Hotfix 15.17.4
 Thursday 2015, August 28th
 * **Fix:** [Corrige la carga de datos del contrato al crear una factura](https://github.com/LemontechSA/ttb/pull/1096)
