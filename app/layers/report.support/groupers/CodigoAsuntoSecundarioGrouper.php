@@ -1,21 +1,21 @@
 <?php
 /**
- * Agrupador por Glosa asunto con Código:
+ * Agrupador por Código de Asunto Secundario:
  *
- * * Agrupa por: asunto.codigo_asunto
- * * Muestra: asunto.codigo_asunto concatenado con asunto.glosa_asunto
- * * Ordena por: asunto.codigo_asunto concatenado con asunto.glosa_asunto
+ * * Agrupa por: asunto.codigo_asunto_secundario
+ * * Muestra: asunto.codigo_asunto_secundario
+ * * Ordena por: asunto.codigo_asunto_secundario
  *
- * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Glosa-Asunto-Codigo
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Codigo-Asunto-Secundario
  */
-class GlosaAsuntoConCodigoGrouper extends AbstractGrouperTranslator {
+class CodigoAsuntoSecundarioGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Obtiene el campo por el cual se agrupará la query
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
-		return $this->getProjectCodeField();
+		return 'asunto.codigo_asunto_secundario';
 	}
 
 	/**
@@ -23,8 +23,7 @@ class GlosaAsuntoConCodigoGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		$code = $this->getProjectCodeField();
-		return "CONCAT($code, ': ', asunto.glosa_asunto)";
+		return 'asunto.codigo_asunto_secundario';
 	}
 
 	/**
@@ -32,18 +31,17 @@ class GlosaAsuntoConCodigoGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
-		$code = $this->getProjectCodeField();
-		return "CONCAT($code, ': ', asunto.glosa_asunto)";
+		return 'asunto.codigo_asunto_secundario';
 	}
 
 	/**
 	 * Traduce los keys de agrupadores a campos para la query de Cobros
-	 * Glosa Código de cada asunto incluido en la liquidación
+	 * Código de cada asunto incluido en la liquidación
 	 * @return void
 	 */
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'glosa_asunto_con_codigo')
+			->add_select($this->getSelectField(), 'codigo_asunto')
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with('cobro_asunto',
@@ -56,12 +54,12 @@ class GlosaAsuntoConCodigoGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Traduce los keys de agrupadores a campos para la query de Trámites
-	 * Glosa y Código del asunto del trámite
+	 * Código del asunto del trámite
 	 * @return void
 	 */
 	function translateForErrands(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'glosa_asunto_con_codigo')
+			->add_select($this->getSelectField(), 'codigo_asunto')
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with('asunto',
@@ -73,12 +71,12 @@ class GlosaAsuntoConCodigoGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Traduce los keys de agrupadores a campos para la query de Trabajos
-	 * Glosa y código del asunto del trabajo
+	 * Código del asunto del trabajo
 	 * @return void
 	 */
 	function translateForWorks(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'glosa_asunto_con_codigo')
+			->add_select($this->getSelectField(), 'codigo_asunto')
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with('asunto',

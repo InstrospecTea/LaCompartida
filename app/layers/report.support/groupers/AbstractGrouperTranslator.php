@@ -16,6 +16,18 @@ abstract class AbstractGrouperTranslator  implements IGrouperTranslator {
 	}
 
 	/**
+ * Obtiene la coluna correcta para código asunto
+ * @return String Campo Codigo de asunto
+ */
+	function getProjectCodeField() {
+	if (Conf::GetConf($this->Session, 'CodigoSecundario')) {
+			return 'asunto.codigo_asunto_secundario';
+		} else {
+			return 'asunto.codigo_asunto';
+		}
+	}
+
+	/**
 	 * Obtiene el campo de la tabla de usuarios correspondiente para Usuario
 	 * @return String
 	 */
