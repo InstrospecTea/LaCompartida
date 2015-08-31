@@ -1,21 +1,46 @@
 <?php
-
+/**
+ * Agrupador por Id Cobro:
+ *
+ * * Agrupa por: cobro.id_cobro o Indefinido
+ * * Muestra: cobro.id_cobro o Indefinido
+ * * Ordena por: cobro.id_cobro o Indefinido
+ *
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Id-Cobro
+ */
 class IdCobroGrouper extends AbstractGrouperTranslator {
 
 	private $uniqueField = "IFNULL(cobro.id_cobro, 'Indefinido')";
 
+	/**
+	 * Obtiene el campo por el cual se agrupará la query
+	 * @return String Campo por el que se agrupa en par tabla.campo o alias
+	 */
 	function getGroupField() {
 		return $this->uniqueField;
 	}
 
+	/**
+	 * Obtiene el campo de grupo que se devolverá en el SELECT de la query
+	 * @return String par tabla.campo o alias de función
+	 */
 	function getSelectField() {
 		return $this->uniqueField;
 	}
 
+	/**
+	 * Obtiene el campo de grupo por el cual se ordenará la query
+	 * @return String par tabla.campo o alias de función
+	 */
 	function getOrderField() {
 		return $this->uniqueField;
 	}
 
+	/**
+	 * Traduce los keys de agrupadores a campos para la query de Cobros
+	 * id cobro del cobro
+	 * @return void
+	 */
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'id_cobro')
@@ -25,6 +50,11 @@ class IdCobroGrouper extends AbstractGrouperTranslator {
 		return $Criteria;
 	}
 
+	/**
+	 * Traduce los keys de agrupadores a campos para la query de Trámites
+	 * id cobro del trámite
+	 * @return void
+	 */
 	function translateForErrands(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'id_cobro')
@@ -34,6 +64,11 @@ class IdCobroGrouper extends AbstractGrouperTranslator {
 		return $Criteria;
 	}
 
+	/**
+	 * Traduce los keys de agrupadores a campos para la query de Trabajos
+	 * id cobro del trabajo
+	 * @return void
+	 */
 	function translateForWorks(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'id_cobro')
