@@ -1,21 +1,46 @@
 <?php
-
+/**
+ * Agrupador por Usuario Repsonable (Encargado Comercial):
+ *
+ * * Agrupa por: usuario_responsable.id_usuario
+ * * Muestra: Full name o  username según configuracion del usuario responsable o "Sin responsable"
+ * * Ordena por: usuario_responsable.id_usuario
+ *
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Usuario-Responsable
+ */
 class IdUsuarioResponsableGrouper extends AbstractGrouperTranslator {
 
+	/**
+	 * Obtiene el campo por el cual se agrupará la query
+	 * @return String Campo por el que se agrupa en par tabla.campo o alias
+	 */
 	function getGroupField() {
 		return "usuario_responsable.id_usuario";
 	}
 
+	/**
+	 * Obtiene el campo de grupo que se devolverá en el SELECT de la query
+	 * @return String par tabla.campo o alias de función
+	 */
 	function getSelectField() {
 		$selectField = $this->getUserAcountManagerField();
 		$selectValue = "IF(usuario_responsable.id_usuario IS NULL, 'Sin Resposable', {$selectField})";
 		return $selectValue;
 	}
 
+	/**
+	 * Obtiene el campo de grupo por el cual se ordenará la query
+	 * @return String par tabla.campo o alias de función
+	 */
 	function getOrderField() {
 		return "usuario_responsable.id_usuario";
 	}
 
+	/**
+	 * Traduce los keys de agrupadores a campos para la query de Cobros
+	 * El usuario encargado del contrato del cobro
+	 * @return void
+	 */
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getGroupField(), 'id_usuario_responsable')
@@ -30,10 +55,14 @@ class IdUsuarioResponsableGrouper extends AbstractGrouperTranslator {
 					'usuario_responsable.id_usuario', 'contrato.id_usuario_responsable'
 				)
 			);
-
 		return $Criteria;
 	}
 
+	/**
+	 * Traduce los keys de agrupadores a campos para la query de Trámites
+	 * El usuario encargado del contrato del cobro o del asunto del trámite
+	 * @return void
+	 */
 	function translateForErrands(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getGroupField(), 'id_usuario_responsable')
@@ -58,6 +87,11 @@ class IdUsuarioResponsableGrouper extends AbstractGrouperTranslator {
 		return $Criteria;
 	}
 
+	/**
+	 * Traduce los keys de agrupadores a campos para la query de Trabajos
+	 * El usuario encargado del contrato del cobro o del asunto del trabajo
+	 * @return void
+	 */
 	function translateForWorks(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getGroupField(), 'id_usuario_responsable')
