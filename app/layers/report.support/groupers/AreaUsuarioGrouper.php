@@ -16,7 +16,7 @@ class AreaUsuarioGrouper extends AbstractGrouperTranslator {
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
-		return 'prm_area_usuario.glosa';
+		return 'area_usuario';
 	}
 
 	/**
@@ -33,7 +33,7 @@ class AreaUsuarioGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
-		return 'prm_area_usuario.glosa';
+		return 'area_usuario';
 	}
 
 	/**
@@ -44,11 +44,11 @@ class AreaUsuarioGrouper extends AbstractGrouperTranslator {
 		$undefined = $this->getUndefinedField();
 		return $criteria->add_select(
 			$this->getUndefinedField(),
-			"'prm_area_usuario.glosa'"
+			'area_usuario'
 		)->add_ordering(
-			"'prm_area_usuario.glosa'"
+			'area_usuario'
 		)->add_grouping(
-			"'prm_area_usuario.glosa'"
+			'area_usuario'
 		);
 	}
 
@@ -59,7 +59,7 @@ class AreaUsuarioGrouper extends AbstractGrouperTranslator {
 	function translateForErrands(Criteria $criteria) {
 		return $criteria->add_select(
 			$this->getSelectField(),
-			"'prm_area_usuario.glosa'"
+			'area_usuario'
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
@@ -86,7 +86,7 @@ class AreaUsuarioGrouper extends AbstractGrouperTranslator {
 	function translateForWorks(Criteria $criteria) {
 		return $criteria->add_select(
 			$this->getSelectField(),
-			"'prm_area_usuario.glosa'"
+			'area_usuario'
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
