@@ -621,13 +621,14 @@ $Form->defaultLabel = false;
 			<?php } ?>
 
 			<?php if ($prm_plugin->isActive(array('facturacion_electronica_cl.php', 'facturacion_electronica_nubox.php'))): ?>
-				<?php if ($codigo_documento_legal == 'FA' && !is_null($codigo_dte)): ?>
+				<?php $codigos = $prm_codigo->getCodigosByGrupo('PRM_FACTURA_CL_DR'); ?>
+				<?php if ($codigo_documento_legal == 'FA' && !is_null($codigo_dte) && sizeof($codigos) > 0): ?>
 				<tr>
 					<td align="right">
 						<label for="id_documento_referencia"><?php echo __('Documento de Referencia') ?>:</label>
 					</td>
 					<td align="left">
-						<?php echo $Form->select('id_documento_referencia', $prm_codigo->getCodigosByGrupo('PRM_FACTURA_CL_DR'), $factura->fields['id_documento_referencia'], array('empty' => __('Seleccione'))); ?>
+						<?php echo $Form->select('id_documento_referencia', $codigos, $factura->fields['id_documento_referencia'], array('empty' => __('Seleccione'))); ?>
 					</td>
 				</tr>
 				<tr>
