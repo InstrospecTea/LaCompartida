@@ -435,7 +435,9 @@ class Trabajo extends Objeto
 			}
 
 			$cobro = new Cobro($sesion);
-			$cobro->Load($id_cobro);
+			if (! $cobro->Load($id_cobro)) {
+				return __('El Cobro') . ' que intenta modificar no se encuentra en la Base de Datos.';
+			}
 			$cobro->LoadAsuntos();
 			$continuar = false;
 			// Para cambiar el asunto en el caso de ver los asuntos por separado necesitamos una variable para
