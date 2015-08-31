@@ -11,8 +11,8 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 	/**
 	 * Constructor
 	 * @param Sesion $Session       La sesión para el acceso a datos
-	 * @param [type] $filtersFields Los campos por los que se debe filtrar y sus valores
-	 * @param [type] $grouperFields Los campos por los que se debe agrupar
+	 * @param [type] $filtersFields Los campos/keys por los que se debe filtrar y sus valores
+	 * @param [type] $grouperFields Los campos/keys por los que se debe agrupar
 	 * @param [type] $currencyId    La moneda en la que se devolverán los valores
 	 */
 	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $currencyId) {
