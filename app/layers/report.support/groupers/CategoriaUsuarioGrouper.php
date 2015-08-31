@@ -3,7 +3,7 @@
 class CategoriaUsuarioGrouper extends AbstractGrouperTranslator {
 
 	function getGroupField() {
-		return 'prm_categoria_usuario.glosa_categoria';
+		return 'categoria_usuario';
 	}
 
 	function getSelectField() {
@@ -11,7 +11,7 @@ class CategoriaUsuarioGrouper extends AbstractGrouperTranslator {
 	}
 
 	function getOrderField() {
-		return 'prm_categoria_usuario.glosa_categoria';
+		return 'categoria_usuario';
 	}
 
 	/**
@@ -21,18 +21,18 @@ class CategoriaUsuarioGrouper extends AbstractGrouperTranslator {
 	function translateForCharges(Criteria $criteria) {
 		return $criteria->add_select(
 			sprintf("'%s'", 'Indefinido'),
-			"'prm_categoria_usuario.glosa_categoria'"
+			'categoria_usuario'
 		)->add_ordering(
-			"'prm_categoria_usuario.glosa_categoria'"
+			'categoria_usuario'
 		)->add_grouping(
-			"'prm_categoria_usuario.glosa_categoria'"
+			'categoria_usuario'
 		);
 	}
 
 	function translateForErrands(Criteria $criteria) {
 		return $criteria->add_select(
 			$this->getSelectField(),
-			"'prm_categoria_usuario.glosa_categoria'"
+			'categoria_usuario'
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
@@ -55,7 +55,7 @@ class CategoriaUsuarioGrouper extends AbstractGrouperTranslator {
 	function translateForWorks(Criteria $criteria) {
 		return $criteria->add_select(
 			$this->getSelectField(),
-			"'prm_categoria_usuario.glosa_categoria'"
+			'categoria_usuario'
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
