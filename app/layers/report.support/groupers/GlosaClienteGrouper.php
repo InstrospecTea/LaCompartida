@@ -25,6 +25,7 @@ class GlosaClienteGrouper extends AbstractGrouperTranslator {
 	function getSelectField() {
 		return 'cliente.glosa_cliente';
 	}
+
 	/**
 	 * Obtiene el campo de grupo por el cual se ordenará la query
 	 * @return String par tabla.campo o alias de función
@@ -38,7 +39,6 @@ class GlosaClienteGrouper extends AbstractGrouperTranslator {
 	 * Glosa del cliente de cada asunto incluido en la liquidación
 	 * @return void
 	 */
-
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'glosa_cliente')
