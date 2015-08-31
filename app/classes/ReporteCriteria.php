@@ -663,7 +663,6 @@ class ReporteCriteria {
 
 		if (array_key_exists($this->tipo_dato, $this->newCalculation)
 				&& !empty($this->newCalculation[$this->tipo_dato])) {
-			pr("NEW CALCULATION");
 			$filtersFields = array(
 				'campo_fecha' => $this->parametros['campo_fecha'],
 				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
