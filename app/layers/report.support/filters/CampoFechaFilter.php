@@ -81,9 +81,7 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 
 	function translateForWorks(Criteria $Criteria) {
 		$filters = $this->getFilterData();
-
 		$Criteria->add_restriction(CriteriaRestriction::between($this->getFieldName(), "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'"));
-
 		return $Criteria;
 	}
 
