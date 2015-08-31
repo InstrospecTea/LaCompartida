@@ -11,7 +11,7 @@ class IntegracionMorenoBaldivieso extends AppShell {
 	protected $Session;
 
 	public function __construct() {
-		// $this->connection['server'] = '200.87.127.182'; // Test and develop
+		//$this->connection['server'] = '200.87.127.182'; // Test and develop
 		$this->connection['server'] = 'embaMSSql'; // Production Only
 		$this->connection['user'] = 'lemontech';
 		$this->connection['password'] = '20emba14';
@@ -62,11 +62,12 @@ class IntegracionMorenoBaldivieso extends AppShell {
 				OCPR.Tel1 AS 'applicant_phone',
 				OCPR.E_MailL AS 'applicant_email',
 				OPRJ.U_Tarifa AS 'charging_data_rate',
-				OPRJ.U_TarPlana AS 'charging_data_flat_rate',
-				OCRD.U_MonTarifa AS 'charging_data_currency_rate',
+				OPRJ.U_MontoFijo AS 'charging_data_flat_rate',
+				OPRJ.U_MonedaTarifa AS 'charging_data_currency_rate',
 				OCRD.U_MonHonor AS 'charging_data_currency_fees',
 				OCRD.U_MonGastos AS 'charging_data_currency_expenses',
-				OPRJ.U_MonedaTarifa AS 'agreement_charging_data_currency',
+				OPRJ.U_HorasRetainer AS 'charging_data_retainer_hours',
+				(CASE WHEN (OPRJ.U_Y = 'Y') THEN 1 ELSE 0 END) AS 'charging_data_as_independent',
 				(CASE
 					WHEN (OPRJ.U_FormaCobro = '1') THEN 'TASA'
 					WHEN (OPRJ.U_FormaCobro = '2') THEN 'RETAINER'
@@ -176,14 +177,6 @@ class IntegracionMorenoBaldivieso extends AppShell {
 					$CurrencyRate->LoadByCode($client['charging_data_currency_rate']);
 					if ($CurrencyRate->Loaded()) {
 						$currency_rate_id = $CurrencyRate->fields['id_moneda'];
-					}
-				} else {
-					// If the currency of the agreement exists, then we must use it.
-					if (!$this->_empty($client['agreement_charging_data_currency'])) {
-						$CurrencyRate->LoadByCode($client['agreement_charging_data_currency']);
-						if ($CurrencyRate->Loaded()) {
-							$currency_rate_id = $CurrencyRate->fields['id_moneda'];
-						}
 					}
 				}
 
