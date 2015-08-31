@@ -41,7 +41,8 @@ class AreaAsuntoGrouper extends AbstractGrouperTranslator {
 	 */
 	function translateForCharges(Criteria $criteria) {
 		return $criteria->add_select(
-			$this->getSelectField()
+			$this->getSelectField(),
+			'area_asunto'
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
@@ -73,7 +74,8 @@ class AreaAsuntoGrouper extends AbstractGrouperTranslator {
 	 */
 	function translateForErrands(Criteria $criteria) {
 		return $criteria->add_select(
-			$this->getSelectField()
+			$this->getSelectField(),
+			'area_asunto'
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
@@ -99,7 +101,8 @@ class AreaAsuntoGrouper extends AbstractGrouperTranslator {
 	 */
 	function translateForWorks(Criteria $criteria) {
 		return $criteria->add_select(
-			$this->getSelectField()
+			$this->getSelectField(),
+			'area_asunto'
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
