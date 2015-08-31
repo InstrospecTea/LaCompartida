@@ -3,11 +3,7 @@
 class ClientesFilter extends AbstractUndependantFilterTranslator {
 
 	function getFieldName() {
-		if (Conf::GetConf($this->Session, 'CodigoSecundario')) {
-			return 'cliente.codigo_cliente_secundario';
-		} else {
-			return 'cliente.codigo_cliente'
-		}
+		return 'cliente.codigo_cliente';
 	}
 
 	function translateForCharges(Criteria $criteria) {
@@ -47,7 +43,7 @@ class ClientesFilter extends AbstractUndependantFilterTranslator {
 				'cliente.codigo_cliente',
 				'asunto.codigo_cliente'
 			)
-		)
+		);
 	}
 
 	function translateForWorks(Criteria $criteria) {
@@ -68,6 +64,6 @@ class ClientesFilter extends AbstractUndependantFilterTranslator {
 				'cliente.codigo_cliente',
 				'asunto.codigo_cliente'
 			)
-		)
+		);
 	}
 }

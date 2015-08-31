@@ -2,6 +2,6 @@
 
 interface IUndependantFilterTranslator extends IFilterTranslator{
 
-	function __construct($data);
+	function __construct($Session, $data);
 
 }

@@ -8,6 +8,6 @@ interface IDependantFilterTranslator extends IFilterTranslator{
 
 	static function getNameOfDependantFilters();
 
-	function __construct($parentData, $dependantData);
+	function __construct($Session, $parentData, $dependantData);
 
 }

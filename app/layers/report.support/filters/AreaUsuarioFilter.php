@@ -3,7 +3,7 @@
 class AreaUsuarioFilter extends AbstractUndependantFilterTranslator {
 
 	function getSelect() {
-		return "IFNULL(prm_area_usuario.glosa, '-')"
+		return "IFNULL(prm_area_usuario.glosa, '-')";
 	}
 
 	function getFieldName() {

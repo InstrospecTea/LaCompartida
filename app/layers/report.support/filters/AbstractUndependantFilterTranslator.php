@@ -1,7 +1,8 @@
 <?php
 
 abstract class AbstractUndependantFilterTranslator extends BaseFilterTranslator implements IUndependantFilterTranslator {
-	public function __construct($data) {
+	public function __construct($Session, $data) {
+		$this->Session = $Session;
 		$this->setFilterData($data);
 	}
 

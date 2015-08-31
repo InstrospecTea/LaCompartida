@@ -197,7 +197,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 					);
 					if ($reflectedClass->getParentClass()->getName() == 'AbstractUndependantFilterTranslator') {
 						$Criteria = $reflectedMethod->invokeArgs(
-							$reflectedClass->newInstance($value),
+							$reflectedClass->newInstance($this->Session, $value),
 							array($Criteria)
 						);
 					}
@@ -215,7 +215,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 							$dependantParameters[$filter] = $this->filtersFields[$filter];
 						}
 						$Criteria = $reflectedMethod->invokeArgs(
-							$reflectedClass->newInstance($value, $dependantParameters),
+							$reflectedClass->newInstance($this->Session, $value, $dependantParameters),
 							array($Criteria)
 						);
 					}

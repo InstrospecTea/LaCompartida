@@ -14,7 +14,7 @@ class EncargadosFilter extends AbstractUndependantFilterTranslator {
 		if (Conf::GetConf($this->Session, 'UsaUsernameEnTodoElSistema')) {
 			return "{$this->getJoinName()}.username";
 		}
-		return "IF({$this->getJoinName()}.id_usuario IS NULL, 'Sin Responsable', {$this->getJoinName()}.id_usuario)"
+		return "IF({$this->getJoinName()}.id_usuario IS NULL, 'Sin Responsable', {$this->getJoinName()}.id_usuario)";
 	}
 
 	function translateForCharges(Criteria $criteria) {

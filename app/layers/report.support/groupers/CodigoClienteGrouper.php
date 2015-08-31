@@ -15,7 +15,7 @@ class CodigoClienteGrouper extends AbstractGrouperTranslator {
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
-		return 'codigo_cliente';
+		return 'client_grouper.codigo_cliente';
 	}
 
 	/**
@@ -23,7 +23,7 @@ class CodigoClienteGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return 'cliente.codigo_cliente'
+		return 'client_grouper.codigo_cliente'
 	}
 
 	/**
@@ -31,7 +31,7 @@ class CodigoClienteGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
-		return 'codigo_cliente';
+		return 'client_grouper.codigo_cliente';
 	}
 
 	/**
@@ -43,8 +43,8 @@ class CodigoClienteGrouper extends AbstractGrouperTranslator {
 		$Criteria->add_select(
 			$this->getSelectField(), 'codigo_cliente'
 		)->add_left_join_with(
-			'cliente',
-			'cliente.codigo_cliente = cobro.codigo_cliente'
+			'cliente client_grouper',
+			'client_grouper.codigo_cliente = cobro.codigo_cliente'
 		)->add_grouping(
 			$this->getGroupField()
 		)->add_ordering(
@@ -70,9 +70,9 @@ class CodigoClienteGrouper extends AbstractGrouperTranslator {
 				'tramite.codigo_asunto'
 			)
 		)->add_left_join_with(
-			'cliente',
+			'cliente client_grouper',
 			CriteriaRestriction::equals(
-				'cliente.codigo_cliente',
+				'client_grouper.codigo_cliente',
 				'asunto.codigo_cliente'
 			)
 		)->add_grouping(
@@ -100,9 +100,9 @@ class CodigoClienteGrouper extends AbstractGrouperTranslator {
 				'trabajo.codigo_asunto'
 			)
 		)->add_left_join_with(
-			'cliente',
+			'cliente client_grouper',
 			CriteriaRestriction::equals(
-				'cliente.codigo_cliente',
+				'client_grouper.codigo_cliente',
 				'asunto.codigo_cliente'
 			)
 		)->add_grouping(

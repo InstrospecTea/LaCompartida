@@ -664,18 +664,17 @@ class ReporteCriteria {
 		if (array_key_exists($this->tipo_dato, $this->newCalculation)
 				&& !empty($this->newCalculation[$this->tipo_dato])) {
 			pr("NEW CALCULATION");
-
 			$filtersFields = array(
 				'campo_fecha' => $this->parametros['campo_fecha'],
 				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
 				'fecha_fin' => Utiles::fecha2sql($this->parametros['fecha_fin']),
 				'usuarios' => $this->parametros['usuarios'],
-				'clientes' => null,
-				'tipos_asunto' => null,
+				'clientes' => $this->parametros['clientes'],
+				'tipo_asunto' => $this->parametros['tipos_asunto'],
 				'areas_asunto' => null,
-				'areas_usuario' => null,
-				'categorias_usuario' => null,
-				'encargados' => null,
+				'area_usuario' => $this->parametros['areas_usuario'],
+				'categoria_usuario' => $this->parametros['categorias_usuario'],
+				'encargados' => $this->parametros['encargados'],
 				'estado_cobro' => $this->parametros['estado_cobro']
 			);
 

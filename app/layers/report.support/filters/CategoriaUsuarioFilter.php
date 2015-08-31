@@ -22,16 +22,16 @@ class CategoriaUsuarioFilter extends AbstractUndependantFilterTranslator {
 			$this->getSelect(),
 			"'prm_categoria_usuario.glosa_categoria'"
 		)->add_left_join_with(
-			'usuario',
+			'usuario cat_usuario_filter_usuario',
 			CriteriaRestriction::equals(
-				'usuario.id_usuario', 
+				'cat_usuario_filter_usuario.id_usuario', 
 				'tramite.id_usuario'
 			)
 		)->add_left_join_with(
 			'prm_categoria_usuario',
 			CriteriaRestriction::equals(
 				'prm_categoria_usuario.id_categoria_usuario',
-				'usuario.id_categoria_usuario'
+				'cat_usuario_filter_usuario.id_categoria_usuario'
 			)
 		);
 	}
@@ -43,16 +43,16 @@ class CategoriaUsuarioFilter extends AbstractUndependantFilterTranslator {
 		)->add_select(
 			$this->getSelect()
 		)->add_left_join_with(
-			'usuario',
+			'usuario cat_usuario_filter_usuario',
 			CriteriaRestriction::equals(
-				'usuario.id_usuario', 
-				'tramite.id_usuario'
+				'cat_usuario_filter_usuario.id_usuario', 
+				'trabajo.id_usuario'
 			)
 		)->add_left_join_with(
 			'prm_categoria_usuario',
 			CriteriaRestriction::equals(
 				'prm_categoria_usuario.id_categoria_usuario',
-				'usuario.id_categoria_usuario'
+				'cat_usuario_filter_usuario.id_categoria_usuario'
 			)
 		);
 	}

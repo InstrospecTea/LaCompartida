@@ -3,23 +3,23 @@
 class CodigoClienteSecundarioGrouper extends AbstractGrouperTranslator {
 
 	function getGroupField() {
-		return 'codigo_cliente_secundario';
+		return 'client_grouper.codigo_cliente_secundario';
 	}
 
 	function getSelectField() {
-		return 'cliente.codigo_cliente_secundario';
+		return 'client_grouper.codigo_cliente_secundario';
 	}
 
 	function getOrderField() {
-		return 'codigo_cliente_secundario';
+		return 'client_grouper.codigo_cliente_secundario';
 	}
 
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria->add_select(
-			$this->getSelectField(), 'codigo_cliente'
+			$this->getSelectField(), 'codigo_cliente_secundario'
 		)->add_left_join_with(
-			'cliente',
-			'cliente.codigo_cliente = cobro.codigo_cliente'
+			'cliente client_grouper',
+			'client_grouper.codigo_cliente = cobro.codigo_cliente'
 		)->add_grouping(
 			$this->getGroupField()
 		)->add_ordering(
@@ -40,9 +40,9 @@ class CodigoClienteSecundarioGrouper extends AbstractGrouperTranslator {
 				'tramite.codigo_asunto'
 			)
 		)->add_left_join_with(
-			'cliente',
+			'cliente client_grouper',
 			CriteriaRestriction::equals(
-				'cliente.codigo_cliente',
+				'client_grouper.codigo_cliente',
 				'asunto.codigo_cliente'
 			)
 		)->add_grouping(
@@ -65,9 +65,9 @@ class CodigoClienteSecundarioGrouper extends AbstractGrouperTranslator {
 				'trabajo.codigo_asunto'
 			)
 		)->add_left_join_with(
-			'cliente',
+			'cliente client_grouper',
 			CriteriaRestriction::equals(
-				'cliente.codigo_cliente',
+				'client_grouper.codigo_cliente',
 				'asunto.codigo_cliente'
 			)
 		)->add_grouping(
