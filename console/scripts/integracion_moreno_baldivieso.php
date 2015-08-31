@@ -29,7 +29,6 @@ class IntegracionMorenoBaldivieso extends AppShell {
 	}
 
 	public function main() {
-		$clients = array();
 
 		$this->debug('Start: ' . date('Y-m-d H:i:s'));
 
