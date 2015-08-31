@@ -13,10 +13,10 @@
 class BilledAmountDataCalculator extends AbstractProportionalDataCalculator {
 
 	/**
- 	 * Obtiene la query de trabajos correspondiente al valor cobrado
- 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
- 	 * @return void
- 	 */
+	 * Obtiene la query de trabajos correspondiente al valor cobrado
+	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
+	 * @return void
+	 */
 	function getReportWorkQuery(Criteria $Criteria) {
 		$rate = $this->getWorksFeeField();
 		$amount = $this->getWorksProportionalityAmountField();
@@ -54,10 +54,10 @@ class BilledAmountDataCalculator extends AbstractProportionalDataCalculator {
 	}
 
 	/**
- 	 * Obtiene la query de trámites correspondiente al valor cobrado
- 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
- 	 * @return void
- 	 */
+	 * Obtiene la query de trámites correspondiente al valor cobrado
+	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
+	 * @return void
+	 */
 	function getReportErrandQuery($Criteria) {
 		$rate = $this->getErrandsFeeField();
 		$amount = $this->getErrandsProportionalityAmountField();
@@ -83,10 +83,10 @@ class BilledAmountDataCalculator extends AbstractProportionalDataCalculator {
 	}
 
 	/**
- 	 * Obtiene la query de cobros sin trabajos ni trámites
- 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
- 	 * @return void
- 	 */
+	 * Obtiene la query de cobros sin trabajos ni trámites
+	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
+	 * @return void
+	 */
 	function getReportChargeQuery($Criteria) {
 		$billed_amount = '
 			(1 / IFNULL(asuntos_cobro.total_asuntos, 1)) *
