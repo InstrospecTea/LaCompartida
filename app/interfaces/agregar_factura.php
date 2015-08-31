@@ -621,7 +621,7 @@ $Form->defaultLabel = false;
 			<?php } ?>
 
 			<?php if ($prm_plugin->isActive(array('facturacion_electronica_cl.php', 'facturacion_electronica_nubox.php'))): ?>
-				<?php $codigos = $prm_codigo->getCodigosByGrupo('PRM_FACTURA_CL_DR'); ?>
+				<?php $codigos = $prm_codigo->getCodigosByGrupo('PRM_FACTURA_DR'); ?>
 				<?php if ($codigo_documento_legal == 'FA' && !is_null($codigo_dte) && sizeof($codigos) > 0): ?>
 				<tr>
 					<td align="right">

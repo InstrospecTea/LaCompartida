@@ -10870,33 +10870,33 @@ QUERY;
 			$archivo = mysql_fetch_array($resp);
 			if ($archivo['archivo_nombre'] == 'facturacion_electronica_nubox.php') {
 				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES 
-								('PRM_FACTURA_CL_DR', '33', 'Factura Electrónica'), 
-								('PRM_FACTURA_CL_DR', '34', 'Factura Electrónica Exenta'), 
-								('PRM_FACTURA_CL_DR', '39', 'Boleta Electrónica'), 
-								('PRM_FACTURA_CL_DR', '41', 'Boleta Electrónica Exenta'), 
-								('PRM_FACTURA_CL_DR', '56', 'Nota de Débito Electrónica'), 
-								('PRM_FACTURA_CL_DR', '61', 'Nota de Crédito Electrónica'), 
-								('PRM_FACTURA_CL_DR', '30', 'Factura'), 
-								('PRM_FACTURA_CL_DR', '35', 'Boleta'), 
-								('PRM_FACTURA_CL_DR', '50', 'Guía de Despacho'), 
-								('PRM_FACTURA_CL_DR', '52', 'Guía Electrónica'), 
-								('PRM_FACTURA_CL_DR', '801', 'Orden Compra'), 
-								('PRM_FACTURA_CL_DR', '802', 'Nota de Pedido')";
+								('PRM_FACTURA_DR', '33', 'Factura Electrónica'), 
+								('PRM_FACTURA_DR', '34', 'Factura Electrónica Exenta'), 
+								('PRM_FACTURA_DR', '39', 'Boleta Electrónica'), 
+								('PRM_FACTURA_DR', '41', 'Boleta Electrónica Exenta'), 
+								('PRM_FACTURA_DR', '56', 'Nota de Débito Electrónica'), 
+								('PRM_FACTURA_DR', '61', 'Nota de Crédito Electrónica'), 
+								('PRM_FACTURA_DR', '30', 'Factura'), 
+								('PRM_FACTURA_DR', '35', 'Boleta'), 
+								('PRM_FACTURA_DR', '50', 'Guía de Despacho'), 
+								('PRM_FACTURA_DR', '52', 'Guía Electrónica'), 
+								('PRM_FACTURA_DR', '801', 'Orden Compra'), 
+								('PRM_FACTURA_DR', '802', 'Nota de Pedido')";
 			} else if ($archivo['archivo_nombre'] == 'facturacion_electronica_cl.php') {
 				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES 
-								('PRM_FACTURA_CL_DR', '801', 'Orden de Compra'), 
-								('PRM_FACTURA_CL_DR', '802', 'Nota de Pedido'),
-								('PRM_FACTURA_CL_DR', '803', 'Contrato'),
-								('PRM_FACTURA_CL_DR', '814', 'Certificación de Depósito Bolsa Prod. Chile'),
-								('PRM_FACTURA_CL_DR', '815', 'Vale de Prenda Bolsa Prod. Chile'),
-								('PRM_FACTURA_CL_DR', 'HAS', 'Hoja Aceptación Servicio (HAS)'),
-								('PRM_FACTURA_CL_DR', 'HES', 'Hoja Estado Servicio (HES)'),
-								('PRM_FACTURA_CL_DR', 'HEM', 'Recepción de Material (HEM)'),
-								('PRM_FACTURA_CL_DR', 'MER', 'Mercadería (MER)'),
-								('PRM_FACTURA_CL_DR', 'SER', 'Servicio (SER)'),
-								('PRM_FACTURA_CL_DR', 'CEC', 'Centro de Costo (CEC)'),
-								('PRM_FACTURA_CL_DR', 'GD', 'Guía Devolución (GD)'),
-								('PRM_FACTURA_CL_DR', 'RE', 'Rebate (RE)')";
+								('PRM_FACTURA_DR', '801', 'Orden de Compra'), 
+								('PRM_FACTURA_DR', '802', 'Nota de Pedido'),
+								('PRM_FACTURA_DR', '803', 'Contrato'),
+								('PRM_FACTURA_DR', '814', 'Certificación de Depósito Bolsa Prod. Chile'),
+								('PRM_FACTURA_DR', '815', 'Vale de Prenda Bolsa Prod. Chile'),
+								('PRM_FACTURA_DR', 'HAS', 'Hoja Aceptación Servicio (HAS)'),
+								('PRM_FACTURA_DR', 'HES', 'Hoja Estado Servicio (HES)'),
+								('PRM_FACTURA_DR', 'HEM', 'Recepción de Material (HEM)'),
+								('PRM_FACTURA_DR', 'MER', 'Mercadería (MER)'),
+								('PRM_FACTURA_DR', 'SER', 'Servicio (SER)'),
+								('PRM_FACTURA_DR', 'CEC', 'Centro de Costo (CEC)'),
+								('PRM_FACTURA_DR', 'GD', 'Guía Devolución (GD)'),
+								('PRM_FACTURA_DR', 'RE', 'Rebate (RE)')";
 			}
 			break;
 	}
