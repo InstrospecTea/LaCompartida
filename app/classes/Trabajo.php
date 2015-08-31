@@ -436,7 +436,7 @@ class Trabajo extends Objeto
 
 			$cobro = new Cobro($sesion);
 			if (! $cobro->Load($id_cobro)) {
-				return __(__('El cobro') . ' que intenta modificar no se encuentra en la Base de Datos.');
+				return __('El cobro') . ' ' . _('que intenta modificar no se encuentra en el sistema') . '.';
 			}
 			$cobro->LoadAsuntos();
 			$continuar = false;
