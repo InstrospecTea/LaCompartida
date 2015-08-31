@@ -1,20 +1,20 @@
 <?php
 /**
- * El valor cobrado corresponde al monto subtotal (descontado) de la Liquidaci√≥n.
- * Esta informaci√≥n se obtiene de: Trabajos, Tr√°mites y Cobros sin trabajos ni tr√°mites
+ * El valor cobrado corresponde al monto subtotal (descontado) de la LiquidaciÛn.
+ * Esta informaciÛn se obtiene de: Trabajos, Tr·mites y Cobros sin trabajos ni tr·mites
  *
  * Condiciones para obtener un valor cobrado:
  * 	* Que exista un cobro en estado: EMITIDO, FACTURADO, ENVIADO AL CLIENTE,
  * 		PAGO PARCIAL o PAGADO
- *	* Que lo que se est√© cobrando sea Cobrable
+ *	* Que lo que se estÈ cobrando sea Cobrable
  *
- * M√°s info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Cobrado
+ * M·s info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Cobrado
  */
 class BilledAmountDataCalculator extends AbstractProportionalDataCalculator {
 
 	/**
 	 * Obtiene la query de trabajos correspondiente al valor cobrado
-	 * @param  Criteria $Criteria Query a la que se agregar√° el c√°lculo
+	 * @param  Criteria $Criteria Query a la que se agregar· el c·lculo
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
@@ -40,22 +40,12 @@ class BilledAmountDataCalculator extends AbstractProportionalDataCalculator {
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in(
-				'cobro.estado',
-				array(
-					'EMITIDO',
-					'FACTURADO',
-					'ENVIADO AL CLIENTE',
-					'PAGO PARCIAL',
-					'PAGADO'
-				)
-			)
-		);
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
 	}
 
 	/**
-	 * Obtiene la query de tr√°mites correspondiente al valor cobrado
-	 * @param  Criteria $Criteria Query a la que se agregar√° el c√°lculo
+	 * Obtiene la query de tr·mites correspondiente al valor cobrado
+	 * @param  Criteria $Criteria Query a la que se agregar· el c·lculo
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
@@ -83,8 +73,8 @@ class BilledAmountDataCalculator extends AbstractProportionalDataCalculator {
 	}
 
 	/**
-	 * Obtiene la query de cobros sin trabajos ni tr√°mites
-	 * @param  Criteria $Criteria Query a la que se agregar√° el c√°lculo
+	 * Obtiene la query de cobros sin trabajos ni tr·mites
+	 * @param  Criteria $Criteria Query a la que se agregar· el c·lculo
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {

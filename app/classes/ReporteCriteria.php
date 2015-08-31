@@ -676,7 +676,7 @@ class ReporteCriteria {
 				'areas_usuario' => null,
 				'categorias_usuario' => null,
 				'encargados' => null,
-				'estado_cobro' => null
+				'estado_cobro' => $this->parametros['estado_cobro']
 			);
 
 			$grouperFields = $this->agrupador;
