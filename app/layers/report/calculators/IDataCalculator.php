@@ -34,13 +34,13 @@ interface IDataCalculator {
 
 	/**
 	 * Construye la query de tramites
-	 * @return boolean
+	 * @return void
 	 */
 	function buildErrandQuery();
 
 	/**
 	 * Construye la query de cobros
-	 * @return boolean
+	 * @return void
 	 */
 	function buildChargeQuery();
 
@@ -65,5 +65,4 @@ interface IDataCalculator {
 	 * @param String $type       El tipo de query: [Works, Errands, Charges]
 	 */
 	function addFiltersToCriteria(Criteria $Criteria, $type);
-
 }
