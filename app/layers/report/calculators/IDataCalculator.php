@@ -28,7 +28,7 @@ interface IDataCalculator {
 
 	/**
 	 * Construye la query de trabajos
-	 * @return boolean
+	 * @return void
 	 */
 	function buildWorkQuery();
 
@@ -45,9 +45,25 @@ interface IDataCalculator {
 	function buildChargeQuery();
 
 	/**
-	 * Ejecuta las querys construidas
+	 * Ejecuta las querys construidas y retorna un array con
+	 * los resultados de todas las queries
 	 * @return array
 	 */
 	function calculate();
+
+	/**
+	 * Agrega los agrupadores a la Query dependiendo de los
+	 * grupos definidos
+	 * @param Criteria $Criteria La query a la que se agregarán los agrupadores
+	 * @param String   $type     El tipo de query: [Works, Errands, Charges]
+	 */
+	function addGroupersToCriteria(Criteria $Criteria, $type);
+
+	/**
+	 * Agrega los filtros a la query dependiendo de filtersFields
+	 * @param Criteria $Criteria Query a la que se agregarán lso filtros
+	 * @param String $type       El tipo de query: [Works, Errands, Charges]
+	 */
+	function addFiltersToCriteria(Criteria $Criteria, $type);
 
 }

@@ -1,9 +1,16 @@
 <?php
 
+/**
+ * Clase base para cada Calculador
+ */
 abstract class AbstractDataCalculator implements IDataCalculator {
 
 	private $Session;
 
+	/**
+	 * Filros permitidos por defecto para todos los calculadores y queries
+	 * @var array
+	 */
 	private $allowedFilters = array(
 		'clientes',
 		'usuarios',
@@ -17,8 +24,13 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'fecha_fin'
 	);
 
+	/**
+	 * Define los filtros que cancelan la ejecución de ciertas queries
+	 * @var array
+	 */
 	private $queryCancelatorsFilters = array(
 		'charge' => array(
+			'usuarios',
 			'areas_usuario',
 			'categorias_usuario'
 		),
@@ -26,6 +38,10 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'work' => array()
 	);
 
+	/**
+	 * Define una lista de filtros dependientes
+	 * @var array
+	 */
 	private $dependantFilters = array(
 		'fecha_ini',
 		'fecha_fin',
@@ -35,6 +51,10 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'id_moneda'
 	);
 
+	/**
+	 * Establece los agrupadores permitidos para todas las queries
+	 * @var array
+	 */
 	private $allowedGroupers = array(
 		'area_asunto',
 		'area_usuario',
@@ -64,6 +84,10 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'username'
 	);
 
+	/**
+	 * Establece los agrupadores para query de cobros
+	 * @var array
+	 */
 	private $chargeGroupers = array(
 		'area_asunto',
 		'tipo_asunto',
@@ -84,12 +108,23 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	private $ErrandsCriteria;
 	private $ChargesCriteria;
 
+	/**
+	 * Constructor
+	 * @param Sesion $Session       La sesión para la obtención de datos
+	 * @param Array $filtersFields  Array con campos a filtrar y sus valores
+	 * @param Array $grouperFields  Array con campos a agrupar
+	 */
 	public function __construct(Sesion $Session, $filtersFields, $grouperFields) {
 		$this->Session = $Session;
 		$this->filtersFields = $filtersFields;
 		$this->grouperFields = $grouperFields;
 	}
 
+	/**
+	 * Ejecuta las querys construidas y retorna un array con
+	 * los resultados de todas las queries
+	 * @return array
+	 */
 	public function calculate() {
 		$this->buildWorkQuery();
 		$this->buildErrandQuery();
@@ -98,28 +133,29 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$results = array();
 
 		if (!empty($this->WorksCriteria)) {
+			pr($this->WorksCriteria->get_plain_query());
 			$results = array_merge($results, $this->WorksCriteria->run());
 		}
 
+		if (!empty($this->ErrandsCriteria)) {
+			pr($this->ErrandsCriteria->get_plain_query());
+			$results = array_merge($results, $this->ErrandsCriteria->run());
+		}
+
 		if (!empty($this->ChargesCriteria)) {
+			pr($this->ChargesCriteria->get_plain_query());
 			$results = array_merge($results, $this->ChargesCriteria->run());
 		}
 
 		return $results;
 	}
 
-	public function getWorksCriteria() {
-		return $this->WorksCriteria;
-	}
-
-	public function getChargesCriteria() {
-		return $this->ChargesCriteria;
-	}
-
-	public function getErrandsCriteria() {
-		return $this->ErrandsCriteria;
-	}
-
+		/**
+	 * Agrega los agrupadores a la Query dependiendo de los
+	 * grupos definidos
+	 * @param Criteria $Criteria La query a la que se agregarán los agrupadores
+	 * @param String   $type     El tipo de query: [Works, Errands, Charges]
+	 */
 	function addGroupersToCriteria(Criteria $Criteria, $type) {
 		foreach ($this->grouperFields as $groupField) {
 			$class_prefix = $this->getClassPrefix($groupField);
@@ -130,7 +166,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 					"translateFor{$type}"
 				);
 				$Criteria = $reflectedMethod->invokeArgs(
-					$reflectedClass->newInstance(),
+					$reflectedClass->newInstance($this->Session),
 					array($Criteria)
 				);
 			} catch (ReflectionException $Exception) {
@@ -141,7 +177,12 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		return $Criteria;
 	}
 
-	function addFiltersToCriteria($Criteria, $type) {
+	/**
+	 * Agrega los filtros a la query dependiendo de filtersFields
+	 * @param Criteria $Criteria Query a la que se agregarán lso filtros
+	 * @param String $type       El tipo de query: [Works, Errands, Charges]
+	 */
+	function addFiltersToCriteria(Criteria $Criteria, $type) {
 		foreach ($this->filtersFields as $key => $value) {
 			if (empty($value)) {
 				continue;
@@ -187,6 +228,11 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		return $Criteria;
 	}
 
+	/**
+	 * Retorna el nombre de la Clase correspondiente a la key
+	 * @param  String $key Key de filtro o grupo
+	 * @return String Nombre Camelcaseado de la clase
+	 */
 	function getClassPrefix($key) {
 		$words = explode('_', $key);
 		$camelizedWords = array();
@@ -197,6 +243,11 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		return $constructedKey;
 	}
 
+	/**
+	 * Obtiene la query base para consultar Trabajos
+	 * @param  Criteria $Criteria Query donde se agregará lo necesario
+	 * @return void
+	 */
 	function getBaseWorkQuery(Criteria $Criteria) {
 		$Criteria->add_from('trabajo');
 
@@ -212,18 +263,32 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->addGroupersToCriteria($Criteria, 'Works');
 	}
 
+	/**
+	 * Obtiene la query base para consultar Trámites
+	 * @param  Criteria $Criteria Query donde se agregará lo necesario
+	 * @return void
+	 */
 	function getBaseErrandQuery($Criteria) {
 		$Criteria->add_from('tramite');
 
 		$Criteria
 			->add_left_join_with(
-				'cobro', CriteriaRestriction::equals('cobro.id_cobro', 'tramite.id_cobro')
+				'cobro',
+				CriteriaRestriction::equals(
+					'cobro.id_cobro',
+					'tramite.id_cobro'
+				)
 			);
 
 		$this->addFiltersToCriteria($Criteria, 'Errands');
 		$this->addGroupersToCriteria($Criteria, 'Errands');
 	}
 
+	/**
+	 * Obtiene la query base para consultar Cobros
+	 * @param  Criteria $Criteria Query donde se agregará lo necesario
+	 * @return void
+	 */
 	function getBaseChargeQuery($Criteria) {
 		$Criteria->add_from('cobro');
 
@@ -259,6 +324,10 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->addGroupersToCriteria($Criteria, 'Charges');
 	}
 
+	/**
+	 * Construye la query de trabajos
+	 * @return void
+	 */
 	function buildWorkQuery() {
 		$Criteria = new Criteria($this->Session);
 		$this->getBaseWorkQuery($Criteria);
@@ -266,6 +335,10 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->WorksCriteria = $Criteria;
 	}
 
+	/**
+	 * Construye la query de tramites
+	 * @return void
+	 */
 	function buildErrandQuery() {
 		$Criteria = new Criteria($this->Session);
 		$this->getBaseErrandQuery($Criteria);
@@ -273,6 +346,10 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->ErrandsCriteria = $Criteria;
 	}
 
+	/**
+	 * Construye la query de cobros
+	 * @return void
+	 */
 	function buildChargeQuery() {
 		if (!$this->cancelQuery('charge')) {
 			$Criteria = new Criteria($this->Session);
@@ -285,6 +362,10 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		return $this->ChargesCriteria;
 	}
 
+	/**
+	 * Obtiene los filtros por los cuales se podrá filtrar
+	 * @return array
+	 */
 	function getAllowedFilters() {
 		return array_diff(
 			$this->allowedFilters,
@@ -292,10 +373,18 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		);
 	}
 
+	/**
+	 * Obtiene los agrupadores por los cuales no se podrán filtrar
+	 * @return array
+	 */
 	function getNotAllowedFilters() {
 		return array();
 	}
 
+	/**
+	 * Obtiene los agrupadores por los cuales se podrán agrupar y ordenar
+	 * @return array
+	 */
 	function getAllowedGroupers() {
 		return array_diff(
 			$this->allowedGroupers,
@@ -303,14 +392,28 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		);
 	}
 
+	/**
+	 * Obtiene los agrupadores por los cuales no se podrán agrupar y ordenar
+	 * @return array
+	 */
 	function getNotAllowedGroupers() {
 		return array();
 	}
 
+	/**
+	 * Devuelve si el filtro es dependiente o no
+	 * @param  String $key Key o Field del filtro
+	 * @return boolean     si es dependiente o no
+	 */
 	function isDependantFilter($key) {
 		return in_array($key, $this->dependantFilters);
 	}
 
+	/**
+	 * Devuelve si debe o no cancelar la query
+	 * @param  String $kind Es el tipo de query [Works, Errands, Charges]
+	 * @return boolean			debe o no cancelar la query
+	 */
 	function cancelQuery($kind) {
 		foreach ($this->filtersFields as $key => $value) {
 			if (in_array($key, $this->queryCancelatorsFilters[$kind]) && !empty($value)) {

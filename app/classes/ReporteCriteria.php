@@ -669,8 +669,8 @@ class ReporteCriteria {
 				'campo_fecha' => $this->parametros['campo_fecha'],
 				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
 				'fecha_fin' => Utiles::fecha2sql($this->parametros['fecha_fin']),
+				'usuarios' => $this->parametros['usuarios'],
 				'clientes' => null,
-				'usuarios' => null,
 				'tipos_asunto' => null,
 				'areas_asunto' => null,
 				'areas_usuario' => null,
@@ -691,19 +691,6 @@ class ReporteCriteria {
 			);
 
 			$this->row = $calculator->calculate();
-
-			$criteria = $calculator->getWorksCriteria();
-			if (!empty($criteria)) {
-				pr($criteria->get_plain_query());
-			}
-			$criteria = $calculator->getErrandsCriteria();
-			if (!empty($criteria)) {
-				pr($criteria->get_plain_query());
-			}
-			$criteria = $calculator->getChargesCriteria();
-			if (!empty($criteria)) {
-				pr($criteria->get_plain_query());
-			}
 
 			return;
 		}
