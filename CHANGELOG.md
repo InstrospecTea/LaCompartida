@@ -1,4 +1,11 @@
 # Changelog
+## [Release 15.18.0](https://github.com/LemontechSA/ttb/pull/1104)
+Tuesday 2015, September 1st
+* **Feature** [Mejorar mensajes cobro masivo](https://github.com/LemontechSA/ttb/pull/1073)
+* **Feature** [Solicitud mejoras](https://github.com/LemontechSA/ttb/pull/1089)
+* **Feature** [Error SQL al actualizar cobro](https://github.com/LemontechSA/ttb/pull/1095)
+* **Feature** [nuevos datos facturacion electronica chile](https://github.com/LemontechSA/ttb/pull/1098)
+
 ## Hotfix 15.17.7
 Monday 2015, August 31th
 * **Fix** [Se corrige codificación en archivo MontoEnPalabra.php](https://github.com/LemontechSA/ttb/pull/1101)
