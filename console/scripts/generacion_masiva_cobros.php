@@ -114,7 +114,7 @@ class GeneracionMasivaCobros extends AppShell {
 			try {
 				++$processing;
 				$msg_procesando = $this->sp($processing, "1 contrato", "{$processing} contratos");
-				$this->status('proceso', "Procesando $msg_procesando de {$total_contratos}.");
+				$this->status('proceso', "Procesando {$msg_procesando} de {$total_contratos}.");
 				if ($contrato['separar_liquidaciones']) {
 					$this->generaHH($contrato['id_contrato']);
 					$this->generaGG($contrato['id_contrato']);
@@ -127,7 +127,7 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->log(' |- Uso de memoria ' . \TTB\Utiles::_h(memory_get_usage()) . ', sistema ' . \TTB\Utiles::_h(memory_get_usage(1)));
 		}
 		$msg_procesando = $this->sp($processing, "Se ha procesado 1 contrato de {$total_contratos}", "Se han procesado {$processing} contratos de {$total_contratos}");
-		$this->status('proceso', "$msg_procesando.");
+		$this->status('proceso', "{$msg_procesando}.");
 	}
 
 	/**
@@ -154,7 +154,7 @@ class GeneracionMasivaCobros extends AppShell {
 			try {
 				++$processing;
 				$msg_procesando = $this->sp($processing, '1 cliente', "{$processing} clientes");
-				$this->status('proceso', "Procesando $msg_procesando de {$total_clientes}.");
+				$this->status('proceso', "Procesando {$msg_procesando} de {$total_clientes}.");
 				foreach ($contratos as $contrato) {
 					if ($contrato['separar_liquidaciones']) {
 						$this->generaHH($contrato['id_contrato']);
@@ -169,7 +169,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		}
 		$msg_procesando = $this->sp($processing, 'ha procesado 1 cliente', "han procesado {$processing}");
-		$this->status('proceso', "Se $msg_procesando de {$total_clientes}.");
+		$this->status('proceso', "Se {$msg_procesando} de {$total_clientes}.");
 	}
 
 	/**
@@ -203,7 +203,7 @@ class GeneracionMasivaCobros extends AppShell {
 				$this->generated['gg'], 'Se ha generado 1 liquidación de gastos', "Se han generado {$this->generated['gg']} liquidaciones de gastos", 'No se han generado liquidaciones de gastos'
 		);
 		$msg_error = $this->sp($this->errors['gg'], '1 con error', "{$this->errors['gg']} con errores", 'sin errores');
-		$this->status('gg', "$msg_generado. ($msg_error $mensajes)");
+		$this->status('gg', "{$msg_generado}. ({$msg_error} {$mensajes})");
 	}
 
 	/**
@@ -237,7 +237,7 @@ class GeneracionMasivaCobros extends AppShell {
 				$this->generated['hh'], 'Se ha generado 1 liquidación de honorarios', "Se han generado {$this->generated['hh']} liquidaciones de honorarios", 'No se han generado liquidaciones de honorarios'
 		);
 		$msg_error = $this->sp($this->errors['hh'], '1 con error', "{$this->errors['hh']} con errores", 'sin errores');
-		$this->status('hh', "$msg_generado. ($msg_error $mensajes)");
+		$this->status('hh', "{$msg_generado}. ({$msg_error} {$mensajes})");
 	}
 
 	/**
@@ -277,7 +277,7 @@ class GeneracionMasivaCobros extends AppShell {
 		);
 		$mensajes = $this->getMessage('mixtas');
 		$msg_error = $this->sp($this->errors['mixtas'], '1 con error', "{$this->errors['mixtas']} con errores", 'sin errores');
-		$this->status('mixtas', "$msg_generado. ($msg_error $mensajes)");
+		$this->status('mixtas', "{$msg_generado}. ({$msg_error} {$mensajes})");
 	}
 
 	/**
