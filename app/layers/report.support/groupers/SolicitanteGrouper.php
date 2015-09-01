@@ -1,17 +1,17 @@
 <?php
 /**
- * Agrupador por Solicitante del trabajo o trÃ¡mites
+ * Agrupador por Solicitante del trabajo o trámites
  *
  * * Agrupa por: solicitante
  * * Muestra: solicitante
  * * Ordena por:  solicitante
  *
- * MÃ¡s info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Solicitante
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Solicitante
  */
 class  extends AbstractGrouperTranslator {
 
 	/**
-	 * Obtiene el campo por el cual se agruparÃ¡ la query
+	 * Obtiene el campo por el cual se agrupará la query
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
@@ -19,16 +19,16 @@ class  extends AbstractGrouperTranslator {
 	}
 
 	/**
-	 * Obtiene el campo de grupo que se devolverÃ¡ en el SELECT de la query
-	 * @return String par tabla.campo o alias de funciÃ³n
+	 * Obtiene el campo de grupo que se devolverá en el SELECT de la query
+	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
 		return "solicitante";
 	}
 
 	/**
-	 * Obtiene el campo de grupo por el cual se ordenarÃ¡ la query
-	 * @return String par tabla.campo o alias de funciÃ³n
+	 * Obtiene el campo de grupo por el cual se ordenará la query
+	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
 		return "solicitante";
@@ -49,8 +49,8 @@ class  extends AbstractGrouperTranslator {
 	}
 
 	/**
-	 * Traduce los keys de agrupadores a campos para la query de TrÃ¡mites
-	 * Solicitante del trÃ¡mite tramite.solicitante
+	 * Traduce los keys de agrupadores a campos para la query de Trámites
+	 * Solicitante del trámite tramite.solicitante
 	 * @return void
 	 */
 	function translateForErrands(Criteria $Criteria) {
