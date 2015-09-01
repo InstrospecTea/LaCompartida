@@ -45,7 +45,7 @@ class ReporteCriteria {
 	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
 
 	private $newCalculation = array(
-		'valor_cobrado' => 'BilledAmount',
+		'valor_cobrado' => 'ValorCobrado',
 		'horas_castigadas' => null,
 		'horas_cobrables' => null,
 		'horas_cobradas' => null,
@@ -60,11 +60,11 @@ class ReporteCriteria {
 		'horas_visibles' => null,
 		'costo' => null,
 		'costo_hh' => null,
-		'diferencia_valor_estandar' => 'DifferenceStandardBilledAmount',
+		'diferencia_valor_estandar' => 'DiferenciaValorEstandar',
 		'rentabilidad' => null,
 		'rentabilidad_base' => null,
 		'valor_cobrado_no_estandar' => null,
-		'valor_estandar' => 'StandardBilledAmount',
+		'valor_estandar' => 'ValorCobradoEstandar',
 		'valor_hora' => null,
 		'valor_incobrable' => null,
 		'valor_pagado' => null,
@@ -73,7 +73,7 @@ class ReporteCriteria {
 		'valor_por_pagar' => null,
 		'valor_por_pagar_parcial' => null,
 		'valor_trabajado_estandar' => null,
-		'valor_tramites' => 'BilledErrandsAmount'
+		'valor_tramites' => 'ValorCobradoTramites'
 	);
 
 	const TIPO_TRABAJOS = 0;
