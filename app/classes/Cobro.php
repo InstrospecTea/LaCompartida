@@ -1207,6 +1207,8 @@ if (!class_exists('Cobro')) {
 				$lista_trabajos->num = 0;
 			}
 
+			$tarifa_cache = array();
+
 			if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 				list($cobro_total_honorario_cobrable, $cobro_total_minutos) = $this->MontoHonorariosEscalonados($lista_trabajos);
 			} else {
@@ -1225,17 +1227,59 @@ if (!class_exists('Cobro')) {
 					// por trabajo, si no saca lo del contrato actual
 					if (Conf::GetConf($this->sesion, 'GuardarTarifaAlIngresoDeHora')) {
 						// Según Tarifa del contrato
-						$profesional[$id_usuario]['tarifa'] = Funciones::TrabajoTarifa($this->sesion, $trabajo->fields['id_trabajo'], $this->fields['id_moneda']);
+						$cache_key = "trabajo_tarifa_{$trabajo->fields['id_trabajo']}_{$this->fields['id_moneda']}";
+						if (isset($tarifa_cache[$cache_key])) {
+							$valor = $tarifa_cache[$cache_key];
+						} else {
+							$valor = Funciones::TrabajoTarifa($this->sesion, $trabajo->fields['id_trabajo'], $this->fields['id_moneda']);
+							$tarifa_cache[$cache_key] = $valor;
+						}
+						$profesional[$id_usuario]['tarifa'] = $valor;
 						// Según Tarifa estándar del sistema
-						$profesional[$id_usuario]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda']);
+						$cache_key = "tarifa_defecto_{$trabajo->fields['id_usuario']}_{$this->fields['id_moneda']}";
+						if (isset($tarifa_cache[$cache_key])) {
+							$valor = $tarifa_cache[$cache_key];
+						} else {
+							$valor = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda']);
+							$tarifa_cache[$cache_key] = $valor;
+						}
+						$profesional[$id_usuario]['tarifa_defecto'] = $valor;
 						// Según tarifa estándar de sistema y si no existe tarifa en moneda indicada buscar mejor tarifa en otra moneda
-						$profesional[$id_usuario]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $this->fields['id_cobro']);
+						$cache_key = "mejor_tarifa_{$trabajo->fields['id_usuario']}_{$this->fields['id_moneda']}_{$this->fields['id_cobro']}";
+						if (isset($tarifa_cache[$cache_key])) {
+							$valor = $tarifa_cache[$cache_key];
+						} else {
+							$valor = Funciones::MejorTarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $this->fields['id_cobro']);
+							$tarifa_cache[$cache_key] = $valor;
+						}
+						$profesional[$id_usuario]['tarifa_hh_estandar'] = $valor;
 					} else if ($profesional[$id_usuario]['tarifa'] == '') {
-						$profesional[$id_usuario]['tarifa'] = Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $trabajo->fields['codigo_asunto']);
+						$cache_key = "tarifa_{$trabajo->fields['id_usuario']}_{$this->fields['id_moneda']}_{$trabajo->fields['codigo_asunto']}";
+						if (isset($tarifa_cache[$cache_key])) {
+							$valor = $tarifa_cache[$cache_key];
+						} else {
+							$valor = Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $trabajo->fields['codigo_asunto']);
+							$tarifa_cache[$cache_key] = $valor;
+						}
+						$profesional[$id_usuario]['tarifa'] = $valor;
 
-						$profesional[$id_usuario]['tarifa_defecto'] = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda']);
+						$cache_key = "tarifa_defecto_{$trabajo->fields['id_usuario']}_{$this->fields['id_moneda']}";
+						if (isset($tarifa_cache[$cache_key])) {
+							$valor = $tarifa_cache[$cache_key];
+						} else {
+							$valor = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda']);
+							$tarifa_cache[$cache_key] = $valor;
+						}
+						$profesional[$id_usuario]['tarifa_defecto'] = $valor;
 
-						$profesional[$id_usuario]['tarifa_hh_estandar'] = Funciones::MejorTarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $this->fields['id_cobro']);
+						$cache_key = "mejor_tarifa_{$trabajo->fields['id_usuario']}_{$this->fields['id_moneda']}_{$this->fields['id_cobro']}";
+						if (isset($tarifa_cache[$cache_key])) {
+							$valor = $tarifa_cache[$cache_key];
+						} else {
+							$valor = Funciones::MejorTarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $this->fields['id_cobro']);
+							$tarifa_cache[$cache_key] = $valor;
+						}
+						$profesional[$id_usuario]['tarifa_hh_estandar'] = $valor;
 					}
 
 					// Se calcula el valor del trabajo, según el tiempo trabajado y la tarifa
@@ -1310,7 +1354,16 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
 					$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
 					$trabajo->Edit('tarifa_hh', $profesional[$id_usuario]['tarifa']);
-					$valor_estandar = Funciones::TarifaDefecto($this->sesion, $id_usuario, $this->fields['id_moneda']);
+
+					$cache_key = "tarifa_defecto_{$id_usuario}_{$this->fields['id_moneda']}";
+					if (isset($tarifa_cache[$cache_key])) {
+						$valor = $tarifa_cache[$cache_key];
+					} else {
+						$valor = Funciones::TarifaDefecto($this->sesion, $id_usuario, $this->fields['id_moneda']);
+						$tarifa_cache[$cache_key] = $valor;
+					}
+					$valor_estandar = $valor;
+
 					$trabajo->ActualizarTrabajoTarifa($this->fields['id_moneda'], $profesional[$id_usuario]['tarifa'], '', $valor_estandar);
 					$trabajo->Edit('monto_cobrado', number_format($valor_a_cobrar, 6, '.', ''));
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
@@ -1389,7 +1442,16 @@ if (!class_exists('Cobro')) {
 					} else {
 						$factor = 1;
 					}
-					$valor_estandar = Funciones::TarifaDefecto($this->sesion, $id_usuario, $trabajo->fields['id_moneda']);
+
+					$cache_key = "tarifa_defecto_{$trabajo->fields['id_usuario']}_{$this->fields['id_moneda']}";
+					if (isset($tarifa_cache[$cache_key])) {
+						$valor = $tarifa_cache[$cache_key];
+					} else {
+						$valor = Funciones::TarifaDefecto($this->sesion, $id_usuario, $trabajo->fields['id_moneda']);
+						$tarifa_cache[$cache_key] = $valor;
+					}
+					$valor_estandar = $valor;
+
 					$trabajo->ActualizarTrabajoTarifa($trabajo->fields['id_moneda'], number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''), '', $valor_estandar);
 					$trabajo->Edit('tarifa_hh', number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''));
 					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
