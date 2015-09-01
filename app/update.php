@@ -10914,6 +10914,11 @@ QUERY;
 			$queries = array("ALTER TABLE `bloqueo_procesos`
 				CHANGE COLUMN `estado` `estado` TEXT NOT NULL DEFAULT ''");
 			break;
+
+		case 8.14;
+			$queries = array(
+					"ALTER TABLE `factura` ADD `dte_folio_fiscal` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `dte_comentario`;"
+				);
 	}
 
 	if (!empty($queries)) {
@@ -10926,7 +10931,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.13;
+$max_update = 8.14;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
