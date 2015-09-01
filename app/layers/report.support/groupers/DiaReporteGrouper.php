@@ -8,7 +8,7 @@
  *
  * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Dia-Reporte
  */
-class  extends AbstractGrouperTranslator {
+class DiaReporteGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Obtiene el campo por el cual se agrupará la query

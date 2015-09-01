@@ -3,12 +3,12 @@
  * Agrupador por Glosa del Grupo (Holding) del cliente
  *
  * * Agrupa por: cliente.id_grupo_cliente
- * * Muestra: IFNULL(grupo_cliente.glosa_grupo_cliente, {$this->undefinedField()})
- * * Ordena por:  IFNULL(grupo_cliente.glosa_grupo_cliente, {$this->undefinedField()})
+ * * Muestra: IFNULL(grupo_cliente.glosa_grupo_cliente, {$this->getUndefinedField()})
+ * * Ordena por:  IFNULL(grupo_cliente.glosa_grupo_cliente, {$this->getUndefinedField()})
  *
  * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Glosa-Grupo-Cliente
  */
-class  extends AbstractGrouperTranslator {
+class GlosaGrupoClienteGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Obtiene el campo por el cual se agrupará la query
@@ -23,7 +23,7 @@ class  extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return "IFNULL(grupo_cliente.glosa_grupo_cliente, {$this->undefinedField()})";
+		return "IFNULL(grupo_cliente.glosa_grupo_cliente, {$this->getUndefinedField()})";
 	}
 
 	/**
@@ -31,7 +31,7 @@ class  extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
-		return "IFNULL(grupo_cliente.glosa_grupo_cliente, {$this->undefinedField()})";
+		return "IFNULL(grupo_cliente.glosa_grupo_cliente, {$this->getUndefinedField()})";
 	}
 
 	/**

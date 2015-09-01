@@ -8,7 +8,7 @@
  *
  * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Mes-Emision
  */
-class  extends AbstractGrouperTranslator {
+class MesEmisionGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Obtiene el campo por el cual se agrupará la query

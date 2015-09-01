@@ -8,7 +8,7 @@
  *
  * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Grupo-O-Cliente
  */
-class  extends AbstractGrouperTranslator {
+class GrupoOClienteGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Obtiene el campo por el cual se agrupará la query

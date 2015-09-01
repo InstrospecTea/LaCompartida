@@ -8,7 +8,7 @@
  *
  * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Id-Trabajo
  */
-class  extends AbstractGrouperTranslator {
+class IdTrabajoGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Obtiene el campo por el cual se agrupará la query
@@ -36,7 +36,7 @@ class  extends AbstractGrouperTranslator {
 
 	/**
 	 * Traduce los keys de agrupadores a campos para la query de Cobros
-	 * $this->undefinedField()
+	 * $this->getUndefinedField()
 	 * @return void
 	 */
 	function translateForCharges(Criteria $Criteria) {
@@ -50,7 +50,7 @@ class  extends AbstractGrouperTranslator {
 
 	/**
 	 * Traduce los keys de agrupadores a campos para la query de Trámites
-	 * $this->undefinedField()
+	 * $this->getUndefinedField()
 	 * @return void
 	 */
 	function translateForErrands(Criteria $Criteria) {
