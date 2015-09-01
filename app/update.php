@@ -10886,7 +10886,7 @@ QUERY;
 								('PRM_FACTURA_DR', '50', 'Gu�a de Despacho'), 
 								('PRM_FACTURA_DR', '52', 'Gu�a Electr�nica'), 
 								('PRM_FACTURA_DR', '801', 'Orden Compra'), 
-								('PRM_FACTURA_DR', '802', 'Nota de Pedido')";
+								('PRM_FACTURA_DR', '802', 'Nota de Pedido');";
 			} else if ($archivo['archivo_nombre'] == 'facturacion_electronica_cl.php') {
 				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES 
 								('PRM_FACTURA_DR', '801', 'Orden de Compra'), 
@@ -10901,10 +10901,16 @@ QUERY;
 								('PRM_FACTURA_DR', 'SER', 'Servicio (SER)'),
 								('PRM_FACTURA_DR', 'CEC', 'Centro de Costo (CEC)'),
 								('PRM_FACTURA_DR', 'GD', 'Gu�a Devoluci�n (GD)'),
-								('PRM_FACTURA_DR', 'RE', 'Rebate (RE)')";
+								('PRM_FACTURA_DR', 'RE', 'Rebate (RE)');";
 			}
 			break;
+
 		case 8.12:
+			$queries = array(
+				"ALTER TABLE `cobro` ADD `opc_mostrar_asuntos_cobrables_sin_horas` TINYINT(1)  UNSIGNED  NOT NULL  DEFAULT '0'  AFTER `opc_ver_asuntos_separados`;"
+			);
+			break;
+		case 8.13:
 			$queries = array("ALTER TABLE `bloqueo_procesos`
 				CHANGE COLUMN `estado` `estado` TEXT NOT NULL DEFAULT ''");
 			break;
@@ -10920,7 +10926,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atr�s no tienen soporte
-$max_update = 8.12;
+$max_update = 8.13;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

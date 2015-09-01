@@ -56,6 +56,7 @@ class ProcessLockController extends AbstractController {
 		$data = $this->data;
 		$data['user_id'] = $this->Session->usuario->fields['id_usuario'];
 		$data['form']['cobrosencero'] = (empty($this->data['cobrosencero'])? 0 : 1);
+		$data['form']['cobros_en_revision'] = (empty($this->data['cobros_en_revision'])? 0 : 1);
 		$log_folder = Log::getFolder();
 		$shell_cmd = sprintf("%s/console/console %s --domain=%s --subdir=%s --data='%s' >> {$log_folder}/ProcessLocking.exec.log &", ROOT_PATH, $shell, SUBDOMAIN, ROOTDIR, json_encode($data));
 		exec($shell_cmd);
