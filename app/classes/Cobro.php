@@ -1058,7 +1058,7 @@ if (!class_exists('Cobro')) {
 		// actual guardado en la configuracion sino el dato traspasado
 		function GuardarCobro($emitir = false, $mantener_porcentaje_impuesto = false) {
 			if (!in_array($this->fields['estado'], array('CREADO', 'EN REVISION', ''))) {
-				return "No se puede guardar " . __('el cobro') . " ya que ya se encuentra emitido. Usted debe volver " . __('el cobro') . " a estado creado o en revisión para poder actualizarlo";
+				return __('No se puede guardar'). " " . __('el cobro') ." " . __('ya que ya se encuentra emitido') .". " . __('Usted debe volver') . " " . __('el cobro') . " " . __('a estado creado o en revisión para poder actualizarlo');
 			}
 
 			// Carga de asuntos del cobro
@@ -1154,7 +1154,7 @@ if (!class_exists('Cobro')) {
 					$tramite->Edit('tarifa_tramite_estandar', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar']);
 
 					if (!$tramite->Write()) {
-						return "Error, trámite #{$tramite->fields['id_tramite']} no se pudo guardar (Cobro {$this->fields['id_cobro']})";
+						return __('Error, trámite') ." #{$tramite->fields['id_tramite']} " . __('no se pudo guardar (Cobro') . " {$this->fields['id_cobro']})";
 					}
 				}
 			}
@@ -1317,7 +1317,7 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $moneda_del_cobro->fields['cifras_decimales'], '.', ''));
 					if (!$trabajo->Write()) {
-						return "Error, trabajo #{$trabajo->fields['id_trabajo']} no se pudo guardar (Cobro {$this->fields['id_cobro']})";
+						return __('Error, trabajo') . " #{$trabajo->fields['id_trabajo']} " . __('no se pudo guardar (Cobro') . " {$this->fields['id_cobro']})";
 					}
 				} #End for cobros
 			}
@@ -1371,7 +1371,7 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $moneda_del_cobro->fields['cifras_decimales'], '.', ''));
 					if (!$trabajo->Write(false)) {
-						return "Error, trabajo #{$trabajo->fields['id_trabajo']} no se pudo guardar (Cobro {$this->fields['id_cobro']})";
+						return __('Error, trabajo') . " #{$trabajo->fields['id_trabajo']} " . __('no se pudo guardar (Cobro') . " {$this->fields['id_cobro']})";
 					}
 				}
 			}
@@ -2319,7 +2319,7 @@ if (!class_exists('Cobro')) {
 							$this->mensajes .= $resultado_guardar;
 						}
 					} else {
-						$this->mensajes .= "No se ha podido generar el cobro para el cliente {$Contrato->fields['codigo_cliente']}";
+						$this->mensajes .= __('No se ha podido generar el cobro para el cliente') ." {$Contrato->fields['codigo_cliente']}";
 					}
 				} // END cobro
 			} // END contrato

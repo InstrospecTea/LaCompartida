@@ -47,7 +47,7 @@ class GeneracionMasivaCobros extends AppShell {
 				$this->clients($contratos);
 			}
 		} catch (Exception $e) {
-			$this->status('error', 'Ocurrio un error inesperado');
+			$this->status('error', __('Ocurrio un error inesperado'));
 		}
 		$this->unlookProcess();
 	}
@@ -113,8 +113,8 @@ class GeneracionMasivaCobros extends AppShell {
 		foreach ($contratos as $contrato) {
 			try {
 				++$processing;
-				$msg_procesando = $this->sp($processing, "1 contrato", "{$processing} contratos");
-				$this->status('proceso', "Procesando {$msg_procesando} de {$total_contratos}.");
+				$msg_procesando = $this->sp($processing, __('1 contrato'), "{$processing} " . __('contratos'));
+				$this->status('proceso', __('Procesando') . " {$msg_procesando} " . __('de') . " {$total_contratos}.");
 				if ($contrato['separar_liquidaciones']) {
 					$this->generaHH($contrato['id_contrato']);
 					$this->generaGG($contrato['id_contrato']);
@@ -126,7 +126,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 			$this->log(' |- Uso de memoria ' . \TTB\Utiles::_h(memory_get_usage()) . ', sistema ' . \TTB\Utiles::_h(memory_get_usage(1)));
 		}
-		$msg_procesando = $this->sp($processing, "Se ha procesado 1 contrato de {$total_contratos}", "Se han procesado {$processing} contratos de {$total_contratos}");
+		$msg_procesando = $this->sp($processing, __('Se ha procesado 1 contrato de') . " {$total_contratos}", __('Se han procesado') . " {$processing} " . __('contratos de') . " {$total_contratos}");
 		$this->status('proceso', "{$msg_procesando}.");
 	}
 
@@ -153,8 +153,8 @@ class GeneracionMasivaCobros extends AppShell {
 		foreach ($clientes as $codigo_cliente => $contratos) {
 			try {
 				++$processing;
-				$msg_procesando = $this->sp($processing, '1 cliente', "{$processing} clientes");
-				$this->status('proceso', "Procesando {$msg_procesando} de {$total_clientes}.");
+				$msg_procesando = $this->sp($processing, __('1 cliente'), "{$processing} ". __('clientes'));
+				$this->status('proceso', __('Procesando') . " {$msg_procesando} " . __('de') . " {$total_clientes}.");
 				foreach ($contratos as $contrato) {
 					if ($contrato['separar_liquidaciones']) {
 						$this->generaHH($contrato['id_contrato']);
@@ -168,8 +168,8 @@ class GeneracionMasivaCobros extends AppShell {
 				$this->log('Error clients: ' . $e->getMessage());
 			}
 		}
-		$msg_procesando = $this->sp($processing, 'ha procesado 1 cliente', "han procesado {$processing}");
-		$this->status('proceso', "Se {$msg_procesando} de {$total_clientes}.");
+		$msg_procesando = $this->sp($processing, __('Se ha procesado 1 cliente'), __('Se han procesado') . " {$processing}");
+		$this->status('proceso', "{$msg_procesando} " . __('de') . " {$total_clientes}.");
 	}
 
 	/**
@@ -200,9 +200,8 @@ class GeneracionMasivaCobros extends AppShell {
 		}
 		$mensajes = $this->getMessage('gg');
 		$msg_generado = $this->sp(
-				$this->generated['gg'], 'Se ha generado 1 liquidación de gastos', "Se han generado {$this->generated['gg']} liquidaciones de gastos", 'No se han generado liquidaciones de gastos'
-		);
-		$msg_error = $this->sp($this->errors['gg'], '1 con error', "{$this->errors['gg']} con errores", 'sin errores');
+				$this->generated['gg'], __('Se ha generado') . ' 1 ' . __('liquidación de gastos'), __('Se han generado') . " {$this->generated['gg']} " . __('liquidaciones de gastos'), __('No se han generado liquidaciones de gastos'));
+		$msg_error = $this->sp($this->errors['gg'], __('1 con error'), "{$this->errors['gg']} " . __('con errores'), __('sin errores'));
 		$this->status('gg', "{$msg_generado}. ({$msg_error} {$mensajes})");
 	}
 
@@ -234,9 +233,8 @@ class GeneracionMasivaCobros extends AppShell {
 		}
 		$mensajes = $this->getMessage('hh');
 		$msg_generado = $this->sp(
-				$this->generated['hh'], 'Se ha generado 1 liquidación de honorarios', "Se han generado {$this->generated['hh']} liquidaciones de honorarios", 'No se han generado liquidaciones de honorarios'
-		);
-		$msg_error = $this->sp($this->errors['hh'], '1 con error', "{$this->errors['hh']} con errores", 'sin errores');
+				$this->generated['hh'], __('Se ha generado 1 liquidación de honorarios'), __('Se han generado') . " {$this->generated['hh']} " . __('liquidaciones de honorarios'), __('No se han generado liquidaciones de honorarios'));
+		$msg_error = $this->sp($this->errors['hh'], __('1 con error'), "{$this->errors['hh']} " . __('con errores'), __('sin errores'));
 		$this->status('hh', "{$msg_generado}. ({$msg_error} {$mensajes})");
 	}
 
@@ -273,10 +271,9 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->status('mensajes', $e->getMessage());
 		}
 		$msg_generado = $this->sp(
-				$this->generated['mixtas'], 'Se ha generado 1 liquidación mixta', "Se han generado {$this->generated['mixtas']} liquidaciones mixtas", 'No se han generado liquidaciones mixtas'
-		);
+				$this->generated['mixtas'], __('Se ha generado 1 liquidación mixta'), __('Se han generado') . " {$this->generated['mixtas']} " . __('liquidaciones mixtas'), __('No se han generado liquidaciones mixtas'));
 		$mensajes = $this->getMessage('mixtas');
-		$msg_error = $this->sp($this->errors['mixtas'], '1 con error', "{$this->errors['mixtas']} con errores", 'sin errores');
+		$msg_error = $this->sp($this->errors['mixtas'], __('1 con error'), "{$this->errors['mixtas']} " . __('con errores'), __('sin errores'));
 		$this->status('mixtas', "{$msg_generado}. ({$msg_error} {$mensajes})");
 	}
 
@@ -291,11 +288,11 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $this->statusText());
 		} catch (PDOException $e) {
 			$this->log('ERROR: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
-			$this->status['error'] = 'Ocurrio un error inesperado.';
+			$this->status['error'] = __('Ocurrio un error inesperado.');
 			++$this->errors[$type];
 		} catch (Exception $e) {
 			$this->log('ERROR: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
-			$this->status['error'] = 'Ocurrio un error inesperado.';
+			$this->status['error'] = __('Ocurrio un error inesperado.');
 			++$this->errors[$type];
 		}
 	}
