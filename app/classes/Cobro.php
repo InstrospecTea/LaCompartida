@@ -1261,7 +1261,7 @@ if (!class_exists('Cobro')) {
 							$valor = Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $trabajo->fields['codigo_asunto']);
 							$tarifa_cache[$cache_key] = $valor;
 						}
-						$profesional[$id_usuario]['tarifa'] = Funciones::Tarifa($this->sesion, $trabajo->fields['id_usuario'], $this->fields['id_moneda'], $trabajo->fields['codigo_asunto']);
+						$profesional[$id_usuario]['tarifa'] = $valor;
 
 						$cache_key = "tarifa_defecto_{$trabajo->fields['id_usuario']}_{$this->fields['id_moneda']}";
 						if (isset($tarifa_cache[$cache_key])) {
