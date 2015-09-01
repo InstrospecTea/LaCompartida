@@ -41,9 +41,9 @@ class IdTrabajoGrouper extends AbstractGrouperTranslator {
 	 */
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'id_trabajo')
-			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
+			->add_select($this->getUndefinedField(), 'id_trabajo')
+			->add_grouping($this->getUndefinedField())
+			->add_ordering($this->getUndefinedField());
 
 		return $Criteria;
 	}
@@ -55,9 +55,9 @@ class IdTrabajoGrouper extends AbstractGrouperTranslator {
 	 */
 	function translateForErrands(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'id_trabajo')
-			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
+			->add_select($this->getUndefinedField(), 'id_trabajo')
+			->add_grouping($this->getUndefinedField())
+			->add_ordering($this->getUndefinedField());
 
 		return $Criteria;
 	}
