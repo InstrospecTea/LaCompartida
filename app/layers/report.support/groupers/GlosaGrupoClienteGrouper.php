@@ -43,7 +43,13 @@ class GlosaGrupoClienteGrouper extends AbstractGrouperTranslator {
 		$Criteria
 			->add_select($this->getSelectField(), 'glosa_grupo_cliente')
 			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
+			->add_ordering($this->getOrderField())
+			->add_left_join_with('contrato',
+				CriteriaRestriction::equals('contrato.id_contrato', 'cobro.id_contrato'))
+			->add_left_join_with('cliente',
+				CriteriaRestriction::equals('cliente.codigo_cliente', 'contrato.codigo_cliente'))
+			->add_left_join_with('grupo_cliente',
+				CriteriaRestriction::equals('grupo_cliente.id_grupo_cliente', 'cliente.id_grupo_cliente'));
 
 		return $Criteria;
 	}
@@ -57,7 +63,13 @@ class GlosaGrupoClienteGrouper extends AbstractGrouperTranslator {
 		$Criteria
 			->add_select($this->getSelectField(), 'glosa_grupo_cliente')
 			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
+			->add_ordering($this->getOrderField())
+			->add_left_join_with('asunto',
+				CriteriaRestriction::equals('asunto.codigo_asunto', 'tramite.codigo_asunto'))
+			->add_left_join_with('cliente',
+				CriteriaRestriction::equals('cliente.codigo_cliente', 'asunto.codigo_cliente'))
+			->add_left_join_with('grupo_cliente',
+				CriteriaRestriction::equals('grupo_cliente.id_grupo_cliente', 'cliente.id_grupo_cliente'));
 
 		return $Criteria;
 	}
@@ -71,7 +83,13 @@ class GlosaGrupoClienteGrouper extends AbstractGrouperTranslator {
 		$Criteria
 			->add_select($this->getSelectField(), 'glosa_grupo_cliente')
 			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
+			->add_ordering($this->getOrderField())
+			->add_left_join_with('asunto',
+				CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto'))
+			->add_left_join_with('cliente',
+				CriteriaRestriction::equals('cliente.codigo_cliente', 'asunto.codigo_cliente'))
+			->add_left_join_with('grupo_cliente',
+				CriteriaRestriction::equals('grupo_cliente.id_grupo_cliente', 'cliente.id_grupo_cliente'));
 
 		return $Criteria;
 	}

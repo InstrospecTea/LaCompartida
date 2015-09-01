@@ -15,7 +15,7 @@ class GrupoOClienteGrouper extends AbstractGrouperTranslator {
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
-		return "IFNULL('grupo_cliente.glosa_grupo_cliente', 'cliente.glosa_cliente')";
+		return "IFNULL(grupo_cliente.glosa_grupo_cliente, cliente.glosa_cliente)";
 	}
 
 	/**
@@ -23,7 +23,7 @@ class GrupoOClienteGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return "IFNULL('grupo_cliente.glosa_grupo_cliente', 'cliente.glosa_cliente')";
+		return "IFNULL(grupo_cliente.glosa_grupo_cliente, cliente.glosa_cliente)";
 	}
 
 	/**
@@ -31,7 +31,7 @@ class GrupoOClienteGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
-		return "IFNULL('grupo_cliente.glosa_grupo_cliente', 'cliente.glosa_cliente')";
+		return "IFNULL(grupo_cliente.glosa_grupo_cliente, cliente.glosa_cliente)";
 	}
 
 	/**
@@ -43,7 +43,13 @@ class GrupoOClienteGrouper extends AbstractGrouperTranslator {
 		$Criteria
 			->add_select($this->getSelectField(), 'grupo_o_cliente')
 			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
+			->add_ordering($this->getOrderField())
+			->add_left_join_with('contrato',
+				CriteriaRestriction::equals('contrato.id_contrato', 'cobro.id_contrato'))
+			->add_left_join_with('cliente',
+				CriteriaRestriction::equals('cliente.codigo_cliente', 'contrato.codigo_cliente'))
+			->add_left_join_with('grupo_cliente',
+				CriteriaRestriction::equals('grupo_cliente.id_grupo_cliente', 'cliente.id_grupo_cliente'));
 
 		return $Criteria;
 	}
@@ -57,7 +63,13 @@ class GrupoOClienteGrouper extends AbstractGrouperTranslator {
 		$Criteria
 			->add_select($this->getSelectField(), 'grupo_o_cliente')
 			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
+			->add_ordering($this->getOrderField())
+			->add_left_join_with('asunto',
+				CriteriaRestriction::equals('asunto.codigo_asunto', 'tramite.codigo_asunto'))
+			->add_left_join_with('cliente',
+				CriteriaRestriction::equals('cliente.codigo_cliente', 'asunto.codigo_cliente'))
+			->add_left_join_with('grupo_cliente',
+				CriteriaRestriction::equals('grupo_cliente.id_grupo_cliente', 'cliente.id_grupo_cliente'));
 
 		return $Criteria;
 	}
@@ -71,7 +83,13 @@ class GrupoOClienteGrouper extends AbstractGrouperTranslator {
 		$Criteria
 			->add_select($this->getSelectField(), 'grupo_o_cliente')
 			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
+			->add_ordering($this->getOrderField())
+			->add_left_join_with('asunto',
+				CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto'))
+			->add_left_join_with('cliente',
+				CriteriaRestriction::equals('cliente.codigo_cliente', 'asunto.codigo_cliente'))
+			->add_left_join_with('grupo_cliente',
+				CriteriaRestriction::equals('grupo_cliente.id_grupo_cliente', 'cliente.id_grupo_cliente'));
 
 		return $Criteria;
 	}
