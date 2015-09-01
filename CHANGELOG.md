@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.17.7
+Monday 2015, August 31th
+* **Fix** [Se corrige codificación en archivo MontoEnPalabra.php](https://github.com/LemontechSA/ttb/pull/1101)
+
 ## Hotfix 15.17.6
 Monday 2015, August 31th
 * **Fix** [Se corrigen columnas a importar desde SAP para integración Moreno Baldivieso](https://github.com/LemontechSA/ttb/pull/1100)
