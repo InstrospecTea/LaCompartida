@@ -51,7 +51,7 @@ class MontoEnPalabra extends Objeto {
 			$s = $this->SubValLetra(intval($Ent));
 		}
 
-		if (substr($s,-9, 9) == 'Millones ' || substr($s,-7, 7) == 'Millï¿½n ') {
+		if (substr($s,-9, 9) == 'Millones ' || substr($s,-7, 7) == 'Millón') {
 			$s = $s . "de ";
 		}
 
