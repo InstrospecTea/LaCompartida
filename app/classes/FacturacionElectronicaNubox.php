@@ -179,7 +179,13 @@ EOF;
 					$hookArg['Error'] = self::ParseError($WsFacturacionNubox, $WsFacturacionNubox->getErrorCode());
 				} else {
 					$csv_documento = self::FacturaToCsv($Sesion, $Factura, $Estudio, $Contrato);
-					$csv_referencias = ($Factura->fields['id_factura_padre'] > 0) ? self::ReferenciaToCsv($Sesion, $Factura, $Estudio) : null;
+					if ($Factura->fields['id_factura_padre'] > 0) {
+						$csv_referencias = self::ReferenciaToCsv($Sesion, $Factura, $Estudio);
+					} else if ($Factura->fields['id_documento_referencia'] > 0) {
+						$csv_referencias = self::DocumentoReferenciaToCsv($Sesion, $Factura, $Estudio);
+					} else {
+						$csv_referencias = NULL;
+					}
 					$opcionFolios = 1; //los folios son asignados por nubox
 					$opcionRutClienteExiste = 0; //se toman los datos del sistema nubox
 					$opcionRutClienteNoExiste = 1; //se agrega al sistema nubox
@@ -372,6 +378,49 @@ EOF;
 		foreach ($arrayFactura as $key => $item) {
 			$arrayFactura[$key] = implode(';', $item);
 		}
+		return implode("\n", $arrayFactura);
+	}
+
+	/**
+	 * Genera CSV de datos del documento de referencia de la FA
+	 * @param Sesion $Sesion
+	 * @param Factura $Factura
+	 * @return array
+	 */
+	public static function DocumentoReferenciaToCsv(Sesion $Sesion, Factura $Factura, PrmEstudio $Estudio) {
+		$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
+		$PrmCodigoReferencia = new PrmCodigo($Sesion);
+
+		$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
+		$PrmCodigoReferencia->Load($Factura->fields['id_documento_referencia']);
+
+		$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
+		$tipoDTEReferencia = $PrmCodigoReferencia->fields['codigo'];
+
+		$referenciaId = $Factura->fields['dte_codigo_referencia'];
+		$Referencia = new PrmCodigo($Sesion);
+		$Referencia->LoadById($referenciaId);
+		$codigoReferencia = $Referencia->Loaded() ? $Referencia->fields['codigo'] : 1;
+
+		$arrayFactura[] = array(
+			'TIPO' => $tipoDTE,
+			'FOLIO' => $Factura->fields['numero'],
+			'SECUENCIA' => 1,
+			'TIPODOCUMENTOREFERENCIADO' => $tipoDTEReferencia,
+			'FOLIODOCUMENTOREFERENCIADO' => $Factura->fields['folio_documento_referencia'],
+			'FECHADOCUMENTOREFERENCIADO' => Utiles::sql2date($Factura->fields['fecha_documento_referencia'], '%d-%m-%Y'),
+			'MOTIVOREFERENCIA' => $codigoReferencia,
+			'GLOSAREFERENCIA' => $Factura->fields['dte_razon_referencia']
+		);
+
+		if (!empty($arrayFactura)) {
+			array_unshift($arrayFactura, array_keys($arrayFactura[0]));
+		}
+		
+		foreach ($arrayFactura as $key => $item) {
+			$arrayFactura[$key] = implode(';', $item);
+		}
+
 		return implode("\n", $arrayFactura);
 	}
 
