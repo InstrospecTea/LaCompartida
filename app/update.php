@@ -10858,6 +10858,10 @@ QUERY;
 				$queries[] = "ALTER TABLE `cta_corriente` ADD COLUMN `detraccion` VARCHAR(100) DEFAULT NULL;";
 			}
 			break;
+
+		case 8.10:
+			$queries = array("ALTER TABLE `factura_cobro` CHANGE `id_documento` `id_documento` INT(11)  NULL  DEFAULT NULL;");
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10870,7 +10874,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.09;
+$max_update = 8.10;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
