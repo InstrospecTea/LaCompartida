@@ -6,7 +6,7 @@
  * * Muestra: prm_tipo_proyecto.glosa_tipo_proyecto
  * * Ordena por: prm_tipo_proyecto.glosa_tipo_proyecto
  *
- * MÃ¡s info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Tipo-Asunto
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Tipo-Asunto
  *
  */
 class TipoAsuntoGrouper extends AbstractGrouperTranslator {

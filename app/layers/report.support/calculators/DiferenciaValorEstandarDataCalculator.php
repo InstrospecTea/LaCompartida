@@ -3,8 +3,8 @@
 /**
  * La diferencia del valor cobrado estándar (diferencia_valor_estandar) corresponde
  * al monto subtotal (descontado) que se hubiese cobrado si la liquidación
- * se tarificara en tarifa estándar {@link StandardBilledAmountDataCalculator}
- * restado del valor cobrado (valor_cobrado) {@link BilledAmountDataCalculator}
+ * se tarificara en tarifa estándar {@link ValorCobradoEstandarDataCalculator}
+ * restado del valor cobrado (valor_cobrado) {@link ValorCobradoDataCalculator}
  *
  * Esta información se obtiene de: Trabajos, Trámites y cobros sin trabajos ni trámites
  *
@@ -16,7 +16,7 @@
  * Más info:
  * https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Diferencia-Valor-Cobrado-Estandar
  */
-class DifferenceStandardBilledAmountDataCalculator extends AbstractProportionalDataCalculator {
+class DiferenciaValorEstandarDataCalculator extends AbstractProportionalDataCalculator {
 
 	/**
 	 * Obtiene la query de trabajos correspondiente a la diferencia del valor cobrado estándar

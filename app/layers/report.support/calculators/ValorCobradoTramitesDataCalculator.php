@@ -11,7 +11,7 @@
  *
  * Más info en https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Cobrado-de-Tramites
  */
-class BilledErrandsAmountDataCalculator extends AbstractProportionalDataCalculator {
+class ValorCobradoTramitesDataCalculator extends AbstractProportionalDataCalculator {
 
 	/**
 	 * Obtiene la query de trabajos correspondiente al valor cobrado

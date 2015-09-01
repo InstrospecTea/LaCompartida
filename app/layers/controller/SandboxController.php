@@ -25,7 +25,7 @@ class SandboxController extends AbstractController {
 	}
 
 	public function data_calculator() {
-		$this->loadModel('BilledAmountDataCalculator');
+		$this->loadModel('ValorCobradoDataCalculator');
 		$this->info('Calculator.. woh wo ooo .. calculator!');
 	}
 

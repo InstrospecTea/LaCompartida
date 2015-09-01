@@ -10,7 +10,7 @@
  *
  * Más info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Cobrado
  */
-class BilledAmountDataCalculator extends AbstractProportionalDataCalculator {
+class ValorCobradoDataCalculator extends AbstractProportionalDataCalculator {
 
 	/**
 	 * Obtiene la query de trabajos correspondiente al valor cobrado

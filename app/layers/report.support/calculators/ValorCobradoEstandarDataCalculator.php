@@ -17,7 +17,7 @@
  * https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Cobrado-Estandar
  *
  */
-class StandardBilledAmountDataCalculator extends AbstractCurrencyDataCalculator {
+class ValorCobradoEstandarDataCalculator extends AbstractCurrencyDataCalculator {
 
 	/**
 	 * Obtiene la query de trabajos correspondiente al valor cobrado estándar
