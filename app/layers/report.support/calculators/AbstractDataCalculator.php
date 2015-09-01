@@ -165,8 +165,15 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 					"{$class_prefix}Grouper",
 					"translateFor{$type}"
 				);
+				$classInstance = $reflectedClass->newInstance($this->Session);
+				if ($reflectedClass->getParentClass()->getName() == 'FilterDependantGrouperTranslator') {
+					$dependantFilters = $classInstance->getFilterDependences();
+					foreach ($dependantFilters as $filterName) {
+						$classInstance->setFilterValue($filterName, $this->filtersFields[$filterName]);
+					}
+				}
 				$Criteria = $reflectedMethod->invokeArgs(
-					$reflectedClass->newInstance($this->Session),
+					$classInstance,
 					array($Criteria)
 				);
 			} catch (ReflectionException $Exception) {
