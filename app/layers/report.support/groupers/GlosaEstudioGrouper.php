@@ -46,7 +46,7 @@ class GlosaEstudioGrouper extends AbstractGrouperTranslator {
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
 			->add_select(CriteriaRestriction::ifnull($this->getSelectField(), $this->getUndefinedValue()), 'glosa_estudio')
-			->add_select(CriteriaRestriction::ifnull('cobro.id_estudio', CriteriaRestriction::ifnull('estudio_contrato.id_estudio', $this->getUndefinedValue())), 'id_estudio')
+			->add_select(CriteriaRestriction::ifnull('cobro.id_estudio', CriteriaRestriction::ifnull('prm_estudio.id_estudio', $this->getUndefinedValue())), 'id_estudio')
 			->add_left_join_with('prm_estudio', CriteriaRestriction::equals('cobro.id_estudio', 'prm_estudio.id_estudio'))
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField());
