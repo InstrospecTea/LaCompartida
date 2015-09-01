@@ -10886,7 +10886,7 @@ QUERY;
 								('PRM_FACTURA_DR', '50', 'Guía de Despacho'), 
 								('PRM_FACTURA_DR', '52', 'Guía Electrónica'), 
 								('PRM_FACTURA_DR', '801', 'Orden Compra'), 
-								('PRM_FACTURA_DR', '802', 'Nota de Pedido')";
+								('PRM_FACTURA_DR', '802', 'Nota de Pedido');";
 			} else if ($archivo['archivo_nombre'] == 'facturacion_electronica_cl.php') {
 				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES 
 								('PRM_FACTURA_DR', '801', 'Orden de Compra'), 
@@ -10901,8 +10901,14 @@ QUERY;
 								('PRM_FACTURA_DR', 'SER', 'Servicio (SER)'),
 								('PRM_FACTURA_DR', 'CEC', 'Centro de Costo (CEC)'),
 								('PRM_FACTURA_DR', 'GD', 'Guía Devolución (GD)'),
-								('PRM_FACTURA_DR', 'RE', 'Rebate (RE)')";
+								('PRM_FACTURA_DR', 'RE', 'Rebate (RE)');";
 			}
+			break;
+
+		case 8.12:
+			$queries = array(
+				"ALTER TABLE `cobro` ADD `opc_mostrar_asuntos_cobrables_sin_horas` TINYINT(1)  UNSIGNED  NOT NULL  DEFAULT '0'  AFTER `opc_ver_asuntos_separados`;"
+			);
 			break;
 	}
 
@@ -10916,7 +10922,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.11;
+$max_update = 8.12;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
