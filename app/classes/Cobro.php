@@ -2315,7 +2315,7 @@ if (!class_exists('Cobro')) {
 							$this->mensajes .= $resultado_guardar;
 						}
 					} else {
-						$this->mensajes .= "No se han podido generar el cobro para el cliente {$Contrato->fields['codigo_cliente']}";
+						$this->mensajes .= "No se ha podido generar el cobro para el cliente {$Contrato->fields['codigo_cliente']}";
 					}
 				} // END cobro
 			} // END contrato
