@@ -10874,22 +10874,22 @@ QUERY;
 
 			$archivo = mysql_fetch_array($resp);
 			if ($archivo['archivo_nombre'] == 'facturacion_electronica_nubox.php') {
-				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES 
-								('PRM_FACTURA_DR', '33', 'Factura Electrónica'), 
-								('PRM_FACTURA_DR', '34', 'Factura Electrónica Exenta'), 
-								('PRM_FACTURA_DR', '39', 'Boleta Electrónica'), 
-								('PRM_FACTURA_DR', '41', 'Boleta Electrónica Exenta'), 
-								('PRM_FACTURA_DR', '56', 'Nota de Débito Electrónica'), 
-								('PRM_FACTURA_DR', '61', 'Nota de Crédito Electrónica'), 
-								('PRM_FACTURA_DR', '30', 'Factura'), 
-								('PRM_FACTURA_DR', '35', 'Boleta'), 
-								('PRM_FACTURA_DR', '50', 'Guía de Despacho'), 
-								('PRM_FACTURA_DR', '52', 'Guía Electrónica'), 
-								('PRM_FACTURA_DR', '801', 'Orden Compra'), 
+				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES
+								('PRM_FACTURA_DR', '33', 'Factura Electrónica'),
+								('PRM_FACTURA_DR', '34', 'Factura Electrónica Exenta'),
+								('PRM_FACTURA_DR', '39', 'Boleta Electrónica'),
+								('PRM_FACTURA_DR', '41', 'Boleta Electrónica Exenta'),
+								('PRM_FACTURA_DR', '56', 'Nota de Débito Electrónica'),
+								('PRM_FACTURA_DR', '61', 'Nota de Crédito Electrónica'),
+								('PRM_FACTURA_DR', '30', 'Factura'),
+								('PRM_FACTURA_DR', '35', 'Boleta'),
+								('PRM_FACTURA_DR', '50', 'Guía de Despacho'),
+								('PRM_FACTURA_DR', '52', 'Guía Electrónica'),
+								('PRM_FACTURA_DR', '801', 'Orden Compra'),
 								('PRM_FACTURA_DR', '802', 'Nota de Pedido');";
 			} else if ($archivo['archivo_nombre'] == 'facturacion_electronica_cl.php') {
-				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES 
-								('PRM_FACTURA_DR', '801', 'Orden de Compra'), 
+				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES
+								('PRM_FACTURA_DR', '801', 'Orden de Compra'),
 								('PRM_FACTURA_DR', '802', 'Nota de Pedido'),
 								('PRM_FACTURA_DR', '803', 'Contrato'),
 								('PRM_FACTURA_DR', '814', 'Certificación de Depósito Bolsa Prod. Chile'),
@@ -10910,6 +10910,10 @@ QUERY;
 				"ALTER TABLE `cobro` ADD `opc_mostrar_asuntos_cobrables_sin_horas` TINYINT(1)  UNSIGNED  NOT NULL  DEFAULT '0'  AFTER `opc_ver_asuntos_separados`;"
 			);
 			break;
+		case 8.13:
+			$queries = array("ALTER TABLE `bloqueo_procesos`
+				CHANGE COLUMN `estado` `estado` TEXT NOT NULL DEFAULT ''");
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10922,7 +10926,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.12;
+$max_update = 8.13;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

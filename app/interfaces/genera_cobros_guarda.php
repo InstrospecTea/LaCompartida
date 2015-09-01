@@ -22,7 +22,7 @@ if ((isset($_POST['cobrosencero']) && $_POST['cobrosencero'] == 1) || (isset($_G
 	$incluir_cobros_en_cero = true;
 }
 
-// Setea estado como 'En Revisión'
+// Setea estado como 'En Revisiï¿½n'
 $cobros_en_revision = FALSE;
 if (isset($_POST['cobros_en_revision']) && $_POST['cobros_en_revision'] == 1) {
 	$cobros_en_revision = TRUE;
@@ -82,9 +82,10 @@ if ($individual && $id_contrato) {
 	$id_cobro_pendiente = !is_null($id_cobro_pendiente) ? $id_cobro_pendiente : '';
 	$monto = !is_null($monto) ? $monto : '';
 	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios, FALSE, $cobros_en_revision);
-
+	$mensajes = $Cobro->mensajes;
 	Log::write(" |- #{$newcobro}", Cobro::PROCESS_NAME);
 	Log::write(' |- SetIncluirEnCierre', Cobro::PROCESS_NAME);
+	Log::write(' |- Mensajes:' . $mensajes, Cobro::PROCESS_NAME);
 	$Contrato->SetIncluirEnCierre($Sesion);
 
 	if (isset($_GET['generar_silenciosamente']) && $_GET['generar_silenciosamente'] == 1) {
@@ -94,7 +95,7 @@ if ($individual && $id_contrato) {
 		unset($Sesion);
 		unset($Cobro);
 		unset($Contrato);
-		die(json_encode(array('proceso' => $id_proceso_nuevo, 'cobro' => $newcobro)));
+		die(json_encode(array('proceso' => $id_proceso_nuevo, 'cobro' => $newcobro, 'mensajes' => $mensajes)));
 	} else {
 		Log::write(' |- redirect', Cobro::PROCESS_NAME);
 		Log::write(' ----', Cobro::PROCESS_NAME);
@@ -215,7 +216,7 @@ if ($print) {
 		} else {
 			$detalle_error = '<div id="sql_error" style="margin: 0px auto  0px; width: 414px; border: 1px solid #00782e; padding: 5px; font-family: Arial, Helvetica, sans_serif;font-size:12px;">
 				<div style="background:#00782e;"><img src="' . Conf::ImgDir() . '/logo_top.png" border="0"></div>
-				<div style="padding:10px;text-align:center"><strong style="font-size:14px">Atención</strong><br/><br/>Error al intentar generar los borradores según periodo, no hay datos para los filtros que Ud. ha seleccionado</div>
+				<div style="padding:10px;text-align:center"><strong style="font-size:14px">Atenciï¿½n</strong><br/><br/>Error al intentar generar los borradores segï¿½n periodo, no hay datos para los filtros que Ud. ha seleccionado</div>
 			</div>
 			<script type="text/javascript">setTimeout("window.history.back()", 4000);</script>';
 			exit($detalle_error);
