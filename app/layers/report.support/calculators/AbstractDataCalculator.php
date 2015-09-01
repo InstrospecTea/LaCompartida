@@ -25,7 +25,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	);
 
 	/**
-	 * Define los filtros que cancelan la ejecuci√≥n de ciertas queries
+	 * Define los filtros que cancelan la ejecuciÛn de ciertas queries
 	 * @var array
 	 */
 	private $queryCancelatorsFilters = array(
@@ -110,7 +110,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	/**
 	 * Constructor
-	 * @param Sesion $Session       La sesi√≥n para la obtenci√≥n de datos
+	 * @param Sesion $Session       La sesiÛn para la obtenciÛn de datos
 	 * @param Array $filtersFields  Array con campos a filtrar y sus valores
 	 * @param Array $grouperFields  Array con campos a agrupar
 	 */
@@ -153,7 +153,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		/**
 	 * Agrega los agrupadores a la Query dependiendo de los
 	 * grupos definidos
-	 * @param Criteria $Criteria La query a la que se agregar√°n los agrupadores
+	 * @param Criteria $Criteria La query a la que se agregar·n los agrupadores
 	 * @param String   $type     El tipo de query: [Works, Errands, Charges]
 	 */
 	function addGroupersToCriteria(Criteria $Criteria, $type) {
@@ -179,7 +179,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	/**
 	 * Agrega los filtros a la query dependiendo de filtersFields
-	 * @param Criteria $Criteria Query a la que se agregar√°n lso filtros
+	 * @param Criteria $Criteria Query a la que se agregar·n lso filtros
 	 * @param String $type       El tipo de query: [Works, Errands, Charges]
 	 */
 	function addFiltersToCriteria(Criteria $Criteria, $type) {
@@ -220,7 +220,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 						);
 					}
 				} catch (ReflectionException $Exception) {
-					// Dejando pasasr ya que la clase no est√° implementada
+					// Dejando pasasr ya que la clase no est· implementada
 					// throw new ReportException($Exception->getMessage());
 				}
 			}
@@ -245,40 +245,31 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	/**
 	 * Obtiene la query base para consultar Trabajos
-	 * @param  Criteria $Criteria Query donde se agregar√° lo necesario
+	 * @param  Criteria $Criteria Query donde se agregar· lo necesario
 	 * @return void
 	 */
 	function getBaseWorkQuery(Criteria $Criteria) {
-		$Criteria->add_from('trabajo');
-
-		$Criteria->add_left_join_with(
-			'cobro',
-			CriteriaRestriction::equals(
-				'cobro.id_cobro',
-				'trabajo.id_cobro'
-			)
-		);
+		$Criteria
+			->add_from('trabajo')
+			->add_left_join_with('cobro', CriteriaRestriction::equals('cobro.id_cobro', 'trabajo.id_cobro'))
+			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto','trabajo.codigo_asunto'))
+			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', CriteriaRestriction::ifnull('cobro.id_contrato', 'asunto.id_contrato')));
 
 		$this->addFiltersToCriteria($Criteria, 'Works');
 		$this->addGroupersToCriteria($Criteria, 'Works');
 	}
 
 	/**
-	 * Obtiene la query base para consultar Tr√°mites
-	 * @param  Criteria $Criteria Query donde se agregar√° lo necesario
+	 * Obtiene la query base para consultar Tr·mites
+	 * @param  Criteria $Criteria Query donde se agregar· lo necesario
 	 * @return void
 	 */
 	function getBaseErrandQuery($Criteria) {
-		$Criteria->add_from('tramite');
-
 		$Criteria
-			->add_left_join_with(
-				'cobro',
-				CriteriaRestriction::equals(
-					'cobro.id_cobro',
-					'tramite.id_cobro'
-				)
-			);
+			->add_from('tramite')
+			->add_left_join_with('cobro', CriteriaRestriction::equals('cobro.id_cobro', 'tramite.id_cobro'))
+			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto','tramite.codigo_asunto'))
+			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', CriteriaRestriction::ifnull('cobro.id_contrato', 'asunto.id_contrato')));
 
 		$this->addFiltersToCriteria($Criteria, 'Errands');
 		$this->addGroupersToCriteria($Criteria, 'Errands');
@@ -286,7 +277,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	/**
 	 * Obtiene la query base para consultar Cobros
-	 * @param  Criteria $Criteria Query donde se agregar√° lo necesario
+	 * @param  Criteria $Criteria Query donde se agregar· lo necesario
 	 * @return void
 	 */
 	function getBaseChargeQuery($Criteria) {
@@ -363,7 +354,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	/**
-	 * Obtiene los filtros por los cuales se podr√° filtrar
+	 * Obtiene los filtros por los cuales se podr· filtrar
 	 * @return array
 	 */
 	function getAllowedFilters() {
@@ -374,7 +365,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	/**
-	 * Obtiene los agrupadores por los cuales no se podr√°n filtrar
+	 * Obtiene los agrupadores por los cuales no se podr·n filtrar
 	 * @return array
 	 */
 	function getNotAllowedFilters() {
@@ -382,7 +373,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	/**
-	 * Obtiene los agrupadores por los cuales se podr√°n agrupar y ordenar
+	 * Obtiene los agrupadores por los cuales se podr·n agrupar y ordenar
 	 * @return array
 	 */
 	function getAllowedGroupers() {
@@ -393,7 +384,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	}
 
 	/**
-	 * Obtiene los agrupadores por los cuales no se podr√°n agrupar y ordenar
+	 * Obtiene los agrupadores por los cuales no se podr·n agrupar y ordenar
 	 * @return array
 	 */
 	function getNotAllowedGroupers() {
