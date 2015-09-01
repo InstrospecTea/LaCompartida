@@ -69,7 +69,7 @@ class ReporteCriteria {
 		'valor_incobrable' => null,
 		'valor_pagado' => null,
 		'valor_pagado_parcial' => null,
-		'valor_por_cobrar' => null,
+		'valor_por_cobrar' => 'ValorPorCobrar',
 		'valor_por_pagar' => null,
 		'valor_por_pagar_parcial' => null,
 		'valor_trabajado_estandar' => null,
