@@ -66,7 +66,7 @@ class ReporteCriteria {
 		'valor_cobrado_no_estandar' => null,
 		'valor_estandar' => 'ValorCobradoEstandar',
 		'valor_hora' => null,
-		'valor_incobrable' => null,
+		'valor_pagado' => 'ValorPagado',
 		'valor_pagado' => null,
 		'valor_pagado_parcial' => null,
 		'valor_por_cobrar' => null,
@@ -694,12 +694,14 @@ class ReporteCriteria {
 		}
 
 		// Obtiene todos los datos para Trabajos
+		// pr($this->getQuery(TIPO_TRABAJOS));
 		$resp = mysql_unbuffered_query($this->getQuery(TIPO_TRABAJOS), $this->sesion->dbh) or Utiles::errorSQL($this->getQuery(TIPO_TRABAJOS), __FILE__, __LINE__, $this->sesion->dbh);
 		while ($row = mysql_fetch_assoc($resp)) {
 			$this->row[] = $row;
 		}
 
 		// Obtiene todos los datos para trámites
+		// pr($this->getQuery(TIPO_TRAMITES));
 		$resp = mysql_unbuffered_query($this->getQuery(TIPO_TRAMITES), $this->sesion->dbh) or Utiles::errorSQL($this->getQuery(TIPO_TRAMITES), __FILE__, __LINE__, $this->sesion->dbh);
 		while ($row = mysql_fetch_assoc($resp)) {
 			$this->row[] = $row;
@@ -708,6 +710,7 @@ class ReporteCriteria {
 		// Obtiene todos los datos para Cobros
 		// En caso de filtrar por área o categoría de usuario no se toman en cuenta los cobros sin horas.
 		$cobroquery = $this->cobroQuery();
+		// pr($cobroquery);
 
 		if (
 			$this->requiereMoneda($this->tipo_dato)
