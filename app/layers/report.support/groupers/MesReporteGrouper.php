@@ -8,14 +8,42 @@
  *
  * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Mes-Reporte
  */
-class MesReporteGrouper extends AbstractGrouperTranslator {
+class MesReporteGrouper extends FilterDependantGrouperTranslator {
 
+	/**
+	 * Obtiene un array que explicita a aquellos filtros de los que este
+	 * agrupador depende.
+	 */
+	public function getFilterDependences() {
+		return array('campo_fecha');
+	}
+
+	public function getDateField() {
+		switch ($this->filterValues['campo_fecha']) {
+			case 'cobro':
+				$field_name = 'cobro.fecha_fin';
+				break;
+			case 'emision':
+				$field_name = 'cobro.fecha_emision';
+				break;
+			case 'envio':
+				$field_name = 'cobro.fecha_enviado_cliente';
+				break;
+			case 'facturacion':
+				$field_name = 'cobro.fecha_facturacion';
+				break;
+			default:
+				$field_name = 'trabajo.fecha';
+				break;
+		}
+		return "DATE_FORMAT({$field_name}, '%m-%Y')";
+	}
 	/**
 	 * Obtiene el campo por el cual se agrupará la query
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
-		return "DATE_FORMAT(fecha, '%m-%Y')";
+		return "DATE_FORMAT(%token%, '%m-%Y')";
 	}
 
 	/**
@@ -23,7 +51,7 @@ class MesReporteGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return "DATE_FORMAT(fecha, '%m-%Y')";
+		return "DATE_FORMAT(%token%, '%m-%Y')";
 	}
 
 	/**
@@ -31,7 +59,7 @@ class MesReporteGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
-		return "DATE_FORMAT(fecha, '%m-%Y')";
+		return "DATE_FORMAT(%token%, '%m-%Y')";
 	}
 
 	/**
@@ -40,12 +68,14 @@ class MesReporteGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForCharges(Criteria $Criteria) {
-		$Criteria
-			->add_select($this->getSelectField(), 'mes_reporte')
-			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
-
-		return $Criteria;
+		return $Criteria->add_select(
+			$this->getDateField(),
+			'mes_reporte'
+		)->add_grouping(
+			$this->getDateField()
+		)->add_ordering(
+			$this->getDateField()
+		);
 	}
 
 	/**
@@ -54,12 +84,25 @@ class MesReporteGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForErrands(Criteria $Criteria) {
-		$Criteria
-			->add_select($this->getSelectField(), 'mes_reporte')
-			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
-
-		return $Criteria;
+		return $Criteria->add_select(
+			str_replace(
+				"%token%",
+				"tramite.fecha",
+				$this->getSelectField()
+			), 'mes_reporte'
+		)->add_grouping(
+			str_replace(
+				"%token%",
+				"tramite.fecha",
+				$this->getSelectField()
+			)
+		)->add_ordering(
+			str_replace(
+				"%token%",
+				"tramite.fecha",
+				$this->getSelectField()
+			)
+		);
 	}
 
 	/**
@@ -68,11 +111,24 @@ class MesReporteGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForWorks(Criteria $Criteria) {
-		$Criteria
-			->add_select($this->getSelectField(), 'mes_reporte')
-			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
-
-		return $Criteria;
+		return $Criteria->add_select(
+			str_replace(
+				"%token%",
+				"trabajo.fecha",
+				$this->getSelectField()
+			), 'mes_reporte'
+		)->add_grouping(
+			str_replace(
+				"%token%",
+				"trabajo.fecha",
+				$this->getSelectField()
+			)
+		)->add_ordering(
+			str_replace(
+				"%token%",
+				"trabajo.fecha",
+				$this->getSelectField()
+			)
+		);
 	}
 }
