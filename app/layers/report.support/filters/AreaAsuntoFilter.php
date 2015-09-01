@@ -1,23 +1,23 @@
 <?php
 /**
- * Filtro por tipo asunto:
+ * Filtro por area asunto:
  *
  * * Filtra por:
- * * Cobros: asunto.id_tipo_asunto
- * * Trámites: asunto.id_tipo_asunto
- * * Trabajos: asunto.id_tipo_asunto
+ * * Cobros: asunto.id_area_proyecto
+ * * Trámites: asunto.id_area_proyecto
+ * * Trabajos: asunto.id_area_proyecto
  *
- * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Filtro:-Tipo-Asunto
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Filtro:-Area-Asunto
  *
  */
-class TipoAsuntoFilter extends AbstractUndependantFilterTranslator {
+class AreaAsuntoFilter extends AbstractUndependantFilterTranslator {
 
 	/**
 	 * Obtiene el nombre del campo que se filtrará
 	 * @return String
 	 */
 	function getFieldName() {
-		return 'asunto.id_tipo_asunto';
+		return 'asunto.id_area_proyecto';
 	}
 
 	/**

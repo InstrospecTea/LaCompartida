@@ -1,14 +1,14 @@
 <?php
 /**
- * Agrupador por Código de Asunto o Código de asunto secundario según conf
+ * Agrupador por Glosa Cliente y Asunto
  *
  * * Agrupa por: asunto.codigo_asunto
- * * Muestra: asunto.codigo_asunto
- * * Ordena por: asunto.codigo_asunto
+ * * Muestra: cliente.glosa_cliente - asunto.codigo_asunto asunto.glosa_asunto
+ * * Ordena por: cliente.glosa_cliente - asunto.codigo_asunto asunto.glosa_asunto
  *
- * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Codigo-Asunto
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Glosa-Cliente-Asunto
  */
-class CodigoAsuntoGrouper extends AbstractGrouperTranslator {
+class GlosaClienteAsuntoGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Obtiene el campo por el cual se agrupará la query
@@ -23,7 +23,8 @@ class CodigoAsuntoGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return $this->getProjectCodeField();
+		$code = $this->getProjectCodeField();
+		return "CONCAT(cliente.glosa_cliente, ' - ', $code, ' ', asunto.glosa_asunto)" ;
 	}
 
 	/**
@@ -31,39 +32,45 @@ class CodigoAsuntoGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
-		return $this->getProjectCodeField();
+		return $this->getSelectField();
 	}
 
 	/**
 	 * Traduce los keys de agrupadores a campos para la query de Cobros
-	 * Código de cada asunto incluido en la liquidación
+	 * Código de cada asunto incluido en la liquidación y Cliente del contrato
 	 * @return void
 	 */
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'codigo_asunto')
+			->add_select($this->getSelectField(), 'glosa_cliente_asunto')
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
+			->add_left_join_with('cliente',
+				CriteriaRestriction::equals('cliente.codigo_cliente', 'contrato.codigo_cliente'))
 			->add_left_join_with('cobro_asunto',
 				CriteriaRestriction::equals('cobro_asunto.id_cobro', 'cobro.id_cobro'))
 			->add_left_join_with('asunto',
-				CriteriaRestriction::equals('asunto.codigo_asunto', 'cobro_asunto.codigo_asunto'));
+				CriteriaRestriction::equals('asunto.codigo_asunto', 'cobro_asunto.codigo_asunto')
+			);
 
 		return $Criteria;
 	}
 
 	/**
 	 * Traduce los keys de agrupadores a campos para la query de Trámites
-	 * Código del asunto del trámite
+	 * Código del asunto del trámite y cliente del asunto
 	 * @return void
 	 */
 	function translateForErrands(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'codigo_asunto')
+			->add_select($this->getSelectField(), 'glosa_cliente_asunto')
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with('asunto',
 				CriteriaRestriction::equals('asunto.codigo_asunto', 'tramite.codigo_asunto')
+			)
+			->add_left_join_with('cliente',
+				CriteriaRestriction::equals('cliente.codigo_cliente', 'asunto.codigo_cliente')
 			);
 
 		return $Criteria;
@@ -71,16 +78,19 @@ class CodigoAsuntoGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Traduce los keys de agrupadores a campos para la query de Trabajos
-	 * Código del asunto del trabajo
+	 * Código del asunto del trabajo y cliente del asunto
 	 * @return void
 	 */
 	function translateForWorks(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'codigo_asunto')
+			->add_select($this->getSelectField(), 'glosa_cliente_asunto')
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with('asunto',
 				CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto')
+			)
+			->add_left_join_with('cliente',
+				CriteriaRestriction::equals('cliente.codigo_cliente', 'asunto.codigo_cliente')
 			);
 
 		return $Criteria;

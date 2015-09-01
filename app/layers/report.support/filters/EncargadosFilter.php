@@ -1,89 +1,116 @@
 <?php
-
+/**
+ * Filtro por encargado comercial:
+ *
+ * * Filtra por:
+ * * Cobros: cobro.id_usuario_responsable
+ * * Trámites: contrato.id_usuario_responsable
+ * * Trabajos: contrato.id_usuario_responsable
+ *
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Filtro:-Encargado-Comercial
+ *
+ */
 class EncargadosFilter extends AbstractUndependantFilterTranslator {
 
+	/**
+	 * Obtiene el nombre del campo que se filtrará
+	 * @return String
+	 */
 	function getFieldName() {
 		return 'contrato.id_usuario_responsable';
 	}
 
+	/**
+	 * Nombre custom del join principal para evitar colisiones
+	 * @return String
+	 */
 	function getJoinName() {
-		return 'usuario_responsable';
+		return 'usuario_responsable_filter';
 	}
 
-	function getSelect() {
-		if (Conf::GetConf($this->Session, 'UsaUsernameEnTodoElSistema')) {
-			return "{$this->getJoinName()}.username";
-		}
-		return "IF({$this->getJoinName()}.id_usuario IS NULL, 'Sin Responsable', {$this->getJoinName()}.id_usuario)";
-	}
-
+	/**
+	 * Traduce el filtro para el caso de los cobros
+	 * @param  Criteria $criteria Query builder asociado a los cobros
+	 * @return Criteria Query builder con las restricciones del filtro ya aplicadas.
+	 */
 	function translateForCharges(Criteria $criteria) {
-		return $this->addData(
-			$this->getFilterData(),
-			$criteria
-		)->add_select(
-			$this->getSelect()
-		)->add_left_join_with(
-			"usuario as {$this->getJoinName()}",
-			CriteriaRestriction::equals(
-				"{$this->getJoinName()}.id_usuario",
-				'cobro.id_usuario'
-			)
-		);
+		$data = $this->getFilterData();
+		if (is_array($data)) {
+			$and_wheres[] = CriteriaRestriction::in(
+				'cobro.id_usuario_responsable', $data
+			);
+			$criteria->add_restriction(
+				CriteriaRestriction::and_clause(
+					$and_wheres
+				)
+			);
+		} else {
+			$criteria->add_restriction(
+				CriteriaRestriction::equals(
+					'cobro.id_usuario_responsable',
+					$data
+				)
+			);
+		}
+		return $criteria;
 	}
 
+	/**
+	 * Traduce el filtro para el caso de los trámites
+	 * @param  Criteria $criteria Query builder asociado a los trámites
+	 * @return Criteria Query builder con las restricciones del filtro ya aplicadas.
+	 */
 	function translateForErrands(Criteria $criteria) {
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria
-		)->add_select(
-			$this->getFieldName(),
-			"'prm_area_usuario.glosa'"
 		)->add_left_join_with(
 			'asunto',
 			CriteriaRestriction::equals(
-				'asunto.codigo_asunto', 
+				'asunto.codigo_asunto',
 				'tramite.codigo_asunto'
 			)
 		)->add_left_join_with(
-			'contrato',
+			'contrato as encargado_comercial_contrato',
 			CriteriaRestriction::equals(
-				'contrato.id_contrato',
+				'encargado_comercial_contrato.id_contrato',
 				'asunto.id_contrato'
 			)
 		)->add_left_join_with(
 			"usuario as {$this->getJoinName()}",
 			CriteriaRestriction::equals(
 				"{$this->getJoinName()}.id_usuario",
-				'contrato.id_usuario_responsable'
+				'encargado_comercial_contrato.id_usuario_responsable'
 			)
 		);
 	}
 
+	/**
+	 * Traduce el filtro para el caso de los trabajos
+	 * @param  Criteria $criteria Query builder asociado a los trabajos
+	 * @return Criteria Query builder con las restricciones del filtro ya aplicadas.
+	 */
 	function translateForWorks(Criteria $criteria) {
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria
-		)->add_select(
-			$this->getFieldName(),
-			"'prm_area_usuario.glosa'"
 		)->add_left_join_with(
 			'asunto',
 			CriteriaRestriction::equals(
-				'asunto.codigo_asunto', 
+				'asunto.codigo_asunto',
 				'trabajo.codigo_asunto'
 			)
 		)->add_left_join_with(
-			'contrato',
+			'contrato as encargado_comercial_contrato',
 			CriteriaRestriction::equals(
-				'contrato.id_contrato',
+				'encargado_comercial_contrato.id_contrato',
 				'asunto.id_contrato'
 			)
 		)->add_left_join_with(
 			"usuario as {$this->getJoinName()}",
 			CriteriaRestriction::equals(
 				"{$this->getJoinName()}.id_usuario",
-				'contrato.id_usuario_responsable'
+				'encargado_comercial_contrato.id_usuario_responsable'
 			)
 		);
 	}

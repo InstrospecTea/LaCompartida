@@ -670,7 +670,7 @@ class ReporteCriteria {
 				'usuarios' => $this->parametros['usuarios'],
 				'clientes' => $this->parametros['clientes'],
 				'tipo_asunto' => $this->parametros['tipos_asunto'],
-				'areas_asunto' => null,
+				'area_asunto' => $this->parametros['areas_asunto'],
 				'area_usuario' => $this->parametros['areas_usuario'],
 				'categoria_usuario' => $this->parametros['categorias_usuario'],
 				'encargados' => $this->parametros['encargados'],
