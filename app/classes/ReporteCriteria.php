@@ -63,7 +63,7 @@ class ReporteCriteria {
 		'diferencia_valor_estandar' => 'DiferenciaValorEstandar',
 		'rentabilidad' => null,
 		'rentabilidad_base' => null,
-		'valor_cobrado_no_estandar' => null,
+		'valor_cobrado_no_estandar' => 'ValorCobradoNoEstandar',
 		'valor_estandar' => 'ValorCobradoEstandar',
 		'valor_hora' => null,
 		'valor_incobrable' => null,
