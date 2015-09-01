@@ -58,6 +58,7 @@ class SolicitanteGrouper extends AbstractGrouperTranslator {
 			->add_select("tramite.{$this->getSelectField()}", 'solicitante')
 			->add_grouping("tramite.{$this->getGroupField()}")
 			->add_ordering("tramite.{$this->getOrderField()}");
+
 		return $Criteria;
 	}
 
@@ -71,7 +72,7 @@ class SolicitanteGrouper extends AbstractGrouperTranslator {
 			->add_select("trabajo.{$this->getSelectField()}", 'solicitante')
 			->add_grouping("trabajo.{$this->getGroupField()}")
 			->add_ordering("trabajo.{$this->getOrderField()}");
-		pr($Criteria->get_plain_query());
+
 		return $Criteria;
 	}
 }
