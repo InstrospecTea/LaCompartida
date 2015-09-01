@@ -1,19 +1,19 @@
 <?php
 /**
- * Filtro por categorÃ­a de usuario:
+ * Filtro por categoría de usuario:
  *
  * * Filtra por:
  * * Cobros: no aplica
- * * TrÃ¡mites: usuario.id_categoria_usuario
+ * * Trámites: usuario.id_categoria_usuario
  * * Trabajos: usuario.id_categoria_usuario
  *
- * MÃ¡s info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Filtro:-Categoria-Usuario
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Filtro:-Categoria-Usuario
  *
  */
 class CategoriaUsuarioFilter extends AbstractUndependantFilterTranslator {
 
 	/**
-	 * Obtiene el nombre del campo que se filtrarÃ¡
+	 * Obtiene el nombre del campo que se filtrará
 	 * @return String
 	 */
 	function getFieldName() {
@@ -30,8 +30,8 @@ class CategoriaUsuarioFilter extends AbstractUndependantFilterTranslator {
 	}
 
 	/**
-	 * Traduce el filtro para el caso de los trÃ¡mites
-	 * @param  Criteria $criteria Query builder asociado a los trÃ¡mites
+	 * Traduce el filtro para el caso de los trámites
+	 * @param  Criteria $criteria Query builder asociado a los trámites
 	 * @return Criteria Query builder con las restricciones del filtro ya aplicadas.
 	 */
 	function translateForErrands(Criteria $criteria) {

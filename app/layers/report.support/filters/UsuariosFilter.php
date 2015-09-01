@@ -14,8 +14,6 @@ class UsuariosFilter extends AbstractUndependantFilterTranslator {
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria
-		)->add_select(
-			$this->getFieldName()
 		)->add_left_join_with(
 			'usuario',
 			CriteriaRestriction::equals(
@@ -29,8 +27,6 @@ class UsuariosFilter extends AbstractUndependantFilterTranslator {
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria
-		)->add_select(
-			$this->getFieldName()
 		)->add_left_join_with(
 			'usuario',
 			CriteriaRestriction::equals(

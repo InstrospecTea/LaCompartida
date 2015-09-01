@@ -14,15 +14,30 @@ class EstadoCobroFilter extends AbstractUndependantFilterTranslator {
 	}
 
 	function translateForCharges(Criteria $Criteria) {
-		$Criteria->add_restriction(CriteriaRestriction::in($this->getFieldName(), $this->getFilterData()));
+		$Criteria->add_restriction(
+			CriteriaRestriction::in(
+				$this->getFieldName(),
+				$this->getFilterData()
+			)
+		);
 	}
 
 	function translateForErrands(Criteria $Criteria) {
-		$Criteria->add_restriction(CriteriaRestriction::in($this->getFieldName(), $this->getFilterData()));
+		$Criteria->add_restriction(
+			CriteriaRestriction::in(
+				$this->getFieldName(),
+				$this->getFilterData()
+			)
+		);
 	}
 
 	function translateForWorks(Criteria $Criteria) {
-		$Criteria->add_restriction(CriteriaRestriction::in($this->getFieldName(), $this->getFilterData()));
+		$Criteria->add_restriction(
+			CriteriaRestriction::in(
+				$this->getFieldName(),
+				$this->getFilterData()
+			)
+		);
 	}
 
 }
