@@ -4,7 +4,7 @@ set_time_limit(0);
 require_once dirname(__FILE__) . '/../app/conf.php';
 
 /* PASO 1: Agregar los cambios en un case del switch de esta funcion. */
-/*         Si ocurre un error, levantar una excepción, nunca hacer un exit o die */
+/*         Si ocurre un error, levantar una excepciï¿½n, nunca hacer un exit o die */
 
 /* IMPORTANTE:
 	Escribir con un echo los cambios realizados (PHP) para poder anunciarlos a los clientes */
@@ -88,7 +88,7 @@ function Actualizaciones(&$dbh, $new_version) {
 			echo 'Mensaje de prueba 2.<br>';
 
 			if (!ExisteCampo('opc_moneda_total', 'cobro', $dbh))
-				$query = "ALTER TABLE `cobro` ADD `opc_moneda_total` INT NULL COMMENT 'Moneda total de impresión del DOC';";
+				$query = "ALTER TABLE `cobro` ADD `opc_moneda_total` INT NULL COMMENT 'Moneda total de impresiï¿½n del DOC';";
 
 			if (!mysql_query($query, $dbh))
 				throw new Exception(mysql_error());
@@ -103,7 +103,7 @@ function Actualizaciones(&$dbh, $new_version) {
 		case 1.3:
 			echo 'Mensaje de prueba 2.<br>';
 			if (!ExisteCampo('opc_moneda_total_tipo_cambio', 'cobro', $dbh))
-				$query = "ALTER TABLE `cobro` ADD `opc_moneda_total_tipo_cambio` DOUBLE NOT NULL DEFAULT '0' COMMENT 'Tipo de cambio de la moneda presentada en la impresión del DOC';";
+				$query = "ALTER TABLE `cobro` ADD `opc_moneda_total_tipo_cambio` DOUBLE NOT NULL DEFAULT '0' COMMENT 'Tipo de cambio de la moneda presentada en la impresiï¿½n del DOC';";
 
 			if (!mysql_query($query, $dbh))
 				throw new Exception(mysql_error());
@@ -193,8 +193,8 @@ function Actualizaciones(&$dbh, $new_version) {
 
 		case 1.7:
 			echo 'Mensaje de prueba 7.<br>';
-			$query = "ALTER TABLE `cobro` CHANGE `opc_moneda_total` `opc_moneda_total` INT( 11 ) NOT NULL DEFAULT '1' COMMENT 'Moneda total de impresión del DOC',
-									CHANGE `opc_moneda_total_tipo_cambio` `opc_moneda_total_tipo_cambio` DOUBLE NOT NULL DEFAULT '1' COMMENT 'Tipo de cambio de la moneda presentada en la impresión del DOC'";
+			$query = "ALTER TABLE `cobro` CHANGE `opc_moneda_total` `opc_moneda_total` INT( 11 ) NOT NULL DEFAULT '1' COMMENT 'Moneda total de impresiï¿½n del DOC',
+									CHANGE `opc_moneda_total_tipo_cambio` `opc_moneda_total_tipo_cambio` DOUBLE NOT NULL DEFAULT '1' COMMENT 'Tipo de cambio de la moneda presentada en la impresiï¿½n del DOC'";
 			if (!mysql_query($query, $dbh))
 				throw new Exception(mysql_error());
 
@@ -224,11 +224,11 @@ function Actualizaciones(&$dbh, $new_version) {
 			$query[] = "DELETE FROM menu WHERE codigo = 'OFI' AND tipo = 1";
 			$query[] = "UPDATE `menu` SET `glosa` = 'Profesional v/s Cliente',`orden` = '0' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'PLANI' LIMIT 1 ";
 			$query[] = "UPDATE `menu` SET `orden` = '10' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_RES_CL' LIMIT 1 ";
-			$query[] = "UPDATE `menu` SET `glosa` = 'Facturación clientes' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_RES_CL' LIMIT 1 ";
+			$query[] = "UPDATE `menu` SET `glosa` = 'Facturaciï¿½n clientes' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_RES_CL' LIMIT 1 ";
 			$query[] = "UPDATE `menu` SET `glosa` = 'Rendimiento abogados' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_RES_AB' LIMIT 1 ";
-			$query[] = "UPDATE `menu` SET `glosa` = 'Gráfico asuntos',`orden` = '40' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_AS' LIMIT 1 ";
-			$query[] = "UPDATE `menu` SET `glosa` = 'Gráfico usuarios',`orden` = '50' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_US' LIMIT 1 ";
-			$query[] = "UPDATE `menu` SET `glosa` = 'Reporte genérico',`orden` = '60' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'OLAP' LIMIT 1 ";
+			$query[] = "UPDATE `menu` SET `glosa` = 'Grï¿½fico asuntos',`orden` = '40' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_AS' LIMIT 1 ";
+			$query[] = "UPDATE `menu` SET `glosa` = 'Grï¿½fico usuarios',`orden` = '50' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'REP_US' LIMIT 1 ";
+			$query[] = "UPDATE `menu` SET `glosa` = 'Reporte genï¿½rico',`orden` = '60' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'OLAP' LIMIT 1 ";
 			$query[] = "UPDATE `menu` SET `glosa` = 'Resumen semana' WHERE CONVERT( `menu`.`codigo` USING utf8 ) = 'ADM_SEM' LIMIT 1 ";
 			$query[] = "UPDATE `menu` SET `glosa` = 'Avanzados', `url` = '/fw/tablas/mantencion_tablas.php', `codigo_padre` = 'ADMIN_SIS' WHERE CONVERT( `codigo` USING utf8 ) = 'MANT' LIMIT 1";
 			$query[] = "DELETE FROM menu WHERE codigo = 'CLI_PRO'";
@@ -313,7 +313,7 @@ function Actualizaciones(&$dbh, $new_version) {
 
 			$query[] = "INSERT ignore INTO `menu` ( `codigo` , `glosa` , `url` , `descripcion` , `foto_url` , `tipo` , `orden` , `codigo_padre` )
 								VALUES (
-								'RAP', 'Periódico', '/app/interfaces/resumen_actividades.php', '', '', '0', '70', 'REP');";
+								'RAP', 'Periï¿½dico', '/app/interfaces/resumen_actividades.php', '', '', '0', '70', 'REP');";
 
 			$query[] = "INSERT ignore INTO `menu_permiso` ( `codigo_permiso` , `codigo_menu` )
 								VALUES (
@@ -588,7 +588,7 @@ function Actualizaciones(&$dbh, $new_version) {
 			break;
 
 		case 2.3:
-			$query = "UPDATE `menu` SET `glosa` = 'Generación de Cobros',
+			$query = "UPDATE `menu` SET `glosa` = 'Generaciï¿½n de Cobros',
 								`url` = '/app/interfaces/genera_cobros.php',
 								`codigo_padre` = 'COBRANZA' WHERE CONVERT( `codigo` USING utf8 ) = 'COBROS' LIMIT 1";
 			if (!($resp = mysql_query($query, $dbh)))
@@ -598,7 +598,7 @@ function Actualizaciones(&$dbh, $new_version) {
 			break;
 
 		case 2.31:
-			### Update cobro para los antiguos que no están relacionados a ningún contrato. ###
+			### Update cobro para los antiguos que no estï¿½n relacionados a ningï¿½n contrato. ###
 			$query[] = "UPDATE cobro
 								JOIN cobro_asunto ON cobro.id_cobro = cobro_asunto.id_cobro
 								JOIN asunto ON cobro_asunto.codigo_asunto = asunto.codigo_asunto
@@ -779,7 +779,7 @@ function Actualizaciones(&$dbh, $new_version) {
 
 
 			if (ExisteCampo('codigo_cliente', 'actividad', $dbh))
-				$query[] = "ALTER TABLE `actividad` CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este código es vacío si la actividad sirve para todos los asuntos'";
+				$query[] = "ALTER TABLE `actividad` CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este cï¿½digo es vacï¿½o si la actividad sirve para todos los asuntos'";
 
 
 			if (!ExisteLlaveForanea('cta_corriente', 'codigo_asunto', 'asunto', 'codigo_asunto', $dbh))
@@ -971,7 +971,7 @@ function Actualizaciones(&$dbh, $new_version) {
 				throw new Exception($query . "---" . mysql_error());
 
 			$query = "ALTER TABLE `actividad` CHANGE `codigo_asunto` `codigo_asunto` VARCHAR( 10 )
-							CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este código es vacío si la actividad sirve para todos los asuntos'";
+							CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Este cï¿½digo es vacï¿½o si la actividad sirve para todos los asuntos'";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 
@@ -1046,14 +1046,14 @@ function Actualizaciones(&$dbh, $new_version) {
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 
-			$query = "UPDATE `menu` SET `glosa` = 'Gráfico profesionales',
+			$query = "UPDATE `menu` SET `glosa` = 'Grï¿½fico profesionales',
 		`url` = '/app/interfaces/reportes_usuarios.php',
 		`codigo_padre` = 'REP' WHERE CONVERT( `codigo` USING utf8 ) = 'REP_US' LIMIT 1";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 
 			$query = "INSERT INTO `menu` ( `codigo` , `glosa` , `url` , `descripcion` , `foto_url` , `tipo` , `orden` , `codigo_padre` )
-					VALUES ('REP_ESPE', 'Específicos', '/app/interfaces/reportes_especificos.php', '', '', '0', '80', 'REP');";
+					VALUES ('REP_ESPE', 'Especï¿½ficos', '/app/interfaces/reportes_especificos.php', '', '', '0', '80', 'REP');";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 
@@ -1562,8 +1562,8 @@ function Actualizaciones(&$dbh, $new_version) {
 
 			echo "Cambios realizados: <br>
 				-Se pueden inrgesar cobros programados. <br>
-				-En la generación de cobros se puede generar directamente por cobro programado. <br>
-				-El la generación masiva te da la opción de generar programados o WIP. <br>
+				-En la generaciï¿½n de cobros se puede generar directamente por cobro programado. <br>
+				-El la generaciï¿½n masiva te da la opciï¿½n de generar programados o WIP. <br>
 				-Se puede ingresar una descripcion a la cobranza. <br>
 				-Los documentos se separaron del menu de cobranza. <br>";
 
@@ -1816,7 +1816,7 @@ function Actualizaciones(&$dbh, $new_version) {
 				throw new Exception($query . "---" . mysql_error());
 			$query = "ALTER TABLE  `cobro`
 									ADD `porcentaje_impuesto` tinyint(3) unsigned NOT NULL default '0'
-											COMMENT 'Para agregar el impuesto al final cuando no está incluido en el valor del cobro.'
+											COMMENT 'Para agregar el impuesto al final cuando no estï¿½ incluido en el valor del cobro.'
 									AFTER  `monto_subtotal` ;";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
@@ -1832,12 +1832,12 @@ function Actualizaciones(&$dbh, $new_version) {
 		case 2.8:
 
 			$query = "CREATE TABLE if not exists `configuracion` (
-								`id` int(11) NOT NULL auto_increment COMMENT 'Necesario para la página de configuración.',
+								`id` int(11) NOT NULL auto_increment COMMENT 'Necesario para la pï¿½gina de configuraciï¿½n.',
 								`glosa_opcion` varchar(64) NOT NULL default '' COMMENT 'Nombre de la opcion para mostrar al usuario.',
 								`valor_opcion` text NOT NULL,
 								`comentario` varchar(255) default NULL COMMENT 'Comentario explicando la funcionalidad para mostrar al usuario.',
-								`valores_posibles` varchar(255) NOT NULL default '' COMMENT 'Puede ser \"numero\" para que el usuario ingrese un número, \"string\" para string ingresado por el usuario, \"boolean\" para un checkbox o \"select;valor1;valor2;...\" para generar un select con los valores definidos.',
-								`orden` int(11) NOT NULL default '-1' COMMENT 'Orden de aparición en la página de configuración, -1 para no mostrar la opción.',
+								`valores_posibles` varchar(255) NOT NULL default '' COMMENT 'Puede ser \"numero\" para que el usuario ingrese un nï¿½mero, \"string\" para string ingresado por el usuario, \"boolean\" para un checkbox o \"select;valor1;valor2;...\" para generar un select con los valores definidos.',
+								`orden` int(11) NOT NULL default '-1' COMMENT 'Orden de apariciï¿½n en la pï¿½gina de configuraciï¿½n, -1 para no mostrar la opciï¿½n.',
 								PRIMARY KEY  (`id`)
 								) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=19;";
 			if (!($resp = mysql_query($query, $dbh)))
@@ -1845,21 +1845,21 @@ function Actualizaciones(&$dbh, $new_version) {
 
 			$query = "INSERT ignore   INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `orden`)
 									VALUES
-									(1, 'MaxDiasIngresoTrabajo', '-1', 'Máximo de días hacia atrás en los que se pueden ingresar trabajos, -1 indica que no hay líÂ­mite.', 'numero', 1),
-									(2, 'MaxDiasIngresoTrabajoRevisor', '-1', 'Máximo de días hacia atrás en los que un revisor puede ingresar o modificar trabajos, -1 indica que no hay líÂ­mite.', 'numero', 1),
+									(1, 'MaxDiasIngresoTrabajo', '-1', 'Mï¿½ximo de dï¿½as hacia atrï¿½s en los que se pueden ingresar trabajos, -1 indica que no hay lï¿½Â­mite.', 'numero', 1),
+									(2, 'MaxDiasIngresoTrabajoRevisor', '-1', 'Mï¿½ximo de dï¿½as hacia atrï¿½s en los que un revisor puede ingresar o modificar trabajos, -1 indica que no hay lï¿½Â­mite.', 'numero', 1),
 									(3, 'MailAdmin', '', 'Email al que llegan los avisos del sistema.', 'string', 3),
-									(4, 'Activar corrector ortográfico', '0', NULL, 'boolean', -1),
+									(4, 'Activar corrector ortogrï¿½fico', '0', NULL, 'boolean', -1),
 									(5, 'MailSistema', '', NULL, 'string', -1),
-									(6, 'MaxLoggedTime', '14400', 'Tiempo en segundos que dura la sesión.', 'string', 3),
+									(6, 'MaxLoggedTime', '14400', 'Tiempo en segundos que dura la sesiï¿½n.', 'string', 3),
 									(7, 'DireccionPdf', '', NULL, 'string', 2),
 									(8, 'PdfLinea1', '', NULL, 'string', 3),
 									(9, 'PdfLinea2', '', NULL, 'string', 3),
 									(10, 'PdfLinea3', '', NULL, 'string', 3),
-									(11, 'MailAsuntoNuevo', '0', 'Indica si se envía un email cada vez que se crea un asunto nuevo.', 'boolean', 4),
+									(11, 'MailAsuntoNuevo', '0', 'Indica si se envï¿½a un email cada vez que se crea un asunto nuevo.', 'boolean', 4),
 									(12, 'RecordarSesion', '1', NULL, 'boolean', 4),
 									(13, 'OrdenadoPor', '0', '0 no se necesita, 1 obligatorio, 2 opcional', 'select;0;1;2', -1),
 									(14, 'IdiomaGrande', '0', NULL, 'boolean', 5),
-									(15, 'CorreosModificacionAdminDatos', '', 'Dejar en blanco para que no se envíen mails.', 'string', 5),
+									(15, 'CorreosModificacionAdminDatos', '', 'Dejar en blanco para que no se envï¿½en mails.', 'string', 5),
 									(16, 'ImprimirDuracionTrabajada', '0', NULL, 'boolean', 7),
 									(17, 'ImprimirValorTrabajo', '0', NULL, 'boolean', 7),
 									(18, 'DiaMailSemanal', 'Fri', NULL, 'select;Mon;Tue;Wed;Thu;Fri;Sat;Sun', 7);";
@@ -1890,7 +1890,7 @@ function Actualizaciones(&$dbh, $new_version) {
 				throw new Exception($query . "---" . mysql_error());
 
 			$query = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`)
-								VALUES ('CONF', 'Configuración', '/app/interfaces/configuracion.php', '', '', '0', '45', 'ADMIN_SIS');";
+								VALUES ('CONF', 'Configuraciï¿½n', '/app/interfaces/configuracion.php', '', '', '0', '45', 'ADMIN_SIS');";
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 
@@ -1898,7 +1898,7 @@ function Actualizaciones(&$dbh, $new_version) {
 			if (!($resp = mysql_query($query, $dbh)))
 				throw new Exception($query . "---" . mysql_error());
 
-			echo "Recordar ingresar la función GetConf en el conf.";
+			echo "Recordar ingresar la funciï¿½n GetConf en el conf.";
 			break;
 		#####MOSTRAR TIPO CAMBIO NOTA DE COBRO####
 		case 2.81:
@@ -2116,7 +2116,7 @@ function Actualizaciones(&$dbh, $new_version) {
 		), (
 		NULL ,  'Cargo Procurador'
 		), (
-		NULL ,  'Teléfono'
+		NULL ,  'Telï¿½fono'
 		), (
 		NULL ,  'Fotocopias'
 		);";
@@ -2128,7 +2128,7 @@ function Actualizaciones(&$dbh, $new_version) {
 					throw new Exception($q . "---" . mysql_error());
 			}
 			break;
-		##### Número OT #####
+		##### Nï¿½mero OT #####
 		case 2.87:
 			$query = "ALTER TABLE  `cta_corriente` ADD  `numero_ot` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `numero_documento` ;";
 			if (!($resp = mysql_query($query, $dbh)))
@@ -2346,7 +2346,7 @@ function Actualizaciones(&$dbh, $new_version) {
 					throw new Exception($q . "---" . mysql_error());
 			}
 			break;
-		#### parametrización glosas excel ####
+		#### parametrizaciï¿½n glosas excel ####
 		case 3.00:
 			$query = array();
 			$query[] = "CREATE TABLE if not exists `prm_excel_cobro` (
@@ -2361,18 +2361,18 @@ function Actualizaciones(&$dbh, $new_version) {
 										(3, 'abogado', 'Abogado', 'Listado de trabajos'),
 										(4, 'asunto', 'Asunto', 'Listado de trabajos'),
 										(5, 'solicitante', 'Solicitante', 'Listado de trabajos'),
-										(6, 'descripcion', 'Descripción', 'Listado de trabajos'),
-										(7, 'duracion_trabajada', 'Duración Trabajada', 'Listado de trabajos'),
-										(8, 'duracion_cobrable', 'Duración', 'Listado de trabajos'),
-										(9, 'duracion_retainer', 'Duración Retainer', 'Listado de trabajos'),
+										(6, 'descripcion', 'Descripciï¿½n', 'Listado de trabajos'),
+										(7, 'duracion_trabajada', 'Duraciï¿½n Trabajada', 'Listado de trabajos'),
+										(8, 'duracion_cobrable', 'Duraciï¿½n', 'Listado de trabajos'),
+										(9, 'duracion_retainer', 'Duraciï¿½n Retainer', 'Listado de trabajos'),
 										(10, 'cobrable', 'Cobrable', 'Listado de trabajos'),
 										(11, 'tarifa_hh', 'Tarifa (%glosa_moneda%)', 'Listado de trabajos'),
 										(12, 'valor_trabajo', 'Valor (%glosa_moneda%)', 'Listado de trabajos'),
 										(13, 'cliente', 'Cliente', 'Encabezado'),
-										(14, 'direccion', 'Dirección', 'Encabezado'),
+										(14, 'direccion', 'Direcciï¿½n', 'Encabezado'),
 										(15, 'rut', 'RUT', 'Encabezado'),
 										(16, 'contacto', 'Contacto', 'Encabezado'),
-										(17, 'telefono', 'Teléfono', 'Encabezado'),
+										(17, 'telefono', 'Telï¿½fono', 'Encabezado'),
 										(18, 'titulo', 'Resumen cobro', 'Resumen'),
 										(19, 'fecha', 'Fecha:', 'Resumen'),
 										(20, 'fecha_desde', 'Fecha desde:', 'Resumen'),
@@ -2400,7 +2400,7 @@ function Actualizaciones(&$dbh, $new_version) {
 										(42, 'total', 'Total (%glosa_moneda%)', 'Detalle profesional'),
 										(43, 'titulo', 'Gastos', 'Listado de gastos'),
 										(44, 'fecha', 'Fecha', 'Listado de gastos'),
-										(45, 'descripcion', 'Descripción', 'Listado de gastos'),
+										(45, 'descripcion', 'Descripciï¿½n', 'Listado de gastos'),
 										(46, 'monto', 'Monto', 'Listado de gastos'),
 										(47, 'horas_retainer', 'Hr. Retainer', 'Detalle profesional'),
 										(48, 'factura', 'Factura NÂº', 'Resumen'),
@@ -2418,7 +2418,7 @@ function Actualizaciones(&$dbh, $new_version) {
 					throw new Exception($q . "---" . mysql_error());
 			}
 			break;
-		#### parametrización glosas en excel (espaÃ±ol e ingles) ####
+		#### parametrizaciï¿½n glosas en excel (espaÃ±ol e ingles) ####
 		case 3.02:
 			$query = array();
 			$query[] = "ALTER TABLE `prm_excel_cobro` DROP COLUMN `glosa`;";
@@ -2429,18 +2429,18 @@ function Actualizaciones(&$dbh, $new_version) {
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'abogado', `glosa_es` = 'Abogado', `glosa_en` = 'Lawyer', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 3;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'asunto', `glosa_es` = 'Asunto', `glosa_en` = 'Matter', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 4;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'solicitante', `glosa_es` = 'Solicitante', `glosa_en` = 'Solicitante', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 5;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'descripcion', `glosa_es` = 'Descripción', `glosa_en` = 'Description', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 6;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_trabajada', `glosa_es` = 'Duración Trabajada', `glosa_en` = 'Worked duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 7;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_cobrable', `glosa_es` = 'Duración', `glosa_en` = 'Collectible duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 8;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_retainer', `glosa_es` = 'Duración Retainer', `glosa_en` = 'Retained duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 9;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'descripcion', `glosa_es` = 'Descripciï¿½n', `glosa_en` = 'Description', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 6;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_trabajada', `glosa_es` = 'Duraciï¿½n Trabajada', `glosa_en` = 'Worked duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 7;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_cobrable', `glosa_es` = 'Duraciï¿½n', `glosa_en` = 'Collectible duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 8;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'duracion_retainer', `glosa_es` = 'Duraciï¿½n Retainer', `glosa_en` = 'Retained duration', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 9;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'cobrable', `glosa_es` = 'Cobrable', `glosa_en` = 'Chargeable', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 10;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'tarifa_hh', `glosa_es` = 'Tarifa (%glosa_moneda%)', `glosa_en` = 'Rate (%glosa_moneda%)', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 11;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'valor_trabajo', `glosa_es` = 'Valor (%glosa_moneda%)', `glosa_en` = 'Amount (%glosa_moneda%)', `grupo` = 'Listado de trabajos' WHERE  `id_prm_excel_cobro` = 12;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'cliente', `glosa_es` = 'Cliente', `glosa_en` = 'Client', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 13;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'direccion', `glosa_es` = 'Dirección', `glosa_en` = 'Address', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 14;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'direccion', `glosa_es` = 'Direcciï¿½n', `glosa_en` = 'Address', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 14;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'rut', `glosa_es` = 'RUT', `glosa_en` = 'Tax Payer Number', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 15;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'contacto', `glosa_es` = 'Contacto', `glosa_en` = 'Contact', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 16;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'telefono', `glosa_es` = 'Teléfono', `glosa_en` = 'Phone Number', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 17;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'telefono', `glosa_es` = 'Telï¿½fono', `glosa_en` = 'Phone Number', `grupo` = 'Encabezado' WHERE  `id_prm_excel_cobro` = 17;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'titulo', `glosa_es` = 'Resumen cobro', `glosa_en` = 'Invoice summary', `grupo` = 'Resumen' WHERE  `id_prm_excel_cobro` = 18;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'fecha', `glosa_es` = 'Fecha:', `glosa_en` = 'Date:', `grupo` = 'Resumen' WHERE  `id_prm_excel_cobro` = 19;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'fecha_desde', `glosa_es` = 'Fecha desde:', `glosa_en` = 'From:', `grupo` = 'Resumen' WHERE  `id_prm_excel_cobro` = 20;";
@@ -2468,7 +2468,7 @@ function Actualizaciones(&$dbh, $new_version) {
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'total', `glosa_es` = 'Total (%glosa_moneda%)', `glosa_en` = 'Total (%glosa_moneda%)', `grupo` = 'Detalle profesional' WHERE  `id_prm_excel_cobro` = 42;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'titulo', `glosa_es` = 'Gastos', `glosa_en` = 'Expenses', `grupo` = 'Listado de gastos' WHERE  `id_prm_excel_cobro` = 43;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'fecha', `glosa_es` = 'Fecha', `glosa_en` = 'Date', `grupo` = 'Listado de gastos' WHERE  `id_prm_excel_cobro` = 44;";
-			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'descripcion', `glosa_es` = 'Descripción', `glosa_en` = 'Descrption', `grupo` = 'Listado de gastos' WHERE  `id_prm_excel_cobro` = 45;";
+			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'descripcion', `glosa_es` = 'Descripciï¿½n', `glosa_en` = 'Descrption', `grupo` = 'Listado de gastos' WHERE  `id_prm_excel_cobro` = 45;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'monto', `glosa_es` = 'Monto', `glosa_en` = 'Amount', `grupo` = 'Listado de gastos' WHERE  `id_prm_excel_cobro` = 46;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'horas_retainer', `glosa_es` = 'Hr. Retainer', `glosa_en` = 'Hrs Retainer', `grupo` = 'Detalle profesional' WHERE  `id_prm_excel_cobro` = 47;";
 			$query[] = "UPDATE prm_excel_cobro SET `nombre_interno` = 'factura', `glosa_es` = 'Factura NÂº', `glosa_en` = 'Invoice NÂº', `grupo` = 'Resumen' WHERE  `id_prm_excel_cobro` = 48;";
@@ -2491,7 +2491,7 @@ function Actualizaciones(&$dbh, $new_version) {
 					throw new Exception($q . "---" . mysql_error());
 			}
 			break;
-		#### Agregación de las tablas del tema trámites ####
+		#### Agregaciï¿½n de las tablas del tema trï¿½mites ####
 		case 3.04:
 			$query = array();
 			$query[] = "ALTER TABLE `contrato` ADD COLUMN `id_tramite_tarifa` INT(11) NULL";
@@ -2539,12 +2539,12 @@ function Actualizaciones(&$dbh, $new_version) {
 									PRIMARY KEY (`id_tramite_valor`),
 									UNIQUE KEY `id_tramite_tarifa_2` (`id_tramite_tipo`,`id_moneda`,`id_tramite_tarifa`)
 									) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=346;";
-			$query[] = "UPDATE `menu` SET `glosa` =  'Gestión', `url` = NULL ,
+			$query[] = "UPDATE `menu` SET `glosa` =  'Gestiï¿½n', `url` = NULL ,
 								`codigo_padre` = NULL WHERE CONVERT( `codigo` USING utf8 ) = 'PRO' LIMIT 1;";
 			$query[] = "INSERT INTO menu ( codigo , glosa , url , descripcion , foto_url , tipo , orden , codigo_padre )
-									VALUES ( 'ADM_TRA', 'Adm. Trámites' , '/app/interfaces/tramites.php' , NULL, NULL, '0' , '25' , 'ADM'),
-												( 'TRA_HRS' , 'Trámites' , '/app/interfaces/horas_tramites.php', NULL , NULL , '0' , '15' , 'PRO' ),
-												( 'TAR_TRA' , 'Tarifa trámites' , '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=2' , NULL , NULL , '0' , '56' , 'COBRANZA') ;";
+									VALUES ( 'ADM_TRA', 'Adm. Trï¿½mites' , '/app/interfaces/tramites.php' , NULL, NULL, '0' , '25' , 'ADM'),
+												( 'TRA_HRS' , 'Trï¿½mites' , '/app/interfaces/horas_tramites.php', NULL , NULL , '0' , '15' , 'PRO' ),
+												( 'TAR_TRA' , 'Tarifa trï¿½mites' , '/app/interfaces/tarifas_tramites.php?id_tramite_tarifa_edicion=2' , NULL , NULL , '0' , '56' , 'COBRANZA') ;";
 			$query[] = "INSERT INTO menu_permiso ( codigo_permiso, codigo_menu )
 									VALUES('ADM' , 'ADM_TRA'),
 												('PRO' , 'TRA_HRS'),
@@ -2589,15 +2589,15 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 
 		case 3.08:
 			$query = array();
-			$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `grupo`) VALUES (50, 'titulo', 'Trámites', 'Trámites', 'Listado de trámites'),
-											(51, 'fecha', 'Fecha', 'Date', 'Listado de trámites'),
-											(52, 'id_trabajo', 'NÂ°', 'NÂ°', 'Listado de trámites'),
-											(53, 'abogado', 'Abogado', 'Lawyer', 'Listado de trámites'),
-											(54, 'asunto', 'Asunto', 'Matter', 'Listado de trámites'),
-											(55, 'solicitante', 'Solicitante', 'Solicitante', 'Listado de trámites'),
-											(56, 'descripcion', 'Descripción', 'Description', 'Listado de trámites'),
-											(57, 'duracion', 'Duración', 'Duration', 'Listado de trámites'),
-											(58, 'valor', 'Valor', 'Amount', 'Listado de trámites');";
+			$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `grupo`) VALUES (50, 'titulo', 'Trï¿½mites', 'Trï¿½mites', 'Listado de trï¿½mites'),
+											(51, 'fecha', 'Fecha', 'Date', 'Listado de trï¿½mites'),
+											(52, 'id_trabajo', 'NÂ°', 'NÂ°', 'Listado de trï¿½mites'),
+											(53, 'abogado', 'Abogado', 'Lawyer', 'Listado de trï¿½mites'),
+											(54, 'asunto', 'Asunto', 'Matter', 'Listado de trï¿½mites'),
+											(55, 'solicitante', 'Solicitante', 'Solicitante', 'Listado de trï¿½mites'),
+											(56, 'descripcion', 'Descripciï¿½n', 'Description', 'Listado de trï¿½mites'),
+											(57, 'duracion', 'Duraciï¿½n', 'Duration', 'Listado de trï¿½mites'),
+											(58, 'valor', 'Valor', 'Amount', 'Listado de trï¿½mites');";
 			foreach ($query as $q) {
 				if (!($resp = mysql_query($q, $dbh)))
 					throw new Exception($q . "---" . mysql_error());
@@ -2698,8 +2698,8 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[] = "ALTER TABLE `configuracion` ENGINE = innodb;";
 			$query[] = "INSERT ignore   INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 								VALUES ( 19 , 'CiudadSignatura', '' , 'La ciudad ingresada va a aparecer en la firma junto con la fecha del documento', 'string', '4', '425'),
-											 ( 20 , 'Numeracion', '310000039689', 'Numeración autorizada por la dian mediante res. No.', 'numero','4', '430'),
-											 ( 21 , 'NumeracionFecha', '2009-05-20', 'Fecha de Numeración', 'string','4', '435'),
+											 ( 20 , 'Numeracion', '310000039689', 'Numeraciï¿½n autorizada por la dian mediante res. No.', 'numero','4', '430'),
+											 ( 21 , 'NumeracionFecha', '2009-05-20', 'Fecha de Numeraciï¿½n', 'string','4', '435'),
 											 ( 22 , 'NumeracionDesde', '41008', NULL , 'numero','4', '440'),
 											 ( 23 , 'NumeracionHasta', '45000', NULL , 'numero','4', '445'),
 											 ( 24 , 'NombreEmpresa', '' , NULL , 'string','1', '130'),
@@ -2710,7 +2710,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 												`id_configuracion_categoria`='1', `orden` = '105' WHERE `id` =3 LIMIT 1 ;";
 			$query[] = "UPDATE `configuracion` SET `comentario` =  NULL , `id_configuracion_categoria`='1',
 												`orden` = '110' WHERE `id` =5 LIMIT 1 ;";
-			$query[] = "UPDATE `configuracion` SET `comentario` =  'Tiempo en segundos que dura la sesión.',
+			$query[] = "UPDATE `configuracion` SET `comentario` =  'Tiempo en segundos que dura la sesiï¿½n.',
 												`id_configuracion_categoria`='1', `orden` = '115' WHERE `id` =6 LIMIT 1 ;";
 			$query[] = "UPDATE `configuracion` SET `comentario` =  NULL , `id_configuracion_categoria`='1',
 												`orden` = '120' WHERE `id` =12 LIMIT 1 ;";
@@ -2722,9 +2722,9 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 												`id_configuracion_categoria`='2', `orden` = '210' WHERE `id` =16 LIMIT 1 ;";
 			$query[] = "UPDATE `configuracion` SET `comentario` =  NULL ,
 												`id_configuracion_categoria`='2', `orden` = '215' WHERE `id` =17 LIMIT 1 ;";
-			$query[] = "UPDATE `configuracion` SET `comentario` =  'Indica si se envía un email cada vez que se crea un asunto nuevo.',
+			$query[] = "UPDATE `configuracion` SET `comentario` =  'Indica si se envï¿½a un email cada vez que se crea un asunto nuevo.',
 												`id_configuracion_categoria`='3', `orden` = '305' WHERE `id` =11 LIMIT 1 ;";
-			$query[] = "UPDATE `configuracion` SET `comentario` =  'Dejar en blanco para que no se envíen mails.',
+			$query[] = "UPDATE `configuracion` SET `comentario` =  'Dejar en blanco para que no se envï¿½en mails.',
 												`id_configuracion_categoria`='3', `orden` = '310' WHERE `id` =15 LIMIT 1 ;";
 			$query[] = "UPDATE `configuracion` SET `comentario` =  NULL ,
 												`id_configuracion_categoria`='3', `orden` = '315' WHERE `id` =18 LIMIT 1 ;";
@@ -2735,7 +2735,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[] = "INSERT INTO `configuracion_categoria` (`id_configuracion_categoria`, `glosa_configuracion_categoria`)
 											VALUES (1, 'Datos Generales'),
 														 (2, 'Datos Cobranza'),
-														 (3, 'Configuración alertas'),
+														 (3, 'Configuraciï¿½n alertas'),
 														 (4, 'Opciones documentos');";
 			foreach ($query as $q) {
 				if (!($resp = mysql_query($q, $dbh)))
@@ -3009,7 +3009,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 																) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 			$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '15' WHERE  `id_prm_excel_cobro` =3 LIMIT 1;";
 			$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '12' WHERE  `id_prm_excel_cobro` =2 LIMIT 1;";
-			$query[] = "INSERT ignore   INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ZonaHoraria', 'America/Santiago', 'Se debe agregar el nombre de la zona horaria que utilizará el sistema', 'string', 1, -1);";
+			$query[] = "INSERT ignore   INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ZonaHoraria', 'America/Santiago', 'Se debe agregar el nombre de la zona horaria que utilizarï¿½ el sistema', 'string', 1, -1);";
 			$query[] = "ALTER TABLE  `trabajo_respaldo_excel`
 														ADD  `codigo_asunto` VARCHAR( 10 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL AFTER  `id_usuario` ,
 														ADD  `id_cobro` INT( 11 ) NULL AFTER  `codigo_asunto` ;";
@@ -3043,8 +3043,8 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 		case 3.27:
 			$query = array();
 
-			//Agrego la categoría Administración, si no existe.
-			$query[] = "INSERT INTO prm_categoria_usuario (glosa_categoria,id_categoria_lemontech) SELECT 'Administración' as glosa_categoria, 5 as id_categoria_lemontech FROM DUAL WHERE NOT EXISTS (SELECT * FROM `prm_categoria_usuario` WHERE  glosa_categoria  LIKE '%dminis%')";
+			//Agrego la categorï¿½a Administraciï¿½n, si no existe.
+			$query[] = "INSERT INTO prm_categoria_usuario (glosa_categoria,id_categoria_lemontech) SELECT 'Administraciï¿½n' as glosa_categoria, 5 as id_categoria_lemontech FROM DUAL WHERE NOT EXISTS (SELECT * FROM `prm_categoria_usuario` WHERE  glosa_categoria  LIKE '%dminis%')";
 			$query[] = "UPDATE prm_categoria_usuario SET id_categoria_lemontech = 2 WHERE glosa_categoria = 'Asociado Senior';";
 			$query[] = "UPDATE prm_categoria_usuario SET id_categoria_lemontech = 3 WHERE glosa_categoria = 'Asociado Junior';";
 			$query[] = "UPDATE prm_categoria_usuario SET id_categoria_lemontech = 3 WHERE glosa_categoria = 'Asesor Externo';";
@@ -3057,7 +3057,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 						LEFT JOIN usuario_permiso as comercial ON (usuario.id_usuario = comercial.id_usuario AND comercial.codigo_permiso = 'SOC')
 						WHERE id_categoria_usuario IS NULL ";
 
-			//Obtengo las categorías a las que se puede asignar.
+			//Obtengo las categorï¿½as a las que se puede asignar.
 			$query_admin = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 5 LIMIT 1 ";
 			$query_socio = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 1 LIMIT 1 ";
 			$query_junior = " SELECT id_categoria_usuario FROM prm_categoria_usuario WHERE id_categoria_lemontech = 3 LIMIT 1 ";
@@ -3087,7 +3087,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			if (!($resp_usuarios = mysql_query($query_usuarios, $sesion->dbh)))
 				throw new Exception($query_usuarios . "---" . mysql_error());
 			while (list($id_usuario, $profesional, $comercial) = mysql_fetch_array($resp_usuarios)) {
-				//por cada usuario sin categoría, puede tener la categoría 'Admin', 'Asociado Junior', o 'Socio' dependiendo de los permisos
+				//por cada usuario sin categorï¿½a, puede tener la categorï¿½a 'Admin', 'Asociado Junior', o 'Socio' dependiendo de los permisos
 				if (!$profesional) {
 					$query[] = "UPDATE usuario SET id_categoria_usuario = '" . $admin . "' WHERE id_usuario = '" . $id_usuario . "'";
 				} else {
@@ -3121,7 +3121,7 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 					throw new Exception($q . "---" . mysql_error());
 			break;
 
-		/* Achicar tamaÃ±o de las columnas fecha y abogado al tamaÃ±o que tenía antes de lo modificacion 3.25 */
+		/* Achicar tamaÃ±o de las columnas fecha y abogado al tamaÃ±o que tenï¿½a antes de lo modificacion 3.25 */
 		case 3.29:
 			$query = array();
 			$query[] = "UPDATE  `prm_excel_cobro` SET  `tamano` =  '9' WHERE  `id_prm_excel_cobro` =2 LIMIT 1;";
@@ -3261,13 +3261,13 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 													PRIMARY KEY  (`id_configuracion_categoria`)
 												) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;";
 			$query[] = "CREATE TABLE if not exists `configuracion` (
-													`id` int(11) NOT NULL auto_increment COMMENT 'Necesario para la página de configuración.',
+													`id` int(11) NOT NULL auto_increment COMMENT 'Necesario para la pï¿½gina de configuraciï¿½n.',
 													`glosa_opcion` varchar(64) NOT NULL default '' COMMENT 'Nombre de la opcion para mostrar al usuario.',
 													`valor_opcion` text NOT NULL,
 													`comentario` varchar(255) default NULL COMMENT 'Comentario explicando la funcionalidad para mostrar al usuario.',
-													`valores_posibles` varchar(255) NOT NULL default '' COMMENT 'Puede ser \"numero\" para que el usuario ingrese un número, \"string\" para string ingresado por el usuario, \"boolean\" para un checkbox o \"select;valor1;valor2;...\" para generar un select con los valores definidos.',
+													`valores_posibles` varchar(255) NOT NULL default '' COMMENT 'Puede ser \"numero\" para que el usuario ingrese un nï¿½mero, \"string\" para string ingresado por el usuario, \"boolean\" para un checkbox o \"select;valor1;valor2;...\" para generar un select con los valores definidos.',
 													`id_configuracion_categoria` int(11) NOT NULL default '0',
-													`orden` int(11) NOT NULL default '-1' COMMENT 'Orden de aparición en la página de configuración, -1 para no mostrar la opción.',
+													`orden` int(11) NOT NULL default '-1' COMMENT 'Orden de apariciï¿½n en la pï¿½gina de configuraciï¿½n, -1 para no mostrar la opciï¿½n.',
 													PRIMARY KEY  (`id`)
 												) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
 			$query[] = "ALTER TABLE `configuracion` ADD INDEX (  `id_configuracion_categoria` );";
@@ -3277,16 +3277,16 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 			$query[] = "ALTER TABLE  `configuracion` ADD UNIQUE (`glosa_opcion`);";
 			$query[] = "INSERT INTO `configuracion_categoria` (`id_configuracion_categoria`, `glosa_configuracion_categoria`) VALUES (1, 'Datos Generales'),
 													(2, 'Datos Cobranza'),
-													(3, 'Configuración alertas'),
+													(3, 'Configuraciï¿½n alertas'),
 													(4, 'Opciones documentos'),
 													(5, 'Administracion Reportes por Lemontech'),
 													(6, 'Configuracion por Lemontech');";
 			if (method_exists('Conf', 'MaxLoggedTime'))
 				$query[] = "INSERT ignore   INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
-													(31, 'MaxLoggedTime', '" . Conf::MaxLoggedTime() . "', 'Tiempo en segundos que dura la sesión', 'string', 6, 10);";
+													(31, 'MaxLoggedTime', '" . Conf::MaxLoggedTime() . "', 'Tiempo en segundos que dura la sesiï¿½n', 'string', 6, 10);";
 			else
 				$query[] = "INSERT ignore   INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
-													(31, 'MaxLoggedTime', '14400', 'Tiempo en segundos que dura la sesión', 'string', 6, 10);";
+													(31, 'MaxLoggedTime', '14400', 'Tiempo en segundos que dura la sesiï¿½n', 'string', 6, 10);";
 
 			if (method_exists('Conf', 'MailSistema'))
 				$query[] = "INSERT ignore   INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
@@ -3917,17 +3917,17 @@ ADD `impuesto_gastos` DOUBLE NOT NULL AFTER `subtotal_gastos` ;";
 
 			if (method_exists('Conf', 'ZonaHoraria'))
 				$query[] = "INSERT ignore   INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
-													(138, 'ZonaHoraria', '" . Conf::ZonaHoraria() . "', 'Se debe agregar el nombre de la zona horaria que utilizará el sistema', 'string', 6, -1);";
+													(138, 'ZonaHoraria', '" . Conf::ZonaHoraria() . "', 'Se debe agregar el nombre de la zona horaria que utilizarï¿½ el sistema', 'string', 6, -1);";
 			else
 				$query[] = "INSERT ignore   INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
-													(138, 'ZonaHoraria', 'America/Santiago', 'Se debe agregar el nombre de la zona horaria que utilizará el sistema', 'string', 6, -1);";
+													(138, 'ZonaHoraria', 'America/Santiago', 'Se debe agregar el nombre de la zona horaria que utilizarï¿½ el sistema', 'string', 6, -1);";
 
 			if (method_exists('Conf', 'CiudadSignatura'))
 				$query[] = "INSERT ignore   INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
-													(139, 'CiudadSignatura', '" . Conf::CiudadSignatura() . "', 'La ciudad ingresada aquí va a aparecer en la signatura junto con la fecha', 'string', 4, 760);";
+													(139, 'CiudadSignatura', '" . Conf::CiudadSignatura() . "', 'La ciudad ingresada aquï¿½ va a aparecer en la signatura junto con la fecha', 'string', 4, 760);";
 			else
 				$query[] = "INSERT ignore   INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
-													(139, 'CiudadSignatura', '', 'La ciudad ingresada aquí va a aparecer en la signatura junto con la fecha', 'string', 4, 760);";
+													(139, 'CiudadSignatura', '', 'La ciudad ingresada aquï¿½ va a aparecer en la signatura junto con la fecha', 'string', 4, 760);";
 
 			if (method_exists('Conf', 'NombreEmpresa'))
 				$query[] = "INSERT ignore   INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
@@ -4029,7 +4029,7 @@ ADD `notificado_monto_excedido` tinyint(4) NOT NULL default '0' AFTER `notificad
 
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 VALUES (
-NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Alerta.',  'boolean',  '6',  '20'
+NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan lï¿½mites de Alerta.',  'boolean',  '6',  '20'
 );";
 
 			foreach ($query as $q)
@@ -4070,7 +4070,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 								`monto_documento_gastos` DOUBLE NOT NULL ,
 								`id_moneda_documento` INT( 11 ) NOT NULL ,
 								PRIMARY KEY ( `id_factura` , `id_cobro` )
-								) ENGINE = INNODB COMMENT = 'Relación de facturas que incluyen cobros';";
+								) ENGINE = INNODB COMMENT = 'Relaciï¿½n de facturas que incluyen cobros';";
 
 			$query[] = "ALTER TABLE `factura_cobro` ADD `impuesto_factura` DOUBLE NOT NULL DEFAULT '0' AFTER `monto_factura` ;";
 
@@ -4097,8 +4097,8 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 
 
 			$query[] = "INSERT INTO `prm_documento_legal` VALUES  (1,'Factura'),
-						 (2,'Nota de crédito'),
-						 (3,'Nota de débito'),
+						 (2,'Nota de crï¿½dito'),
+						 (3,'Nota de dï¿½bito'),
 						 (4,'Boleta');";
 
 			$query[] = "
@@ -4264,7 +4264,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 
 		case 3.54:
 			$query = array();
-			$query[] = "ALTER TABLE `prm_documento_legal` ADD `numero_inicial` INT NOT NULL COMMENT 'ultimo numero usado como instalación del documento legal para usar correlativo';";
+			$query[] = "ALTER TABLE `prm_documento_legal` ADD `numero_inicial` INT NOT NULL COMMENT 'ultimo numero usado como instalaciï¿½n del documento legal para usar correlativo';";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -4338,7 +4338,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 
 		case 3.59:
 			$query = array();
-			$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('FACTURA', 'Facturación', '/app/interfaces/mantencion_facturacion.php', '', '', 0, 300, 'ADMIN_SIS');";
+			$query[] = "INSERT INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('FACTURA', 'Facturaciï¿½n', '/app/interfaces/mantencion_facturacion.php', '', '', 0, 300, 'ADMIN_SIS');";
 			$query[] = "INSERT INTO `menu_permiso` (`codigo_permiso`, `codigo_menu`) VALUES ('ADM', 'FACTURA');";
 
 			foreach ($query as $q)
@@ -4386,7 +4386,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 												VALUES (
-												NULL ,  'PagoRetencionImpuesto',  '0',  'Indica si se usa la funcionalidad del pago de retención',  'boolean',  '6',  '-1'
+												NULL ,  'PagoRetencionImpuesto',  '0',  'Indica si se usa la funcionalidad del pago de retenciï¿½n',  'boolean',  '6',  '-1'
 												);";
 
 			foreach ($query as $q)
@@ -4412,7 +4412,7 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 			$query = array();
 			$query[] = " INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 													VALUES (
-													NULL ,  'MonedaTarifaPorDefecto',  '" . $glosa_moneda_base . "',  '',  'select;Peso;Dólar;UF;UTM;Euro;UTA',  '2',  '299'
+													NULL ,  'MonedaTarifaPorDefecto',  '" . $glosa_moneda_base . "',  '',  'select;Peso;Dï¿½lar;UF;UTM;Euro;UTA',  '2',  '299'
 													);";
 
 			foreach ($query as $q)
@@ -4625,19 +4625,19 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 
 			$query[] = "INSERT ignore INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` )
 						VALUES (
-						NULL ,  'fecha_dia',  'Día',  'Day',  '4',  'Listado de trabajos'
+						NULL ,  'fecha_dia',  'Dï¿½a',  'Day',  '4',  'Listado de trabajos'
 						), (
 						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trabajos'
 						);";
-			$query[] = "INSERT ignore INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trabajos');";
+			$query[] = "INSERT ignore INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Aï¿½o', 'Year', '6', 'Listado de trabajos');";
 
 			$query[] = "INSERT ignore INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` )
 						VALUES (
-						NULL ,  'fecha_dia',  'Día',  'Day',  '4',  'Listado de trámites'
+						NULL ,  'fecha_dia',  'Dï¿½a',  'Day',  '4',  'Listado de trï¿½mites'
 						), (
-						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trámites'
+						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trï¿½mites'
 						);";
-			$query[] = "INSERT  ignore INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trámites');";
+			$query[] = "INSERT  ignore INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Aï¿½o', 'Year', '6', 'Listado de trï¿½mites');";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -4803,11 +4803,11 @@ NULL ,  'AlertaCliente',  '0',  'Permite que los clientes tengan límites de Aler
 
 			$query[] = "INSERT ignore INTO  `prm_area_trabajo` ( `glosa` )
 								VALUES ( 'Corporativo' ),
-								( 'Contratación Estatal' ),
+								( 'Contrataciï¿½n Estatal' ),
 								( 'Financiero' ),
 								( 'Mercado de Valores' ),
 								( 'Fusiones y Adquisiciones' ),
-								( 'Minero y Energético' ),
+								( 'Minero y Energï¿½tico' ),
 								( 'Laboral' ),
 								( 'Litigio y Arbitraje' ),
 								( 'Tributario' );";
@@ -5039,7 +5039,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 			$query[] = "ALTER TABLE `cta_cte_fact_mvto_neteo`
 													ADD CONSTRAINT `cta_cte_fact_mvto_neteo_ibfk_4` FOREIGN KEY (`id_mvto_pago`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON UPDATE CASCADE,
 													ADD CONSTRAINT `cta_cte_fact_mvto_neteo_ibfk_3` FOREIGN KEY (`id_mvto_deuda`) REFERENCES `cta_cte_fact_mvto` (`id_cta_cte_mvto`) ON UPDATE CASCADE;";
-			$query[] = "ALTER TABLE  `factura` CHANGE  `cliente`  `cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT  'Razón Social Cliente'";
+			$query[] = "ALTER TABLE  `factura` CHANGE  `cliente`  `cliente` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT  'Razï¿½n Social Cliente'";
 
 
 			foreach ($query as $q)
@@ -5172,7 +5172,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 			if (!ExisteCampo('glosa_moneda_plural', 'prm_moneda', $dbh))
 				$query[] = "ALTER TABLE  `prm_moneda` ADD  `glosa_moneda_plural` VARCHAR( 100 ) NOT NULL COMMENT  'este campo se usa principalmente en cambiar montos por palabras' AFTER `glosa_moneda` ;";
 			$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =  'Pesos' WHERE glosa_moneda =  'Peso'";
-			$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'Dólares' WHERE glosa_moneda =  'Dólar'";
+			$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'Dï¿½lares' WHERE glosa_moneda =  'Dï¿½lar'";
 			$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'Euros' WHERE glosa_moneda =  'Euro'";
 			$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'Soles' WHERE glosa_moneda =  'Soles'";
 			$query[] = "UPDATE prm_moneda SET glosa_moneda_plural =   'UF' WHERE glosa_moneda =  'UF'";
@@ -5214,9 +5214,9 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 
 			$query[] = "INSERT ignore INTO `prm_factura_pago_concepto` (`id_concepto`, `glosa`, `pje_variable`, `orden`) VALUES
 																								(1, 'Cobranza al 100%', 0, 2),
-																								(2, 'Cobranza de detracción 12%', 0, 6),
-																								(3, 'Comisión y gastos bancarios', 0, 7),
-																								(4, 'Retención', 0, 15),
+																								(2, 'Cobranza de detracciï¿½n 12%', 0, 6),
+																								(3, 'Comisiï¿½n y gastos bancarios', 0, 7),
+																								(4, 'Retenciï¿½n', 0, 15),
 																								(5, 'Dscto. nota de credito', 0, 8),
 																								(6, 'Cobranza al 88%', 0, 3),
 																								(7, 'Gastos Financieros', 0, 10),
@@ -5455,10 +5455,10 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 
 		case 4.26:
 			$query = array();
-			$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'N°', `glosa_en` =  'N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =1 LIMIT 1 ;";
-			$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'Factura N°', `glosa_en` =  'Invoice N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =48 LIMIT 1 ;";
-			$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'Minuta de cobro N°', `glosa_en` =  'Bill of charge N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =49 LIMIT 1 ;";
-			$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'N°', `glosa_en` =  'N°' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =52 LIMIT 1 ;";
+			$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'Nï¿½', `glosa_en` =  'Nï¿½' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =1 LIMIT 1 ;";
+			$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'Factura Nï¿½', `glosa_en` =  'Invoice Nï¿½' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =48 LIMIT 1 ;";
+			$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'Minuta de cobro Nï¿½', `glosa_en` =  'Bill of charge Nï¿½' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =49 LIMIT 1 ;";
+			$query[] = "UPDATE  `prm_excel_cobro` SET  `glosa_es` =  'Nï¿½', `glosa_en` =  'Nï¿½' WHERE  `prm_excel_cobro`.`id_prm_excel_cobro` =52 LIMIT 1 ;";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -5503,7 +5503,7 @@ ADD `incluye_gastos` TINYINT( 1 ) NOT NULL DEFAULT '1' AFTER `incluye_honorarios
 
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 														VALUES (
-														NULL ,  'MaxDuracionTrabajo',  '14',  'duración maxima que puede tener un trabajo',  'numero',  '2',  '240'
+														NULL ,  'MaxDuracionTrabajo',  '14',  'duraciï¿½n maxima que puede tener un trabajo',  'numero',  '2',  '240'
 														);";
 
 			foreach ($query as $q)
@@ -5577,51 +5577,51 @@ VALUES (
 	PRIMARY KEY  (`id_pais`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
 			$query[] = "
-INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nombre`, `preferencia`) VALUES (1, 4, 'AF', 'AFG', 'Afganistán', 0),
+INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas`, `nombre`, `preferencia`) VALUES (1, 4, 'AF', 'AFG', 'Afganistï¿½n', 0),
 (2, 248, 'AX', 'ALA', 'Islas Gland', 0),
 (3, 8, 'AL', 'ALB', 'Albania', 0),
 (4, 276, 'DE', 'DEU', 'Alemania', 0),
 (5, 20, 'AD', 'AND', 'Andorra', 0),
 (6, 24, 'AO', 'AGO', 'Angola', 0),
 (7, 660, 'AI', 'AIA', 'Anguilla', 0),
-(8, 10, 'AQ', 'ATA', 'Antártida', 0),
+(8, 10, 'AQ', 'ATA', 'Antï¿½rtida', 0),
 (9, 28, 'AG', 'ATG', 'Antigua y Barbuda', 0),
 (10, 530, 'AN', 'ANT', 'Antillas Holandesas', 0),
-(11, 682, 'SA', 'SAU', 'Arabia Saudí', 0),
+(11, 682, 'SA', 'SAU', 'Arabia Saudï¿½', 0),
 (12, 12, 'DZ', 'DZA', 'Argelia', 0),
 (13, 32, 'AR', 'ARG', 'Argentina', 1),
 (14, 51, 'AM', 'ARM', 'Armenia', 0),
 (15, 533, 'AW', 'ABW', 'Aruba', 0),
 (16, 36, 'AU', 'AUS', 'Australia', 0),
 (17, 40, 'AT', 'AUT', 'Austria', 0),
-(18, 31, 'AZ', 'AZE', 'Azerbaiyán', 0),
+(18, 31, 'AZ', 'AZE', 'Azerbaiyï¿½n', 0),
 (19, 44, 'BS', 'BHS', 'Bahamas', 0),
-(20, 48, 'BH', 'BHR', 'Bahréin', 0),
+(20, 48, 'BH', 'BHR', 'Bahrï¿½in', 0),
 (21, 50, 'BD', 'BGD', 'Bangladesh', 0),
 (22, 52, 'BB', 'BRB', 'Barbados', 0),
 (23, 112, 'BY', 'BLR', 'Bielorrusia', 0),
-(24, 56, 'BE', 'BEL', 'Bélgica', 0),
+(24, 56, 'BE', 'BEL', 'Bï¿½lgica', 0),
 (25, 84, 'BZ', 'BLZ', 'Belice', 0),
 (26, 204, 'BJ', 'BEN', 'Benin', 0),
 (27, 60, 'BM', 'BMU', 'Bermudas', 0),
-(28, 64, 'BT', 'BTN', 'Bhután', 0),
+(28, 64, 'BT', 'BTN', 'Bhutï¿½n', 0),
 (29, 68, 'BO', 'BOL', 'Bolivia', 1),
 (30, 70, 'BA', 'BIH', 'Bosnia y Herzegovina', 0),
 (31, 72, 'BW', 'BWA', 'Botsuana', 0),
 (32, 74, 'BV', 'BVT', 'Isla Bouvet', 0),
 (33, 76, 'BR', 'BRA', 'Brasil', 1),
-(34, 96, 'BN', 'BRN', 'Brunéi', 0),
+(34, 96, 'BN', 'BRN', 'Brunï¿½i', 0),
 (35, 100, 'BG', 'BGR', 'Bulgaria', 0),
 (36, 854, 'BF', 'BFA', 'Burkina Faso', 0),
 (37, 108, 'BI', 'BDI', 'Burundi', 0),
 (38, 132, 'CV', 'CPV', 'Cabo Verde', 0),
-(39, 136, 'KY', 'CYM', 'Islas Caimán', 0),
+(39, 136, 'KY', 'CYM', 'Islas Caimï¿½n', 0),
 (40, 116, 'KH', 'KHM', 'Camboya', 0),
-(41, 120, 'CM', 'CMR', 'Camerún', 0),
-(42, 124, 'CA', 'CAN', 'Canadá', 0),
-(43, 140, 'CF', 'CAF', 'República Centroafricana', 0),
+(41, 120, 'CM', 'CMR', 'Camerï¿½n', 0),
+(42, 124, 'CA', 'CAN', 'Canadï¿½', 0),
+(43, 140, 'CF', 'CAF', 'Repï¿½blica Centroafricana', 0),
 (44, 148, 'TD', 'TCD', 'Chad', 0),
-(45, 203, 'CZ', 'CZE', 'República Checa', 0),
+(45, 203, 'CZ', 'CZE', 'Repï¿½blica Checa', 0),
 (46, 152, 'CL', 'CHL', 'Chile', 1),
 (47, 156, 'CN', 'CHN', 'China', 0),
 (48, 196, 'CY', 'CYP', 'Chipre', 0),
@@ -5630,7 +5630,7 @@ INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas
 (51, 166, 'CC', 'CCK', 'Islas Cocos', 0),
 (52, 170, 'CO', 'COL', 'Colombia', 1),
 (53, 174, 'KM', 'COM', 'Comoras', 0),
-(54, 180, 'CD', 'COD', 'República Democrática del Congo', 0),
+(54, 180, 'CD', 'COD', 'Repï¿½blica Democrï¿½tica del Congo', 0),
 (55, 178, 'CG', 'COG', 'Congo', 0),
 (56, 184, 'CK', 'COK', 'Islas Cook', 0),
 (57, 408, 'KP', 'PRK', 'Corea del Norte', 0),
@@ -5641,25 +5641,25 @@ INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas
 (62, 192, 'CU', 'CUB', 'Cuba', 1),
 (63, 208, 'DK', 'DNK', 'Dinamarca', 0),
 (64, 212, 'DM', 'DMA', 'Dominica', 0),
-(65, 214, 'DO', 'DOM', 'República Dominicana', 0),
+(65, 214, 'DO', 'DOM', 'Repï¿½blica Dominicana', 0),
 (66, 218, 'EC', 'ECU', 'Ecuador', 1),
 (67, 818, 'EG', 'EGY', 'Egipto', 0),
 (68, 222, 'SV', 'SLV', 'El Salvador', 1),
-(69, 784, 'AE', 'ARE', 'Emiratos Árabes Unidos', 0),
+(69, 784, 'AE', 'ARE', 'Emiratos ï¿½rabes Unidos', 0),
 (70, 232, 'ER', 'ERI', 'Eritrea', 0),
 (71, 703, 'SK', 'SVK', 'Eslovaquia', 0),
 (72, 705, 'SI', 'SVN', 'Eslovenia', 0),
-(73, 724, 'ES', 'ESP', 'España', 0),
+(73, 724, 'ES', 'ESP', 'Espaï¿½a', 0),
 (74, 581, 'UM', 'UMI', 'Islas ultramarinas de Estados Unidos', 0),
 (75, 840, 'US', 'USA', 'Estados Unidos', 0),
 (76, 233, 'EE', 'EST', 'Estonia', 0),
-(77, 231, 'ET', 'ETH', 'Etiopía', 0),
+(77, 231, 'ET', 'ETH', 'Etiopï¿½a', 0),
 (78, 234, 'FO', 'FRO', 'Islas Feroe', 0),
 (79, 608, 'PH', 'PHL', 'Filipinas', 0),
 (80, 246, 'FI', 'FIN', 'Finlandia', 0),
 (81, 242, 'FJ', 'FJI', 'Fiyi', 0),
 (82, 250, 'FR', 'FRA', 'Francia', 0),
-(83, 266, 'GA', 'GAB', 'Gabón', 0),
+(83, 266, 'GA', 'GAB', 'Gabï¿½n', 0),
 (84, 270, 'GM', 'GMB', 'Gambia', 0),
 (85, 268, 'GE', 'GEO', 'Georgia', 0),
 (86, 239, 'GS', 'SGS', 'Islas Georgias del Sur y Sandwich del Sur', 0),
@@ -5676,31 +5676,31 @@ INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas
 (97, 226, 'GQ', 'GNQ', 'Guinea Ecuatorial', 0),
 (98, 624, 'GW', 'GNB', 'Guinea-Bissau', 0),
 (99, 328, 'GY', 'GUY', 'Guyana', 0),
-(100, 332, 'HT', 'HTI', 'Haití', 0),
+(100, 332, 'HT', 'HTI', 'Haitï¿½', 0),
 (101, 334, 'HM', 'HMD', 'Islas Heard y McDonald', 0),
 (102, 340, 'HN', 'HND', 'Honduras', 1),
 (103, 344, 'HK', 'HKG', 'Hong Kong', 0),
-(104, 348, 'HU', 'HUN', 'Hungría', 0),
+(104, 348, 'HU', 'HUN', 'Hungrï¿½a', 0),
 (105, 356, 'IN', 'IND', 'India', 0),
 (106, 360, 'ID', 'IDN', 'Indonesia', 0),
-(107, 364, 'IR', 'IRN', 'Irán', 0),
+(107, 364, 'IR', 'IRN', 'Irï¿½n', 0),
 (108, 368, 'IQ', 'IRQ', 'Iraq', 0),
 (109, 372, 'IE', 'IRL', 'Irlanda', 0),
 (110, 352, 'IS', 'ISL', 'Islandia', 0),
 (111, 376, 'IL', 'ISR', 'Israel', 0),
 (112, 380, 'IT', 'ITA', 'Italia', 0),
 (113, 388, 'JM', 'JAM', 'Jamaica', 0),
-(114, 392, 'JP', 'JPN', 'Japón', 0),
+(114, 392, 'JP', 'JPN', 'Japï¿½n', 0),
 (115, 400, 'JO', 'JOR', 'Jordania', 0),
-(116, 398, 'KZ', 'KAZ', 'Kazajstán', 0),
+(116, 398, 'KZ', 'KAZ', 'Kazajstï¿½n', 0),
 (117, 404, 'KE', 'KEN', 'Kenia', 0),
-(118, 417, 'KG', 'KGZ', 'Kirguistán', 0),
+(118, 417, 'KG', 'KGZ', 'Kirguistï¿½n', 0),
 (119, 296, 'KI', 'KIR', 'Kiribati', 0),
 (120, 414, 'KW', 'KWT', 'Kuwait', 0),
 (121, 418, 'LA', 'LAO', 'Laos', 0),
 (122, 426, 'LS', 'LSO', 'Lesotho', 0),
 (123, 428, 'LV', 'LVA', 'Letonia', 0),
-(124, 422, 'LB', 'LBN', 'Líbano', 0),
+(124, 422, 'LB', 'LBN', 'Lï¿½bano', 0),
 (125, 430, 'LR', 'LBR', 'Liberia', 0),
 (126, 434, 'LY', 'LBY', 'Libia', 0),
 (127, 438, 'LI', 'LIE', 'Liechtenstein', 0),
@@ -5712,7 +5712,7 @@ INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas
 (133, 458, 'MY', 'MYS', 'Malasia', 0),
 (134, 454, 'MW', 'MWI', 'Malawi', 0),
 (135, 462, 'MV', 'MDV', 'Maldivas', 0),
-(136, 466, 'ML', 'MLI', 'Malí', 0),
+(136, 466, 'ML', 'MLI', 'Malï¿½', 0),
 (137, 470, 'MT', 'MLT', 'Malta', 0),
 (138, 238, 'FK', 'FLK', 'Islas Malvinas', 0),
 (139, 580, 'MP', 'MNP', 'Islas Marianas del Norte', 0),
@@ -5722,10 +5722,10 @@ INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas
 (143, 480, 'MU', 'MUS', 'Mauricio', 0),
 (144, 478, 'MR', 'MRT', 'Mauritania', 0),
 (145, 175, 'YT', 'MYT', 'Mayotte', 0),
-(146, 484, 'MX', 'MEX', 'México', 0),
+(146, 484, 'MX', 'MEX', 'Mï¿½xico', 0),
 (147, 583, 'FM', 'FSM', 'Micronesia', 0),
 (148, 498, 'MD', 'MDA', 'Moldavia', 0),
-(149, 492, 'MC', 'MCO', 'Mónaco', 0),
+(149, 492, 'MC', 'MCO', 'Mï¿½naco', 0),
 (150, 496, 'MN', 'MNG', 'Mongolia', 0),
 (151, 500, 'MS', 'MSR', 'Montserrat', 0),
 (152, 508, 'MZ', 'MOZ', 'Mozambique', 0),
@@ -5734,22 +5734,22 @@ INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas
 (155, 520, 'NR', 'NRU', 'Nauru', 0),
 (156, 524, 'NP', 'NPL', 'Nepal', 0),
 (157, 558, 'NI', 'NIC', 'Nicaragua', 0),
-(158, 562, 'NE', 'NER', 'Níger', 0),
+(158, 562, 'NE', 'NER', 'Nï¿½ger', 0),
 (159, 566, 'NG', 'NGA', 'Nigeria', 0),
 (160, 570, 'NU', 'NIU', 'Niue', 0),
 (161, 574, 'NF', 'NFK', 'Isla Norfolk', 0),
 (162, 578, 'NO', 'NOR', 'Noruega', 0),
 (163, 540, 'NC', 'NCL', 'Nueva Caledonia', 0),
 (164, 554, 'NZ', 'NZL', 'Nueva Zelanda', 0),
-(165, 512, 'OM', 'OMN', 'Omán', 0),
-(166, 528, 'NL', 'NLD', 'Países Bajos', 0),
-(167, 586, 'PK', 'PAK', 'Pakistán', 0),
+(165, 512, 'OM', 'OMN', 'Omï¿½n', 0),
+(166, 528, 'NL', 'NLD', 'Paï¿½ses Bajos', 0),
+(167, 586, 'PK', 'PAK', 'Pakistï¿½n', 0),
 (168, 585, 'PW', 'PLW', 'Palau', 0),
 (169, 275, 'PS', 'PSE', 'Palestina', 0),
-(170, 591, 'PA', 'PAN', 'Panamá', 0),
-(171, 598, 'PG', 'PNG', 'Papúa Nueva Guinea', 0),
+(170, 591, 'PA', 'PAN', 'Panamï¿½', 0),
+(171, 598, 'PG', 'PNG', 'Papï¿½a Nueva Guinea', 0),
 (172, 600, 'PY', 'PRY', 'Paraguay', 1),
-(173, 604, 'PE', 'PER', 'Perú', 1),
+(173, 604, 'PE', 'PER', 'Perï¿½', 1),
 (174, 612, 'PN', 'PCN', 'Islas Pitcairn', 0),
 (175, 258, 'PF', 'PYF', 'Polinesia Francesa', 0),
 (176, 616, 'PL', 'POL', 'Polonia', 0),
@@ -5757,21 +5757,21 @@ INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas
 (178, 630, 'PR', 'PRI', 'Puerto Rico', 0),
 (179, 634, 'QA', 'QAT', 'Qatar', 0),
 (180, 826, 'GB', 'GBR', 'Reino Unido', 0),
-(181, 638, 'RE', 'REU', 'Reunión', 0),
+(181, 638, 'RE', 'REU', 'Reuniï¿½n', 0),
 (182, 646, 'RW', 'RWA', 'Ruanda', 0),
 (183, 642, 'RO', 'ROU', 'Rumania', 0),
 (184, 643, 'RU', 'RUS', 'Rusia', 0),
 (185, 732, 'EH', 'ESH', 'Sahara Occidental', 0),
-(186, 90, 'SB', 'SLB', 'Islas Salomón', 0),
+(186, 90, 'SB', 'SLB', 'Islas Salomï¿½n', 0),
 (187, 882, 'WS', 'WSM', 'Samoa', 0),
 (188, 16, 'AS', 'ASM', 'Samoa Americana', 0),
-(189, 659, 'KN', 'KNA', 'San Cristóbal y Nevis', 0),
+(189, 659, 'KN', 'KNA', 'San Cristï¿½bal y Nevis', 0),
 (190, 674, 'SM', 'SMR', 'San Marino', 0),
-(191, 666, 'PM', 'SPM', 'San Pedro y Miquelón', 0),
+(191, 666, 'PM', 'SPM', 'San Pedro y Miquelï¿½n', 0),
 (192, 670, 'VC', 'VCT', 'San Vicente y las Granadinas', 0),
 (193, 654, 'SH', 'SHN', 'Santa Helena', 0),
-(194, 662, 'LC', 'LCA', 'Santa Lucía', 0),
-(195, 678, 'ST', 'STP', 'Santo Tomé y Príncipe', 0),
+(194, 662, 'LC', 'LCA', 'Santa Lucï¿½a', 0),
+(195, 678, 'ST', 'STP', 'Santo Tomï¿½ y Prï¿½ncipe', 0),
 (196, 686, 'SN', 'SEN', 'Senegal', 0),
 (197, 891, 'CS', 'SCG', 'Serbia y Montenegro', 0),
 (198, 690, 'SC', 'SYC', 'Seychelles', 0),
@@ -5781,37 +5781,37 @@ INSERT ignore INTO `prm_pais` (`id_pais`, `iso_num`, `iso_2siglas`, `iso_3siglas
 (202, 706, 'SO', 'SOM', 'Somalia', 0),
 (203, 144, 'LK', 'LKA', 'Sri Lanka', 0),
 (204, 748, 'SZ', 'SWZ', 'Suazilandia', 0),
-(205, 710, 'ZA', 'ZAF', 'Sudáfrica', 0),
-(206, 736, 'SD', 'SDN', 'Sudán', 0),
+(205, 710, 'ZA', 'ZAF', 'Sudï¿½frica', 0),
+(206, 736, 'SD', 'SDN', 'Sudï¿½n', 0),
 (207, 752, 'SE', 'SWE', 'Suecia', 0),
 (208, 756, 'CH', 'CHE', 'Suiza', 0),
 (209, 740, 'SR', 'SUR', 'Surinam', 0),
 (210, 744, 'SJ', 'SJM', 'Svalbard y Jan Mayen', 0),
 (211, 764, 'TH', 'THA', 'Tailandia', 0),
-(212, 158, 'TW', 'TWN', 'Taiwán', 0),
+(212, 158, 'TW', 'TWN', 'Taiwï¿½n', 0),
 (213, 834, 'TZ', 'TZA', 'Tanzania', 0),
-(214, 762, 'TJ', 'TJK', 'Tayikistán', 0),
-(215, 86, 'IO', 'IOT', 'Territorio Británico del Océano Índico', 0),
+(214, 762, 'TJ', 'TJK', 'Tayikistï¿½n', 0),
+(215, 86, 'IO', 'IOT', 'Territorio Britï¿½nico del Ocï¿½ano ï¿½ndico', 0),
 (216, 260, 'TF', 'ATF', 'Territorios Australes Franceses', 0),
 (217, 626, 'TL', 'TLS', 'Timor Oriental', 0),
 (218, 768, 'TG', 'TGO', 'Togo', 0),
 (219, 772, 'TK', 'TKL', 'Tokelau', 0),
 (220, 776, 'TO', 'TON', 'Tonga', 0),
 (221, 780, 'TT', 'TTO', 'Trinidad y Tobago', 0),
-(222, 788, 'TN', 'TUN', 'Túnez', 0),
+(222, 788, 'TN', 'TUN', 'Tï¿½nez', 0),
 (223, 796, 'TC', 'TCA', 'Islas Turcas y Caicos', 0),
-(224, 795, 'TM', 'TKM', 'Turkmenistán', 0),
-(225, 792, 'TR', 'TUR', 'Turquía', 0),
+(224, 795, 'TM', 'TKM', 'Turkmenistï¿½n', 0),
+(225, 792, 'TR', 'TUR', 'Turquï¿½a', 0),
 (226, 798, 'TV', 'TUV', 'Tuvalu', 0),
 (227, 804, 'UA', 'UKR', 'Ucrania', 0),
 (228, 800, 'UG', 'UGA', 'Uganda', 0),
 (229, 858, 'UY', 'URY', 'Uruguay', 1),
-(230, 860, 'UZ', 'UZB', 'Uzbekistán', 0),
+(230, 860, 'UZ', 'UZB', 'Uzbekistï¿½n', 0),
 (231, 548, 'VU', 'VUT', 'Vanuatu', 0),
 (232, 862, 'VE', 'VEN', 'Venezuela', 1),
 (233, 704, 'VN', 'VNM', 'Vietnam', 0),
-(234, 92, 'VG', 'VGB', 'Islas Vírgenes Británicas', 0),
-(235, 850, 'VI', 'VIR', 'Islas Vírgenes de los Estados Unidos', 0),
+(234, 92, 'VG', 'VGB', 'Islas Vï¿½rgenes Britï¿½nicas', 0),
+(235, 850, 'VI', 'VIR', 'Islas Vï¿½rgenes de los Estados Unidos', 0),
 (236, 876, 'WF', 'WLF', 'Wallis y Futuna', 0),
 (237, 887, 'YE', 'YEM', 'Yemen', 0),
 (238, 262, 'DJ', 'DJI', 'Yibuti', 0),
@@ -6032,19 +6032,19 @@ WHERE  `id` =105 LIMIT 1 ;";
 
 			$query[] = "INSERT ignore INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` )
 						VALUES (
-						NULL ,  'fecha_dia',  'Día',  'Day',  '4',  'Listado de trabajos'
+						NULL ,  'fecha_dia',  'Dï¿½a',  'Day',  '4',  'Listado de trabajos'
 						), (
 						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trabajos'
 						);";
-			$query[] = "INSERT ignore  INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trabajos');";
+			$query[] = "INSERT ignore  INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Aï¿½o', 'Year', '6', 'Listado de trabajos');";
 
 			$query[] = "INSERT ignore INTO  `prm_excel_cobro` (  `id_prm_excel_cobro` , `nombre_interno` ,  `glosa_es` ,  `glosa_en` ,  `tamano` ,  `grupo` )
 						VALUES (
-						NULL ,  'fecha_dia',  'Día',  'Day',  '4',  'Listado de trámites'
+						NULL ,  'fecha_dia',  'Dï¿½a',  'Day',  '4',  'Listado de trï¿½mites'
 						), (
-						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trámites'
+						NULL ,  'fecha_mes',  'Mes',  'Month',  '4',  'Listado de trï¿½mites'
 						);";
-			$query[] = "INSERT ignore INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Año', 'Year', '6', 'Listado de trámites');";
+			$query[] = "INSERT ignore INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES (NULL, 'fecha_anyo', 'Aï¿½o', 'Year', '6', 'Listado de trï¿½mites');";
 
 
 			foreach ($query as $q)
@@ -6196,7 +6196,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 		case 4.62:
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-							VALUES (NULL ,  'MonedaTramitePorDefecto',  'Dólar', NULL ,  'select;Peso;Dólar;UF;UTM;Euro;UTA',  '2',  '299');";
+							VALUES (NULL ,  'MonedaTramitePorDefecto',  'Dï¿½lar', NULL ,  'select;Peso;Dï¿½lar;UF;UTM;Euro;UTA',  '2',  '299');";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6275,7 +6275,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 		case 4.65:
 			$query = array();
 
-			$query[] = "INSERT ignore INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) VALUES (NULL ,  'Opciones Impresión Carta');";
+			$query[] = "INSERT ignore INTO  `configuracion_categoria` (  `id_configuracion_categoria` ,  `glosa_configuracion_categoria` ) VALUES (NULL ,  'Opciones Impresiï¿½n Carta');";
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerDetallesPorHora',  '1', NULL ,  'boolean',  '8',  '-1');";
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerModalidad',  '0', NULL ,  'boolean',  '8',  '-1');";
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'OpcVerProfesional',  '1', NULL ,  'boolean',  '8',  '-1');";
@@ -6309,7 +6309,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 
 		case 4.66:
 			$query = array();
-			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'MostrarBotonCobroPDF',  '0',  'Dar la opción de bajar Pre-liquidación (Word de cobros) en formato PDF',  'boolean',  '6',  '-1');";
+			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` ) VALUES (NULL ,  'MostrarBotonCobroPDF',  '0',  'Dar la opciï¿½n de bajar Pre-liquidaciï¿½n (Word de cobros) en formato PDF',  'boolean',  '6',  '-1');";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6369,7 +6369,7 @@ WHERE  `id` =105 LIMIT 1 ;";
 
 		case 4.71:
 			$query = array();
-			$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES ( NULL, 'senores', 'Señores', 'Dear', 0, 'Encabezado');";
+			$query[] = "INSERT INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `glosa_es`, `glosa_en`, `tamano`, `grupo`) VALUES ( NULL, 'senores', 'Seï¿½ores', 'Dear', 0, 'Encabezado');";
 
 			$sql = "SELECT count(*) FROM menu_permiso WHERE codigo_permiso = 'COB' AND codigo_menu = 'FACT_PAGO' ";
 			$resp = mysql_query($sql, $sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $sesion->dbh);
@@ -6482,9 +6482,9 @@ WHERE  `id` =105 LIMIT 1 ;";
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 							VALUES (
-							NULL ,  'AnchoGraficoReporteGeneral',  '730',  'ancho que tendrá la imagen del gráfico generado en el Reporte General',  'numero',  '5',  '-1'
+							NULL ,  'AnchoGraficoReporteGeneral',  '730',  'ancho que tendrï¿½ la imagen del grï¿½fico generado en el Reporte General',  'numero',  '5',  '-1'
 							), (
-							NULL ,  'AltoGraficoReporteGeneral',  '500',  'alto que tendrá la imagen del gráfico generado en el Reporte General',  'numero',  '5',  '-1'
+							NULL ,  'AltoGraficoReporteGeneral',  '500',  'alto que tendrï¿½ la imagen del grï¿½fico generado en el Reporte General',  'numero',  '5',  '-1'
 							);";
 
 			foreach ($query as $q) {
@@ -6536,8 +6536,8 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 												CHANGE  `glosa_es`  `glosa_es` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
 												CHANGE  `glosa_en`  `glosa_en` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
 												CHANGE  `grupo`  `grupo` VARCHAR( 60 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
-			$query[] = "UPDATE	`prm_excel_cobro` SET  `glosa_es` =  'N°',
-														`glosa_en` =  'N°' WHERE  `id_prm_excel_cobro` =1 LIMIT 1 ;";
+			$query[] = "UPDATE	`prm_excel_cobro` SET  `glosa_es` =  'Nï¿½',
+														`glosa_en` =  'Nï¿½' WHERE  `id_prm_excel_cobro` =1 LIMIT 1 ;";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6558,7 +6558,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 4.83:
 			$query = array();
-			$query[] = "INSERT ignore INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('MPDF', 'Mantención pdf factura', '/app/interfaces/mantencion_factura_pdf.php', '', '', 0, 60, 'ADMIN_SIS');";
+			$query[] = "INSERT ignore INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`) VALUES ('MPDF', 'Mantenciï¿½n pdf factura', '/app/interfaces/mantencion_factura_pdf.php', '', '', 0, 60, 'ADMIN_SIS');";
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
 											NULL ,  'AnchoFacturaPdf',  '216', NULL ,  'numero',  '6',  '-1'
@@ -6579,9 +6579,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 				`tamano` int(11) NOT NULL default '0',
 				PRIMARY KEY  (`id_tipo_dato`)
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;";
-				$query[] = "INSERT ignore INTO `factura_pdf_datos` (`id_tipo_dato`, `tipo_dato`, `glosa_dato`, `activo`, `coordinateX`, `coordinateY`, `font`, `style`, `mayuscula`, `tamano`) VALUES (1, 'direccion', 'Dirección', 1, 50, 70, 'Times', '', '', 8),
-				(2, 'fecha_ano', 'Fecha Año', 1, 90, 50, 'Times', '', '', 8),
-				(3, 'fecha_dia', 'Fecha Día', 1, 45, 50, 'Times', '', '', 8),
+				$query[] = "INSERT ignore INTO `factura_pdf_datos` (`id_tipo_dato`, `tipo_dato`, `glosa_dato`, `activo`, `coordinateX`, `coordinateY`, `font`, `style`, `mayuscula`, `tamano`) VALUES (1, 'direccion', 'Direcciï¿½n', 1, 50, 70, 'Times', '', '', 8),
+				(2, 'fecha_ano', 'Fecha Aï¿½o', 1, 90, 50, 'Times', '', '', 8),
+				(3, 'fecha_dia', 'Fecha Dï¿½a', 1, 45, 50, 'Times', '', '', 8),
 				(4, 'fecha_mes', 'Fecha Mes', 1, 60, 50, 'Times', '', 'may', 8),
 				(5, 'razon_social', 'Razon Social', 1, 50, 60, 'Times', '', '', 8),
 				(6, 'rut', 'Rut', 1, 160, 60, 'Times', '', '', 8),
@@ -6634,7 +6634,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 (4, 4, 1, 1, 158, 54, 0, 0, 'Arial', '', 'may', 10, 'marzo', 'L'),
 (5, 5, 1, 1, 19, 41, 122, 5, 'Arial', '', '', 10, 'CAPITALES FONDO INMOBILIARIO', 'L'),
 (6, 6, 1, 1, 19, 53, 40, 5, 'Arial', '', '', 10, '20100987654', 'L'),
-(7, 7, 1, 1, 4, 71, 130, 15, 'Arial', '', '', 10, 'Asesoría Legal <br  />0187-004 ASESORIA GENERAL', 'L'),
+(7, 7, 1, 1, 4, 71, 130, 15, 'Arial', '', '', 10, 'Asesorï¿½a Legal <br  />0187-004 ASESORIA GENERAL', 'L'),
 (8, 8, 1, 1, 161, 71, 12, 5, 'Arial', '', '', 10, 'USD', 'L'),
 (9, 9, 1, 1, 173, 71, 23, 5, 'Arial', '', '', 10, '6,000.00', 'R'),
 (10, 10, 1, 1, 4, 90, 130, 5, 'Arial', '', '', 10, 'Gastos c/ IGV', 'L'),
@@ -6643,7 +6643,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 (13, 13, 1, 1, 4, 100, 130, 5, 'Arial', '', '', 10, 'Gastos c/ IGV', 'L'),
 (14, 14, 1, 1, 161, 100, 12, 5, 'Arial', '', '', 10, 'USD', 'L'),
 (15, 15, 1, 1, 173, 100, 23, 5, 'Arial', '', '', 10, '0.00', 'R'),
-(16, 16, 1, 1, 15, 111, 136, 16, 'Arial', '', '', 9, 'SIETE MIL OCHENTA DÓLARES AMERICANOS', 'L'),
+(16, 16, 1, 1, 15, 111, 136, 16, 'Arial', '', '', 9, 'SIETE MIL OCHENTA Dï¿½LARES AMERICANOS', 'L'),
 (17, 17, 1, 1, 146, 134, 8, 5, 'Arial', '', '', 8, '18', 'L'),
 (18, 18, 1, 1, 161, 128, 11, 5, 'Arial', '', '', 10, 'USD', 'L'),
 (19, 19, 1, 1, 173, 128, 23, 5, 'Arial', '', '', 10, '6.000.00', 'R'),
@@ -6670,9 +6670,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 (40, 6, 2, 1, 160, 60, 0, 0, 'Times', '', '', 8, '20110522151', 'L'),
 (41, 6, 3, 1, 160, 60, 0, 0, 'Times', '', '', 8, NULL, 'L'),
 (42, 6, 4, 1, 160, 60, 0, 0, 'Times', '', '', 8, '05271240', 'L'),
-(43, 7, 2, 1, 50, 100, 0, 0, 'Times', '', '', 8, 'Por la anulación de la factura 001-0020904 del 13/12/2011<br />\r\n', 'L'),
+(43, 7, 2, 1, 50, 100, 0, 0, 'Times', '', '', 8, 'Por la anulaciï¿½n de la factura 001-0020904 del 13/12/2011<br />\r\n', 'L'),
 (44, 7, 3, 1, 50, 100, 0, 0, 'Times', '', '', 8, NULL, 'L'),
-(45, 7, 4, 1, 50, 100, 0, 0, 'Times', '', '', 8, 'Asesoría Legal<br />\r\n1223-004 ', 'L'),
+(45, 7, 4, 1, 50, 100, 0, 0, 'Times', '', '', 8, 'Asesorï¿½a Legal<br />\r\n1223-004 ', 'L'),
 (46, 8, 2, 1, 160, 100, 0, 0, 'Times', '', '', 8, 'USD', 'L'),
 (47, 8, 3, 1, 160, 100, 0, 0, 'Times', '', '', 8, NULL, 'L'),
 (48, 8, 4, 1, 160, 100, 0, 0, 'Times', '', '', 8, 'USD', 'L'),
@@ -6697,9 +6697,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 (67, 15, 2, 1, 170, 120, 0, 0, 'Times', '', '', 8, '0.00', 'L'),
 (68, 15, 3, 1, 170, 120, 0, 0, 'Times', '', '', 8, NULL, 'L'),
 (69, 15, 4, 1, 170, 120, 0, 0, 'Times', '', '', 8, '0.00', 'L'),
-(70, 16, 2, 1, 50, 150, 0, 0, 'Times', '', '', 8, 'CIENTO DOCE  CON 10/100 DÓLARES AMERICANOS', 'L'),
+(70, 16, 2, 1, 50, 150, 0, 0, 'Times', '', '', 8, 'CIENTO DOCE  CON 10/100 Dï¿½LARES AMERICANOS', 'L'),
 (71, 16, 3, 1, 50, 150, 0, 0, 'Times', '', '', 8, NULL, 'L'),
-(72, 16, 4, 1, 50, 150, 0, 0, 'Times', '', '', 8, 'TRES MIL QUINIENTOS CUARENTA DÓLARES AMERICANOS', 'L'),
+(72, 16, 4, 1, 50, 150, 0, 0, 'Times', '', '', 8, 'TRES MIL QUINIENTOS CUARENTA Dï¿½LARES AMERICANOS', 'L'),
 (73, 17, 2, 1, 150, 160, 0, 0, 'Times', '', '', 8, '18%', 'L'),
 (74, 17, 3, 1, 150, 160, 0, 0, 'Times', '', '', 8, NULL, 'L'),
 (75, 17, 4, 1, 150, 160, 0, 0, 'Times', '', '', 8, '18%', 'L'),
@@ -6765,9 +6765,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 
 			$query[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_tipo_dato`, `id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES
-(1, 2, 'direccion', 'Dirección'),
-(2, 1, 'fecha_ano', 'Fecha Año'),
-(3, 1, 'fecha_dia', 'Fecha Día'),
+(1, 2, 'direccion', 'Direcciï¿½n'),
+(2, 1, 'fecha_ano', 'Fecha Aï¿½o'),
+(3, 1, 'fecha_dia', 'Fecha Dï¿½a'),
 (4, 1, 'fecha_mes', 'Fecha Mes'),
 (5, 2, 'razon_social', 'Razon Social'),
 (6, 2, 'rut', 'Rut'),
@@ -6788,9 +6788,9 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 (21, 4, 'monto_iva', 'Monto IVA'),
 (22, 4, 'moneda_total', 'Moneda total'),
 (23, 4, 'monto_total', 'Monto total'),
-(24, 1, 'fecha_ano_ultima_cifra', 'Fecha Año ultima cifra'),
-(25, 1, 'tipo_papel', 'Tamaño Página'),
-(26, 2, 'telefono', 'Teléfono');";
+(24, 1, 'fecha_ano_ultima_cifra', 'Fecha Aï¿½o ultima cifra'),
+(25, 1, 'tipo_papel', 'Tamaï¿½o Pï¿½gina'),
+(26, 2, 'telefono', 'Telï¿½fono');";
 
 
 			$query[] = "ALTER TABLE `factura_pdf_datos`
@@ -6812,7 +6812,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			if (!ExisteCampo('id_glosa_gasto', 'cta_corriente', $dbh))
 				$query[] = "ALTER TABLE  `cta_corriente` ADD  `id_glosa_gasto` TINYINT( 4 ) NULL AFTER  `codigo_asunto` ;
 ";
-			$query[] = "INSERT ignore INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('PrmGastosActualizarDescripcion', '1', 'Activa la actualización del campo descripción al agregar gastos.', 'boolean', 6, -1);";
+			$query[] = "INSERT ignore INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('PrmGastosActualizarDescripcion', '1', 'Activa la actualizaciï¿½n del campo descripciï¿½n al agregar gastos.', 'boolean', 6, -1);";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -6844,7 +6844,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 				VALUES (
-				NULL ,  'ImprimirExcelCobrosUnaPagina',  '0',  'Imprimir excel cobros una página (fit to pages)',  'boolean',  '6',  '-1'
+				NULL ,  'ImprimirExcelCobrosUnaPagina',  '0',  'Imprimir excel cobros una pï¿½gina (fit to pages)',  'boolean',  '6',  '-1'
 				);";
 
 			foreach ($query as $q)
@@ -6856,7 +6856,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			$query = array();
 			/* DEPRECATED	$query[] = "INSERT ignore INTO  `factura_pdf_datos` (  `id_tipo_dato` ,  `tipo_dato` ,  `glosa_dato` ,  `activo` ,  `coordinateX` ,  `coordinateY` ,  `font` ,  `style` ,  `mayuscula` ,  `tamano` )
 				VALUES (
-				NULL ,  'fecha_ano_ultima_cifra',  'Fecha Año ultima cifra', 1, 90, 50,  'Times',  '',  '', 8
+				NULL ,  'fecha_ano_ultima_cifra',  'Fecha Aï¿½o ultima cifra', 1, 90, 50,  'Times',  '',  '', 8
 				);"; */
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 											VALUES (
@@ -6887,7 +6887,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 																						 `glosa` VARCHAR( 30 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ,
 																						PRIMARY KEY (  `codigo` )
 																						) ENGINE = INNODB;";
-			$query[] = "INSERT ignore INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'T', 'Transferencia' ), ( 'A', 'Amortización' );";
+			$query[] = "INSERT ignore INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'T', 'Transferencia' ), ( 'A', 'Amortizaciï¿½n' );";
 			$query[] = "INSERT ignore  INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'E', 'Efectivo' ), ( 'C', 'Cheque' );";
 			$query[] = "INSERT ignore  INTO  `prm_tipo_pago` (  `codigo` ,  `glosa` ) VALUES ( 'O',  'Otro' ), ( 'N',  'Ninguno' );";
 			if (!ExisteCampo('orden', 'prm_tipo_pago', $dbh))
@@ -6905,7 +6905,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			break;
 		case 4.91:
 			$query = array();
-			$query[] = "INSERT ignore INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES ( 'SelectMultipleFacturasPago', '0', 'Cambiar los combo de banco, estado y concepto por selectores múltiples', 'boolean', '6', '-1' );";
+			$query[] = "INSERT ignore INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES ( 'SelectMultipleFacturasPago', '0', 'Cambiar los combo de banco, estado y concepto por selectores mï¿½ltiples', 'boolean', '6', '-1' );";
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
 					throw new Exception($q . "---" . mysql_error());
@@ -7106,7 +7106,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.05:
 			$query = array();
-			$query[] = "INSERT ignore INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'PapelPorDefecto',  'LETTER',  'Tamaño de papel por defecto',  'select;LETTER;LEGAL;A4;A5',  '6',  '-1');";
+			$query[] = "INSERT ignore INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'PapelPorDefecto',  'LETTER',  'Tamaï¿½o de papel por defecto',  'select;LETTER;LEGAL;A4;A5',  '6',  '-1');";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -7115,15 +7115,15 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 
 		case 5.06:
 			$query = array();
-			$query[] = "INSERT ignore  INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'DescripcionFacturaConAsuntos',  '0',  'Opción para detallar la glosa de honorarios en las facturas',  'boolean',  '6',  '-1');";
+			$query[] = "INSERT ignore  INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (NULL ,  'DescripcionFacturaConAsuntos',  '0',  'Opciï¿½n para detallar la glosa de honorarios en las facturas',  'boolean',  '6',  '-1');";
 
 
 			if (!ExisteCampo('notificar_encargado_principal', 'contrato', $dbh))
-				$query[] = "ALTER TABLE  `contrato` 	ADD  `notificar_encargado_principal` TINYINT NOT NULL DEFAULT  '1' COMMENT 'Se notificará al encargado principal en caso de gatillarse una alerta' AFTER  `notificado_monto_excedido` ;";
+				$query[] = "ALTER TABLE  `contrato` 	ADD  `notificar_encargado_principal` TINYINT NOT NULL DEFAULT  '1' COMMENT 'Se notificarï¿½ al encargado principal en caso de gatillarse una alerta' AFTER  `notificado_monto_excedido` ;";
 			if (!ExisteCampo('notificar_encargado_principal', 'contrato', $dbh))
-				$query[] = "ALTER TABLE  `contrato`  ADD  `notificar_encargado_secundario` TINYINT NULL DEFAULT  '0' COMMENT 'Se notificará al encargado secundario en caso de gatillarse una alerta' AFTER  `notificar_encargado_principal` ;";
+				$query[] = "ALTER TABLE  `contrato`  ADD  `notificar_encargado_secundario` TINYINT NULL DEFAULT  '0' COMMENT 'Se notificarï¿½ al encargado secundario en caso de gatillarse una alerta' AFTER  `notificar_encargado_principal` ;";
 			if (!ExisteCampo('notificar_encargado_principal', 'contrato', $dbh))
-				$query[] = "ALTER TABLE  `contrato`  ADD  `notificar_otros_correos` VARCHAR( 255 ) NULL COMMENT 'CSV de correos a los cuales se les notificará en caso de gatillarse una alerta' AFTER  `notificar_encargado_secundario` ;";
+				$query[] = "ALTER TABLE  `contrato`  ADD  `notificar_otros_correos` VARCHAR( 255 ) NULL COMMENT 'CSV de correos a los cuales se les notificarï¿½ en caso de gatillarse una alerta' AFTER  `notificar_encargado_secundario` ;";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -7199,7 +7199,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			$query = array();
 			$query[] = "INSERT ignore INTO  `prm_permisos` (  `codigo_permiso` ,  `glosa` )
 																								VALUES (
-																										'SEC',  'Secretaría'
+																										'SEC',  'Secretarï¿½a'
 																								);";
 			$query[] = "INSERT ignore  INTO menu_permiso ( codigo_menu, codigo_permiso )
 																						VALUES ( 'PRO', 'SEC' ), ('MIS_HRS','SEC'), ('TRAB','SEC'), ('TRA_HRS','SEC')";
@@ -7245,7 +7245,7 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 			$query = array();
 			if (!ExisteCampo('asiento_contable', 'factura', $dbh)) {
 				$query[] = "ALTER TABLE `factura` ADD `asiento_contable` INT NULL COMMENT 'correlativo mensual (para PRC)',
-																		ADD `mes_contable` INT NULL COMMENT 'año*100+mes para el asiento_contable (para PRC)';";
+																		ADD `mes_contable` INT NULL COMMENT 'aï¿½o*100+mes para el asiento_contable (para PRC)';";
 
 				$query[] = "ALTER TABLE `factura` ADD UNIQUE (`asiento_contable` ,`mes_contable`);";
 			}
@@ -7286,12 +7286,12 @@ ADD `pago_gastos` TINYINT( 1 ) NULL COMMENT 'para los pagos, indica si el saldo 
 					 `glosa` VARCHAR( 255 ) NOT NULL
 					) ENGINE = MYISAM ;";
 			$query[] = "INSERT ignore INTO  `prm_tipo_documento_identidad` (  `id_tipo_documento_identidad` ,  `glosa` )
-					VALUES (NULL ,  'RUC'), (NULL ,  'Documento de Extranjería'), (NULL ,  'Libreta Electoral'), (NULL ,  'DNI');";
+					VALUES (NULL ,  'RUC'), (NULL ,  'Documento de Extranjerï¿½a'), (NULL ,  'Libreta Electoral'), (NULL ,  'DNI');";
 
 			if (!ExisteCampo('id_tipo_documento_identidad', 'factura', $dbh))
-				$query[] = "ALTER TABLE  `factura` ADD  `id_tipo_documento_identidad` INT NULL COMMENT 'Tipo de Documento Cliente Facturación para PRC';";
+				$query[] = "ALTER TABLE  `factura` ADD  `id_tipo_documento_identidad` INT NULL COMMENT 'Tipo de Documento Cliente Facturaciï¿½n para PRC';";
 
-			$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'TipoDocumentoIdentidadFacturacion', '0', 'Permite seleccionar el tipo de documento de identidad que se utilizó para facturar al cliente', 'boolean', '6', '-1');";
+			$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'TipoDocumentoIdentidadFacturacion', '0', 'Permite seleccionar el tipo de documento de identidad que se utilizï¿½ para facturar al cliente', 'boolean', '6', '-1');";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
@@ -7573,16 +7573,16 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 		case 5.27:
 			$query = array();
-			/* este debe ser el update más feo de mi vida */
+			/* este debe ser el update mï¿½s feo de mi vida */
 			$query[] = "CREATE TABLE IF NOT EXISTS  `cobro_log` ( `id_cobro` int( 11 ) NOT NULL default '0', `incluye_honorarios` tinyint( 1 ) NOT NULL default '1',
 				`incluye_gastos` tinyint( 1 ) NOT NULL default '1', `id_usuario` int( 11 ) default NULL , `codigo_cliente` varchar( 10 ) NOT NULL default '',
 				`monto_subtotal` double NOT NULL default '0', `monto_ajustado` double NOT NULL default '0', `monto_original` double NOT NULL default '0',
 				`impuesto` double NOT NULL default '0',
-				`porcentaje_impuesto` tinyint( 3 ) unsigned NOT NULL default '0' COMMENT 'Para agregar el impuesto al final cuando no está incluido en el valor del cobro.',
+				`porcentaje_impuesto` tinyint( 3 ) unsigned NOT NULL default '0' COMMENT 'Para agregar el impuesto al final cuando no estï¿½ incluido en el valor del cobro.',
 				`porcentaje_impuesto_gastos` tinyint( 3 ) unsigned NOT NULL default '0', `descuento` double NOT NULL default '0',
 				`porcentaje_descuento` int( 3 ) NOT NULL default '0', `tipo_descuento` varchar( 20 ) NOT NULL default 'VALOR',
 				`monto_contrato` double NOT NULL default '0', `id_moneda_monto` int( 11 ) NOT NULL default '1', `monto_trabajos` double default NULL ,
-				`monto_tramites` double default NULL , `monto` double default NULL COMMENT 'monto honorarios, ya incluye los trámites',
+				`monto_tramites` double default NULL , `monto` double default NULL COMMENT 'monto honorarios, ya incluye los trï¿½mites',
 				`monto_thh` double NOT NULL default '0', `monto_thh_estandar` double NOT NULL default '0', `retainer_horas` decimal( 10, 2 ) default NULL ,
 				`retainer_usuarios` varchar( 100 ) default NULL COMMENT 'este campo contiene una lista con todos los usuarios cuales horas se van incluir en un retainer',
 				`total_minutos` int( 11 ) default NULL , `subtotal_gastos` double NOT NULL default '0', `impuesto_gastos` double NOT NULL default '0',
@@ -7606,7 +7606,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				`opc_ver_gastos` tinyint( 4 ) NOT NULL default '1', `opc_ver_concepto_gastos` tinyint( 1 ) NOT NULL default '1',
 				`opc_ver_descuento` tinyint( 4 ) NOT NULL default '1', `opc_papel` varchar( 16 ) NOT NULL default 'LETTER',
 				`opc_ver_numpag` tinyint( 4 ) NOT NULL default '1', `opc_ver_solicitante` tinyint( 1 ) NOT NULL default '0',
-				`opc_moneda_total` int( 11 ) NOT NULL default '1' COMMENT 'Moneda total de impresión del DOC',
+				`opc_moneda_total` int( 11 ) NOT NULL default '1' COMMENT 'Moneda total de impresiï¿½n del DOC',
 				`opc_ver_carta` tinyint( 1 ) NOT NULL default '1', `opc_ver_morosidad` tinyint( 4 ) NOT NULL default '1' COMMENT 'Ver saldo adeudado',
 				`opc_ver_tipo_cambio` tinyint( 4 ) NOT NULL default '0', `opc_ver_resumen_cobro` tinyint( 4 ) NOT NULL default '1',
 				`opc_ver_detalles_por_hora_iniciales` tinyint( 1 ) NOT NULL default '1', `opc_ver_detalles_por_hora_categoria` tinyint( 1 ) NOT NULL default '1',
@@ -7640,7 +7640,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				`id_documento_legal` int( 11 ) NOT NULL default '1' COMMENT 'tipo de documento legal', `id_documento_legal_motivo` int( 11 ) default NULL ,
 				`numero` int( 11 ) NOT NULL default '0', `comprobante_erp` varchar( 20 ) default NULL , `condicion_pago` tinyint( 2 ) NOT NULL default '0',
 				`serie_documento_legal` tinyint( 4 ) NOT NULL default '1', `fecha` date NOT NULL default '0000-00-00',
-				`cliente` varchar( 100 ) default NULL COMMENT 'Razón Social Cliente',
+				`cliente` varchar( 100 ) default NULL COMMENT 'Razï¿½n Social Cliente',
 				`RUT_cliente` varchar( 20 ) default NULL COMMENT 'En Colombia se usa NIT en vez de RUT', `direccion_cliente` varchar( 255 ) default NULL ,
 				`codigo_cliente` varchar( 10 ) NOT NULL default '' COMMENT 'daro secundario, ocupar el codigo_cliente del COBRO', `subtotal` double NOT NULL default '0',
 				`subtotal_sin_descuento` double NOT NULL default '0', `descuento_honorarios` double NOT NULL default '0', `honorarios` double NOT NULL default '0',
@@ -7655,8 +7655,8 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				`fecha_modificacion` datetime NOT NULL default '0000-00-00 00:00:00', `id_moneda` int( 11 ) NOT NULL default '1',
 				`porcentaje_impuesto` double NOT NULL default '0' COMMENT 'cada factura almacena su % impuesto, y en base a este se deben realizar los calculos',
 				`id_contrato` int( 11 ) NOT NULL default '0', `asiento_contable` int( 11 ) default NULL COMMENT 'correlativo mensual (para PRC)',
-				`mes_contable` int( 11 ) default NULL COMMENT 'año*100+mes para el asiento_contable (para PRC)',
-				`id_tipo_documento_identidad` int( 11 ) default NULL COMMENT 'Tipo de Documento Cliente Facturación para PRC',
+				`mes_contable` int( 11 ) default NULL COMMENT 'aï¿½o*100+mes para el asiento_contable (para PRC)',
+				`id_tipo_documento_identidad` int( 11 ) default NULL COMMENT 'Tipo de Documento Cliente Facturaciï¿½n para PRC',
 				`fecha_log` datetime NOT NULL default '0000-00-00 00:00:00',
 				`usuario_log` varchar( 64 ) NOT NULL default '' ) ENGINE = InnoDB DEFAULT CHARSET = latin1;";
 
@@ -7887,7 +7887,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 								VALUES (
-									NULL ,  'EsconderDescargarLiquidacionEnBorrador',  " . ( Conf::DbUser() == 'prc' ? '1' : '0' ) . ", 'Para esconder Buton para descargar Word de liquidación en caso de que liquidación está en estado EN REVISION todavía.',  'boolean',  '6',  '-1'
+									NULL ,  'EsconderDescargarLiquidacionEnBorrador',  " . ( Conf::DbUser() == 'prc' ? '1' : '0' ) . ", 'Para esconder Buton para descargar Word de liquidaciï¿½n en caso de que liquidaciï¿½n estï¿½ en estado EN REVISION todavï¿½a.',  'boolean',  '6',  '-1'
 								);";
 
 			foreach ($query as $q) {
@@ -7949,7 +7949,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 								VALUES (
-									NULL ,  'ClienteReferencia', " . (Conf::dbUser() == 'prc' ? '1' : '0') . ",  'Activando el config se mostrará un selector al agregar un cliente para indica cual referencia trajo el cliente',  'boolean',  '6',  '-1'
+									NULL ,  'ClienteReferencia', " . (Conf::dbUser() == 'prc' ? '1' : '0') . ",  'Activando el config se mostrarï¿½ un selector al agregar un cliente para indica cual referencia trajo el cliente',  'boolean',  '6',  '-1'
 								);";
 			$query[] = "CREATE TABLE IF NOT EXISTS `prm_cliente_referencia` (
 								 `id_cliente_referencia` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
@@ -7972,7 +7972,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 								VALUES (
 								'3',  'Estudios de abogados locales',  '3'
 								), (
-								'4',  'Página web',  '4'
+								'4',  'Pï¿½gina web',  '4'
 								);";
 			$query[] = "INSERT ignore INTO  `prm_cliente_referencia` (  `id_cliente_referencia` ,  `glosa_cliente_referencia` ,  `orden` )
 								VALUES (
@@ -8072,7 +8072,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 								`orden`
 								)
 								VALUES (
-								NULL ,  'SeEstaCobrandoEspecial',  " . (Conf::dbUser() == 'bmahj' ? '1' : '0') . ",  'Este config se usa en Bofillmir, cuales llenan el campo \"Se esta cobrando\" con mas información que el resto de los clientes.',  'boolean',  '6',  '-1'
+								NULL ,  'SeEstaCobrandoEspecial',  " . (Conf::dbUser() == 'bmahj' ? '1' : '0') . ",  'Este config se usa en Bofillmir, cuales llenan el campo \"Se esta cobrando\" con mas informaciï¿½n que el resto de los clientes.',  'boolean',  '6',  '-1'
 								) on duplicate key update glosa_opcion='SeEstaCobrandoEspecial';";
 
 			foreach ($query as $q) {
@@ -8086,7 +8086,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			$query = array();
 			$query[] = "INSERT ignore  INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 								VALUES (
-									NULL ,  'ActualizacionTerminado',  '1',  'para reactivar el sistema después de la actualización.',  'boolean',  '6',  '-1'
+									NULL ,  'ActualizacionTerminado',  '1',  'para reactivar el sistema despuï¿½s de la actualizaciï¿½n.',  'boolean',  '6',  '-1'
 								);";
 
 			foreach ($query as $q) {
@@ -8098,12 +8098,12 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.54:
 			$query = array();
 
-			// inserta el tipo de dato Tamaño Papel, lo agrupa junto con la fecha (aunque esto es arbitrario). No le asigna ID sino que asume que el auto increment le asignará un id_tipo_dato
-			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (1, 'tipo_papel', 'Tamaño Página') on duplicate key update glosa_tipo_dato='Tamaño Página';";
+			// inserta el tipo de dato Tamaï¿½o Papel, lo agrupa junto con la fecha (aunque esto es arbitrario). No le asigna ID sino que asume que el auto increment le asignarï¿½ un id_tipo_dato
+			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (1, 'tipo_papel', 'Tamaï¿½o Pï¿½gina') on duplicate key update glosa_tipo_dato='Tamaï¿½o Pï¿½gina';";
 
 			$query[] = "ALTER TABLE `factura_pdf_datos` CHANGE `font` `font` VARCHAR( 255 )";
 
-			// inserta para cada tipo de documento legal el tipo de dato "Tamaño Papel" usando como id_tipo_dato el máximo ID de la tabla factura_pdf_tipo_datos, que es el que acaba de insertar en la consulta anterior
+			// inserta para cada tipo de documento legal el tipo de dato "Tamaï¿½o Papel" usando como id_tipo_dato el mï¿½ximo ID de la tabla factura_pdf_tipo_datos, que es el que acaba de insertar en la consulta anterior
 			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
 																(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,216 as cellW,297 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
 																from factura_pdf_tipo_datos td, prm_documento_legal pdl
@@ -8158,7 +8158,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			break;
 		case 5.58:
 			$query = array();
-			$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES ( NULL , 'ObservacionReversarCobroPagado', '0', 'Agregar obsevación al historial al reversar cobro pagado', 'boolean', '6', '-1' );";
+			$query[] = "INSERT ignore INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES ( NULL , 'ObservacionReversarCobroPagado', '0', 'Agregar obsevaciï¿½n al historial al reversar cobro pagado', 'boolean', '6', '-1' );";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -8183,7 +8183,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `id` ,  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 								VALUES (
-									NULL ,  'PermitirCampoCobrableAProfesional',  '0',  'Con ese conf activado los Abogados podrán decidir si su hora ingresado será cobrable o no',  'boolean',  '6',  '-1'
+									NULL ,  'PermitirCampoCobrableAProfesional',  '0',  'Con ese conf activado los Abogados podrï¿½n decidir si su hora ingresado serï¿½ cobrable o no',  'boolean',  '6',  '-1'
 								);";
 
 			foreach ($query as $q) {
@@ -8298,7 +8298,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			$query = array();
 
 			$query[] = "REPLACE INTO `menu` (`codigo`, `glosa`, `url`, `descripcion`, `foto_url`, `tipo`, `orden`, `codigo_padre`, `bitmodfactura`) VALUES
-							('MPDF', 'Mantención pdf factura', '/app/interfaces/mantencion_factura_pdf.php', '', '', 0, 60, 'ADMIN_SIS', 1)";
+							('MPDF', 'Mantenciï¿½n pdf factura', '/app/interfaces/mantencion_factura_pdf.php', '', '', 0, 60, 'ADMIN_SIS', 1)";
 
 
 			$query[] = "REPLACE INTO `menu_permiso` (`codigo_permiso`,`codigo_menu`) VALUES
@@ -8307,7 +8307,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 
 			$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-							VALUES ( 'MostrarMenuMantencionPDF',  '0',  'Mostrar Menu Mantencion PDF Facturaen Sección Admin. Sistema',  'boolean',  '6',  '-1' );";
+							VALUES ( 'MostrarMenuMantencionPDF',  '0',  'Mostrar Menu Mantencion PDF Facturaen Secciï¿½n Admin. Sistema',  'boolean',  '6',  '-1' );";
 
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
@@ -8453,7 +8453,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 				`id_cobro` int(11) DEFAULT NULL,
 				`estadocobro` varchar(20) COLLATE latin1_spanish_ci NOT NULL DEFAULT 'SIN COBRO',
 				`fecha_modificacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-				`Eliminado` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trámite fue eliminado, ya no hay que tomarlo en cuenta para la query',
+				`Eliminado` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trï¿½mite fue eliminado, ya no hay que tomarlo en cuenta para la query',
 				PRIMARY KEY (`id_unico`),
 				KEY `id_cliente` (`id_cliente`),
 				KEY `codigos_asuntos` (`codigos_asuntos`),
@@ -8703,7 +8703,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.81:
 			$query = array();
 			$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-							VALUES ( 'EnviarAlClienteAntesDeFacturar',  '0',  'Permite invertir el flujo de liquidaciones para que primero se envíe al cliente y luego se facture (solicitado por PRC y BMAHJ) OJO: Invertir los valores de prm_estado_cobro',  'boolean',  '6',  '-1' );";
+							VALUES ( 'EnviarAlClienteAntesDeFacturar',  '0',  'Permite invertir el flujo de liquidaciones para que primero se envï¿½e al cliente y luego se facture (solicitado por PRC y BMAHJ) OJO: Invertir los valores de prm_estado_cobro',  'boolean',  '6',  '-1' );";
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
 					throw new Exception($q . "---" . mysql_error());
@@ -8749,7 +8749,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			if (!ExisteCampo('id_usuario_responsable', 'cobro', $dbh))
 				$query[] = "ALTER TABLE  `cobro` ADD  `id_usuario_responsable` MEDIUMINT( 8 ) NULL DEFAULT  '0' COMMENT  'Quien era el encargado comercial cuando se emitio el cobro';";
 			if (!ExisteCampo('id_ultimo_emisor', 'cobro', $dbh))
-				$query[] = "ALTER TABLE  `cobro` ADD  `id_ultimo_emisor` MEDIUMINT( 8 ) NULL DEFAULT  '0' COMMENT  'Quien  emitió el cobro por última vez'";
+				$query[] = "ALTER TABLE  `cobro` ADD  `id_ultimo_emisor` MEDIUMINT( 8 ) NULL DEFAULT  '0' COMMENT  'Quien  emitiï¿½ el cobro por ï¿½ltima vez'";
 
 			$query[] = "update cobro set id_ultimo_emisor=id_usuario";
 			$query[] = "update cobro c set c.id_usuario_responsable=(select id_usuario_responsable from contrato where id_contrato=c.id_contrato)";
@@ -8786,15 +8786,15 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 			$query[] = "INSERT ignore INTO `prm_mantencion_tablas` (`id_tabla`, `nombre_tabla`, `glosa_tabla`, `info_tabla`) VALUES
 						(1, 'grupo_cliente', 'Grupo Cliente', NULL),
-						(2, 'prm_mantencion_tablas', 'Tablas Paramétricas', NULL),
+						(2, 'prm_mantencion_tablas', 'Tablas Paramï¿½tricas', NULL),
 						(3, 'prm_comuna', 'Comuna', NULL),
-						(4, 'prm_area_proyecto', 'Área Proyecto', NULL),
-						(5, 'prm_area_usuario', 'Área Usuario', NULL),
+						(4, 'prm_area_proyecto', 'ï¿½rea Proyecto', NULL),
+						(5, 'prm_area_usuario', 'ï¿½rea Usuario', NULL),
 						(6, 'prm_tipo_proyecto', 'Tipo Asunto o Proyecto', NULL),
 						(7, 'prm_moneda', 'Monedas y Tasas de Cambio', NULL),
 						(8, 'j_prm_materia', 'Juicios: Materia de la Causa', NULL),
 						(9, 'j_prm_estado_causa', 'Juicios: Estado de la Causa', NULL),
-						(10, 'prm_categoria_usuario', 'Categorías de Usuario', NULL),
+						(10, 'prm_categoria_usuario', 'Categorï¿½as de Usuario', NULL),
 						(11, 'prm_banco', 'Bancos', NULL);";
 
 			foreach ($query as $q) {
@@ -8807,7 +8807,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.88:
 
 			$query[] = "INSERT ignore INTO  `configuracion` (  `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-							VALUES ( 'NuevoMetodoGastoProvision',  '0',  'Si está activo, la cta corriente se cuadra dividiendo una provisión en vez de generando 2 ficticias',  'boolean',  '10',  '-1' );";
+							VALUES ( 'NuevoMetodoGastoProvision',  '0',  'Si estï¿½ activo, la cta corriente se cuadra dividiendo una provisiï¿½n en vez de generando 2 ficticias',  'boolean',  '10',  '-1' );";
 			foreach ($query as $q) {
 				if (!($res = mysql_query($q, $dbh) )) {
 					throw new Exception($q . "---" . mysql_error());
@@ -8854,7 +8854,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			break;
 		case 5.92:
 			if (!ExisteCampo('eliminado', 'olap_liquidaciones', $dbh))
-				$query[] = "ALTER TABLE  `olap_liquidaciones` ADD  `Eliminado` TINYINT( 1 ) NOT NULL DEFAULT  '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trámite fue eliminado, ya no hay que tomarlo en cuenta para la query'";
+				$query[] = "ALTER TABLE  `olap_liquidaciones` ADD  `Eliminado` TINYINT( 1 ) NOT NULL DEFAULT  '0' COMMENT 'Cuando el campo es igual a 1 el trabajo, cobro o trï¿½mite fue eliminado, ya no hay que tomarlo en cuenta para la query'";
 			$query[] = "update olap_liquidaciones ol left join trabajo t on ol.id_entry=t.id_trabajo set ol.eliminado=1 where ol.tipo='TRB' and t.id_trabajo is null";
 			$query[] = "update olap_liquidaciones ol left join cta_corriente cc on ol.id_entry=cc.id_movimiento set ol.eliminado=1 where ol.tipo='GAS' and cc.id_movimiento is null";
 			foreach ($query as $q) {
@@ -8872,14 +8872,14 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			$query[] = "INSERT ignore INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 						VALUES ( 'MostrarLinkCarpeta', '0', 'Campo Link especial para correa gubbins', 'boolean', '6', '-1' );";
 			$query[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
-						VALUES ('CantidadCharsGlosaCarpeta', '60', 'cantidad de chars que tendrá la glosa de la carpeta', 'numero', '6', '-1');";
+						VALUES ('CantidadCharsGlosaCarpeta', '60', 'cantidad de chars que tendrï¿½ la glosa de la carpeta', 'numero', '6', '-1');";
 
 			foreach ($query as $q)
 				if (!($res = mysql_query($q, $dbh)))
 					throw new Exception($q . "---" . mysql_error());
 			break;
 		case 5.94:
-			$q = "INSERT ignore   INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ExportacionLedes', '0', 'Usar exportación de cobros en formato LEDES', 'boolean', '6', '0');";
+			$q = "INSERT ignore   INTO `configuracion` ( `id` , `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` ) VALUES (NULL , 'ExportacionLedes', '0', 'Usar exportaciï¿½n de cobros en formato LEDES', 'boolean', '6', '0');";
 			if (!($res = mysql_query($q, $dbh))) {
 				throw new Exception($q . "---" . mysql_error());
 			}
@@ -8905,7 +8905,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 			$q = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion` , `valor_opcion` ,
 								`comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 								VALUES ( 'MostrarAsuntosSinTrabajosGastosTramites', '0',
-								'Mostrar Asuntos en Nota de cobro independiente si tienen trabajos, gastos o trámites, solicitado por Weinstok',
+								'Mostrar Asuntos en Nota de cobro independiente si tienen trabajos, gastos o trï¿½mites, solicitado por Weinstok',
 								'boolean', '10', '-1' );";
 			if (!($res = mysql_query($q, $dbh))) {
 				throw new Exception($q . "---" . mysql_error());
@@ -8915,11 +8915,11 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 		case 5.97:
 			$query = array();
 
-			// inserta el tipo de dato Tamaño Papel, lo agrupa junto con la fecha (aunque esto es arbitrario). No le asigna ID sino que asume que el auto increment le asignará un id_tipo_dato
-			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (2, 'telefono', 'Teléfono') on duplicate key update glosa_tipo_dato='Teléfono';";
+			// inserta el tipo de dato Tamaï¿½o Papel, lo agrupa junto con la fecha (aunque esto es arbitrario). No le asigna ID sino que asume que el auto increment le asignarï¿½ un id_tipo_dato
+			$query[] = "INSERT ignore INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES (2, 'telefono', 'Telï¿½fono') on duplicate key update glosa_tipo_dato='Telï¿½fono';";
 
 
-			// inserta para cada tipo de documento legal el tipo de dato "Tamaño Papel" usando como id_tipo_dato el máximo ID de la tabla factura_pdf_tipo_datos, que es el que acaba de insertar en la consulta anterior
+			// inserta para cada tipo de documento legal el tipo de dato "Tamaï¿½o Papel" usando como id_tipo_dato el mï¿½ximo ID de la tabla factura_pdf_tipo_datos, que es el que acaba de insertar en la consulta anterior
 			$query[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
 																		(select max(id_tipo_dato) as id_tipo_dato, pdl.id_documento_legal ,0 as activo,0 as coordinateX,0 as coordinateY,0 as cellW,0 as cellH,'' as font,'' as style,'' as mayuscula,8 as tamano
 																		from factura_pdf_tipo_datos td, prm_documento_legal pdl
@@ -8959,7 +8959,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 		case 6.00:
 			$query = array();
-			$query[] = "INSERT IGNORE INTO  `prm_permisos` (  `codigo_permiso` ,  `glosa` ) VALUES ('SASU',  'Sólo Asuntos');";
+			$query[] = "INSERT IGNORE INTO  `prm_permisos` (  `codigo_permiso` ,  `glosa` ) VALUES ('SASU',  'Sï¿½lo Asuntos');";
 			$query[] = "INSERT IGNORE INTO  `menu_permiso` (  `codigo_permiso` ,  `codigo_menu` ) VALUES ('SASU',  'ADMIN_SIS' );";
 			$query[] = "INSERT IGNORE INTO  `menu_permiso` (  `codigo_permiso` ,  `codigo_menu` ) VALUES ('SASU',  'ASUN' );";
 			ejecutar($query, $dbh);
@@ -8978,7 +8978,7 @@ ADD  `condicion_pago` TINYINT( 2 ) NOT NULL DEFAULT  '0' AFTER  `comprobante_erp
 
 		case 6.02:
 			$q = "INSERT IGNORE INTO `configuracion` (`glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
-						VALUES ('OcultarCobrosTotalCeroGeneracion', '0', 'Ocultar los cobros con total cero (sin horas), en la descarga de borradores masiva en generación de cobros', 'boolean', '10', '-1');";
+						VALUES ('OcultarCobrosTotalCeroGeneracion', '0', 'Ocultar los cobros con total cero (sin horas), en la descarga de borradores masiva en generaciï¿½n de cobros', 'boolean', '10', '-1');";
 			if (!($res = mysql_query($q, $dbh))) {
 				throw new Exception($q . "---" . mysql_error());
 			}
@@ -8994,16 +8994,16 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 			$query = array();
 			$query[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 							VALUES
-							( 'TrabajosOrdenarPorCategoriaNombreUsuario', '0', 'Ordenar Listado de Trabajos por Orden de Categoría', 'radio;ordentrabajo', '4', '700' ),
-							( 'TrabajosOrdenarPorCategoriaUsuario', '0', 'Trabajos Ordenados por Categoría y luego Usuario', 'radio;ordentrabajo', '4', '701' ),
-							( 'TrabajosOrdenarPorCategoriaDetalleProfesional', '0', 'Ordenar Listado de Trabajos por Nombre de Categoría de usuario', 'radio;ordentrabajo', '4', '702'),
-							( 'TrabajosOrdenarPorFechaCategoria', '1', 'Ordenar por fecha del trabajo y luego categoría de usuario', 'radio;ordentrabajo', '4', '703' );";
+							( 'TrabajosOrdenarPorCategoriaNombreUsuario', '0', 'Ordenar Listado de Trabajos por Orden de Categorï¿½a', 'radio;ordentrabajo', '4', '700' ),
+							( 'TrabajosOrdenarPorCategoriaUsuario', '0', 'Trabajos Ordenados por Categorï¿½a y luego Usuario', 'radio;ordentrabajo', '4', '701' ),
+							( 'TrabajosOrdenarPorCategoriaDetalleProfesional', '0', 'Ordenar Listado de Trabajos por Nombre de Categorï¿½a de usuario', 'radio;ordentrabajo', '4', '702'),
+							( 'TrabajosOrdenarPorFechaCategoria', '1', 'Ordenar por fecha del trabajo y luego categorï¿½a de usuario', 'radio;ordentrabajo', '4', '703' );";
 			$query[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
 							VALUES
-							( 'TramitesOrdenarPorCategoriaNombreUsuario', '0', 'Ordenar Listado de trámites por Orden de Categoría', 'radio;ordentramite', '4', '704' ),
-							( 'TramitesOrdenarPorCategoriaUsuario', '0', 'Trámites Ordenados por Categoría y luego Usuario', 'radio;ordentramite', '4', '705' ),
-							( 'TramitesOrdenarPorCategoriaDetalleProfesional', '0', 'Ordenar Listado de Trámites por Nombre de Categoría de usuario', 'radio;ordentramite', '4', '706'),
-							( 'TramitesOrdenarPorFechaCategoria', '1', 'Ordenar por fecha del trámite y luego categoría de usuario', 'radio;ordentramite', '4', '707' );";
+							( 'TramitesOrdenarPorCategoriaNombreUsuario', '0', 'Ordenar Listado de trï¿½mites por Orden de Categorï¿½a', 'radio;ordentramite', '4', '704' ),
+							( 'TramitesOrdenarPorCategoriaUsuario', '0', 'Trï¿½mites Ordenados por Categorï¿½a y luego Usuario', 'radio;ordentramite', '4', '705' ),
+							( 'TramitesOrdenarPorCategoriaDetalleProfesional', '0', 'Ordenar Listado de Trï¿½mites por Nombre de Categorï¿½a de usuario', 'radio;ordentramite', '4', '706'),
+							( 'TramitesOrdenarPorFechaCategoria', '1', 'Ordenar por fecha del trï¿½mite y luego categorï¿½a de usuario', 'radio;ordentramite', '4', '707' );";
 
 			ejecutar($query, $dbh);
 			break;
@@ -9018,7 +9018,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 
 		case 6.06:
 			$q = "INSERT IGNORE INTO `configuracion` (`glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
-						VALUES ('MostrarTarifaAlProfesional', '0', 'Le permite al profesional ver la tarifa para el contrato del trabajo ingresado en revisión de horas (para FAYCA)', 'boolean', '10', '-1');";
+						VALUES ('MostrarTarifaAlProfesional', '0', 'Le permite al profesional ver la tarifa para el contrato del trabajo ingresado en revisiï¿½n de horas (para FAYCA)', 'boolean', '10', '-1');";
 			if (!($res = mysql_query($q, $dbh) )) {
 				throw new Exception($q . "---" . mysql_error());
 			}
@@ -9027,7 +9027,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 		case 6.07:
 			$query = array();
 			$query[] = "INSERT IGNORE INTO `configuracion` (`id`, `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
-						VALUES (NULL, 'FormatoNotaCobroMTA', '0', 'formato de cobro especial de Muñoz Tamayo y Asociados', 'boolean', '10', '-1');";
+						VALUES (NULL, 'FormatoNotaCobroMTA', '0', 'formato de cobro especial de Muï¿½oz Tamayo y Asociados', 'boolean', '10', '-1');";
 
 			ejecutar($query, $dbh);
 			break;
@@ -9051,7 +9051,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 		case 6.09 :
 			$query = array();
 			$query[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion` , `valor_opcion` , `comentario` , `valores_posibles` , `id_configuracion_categoria` , `orden` )
-								VALUES ( 'SegundaCuentaBancaria', '0', 'Segunda cuenta bancaria, esto nace por petición de Muñoz Tamayo y Asociados', 'boolean', '10', '-1' );";
+								VALUES ( 'SegundaCuentaBancaria', '0', 'Segunda cuenta bancaria, esto nace por peticiï¿½n de Muï¿½oz Tamayo y Asociados', 'boolean', '10', '-1' );";
 			if (!ExisteCampo('id_cuenta2', 'contrato', $dbh)) {
 				$query[] = "ALTER TABLE `contrato` ADD `id_cuenta2` INT NULL AFTER `id_cuenta` ;";
 			}
@@ -9141,7 +9141,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 			$queries = array();
 
 			if (!ExisteCampo('exportacion_ledes', 'contrato', $dbh)) {
-				$queries[] = "ALTER TABLE `contrato` ADD `exportacion_ledes` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT  '0' COMMENT  'Define si las liquidaciones del contrato se podrán exportar a LEDES'";
+				$queries[] = "ALTER TABLE `contrato` ADD `exportacion_ledes` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT  '0' COMMENT  'Define si las liquidaciones del contrato se podrï¿½n exportar a LEDES'";
 			}
 			if (!ExisteCampo('codigo_homologacion', 'asunto', $dbh)) {
 				$queries[] = "ALTER TABLE `asunto` ADD `codigo_homologacion` VARCHAR( 100 ) NULL COMMENT 'codigo que usa internamente el cliente en su propio sistema. requerido para generar archivos LEDES' AFTER `glosa_asunto` ";
@@ -9248,7 +9248,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 							`id_configuracion_categoria` ,
 							`orden`
 							)
-						VALUES (NULL , 'IdentificadorEstudio', '', 'Código identificador del estudio, por ejemplo el número de cédula jurídica. Este es el LAW_FIRM_ID para LEDES', 'string', '1', '-1');"
+						VALUES (NULL , 'IdentificadorEstudio', '', 'Cï¿½digo identificador del estudio, por ejemplo el nï¿½mero de cï¿½dula jurï¿½dica. Este es el LAW_FIRM_ID para LEDES', 'string', '1', '-1');"
 			);
 
 			ejecutar($queries, $dbh);
@@ -9256,7 +9256,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 		case 6.15:
 			$query = array();
 			$query[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
-								VALUES ('SegundaNotaCobro', '0', 'id del formato de segunda nota de cobro que se adjuntará (aguilar castillo love)', 'numero', '10', '-1');";
+								VALUES ('SegundaNotaCobro', '0', 'id del formato de segunda nota de cobro que se adjuntarï¿½ (aguilar castillo love)', 'numero', '10', '-1');";
 			ejecutar($query, $dbh);
 			break;
 
@@ -9284,7 +9284,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 		case 6.17:
 			$query = array();
 			$query[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
-								VALUES ('SegundaNotaCobro', '0', 'id del formato de segunda nota de cobro que se adjuntará (aguilar castillo love)', 'numero', '10', '-1');";
+								VALUES ('SegundaNotaCobro', '0', 'id del formato de segunda nota de cobro que se adjuntarï¿½ (aguilar castillo love)', 'numero', '10', '-1');";
 			ejecutar($query, $dbh);
 			break;
 		case 7.00:
@@ -9306,7 +9306,7 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 			$query = array();
 			$query[] = "INSERT IGNORE INTO  `configuracion`
 				( `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-				VALUES ( 'UsarModuloSolicitudAdelantos', '0', 'Activa el módulo de solicitud de adelantos',  'boolean',  '10',  '-1');";
+				VALUES ( 'UsarModuloSolicitudAdelantos', '0', 'Activa el mï¿½dulo de solicitud de adelantos',  'boolean',  '10',  '-1');";
 
 			$query[] = "CREATE TABLE IF NOT EXISTS `solicitud_adelanto` (
 						`id_solicitud_adelanto` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -9350,8 +9350,8 @@ VALUES ( 'MostrarColumnaReporteFacturacion', 'glosa_cliente,fecha,tipo,numero,cl
 				`id` int(11) NOT NULL AUTO_INCREMENT,
 				`tipo` enum('SOLICITUDES_ADELANTO','FACTURAS','FACTURAS_PAGOS','HORAS','TRAMITES','ADELANTOS','GASTOS','CLIENTES','ASUNTOS','USUARIOS') COLLATE latin1_general_ci NOT NULL,
 				`id_usuario` int(11) DEFAULT NULL,
-				`configuracion_original` text COLLATE latin1_general_ci NOT NULL COMMENT 'JSON con la configuración original del reporte',
-				`configuracion` text COLLATE latin1_general_ci NOT NULL COMMENT 'JSON con la configuración del reporte',
+				`configuracion_original` text COLLATE latin1_general_ci NOT NULL COMMENT 'JSON con la configuraciï¿½n original del reporte',
+				`configuracion` text COLLATE latin1_general_ci NOT NULL COMMENT 'JSON con la configuraciï¿½n del reporte',
 				`fecha_creacion` datetime NOT NULL,
 				`fecha_modificacion` datetime NOT NULL,
 				PRIMARY KEY (`id`),
@@ -9493,7 +9493,7 @@ QUERY;
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO  `configuracion`
 				( `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
-				VALUES ( 'OrientacionPapelPorDefecto', 'PORTRAIT', 'Permite cambiar la orientación del papel de los cobros',  'select;PORTRAIT;LANDSCAPE;',  '10',  '-1');";
+				VALUES ( 'OrientacionPapelPorDefecto', 'PORTRAIT', 'Permite cambiar la orientaciï¿½n del papel de los cobros',  'select;PORTRAIT;LANDSCAPE;',  '10',  '-1');";
 			$queries[] = "INSERT IGNORE INTO  `configuracion`
 				( `glosa_opcion` ,  `valor_opcion` ,  `comentario` ,  `valores_posibles` ,  `id_configuracion_categoria` ,  `orden` )
 				VALUES ( 'SepararPorUsuario', '0', 'Permite entregar subtotales por usuario en la nota de cobro',  'boolean',  '10',  '-1');";
@@ -9505,8 +9505,8 @@ QUERY;
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion`
 				(`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
-				('RetribucionCentroCosto', '17', 'Porcentaje de Retribución para cada Centro de Costo (Area usuario - Socio)', 'numero', 10, -1),
-				('UsarModuloRetribuciones', '0', 'Activa el módulo de Retribuciones', 'boolean', 10, -1)";
+				('RetribucionCentroCosto', '17', 'Porcentaje de Retribuciï¿½n para cada Centro de Costo (Area usuario - Socio)', 'numero', 10, -1),
+				('UsarModuloRetribuciones', '0', 'Activa el mï¿½dulo de Retribuciones', 'boolean', 10, -1)";
 
 			if (!ExisteCampo('retribucion_usuario_responsable', 'contrato', $dbh)) {
 				$queries[] = "ALTER TABLE `contrato`
@@ -9537,8 +9537,8 @@ QUERY;
 			$queries = array();
 			$queries[] = "INSERT IGNORE INTO `configuracion`
 				(`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES
-				('RetribucionUsuarioResponsable', '10', 'Porcentaje de Retribución por defecto para el usuario responsable de un contrato', 'numero', 10, -1),
-				('RetribucionUsuarioSecundario', '10', 'Porcentaje de Retribución por defecto para el usuario secundario de un contrato', 'numero', 10, -1)";
+				('RetribucionUsuarioResponsable', '10', 'Porcentaje de Retribuciï¿½n por defecto para el usuario responsable de un contrato', 'numero', 10, -1),
+				('RetribucionUsuarioSecundario', '10', 'Porcentaje de Retribuciï¿½n por defecto para el usuario secundario de un contrato', 'numero', 10, -1)";
 
 			ejecutar($queries, $dbh);
 			break;
@@ -9555,7 +9555,7 @@ QUERY;
 					ADD `id_moneda_retribucion_secundario` INT NULL,
 					ADD `id_usuario_secundario` INT NULL COMMENT 'copiado del contrato al momento de emitir' AFTER `id_usuario_responsable`,
 					CHANGE `id_usuario_responsable` `id_usuario_responsable` INT NULL DEFAULT NULL COMMENT 'Quien era el encargado comercial cuando se emitio el cobro',
-					CHANGE `id_ultimo_emisor` `id_ultimo_emisor` INT NULL DEFAULT NULL COMMENT 'Quien emitió el cobro por última vez'";
+					CHANGE `id_ultimo_emisor` `id_ultimo_emisor` INT NULL DEFAULT NULL COMMENT 'Quien emitiï¿½ el cobro por ï¿½ltima vez'";
 
 				$queries[] = "UPDATE cobro c SET c.id_usuario_secundario = (SELECT id_usuario_secundario FROM contrato WHERE id_contrato = c.id_contrato)";
 			}
@@ -9661,7 +9661,7 @@ QUERY;
 
 			$queries[] = "INSERT ignore INTO `factura_pdf_tipo_datos`
 								(`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`)
-								VALUES (2, 'factura_codigopostal', 'Código Postal') on duplicate key update glosa_tipo_dato='factura_codigopostal';";
+								VALUES (2, 'factura_codigopostal', 'Cï¿½digo Postal') on duplicate key update glosa_tipo_dato='factura_codigopostal';";
 
 
 			$queries[] = "INSERT ignore INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`)
@@ -9727,7 +9727,7 @@ QUERY;
 
 			$queries = array();
 
-			$queries[] = "ALTER TABLE  `documento` CHANGE  `tipo_doc`  `tipo_doc` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'N' COMMENT  'C:Cheque T:Transferencia E:Efectivo F:Factura O:Otro OP:Otro N:NoAplica EP:Efectivo CP:Cheque RP:Recaudacion TP:Transferencia OP:Otro CC:certificado de crédito'";
+			$queries[] = "ALTER TABLE  `documento` CHANGE  `tipo_doc`  `tipo_doc` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT  'N' COMMENT  'C:Cheque T:Transferencia E:Efectivo F:Factura O:Otro OP:Otro N:NoAplica EP:Efectivo CP:Cheque RP:Recaudacion TP:Transferencia OP:Otro CC:certificado de crï¿½dito'";
 			if (!ExisteCampo('familia', 'prm_tipo_pago', $dbh)) {
 				$queries[] = "ALTER TABLE  `prm_tipo_pago` ADD  `familia` VARCHAR( 1 ) NOT NULL COMMENT 'Tipo de documento (A:Adelanto P:Pago T:Todos)' FIRST";
 			}
@@ -9915,14 +9915,14 @@ QUERY;
 			$queries[] = "CREATE TABLE IF NOT EXISTS `prm_estudio` (
 				`id_estudio` smallint(3) NOT NULL AUTO_INCREMENT,
 				`glosa_estudio` varchar(120) NOT NULL,
-				`metadata_estudio` text NOT NULL COMMENT 'Opcionalmente, este campo puede tener dirección, fono, etc de cada sub_estudio',
+				`metadata_estudio` text NOT NULL COMMENT 'Opcionalmente, este campo puede tener direcciï¿½n, fono, etc de cada sub_estudio',
 				`visible` tinyint(1) NOT NULL DEFAULT '1',
 				PRIMARY KEY (`id_estudio`),
 				KEY `visible` (`visible`),
 				UNIQUE KEY `glosa_estudio` (`glosa_estudio`)
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Las empresas que componen el estudio. Por defecto es una sola: el estudio mismo.' AUTO_INCREMENT=1 ;";
 
-			// Inserto como primera (y probablemente única) compañía, al nombre del estudio. Lo intento obtener de PdfLinea1, y si no del archivo Conf.
+			// Inserto como primera (y probablemente ï¿½nica) compaï¿½ï¿½a, al nombre del estudio. Lo intento obtener de PdfLinea1, y si no del archivo Conf.
 			$NombreEstudio = trim(Conf::GetConf($sesion, 'PdfLinea1')) ? Conf::GetConf($sesion, 'PdfLinea1') : Conf::AppName();
 
 			$queries[] = "REPLACE INTO prm_estudio (id_estudio, glosa_estudio) VALUES (1, '$NombreEstudio')";
@@ -9989,29 +9989,29 @@ QUERY;
 			$queries = array();
 
 			if (!ExisteCampo('dte_fecha_creacion', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_creacion` DATETIME NULL COMMENT 'Documento Tributario Electrónico - Fecha creacion';";
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_creacion` DATETIME NULL COMMENT 'Documento Tributario Electrï¿½nico - Fecha creacion';";
 			}
 			if (!ExisteCampo('dte_firma', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_firma` VARCHAR(255) NULL COMMENT 'Documento Tributario Electrónico - Firma';";
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_firma` VARCHAR(255) NULL COMMENT 'Documento Tributario Electrï¿½nico - Firma';";
 			}
 			if (!ExisteCampo('dte_xml', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_xml` TEXT NULL COMMENT 'Documento Tributario Electrónico - XML';";
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_xml` TEXT NULL COMMENT 'Documento Tributario Electrï¿½nico - XML';";
 			}
 			if (!ExisteCampo('dte_url_pdf', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_url_pdf` VARCHAR(255) NULL COMMENT 'Documento Tributario Electrónico - URL PDF documento';";
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_url_pdf` VARCHAR(255) NULL COMMENT 'Documento Tributario Electrï¿½nico - URL PDF documento';";
 			}
 			if (!ExisteCampo('dte_fecha_anulacion', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_anulacion` DATETIME NULL COMMENT 'Documento Tributario Electrónico - Fecha anulacion';";
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_fecha_anulacion` DATETIME NULL COMMENT 'Documento Tributario Electrï¿½nico - Fecha anulacion';";
 			}
 			if (!ExisteCampo('dte_metodo_pago', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_metodo_pago` INT(3)  NULL COMMENT 'Método de pago para facturar electronicamente, se cuelga de prm_codigo';";
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_metodo_pago` INT(3)  NULL COMMENT 'Mï¿½todo de pago para facturar electronicamente, se cuelga de prm_codigo';";
 			}
 
 			$queries[] = "INSERT IGNORE INTO prm_codigo (grupo, codigo, glosa) VALUES
 							('PRM_FACTURA_MX_METOD', 'M01', 'Cheque'),
-							('PRM_FACTURA_MX_METOD', 'M02', 'Tarjeta de crédito'),
-							('PRM_FACTURA_MX_METOD', 'M03', 'Tarjeta de débito'),
-							('PRM_FACTURA_MX_METOD', 'M04', 'Depósito en cuenta'),
+							('PRM_FACTURA_MX_METOD', 'M02', 'Tarjeta de crï¿½dito'),
+							('PRM_FACTURA_MX_METOD', 'M03', 'Tarjeta de dï¿½bito'),
+							('PRM_FACTURA_MX_METOD', 'M04', 'Depï¿½sito en cuenta'),
 							('PRM_FACTURA_MX_METOD', 'M05', 'Transferencia interbancaria'),
 							('PRM_FACTURA_MX_METOD', 'M06', 'No Identificado')";
 
@@ -10073,7 +10073,7 @@ QUERY;
 					CONSTRAINT `factura_generador_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
 				) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
-			$comentario = 'Esta opcion habilita el módulo de producción, % de generadores por contrato y reportes';
+			$comentario = 'Esta opcion habilita el mï¿½dulo de producciï¿½n, % de generadores por contrato y reportes';
 
 			$queries[] = "INSERT IGNORE INTO configuracion(glosa_opcion, valor_opcion, valores_posibles, comentario, id_configuracion_categoria, orden)
 										VALUES('UsarModuloProduccion', 0, 'boolean','{$comentario}', 10, -1)";
@@ -10093,7 +10093,7 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `reporte_listado` (`tipo`, `id_usuario`, `configuracion_original`, `configuracion`, `fecha_creacion`, `fecha_modificacion`, `query`, `api_accessible`, `title`)
 				VALUES
 				('FACTURA_COBRANZA_APLICADA', NULL, '', '', '2013-09-12 19:12:48', '0000-00-00 00:00:00', NULL, 0, 'Cobranza Aplicada'),
-				('FACTURA_PRODUCCION', NULL, '', '', '2013-09-12 19:12:53', '2013-09-12 19:13:21', NULL, 0, 'Facturación'),
+				('FACTURA_PRODUCCION', NULL, '', '', '2013-09-12 19:12:53', '2013-09-12 19:13:21', NULL, 0, 'Facturaciï¿½n'),
 				('FACTURA_COBRANZA', NULL, '', '', '2013-09-12 19:13:39', '0000-00-00 00:00:00', NULL, 0, 'Cobranza'),
 				('GASTOS_NO_COBRABLES', NULL, '', '', '2013-09-12 19:13:39', '0000-00-00 00:00:00', NULL, 0, 'Gastos No Cobrables');";
 
@@ -10107,7 +10107,7 @@ QUERY;
 			if (!ExisteCampo('dte_metodo_pago_cta', 'factura', $dbh) && !ExisteCampo('dte_id_pais', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura`
 							ADD COLUMN `dte_metodo_pago_cta` VARCHAR(50) NULL COMMENT 'Cuenta en la que se cobrara la factura electronica',
-							ADD COLUMN `dte_id_pais` INT(3)  NULL COMMENT 'País de la factura electronica';";
+							ADD COLUMN `dte_id_pais` INT(3)  NULL COMMENT 'Paï¿½s de la factura electronica';";
 			}
 			ejecutar($queries, $dbh);
 			break;
@@ -10145,7 +10145,7 @@ QUERY;
 
 		case 7.57:
 			$queries = array();
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('GastosConImpuestosPorDefecto', 0, 'Dejar seleccionado la opción de impuesto al agregar un gasto', 'boolean', 2, -1);";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('GastosConImpuestosPorDefecto', 0, 'Dejar seleccionado la opciï¿½n de impuesto al agregar un gasto', 'boolean', 2, -1);";
 			ejecutar($queries, $dbh);
 			break;
 
@@ -10168,10 +10168,10 @@ QUERY;
 			$queries = array();
 			if (!ExisteCampo('dte_estado', 'factura', $dbh) && !ExisteCampo('dte_estado_descripcion', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE `factura`	ADD COLUMN `dte_estado` INT(3) NULL COMMENT 'Estado del documento [1: firmado, 2: error_firma, 3: proceso_anular, 4: anulado]',
-							ADD COLUMN `dte_estado_descripcion` VARCHAR(255) NULL COMMENT 'Descripción del estado o mensaje de error';";
+							ADD COLUMN `dte_estado_descripcion` VARCHAR(255) NULL COMMENT 'Descripciï¿½n del estado o mensaje de error';";
 			}
-			$queries[] = "UPDATE factura SET `dte_estado` = 1, `dte_estado_descripcion` = 'Documento Tributario Electrónico Firmado' WHERE `dte_fecha_creacion` IS NOT NULL;";
-			$queries[] = "UPDATE factura SET `dte_estado` = 4, `dte_estado_descripcion` = 'Documento Tributario Electrónico Cancelado' WHERE `dte_fecha_anulacion` IS NOT NULL;";
+			$queries[] = "UPDATE factura SET `dte_estado` = 1, `dte_estado_descripcion` = 'Documento Tributario Electrï¿½nico Firmado' WHERE `dte_fecha_creacion` IS NOT NULL;";
+			$queries[] = "UPDATE factura SET `dte_estado` = 4, `dte_estado_descripcion` = 'Documento Tributario Electrï¿½nico Cancelado' WHERE `dte_fecha_anulacion` IS NOT NULL;";
 
 			ejecutar($queries, $dbh);
 			break;
@@ -10211,10 +10211,10 @@ QUERY;
 			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (2, 'TTB Webservice', 'ttb-ws');";
 			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (3, 'TTB iOS', 'ttb-ios');";
 			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (4, 'TTB Desktop', 'ttb-desktop');";
-			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (5, 'TTB Web Móvil', 'ttb-movil');";
+			$queries[] = "INSERT IGNORE INTO `application` (`id`, `name`, `app_key`) VALUES (5, 'TTB Web Mï¿½vil', 'ttb-movil');";
 
 			if (!ExisteCampo('app_id', 'trabajo_historial', $dbh)) {
-				$queries[] = "ALTER TABLE `trabajo_historial` ADD `app_id` INT(3) NOT NULL DEFAULT '1' COMMENT 'Aplicación por defecto, ttb = 1' ";
+				$queries[] = "ALTER TABLE `trabajo_historial` ADD `app_id` INT(3) NOT NULL DEFAULT '1' COMMENT 'Aplicaciï¿½n por defecto, ttb = 1' ";
 				$queries[] = "ALTER TABLE `trabajo_historial` ADD INDEX (`app_id`)";
 			}
 			if (!ExisteCampo('tarifa_hh', 'trabajo_historial', $dbh)) {
@@ -10250,8 +10250,8 @@ QUERY;
 			if (!ExisteCampo('factura_region', 'factura', $dbh)) {
 				$queries[] = "ALTER TABLE  `factura` ADD `factura_region` VARCHAR( 100 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL AFTER  `ciudad_cliente`;";
 			}
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosProfesionales', 0, 'Cupo máximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosAdministrativos', 0, 'Cupo máximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosProfesionales', 0, 'Cupo mï¿½ximo de usuarios activos con rol profesional', 'numero', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('CupoUsuariosAdministrativos', 0, 'Cupo mï¿½ximo de usuarios activos con rol administrador', 'numero', '6', '-1');";
 			$queries[] = "UPDATE configuracion, (
 					SELECT
 						SUM(IF(_tmp.profesional > 0, 1, 0)) AS cupo
@@ -10302,8 +10302,8 @@ QUERY;
 
 				if (empty($fecha_vencimiento)) {
 
-					//Se asume que es contado (fecha de pago al día de facturación), a menos que la condición de pago especifique lo contrario. Se han considerado todos los casos
-					//excepto el de cheque a fecha, ya que no hay como saber para cuándo fue pactado el convenio.
+					//Se asume que es contado (fecha de pago al dï¿½a de facturaciï¿½n), a menos que la condiciï¿½n de pago especifique lo contrario. Se han considerado todos los casos
+					//excepto el de cheque a fecha, ya que no hay como saber para cuï¿½ndo fue pactado el convenio.
 
 					$dias = 0;
 
@@ -10382,7 +10382,7 @@ QUERY;
 			if (!ExisteCampo('cta_corriente', 'nro_seguimiento', $dbh)) {
 				$queries = array();
 				$queries[] = "ALTER TABLE `cta_corriente` ADD `nro_seguimiento` INT(11) NULL AFTER `estado_pago`;";
-				$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`) VALUES ('AñadeAutoincrementableGasto', '0', 'Añade un numero de seguimiento autoincrementable al manejo de gastos.', 'boolean', '10');";
+				$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`) VALUES ('Aï¿½adeAutoincrementableGasto', '0', 'Aï¿½ade un numero de seguimiento autoincrementable al manejo de gastos.', 'boolean', '10');";
 				$queries[] = "CREATE TABLE `prm_nro_seguimiento_gasto` (
 					`id_nro_seguimiento_gasto` INT NOT NULL AUTO_INCREMENT,
 					`id_ultimo_gasto_modificado` INT NULL,
@@ -10532,21 +10532,21 @@ QUERY;
 			break;
 		case 7.82:
 			$queries = array();
-			$queries[] = "INSERT IGNORE INTO `menu` (`codigo`, `glosa`, `url`, `tipo`, `orden`, `codigo_padre`, `bitmodfactura`) VALUES ('AUDIT', 'Auditoría', '/app/interfaces/reporte_historial_movimientos.php', '0', '99999', 'ADMIN_SIS', '0');";
+			$queries[] = "INSERT IGNORE INTO `menu` (`codigo`, `glosa`, `url`, `tipo`, `orden`, `codigo_padre`, `bitmodfactura`) VALUES ('AUDIT', 'Auditorï¿½a', '/app/interfaces/reporte_historial_movimientos.php', '0', '99999', 'ADMIN_SIS', '0');";
 			$queries[] = "INSERT IGNORE INTO `menu_permiso` (`codigo_permiso`,`codigo_menu`) VALUES ('ADM', 'AUDIT');";
 			ejecutar($queries, $dbh);
 		case 7.83:
 			$queries = array();
 			$queries[] = "ALTER TABLE `prm_excel_cobro` CHANGE glosa_es glosa_es VARCHAR(255), CHANGE glosa_en glosa_en VARCHAR(255)";
 			$queries[] = "INSERT IGNORE INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'concepto', 'Encabezado', 'Concepto', 'Concept', 0)";
-			$queries[] = "INSERT IGNORE INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'concepto_glosa', 'Encabezado', 'Servicios profesionales prestados a la compañía durante el mes de %s', 'Professional services provided to the company during %s', 0)";
+			$queries[] = "INSERT IGNORE INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'concepto_glosa', 'Encabezado', 'Servicios profesionales prestados a la compaï¿½ï¿½a durante el mes de %s', 'Professional services provided to the company during %s', 0)";
 			$queries[] = "INSERT IGNORE INTO `prm_excel_cobro` (`id_prm_excel_cobro`, `nombre_interno`, `grupo`, `glosa_es`, `glosa_en`, `tamano`) VALUES (NULL, 'detalle_cobranza', 'Encabezado', 'Detalle Cobranza', 'Detail Billing', 0)";
 			ejecutar($queries, $dbh);
 			break;
 
 		case 7.84:
 			$queries = array();
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('MostrarModalidadCalculo', '0', 'Mostrar opción para modificar modalidad de cálculo en Cobros6', 'boolean', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('MostrarModalidadCalculo', '0', 'Mostrar opciï¿½n para modificar modalidad de cï¿½lculo en Cobros6', 'boolean', '6', '-1');";
 			ejecutar($queries, $dbh);
 			break;
 
@@ -10560,7 +10560,7 @@ QUERY;
 		case 7.86:
 			$queries[] = "ALTER TABLE `trabajo_historial`
 							CHANGE COLUMN `accion` `accion` VARCHAR(9) NOT NULL DEFAULT '' AFTER `fecha_accion`,
-							CHANGE COLUMN `app_id` `app_id` INT(3) NOT NULL DEFAULT '1' COMMENT 'Aplicación por defecto, ttb = 1' AFTER `accion`,
+							CHANGE COLUMN `app_id` `app_id` INT(3) NOT NULL DEFAULT '1' COMMENT 'Aplicaciï¿½n por defecto, ttb = 1' AFTER `accion`,
 							CHANGE COLUMN `id_trabajo_respaldo_excel` `id_trabajo_respaldo_excel` INT(11) NULL DEFAULT NULL AFTER `app_id`,
 							CHANGE COLUMN `fecha` `fecha_accion` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 							CHANGE COLUMN `fecha_trabajo` `fecha_trabajo` DATE NULL DEFAULT NULL ,
@@ -10575,10 +10575,10 @@ QUERY;
 
 		case 7.87:
 			if (!ExisteCampo('dte_codigo_referencia', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_codigo_referencia` INT(3)  NULL COMMENT 'Código de la referencia que se enviará en caso de ND/NC';";
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_codigo_referencia` INT(3)  NULL COMMENT 'Cï¿½digo de la referencia que se enviarï¿½ en caso de ND/NC';";
 			}
 			if (!ExisteCampo('dte_razon_referencia', 'factura', $dbh)) {
-				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_razon_referencia` VARCHAR(255)  NULL COMMENT 'Razón de la Referencia';";
+				$queries[] = "ALTER TABLE `factura` ADD COLUMN `dte_razon_referencia` VARCHAR(255)  NULL COMMENT 'Razï¿½n de la Referencia';";
 			}
 			break;
 
@@ -10596,12 +10596,12 @@ QUERY;
 
 		case 7.89:
 			$queries = array();
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarFacturasPorDefecto', 'numero desc', 'Campos soportados para ordenamiento:<br/> Razón Social => cliente<br/> Fecha Documento => fecha<br/> Datos Documentos => numero<br/> Socio a cargo => encargado_comercial<br/> NºLiquidación => id_cobro<br/> Estado => estado', 'string', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('OrdenarFacturasPorDefecto', 'numero desc', 'Campos soportados para ordenamiento:<br/> Razï¿½n Social => cliente<br/> Fecha Documento => fecha<br/> Datos Documentos => numero<br/> Socio a cargo => encargado_comercial<br/> Nï¿½Liquidaciï¿½n => id_cobro<br/> Estado => estado', 'string', '6', '-1');";
 			break;
 
 		case 7.90:
 			$queries = array();
-			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarán', 'string', '6', '-1');";
+			$queries[] = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('ValidacionesClienteExcepciones', '', 'Campos que no se validarï¿½n', 'string', '6', '-1');";
 			break;
 
 		case 7.91:
@@ -10624,7 +10624,7 @@ QUERY;
 			break;
 
 		case 7.92:
-			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TipoGeneracionMasiva', 'cliente', 'Define si la generación masiva de cobros itera por cliente (rapido pero puede caerse por memoria) o por contrato (lento pero seguro, recomendable para estudios grandes)', 'select;cliente;contrato', '6', '90')";
+			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('TipoGeneracionMasiva', 'cliente', 'Define si la generaciï¿½n masiva de cobros itera por cliente (rapido pero puede caerse por memoria) o por contrato (lento pero seguro, recomendable para estudios grandes)', 'select;cliente;contrato', '6', '90')";
 			break;
 
 		case 7.93:
@@ -10640,13 +10640,13 @@ QUERY;
 				$queries[] = "ALTER TABLE `prm_cliente_referencia` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
 			}
 			if (!ExisteCampo('desglose_area', 'asunto', $dbh)) {
-				$queries[] = "ALTER TABLE `asunto` ADD `desglose_area` VARCHAR(255) NULL COMMENT 'este campo contiene desglose del área del asunto cuando corresponde' AFTER `id_area_proyecto` ;";
+				$queries[] = "ALTER TABLE `asunto` ADD `desglose_area` VARCHAR(255) NULL COMMENT 'este campo contiene desglose del ï¿½rea del asunto cuando corresponde' AFTER `id_area_proyecto` ;";
 			}
 			if (!ExisteCampo('contraparte', 'asunto', $dbh)) {
 				$queries[] = "ALTER TABLE `asunto` ADD `contraparte` VARCHAR(255) NULL COMMENT 'este campo contiene un texto libre para el nombre de la contraparte' AFTER `contacto` ;";
 			}
 			if (!ExisteCampo('cotizado_con', 'asunto', $dbh)) {
-				$queries[] = "ALTER TABLE `asunto` ADD `cotizado_con` VARCHAR(255) NULL COMMENT 'contiene una descripción de otro asunto cotizado en conjunto' AFTER `contraparte` ;";
+				$queries[] = "ALTER TABLE `asunto` ADD `cotizado_con` VARCHAR(255) NULL COMMENT 'contiene una descripciï¿½n de otro asunto cotizado en conjunto' AFTER `contraparte` ;";
 			}
 			if (!ExisteCampo('requiere_desglose', 'prm_area_proyecto', $dbh)) {
 				$queries[] = "ALTER TABLE `prm_area_proyecto` ADD `requiere_desglose` TINYINT(1) NOT NULL DEFAULT '0';";
@@ -10697,7 +10697,7 @@ QUERY;
 
 		case 7.95:
 			$queries[] = "INSERT IGNORE INTO `configuracion` ( `glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
-				VALUES ('UsaFechaDesdeUltimoCobro', '0', 'Permite definir automáticamente la fecha desde de los cobros según la fecha del último cobro emitido + 1', 'boolean', '6', -1)";
+				VALUES ('UsaFechaDesdeUltimoCobro', '0', 'Permite definir automï¿½ticamente la fecha desde de los cobros segï¿½n la fecha del ï¿½ltimo cobro emitido + 1', 'boolean', '6', -1)";
 			break;
 
 		case 7.96:
@@ -10748,7 +10748,7 @@ QUERY;
 			if (!ExisteCampo('codigo_homologacion', 'cliente', $dbh)) {
 				$queries[] = "ALTER TABLE `cliente` ADD `codigo_homologacion` VARCHAR( 100 ) NULL COMMENT 'codigo que usa internamente el cliente en su propio sistema. requerido para generar archivos LEDES' ";
 
-				// Actualiza todos los clientes con el código del cliente por defecto
+				// Actualiza todos los clientes con el cï¿½digo del cliente por defecto
 				$queries[] = "UPDATE `cliente` SET `codigo_homologacion` = `codigo_cliente`";
 			}
 
@@ -10834,8 +10834,8 @@ QUERY;
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 
 			$queries[] = "ALTER TABLE `contrato`
-				ADD `emitir_liquidacion_al_generar` int(11) NULL DEFAULT 0 COMMENT 'Liquidaciones Programadas: Emitir la liquidación al generar',
-				ADD `enviar_liquidacion_al_generar` int(11) NULL DEFAULT 0 COMMENT 'Liquidaciones Programadas: Enviar la liquidación generada al cliente'";
+				ADD `emitir_liquidacion_al_generar` int(11) NULL DEFAULT 0 COMMENT 'Liquidaciones Programadas: Emitir la liquidaciï¿½n al generar',
+				ADD `enviar_liquidacion_al_generar` int(11) NULL DEFAULT 0 COMMENT 'Liquidaciones Programadas: Enviar la liquidaciï¿½n generada al cliente'";
 
 			break;
 
@@ -10846,10 +10846,9 @@ QUERY;
 		case 8.08:
 			$queries = array(
 				"INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
-				VALUES ('FiltroFacturacionGastosCobrado', 'NO', 'Define la opción por defecto para desplegar en filtro Cobrado al revisar gastos', 'select;Todos;SI;NO', 2, -1);"
+				VALUES ('FiltroFacturacionGastosCobrado', 'NO', 'Define la opciï¿½n por defecto para desplegar en filtro Cobrado al revisar gastos', 'select;Todos;SI;NO', 2, -1);"
 			);
 			break;
-
 		case 8.09:
 			if (!ExisteCampo('cta_corriente', 'cuenta_gasto', $dbh)) {
 				$queries[] = "ALTER TABLE `cta_corriente` ADD COLUMN `cuenta_gasto` VARCHAR(100) DEFAULT NULL;";
@@ -10858,7 +10857,54 @@ QUERY;
 				$queries[] = "ALTER TABLE `cta_corriente` ADD COLUMN `detraccion` VARCHAR(100) DEFAULT NULL;";
 			}
 			break;
+
 		case 8.10:
+			$queries = array("ALTER TABLE `factura_cobro` CHANGE `id_documento` `id_documento` INT(11)  NULL  DEFAULT NULL;");
+			break;
+
+		case 8.11:
+			$queries = array(
+					"ALTER TABLE `factura` ADD `id_documento_referencia` TINYINT(1)  UNSIGNED  NULL  DEFAULT NULL  AFTER `dte_comentario`;",
+					"ALTER TABLE `factura` ADD `folio_documento_referencia` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `id_documento_referencia`;",
+					"ALTER TABLE `factura` ADD `fecha_documento_referencia` DATE  NULL  DEFAULT NULL  AFTER `folio_documento_referencia`;"
+				);
+
+			$query = "SELECT archivo_nombre FROM prm_plugin WHERE activo = 1 AND archivo_nombre IN ('facturacion_electronica_nubox.php', 'facturacion_electronica_cl.php');";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+			$archivo = mysql_fetch_array($resp);
+			if ($archivo['archivo_nombre'] == 'facturacion_electronica_nubox.php') {
+				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES 
+								('PRM_FACTURA_DR', '33', 'Factura Electrï¿½nica'), 
+								('PRM_FACTURA_DR', '34', 'Factura Electrï¿½nica Exenta'), 
+								('PRM_FACTURA_DR', '39', 'Boleta Electrï¿½nica'), 
+								('PRM_FACTURA_DR', '41', 'Boleta Electrï¿½nica Exenta'), 
+								('PRM_FACTURA_DR', '56', 'Nota de Dï¿½bito Electrï¿½nica'), 
+								('PRM_FACTURA_DR', '61', 'Nota de Crï¿½dito Electrï¿½nica'), 
+								('PRM_FACTURA_DR', '30', 'Factura'), 
+								('PRM_FACTURA_DR', '35', 'Boleta'), 
+								('PRM_FACTURA_DR', '50', 'Guï¿½a de Despacho'), 
+								('PRM_FACTURA_DR', '52', 'Guï¿½a Electrï¿½nica'), 
+								('PRM_FACTURA_DR', '801', 'Orden Compra'), 
+								('PRM_FACTURA_DR', '802', 'Nota de Pedido')";
+			} else if ($archivo['archivo_nombre'] == 'facturacion_electronica_cl.php') {
+				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES 
+								('PRM_FACTURA_DR', '801', 'Orden de Compra'), 
+								('PRM_FACTURA_DR', '802', 'Nota de Pedido'),
+								('PRM_FACTURA_DR', '803', 'Contrato'),
+								('PRM_FACTURA_DR', '814', 'Certificaciï¿½n de Depï¿½sito Bolsa Prod. Chile'),
+								('PRM_FACTURA_DR', '815', 'Vale de Prenda Bolsa Prod. Chile'),
+								('PRM_FACTURA_DR', 'HAS', 'Hoja Aceptaciï¿½n Servicio (HAS)'),
+								('PRM_FACTURA_DR', 'HES', 'Hoja Estado Servicio (HES)'),
+								('PRM_FACTURA_DR', 'HEM', 'Recepciï¿½n de Material (HEM)'),
+								('PRM_FACTURA_DR', 'MER', 'Mercaderï¿½a (MER)'),
+								('PRM_FACTURA_DR', 'SER', 'Servicio (SER)'),
+								('PRM_FACTURA_DR', 'CEC', 'Centro de Costo (CEC)'),
+								('PRM_FACTURA_DR', 'GD', 'Guï¿½a Devoluciï¿½n (GD)'),
+								('PRM_FACTURA_DR', 'RE', 'Rebate (RE)')";
+			}
+			break;
+		case 8.12:
 			$queries = array("ALTER TABLE `bloqueo_procesos`
 				CHANGE COLUMN `estado` `estado` TEXT NOT NULL DEFAULT ''");
 			break;
@@ -10873,8 +10919,8 @@ QUERY;
 	(No olvidar agregar la notificacion de los cambios) */
 
 $num = 0;
-$min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.10;
+$min_update = 2; //FFF: del 2 hacia atrï¿½s no tienen soporte
+$max_update = 8.12;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
@@ -10894,12 +10940,12 @@ if (isset($_GET['lastver'])) {
 	echo number_format($lastver, 2, '.', '');
 } else {
 
-	/*	 * ********************************************** LISTO, NO MODIFICAR NADA MÁS A PARTIR DE ESTA LÍNEA ****************************************************** */
+	/*	 * ********************************************** LISTO, NO MODIFICAR NADA Mï¿½S A PARTIR DE ESTA Lï¿½NEA ****************************************************** */
 
 	require_once dirname(__FILE__) . '/../app/conf.php';
 
 	if ($_GET['hash'] != Conf::Hash() && Conf::Hash() != $argv[1]) {
-		die('Credenciales inválidas.');
+		die('Credenciales invï¿½lidas.');
 	}
 	$sesion = new Sesion();
 	$sesion->dbh = @mysql_connect(Conf::dbHost(), 'admin', 'admin1awdx') or die(mysql_error());
@@ -10915,13 +10961,13 @@ if (isset($_GET['lastver'])) {
 	}
 
 	if (!isset($VERSION) or $VERSION < 0.01) {
-		die('Error en la versión del software.');
+		die('Error en la versiï¿½n del software.');
 	}
 
 	foreach ($VERSIONES as $key => $new_version) {
 		if ($VERSION < $new_version || $force == 1) {
 			flush();
-			echo '<hr>Comienzo de proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br>';
+			echo '<hr>Comienzo de proceso de cambios para versiï¿½n ' . number_format($new_version, 2, '.', '') . '<br>';
 
 			try {
 
@@ -10942,8 +10988,8 @@ if (isset($_GET['lastver'])) {
 				if (!mysql_query("ROLLBACK", $sesion->dbh)) {
 					$error_message .= 'Error en ROLLBACK: <br />';
 				}
-				$error_message .= 'Error en proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . '<br />';
-				$error_message .= 'Se encontró un error: ' . $exc->getMessage() . '<br />';
+				$error_message .= 'Error en proceso de cambios para versiï¿½n ' . number_format($new_version, 2, '.', '') . '<br />';
+				$error_message .= 'Se encontrï¿½ un error: ' . $exc->getMessage() . '<br />';
 
 				echo($error_message);
 
@@ -10953,11 +10999,11 @@ if (isset($_GET['lastver'])) {
 			}
 
 			GuardarVersion($new_version, $sesion);
-			echo 'Proceso de cambios para versión ' . number_format($new_version, 2, '.', '') . ' finalizado<br>';
+			echo 'Proceso de cambios para versiï¿½n ' . number_format($new_version, 2, '.', '') . ' finalizado<br>';
 
 		} else {
 			if ($VERSION == $new_version) {
-				echo '<p>Su software está corriendo la versi&oacute;n ' . number_format($VERSION, 2, '.', '') . '</p>';
+				echo '<p>Su software estï¿½ corriendo la versi&oacute;n ' . number_format($VERSION, 2, '.', '') . '</p>';
 			}
 		}
 	}
@@ -10966,7 +11012,7 @@ if (isset($_GET['lastver'])) {
 function EnviarLogError($error_message, $e, $sesion) {
 	$array_correo = array(
 		array('mail' => 'implementacion@lemontech.cl',
-			'nombre' => 'Implementación Lemontech'
+			'nombre' => 'Implementaciï¿½n Lemontech'
 		),
 		array('mail' => 'soporte@lemontech.cl',
 			'nombre' => 'Soporte Lemontech'
@@ -10984,7 +11030,7 @@ MAIL;
 }
 
 function InitVersion($version, $sesion) {
-	echo '<hr>Inicializando tabla para versión.<br>';
+	echo '<hr>Inicializando tabla para versiï¿½n.<br>';
 	mysql_query("CREATE TABLE IF NOT EXISTS `version_db` (
 	`version` decimal(3,1) NOT NULL DEFAULT '0.0',
 	`version_ct` decimal(3,1) NOT NULL DEFAULT '0.0',
