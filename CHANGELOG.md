@@ -1,5 +1,9 @@
 # Changelog
 ## Hotfix 15.17.7
+Wednesday 2015, September 2nd
+* **Fix** [Corrección de las horas cobrables en el reporte avanzado](https://github.com/LemontechSA/ttb/pull/1106)
+
+## Hotfix 15.17.7
 Monday 2015, August 31th
 * **Fix** [Se corrige codificación en archivo MontoEnPalabra.php](https://github.com/LemontechSA/ttb/pull/1101)
 
