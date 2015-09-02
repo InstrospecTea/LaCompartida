@@ -131,9 +131,11 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->buildChargeQuery();
 
 		$results = array();
-		// pr($this->WorksCriteria->get_plain_query());
-		// pr($this->ErrandsCriteria->get_plain_query());
-		// pr($this->ChargesCriteria->get_plain_query());
+		// echo '<!-- ';
+		// echo "<pre>{$this->WorksCriteria->get_plain_query()}</pre>";
+		// echo "<pre>{$this->ErrandsCriteria->get_plain_query()}</pre>";
+		// echo "<pre>{$this->ChargesCriteria->get_plain_query()}</pre>";
+		// echo '-->';
 		if (!empty($this->WorksCriteria)) {
 			// pr($this->WorksCriteria->get_plain_query());
 			$results = array_merge($results, $this->WorksCriteria->run());
@@ -316,6 +318,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			CriteriaRestriction::equals('cobro.incluye_honorarios', '1'),
 			CriteriaRestriction::greater_than('cobro.monto_subtotal', '0'),
 			CriteriaRestriction::equals('cobro.monto_thh', '0'),
+			CriteriaRestriction::equals('cobro.monto_thh_estandar', '0'),
 			CriteriaRestriction::equals('cobro.monto_tramites', '0')
 		);
 		$Criteria->add_restriction(CriteriaRestriction::and_clause($and_wheres));

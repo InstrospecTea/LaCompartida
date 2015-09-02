@@ -57,8 +57,9 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 			return 'IF(cobro.monto_thh_estandar > 0, cobro.monto_thh_estandar,
 				IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1))';
 		} else {
-			return 'IF(cobro.monto_thh > 0, cobro.monto_thh,
-				IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1))';
+			return "IF(cobro.forma_cobro = 'FLAT FEE',
+					IF(cobro.monto_thh_estandar > 0, cobro.monto_thh_estandar, IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1)),
+					IF(cobro.monto_thh > 0, cobro.monto_thh, IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1)))";
 		}
 	}
 
