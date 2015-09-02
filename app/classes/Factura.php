@@ -2383,7 +2383,6 @@ class Factura extends Objeto {
 		$prm_plugin = new PrmPlugin($this->sesion);
 
 		if ($prm_plugin->isActive('facturacion_electronica_mx.php')) {
-			echo 'asdas';
 			self::$configuracion_reporte[] = array(
 					'field' => 'dte_folio_fiscal',
 					'title' => 'Folio Fiscal'
