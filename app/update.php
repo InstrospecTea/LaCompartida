@@ -10916,9 +10916,24 @@ QUERY;
 			break;
 
 		case 8.14;
-			$queries = array(
-					"ALTER TABLE `factura` ADD `dte_folio_fiscal` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `dte_comentario`;"
-				);
+			$queries[] = "ALTER TABLE `factura` ADD `dte_folio_fiscal` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `dte_comentario`;";
+
+			$query = "SELECT id_factura,
+							   dte_firma
+						FROM factura
+						WHERE
+						    (SELECT COUNT(*) AS total
+						     FROM prm_plugin
+						     WHERE activo = 1
+						       AND archivo_nombre = 'facturacion_electronica_mx.php')
+						  AND dte_firma IS NOT NULL;";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+			while (list($id_factura, $dte_firma) = (mysql_fetch_array($resp))) {
+				preg_match('/1.0\|([a-zA-Z0-9-]+)\|/', $dte_firma, $folio_fiscal);
+				$queries[] = "UPDATE factura SET dte_folio_fiscal = '{$folio_fiscal[1]}' WHERE id_factura = {$id_factura};";
+			}
+			break;
 	}
 
 	if (!empty($queries)) {

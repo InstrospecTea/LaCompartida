@@ -330,6 +330,11 @@ class Factura extends Objeto {
 			'title' => 'Fecha Anulación',
 			'format' => 'date',
 			'visible' => false,
+		),
+		array(
+			'field' => 'dte_folio_fiscal',
+			'title' => 'Folio Fiscal',
+			'visible' => false
 		)
 	);
 
@@ -2380,15 +2385,6 @@ class Factura extends Objeto {
 
 		set_time_limit(0);
 
-		$prm_plugin = new PrmPlugin($this->sesion);
-
-		if ($prm_plugin->isActive('facturacion_electronica_mx.php')) {
-			self::$configuracion_reporte[] = array(
-					'field' => 'dte_folio_fiscal',
-					'title' => 'Folio Fiscal'
-				);
-		}
-		
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('FACTURAS');
