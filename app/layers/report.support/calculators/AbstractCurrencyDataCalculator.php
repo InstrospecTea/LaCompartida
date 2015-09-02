@@ -6,7 +6,7 @@
  */
 abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 
-	private $currencyId;
+	protected $currencyId;
 
 	/**
 	 * Constructor
