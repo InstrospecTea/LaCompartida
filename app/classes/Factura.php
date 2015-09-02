@@ -133,10 +133,6 @@ class Factura extends Objeto {
 			)
 		),
 		array(
-			'field' => 'dte_folio_fiscal',
-			'title' => 'Folio Fiscal'
-		),
-		array(
 			'field' => 'RUT_cliente',
 			'title' => 'RUT',
 			'visible' => false
@@ -2384,6 +2380,16 @@ class Factura extends Objeto {
 
 		set_time_limit(0);
 
+		$prm_plugin = new PrmPlugin($this->sesion);
+
+		if ($prm_plugin->isActive('facturacion_electronica_mx.php')) {
+			echo 'asdas';
+			self::$configuracion_reporte[] = array(
+					'field' => 'dte_folio_fiscal',
+					'title' => 'Folio Fiscal'
+				);
+		}
+		
 		$SimpleReport = new SimpleReport($this->sesion);
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('FACTURAS');

@@ -12,11 +12,11 @@ class PrmPlugin extends Objeto {
 
 	/**
 	 *
-	 * Permite saber si un plugin estÃ¡ activo.
+	 * Permite saber si un plugin está activo.
 	 *
-	 * @param mixed $nombre recibe el nombre de el o los plugins a revisar si estÃ¡n activos
+	 * @param mixed $nombre recibe el nombre de el o los plugins a revisar si están activos
 	 *
-	 * @return bool Retorna TRUE | FALSE para saber si cuenta con algÃºn plugin activo
+	 * @return bool Retorna TRUE | FALSE para saber si cuenta con algún plugin activo
 	 */
 	public function isActive($nombre) {
 		$criteria = new Criteria($this->sesion);
@@ -32,7 +32,7 @@ class PrmPlugin extends Objeto {
 
 		try {
 			$result = $criteria->run();
-			return sizeof($result[0]['total']) > 0 ? TRUE : FALSE;
+			return $result[0]['total'] > 0 ? TRUE : FALSE;
 
 		} catch (Exception $e) {
 			echo "Error: {$e} {$criteria->__toString()}";
