@@ -40,9 +40,9 @@ class ClientesFilter extends AbstractUndependantFilterTranslator {
 				'filtro_cliente_asunto.codigo_asunto', 'filtro_cliente_cobro_asunto.codigo_asunto'
 			)
 		)->add_left_join_with(
-			'cliente as filtro_cliente_cliente',
+			'cliente',
 			CriteriaRestriction::equals(
-				'filtro_cliente_cliente.codigo_cliente', 'filtro_cliente_asunto.codigo_cliente'
+				'cliente.codigo_cliente', 'filtro_cliente_asunto.codigo_cliente'
 			)
 		);
 	}
@@ -63,9 +63,9 @@ class ClientesFilter extends AbstractUndependantFilterTranslator {
 				'tramite.codigo_asunto'
 			)
 		)->add_left_join_with(
-			'cliente filtro_cliente_cliente',
+			'cliente',
 			CriteriaRestriction::equals(
-				'filtro_cliente_cliente.codigo_cliente',
+				'cliente.codigo_cliente',
 				'filtro_cliente_asunto.codigo_cliente'
 			)
 		);
@@ -87,9 +87,9 @@ class ClientesFilter extends AbstractUndependantFilterTranslator {
 				'trabajo.codigo_asunto'
 			)
 		)->add_left_join_with(
-			'cliente as filtro_cliente_cliente',
+			'cliente',
 			CriteriaRestriction::equals(
-				'filtro_cliente_cliente.codigo_cliente',
+				'cliente.codigo_cliente',
 				'filtro_cliente_asunto.codigo_cliente'
 			)
 		);

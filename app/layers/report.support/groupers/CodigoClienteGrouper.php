@@ -23,7 +23,7 @@ class CodigoClienteGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return 'client_grouper.codigo_cliente'
+		return 'client_grouper.codigo_cliente';
 	}
 
 	/**
