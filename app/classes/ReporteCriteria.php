@@ -667,31 +667,15 @@ class ReporteCriteria {
 				'campo_fecha' => $this->parametros['campo_fecha'],
 				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
 				'fecha_fin' => Utiles::fecha2sql($this->parametros['fecha_fin']),
-				'usuarios' => null,
-				'clientes' => null,
-				'tipo_asunto' => $this->parametros['tipos_asunto'],
-				'area_asunto' => $this->parametros['areas_asunto'],
-				'area_usuario' => $this->parametros['areas_usuario'],
-				'categoria_usuario' => $this->parametros['categorias_usuario'],
-				'encargados' => $this->parametros['encargados'],
-				'estado_cobro' => $this->parametros['estado_cobro']
+				'usuarios' => $this->sanitizeArray($this->parametros['usuarios']),
+				'clientes' => $this->sanitizeArray($this->parametros['clientes']),
+				'tipo_asunto' => $this->sanitizeArray($this->parametros['tipos_asunto']),
+				'area_asunto' => $this->sanitizeArray($this->parametros['areas_asunto']),
+				'area_usuario' => $this->sanitizeArray($this->parametros['areas_usuario']),
+				'categoria_usuario' => $this->sanitizeArray($this->parametros['categorias_usuario']),
+				'encargados' => $this->sanitizeArray($this->parametros['encargados']),
+				'estado_cobro' => $this->sanitizeArray($this->parametros['estado_cobro'])
 			);
-
-			if (is_array($this->parametros['usuarios'])) {
-				foreach($this->parametros['usuarios'] as $usuario) {
-					if (!empty($usuario)) {
-						$filtersFields['usuarios'][] = $usuario;
-					}
-				}
-			}
-
-			if (is_array($this->parametros['clientes'])) {
-				foreach($this->parametros['clientes'] as $cliente) {
-					if (!empty($cliente)) {
-						$filtersFields['clientes'][] = $cliente;
-					}
-				}
-			}
 
 			$grouperFields = $this->agrupador;
 			$calculator_name = $this->newCalculation[$this->tipo_dato];
@@ -2285,6 +2269,22 @@ class ReporteCriteria {
 		$this->setGroup($Criteria, $type);
 		$this->setOrder($Criteria, $type);
 		return $Criteria->get_plain_query();
+	}
+
+	/**
+	 * Elimina los elementos que contengan un vacio como valor
+	 * @param  array $array
+	 * @return array
+	 */
+	private function sanitizeArray($array) {
+		if (is_array($array)) {
+			foreach($array as $k => $v) {
+				if (trim($v) == '') {
+					unset($array[$k]);
+				}
+			}
+		}
+		return $array;
 	}
 
 }
