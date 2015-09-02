@@ -29,7 +29,7 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
 			)
 			/
-			cobro.{$amount}
+			{$amount}
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";
@@ -43,7 +43,7 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
 			)
 			/
-			cobro.{$amount}
+			{$amount}
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)) * (1 - (documento.saldo_honorarios / documento.honorarios))";
@@ -70,7 +70,7 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 				*
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
 			)
-			/ cobro.{$amount}
+			/ {$amount}
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";
@@ -84,7 +84,7 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
 			)
 			/
-			cobro.{$amount}
+			{$amount}
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)) * (1 - (documento.saldo_honorarios / documento.honorarios)))";

@@ -131,7 +131,9 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->buildChargeQuery();
 
 		$results = array();
-
+		// pr($this->WorksCriteria->get_plain_query());
+		// pr($this->ErrandsCriteria->get_plain_query());
+		// pr($this->ChargesCriteria->get_plain_query());
 		if (!empty($this->WorksCriteria)) {
 			// pr($this->WorksCriteria->get_plain_query());
 			$results = array_merge($results, $this->WorksCriteria->run());

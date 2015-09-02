@@ -27,7 +27,8 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 	function getReportWorkQuery(Criteria $Criteria) {
 		$rate = $this->getWorksFeeField();
 		$amount = $this->getWorksProportionalityAmountField();
-		$valor_por_cobrar = "SUM(
+
+		$valor_por_cobrar_con_cobro = "SUM(
 			({$rate} * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
 			*
 			(
@@ -36,27 +37,50 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 				cobro.monto_subtotal
 			)
 			/
-			cobro.{$amount}
+			{$amount}
 		)
 		*
 		(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
 
-		//TODO: QUE PASA CUANDO NO HAY COBRO????
-		// $Criteria->add_select("IF( cobro.id_cobro IS NOT NULL, {$monto_honorarios},
-		// 				SUM(
-		// 					usuario_tarifa.tarifa
-		// 					* TIME_TO_SEC( duracion_cobrada )
-		// 					* moneda_por_cobrar.tipo_cambio
-		// 					/ (moneda_display.tipo_cambio * 3600)
-		// 				)
-		// 			)", $data_type);
+		$valor_por_cobrar = "IF(cobro.id_cobro IS NOT NULL, {$valor_por_cobrar_con_cobro},
+				SUM(
+					  (usuario_tarifa.tarifa * TIME_TO_SEC(duracion_cobrada) / 3600)
+					* (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio)
+				)";
 
 		$Criteria
-			->add_select($valor_por_cobrar, 'valor_por_cobrar');
+			->add_select($valor_por_cobrar, 'valor_por_cobrar')
+
+
+		$usuario_tarifa = CriteriaRestriction::and_clause(
+			CriteriaRestriction::equals('usuario_tarifa.id_usuario', 'trabajo.id_usuario'),
+			CriteriaRestriction::equals('usuario_tarifa.id_moneda', 'contrato.id_moneda')
+		);
+
+		$usuario_tarifa = CriteriaRestriction::and_clause(
+			$usuario_tarifa,
+			CriteriaRestriction::equals('usuario_tarifa.id_tarifa', 'contrato.id_tarifa')
+		);
+
+		$Criteria
+			->add_left_join_with(
+				array('prm_moneda', 'moneda_por_cobrar'),
+				CriteriaRestriction::equals('moneda_por_cobrar.id_moneda', 'contrato.id_moneda'))
+			->add_left_join_with(
+				array('prm_moneda', 'moneda_display'),
+				CriteriaRestriction::equals('moneda_display.id_moneda', $this->currencyId))
+			->add_left_join_with(
+				'usuario_tarifa',
+				$usuario_tarifa)
+			);
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
+			->add_restriction(CriteriaRestriction::not_in(
+				'cobro.estado',
+				array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO', 'INCOBRABLE')
+				)
+			);
 	}
 
 
@@ -69,7 +93,7 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 	function getReportErrandQuery($Criteria) {
 		$rate = $this->getErrandsFeeField();
 		$amount = $this->getErrandsProportionalityAmountField();
-		$valor_por_cobrar =  "SUM(
+		$valor_por_cobrar_con_cobro =  "SUM(
 			({$rate})
 			*
 			(
@@ -77,23 +101,35 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 				*
 				cobro.monto_subtotal
 			)
-			/ cobro.{$amount}
+			/ {$amount}
 		)
 		*
 		(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
 
-		// $Criteria->add_select("IF( cobro.id_cobro IS NOT NULL, {$monto_honorarios},
-		// 				SUM(tramite.tarifa_tramite)
-		// 					* moneda_por_cobrar.tipo_cambio
-		// 					/ (moneda_display.tipo_cambio)
-		// 				)", $data_type);
+		$valor_por_cobrar  = "IF(cobro.id_cobro IS NOT NULL, {$valor_por_cobrar_con_cobro},
+				SUM(
+					  (tramite.tarifa_tramite)
+					* (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio)
+				)";
 
 		$Criteria
 			->add_select($valor_por_cobrar, 'valor_por_cobrar');
 
 		$Criteria
+			->add_left_join_with(
+				array('prm_moneda', 'moneda_por_cobrar'),
+				CriteriaRestriction::equals('moneda_por_cobrar.id_moneda', 'contrato.id_moneda'))
+			->add_left_join_with(
+				array('prm_moneda', 'moneda_display'),
+				CriteriaRestriction::equals('moneda_display.id_moneda', $this->currencyId))
+
+		$Criteria
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
+			->add_restriction(CriteriaRestriction::not_in(
+				'cobro.estado',
+				array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO', 'INCOBRABLE')
+				)
+			);
 	}
 
 
@@ -104,7 +140,6 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {
-		$Criteria = null;
 		$valor_por_cobrar = '
 			(1 / IFNULL(asuntos_cobro.total_asuntos, 1)) *
 			SUM(cobro.monto_subtotal
@@ -117,7 +152,11 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 			->add_select($valor_por_cobrar, 'valor_por_cobrar');
 
 		$Criteria
-			->add_restriction(CriteriaRestriction::not_in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO', 'INCOBRABLE')));
+			->add_restriction(CriteriaRestriction::not_in(
+				'cobro.estado',
+				array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO', 'INCOBRABLE')
+				)
+			);
 	}
 
 }
