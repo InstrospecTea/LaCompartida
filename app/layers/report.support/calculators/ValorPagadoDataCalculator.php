@@ -37,7 +37,7 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado')
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL', 'PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGADO')));
 	}
 
 	/**
@@ -64,7 +64,7 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado')
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL', 'PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGADO')));
 	}
 
 	/**
@@ -82,7 +82,7 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado')
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL', 'PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGADO')));
 	}
 
 }

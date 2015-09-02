@@ -67,8 +67,7 @@ class ReporteCriteria {
 		'valor_estandar' => 'ValorCobradoEstandar',
 		'valor_hora' => null,
 		'valor_pagado' => 'ValorPagado',
-		'valor_pagado' => null,
-		'valor_pagado_parcial' => null,
+		'valor_pagado_parcial' => 'ValorPagadoParcial',
 		'valor_por_cobrar' => 'ValorPorCobrar',
 		'valor_por_pagar' => null,
 		'valor_por_pagar_parcial' => null,
@@ -663,12 +662,13 @@ class ReporteCriteria {
 
 		if (array_key_exists($this->tipo_dato, $this->newCalculation)
 				&& !empty($this->newCalculation[$this->tipo_dato])) {
+
 			$filtersFields = array(
 				'campo_fecha' => $this->parametros['campo_fecha'],
 				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
 				'fecha_fin' => Utiles::fecha2sql($this->parametros['fecha_fin']),
-				'usuarios' => $this->parametros['usuarios'],
-				'clientes' => $this->parametros['clientes'],
+				'usuarios' => null,
+				'clientes' => null,
 				'tipo_asunto' => $this->parametros['tipos_asunto'],
 				'area_asunto' => $this->parametros['areas_asunto'],
 				'area_usuario' => $this->parametros['areas_usuario'],
@@ -676,6 +676,22 @@ class ReporteCriteria {
 				'encargados' => $this->parametros['encargados'],
 				'estado_cobro' => $this->parametros['estado_cobro']
 			);
+
+			if (is_array($this->parametros['usuarios'])) {
+				foreach($this->parametros['usuarios'] as $usuario) {
+					if (!empty($usuario)) {
+						$filtersFields['usuarios'][] = $usuario;
+					}
+				}
+			}
+
+			if (is_array($this->parametros['clientes'])) {
+				foreach($this->parametros['clientes'] as $cliente) {
+					if (!empty($cliente)) {
+						$filtersFields['clientes'][] = $cliente;
+					}
+				}
+			}
 
 			$grouperFields = $this->agrupador;
 			$calculator_name = $this->newCalculation[$this->tipo_dato];
