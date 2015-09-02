@@ -101,7 +101,7 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 	 * @return void
 	 */
 	function getReportChargeQuery(Criteria $Criteria) {
-		$partial_billed_amount = "(1 / IFNULL(cantidad_asuntos, 1))
+		$partial_billed_amount = "(1 / IFNULL(count(asunto.codigo_asunto), 1))
 			* SUM((cobro.monto_subtotal - cobro.monto_tramites)
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 				* (1 - documento.saldo_honorarios / documento.honorarios)
@@ -109,7 +109,6 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 			)";
 
 		$Criteria
-			->add_select('count(asunto.codigo_asunto)', 'cantidad_asuntos')
 			->add_select($partial_billed_amount, 'valor_pagado_parcial')
 			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL')));
 	}
