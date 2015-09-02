@@ -29,7 +29,7 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
 			)
 			/
-			cobro.{$amount}
+			{$amount}
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";
@@ -56,7 +56,7 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 				*
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
 			)
-			/ cobro.{$amount}
+			/ {$amount}
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";

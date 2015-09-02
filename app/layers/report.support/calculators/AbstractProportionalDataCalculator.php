@@ -42,7 +42,7 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 		if ($proportionality == PROPORTIONALITY_STANDARD)  {
 			return 'trabajo.tarifa_hh_estandar';
 		} else {
-			return 'trabajo.tarifa_hh';
+			return "IF(cobro.forma_cobro = 'FLAT FEE', trabajo.tarifa_hh_estandar, trabajo.tarifa_hh)";
 		}
 	}
 
@@ -54,9 +54,11 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	function getWorksProportionalityAmountField() {
 		$proportionality = $this->getProportionality();
 		if ($proportionality == PROPORTIONALITY_STANDARD)  {
-			return 'monto_thh_estandar';
+			return 'IF(cobro.monto_thh_estandar > 0, cobro.monto_thh_estandar,
+				IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1))';
 		} else {
-			return 'monto_thh';
+			return 'IF(cobro.monto_thh > 0, cobro.monto_thh,
+				IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1))';
 		}
 	}
 
@@ -68,7 +70,7 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	function getErrandsFeeField() {
 		$proportionality = $this->getProportionality();
 		if ($proportionality == PROPORTIONALITY_STANDARD)  {
-			return 'tramite.tarifa_tramite_estandar';
+			return 'tramite.tarifa_tramite';
 		} else {
 			return 'tramite.tarifa_tramite';
 		}
@@ -83,9 +85,9 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	function getErrandsProportionalityAmountField() {
 		$proportionality = $this->getProportionality();
 		if ($proportionality == PROPORTIONALITY_STANDARD)  {
-			return 'monto_tramites';
+			return 'cobro.monto_tramites';
 		} else {
-			return 'monto_tramites';
+			return 'cobro.monto_tramites';
 		}
 	}
 }
