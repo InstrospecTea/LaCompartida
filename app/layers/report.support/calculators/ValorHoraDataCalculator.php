@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * El valor hora corresponde al cuociente entre la hora facturada al cliente{@link HorasCobradasDataCalculator}
+ * , según el valor cobrado {@link ValorCobradoDataCalculator}.
+ *
+ * Condiciones para obtener un valor hora:
+ * 	* Que exista en un cobro en estado: EMITIDO, FACTURADO, ENVIADO AL CLIENTE,
+ * 		PAGO PARCIAL o PAGADO
+ *	* Que el trabajo sea cobrable
+ *
+ * Más info en https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Hora
+ */
 class ValorHoraDataCalculator extends AbstractProportionalDataCalculator {
 	/**
 	 * Obtiene la query de trabajos correspondiente al valor cobrado estándar
@@ -7,20 +17,37 @@ class ValorHoraDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$trabajos_amount = "((documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
-		$monto_honorarios = "SUM(({$this->getWorksFeeField()} * TIME_TO_SEC(duracion_cobrada) / 3600)
-			* (({$trabajos_amount} * cobro_moneda_documento.tipo_cambio)
-			/ ({$this->getWorksProportionalityAmountField()} * cobro_moneda_cobro.tipo_cambio))
-			* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
+		$rate = $this->getWorksFeeField();
+		$amount = $this->getWorksProportionalityAmountField();
+		$billed_amount = "SUM(
+			({$rate} * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
+			*
+			(
+				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
+				*
+				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
+			)
+			/
+			{$amount}
+		)
+		*
+		(1 / cobro_moneda.tipo_cambio)";
+		$billed_hours = 'SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600';
 
 		$Criteria->add_select(
-			'SUM((TIME_TO_SEC(duracion_cobrada) / 3600))',
-			'valor_divisor'
-		)->add_select(
-			$monto_honorarios,
+			$billed_amount,
 			'valor_hora'
+		)->add_select(
+			$billed_hours,
+			'valor_divisor'
+		)->add_restriction(
+			CriteriaRestriction::equals('trabajo.cobrable', 1)
+		)->add_restriction(
+			CriteriaRestriction::in(
+				'cobro.estado',
+				array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')
+			)
 		);
-		pr($Criteria->get_plain_query());
 	}
 
 	/**
@@ -29,17 +56,7 @@ class ValorHoraDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
-		$tramites_amount = "((documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
-		$monto_honorarios = "SUM(({$this->getErrandsFeeField()})
-			* (({$tramites_amount} * cobro_moneda_documento.tipo_cambio)
-				/ ({$this->getErrandsProportionalityAmountField()} * cobro_moneda_cobro.tipo_cambio))
-			* (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))";
-		$Criteria->add_select(
-			'1', 'valor_divisor'
-		)->add_select(
-			$monto_honorarios, 'valor_hora'
-		);
-		pr($Criteria->get_plain_query());
+		$Criteria = null;
 	}
 
 	/**
