@@ -47,7 +47,7 @@ class ValorCobradoDataCalculator extends AbstractProportionalDataCalculator {
 	function getReportErrandQuery($Criteria) {
 		$factor = $this->getErrandsProportionalFactor();
 		$billed_amount =  "SUM(
-			({$factor})
+			{$factor}
 			*
 			(
 				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))

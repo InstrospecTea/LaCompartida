@@ -17,18 +17,15 @@ class ValorHoraDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$rate = $this->getWorksFeeField();
-		$amount = $this->getWorksProportionalityAmountField();
+		$factor = $this->getWorksProportionalFactor();
 		$billed_amount = "SUM(
-			({$rate} * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
+			{$factor}
 			*
 			(
 				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
 				*
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
 			)
-			/
-			{$amount}
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";

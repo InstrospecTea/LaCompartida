@@ -25,19 +25,15 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$rate = $this->getWorksFeeField();
-		$amount = $this->getWorksProportionalityAmountField();
-
+		$factor = $this->getWorksProportionalFactor();
 		$valor_por_cobrar_con_cobro = "SUM(
-			({$rate} * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
+			{$factor}
 			*
 			(
 				(cobro.monto_trabajos / (cobro.monto_trabajos + cobro.monto_tramites))
 				*
 				cobro.monto_subtotal
 			)
-			/
-			{$amount}
 		)
 		*
 		(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
@@ -46,10 +42,10 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 				SUM(
 					  (usuario_tarifa.tarifa * TIME_TO_SEC(duracion_cobrada) / 3600)
 					* (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio)
-				)";
+				))";
 
 		$Criteria
-			->add_select($valor_por_cobrar, 'valor_por_cobrar')
+			->add_select($valor_por_cobrar, 'valor_por_cobrar');
 
 
 		$usuario_tarifa = CriteriaRestriction::and_clause(
@@ -71,8 +67,7 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 				CriteriaRestriction::equals('moneda_display.id_moneda', $this->currencyId))
 			->add_left_join_with(
 				'usuario_tarifa',
-				$usuario_tarifa)
-			);
+				$usuario_tarifa);
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
@@ -91,17 +86,15 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
-		$rate = $this->getErrandsFeeField();
-		$amount = $this->getErrandsProportionalityAmountField();
+		$factor = $this->getErrandsProportionalFactor();
 		$valor_por_cobrar_con_cobro =  "SUM(
-			({$rate})
+			{$factor}
 			*
 			(
 				(cobro.monto_tramites / (cobro.monto_trabajos + cobro.monto_tramites))
 				*
 				cobro.monto_subtotal
 			)
-			/ {$amount}
 		)
 		*
 		(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
@@ -110,7 +103,7 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 				SUM(
 					  (tramite.tarifa_tramite)
 					* (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio)
-				)";
+				))";
 
 		$Criteria
 			->add_select($valor_por_cobrar, 'valor_por_cobrar');
@@ -121,7 +114,7 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 				CriteriaRestriction::equals('moneda_por_cobrar.id_moneda', 'contrato.id_moneda'))
 			->add_left_join_with(
 				array('prm_moneda', 'moneda_display'),
-				CriteriaRestriction::equals('moneda_display.id_moneda', $this->currencyId))
+				CriteriaRestriction::equals('moneda_display.id_moneda', $this->currencyId));
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))

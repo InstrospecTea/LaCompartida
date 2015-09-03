@@ -29,17 +29,15 @@ class ValorCobradoTramitesDataCalculator extends AbstractProportionalDataCalcula
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
-		$rate = $this->getErrandsFeeField();
-		$amount = $this->getErrandsProportionalityAmountField();
+		$factor = $this->getErrandsProportionalFactor();
 		$billed_amount =  "SUM(
-			({$rate})
+			{$factor}
 			*
 			(
 				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
 				*
 				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
 			)
-			/ {$amount}
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";
