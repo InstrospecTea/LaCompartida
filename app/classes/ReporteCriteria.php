@@ -667,14 +667,14 @@ class ReporteCriteria {
 				'campo_fecha' => $this->parametros['campo_fecha'],
 				'fecha_ini' => Utiles::fecha2sql($this->parametros['fecha_ini']),
 				'fecha_fin' => Utiles::fecha2sql($this->parametros['fecha_fin']),
-				'usuarios' => $this->parametros['usuarios'],
-				'clientes' => $this->parametros['clientes'],
-				'tipo_asunto' => $this->parametros['tipos_asunto'],
-				'area_asunto' => $this->parametros['areas_asunto'],
-				'area_usuario' => $this->parametros['areas_usuario'],
-				'categoria_usuario' => $this->parametros['categorias_usuario'],
-				'encargados' => $this->parametros['encargados'],
-				'estado_cobro' => $this->parametros['estado_cobro']
+				'usuarios' => $this->sanitizeArray($this->parametros['usuarios']),
+				'clientes' => $this->sanitizeArray($this->parametros['clientes']),
+				'tipo_asunto' => $this->sanitizeArray($this->parametros['tipos_asunto']),
+				'area_asunto' => $this->sanitizeArray($this->parametros['areas_asunto']),
+				'area_usuario' => $this->sanitizeArray($this->parametros['areas_usuario']),
+				'categoria_usuario' => $this->sanitizeArray($this->parametros['categorias_usuario']),
+				'encargados' => $this->sanitizeArray($this->parametros['encargados']),
+				'estado_cobro' => $this->sanitizeArray($this->parametros['estado_cobro'])
 			);
 
 			$grouperFields = $this->agrupador;
@@ -728,6 +728,24 @@ class ReporteCriteria {
 				}
 		}
 	}
+
+
+	/**
+	 * Elimina los elementos que contengan un vacio como valor
+	 * @param  array $array
+	 * @return array
+	 */
+	private function sanitizeArray($array) {
+		if (is_array($array)) {
+			foreach($array as $k => $v) {
+				if (trim($v) == '') {
+					unset($array[$k]);
+				}
+			}
+		}
+		return $array;
+	}
+
 
 	/*
 		Constructor de Arreglo Resultado. TIPO BARRAS.
