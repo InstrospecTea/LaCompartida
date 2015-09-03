@@ -1,5 +1,9 @@
 # Changelog
-## Hotfix 15.17.7
+## Hotfix 15.17.9
+Thursday 2015, September 3rd
+* **Fix** [Corrección de las horas cobrables en el reporte avanzado](https://github.com/LemontechSA/ttb/pull/1106)
+
+## Hotfix 15.17.8
 Wednesday 2015, September 2nd
 * **Fix** [Corrección de las horas cobrables en el reporte avanzado](https://github.com/LemontechSA/ttb/pull/1106)
 
