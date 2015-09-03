@@ -39,7 +39,7 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	function getWorksProportionalFactor() {
 		$rate = $this->getWorksFeeField();
 		$amount = $this->getWorksProportionalityAmountField();
-		return "ROUND({$rate} / {$amount}, 4)";
+		return "({$rate} / {$amount})";
 	}
 
 	/**
@@ -52,29 +52,11 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 
 		$duration = 'TIME_TO_SEC(trabajo.duracion_cobrada)';
 		$duration_hours = "{$duration}/3600";
-		$duration_minutes = "{$duration}/60";
 
 		if ($proportionality == PROPORTIONALITY_STANDARD)  {
-			return "
-				IF(cobro.monto_thh_estandar > 0,
-					(trabajo.tarifa_hh_estandar *  {$duration_hours}),
-					{$duration_minutes}
-				)";
+			return "trabajo.tarifa_hh_estandar * {$duration_hours}";
 		} else {
-			return "
-				IF(cobro.forma_cobro = 'FLAT FEE',
-					IF(cobro.monto_thh  > 0,
-						trabajo.tarifa_hh * {$duration_hours},
-					 	IF(cobro.monto_thh_estandar > 0,
-							(trabajo.tarifa_hh_estandar * {$duration_hours}),
-							{$duration_minutes}
-						)
-					),
-					IF(cobro.monto_thh > 0,
-						trabajo.tarifa_hh * {$duration_hours},
-						{$duration_minutes}
-					)
-				)";
+			return "IF(cobro.forma_cobro = 'FLAT FEE', trabajo.tarifa_hh_estandar, trabajo.tarifa_hh) * {$duration_hours}";
 		}
 	}
 
@@ -86,24 +68,16 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	function getWorksProportionalityAmountField() {
 		$proportionality = $this->getProportionality();
 		if ($proportionality == PROPORTIONALITY_STANDARD)  {
-			return  '
-				IF(cobro.monto_thh_estandar > 0,
-					cobro.monto_thh_estandar,
-					cobro.total_minutos
-				)';
+			return 'IF(cobro.monto_thh_estandar > 0, cobro.monto_thh_estandar,
+					IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1))';
 		} else {
-			return "
-				IF(cobro.forma_cobro = 'FLAT FEE',
+			return "IF(cobro.forma_cobro = 'FLAT FEE',
+					IF(cobro.monto_thh_estandar > 0, cobro.monto_thh_estandar,
+						IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1)
+					),
 					IF(cobro.monto_thh > 0,
 						cobro.monto_thh,
-					 	IF(cobro.monto_thh_estandar > 0,
-							cobro.monto_thh_estandar,
-							cobro.total_minutos
-						)
-					),
-					IF(cobro.monto_thh  > 0,
-						cobro.monto_thh ,
-						cobro.total_minutos
+						IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1)
 					)
 				)";
 		}
@@ -116,7 +90,7 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	function getErrandsProportionalFactor() {
 		$rate = $this->getErrandsFeeField();
 		$amount = $this->getErrandsProportionalityAmountField();
-		return "ROUND({$rate} / {$amount}, 4)";
+		return "({$rate} / {$amount})";
 	}
 
 	/**
