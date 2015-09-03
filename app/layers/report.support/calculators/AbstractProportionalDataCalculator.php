@@ -56,21 +56,21 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 
 		if ($proportionality == PROPORTIONALITY_STANDARD)  {
 			return "
-				IF(trabajo.tarifa_hh_estandar > 0,
+				IF(cobro.monto_thh_estandar > 0,
 					(trabajo.tarifa_hh_estandar *  {$duration_hours}),
 					{$duration_minutes}
 				)";
 		} else {
 			return "
 				IF(cobro.forma_cobro = 'FLAT FEE',
-					IF(trabajo.tarifa_hh > 0,
+					IF(cobro.monto_thh > 0,
 						trabajo.tarifa_hh * {$duration_hours},
-					 	IF(trabajo.tarifa_hh_estandar > 0,
+					 	IF(cobro.monto_thh_estandar > 0,
 							(trabajo.tarifa_hh_estandar * {$duration_hours}),
 							{$duration_minutes}
 						)
 					),
-					IF(trabajo.tarifa_hh > 0,
+					IF(cobro.monto_thh > 0,
 						trabajo.tarifa_hh * {$duration_hours},
 						{$duration_minutes}
 					)
