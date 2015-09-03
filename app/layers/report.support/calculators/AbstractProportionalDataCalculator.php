@@ -50,30 +50,18 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	function getWorksFeeField() {
 		$proportionality = $this->getProportionality();
 
-		$duration = 'TIME_TO_SEC(trabajo.duracion_cobrada)';
-		$duration_hours = "{$duration}/3600";
-		$duration_minutes = "{$duration}/60";
+		$duration_hours = "TIME_TO_SEC(trabajo.duracion_cobrada)/3600";
 
 		if ($proportionality == PROPORTIONALITY_STANDARD)  {
-			return "
-				IF(cobro.monto_thh_estandar > 0,
-					(trabajo.tarifa_hh_estandar *  {$duration_hours}),
-					{$duration_minutes}
-				)";
+			return "trabajo.tarifa_hh_estandar * {$duration_hours}";
 		} else {
 			return "
 				IF(cobro.forma_cobro = 'FLAT FEE',
 					IF(cobro.monto_thh > 0,
 						trabajo.tarifa_hh * {$duration_hours},
-					 	IF(cobro.monto_thh_estandar > 0,
-							(trabajo.tarifa_hh_estandar * {$duration_hours}),
-							{$duration_minutes}
-						)
+					 	trabajo.tarifa_hh_estandar * {$duration_hours}
 					),
-					IF(cobro.monto_thh > 0,
-						trabajo.tarifa_hh * {$duration_hours},
-						{$duration_minutes}
-					)
+					trabajo.tarifa_hh * {$duration_hours}
 				)";
 		}
 	}
@@ -86,25 +74,15 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	function getWorksProportionalityAmountField() {
 		$proportionality = $this->getProportionality();
 		if ($proportionality == PROPORTIONALITY_STANDARD)  {
-			return  '
-				IF(cobro.monto_thh_estandar > 0,
-					cobro.monto_thh_estandar,
-					cobro.total_minutos
-				)';
+			return  'cobro.monto_thh_estandar';
 		} else {
 			return "
 				IF(cobro.forma_cobro = 'FLAT FEE',
 					IF(cobro.monto_thh > 0,
 						cobro.monto_thh,
-					 	IF(cobro.monto_thh_estandar > 0,
-							cobro.monto_thh_estandar,
-							cobro.total_minutos
-						)
+						cobro.monto_thh_estandar
 					),
-					IF(cobro.monto_thh  > 0,
-						cobro.monto_thh ,
-						cobro.total_minutos
-					)
+					cobro.monto_thh
 				)";
 		}
 	}
