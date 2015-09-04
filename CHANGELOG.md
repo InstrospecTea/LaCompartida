@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.17.10
+Friday 2015, September 4th
+* **Fix** [Corregir reporte facturas pago]()
+
 ## Hotfix 15.17.9
 Thursday 2015, September 3rd
 * **Fix** [Corrección de las horas cobrables en el reporte avanzado](https://github.com/LemontechSA/ttb/pull/1106)
