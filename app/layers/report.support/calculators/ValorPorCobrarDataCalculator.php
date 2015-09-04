@@ -72,7 +72,7 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
 			->add_restriction(CriteriaRestriction::not_in(
-				'cobro.estado',
+				'IFNULL(cobro.estado, "")',
 				array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO', 'INCOBRABLE')
 				)
 			);
@@ -119,7 +119,7 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
 			->add_restriction(CriteriaRestriction::not_in(
-				'cobro.estado',
+				'IFNULL(cobro.estado, "")',
 				array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO', 'INCOBRABLE')
 				)
 			);
@@ -146,7 +146,7 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::not_in(
-				'cobro.estado',
+				'IFNULL(cobro.estado, "")',
 				array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO', 'INCOBRABLE')
 				)
 			);
