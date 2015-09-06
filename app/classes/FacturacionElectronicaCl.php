@@ -425,6 +425,43 @@ EOF;
 				 */
 				'razon'	=> $Factura->fields['dte_razon_referencia'],
 			);
+		} else if ($Factura->fields['id_documento_referencia'] > 0) {
+			$FacturaPadre = new Factura($Sesion);
+			$FacturaPadre->Load($Factura->fields['id_factura_padre']);
+			$arrayPadre = self::FacturaToArray($Sesion, $FacturaPadre, $Estudio);
+
+			$PrmDocumentoLegal->Load($Factura->fields['id_documento_referencia']);
+			$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
+
+			$referenciaId = intval($Factura->fields['dte_codigo_referencia']);
+			$Referencia = new PrmCodigo($Sesion);
+			$Referencia->LoadById($referenciaId);
+			$codigoReferencia = $Referencia->Loaded() ? $Referencia->fields['codigo'] : 1;
+			$arrayFactura['referencia'] = array(
+				'tipo_dte'	=> $tipoDTE,
+				'folio'	=> $Factura->fields['folio_documento_referencia'],
+				'fecha_emision'	=> Utiles::sql2date($Factura->fields['fecha_documento_referencia'], '%Y-%m-%d'),
+				/**
+				 * CodRef: Indica los distintos casos de referencia, los cuales pueden ser:
+				 * a) Nota de Crédito que elimina documento de referencia en forma completa
+				 *    (Factura de venta, Nota de débito, o Factura de compra)
+				 * b) Nota de crédito que corrige un texto del documento de referencia
+				 * c) Nota de Débito que elimina una Nota de Crédito en la referencia en forma completa
+				 * d) Notas de crédito o débito que corrigen montos de otro documento
+				 * Casos a) b) y c) deben tener un único documento de referencia, es decir una sola línea de referencia.
+				 * Sus valores pueden ser:
+				 *   1: Anula Documento de Referencia.
+				 *   2: Corrige Texto Documento de Referencia.
+				 *   3: Corrige Montos.
+				 */
+				'codigo'	=> $codigoReferencia,
+				/**
+				 * RazonRef: Explicitar razon. Ejemplo una Nota de Credito que hacer referencia a una factura,
+				 * indica "descuento por pronto pago", "error en precio" o “anula factura”, etc.
+				 * El campo tiene un largo maximo de 90 caracteres.
+				 */
+				'razon'	=> $Factura->fields['dte_razon_referencia'],
+			);
 		}
 
 		return $arrayFactura;

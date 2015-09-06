@@ -10849,7 +10849,6 @@ QUERY;
 				VALUES ('FiltroFacturacionGastosCobrado', 'NO', 'Define la opción por defecto para desplegar en filtro Cobrado al revisar gastos', 'select;Todos;SI;NO', 2, -1);"
 			);
 			break;
-
 		case 8.09:
 			if (!ExisteCampo('cta_corriente', 'cuenta_gasto', $dbh)) {
 				$queries[] = "ALTER TABLE `cta_corriente` ADD COLUMN `cuenta_gasto` VARCHAR(100) DEFAULT NULL;";
@@ -10857,6 +10856,63 @@ QUERY;
 			if (!ExisteCampo('cta_corriente', 'detraccion', $dbh)) {
 				$queries[] = "ALTER TABLE `cta_corriente` ADD COLUMN `detraccion` VARCHAR(100) DEFAULT NULL;";
 			}
+			break;
+
+		case 8.10:
+			$queries = array("ALTER TABLE `factura_cobro` CHANGE `id_documento` `id_documento` INT(11)  NULL  DEFAULT NULL;");
+			break;
+
+		case 8.11:
+			$queries = array(
+					"ALTER TABLE `factura` ADD `id_documento_referencia` TINYINT(1)  UNSIGNED  NULL  DEFAULT NULL  AFTER `dte_comentario`;",
+					"ALTER TABLE `factura` ADD `folio_documento_referencia` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `id_documento_referencia`;",
+					"ALTER TABLE `factura` ADD `fecha_documento_referencia` DATE  NULL  DEFAULT NULL  AFTER `folio_documento_referencia`;"
+				);
+
+			$query = "SELECT archivo_nombre FROM prm_plugin WHERE activo = 1 AND archivo_nombre IN ('facturacion_electronica_nubox.php', 'facturacion_electronica_cl.php');";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+			$archivo = mysql_fetch_array($resp);
+			if ($archivo['archivo_nombre'] == 'facturacion_electronica_nubox.php') {
+				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES
+								('PRM_FACTURA_DR', '33', 'Factura Electrónica'),
+								('PRM_FACTURA_DR', '34', 'Factura Electrónica Exenta'),
+								('PRM_FACTURA_DR', '39', 'Boleta Electrónica'),
+								('PRM_FACTURA_DR', '41', 'Boleta Electrónica Exenta'),
+								('PRM_FACTURA_DR', '56', 'Nota de Débito Electrónica'),
+								('PRM_FACTURA_DR', '61', 'Nota de Crédito Electrónica'),
+								('PRM_FACTURA_DR', '30', 'Factura'),
+								('PRM_FACTURA_DR', '35', 'Boleta'),
+								('PRM_FACTURA_DR', '50', 'Guía de Despacho'),
+								('PRM_FACTURA_DR', '52', 'Guía Electrónica'),
+								('PRM_FACTURA_DR', '801', 'Orden Compra'),
+								('PRM_FACTURA_DR', '802', 'Nota de Pedido');";
+			} else if ($archivo['archivo_nombre'] == 'facturacion_electronica_cl.php') {
+				$queries[] = "INSERT INTO prm_codigo (grupo, codigo, glosa) VALUES
+								('PRM_FACTURA_DR', '801', 'Orden de Compra'),
+								('PRM_FACTURA_DR', '802', 'Nota de Pedido'),
+								('PRM_FACTURA_DR', '803', 'Contrato'),
+								('PRM_FACTURA_DR', '814', 'Certificación de Depósito Bolsa Prod. Chile'),
+								('PRM_FACTURA_DR', '815', 'Vale de Prenda Bolsa Prod. Chile'),
+								('PRM_FACTURA_DR', 'HAS', 'Hoja Aceptación Servicio (HAS)'),
+								('PRM_FACTURA_DR', 'HES', 'Hoja Estado Servicio (HES)'),
+								('PRM_FACTURA_DR', 'HEM', 'Recepción de Material (HEM)'),
+								('PRM_FACTURA_DR', 'MER', 'Mercadería (MER)'),
+								('PRM_FACTURA_DR', 'SER', 'Servicio (SER)'),
+								('PRM_FACTURA_DR', 'CEC', 'Centro de Costo (CEC)'),
+								('PRM_FACTURA_DR', 'GD', 'Guía Devolución (GD)'),
+								('PRM_FACTURA_DR', 'RE', 'Rebate (RE)');";
+			}
+			break;
+
+		case 8.12:
+			$queries = array(
+				"ALTER TABLE `cobro` ADD `opc_mostrar_asuntos_cobrables_sin_horas` TINYINT(1)  UNSIGNED  NOT NULL  DEFAULT '0'  AFTER `opc_ver_asuntos_separados`;"
+			);
+			break;
+		case 8.13:
+			$queries = array("ALTER TABLE `bloqueo_procesos`
+				CHANGE COLUMN `estado` `estado` TEXT NOT NULL DEFAULT ''");
 			break;
 	}
 
@@ -10870,7 +10926,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.09;
+$max_update = 8.13;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

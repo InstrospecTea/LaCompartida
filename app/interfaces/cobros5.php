@@ -140,6 +140,7 @@ if ($opc == 'anular_emision') {
 
 	$cobro->Edit('opc_ver_carta', $opc_ver_carta);
 	$cobro->Edit("opc_ver_asuntos_separados", $opc_ver_asuntos_separados);
+	$cobro->Edit("opc_mostrar_asuntos_cobrables_sin_horas", $opc_mostrar_asuntos_cobrables_sin_horas);
 	$cobro->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$cobro->Edit("opc_ver_cobrable", $opc_ver_cobrable);
 	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
@@ -1879,6 +1880,10 @@ else
 										<td align="right"><input type="checkbox" name="opc_ver_asuntos_separados" id="opc_ver_asuntos_separados" value="1" <?php echo $cobro->fields['opc_ver_asuntos_separados'] == '1' ? 'checked' : '' ?>></td>
 										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_asuntos_separados"><?php echo __('Ver asuntos por separado') ?></label></td>
 									</tr>
+                                    <tr>
+                                        <td align="right"><input type="checkbox" name="opc_mostrar_asuntos_cobrables_sin_horas" id="opc_mostrar_asuntos_cobrables_sin_horas" value="1" <?php echo $cobro->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == '1' ? 'checked' : '' ?>></td>
+                                        <td align="left" style="font-size: 10px;"><label for="opc_mostrar_asuntos_cobrables_sin_horas"><?php echo __('Mostrar Asuntos Cobrables Sin Horas') ?></label></td>
+                                    </tr>
 									<tr>
 										<td align="right"><input type="checkbox" name="opc_ver_resumen_cobro" id="opc_ver_resumen_cobro" value="1" <?php echo $cobro->fields['opc_ver_resumen_cobro'] == '1' ? 'checked' : '' ?>></td>
 										<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_ver_resumen_cobro"><?php echo __('Mostrar resumen del cobro') ?></label></td>

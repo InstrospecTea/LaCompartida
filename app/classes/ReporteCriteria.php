@@ -1897,6 +1897,7 @@ class ReporteCriteria {
 					$Criteria->add_select("SUM(IF(cobro.forma_cobro='FLAT FEE', tramite_tarifa_estandar, tramite_tarifa) * (cobro_moneda_cobro.tipo_cambio/cobro_moneda.tipo_cambio))", $data_type);
 				}
 				break;
+			case 'horas_cobrables':
 			case 'horas_trabajadas':
 			case 'horas_no_cobrables':
 				if ($type == TIPO_TRABAJOS) {
@@ -1906,7 +1907,6 @@ class ReporteCriteria {
 					$Criteria->add_select('0', $data_type);
 				}
 				break;
-			case 'horas_cobrables':
 			case 'horas_spot':
 			case 'horas_convenio':
 				if ($type == TIPO_TRABAJOS) {
