@@ -1,19 +1,20 @@
 <?php
 /**
- * El valor por pagar corresponde a las liquidaciones que no están pagadas
+ * El valor por pagar parcial corresponde a lo que queda por ser pagado del monto correspondiente
+ * al valor de la liquidaciÃ³n antes de impuestos.
  *
  * Condiciones para obtener un valor por pagar:
- * 	* Que exista un cobro en estado: EMITIDO, FACTURADO, ENVIADO AL CLIENTE o PAGO PARCIAL
- *	* Que lo que se esté cobrando sea Cobrable
+ *  * Que exista un cobro en estado: EMITIDO, FACTURADO, ENVIADO AL CLIENTE o PAGO PARCIAL
+ *  * Que lo que se estÃ© cobrando sea Cobrable
  *
- * Más info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Por-Pagar
+ * MÃ¡s info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Por-Pagar-Parcial
  */
-class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
+class ValorPorPagarParcialDataCalculator extends AbstractProportionalDataCalculator {
 
 	/**
 	 * Obtiene la query de trabajos correspondiente a Valor Por Cobrar
-	 * Se obtiene desde el monto de trabajos del cobro no emitido, si no existe cobro se tarifican los trabajos
-	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
+	 * Se obtiene desde el monto de trabajos del cobro
+	 * @param  Criteria $Criteria Query a la que se agregarÃ¡ el cÃ¡lculo
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
@@ -30,18 +31,18 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 
 		$factor = $this->getWorksProportionalFactor();
 		$amount = "((documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
-		$valor_por_pagar = "SUM({$factor} * ({$amount}) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
+		$valor_por_pagar = "SUM({$factor} * ({$amount}) * ((documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)))";
 
 		$Criteria->add_select(
-			$valor_por_pagar, 'valor_por_pagar'
+			$valor_por_pagar, 'valor_por_pagar_parcial'
 		);
 	}
 
 
 	/**
-	 * Obtiene la query de trátmies correspondiente a Valor Por Cobrar
-	 * Se obtiene desde el monto de trámites del cobro no emitido, si no existe cobro se tarifican los trámites
-	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
+	 * Obtiene la query de trÃ¡tmies correspondiente a Valor Por Cobrar
+	 * Se obtiene desde el monto de trÃ¡mites del cobro
+	 * @param  Criteria $Criteria Query a la que se agregarÃ¡ el cÃ¡lculo
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
@@ -58,18 +59,18 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 
 		$factor = $this->getErrandsProportionalFactor();
 		$amount = "((documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
-		$valor_por_pagar = "SUM({$factor} * ({$amount}) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
+		$valor_por_pagar = "SUM({$factor} * ({$amount}) * ((documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)))";
 
 		$Criteria->add_select(
-			$valor_por_pagar, 'valor_por_pagar'
+			$valor_por_pagar, 'valor_por_pagar_parcial'
 		);
 	}
 
 
 	/**
-	 * Obtiene la query de cobros sin trabajos ni trámites correspondiente a Valor Por Cobrar
+	 * Obtiene la query de cobros sin trabajos ni trÃ¡mites correspondiente a Valor Por Cobrar parcial
 	 *
-	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
+	 * @param  Criteria $Criteria Query a la que se agregarÃ¡ el cÃ¡lculo
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {
@@ -79,10 +80,11 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 		(
 			(cobro.monto_subtotal - cobro.descuento)
 			* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
+			* (documento.saldo_honorarios / documento.honorarios)
 			/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
 		)";
 
-		$Criteria->add_select($valor_por_pagar, 'valor_por_pagar');
+		$Criteria->add_select($valor_por_pagar, 'valor_por_pagar_parcial');
 		$Criteria->add_restriction(
 			CriteriaRestriction::in(
 				'cobro.estado',

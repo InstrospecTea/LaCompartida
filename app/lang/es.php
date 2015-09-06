@@ -1002,6 +1002,7 @@ $_LANG['valor_tramites'] = "Valor trámites";
 $_LANG['valor_por_cobrar'] = "Valor por Cobrar";
 $_LANG['valor_pagado'] = "Valor Pagado";
 $_LANG['valor_por_pagar'] = "Valor por Pagar";
+$_LANG['valor_por_pagar_parcial'] = "Valor por Pagar Parcial";
 $_LANG['valor_incobrable'] = "Valor Incobrable";
 $_LANG['rentabilidad'] = "Rentabilidad";
 $_LANG['valor_hora'] = "Valor Hora";

@@ -70,7 +70,7 @@ class ReporteCriteria {
 		'valor_pagado_parcial' => 'ValorPagadoParcial',
 		'valor_por_cobrar' => 'ValorPorCobrar',
 		'valor_por_pagar' => 'ValorPorPagar',
-		'valor_por_pagar_parcial' => null,
+		'valor_por_pagar_parcial' => 'ValorPorPagarParcial',
 		'valor_trabajado_estandar' => 'ValorTrabajadoEstandar',
 		'valor_tramites' => 'ValorCobradoTramites'
 	);

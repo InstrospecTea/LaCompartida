@@ -91,8 +91,8 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 	 * @return void
 	 */
 	function getReportChargeQuery(Criteria $Criteria) {
-		$partial_billed_amount = "(1 / IFNULL(count(asunto.codigo_asunto), 1))
-			* SUM((cobro.monto_subtotal - cobro.monto_tramites)
+		$partial_billed_amount = "(1 / IFNULL(asuntos_cobro.total_asuntos, 1))
+			* SUM((cobro.monto_subtotal - cobro.descuento)
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 				* (1 - documento.saldo_honorarios / documento.honorarios)
 				/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
