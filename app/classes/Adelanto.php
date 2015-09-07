@@ -8,20 +8,74 @@ require_once dirname(__FILE__) . '/../conf.php';
 class Adelanto extends Documento {
 
 	public static $configuracion_reporte = array(
-		array('field' => 'id_documento', 'title' => 'Nº Adelanto'),
-		array('field' => 'fecha', 'title' => 'Fecha'),
-		array('field' => 'glosa_cliente', 'title' => 'Cliente'),
-		array('field' => 'asuntos', 'title' => 'Asunto'),
-		array('field' => 'glosa_documento', 'title' => 'Descripción'),
-		array('field' => 'tipo_moneda', 'title' => 'Moneda'),
-		array('field' => 'monto', 'title' => 'Monto'),
-		array('field' => 'saldo_pago', 'title' => 'Saldo'),
-		array('field' => 'tipo_pago_glosa', 'title' => 'Tipo'),
-		array('field' => 'banco_nombre', 'title' => 'Banco'),
-		array('field' => 'numero_cuenta', 'title' => 'Cuenta'),
-		array('field' => 'uso', 'title' => 'Uso'),
-		array('field' => 'cobros', 'title' => 'Cobros'),
-		array('field' => 'facturas', 'title' => 'Documentos Legales')
+		array(
+			'field' => 'id_documento', 
+			'title' => 'Nº Adelanto'
+		),
+		array(
+			'field' => 'fecha', 
+			'title' => 'Fecha'
+		),
+		array(
+			'field' => 'glosa_cliente', 
+			'title' => 'Cliente'
+		),
+		array(
+			'field' => 'asuntos', 
+			'title' => 'Asunto'
+		),
+		array(
+			'field' => 'glosa_documento', 
+			'title' => 'Descripción'
+		),
+		array(
+			'field' => 'tipo_moneda', 
+			'title' => 'Moneda'
+		),
+		array(
+			'field' => 'monto', 
+			'title' => 'Monto', 
+			'format' => 'number',
+			'extras' => array(
+                'decimals' => 'cifras_decimales',
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			)
+		),
+		array(
+			'field' => 'saldo_pago', 
+			'title' => 'Saldo', 
+			'format' => 'number',
+			'extras' => array(
+                'decimals' => 'cifras_decimales',
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			)
+		),
+		array(
+			'field' => 'tipo_pago_glosa', 
+			'title' => 'Tipo'
+		),
+		array(
+			'field' => 'banco_nombre', 
+			'title' => 'Banco'
+		),
+		array(
+			'field' => 'numero_cuenta', 
+			'title' => 'Cuenta'
+		),
+		array(
+			'field' => 'uso', 
+			'title' => 'Uso'
+		),
+		array(
+			'field' => 'cobros', 
+			'title' => 'Cobros'
+		),
+		array(
+			'field' => 'facturas', 
+			'title' => 'Documentos Legales'
+		)
 	);
 
 	function formatoFecha($fecha) {
@@ -94,6 +148,7 @@ class Adelanto extends Documento {
 			IF(adelanto.saldo_pago = 0, 0, adelanto.saldo_pago * -1) AS saldo_pago,
 			adelanto.glosa_documento,
 			prm_moneda.id_moneda,
+			prm_moneda.simbolo,
 			prm_moneda.glosa_moneda AS tipo_moneda,
 			prm_moneda.cifras_decimales,
 			prm_tipo_pago.glosa AS tipo_pago_glosa,
