@@ -33,6 +33,10 @@ class FacturaPago extends Objeto {
 
 	public static $configuracion_reporte = array(
 			array(
+				'title' => 'N° Pago',
+				'field' => 'numero_pago',
+			),
+			array(
 					'format' => 'date',
 					'title' => 'Fecha Pago',
 					'field' => 'fecha_pago',
@@ -776,6 +780,7 @@ class FacturaPago extends Objeto {
 		}
 
 		return "SELECT SQL_CALC_FOUND_ROWS
+					fp.id_factura_pago as numero_pago,
 					factura.id_factura
 				, factura.fecha as fecha_factura
 				, factura.id_moneda
@@ -844,7 +849,7 @@ class FacturaPago extends Objeto {
 			LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
 			LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
 			WHERE $where
-			GROUP BY fp.id_factura_pago";
+			GROUP BY factura.id_cobro";
 	}
 
 	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
