@@ -21,6 +21,9 @@ class HorasCastigadasDataCalculator extends AbstractDataCalculator {
 
 		$Criteria
 			->add_select($horas_castigadas, 'horas_castigadas');
+
+		$Criteria
+			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1));
 	}
 
 

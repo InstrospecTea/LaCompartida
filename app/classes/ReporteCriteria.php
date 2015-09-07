@@ -49,7 +49,7 @@ class ReporteCriteria {
 		'horas_spot' => 'HorasSpot',
 		'horas_no_cobrables' => 'HorasNoCobrables',
 		'valor_cobrado' => 'ValorCobrado',
-		'horas_castigadas' => null,
+		'horas_castigadas' => 'HorasCastigadas',
 		'horas_cobrables' => 'HorasCobrables',
 		'horas_cobradas' => 'HorasCobradas',
 		'horas_convenio' => 'HorasConvenio',
