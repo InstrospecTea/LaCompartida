@@ -21,6 +21,9 @@ class HorasNoCobrablesDataCalculator extends AbstractDataCalculator {
 
 		$Criteria
 			->add_select($horas_no_cobrables, 'horas_no_cobrables');
+
+		$Criteria
+			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 0));
 	}
 
 
