@@ -1,7 +1,8 @@
 # Changelog
 ## Hotfix 15.17.10
 Friday 2015, September 4th
-* **Fix** [Corregir reporte facturas pago]()
+* **Fix** [Corregir reporte facturas pago](https://github.com/LemontechSA/ttb/pull/1109)
+* **Fix** [Se corrige API para historial asuntos](https://github.com/LemontechSA/ttb/pull/1109)
 
 ## Hotfix 15.17.9
 Thursday 2015, September 3rd
