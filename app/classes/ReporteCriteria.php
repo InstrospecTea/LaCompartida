@@ -45,6 +45,7 @@ class ReporteCriteria {
 	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
 
 	private $newCalculation = array(
+		'horas_trabajadas' => 'HorasTrabajadas',
 		'valor_cobrado' => 'ValorCobrado',
 		'horas_castigadas' => null,
 		'horas_cobrables' => null,
@@ -56,7 +57,6 @@ class ReporteCriteria {
 		'horas_por_cobrar' => null,
 		'horas_por_pagar' => null,
 		'horas_spot' => null,
-		'horas_trabajadas' => null,
 		'horas_visibles' => null,
 		'costo' => 'Costo',
 		'costo_hh' => 'CostoHh',
