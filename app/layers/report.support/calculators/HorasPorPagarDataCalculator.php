@@ -21,6 +21,14 @@ class HorasPorPagarDataCalculator extends AbstractDataCalculator {
 
 		$Criteria
 			->add_select($horas_por_pagar, 'horas_por_pagar');
+
+		$Criteria
+			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
+			->add_restriction(CriteriaRestriction::in(
+				'cobro.estado',
+				array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL')
+				)
+			);
 	}
 
 

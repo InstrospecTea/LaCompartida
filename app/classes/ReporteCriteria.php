@@ -56,7 +56,7 @@ class ReporteCriteria {
 		'horas_incobrables' => null,
 		'horas_pagadas' => 'HorasPagadas',
 		'horas_por_cobrar' => 'HorasPorCobrar',
-		'horas_por_pagar' => null,
+		'horas_por_pagar' => 'HorasPorPagar',
 		'horas_visibles' => 'HorasVisibles',
 		'costo' => 'Costo',
 		'costo_hh' => 'CostoHh',
