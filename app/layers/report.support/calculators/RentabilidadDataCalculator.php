@@ -84,8 +84,20 @@ class RentabilidadDataCalculator extends AbstractProportionalDataCalculator {
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
-	function getReportChargeQuery(&$Criteria) {
-		$Criteria = null;
+	function getReportChargeQuery($Criteria) {
+		$billed_amount = '
+			(1 / IFNULL(asuntos_cobro.total_asuntos, 1)) *
+			SUM((cobro.monto_subtotal - cobro.descuento)
+				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+			)
+		';
+
+		$Criteria
+			->add_select('0', 'valor_divisor')
+			->add_select($billed_amount, 'rentabilidad');
+
+		$Criteria
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
 	}
 
 }

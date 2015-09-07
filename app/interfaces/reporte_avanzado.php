@@ -80,7 +80,7 @@ $tipos_de_dato = array(
 	'valor_pagado_parcial',
 	'valor_incobrable',
 	'rentabilidad',
-	//'rentabilidad_base',
+	'rentabilidad_base',
 	'valor_hora',
 	'diferencia_valor_estandar',
 	'valor_estandar',
@@ -995,9 +995,13 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(8) ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('valor_tramites') ?>
+								<?php echo $ReporteAvanzado->nada(2) ?>
+								<?php echo $ReporteAvanzado->celda('costo') ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('costo_hh') ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->nada(1) ?>
+								<?php echo $ReporteAvanzado->nada(9) ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(13) ?>
@@ -1006,33 +1010,36 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->titulo_proporcionalidad() ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->moneda() ?>
+								<?php echo $ReporteAvanzado->nada(3) ?>
+
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
-								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('valor_estandar') ?>
-								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('diferencia_valor_estandar'); ?>
+								<?php echo $ReporteAvanzado->celda('valor_estandar'); ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('diferencia_valor_estandar') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('rentabilidad') ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->nada(1) ?>
+								<?php echo $ReporteAvanzado->nada(11) ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(1) ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(12) ?>
+
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->select_proporcionalidad() ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->select_moneda() ?>
 								<?php echo $ReporteAvanzado->nada(5) ?>
-								<?php echo $ReporteAvanzado->celda('costo') ?>
-								<?php // echo $ReporteAvanzado->celda_disabled('rentabilidad_base') ?>
-								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('costo_hh') ?>
+								<?php echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('rentabilidad_base') ?>
+
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(1) ?>

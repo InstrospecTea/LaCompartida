@@ -51,9 +51,9 @@ class ReporteAvanzado {
 		return $this->Html->tag('td', '&nbsp;', $attr);
 	}
 
-	public function borde_derecha() {
+	public function borde_derecha($rows = 3) {
 		$attr = array(
-			'rowspan' => 3,
+			'rowspan' => $rows,
 			'class' => 'borde_derecha'
 		);
 		return $this->Html->tag('td', '&nbsp;', $attr);
