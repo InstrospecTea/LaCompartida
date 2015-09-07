@@ -26,16 +26,12 @@ class FacturaPago extends Objeto {
 			'titulo' => 'Tipo Documento',
 			'tipo' => array('EP', 'CP', 'RP', 'TP', 'OP', 'CC')
 		),
-		'nro_documento' => 'Número Doc Pago',
-		'nro_cheque' => 'Número Cheque',
-		'descripcion' => 'Descripción'
+		'nro_documento' => 'Nï¿½mero Doc Pago',
+		'nro_cheque' => 'Nï¿½mero Cheque',
+		'descripcion' => 'Descripciï¿½n'
 	);
 
 	public static $configuracion_reporte = array(
-			array(
-				'title' => 'N° Pago',
-				'field' => 'numero_pago',
-			),
 			array(
 					'format' => 'date',
 					'title' => 'Fecha Pago',
@@ -46,7 +42,7 @@ class FacturaPago extends Objeto {
 					'field' => 'tipo',
 			),
 			array(
-					'title' => 'N° Documento',
+					'title' => 'Nï¿½ Documento',
 					'field' => 'numero',
 			),
 			array(
@@ -55,7 +51,7 @@ class FacturaPago extends Objeto {
 					'visible' => false,
 			),
 			array(
-					'title' => 'Código Cliente',
+					'title' => 'Cï¿½digo Cliente',
 					'field' => 'cliente_pago',
 			),
 			array(
@@ -68,7 +64,7 @@ class FacturaPago extends Objeto {
 					'visible' => false,
 			),
 			array(
-					'title' => 'Razón Social',
+					'title' => 'Razï¿½n Social',
 					'field' => 'factura_razon_social',
 			),
 			array(
@@ -80,7 +76,7 @@ class FacturaPago extends Objeto {
 					'field' => 'estado',
 			),
 			array(
-					'title' => 'N° Liquidación',
+					'title' => 'Nï¿½ Liquidaciï¿½n',
 					'field' => 'id_cobro',
 			),
 			array(
@@ -88,7 +84,7 @@ class FacturaPago extends Objeto {
 					'field' => 'concepto_pago',
 			),
 			array(
-					'title' => 'Descripción Pago',
+					'title' => 'Descripciï¿½n Pago',
 					'field' => 'descripcion_pago',
 			),
 			array(
@@ -96,7 +92,7 @@ class FacturaPago extends Objeto {
 					'field' => 'nombre_banco',
 			),
 			array(
-					'title' => 'N° Cuenta',
+					'title' => 'Nï¿½ Cuenta',
 					'field' => 'numero_cuenta',
 			),
 			array(
@@ -105,12 +101,12 @@ class FacturaPago extends Objeto {
 					'field' => 'fecha_factura',
 			),
 			array(
-					'title' => 'Código Idioma',
+					'title' => 'Cï¿½digo Idioma',
 					'field' => 'codigo_idioma',
 					'visible' => false,
 			),
 			array(
-					'title' => 'Símbolo Moneda',
+					'title' => 'Sï¿½mbolo Moneda',
 					'field' => 'simbolo_factura',
 			),
 			array(
@@ -221,7 +217,7 @@ class FacturaPago extends Objeto {
 					'field' => 'saldo_pago',
 			),
 			array(
-					'title' => 'Códigos Asuntos',
+					'title' => 'Cï¿½digos Asuntos',
 					'field' => 'codigos_asunto',
 			),
 			array(
@@ -229,12 +225,12 @@ class FacturaPago extends Objeto {
 					'field' => 'glosas_asunto',
 			),
 			array(
-					'title' => 'Descripción Factura',
+					'title' => 'Descripciï¿½n Factura',
 					'field' => 'descripcion_factura',
 			),
 			array(
 					'field' => 'glosa_estudio',
-					'title' => 'Companía',
+					'title' => 'Companï¿½a',
 					'visible' => false,
 			)
 	);
@@ -301,9 +297,9 @@ class FacturaPago extends Objeto {
 		$lista_pagos = $factura->GetPagosSoyFactura(null, $id_documento);
 		$html = "<table width=\"500\">
 					<tr bgcolor=\"#aaffaa\" style=\"font-size: 10pt;\">
-						<th width=\"50\" align=center>N°</th>
+						<th width=\"50\" align=center>Nï¿½</th>
 						<th width=\"100\" align=center>" . __('Fecha') . "</th>
-						<th width=200>" . __('Descripción') . "</th>
+						<th width=200>" . __('Descripciï¿½n') . "</th>
 						<th width=100>" . __('Monto Pago') . "</th>
 						<th style='width:60px;white-space:nowrap;'>Opc.</th>
 					</tr>";
@@ -317,7 +313,7 @@ class FacturaPago extends Objeto {
 			$html .= "<td align=center>" . $moneda->fields['simbolo'] . " " . number_format($pago->fields['monto_aporte'], $moneda->fields['cifras_decimales']) . "</td>";
 			$html .= "<td align=center>
 									<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura_Pago', 730, 580, 'agregar_pago_factura.php?id_factura_pago=" . $pago->fields['id_factura_pago'] . "&id_factura=" . $factura->fields['id_factura'] . "&id_cobro=" . $factura->fields['id_cobro'] . "&popup=1', 'top=100, left=155');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=\"0\" title=\"Editar\"/></a>
-									<img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' onclick=\"if( confirm('Está eliminando un pago. Se reajustarán los saldos de los documentos asociados. ¿Desea continuar?') )EliminarPago('" . $pago->fields['id_factura_pago'] . "');\" />";
+									<img src='" . Conf::ImgDir() . "/cruz_roja_nuevo.gif' onclick=\"if( confirm('Estï¿½ eliminando un pago. Se reajustarï¿½n los saldos de los documentos asociados. ï¿½Desea continuar?') )EliminarPago('" . $pago->fields['id_factura_pago'] . "');\" />";
 			$html .= UtilesApp::LogDialog($sesion, 'factura_pago', $pago->fields['id_factura_pago']);
 
 
@@ -409,7 +405,7 @@ class FacturaPago extends Objeto {
 
 			case 'CLIENTE':
 
-				$html = str_replace('%Num%', __('N°'), $html);
+				$html = str_replace('%Num%', __('Nï¿½'), $html);
 				$html = str_replace('%rut%', __('RUT'), $html);
 				$html = str_replace('%cliente%', __('CLIENTE'), $html);
 				$html = str_replace('%cheque%', __('Cheque'), $html);
@@ -432,19 +428,19 @@ class FacturaPago extends Objeto {
 
 			case 'DATOS_FACTURA_PAGO':
 
-				$html = str_replace('%Num%', __('N°'), $html);
+				$html = str_replace('%Num%', __('Nï¿½'), $html);
 				$html = str_replace('%tipo%', __('Tipo'), $html);
 				$html = str_replace('%documento%', __('Documento'), $html);
 				$html = str_replace('%concepto%', __('Concepto'), $html);
 				$html = str_replace('%importe%', __('Importe'), $html);
 				$html = str_replace('%neto%', __('Neto'), $html);
 				$html = str_replace('%total%', __('Total'), $html);
-				$html = str_replace('%detraccion%', __('Detracción'), $html);
+				$html = str_replace('%detraccion%', __('Detracciï¿½n'), $html);
 				$html = str_replace('%total_mayuscula%', __('TOTAL'), $html);
 				$html = str_replace('%moneda%', __('Moneda'), $html);
 				$html = str_replace('%hecho_por%', __('Hecho por'), $html);
 				$html = str_replace('%aprobado_por%', __('Aprobado por'), $html);
-				$html = str_replace('%V_B%', __('V° B°'), $html);
+				$html = str_replace('%V_B%', __('Vï¿½ Bï¿½'), $html);
 
 				$html = str_replace('%hecho_por_valor%', '', $html);
 				$html = str_replace('%V_B_hecho_por_valor%', '', $html);
@@ -568,15 +564,15 @@ class FacturaPago extends Objeto {
 		$cta_cte_mvto = new CtaCteFactMvto($this->sesion);
 		//obtenemos todas las facturas asociadas a la factura pago actual
 		$lista_facturas = $this->GetListaFacturasSoyPago($id_factura_pago);
-		//de la lista de facturas asociadas, buscamos a la última factura_pago
+		//de la lista de facturas asociadas, buscamos a la ï¿½ltima factura_pago
 		$ultimo_id_factura_pago = $factura->GetUltimoPagoSoyFactura($lista_facturas);
 		//Obtenemos el saldo de la factura (saldo deuda)
 		$saldo = $cta_cte_mvto->GetSaldoDeuda($lista_facturas);
-		//verificamos si el pago actual es el último pago
+		//verificamos si el pago actual es el ï¿½ltimo pago
 		if ($ultimo_id_factura_pago == $id_factura_pago) {
 			/*
 			 * si el saldo es negativo, significa que es plata encontra
-			 * (aún no se termina de pagar)
+			 * (aï¿½n no se termina de pagar)
 			 */
 			if ($saldo >= 0) {
 				$mje = " (" . __('Saldado') . ") ";
@@ -631,7 +627,7 @@ class FacturaPago extends Objeto {
 	}
 
 	/**
-	 * Descarga el reporte excel básico según configuraciones
+	 * Descarga el reporte excel bï¿½sico segï¿½n configuraciones
 	 */
 	public function DownloadExcel($results) {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
@@ -780,7 +776,6 @@ class FacturaPago extends Objeto {
 		}
 
 		return "SELECT SQL_CALC_FOUND_ROWS
-					fp.id_factura_pago as numero_pago,
 					factura.id_factura
 				, factura.fecha as fecha_factura
 				, factura.id_moneda
@@ -849,7 +844,7 @@ class FacturaPago extends Objeto {
 			LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
 			LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
 			WHERE $where
-			GROUP BY fp.id_factura_pago, factura.id_factura";
+			GROUP BY fp.id_factura_pago";
 	}
 
 	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
@@ -862,7 +857,7 @@ class FacturaPago extends Objeto {
 			$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda,
 			$grupo_ventas, $razon_social, $descripcion_factura, $codigo_cliente);
 
-		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
+		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha ï¿½ltimo pago
 		$statement = $this->sesion->pdodbh->prepare($query);
 		$statement->execute();
 		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
