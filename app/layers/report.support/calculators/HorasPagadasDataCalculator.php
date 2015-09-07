@@ -21,6 +21,10 @@ class HorasPagadasDataCalculator extends AbstractDataCalculator {
 
 		$Criteria
 			->add_select($horas_pagadas, 'horas_pagadas');
+
+		$Criteria
+			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
+			->add_restriction(CriteriaRestriction::equals('cobro.estado', "'PAGADO'"));
 	}
 
 
