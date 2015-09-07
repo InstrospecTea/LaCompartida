@@ -68,7 +68,7 @@ class ReporteCriteria {
 		'valor_hora' => 'ValorHora',
 		'valor_pagado' => 'ValorPagado',
 		'valor_pagado_parcial' => 'ValorPagadoParcial',
-		'valor_incobrable' => null,
+		'valor_incobrable' => 'ValorIncobrable',
 		'valor_por_cobrar' => 'ValorPorCobrar',
 		'valor_por_pagar' => 'ValorPorPagar',
 		'valor_por_pagar_parcial' => 'ValorPorPagarParcial',
