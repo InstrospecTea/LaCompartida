@@ -849,7 +849,7 @@ class FacturaPago extends Objeto {
 			LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
 			LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
 			WHERE $where
-			GROUP BY factura.id_cobro";
+			GROUP BY fp.id_factura_pago, factura.id_factura";
 	}
 
 	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
