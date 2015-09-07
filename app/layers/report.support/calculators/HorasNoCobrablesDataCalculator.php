@@ -33,13 +33,9 @@ class HorasNoCobrablesDataCalculator extends AbstractDataCalculator {
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
-	function getReportErrandQuery($Criteria) {
-		$horas_no_cobrables = "0";
-
-		$Criteria
-			->add_select($horas_no_cobrables, 'horas_no_cobrables');
+	function getReportErrandQuery(&$Criteria) {
+		$Criteria = null;
 	}
-
 
 	/**
 	 * Obtiene la query de cobros sin trabajos ni trámites correspondiente a Horas No Cobrables

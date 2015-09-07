@@ -45,11 +45,8 @@ class HorasCobradasDataCalculator extends AbstractDataCalculator {
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
-	function getReportErrandQuery($Criteria) {
-		$horas_cobradas = '0';
-
-		$Criteria
-			->add_select($horas_cobradas, 'horas_cobradas');
+	function getReportErrandQuery(&$Criteria) {
+		$Criteria = null;
 	}
 
 

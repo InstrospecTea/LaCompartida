@@ -31,13 +31,9 @@ class HorasVisiblesDataCalculator extends AbstractDataCalculator {
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
-	function getReportErrandQuery($Criteria) {
-		$horas_visibles = "0";
-
-		$Criteria
-			->add_select($horas_visibles, 'horas_visibles');
+	function getReportErrandQuery(&$Criteria) {
+		$Criteria = null;
 	}
-
 
 	/**
 	 * Obtiene la query de cobros sin trabajos ni trámites correspondiente a Horas Visibles

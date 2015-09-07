@@ -34,13 +34,9 @@ class HorasPagadasDataCalculator extends AbstractDataCalculator {
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
-	function getReportErrandQuery($Criteria) {
-		$horas_pagadas = "0";
-
-		$Criteria
-			->add_select($horas_pagadas, 'horas_pagadas');
+	function getReportErrandQuery(&$Criteria) {
+		$Criteria = null;
 	}
-
 
 	/**
 	 * Obtiene la query de cobros sin trabajos ni trámites correspondiente a Horas Pagadas

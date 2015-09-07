@@ -33,11 +33,8 @@ class HorasCastigadasDataCalculator extends AbstractDataCalculator {
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
-	function getReportErrandQuery($Criteria) {
-		$horas_castigadas = "0";
-
-		$Criteria
-			->add_select($horas_castigadas, 'horas_castigadas');
+	function getReportErrandQuery(&$Criteria) {
+		$Criteria = null;
 	}
 
 
