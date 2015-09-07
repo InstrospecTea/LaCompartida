@@ -57,7 +57,7 @@ class ReporteCriteria {
 		'horas_pagadas' => null,
 		'horas_por_cobrar' => null,
 		'horas_por_pagar' => null,
-		'horas_visibles' => null,
+		'horas_visibles' => 'HorasVisibles',
 		'costo' => 'Costo',
 		'costo_hh' => 'CostoHh',
 		'diferencia_valor_estandar' => 'DiferenciaValorEstandar',

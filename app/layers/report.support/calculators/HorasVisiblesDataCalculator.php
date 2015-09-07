@@ -20,7 +20,8 @@ class HorasVisiblesDataCalculator extends AbstractDataCalculator {
 		$horas_visibles = "SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
 
 		$Criteria
-			->add_select($horas_visibles, 'horas_visibles');
+			->add_select($horas_visibles, 'horas_visibles')
+			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1));
 	}
 
 
