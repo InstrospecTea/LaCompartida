@@ -20,7 +20,13 @@ class HorasPorCobrarDataCalculator extends AbstractDataCalculator {
 		$horas_por_cobrar = "SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
 
 		$Criteria
-			->add_select($horas_por_cobrar, 'horas_por_cobrar');
+			->add_select($horas_por_cobrar, 'horas_por_cobrar')
+			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
+			->add_restriction(CriteriaRestriction::not_in(
+				'IFNULL(cobro.estado, "")',
+				array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO', 'INCOBRABLE')
+				)
+			);
 	}
 
 
