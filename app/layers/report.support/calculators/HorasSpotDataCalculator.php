@@ -26,16 +26,16 @@ class HorasSpotDataCalculator extends AbstractDataCalculator {
 
 		$or_wheres[] = CriteriaRestriction::and_clause(
 			CriteriaRestriction::not_in('cobro.estado', array('CREADO', 'EN REVISION')),
-			CriteriaRestriction::in('cobro.forma_cobro', array('TASA','CAP'))
+			CriteriaRestriction::in('cobro.forma_cobro', array('TASA', 'CAP'))
 		);
 
 		$or_wheres[] = CriteriaRestriction::and_clause(
 			CriteriaRestriction::or_clause(
 				CriteriaRestriction::is_null('cobro.estado'),
-				CriteriaRestriction::in('cobro.estado', array('CREADO','EN REVISION'))
+				CriteriaRestriction::in('cobro.estado', array('CREADO', 'EN REVISION'))
 			),
 			CriteriaRestriction::or_clause(
-				CriteriaRestriction::in('contrato.forma_cobro', array('TASA','CAP')),
+				CriteriaRestriction::in('contrato.forma_cobro', array('TASA', 'CAP')),
 				CriteriaRestriction::is_null('contrato.forma_cobro')
 			)
 		);

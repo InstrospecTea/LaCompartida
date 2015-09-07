@@ -52,7 +52,7 @@ class ReporteCriteria {
 		'horas_castigadas' => null,
 		'horas_cobrables' => 'HorasCobrables',
 		'horas_cobradas' => 'HorasCobradas',
-		'horas_convenio' => null,
+		'horas_convenio' => 'HorasConvenio',
 		'horas_incobrables' => null,
 		'horas_pagadas' => null,
 		'horas_por_cobrar' => null,
