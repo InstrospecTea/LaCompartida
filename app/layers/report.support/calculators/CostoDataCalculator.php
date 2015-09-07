@@ -3,6 +3,8 @@
  * CostoDataCalculator
  * key: costo
  * Description: Costo del profesional
+ * El costo, corresponde al costo para la firma por concepto de sueldos
+ * Se obtiene de la suma de los trabajos * el costo x hora
  *
  * Más info:
  * https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Costo
@@ -21,6 +23,14 @@ class CostoDataCalculator extends AbstractCurrencyDataCalculator {
 
 		$Criteria
 			->add_select($costo, 'costo');
+
+		$Criteria->add_left_join_with(
+			array('usuario_costo_hh', 'usuario_costo_hh'),
+			CriteriaRestriction::and_clause(
+				CriteriaRestriction::equals("trabajo.id_usuario", 'usuario_costo_hh.id_usuario'),
+				CriteriaRestriction::equals("date_format(trabajo.fecha, '%Y%m')", 'usuario_costo_hh.yearmonth')
+			)
+		);
 	}
 
 

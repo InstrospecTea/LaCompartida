@@ -58,7 +58,7 @@ class ReporteCriteria {
 		'horas_spot' => null,
 		'horas_trabajadas' => null,
 		'horas_visibles' => null,
-		'costo' => null,
+		'costo' => 'Costo',
 		'costo_hh' => null,
 		'diferencia_valor_estandar' => 'DiferenciaValorEstandar',
 		'rentabilidad' => 'Rentabilidad',
