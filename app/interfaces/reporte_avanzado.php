@@ -72,6 +72,7 @@ $tipos_de_dato = array(
 	'horas_pagadas',
 	'horas_por_pagar',
 	'horas_incobrables',
+	'horas_spot',
 	'valor_por_cobrar',
 	'valor_cobrado',
 	'valor_por_pagar',
@@ -203,6 +204,7 @@ $ReporteAvanzado->glosa_dato['horas_por_cobrar'] = "Horas Visibles que aún no se
 $ReporteAvanzado->glosa_dato['horas_incobrables'] = __("Horas en Cobros Incobrables");
 $ReporteAvanzado->glosa_dato['horas_castigadas'] = __("Diferencia de Horas Cobrables con las Horas que ve el cliente en nota de Cobro");
 $ReporteAvanzado->glosa_dato['horas_no_cobrables'] = __("Total de Horas Trabajadas en asuntos no Facturables");
+$ReporteAvanzado->glosa_dato['horas_spot'] = __("Horas cobrables de profesionales, en formas de cobro TASA y CAP");
 
 $ReporteAvanzado->glosa_dato['valor_cobrado'] = __("Valor monetario que corresponde a cada Profesional (por horas o trámites), en un Cobro ya Emitido");
 $ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario que corresponde a cada Profesional por concepto de trámites, en un Cobro ya Emitido");

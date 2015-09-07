@@ -997,6 +997,7 @@ $_LANG['horas_por_cobrar'] = "Horas por Cobrar";
 $_LANG['horas_pagadas'] = "Horas Pagadas";
 $_LANG['horas_por_pagar'] = "Horas por Pagar";
 $_LANG['horas_incobrables'] = "Horas Incobrables";
+$_LANG['horas_spot'] = "Horas Spot";
 $_LANG['valor_cobrado'] = "Valor Cobrado";
 $_LANG['valor_tramites'] = "Valor Cobrado Trámites";
 $_LANG['valor_por_cobrar'] = "Valor por Cobrar";
