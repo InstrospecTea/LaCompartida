@@ -80,11 +80,11 @@ $tipos_de_dato = array(
 	'valor_pagado_parcial',
 	'valor_incobrable',
 	'rentabilidad',
+	//'rentabilidad_base',
 	'valor_hora',
 	'diferencia_valor_estandar',
 	'valor_estandar',
 	'valor_trabajado_estandar',
-	//'rentabilidad_base',
 	'costo',
 	'costo_hh',
 	'valor_tramites'
@@ -195,26 +195,32 @@ $ReporteAvanzado->id_moneda = $id_moneda;
 $ReporteAvanzado->glosa_dato['codigo_asunto'] = "Código " . __('Asunto');
 $ReporteAvanzado->glosa_dato['horas_trabajadas'] = "Total de Horas Trabajadas";
 $ReporteAvanzado->glosa_dato['horas_cobrables'] = __("Total de Horas Trabajadas en asuntos Facturables");
-$ReporteAvanzado->glosa_dato['horas_no_cobrables'] = __("Total de Horas Trabajadas en asuntos no Facturables");
-$ReporteAvanzado->glosa_dato['horas_castigadas'] = __("Diferencia de Horas Cobrables con las Horas que ve el cliente en nota de Cobro");
 $ReporteAvanzado->glosa_dato['horas_visibles'] = __("Horas que ve el Cliente en nota de cobro (tras revisión)");
 $ReporteAvanzado->glosa_dato['horas_cobradas'] = __("Horas Visibles en Cobros que ya fueron Emitidos");
-$ReporteAvanzado->glosa_dato['horas_por_cobrar'] = "Horas Visibles que aún no se Emiten al Cliente";
 $ReporteAvanzado->glosa_dato['horas_pagadas'] = __("Horas Cobradas en Cobros con estado Pagado");
 $ReporteAvanzado->glosa_dato['horas_por_pagar'] = __("Horas Cobradas que aún no han sido pagadas");
+$ReporteAvanzado->glosa_dato['horas_por_cobrar'] = "Horas Visibles que aún no se Emiten al Cliente";
 $ReporteAvanzado->glosa_dato['horas_incobrables'] = __("Horas en Cobros Incobrables");
-$ReporteAvanzado->glosa_dato['valor_por_cobrar'] = __("Valor monetario estimado que corresponde a cada Profesional en horas por cobrar");
-$ReporteAvanzado->glosa_dato['valor_cobrado'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro ya Emitido");
-$ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario de trámites que corresponde a cada Profesional, en un Cobro ya Emitido");
-$ReporteAvanzado->glosa_dato['valor_incobrable'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable");
-$ReporteAvanzado->glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado");
+$ReporteAvanzado->glosa_dato['horas_castigadas'] = __("Diferencia de Horas Cobrables con las Horas que ve el cliente en nota de Cobro");
+$ReporteAvanzado->glosa_dato['horas_no_cobrables'] = __("Total de Horas Trabajadas en asuntos no Facturables");
+
+$ReporteAvanzado->glosa_dato['valor_cobrado'] = __("Valor monetario que corresponde a cada Profesional (por horas o trámites), en un Cobro ya Emitido");
+$ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario que corresponde a cada Profesional por concepto de trámites, en un Cobro ya Emitido");
+
+$ReporteAvanzado->glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado totalmente");
+$ReporteAvanzado->glosa_dato['valor_pagado_parcial'] = __("Valor Pagado de un Cobro que ha sido parcialmente pagado");
 $ReporteAvanzado->glosa_dato['valor_por_pagar'] = __("Valor Cobrado que aún no ha sido pagado");
-$ReporteAvanzado->glosa_dato['rentabilidad'] = __("Valor Cobrado / Valor Estándar");
-$ReporteAvanzado->glosa_dato['valor_hora'] = __("Valor Cobrado / Horas Cobradas");
-$ReporteAvanzado->glosa_dato['diferencia_valor_estandar'] = __("Valor Cobrado - Valor Estándar");
-$ReporteAvanzado->glosa_dato['valor_estandar'] = __("Valor Cobrado, si se hubiera usado THH Estándar");
+$ReporteAvanzado->glosa_dato['valor_por_pagar_parcial'] = __("Valor Por Pagar de un Cobro que ha sido pagado parcialmente");
+$ReporteAvanzado->glosa_dato['valor_por_cobrar'] = __("Valor monetario estimado que corresponde a cada Profesional en horas por cobrar");
+$ReporteAvanzado->glosa_dato['valor_incobrable'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable");
 $ReporteAvanzado->glosa_dato['valor_trabajado_estandar'] = __("Horas Trabajadas por THH Estándar, para todo Trabajo");
+$ReporteAvanzado->glosa_dato['valor_estandar'] = __("Valor Cobrado, si se hubiera usado THH Estándar");
+$ReporteAvanzado->glosa_dato['diferencia_valor_estandar'] = __("Valor Cobrado - Valor Estándar");
+
+$ReporteAvanzado->glosa_dato['valor_hora'] = __("Valor Cobrado / Horas Cobradas");
 $ReporteAvanzado->glosa_dato['rentabilidad_base'] = __("Valor Cobrado / Valor Trabajado Estándar");
+$ReporteAvanzado->glosa_dato['rentabilidad'] = __("Valor Cobrado / Valor Estándar");
+
 $ReporteAvanzado->glosa_dato['costo'] = __("Costo para la firma, por concepto de sueldos");
 $ReporteAvanzado->glosa_dato['costo_hh'] = __("Costo HH para la firma, por concepto de sueldos");
 

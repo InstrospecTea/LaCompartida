@@ -147,7 +147,9 @@ class ReporteCriteria {
 	 * |  |  |  +-- valor_cobrado: Valor monetario que corresponde a cada Profesional, en una Liquidación ya Emitida
 	 * |  |  |  +-- valor_tramites: Valor monetario de trámites que corresponde a cada Profesional, en una Liquidación ya Emitida
 	 * |  |  |  |  +-- valor_pagado: Valor Cobrado que ha sido Pagado
-	 * |  |  |  |  \-- valor_por_pagar: Valor Cobrado que aún no ha sido pagado
+	 * |  |  |  |  +-- valor_pagado_parcial: Valor Cobrado que ha sido Pagado parcialmente
+	 * |  |  |  |  +-- valor_por_pagar: Valor Cobrado que aún no ha sido pagado
+	 * |  |  |  |  \-- valor_por_pagar_parcial: Valor por pagar parcial
 	 * |  |  |  +-- valor_por_cobrar: Valor monetario estimado que corresponde a cada Profesional en horas por cobrar
 	 * |  |  |  \-- valor_incobrable: Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable
 	 * |  |  +-- valor_castigado: (no implementado)
