@@ -17,10 +17,19 @@ class CostoHhDataCalculator extends AbstractCurrencyDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$costo_hh = "SUM(IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * cut.costo_hh * (TIME_TO_SEC(duracion) / 3600))";
+		$costo_hh = "SUM(IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * usuario_costo_hh.costo_hh * (TIME_TO_SEC(duracion) / 3600))";
 
 		$Criteria
+			->add_select('SUM((TIME_TO_SEC(duracion) / 3600))', 'valor_divisor')
 			->add_select($costo_hh, 'costo_hh');
+
+		$Criteria->add_left_join_with(
+			array('usuario_costo_hh', 'usuario_costo_hh'),
+			CriteriaRestriction::and_clause(
+				CriteriaRestriction::equals("trabajo.id_usuario", 'usuario_costo_hh.id_usuario'),
+				CriteriaRestriction::equals("date_format(trabajo.fecha, '%Y%m')", 'usuario_costo_hh.yearmonth')
+			)
+		);
 	}
 
 
