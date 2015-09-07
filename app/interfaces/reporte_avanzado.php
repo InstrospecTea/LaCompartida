@@ -77,6 +77,7 @@ $tipos_de_dato = array(
 	'valor_por_pagar',
 	'valor_por_pagar_parcial',
 	'valor_pagado',
+	'valor_pagado_parcial',
 	'valor_incobrable',
 	'rentabilidad',
 	'valor_hora',
@@ -88,11 +89,6 @@ $tipos_de_dato = array(
 	'costo_hh',
 	'valor_tramites'
 );
-
-if ($debug == 1) {
-	$tipos_de_dato[] = 'valor_pagado_parcial';
-	$tipos_de_dato[] = 'valor_por_pagar_parcial';
-}
 
 $tipos_de_dato_select = array();
 foreach ($tipos_de_dato as $tipo) {
@@ -363,6 +359,7 @@ if (!$popup) {
 
 	<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/reporte_avanzado.js"></script>
 	<script type="text/javascript">
+		var tipos_moneda = <?php echo json_encode(array_values(ReporteCriteria::$tiposMoneda)); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
 		var urlAjaxReporteAvanzado = '<?php echo Conf::RootDir(); ?>/app/interfaces/ajax/reporte_avanzado.php';
 		var buttonsReporte = {
@@ -393,14 +390,6 @@ if (!$popup) {
 	<?php
 }
 ?>
-
-<table class="alerta" width="90%" style="margin-bottom: 10px;">
-	<tr>
-		<td style="font-size:13px !important;">
-			<strong>Estimado usuario:</strong> Durante esta semana estamos mejorando el m&oacute;dulo de reportes avanzados, por lo tanto recomendamos no hacer uso de dichos reportes hasta nuevo aviso. De antemano muchas gracias por su comprensi&oacute;n.
-		</td>
-	</tr>
-</table>
 
 <form method="post" name="formulario" action="" id="formulario" autocomplete="off">
 	<input type="hidden" name="opc" id="opc" value="print">
@@ -946,6 +935,8 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->celda('valor_cobrado') ?>
 								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
 								<?php echo $ReporteAvanzado->celda('valor_pagado') ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('valor_pagado_parcial') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(7) ?>
@@ -968,11 +959,14 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->celda('valor_por_cobrar') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('valor_por_pagar') ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('valor_por_pagar_parcial') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(7) ?>
 								<?php echo $ReporteAvanzado->borde_derecha() ?>
-								<?php echo $ReporteAvanzado->nada(3) ?>
+								<?php echo $ReporteAvanzado->nada() ?>
+								<?php echo $ReporteAvanzado->borde_derecha() ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(12) ?>
@@ -981,7 +975,20 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(8) ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('valor_incobrable') ?>
-								<?php echo $ReporteAvanzado->nada(3) ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('valor_hora') ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(7) ?>
+								<?php echo $ReporteAvanzado->borde_derecha() ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(7) ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(8) ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('valor_tramites') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(1) ?>
@@ -994,11 +1001,13 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->moneda() ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
+								<?php echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
+								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->celda('valor_estandar') ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('diferencia_valor_estandar') ?>
-								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('valor_hora'); ?>
+								<?php echo $ReporteAvanzado->celda('diferencia_valor_estandar'); ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('rentabilidad') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(1) ?>
@@ -1014,10 +1023,10 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->select_moneda() ?>
 								<?php echo $ReporteAvanzado->nada(5) ?>
-								<?php echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
+								<?php echo $ReporteAvanzado->celda('costo') ?>
 								<?php // echo $ReporteAvanzado->celda_disabled('rentabilidad_base') ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('rentabilidad') ?>
+								<?php echo $ReporteAvanzado->celda('costo_hh') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(1) ?>
@@ -1031,9 +1040,7 @@ if (!$popup) {
 							<tr>
 								<?php echo $ReporteAvanzado->tinta() ?>
 								<?php echo $ReporteAvanzado->nada(8) ?>
-								<?php echo $ReporteAvanzado->celda('costo') ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('costo_hh') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(9) ?>
