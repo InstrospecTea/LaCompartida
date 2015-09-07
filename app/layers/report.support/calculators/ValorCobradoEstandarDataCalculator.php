@@ -1,27 +1,27 @@
 <?php
 
 /**
- * El valor cobrado estÃ¡ndar (o valor_estandar) corresponde
- * al monto subtotal (descontado) que se hubiese cobrado si la liquidaciÃ³n
- * se tarificara en tarifa estÃ¡ndar. Independiente del tipo de liquidaciÃ³n.
+ * El valor cobrado estándar (o valor_estandar) corresponde
+ * al monto subtotal (descontado) que se hubiese cobrado si la liquidación
+ * se tarificara en tarifa estándar. Independiente del tipo de liquidación.
  *
- * Esta informaciÃ³n se obtiene de: Trabajos y TrÃ¡mites, ya que para cobros
- * sin trabajos ni trÃ¡mites no es posible establecer una relaciÃ³n estÃ¡ndar.
+ * Esta información se obtiene de: Trabajos y Trámites, ya que para cobros
+ * sin trabajos ni trámites no es posible establecer una relación estándar.
  *
  * Condiciones para obtener un valor cobrado:
  * 	* Que exista un cobro en estado: EMITIDO, FACTURADO, ENVIADO AL CLIENTE,
  * 		PAGO PARCIAL o PAGADO
- *	* Que lo que se estÃ© cobrando sea Cobrable
+ *	* Que lo que se esté cobrando sea Cobrable
  *
- * MÃ¡s info:
+ * Más info:
  * https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Cobrado-Estandar
  *
  */
 class ValorCobradoEstandarDataCalculator extends AbstractCurrencyDataCalculator {
 
 	/**
-	 * Obtiene la query de trabajos correspondiente al valor cobrado estÃ¡ndar
-	 * @param  Criteria $Criteria Query a la que se agregarÃ¡ el cÃ¡lculo
+	 * Obtiene la query de trabajos correspondiente al valor cobrado estándar
+	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
@@ -49,8 +49,8 @@ class ValorCobradoEstandarDataCalculator extends AbstractCurrencyDataCalculator 
 	}
 
 	/**
-	 * Obtiene la query de trÃ¡mites correspondiente al valor cobrado estÃ¡ndar
-	 * @param  Criteria $Criteria Query a la que se agregarÃ¡ el cÃ¡lculo
+	 * Obtiene la query de trámites correspondiente al valor cobrado estándar
+	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
@@ -78,8 +78,8 @@ class ValorCobradoEstandarDataCalculator extends AbstractCurrencyDataCalculator 
 	}
 
 	/**
-	 * Obtiene la query de cobros sin trabajos ni trÃ¡mites
-	 * @param  Criteria $Criteria Query a la que se agregarÃ¡ el cÃ¡lculo
+	 * Obtiene la query de cobros sin trabajos ni trámites
+	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
 	function getReportChargeQuery(&$Criteria) {
