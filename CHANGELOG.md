@@ -1,4 +1,15 @@
 # Changelog
+## [Release 15.18.0](https://github.com/LemontechSA/ttb/pull/1104)
+Tuesday 2015, September 8th
+* **Feature** [Mejorar mensajes cobro masivo](https://github.com/LemontechSA/ttb/pull/1073)
+* **Feature** [Solicitud mejoras](https://github.com/LemontechSA/ttb/pull/1089)
+* **Feature** [Error SQL al actualizar cobro](https://github.com/LemontechSA/ttb/pull/1095)
+* **Feature** [nuevos datos facturacion electronica chile](https://github.com/LemontechSA/ttb/pull/1098)
+
+## Hotfix 15.17.11
+Monday 2015, September 7th
+* **Fix** [Formato en columna excel adelantos](https://github.com/LemontechSA/ttb/pull/1110)
+
 ## Hotfix 15.17.10
 Friday 2015, September 4th
 * **Fix** [Se corrige API para historial asuntos](https://github.com/LemontechSA/ttb/pull/1109)

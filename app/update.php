@@ -10859,15 +10859,13 @@ QUERY;
 			break;
 
 		case 8.10:
-			$queries = array("ALTER TABLE `factura_cobro` CHANGE `id_documento` `id_documento` INT(11)  NULL  DEFAULT NULL;");
+			$queries[] = "ALTER TABLE `factura_cobro` CHANGE `id_documento` `id_documento` INT(11)  NULL  DEFAULT NULL;";
 			break;
 
 		case 8.11:
-			$queries = array(
-					"ALTER TABLE `factura` ADD `id_documento_referencia` TINYINT(1)  UNSIGNED  NULL  DEFAULT NULL  AFTER `dte_comentario`;",
-					"ALTER TABLE `factura` ADD `folio_documento_referencia` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `id_documento_referencia`;",
-					"ALTER TABLE `factura` ADD `fecha_documento_referencia` DATE  NULL  DEFAULT NULL  AFTER `folio_documento_referencia`;"
-				);
+			$queries[] = "ALTER TABLE `factura` ADD `id_documento_referencia` TINYINT(1)  UNSIGNED  NULL  DEFAULT NULL  AFTER `dte_comentario`;";
+			$queries[] = "ALTER TABLE `factura` ADD `folio_documento_referencia` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `id_documento_referencia`;";
+			$queries[] = "ALTER TABLE `factura` ADD `fecha_documento_referencia` DATE  NULL  DEFAULT NULL  AFTER `folio_documento_referencia`;";
 
 			$query = "SELECT archivo_nombre FROM prm_plugin WHERE activo = 1 AND archivo_nombre IN ('facturacion_electronica_nubox.php', 'facturacion_electronica_cl.php');";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -10906,13 +10904,10 @@ QUERY;
 			break;
 
 		case 8.12:
-			$queries = array(
-				"ALTER TABLE `cobro` ADD `opc_mostrar_asuntos_cobrables_sin_horas` TINYINT(1)  UNSIGNED  NOT NULL  DEFAULT '0'  AFTER `opc_ver_asuntos_separados`;"
-			);
+			$queries[] = "ALTER TABLE `cobro` ADD `opc_mostrar_asuntos_cobrables_sin_horas` TINYINT(1)  UNSIGNED  NOT NULL  DEFAULT '0'  AFTER `opc_ver_asuntos_separados`;";
 			break;
 		case 8.13:
-			$queries = array("ALTER TABLE `bloqueo_procesos`
-				CHANGE COLUMN `estado` `estado` TEXT NOT NULL DEFAULT ''");
+			$queries[] = "ALTER TABLE `bloqueo_procesos` CHANGE COLUMN `estado` `estado` TEXT NOT NULL DEFAULT ''";
 			break;
 	}
 
