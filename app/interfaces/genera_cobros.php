@@ -282,7 +282,6 @@ if ($opc == 'buscar') {
 			text_window += '<div style="text-align:left;font-weight:normal;margin:0 20px;">';
 			text_window += '<?php echo $Form->radio('radio_generacion', '', true, array('id' => 'radio_wip')) .  __('Honorarios') . ' y ' . __('Gastos') . __(', se incluirán horas hasta el') ?> ' + jQuery('#fecha_fin').val();
 			text_window += '<br/><?php echo $Form->checkbox('cobrosencero_generacion', 1, $cobrosencero_chk, array('label' => 'Incluir ' . __('cobros') . ' de monto cero'));?>';
-			text_window += '<br/><?php echo $Form->checkbox('cobros_en_revision_generacion', 1, FALSE, array('label' => '¿Dejar cobros con estado En Revisión?'));?>';
 			text_window += '</div><div style="text-align:center;"> ';
 			text_window += '<span id="loading" style="text-align:center;margin:auto;">&nbsp;</span> ';
 			text_window += '<br><span id="respuestahh">&nbsp;</span> ';
@@ -324,8 +323,7 @@ if ($opc == 'buscar') {
 									var data = {
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
 										'form': <?php echo json_encode($_POST);?>,
-										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0,
-										'cobros_en_revision': jQuery('#cobros_en_revision_generacion').is(':checked') ? 1 : 0
+										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
 										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoContratos + ' contratos para la generación de sus cobros' + (totalHITOS ? ', se excluyen ' + totalHITOS + ' contratos del tipo HITOS' : '') + '.<br><br>Presione "Cerrar" para continuar.');
@@ -338,8 +336,7 @@ if ($opc == 'buscar') {
 									var data = {
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
 										'form': <?php echo json_encode($_POST); ?>,
-										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0,
-										'cobros_en_revision': jQuery('#cobros_en_revision_generacion').is(':checked') ? 1 : 0
+										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
 										jQuery('#respuestamixtas').html('<h3>Proceso Iniciado</h3> Se han enviado ' + largoClientes + ' clientes para la generacion de sus cobros.<br><br>Presione "Cerrar" para continuar.');
@@ -1150,7 +1147,7 @@ if ($proceso !== false) {
 					echo $Form->button(__('Excel borradores'), array('onclick' => "GeneraCobros(this.form, 'excel', false)"));
 					echo $Form->button(__('Descargar borradores'), array('onclick' => "ImpresionCobros(true, false)"));
 					echo $Form->button(__('Emitir cobros').' '.__('masivamente'), array('onclick' => "GeneraCobros(this.form, 'emitir', false)"));
-					echo $Form->button(__('Dejar coboros con estado EN REVISION'), array('onclick' => "GeneraCobros(this.form, 'en_revision', false)"));
+					echo $Form->button(__('Pasar cobros a estado EN REVISIÓN'), array('onclick' => "GeneraCobros(this.form, 'en_revision', false)"));
 					?>
 				</td>
 			</tr>
