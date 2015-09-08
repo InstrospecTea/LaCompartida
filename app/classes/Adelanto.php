@@ -37,7 +37,7 @@ class Adelanto extends Documento {
 			'title' => 'Monto', 
 			'format' => 'number',
 			'extras' => array(
-                'decimals' => 'cifras_decimales',
+				'decimals' => 'cifras_decimales',
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			)
@@ -47,7 +47,7 @@ class Adelanto extends Documento {
 			'title' => 'Saldo', 
 			'format' => 'number',
 			'extras' => array(
-                'decimals' => 'cifras_decimales',
+				'decimals' => 'cifras_decimales',
 				'symbol' => 'simbolo',
 				'subtotal' => 'simbolo'
 			)
