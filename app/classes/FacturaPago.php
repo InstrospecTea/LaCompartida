@@ -199,6 +199,16 @@ class FacturaPago extends Objeto {
 			),
 			array(
 					'format' => 'number',
+					'extras' =>
+					array(
+							'symbol' => 'simbolo_factura',
+							'subtotal' => false,
+					),
+					'title' => 'Saldo Actual',
+					'field' => 'saldo_actual',
+			),
+			array(
+					'format' => 'number',
 					'title' => 'Moneda Pago',
 					'field' => 'simbolo_pago',
 			),
@@ -805,7 +815,7 @@ class FacturaPago extends Objeto {
 				, moneda_pago.simbolo as simbolo_pago
 				, moneda_pago.cifras_decimales as cifras_decimales_pago
 				, moneda_pago.tipo_cambio as tipo_cambio_pago
-				, -1 * ccfm2.saldo as saldo_factura
+				, -1 * ccfm2.saldo as saldo_actual
 				, -1 * ccfm.saldo as saldo_pago
 				, ccfm.monto_bruto as monto_pago
 				, -1 * ccfm2.monto_bruto as monto_factura
