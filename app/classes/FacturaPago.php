@@ -33,6 +33,10 @@ class FacturaPago extends Objeto {
 
 	public static $configuracion_reporte = array(
 			array(
+				'title' => 'N° Pago',
+				'field' => 'id_factura_pago',
+			),
+			array(
 					'format' => 'date',
 					'title' => 'Fecha Pago',
 					'field' => 'fecha_pago',
@@ -199,8 +203,8 @@ class FacturaPago extends Objeto {
 					array(
 							'symbol' => 'simbolo_factura',
 					),
-					'title' => 'Saldo Factura',
-					'field' => 'saldo_factura',
+					'title' => 'Saldo Actual',
+					'field' => 'saldo_actual',
 			),
 			array(
 					'format' => 'number',
@@ -211,7 +215,7 @@ class FacturaPago extends Objeto {
 					'format' => 'number',
 					'extras' =>
 					array(
-							'symbol' => 'simbolo_pago',
+							'symbol' => 'simbolo_factura',
 					),
 					'title' => 'Saldo Pago',
 					'field' => 'saldo_pago',
@@ -776,6 +780,7 @@ class FacturaPago extends Objeto {
 		}
 
 		return "SELECT SQL_CALC_FOUND_ROWS
+					fp.id_factura_pago,
 					factura.id_factura
 				, factura.fecha as fecha_factura
 				, factura.id_moneda
@@ -809,7 +814,7 @@ class FacturaPago extends Objeto {
 				, moneda_pago.simbolo as simbolo_pago
 				, moneda_pago.cifras_decimales as cifras_decimales_pago
 				, moneda_pago.tipo_cambio as tipo_cambio_pago
-				, -1 * ccfm2.saldo as saldo_factura
+				, -1 * ccfm2.saldo as saldo_actual
 				, -1 * ccfm.saldo as saldo_pago
 				, ccfm.monto_bruto as monto_pago
 				, -1 * ccfm2.monto_bruto as monto_factura
@@ -844,7 +849,7 @@ class FacturaPago extends Objeto {
 			LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
 			LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
 			WHERE $where
-			GROUP BY fp.id_factura_pago";
+			GROUP BY fp.id_factura_pago, factura.id_factura";
 	}
 
 	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
