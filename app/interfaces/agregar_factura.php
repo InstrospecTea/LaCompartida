@@ -12,6 +12,8 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 	$pagina = new Pagina($sesion);
 	$DocumentoLegalNumero = new DocumentoLegalNumero($sesion);
 	$factura = new Factura($sesion);
+	$prm_codigo = new PrmCodigo($sesion);
+	$prm_plugin = new PrmPlugin($sesion);
 
 	if ($id_cobro > 0) {
 		$cobro = new Cobro($sesion);
@@ -149,6 +151,10 @@ if ($opcion == "guardar") {
 		$factura->Edit("cliente", $cliente ? addslashes($cliente) : "");
 		$factura->Edit("RUT_cliente", $RUT_cliente ? $RUT_cliente : "");
 		$factura->Edit("direccion_cliente", $direccion_cliente ? addslashes($direccion_cliente) : "");
+
+		$factura->Edit('id_documento_referencia', $id_documento_referencia);
+		$factura->Edit('folio_documento_referencia', $folio_documento_referencia);
+		$factura->Edit("fecha_documento_referencia", Utiles::fecha2sql($fecha_documento_referencia));
 
 		$factura->Edit("comuna_cliente", $comuna_cliente ? addslashes($comuna_cliente) : "");
 		$factura->Edit("factura_codigopostal", $factura_codigopostal ? $factura_codigopostal : "");
@@ -613,6 +619,33 @@ $Form->defaultLabel = false;
 				<td align="left" colspan="3"><?php echo Html::SelectQuery($sesion, $query_padre, 'id_factura_padre', $factura->fields['id_factura_padre'], '', '--', '160') ?></td>
 			</tr>
 			<?php } ?>
+
+			<?php if ($prm_plugin->isActive(array('facturacion_electronica_cl.php', 'facturacion_electronica_nubox.php'))): ?>
+				<?php $codigos = $prm_codigo->getCodigosByGrupo('PRM_FACTURA_DR'); ?>
+				<?php if ($codigo_documento_legal == 'FA' && !is_null($codigo_dte) && sizeof($codigos) > 0): ?>
+				<tr>
+					<td align="right">
+						<label for="id_documento_referencia"><?php echo __('Documento de Referencia') ?>:</label>
+					</td>
+					<td align="left">
+						<?php echo $Form->select('id_documento_referencia', $codigos, $factura->fields['id_documento_referencia'], array('empty' => __('Seleccione'))); ?>
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><label for="folio_documento_referencia">Folio Documento Referencia</label></td>
+					<td align="left">
+						<input type="text" name="folio_documento_referencia" id="folio_documento_referencia" value="<?php echo ! empty($factura->fields['folio_documento_referencia']) ? $factura->fields['folio_documento_referencia'] : NULL ?>">
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><label for="fecha_documento_referencia">Fecha Documento Referencia</label></td>
+					<td align="left">
+						<input type="text" class="fechadiff" name="fecha_documento_referencia" id="fecha_documento_referencia" value="<?php echo ! empty($factura->fields['fecha_documento_referencia']) ? Utiles::sql2date($factura->fields['fecha_documento_referencia'], '%d-%m-%Y') : NULL ?>">
+					</td>
+				</tr>
+				<?php $buscar_padre = true; ?>
+				<?php endif; ?>
+			<?php endif; ?>
 
 		<?php
 		$zona_horaria = Conf::GetConf($sesion, 'ZonaHoraria');

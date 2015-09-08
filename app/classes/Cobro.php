@@ -11,6 +11,7 @@ if (!class_exists('Cobro')) {
 		var $ArrayFacturasDelContrato = array();
 		var $ArrayTotalesDelContrato = array();
 		var $ArrayStringFacturasDelContrato = array();
+		public $mensajes = '';
 
 		const PROCESS_NAME = 'GeneracionMasivaCobros';
 
@@ -1057,7 +1058,7 @@ if (!class_exists('Cobro')) {
 		// actual guardado en la configuracion sino el dato traspasado
 		function GuardarCobro($emitir = false, $mantener_porcentaje_impuesto = false) {
 			if (!in_array($this->fields['estado'], array('CREADO', 'EN REVISION', ''))) {
-				return "No se puede guardar " . __('el cobro') . " ya que ya se encuentra emitido. Usted debe volver " . __('el cobro') . " a estado creado o en revisión para poder actualizarlo";
+				return __('No se puede guardar'). " " . __('el cobro') ." " . __('ya que ya se encuentra emitido') .". " . __('Usted debe volver') . " " . __('el cobro') . " " . __('a estado creado o en revisión para poder actualizarlo');
 			}
 
 			// Carga de asuntos del cobro
@@ -1153,7 +1154,7 @@ if (!class_exists('Cobro')) {
 					$tramite->Edit('tarifa_tramite_estandar', $tarifa_tramite[$tramite->fields['glosa_tramite']]['tarifa_estandar']);
 
 					if (!$tramite->Write()) {
-						return 'Error, trámite #' . $tramite->fields['id_tramite'] . ' no se pudo guardar';
+						return __('Error, trámite') ." #{$tramite->fields['id_tramite']} " . __('no se pudo guardar (Cobro') . " {$this->fields['id_cobro']})";
 					}
 				}
 			}
@@ -1369,7 +1370,7 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $moneda_del_cobro->fields['cifras_decimales'], '.', ''));
 					if (!$trabajo->Write()) {
-						return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
+						return __('Error, trabajo') . " #{$trabajo->fields['id_trabajo']} " . __('no se pudo guardar (Cobro') . " {$this->fields['id_cobro']})";
 					}
 				} #End for cobros
 			}
@@ -1423,7 +1424,7 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('costo_hh', $profesional[$id_usuario]['tarifa_defecto']);
 					$trabajo->Edit('tarifa_hh_estandar', number_format($profesional[$id_usuario]['tarifa_hh_estandar'], $moneda_del_cobro->fields['cifras_decimales'], '.', ''));
 					if (!$trabajo->Write(false)) {
-						return 'Error, trabajo #' . $trabajo->fields['id_trabajo'] . ' no se pudo guardar';
+						return __('Error, trabajo') . " #{$trabajo->fields['id_trabajo']} " . __('no se pudo guardar (Cobro') . " {$this->fields['id_cobro']})";
 					}
 				}
 			}
@@ -1998,21 +1999,21 @@ if (!class_exists('Cobro')) {
 
 		/**
 		 * Asocia los trabajos al cobro que se está creando
-		 * @param type $fecha_ini
-		 * @param type $fecha_fin
-		 * @param type $id_contrato
-		 * @param boolean $emitir_obligatoriamente
-		 * @param type $id_proceso
-		 * @param type $monto
-		 * @param type $id_cobro_pendiente
-		 * @param type $con_gastos
-		 * @param type $solo_gastos
-		 * @param type $incluye_gastos
-		 * @param type $incluye_honorarios
-		 * @param type $cobro_programado
-		 * @return integer id del cobro generado.
+		 * @param $fecha_ini
+		 * @param $fecha_fin
+		 * @param $id_contrato
+		 * @param $emitir_obligatoriamente
+		 * @param $id_proceso
+		 * @param string $monto
+		 * @param string $id_cobro_pendiente
+		 * @param bool|false $con_gastos
+		 * @param bool|false $solo_gastos
+		 * @param bool|true $incluye_gastos
+		 * @param bool|true $incluye_honorarios
+		 * @param bool|false $cobro_programado
+		 * @return mixed id del cobro generado.
 		 */
-		function PrepararCobro($fecha_ini, $fecha_fin, $id_contrato, $emitir_obligatoriamente, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false) {
+		function PrepararCobro($fecha_ini, $fecha_fin, $id_contrato, $emitir_obligatoriamente, $id_proceso, $monto = '', $id_cobro_pendiente = '', $con_gastos = false, $solo_gastos = false, $incluye_gastos = true, $incluye_honorarios = true, $cobro_programado = false, $cobros_en_revision = FALSE) {
 			$incluye_gastos = empty($incluye_gastos) ? '0' : '1';
 			$incluye_honorarios = empty($incluye_honorarios) ? '0' : '1';
 
@@ -2092,6 +2093,10 @@ if (!class_exists('Cobro')) {
 					}
 
 					$this->Edit('id_usuario', $id_usuario_cobro);
+
+					if ($cobros_en_revision) {
+						$this->Edit('estado', 'EN REVISION');
+					}
 
 					$this->Edit('codigo_cliente', $Contrato->fields['codigo_cliente']);
 					$this->Edit('id_contrato', $Contrato->fields['id_contrato']);
@@ -2371,8 +2376,12 @@ if (!class_exists('Cobro')) {
 							$his->Edit('id_cobro', $this->fields['id_cobro']);
 							$his->Write();
 						}
-
-						$this->GuardarCobro($emitir);
+						$resultado_guardar = $this->GuardarCobro($emitir);
+						if (!empty($resultado_guardar)) {
+							$this->mensajes .= $resultado_guardar;
+						}
+					} else {
+						$this->mensajes .= __('No se ha podido generar el cobro para el cliente') ." {$Contrato->fields['codigo_cliente']}";
 					}
 				} // END cobro
 			} // END contrato

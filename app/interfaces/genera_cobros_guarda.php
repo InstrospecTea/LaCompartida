@@ -18,8 +18,20 @@ $imprimir_cartas = $opcion[0] == 'cartas';
 $agrupar_cartas = $opcion[1] == 'agrupar';
 
 $incluir_cobros_en_cero = false;
-if (isset($_POST['cobrosencero']) && $_POST['cobrosencero'] == 1) {
+if ((isset($_POST['cobrosencero']) && $_POST['cobrosencero'] == 1) || (isset($_GET['cobrosencero']) && $_GET['cobrosencero'] == 1)) {
 	$incluir_cobros_en_cero = true;
+}
+
+// Setea estado como 'En Revisiï¿½n'
+$cobros_en_revision = FALSE;
+if (isset($_POST['cobros_en_revision']) && $_POST['cobros_en_revision'] == 1) {
+	$cobros_en_revision = TRUE;
+}
+
+// Determina si muestra asuntos sin horas
+$mostrar_asuntos_cobrables_sin_horas = FALSE;
+if (isset($_POST['mostrar_asuntos_cobrables_sin_horas']) && $_POST['mostrar_asuntos_cobrables_sin_horas'] == 1) {
+	$mostrar_asuntos_cobrables_sin_horas = TRUE;
 }
 
 if (!$incluir_cobros_en_cero && isset($_GET['generar_silenciosamente'])) {
@@ -69,10 +81,11 @@ if ($individual && $id_contrato) {
 
 	$id_cobro_pendiente = !is_null($id_cobro_pendiente) ? $id_cobro_pendiente : '';
 	$monto = !is_null($monto) ? $monto : '';
-	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios);
-
+	$newcobro = $Cobro->PrepararCobro($fecha_ini_cobro, Utiles::fecha2sql($fecha_fin), $id_contrato, $forzar, $id_proceso_nuevo, $monto, $id_cobro_pendiente, false, false, $incluye_gastos, $incluye_honorarios, FALSE, $cobros_en_revision);
+	$mensajes = $Cobro->mensajes;
 	Log::write(" |- #{$newcobro}", Cobro::PROCESS_NAME);
 	Log::write(' |- SetIncluirEnCierre', Cobro::PROCESS_NAME);
+	Log::write(' |- Mensajes:' . $mensajes, Cobro::PROCESS_NAME);
 	$Contrato->SetIncluirEnCierre($Sesion);
 
 	if (isset($_GET['generar_silenciosamente']) && $_GET['generar_silenciosamente'] == 1) {
@@ -82,7 +95,7 @@ if ($individual && $id_contrato) {
 		unset($Sesion);
 		unset($Cobro);
 		unset($Contrato);
-		die(json_encode(array('proceso' => $id_proceso_nuevo, 'cobro' => $newcobro)));
+		die(json_encode(array('proceso' => $id_proceso_nuevo, 'cobro' => $newcobro, 'mensajes' => $mensajes)));
 	} else {
 		Log::write(' |- redirect', Cobro::PROCESS_NAME);
 		Log::write(' ----', Cobro::PROCESS_NAME);
@@ -101,7 +114,7 @@ if ($codigo_asunto && !$id_contrato) {
 	$id_contrato = $Contrato->fields['id_contrato'];
 }
 
-if ($print || $emitir) {
+if ($print || $emitir || $en_revision) {
 	$where = 1;
 	$join_cobro_cliente = '';
 
@@ -199,11 +212,11 @@ if ($print) {
 		$logdir = dirname($error_logfile);
 
 		if ($totaldecobros > 0) {
-			$NotaCobro->GeneraCobrosMasivos($cobroRT, $imprimir_cartas, $agrupar_cartas, $id_formato);
+			$NotaCobro->GeneraCobrosMasivos($cobroRT, $imprimir_cartas, $agrupar_cartas, $id_formato, $mostrar_asuntos_cobrables_sin_horas);
 		} else {
 			$detalle_error = '<div id="sql_error" style="margin: 0px auto  0px; width: 414px; border: 1px solid #00782e; padding: 5px; font-family: Arial, Helvetica, sans_serif;font-size:12px;">
 				<div style="background:#00782e;"><img src="' . Conf::ImgDir() . '/logo_top.png" border="0"></div>
-				<div style="padding:10px;text-align:center"><strong style="font-size:14px">Atención</strong><br/><br/>Error al intentar generar los borradores según periodo, no hay datos para los filtros que Ud. ha seleccionado</div>
+				<div style="padding:10px;text-align:center"><strong style="font-size:14px">Atenciï¿½n</strong><br/><br/>Error al intentar generar los borradores segï¿½n periodo, no hay datos para los filtros que Ud. ha seleccionado</div>
 			</div>
 			<script type="text/javascript">setTimeout("window.history.back()", 4000);</script>';
 			exit($detalle_error);
@@ -235,7 +248,7 @@ if ($print) {
 		FROM cobro
 			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
 			LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
-		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION')";
+		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
 
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 
@@ -276,4 +289,28 @@ if ($print) {
 	} else {
 		$Pagina->Redirect($url);
 	}
+} else if ($en_revision) {
+	$Cobro = new Cobro($Sesion);
+	$errores_cobro = array();
+	$total_cobros_procesados = 0;
+	$total_cobros_emitidos = 0;
+
+	$query = "SELECT
+			cobro.id_cobro
+		FROM cobro
+			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+			LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
+		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
+	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+	
+	$cobros = array();
+	while ($cobro = mysql_fetch_array($resp)) {
+		$cobros[] = $cobro['id_cobro'];
+	}
+
+	$query = "UPDATE cobro SET estado = 'EN REVISION' WHERE estado IN ('CREADO', 'EN REVISION') AND id_cobro IN (" . implode(', ', $cobros) . ");";
+	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+
+	$url .= '&cobros_en_revision=1';
+	echo json_encode(array('url_redirect' => $url));
 }
