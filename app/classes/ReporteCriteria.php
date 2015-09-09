@@ -56,8 +56,9 @@ class ReporteCriteria {
 	// Arreglo con resultados, puede ser accedido desde afuera :(
 	public $row;
 
-	// String con el último error
-	public $error = '';
+	/*
+	TODO: Revisar desde aqui is deben ser públicas estas variables
+	 */
 	// El orden de los agrupadores
 	public $agrupador = array();
 	public $id_agrupador = array();
@@ -76,6 +77,9 @@ class ReporteCriteria {
 	public $filas = array();
 
 	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
+	/*
+	TODO END
+	*/
 
 	public function __construct($sesion) {
 		$this->sesion = $sesion;
