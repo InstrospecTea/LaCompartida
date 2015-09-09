@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.18.1
+Wednesday 2015, September 9th
+* **Feature** [Nuevo parámetro id_cobro para la integración contable BMAJ](https://github.com/LemontechSA/ttb/pull/1113)
+
 ## [Release 15.18.0](https://github.com/LemontechSA/ttb/pull/1104)
 Tuesday 2015, September 8th
 * **Feature** [Mejorar mensajes cobro masivo](https://github.com/LemontechSA/ttb/pull/1073)
