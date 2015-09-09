@@ -164,9 +164,9 @@ $server->wsdl->addComplexType(
 		'ResultadoPagos', 'complexType', 'array', '', 'SOAP-ENC:Array', array(), array(array('ref' => 'SOAP-ENC:arrayType', 'wsdl:arrayType' => 'tns:DatosResultadoPago[]')), 'tns:DatosResultadoPago'
 );
 
-$server->register('ListaCobrosFacturados', array('usuario' => 'xsd:string', 'password' => 'xsd:string', 'timestamp' => 'xsd:integer'), array('lista_cobros_emitidos' => 'tns:ListaCobros'), $ns);
+$server->register('ListaCobrosFacturados', array('usuario' => 'xsd:string', 'password' => 'xsd:string', 'timestamp' => 'xsd:integer', 'id_cobro' => 'xsd:integer'), array('lista_cobros_emitidos' => 'tns:ListaCobros'), $ns);
 
-function ListaCobrosFacturados($usuario, $password, $timestamp) {
+function ListaCobrosFacturados($usuario, $password, $timestamp, $id_cobro) {
 	$sesion = new Sesion();
 	$time = mktime();
 
@@ -175,10 +175,18 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
 	if (UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
 		$lista_cobros = array();
 
+		$query_estados = " AND cobro.estado_contabilidad IN ('PARA INFORMAR','PARA INFORMAR Y FACTURAR') ";
+
 		$query_timestamp = "";
 		if ($timestamp) {
 			$query_timestamp = " OR cobro.id_cobro IN (SELECT DISTINCT id_cobro FROM log_contabilidad WHERE timestamp >= " . intval(mysql_real_escape_string($timestamp)) . " ) ";
 		}
+
+		if (!empty($id_cobro) && $id_cobro != 0) {
+			$query_cobro = " AND cobro.id_cobro = '{$id_cobro}' ";
+			$query_estados = "";
+		}
+
 		$query = "SELECT cobro.id_cobro,
                     cobro.codigo_cliente,
                     cobro.estado,
@@ -216,8 +224,10 @@ function ListaCobrosFacturados($usuario, $password, $timestamp) {
                     LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
                     LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
                     LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
-                    WHERE cobro.estado_contabilidad IN ('PARA INFORMAR','PARA INFORMAR Y FACTURAR')
+                    WHERE 1
+										$query_estados
                     $query_timestamp
+										$query_cobro
         GROUP BY cobro.id_cobro";
 
 		if (!($resp = mysql_query($query, $sesion->dbh))) {
