@@ -24,6 +24,15 @@ class HorasCastigadasDataCalculator extends AbstractDataCalculator {
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1));
+
+		if (!empty($this->options) && $this->options['hidde_penalized_hours']) {
+			$Criteria
+				->add_restriction(CriteriaRestriction::greater_than(
+					'(duracion - duracion_cobrada)',
+					0
+				)
+			);
+		}
 	}
 
 

@@ -15,8 +15,8 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 	 * @param [type] $grouperFields Los campos/keys por los que se debe agrupar
 	 * @param [type] $currencyId    La moneda en la que se devolverán los valores
 	 */
-	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $currencyId) {
-		parent::__construct($Session, $filtersFields, $grouperFields);
+	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $options, $currencyId) {
+		parent::__construct($Session, $filtersFields, $grouperFields, $options);
 		$this->currencyId = $currencyId;
 	}
 

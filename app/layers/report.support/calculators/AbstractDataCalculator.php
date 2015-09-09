@@ -103,6 +103,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	private $filtersFields = array();
 	private $grouperFields = array();
+	protected $options = array();
 
 	private $WorksCriteria;
 	private $ErrandsCriteria;
@@ -113,11 +114,14 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	 * @param Sesion $Session       La sesión para la obtención de datos
 	 * @param Array $filtersFields  Array con campos a filtrar y sus valores
 	 * @param Array $grouperFields  Array con campos a agrupar
+	 * @param Array $options 				Array con opciones propias del calculador
+	 *      [ignore_charges_query]: Ignora la query de cobros
 	 */
-	public function __construct(Sesion $Session, $filtersFields, $grouperFields) {
+	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $options) {
 		$this->Session = $Session;
 		$this->filtersFields = $filtersFields;
 		$this->grouperFields = $grouperFields;
+		$this->options = $options;
 	}
 
 	/**
@@ -128,7 +132,12 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	public function calculate() {
 		$this->buildWorkQuery();
 		$this->buildErrandQuery();
-		$this->buildChargeQuery();
+
+		$ignoresChargeQuery = (!empty($this->options) && $this->options['ignore_charges_query'] == true);
+
+		if (!$ignoresChargeQuery) {
+			$this->buildChargeQuery();
+		}
 
 		$results = array();
 

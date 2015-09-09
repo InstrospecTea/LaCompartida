@@ -19,8 +19,8 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	 * @param [type] $currencyId      La moneda en la que se devolverán los valores
 	 * @param [type] $proportionality La proporcionalidad en la que se deben distribuir los valores
 	 */
-	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $currencyId, $proportionality) {
-		parent::__construct($Session, $filtersFields, $grouperFields, $currencyId);
+	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $options, $currencyId, $proportionality) {
+		parent::__construct($Session, $filtersFields, $grouperFields, $options, $currencyId);
 		$this->proportionality = $proportionality;
 	}
 
