@@ -77,10 +77,6 @@ class ReporteCriteria {
 
 	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
 
-	const TIPO_TRABAJOS = 0;
-	const TIPO_TRAMITES = 1;
-	const TIPO_COBROS = 2;
-
 	public function __construct($sesion) {
 		$this->sesion = $sesion;
 	}
