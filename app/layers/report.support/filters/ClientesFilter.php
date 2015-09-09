@@ -17,7 +17,7 @@ class ClientesFilter extends AbstractUndependantFilterTranslator {
 	 * @return String
 	 */
 	function getFieldName() {
-		return 'cliente.codigo_cliente';
+		return 'filtro_cliente.codigo_cliente';
 	}
 
 	/**
