@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.18.4
+Thursday 2015, September 10th
+* **Fix** [Se corrige función que carga listado de usuarios profesional en interfaz Horas](https://github.com/LemontechSA/ttb/pull/1116)
+
 ## Hotfix 15.18.3
 Thursday 2015, September 10th
 * **Fix** [Se corrige query para permitir ver al usuario seleccionado desde el formulario sin importar su condición y permisos](https://github.com/LemontechSA/ttb/pull/1115)
