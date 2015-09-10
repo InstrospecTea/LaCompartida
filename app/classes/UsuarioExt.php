@@ -929,18 +929,18 @@ class UsuarioExt extends Usuario {
 				->add_from('usuario U')
 				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
 				->add_left_join_with('usuario_secretario US', 'US.id_profesional = U.id_usuario')
-				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'"))
-				->add_restriction(CriteriaRestriction::equals('U.activo', 1))
 		 		->add_grouping('U.id_usuario')
 		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
 
-		$clauses = array();
-		$clauses[] = CriteriaRestriction::equals('U.visible', 1);
-		$clauses[] = CriteriaRestriction::equals('U.id_usuario', $id_usuario);
+		$clauses_and = array();
+		$clauses_and[] = CriteriaRestriction::equals('U.activo', 1);
+		$clauses_and[] = CriteriaRestriction::equals('UP.codigo_permiso', "'PRO'");
+		$clauses_and[] = CriteriaRestriction::equals('U.visible', 1);
 
-		$criteria->add_restriction(
-			CriteriaRestriction::or_clause($clauses)
-		);
+		$clauses = array();
+		$clauses[] = CriteriaRestriction::and_clause($clauses_and);
+		$clauses[] = CriteriaRestriction::equals('U.id_usuario', $id_usuario);
+		$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
 
 		$clauses = array();
 
@@ -969,7 +969,7 @@ class UsuarioExt extends Usuario {
 			foreach ($result as $key => $value) {
 				$rows[$value['id_usuario']] = $value['nombre'];
 			}
-
+			
 			return $rows;
 
 		} catch (Exception $e) {
