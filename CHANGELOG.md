@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.18.3
+Thursday 2015, September 10th
+* **Fix** [Se corrige query para permitir ver al usuario seleccionado desde el formulario sin importar su condición y permisos](https://github.com/LemontechSA/ttb/pull/1115)
+
 ## Hotfix 15.18.2
 Thursday 2015, September 10th
 * **Fix** [Se corrige query para permitir ver un usuario inactivo cuando se envía `id_usuario` como parámetro](https://github.com/LemontechSA/ttb/pull/1114)
