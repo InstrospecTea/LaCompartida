@@ -116,21 +116,34 @@ class ReporteCriteria {
 		$this->setCampoFecha();
 	}
 
-	//Obtiene los tipos que son afectos a moneda
+	/**
+	 * Obtiene los tipos de datos afectos a moneda
+	 * @return Array nombres de los tipos de datos
+	 * TODO: Refactorizar a Abstractos
+	 */
 	public static function getTiposMoneda() {
-		//TODO: Refactorizar a Abstractos
 		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
 	}
 
-	//Agrega un filtro personalizado
-	public function addFiltro($tabla, $campo, $valor, $positivo = true) {
-		$direction_key = $positivo ? 'equals' : 'not_equal';
+	/**
+	 * Agrega un filtro personalizado para consultar los datos
+	 * @param string  $tabla    Es la tabla de la bd desde donde se quiere filtrar
+	 * @param string  $campo    Es el campo de la tabla que se filtrará
+	 * @param string  $valor    Es el valor buscado
+	 * @param boolean $igual    Esteblce relación de igualdad o lo contrario
+	 */
+	public function addFiltro($tabla, $campo, $valor, $igual = true) {
+		$direction_key = $igual ? 'equals' : 'not_equal';
 		$this->filtros["{$tabla}.{$campo}.{$direction_key}"] = $valor;
 	}
 
-	//Indica si el tipo de dato se calcula usando Moneda.
+	/**
+	 * Indica si el tipo de dato se calcula usando Moneda.
+	 * @param  string $tipo_dato El tipo de datos consultado
+	 * @return boolean           si requiere o no moneda
+	 * TODO: Refactorizar a Abstracto del tipo_dato
+	 */
 	public function requiereMoneda($tipo_dato) {
-		//TODO: Refactorizar a Abstracto del tipo_dato
 		$tiposMoneda = self::getTiposMoneda();
 		if (in_array($tipo_dato, $tiposMoneda)) {
 			return true;
@@ -138,8 +151,13 @@ class ReporteCriteria {
 		return false;
 	}
 
+	/**
+	 * Indica si el tipo de datos usa o no divisor
+	 * @return boolean true/false si usa o no divisor
+	 *
+	 * TODO: Esta información debería entregarla el tipo de datos
+	 */
 	public function usaDivisor() {
-		//TODO: Esta información debería entregarla el tipo de datos
 		if (in_array($this->tipo_dato, array('rentabilidad', 'rentabilidad_base', 'valor_hora', 'costo_hh'))) {
 			return true;
 		}
@@ -159,25 +177,39 @@ class ReporteCriteria {
 	}
 
 	//Agrega un Filtro de Rango de Fechas
-	public function addRangoFecha($valor1, $valor2) {
-		$this->rango['fecha_ini'] = $valor1;
-		$this->rango['fecha_fin'] = $valor2;
+	/**
+	 * Establece el rango de fechas a consultar
+	 * @param string $fecha_ini Fecha de inicio del rango en formato dd-mm-aaaa
+	 * @param string $fecha_fin Fecha de fin del rango en formato dd-mm-aaaa
+	 */
+	public function addRangoFecha($fecha_ini, $fecha_fin) {
+		$this->rango['fecha_ini'] = $fecha_ini;
+		$this->rango['fecha_fin'] = $fecha_fin;
 	}
 
+	/**
+	 * Establece la proporcionalidad del reporte
+	 * @param string $proporcionalidad cliente / estandar, default 'cliente'
+	 */
 	public function setProporcionalidad($proporcionalidad = 'cliente') {
 		$this->proporcionalidad = $proporcionalidad;
 	}
 
-	//Establece el Campo de la fecha
+	/**
+	 * Establece el campo de fecha a utilizar
+	 * @param string $campo_fecha (emision, trabajo, cobro, etc)
+	 */
 	public function setCampoFecha($campo_fecha = 'emision') {
 		$this->campo_fecha = $campo_fecha;
 	}
 
-	//Los Agrupadores definen GROUP y ORDER en las queries.
-	public function addAgrupador($s) {
-		$this->agrupador[] = $s;
-		//Para GROUP BY - Query principal por trabajos
-		switch ($s) {
+	/**
+	 * Agrega agrupadores al reporte
+	 * @param string $field campo por el que se agrupará
+	 */
+	public function addAgrupador($field) {
+		$this->agrupador[] = $field;
+		switch ($field) {
 			case "profesional":
 			case "username":
 				$this->id_agrupador[] = "id_usuario";
@@ -198,12 +230,16 @@ class ReporteCriteria {
 				break;
 
 			default:
-				$this->id_agrupador[] = $s;
+				$this->id_agrupador[] = $field;
 		}
 
 	}
 
-	//Establece la vista: los agrupadores (y su orden) son la base para la construcción de arreglos de resultado.
+	/**
+	 * Establece la vista: los agrupadores (y su orden)
+	 * son la base para la construcción de arreglos de resultado.
+	 * @param string $vista Ej: 'glosa_cliente_asunto-mes_reporte'
+	 */
 	public function setVista($vista) {
 		$this->vista = $vista;
 		$this->agrupador = array();
@@ -214,7 +250,6 @@ class ReporteCriteria {
 			return;
 		}
 
-		//Relleno Agrupadores faltantes (hasta 6)
 		while (!$agrupadores[5]) {
 			for ($i = 5; $i > 0; $i--) {
 				if (isset($agrupadores[$i - 1])) {
@@ -754,20 +789,38 @@ class ReporteCriteria {
 		return $data;
 	}
 
-	//Indica el Simbolo asociado al tipo de dato.
-	public function setFiltros($filtros) {
-		$this->parametros = $filtros;
+	/**
+	 * Entrega parámetros al reporte
+	 * @param Array $parametros Parámetros para la consulta
+	 * 	* Algunos filtros y sus valores
+	 *  * Rangos de fecha (fecha_ini, fecha_fin)
+	 *  * Tipo de Campo de Fecha (campo_fecha)
+	 *  * Tipo de dato a consultar (dato)
+	 *  * Vista de datos  (vista)
+	 *  * Porporcionalidad (prop)
+	 *  * Moneda de visualización (id_moneda)
+	 */
+	public function setFiltros($parametros) {
+		$this->parametros = $parametros;
 
-		$this->addRangoFecha($filtros['fecha_ini'], $filtros['fecha_fin']);
-		if ($filtros['campo_fecha']) {
-			$this->setCampoFecha($filtros['campo_fecha']);
+		$this->addRangoFecha($parametros['fecha_ini'], $parametros['fecha_fin']);
+		if ($parametros['campo_fecha']) {
+			$this->setCampoFecha($parametros['campo_fecha']);
 		}
-		$this->setTipoDato($filtros['dato']);
-		$this->setVista($filtros['vista']);
-		$this->setProporcionalidad($filtros['prop']);
-		$this->id_moneda = $filtros['id_moneda'];
+		$this->setTipoDato($parametros['dato']);
+		$this->setVista($parametros['vista']);
+		$this->setProporcionalidad($parametros['prop']);
+		$this->id_moneda = $parametros['id_moneda'];
 	}
 
+	/**
+	 * Obtiene el símbolo del tipo de datos
+	 * @param  string $tipo_dato El tipo de dato a consultar
+	 * @param  Sesion $sesion    La sesión activa
+	 * @param  string $id_moneda La moneda de visualización, default: 1
+	 * @return string            El símbolo del tipo de datos
+	 * TODO: El símbolo lo debería conocer y devolver cada tipo de datos
+	 */
 	public function simboloTipoDato($tipo_dato, $sesion, $id_moneda = '1') {
 		switch ($tipo_dato) {
 			case "horas_trabajadas":
