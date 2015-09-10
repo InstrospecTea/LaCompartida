@@ -780,7 +780,8 @@ $agrupadores = explode('-', $vista);
 
 if ($opc == 'print' || $opc == 'grafico' || $popup) {
 	$reporte->setCampoFecha($campo_fecha);
-	$reporte->setTipoDato($tipo_dato, $ocultar_horas_castigadas);
+	$reporte->setTipoDato($tipo_dato);
+	$reporte->setHiddePenalizedHours($ocultar_horas_castigadas);
 	$reporte->setVista($vista);
 	$reporte->addRangoFecha($fecha_ini, $fecha_fin);
 

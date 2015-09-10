@@ -41,14 +41,10 @@ class AreaTrabajoGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForCharges(Criteria $criteria) {
-		return $criteria->add_select(
-			$this->getUndefinedField(),
-			"'prm_area_trabajo.glosa'"
-		)->add_ordering(
-			"'prm_area_trabajo.glosa'"
-		)->add_grouping(
-			"'prm_area_trabajo.glosa'"
-		);
+		return $criteria->add_select($this->getUndefinedField(), "'prm_area_trabajo.glosa'")
+			->add_select($this->getUndefinedField(), 'id_area_trabajo')
+			->add_ordering("'prm_area_trabajo.glosa'")
+			->add_grouping("'prm_area_trabajo.glosa'");
 	}
 
 	/**
@@ -56,14 +52,10 @@ class AreaTrabajoGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForErrands(Criteria $criteria) {
-		return $criteria->add_select(
-			$this->getUndefinedField(),
-			"'prm_area_trabajo.glosa'"
-		)->add_ordering(
-			"'prm_area_trabajo.glosa'"
-		)->add_grouping(
-			"'prm_area_trabajo.glosa'"
-		);
+		return $criteria->add_select($this->getUndefinedField(),"'prm_area_trabajo.glosa'")
+			->add_select($this->getUndefinedField(), 'id_area_trabajo')
+			->add_ordering("'prm_area_trabajo.glosa'")
+			->add_grouping("'prm_area_trabajo.glosa'");
 	}
 
 	/**
@@ -71,18 +63,15 @@ class AreaTrabajoGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForWorks(Criteria $criteria) {
-		return $criteria->add_select(
-			$this->getSelectField()
-		)->add_ordering(
-			$this->getOrderField()
-		)->add_grouping(
-			$this->getGroupField()
-		)->add_left_join_with(
-			'prm_area_trabajo',
-			CriteriaRestriction::equals(
-				'prm_area_trabajo.id_area_trabajo',
-				'trabajo.id_area_trabajo'
-			)
-		);
+		return $criteria->add_select($this->getSelectField())
+			->add_select($this->getGroupField())
+			->add_ordering($this->getOrderField())
+			->add_grouping($this->getGroupField())
+			->add_left_join_with('prm_area_trabajo',
+				CriteriaRestriction::equals(
+					'prm_area_trabajo.id_area_trabajo',
+					'trabajo.id_area_trabajo'
+				)
+			);
 	}
 }

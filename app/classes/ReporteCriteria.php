@@ -2,7 +2,7 @@
 
 require_once dirname(dirname(__FILE__)) . '/conf.php';
 
- /**
+/**
  *
  * Permite la Visualización Agrupada de reportes
  * correspondientes a ciertos tipos de datos.
@@ -49,7 +49,7 @@ class ReporteCriteria {
 	// Sesion PHP
 	public $sesion = null;
 	// opciones para generar los reportes
-	private $options = null;
+	private $hiddePenalizedHours = null;
 	// Establece el mapping entre el tipo de dato y la Clase que lo calcula
 	private $calculationMapping = array(
 		'horas_trabajadas' => 'HorasTrabajadas',
@@ -109,7 +109,8 @@ class ReporteCriteria {
 	// Son los agrupadores por los que se pide devolver el reporte
 	// Este dato es consultado por las clases que usan Reporte
 	public $agrupador = array();
-
+	// Establece si se ignoran los cobros sin horas ni trámites
+	public $ignorar_cobros_sin_horas = false;
 
 	public function __construct($sesion) {
 		$this->sesion = $sesion;
@@ -168,15 +169,20 @@ class ReporteCriteria {
 	 * Establece el tipo de dato a buscar, y agrega los filtros correspondientes
 	 *
 	 * @param $nombre String tipo de dato a considerar en el reporte
-	 * @param $dato_extra Datos extras (usado para determinar si mostrar trabajos sin horas castigadas)
 	 * @return void sólo asigna los filtros necesarios según tipo de dato
 	 */
-	public function setTipoDato($nombre, $options = null) {
+	public function setTipoDato($nombre) {
 		$this->tipo_dato = $nombre;
-		$this->options = $options;
 	}
 
-	//Agrega un Filtro de Rango de Fechas
+	/**
+	 * Usado para determinar si ocultar trabajos sin horas castigadas
+	 * @param boolean $hiddePenalizedHours
+	 */
+	public function setHiddePenalizedHours($hiddePenalizedHours) {
+		$this->hiddePenalizedHours = $hiddePenalizedHours;
+	}
+
 	/**
 	 * Establece el rango de fechas a consultar
 	 * @param string $fecha_ini Fecha de inicio del rango en formato dd-mm-aaaa
@@ -205,7 +211,9 @@ class ReporteCriteria {
 
 	/**
 	 * Agrega agrupadores al reporte
-	 * @param string $field campo por el que se agrupará
+	 * @param string $field campo por el que se agrupar
+	 * TODO: Se debe refactorizar por que el campo correspondiente
+	 * al id_agrupador se puede obtener desde cada Grouper->getGroupField()
 	 */
 	public function addAgrupador($field) {
 		$this->agrupador[] = $field;
@@ -226,7 +234,7 @@ class ReporteCriteria {
 				$this->id_agrupador[] = "codigo_asunto";
 				break;
 			case "area_trabajo":
-				$this->id_agrupador[] = "trabajo.id_area_trabajo";
+				$this->id_agrupador[] = "id_area_trabajo";
 				break;
 
 			default:
@@ -263,67 +271,54 @@ class ReporteCriteria {
 		}
 	}
 
-	public function alt($opc1, $opc2) {
-		if (!$opc2) {
-			return $opc1;
-		} else {
-			return " IF( $opc1 IS NULL OR $opc1 = '00-00-0000' , $opc2 , $opc1 )";
-		}
-	}
-
-	public function nombre_usuario($tabla) {
-		if (Conf::GetConf($this->sesion, 'UsaUsernameEnTodoElSistema')) {
-			return "{$tabla}.username";
-		}
-		return "CONCAT_WS(' ', {$tabla}.nombre, {$tabla}.apellido1, LEFT({$tabla}.apellido2, 1))";
-	}
-
-	//Ejecuta la Query y guarda internamente las filas de resultado.
+	/**
+	 * Extrae los resultados del Tipo de Datos y guarda internamente
+	 * para postproceso
+	 *
+	 */
 	public function Query() {
-		$stringquery = "";
 		$this->row = array();
-		if (array_key_exists($this->tipo_dato, $this->calculationMapping)
-				&& !empty($this->calculationMapping[$this->tipo_dato])) {
 
-			$filtersFields = array(
-				'campo_fecha' => $this->campo_fecha,
-				'fecha_ini' => Utiles::fecha2sql($this->rango['fecha_ini']),
-				'fecha_fin' => Utiles::fecha2sql($this->rango['fecha_fin']),
-				'usuarios' => $this->sanitizeArray($this->parametros['usuarios']),
-				'clientes' => $this->sanitizeArray($this->parametros['clientes']),
-				'tipo_asunto' => $this->sanitizeArray($this->parametros['tipos_asunto']),
-				'area_asunto' => $this->sanitizeArray($this->parametros['areas_asunto']),
-				'area_usuario' => $this->sanitizeArray($this->parametros['areas_usuario']),
-				'categoria_usuario' => $this->sanitizeArray($this->parametros['categorias_usuario']),
-				'encargados' => $this->sanitizeArray($this->parametros['encargados']),
-				'estado_cobro' => $this->sanitizeArray($this->parametros['estado_cobro'])
-			);
+		// Filtros permitidos
+		$filtersFields = array(
+			'campo_fecha' => $this->campo_fecha,
+			'fecha_ini' => Utiles::fecha2sql($this->rango['fecha_ini']),
+			'fecha_fin' => Utiles::fecha2sql($this->rango['fecha_fin']),
+			'usuarios' => $this->sanitizeArray($this->parametros['usuarios']),
+			'clientes' => $this->sanitizeArray($this->parametros['clientes']),
+			'tipo_asunto' => $this->sanitizeArray($this->parametros['tipos_asunto']),
+			'area_asunto' => $this->sanitizeArray($this->parametros['areas_asunto']),
+			'area_usuario' => $this->sanitizeArray($this->parametros['areas_usuario']),
+			'categoria_usuario' => $this->sanitizeArray($this->parametros['categorias_usuario']),
+			'encargados' => $this->sanitizeArray($this->parametros['encargados']),
+			'estado_cobro' => $this->sanitizeArray($this->parametros['estado_cobro'])
+		);
 
-			$options = array();
-			$this->options = 1;
-			if (!empty($this->options) && $this->options == 1) {
-				$options['hidde_penalized_hours'] = true;
-			}
-			if ($this->ignorar_cobros_sin_horas) {
-				$options['ignore_charges_query'] = true;
-			}
+		$options = array();
 
-			$grouperFields = $this->agrupador;
-			$calculator_name = $this->calculationMapping[$this->tipo_dato];
-			$reflectedClass = new ReflectionClass("{$calculator_name}DataCalculator");
-			$calculator = $reflectedClass->newInstance(
-				$this->sesion,
-				$filtersFields,
-				$grouperFields,
-				$options,
-				$this->id_moneda,
-				$this->proporcionalidad
-			);
-
-			$this->row = $calculator->calculate();
-
-			return;
+		if (!empty($this->hiddePenalizedHours) && $this->hiddePenalizedHours == 1) {
+			$options['hidde_penalized_hours'] = true;
 		}
+		if ($this->ignorar_cobros_sin_horas) {
+			$options['ignore_charges_query'] = true;
+		}
+
+		$grouperFields = $this->agrupador;
+
+		$calculator_name = $this->calculationMapping[$this->tipo_dato];
+
+		$reflectedClass = new ReflectionClass("{$calculator_name}DataCalculator");
+		$calculator = $reflectedClass->newInstance(
+			$this->sesion,
+			$filtersFields,
+			$grouperFields,
+			$options,
+			$this->id_moneda,
+			$this->proporcionalidad
+		);
+
+		$this->row = $calculator->calculate();
+
 	}
 
 
@@ -344,11 +339,11 @@ class ReporteCriteria {
 	}
 
 
-	/*
-		Constructor de Arreglo Resultado. TIPO BARRAS.
-		Entrega un arreglo lineal de Indices, Valores y Labels. Además indica Total.
+	/**
+	 * Constructor de Arreglo Resultado. TIPO BARRAS.
+	 * Entrega un arreglo lineal de Indices, Valores y Labels. Además indica Total.
+	 * @return array
 	 */
-
 	public function toBars() {
 		$data = array();
 		$data['total'] = 0;
@@ -418,7 +413,13 @@ class ReporteCriteria {
 		return $data;
 	}
 
-	//Arregla espacios vacíos en Barras: retorna data con los labels extra de data2.
+
+	/**
+	 * Arregla espacios vacíos en Barras: retorna data con los labels extra de data2.
+	 * @param  array $data  ??
+	 * @param  array $data2 ??
+	 * @return array
+	 */
 	public function fixBar($data, $data2) {
 		foreach ($data2 as $k => $d) {
 			if (!isset($data[$k])) {
@@ -429,7 +430,11 @@ class ReporteCriteria {
 		return $data;
 	}
 
-	//divide un valor por su valor_divisor
+	/**
+	 * Divide un valor por su valor_divisor y loguarda en valor
+	 * @param  array &$a array de resultado
+	 * @return void
+	 */
 	public function dividir(&$a) {
 		if ($a['valor_divisor'] == 0) {
 			if ($a['valor'] != 0) {
@@ -440,8 +445,11 @@ class ReporteCriteria {
 		}
 	}
 
-	/* Entrega el label a usar para un agrupador */
-
+	/**
+	 * Entrega el label a usar para un agrupador
+	 * @param  string $agrupador Id Agrupador para encontrar su campo glosa
+	 * @return string            Glosa correspondiente al id agrupador
+	 */
 	public function label($agrupador) {
 		switch ($agrupador) {
 			case 'id_usuario_responsable':
@@ -454,8 +462,10 @@ class ReporteCriteria {
 		return $agrupador;
 	}
 
-	/* Constructor de Arreglo Cruzado: sólo vista Cliente o Profesional */
-
+	/**
+	 * Constructor de Arreglo Cruzado: sólo vista Cliente o Profesional
+	 * @return array Arreglo Cruzado
+	 */
 	public function toCross() {
 		$r = array();
 		$r['total'] = 0;
@@ -558,11 +568,15 @@ class ReporteCriteria {
 		return $r;
 	}
 
-	/*
-		Constructor de Arreglo Resultado. TIPO PLANILLA.
-		Entrega un arreglo con profundidad 4, de Indices, Valores y Labels. Además indica Total para cada subgrupo.
-	 */
 
+	/**
+	 * Constructor de Arreglo Resultado. TIPO PLANILLA.
+	 * Entrega un arreglo con profundidad 4, de Indices, Valores y Labels. Además indica Total para cada subgrupo.
+	 *
+	 * conocido como el velero, el crucero, entre otros.
+	 *
+	 * @return array Array de resulados tipo planilla
+	 */
 	public function toArray() {
 		$r = array(); //Arreglo resultado
 		$r['total'] = 0;
@@ -722,6 +736,12 @@ class ReporteCriteria {
 		return $r;
 	}
 
+	/**
+	 * Rellena los datos de un array con otro y limpia otros datos
+	 * @param  array &$a array de datos
+	 * @param  array $b  otro array de datos
+	 * @return void
+	 */
 	public static function rellenar(&$a, $b) {
 		$a['valor'] = 0;
 		$a['valor_divisor'] = 0;
@@ -730,7 +750,12 @@ class ReporteCriteria {
 		$a['filtro_valor'] = $b['filtro_valor'];
 	}
 
-	//Arregla espacios vacíos en Arreglos. Retorna data con los campos extra en data2 (rellenando con 0).
+	/**
+	 * Arregla espacios vacíos en Arreglos. Retorna data con los campos extra en data2 (rellenando con 0).
+	 * @param  array $data   Array de datos
+	 * @param  array $data2  Array de campos extra
+	 * @return array         Rellenado
+	 */
 	public static function fixArray($data, $data2) {
 		foreach ($data2 as $ag1 => $a) {
 			if (is_array($a)) {
@@ -807,6 +832,7 @@ class ReporteCriteria {
 		if ($parametros['campo_fecha']) {
 			$this->setCampoFecha($parametros['campo_fecha']);
 		}
+
 		$this->setTipoDato($parametros['dato']);
 		$this->setVista($parametros['vista']);
 		$this->setProporcionalidad($parametros['prop']);
@@ -862,7 +888,13 @@ class ReporteCriteria {
 		return "%";
 	}
 
-	//Indica el tipo de dato (No especifica moneda: se usa para simple comparación entre datos).
+	/**
+	 * Obtiene el símbolo del tipo de datos
+	 * (No especifica moneda: se usa para simple comparación entre datos).
+	 *
+	 * @param  string $tipo_dato Tipo de dato a evaluar
+	 * @return string            símbolo genérico del tipo de datos
+	 */
 	public static function sTipoDato($tipo_dato) {
 		switch ($tipo_dato) {
 			case "horas_trabajadas":
@@ -898,7 +930,13 @@ class ReporteCriteria {
 		return "%";
 	}
 
-	//Indica la Moneda, de ser necesaria. Se usa para añadir a un string, si lo necesita.
+	/**
+	 * Indica la Moneda, de ser necesaria. Se usa para añadir a un string, si lo necesita.
+	 * @param  string $tipo_dato Tipo de datos a evaluar
+	 * @param  Sesion $sesion    La sesión para buscar la moneda
+	 * @param  string $id_moneda Moneda (default 1)
+	 * @return string            - (Moneda)
+	 */
 	public static function unidad($tipo_dato, $sesion, $id_moneda = '1') {
 		switch ($tipo_dato) {
 			case "valor_por_cobrar":
@@ -920,7 +958,14 @@ class ReporteCriteria {
 		return "";
 	}
 
-	//Transforma las horas a hh:mm en el caso de que tenga el conf y que sean horas
+	/**
+	 * Transforma las horas a hh:mm en el caso de que tenga el conf y que sean horas
+	 * @param Sesion $sesion        La sesión para buscar cositas
+	 * @param Double $valor         Valor de horas
+	 * @param string $tipo_dato     Tipo de dato
+	 * @param string $tipo_reporte  Tipo de reporte (si va para excel)
+	 * @param array  $formato_valor Datos para hacer format
+	 */
 	public static function FormatoValor($sesion, $valor, $tipo_dato = "horas_", $tipo_reporte = "", $formato_valor = array('cifras_decimales' => 2, 'miles' => '.', 'decimales' => ',')) {
 		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, "oras_")) {
 			$valor_horas = floor($valor);
@@ -937,6 +982,5 @@ class ReporteCriteria {
 		}
 		return $valor;
 	}
-
 
 }
