@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.18.5
+Thursday 2015, September 10th
+* **Fix** [Se quita condición la cual impedía mostrar detalle del gasto (descarga masiva de cobros) pese a que el contrato lo indicara](https://github.com/LemontechSA/ttb/pull/1117)
+
 ## Hotfix 15.18.4
 Thursday 2015, September 10th
 * **Fix** [Se corrige función que carga listado de usuarios profesional en interfaz Horas](https://github.com/LemontechSA/ttb/pull/1116)
