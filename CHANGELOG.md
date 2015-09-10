@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.18.2
+Thursday 2015, September 10th
+* **Fix** [Se corrige query para permitir ver un usuario inactivo cuando se envía `id_usuario` como parámetro](https://github.com/LemontechSA/ttb/pull/1114)
+
 ## Hotfix 15.18.1
 Wednesday 2015, September 9th
 * **Feature** [Nuevo parámetro id_cobro para la integración contable BMAJ](https://github.com/LemontechSA/ttb/pull/1113)
