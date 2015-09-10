@@ -11582,10 +11582,6 @@ class NotaCobro extends Cobro {
 				$NotaCobro->fields['id_carta'] = null;
 			}
 
-			if ($NotaCobro->fields['subtotal_gastos'] == 0) {
-			   $NotaCobro->fields['opc_ver_gastos'] = 0;
-			}
-
 			if ($agrupar_cartas) {
 				$codigo_cliente = $NotaCobro->fields['codigo_cliente'];
 
