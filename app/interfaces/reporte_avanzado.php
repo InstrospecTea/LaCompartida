@@ -367,7 +367,7 @@ if (!$popup) {
 
 	<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/reporte_avanzado.js"></script>
 	<script type="text/javascript">
-		var tipos_moneda = <?php echo json_encode(array_values(ReporteCriteria::$tiposMoneda)); ?>;
+		var tipos_moneda = <?php echo json_encode(array_values(ReporteCriteria::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
 		var urlAjaxReporteAvanzado = '<?php echo Conf::RootDir(); ?>/app/interfaces/ajax/reporte_avanzado.php';
 		var buttonsReporte = {

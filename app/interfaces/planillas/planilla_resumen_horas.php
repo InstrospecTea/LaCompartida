@@ -321,7 +321,7 @@ foreach ($datos_reporte as $tipo_dato => $config) {
 	$reporte = new ReporteCriteria($Sesion);
 	$reporte->id_moneda = $id_moneda;
 	if (!empty($proporcionalidad)) {
-		$reporte->proporcionalidad = $proporcionalidad;
+		$reporte->setProporcionalidad($proporcionalidad);
 	}
 	// $fecha1 y $fecha2 deben estar en formato dd-mm-aaaa
 	$reporte->addRangoFecha($fecha1, $fecha2);

@@ -2,12 +2,56 @@
 
 require_once dirname(dirname(__FILE__)) . '/conf.php';
 
+ /**
+ *
+ * Permite la Visualización Agrupada de reportes
+ * correspondientes a ciertos tipos de datos.
+ *
+ * Tipos de dato disponibles:
+ *
+ * +-- horas_trabajadas: Total de Horas Trabajadas
+ * |  +-- horas_spot: TODO: Documentacion
+ * |  +-- horas_convenio: TODO: Documentacion
+ * |  +-- horas_cobrables: Total de Horas Trabajadas en asuntos Facturables
+ * |  |  +-- horas_visibles: Horas que ve el Cliente en nota de liquidación (tras revisión)
+ * |  |  |  +-- horas_cobradas: Horas Visibles en Liquidaciones que ya fueron Emitidas
+ * |  |  |  |  +-- horas_pagadas: Horas Cobradas en Cobros con estado Pagado
+ * |  |  |  |  \-- horas_por_pagar: Horas Cobradas que aún no han sido pagadas
+ * |  |  |  +-- horas_por_cobrar: Horas Visibles que aún no se Emiten al Cliente
+ * |  |  |  \-- horas_incobrables: Horas en Cobros Incobrables
+ * |  |  \-- horas_castigadas: Diferencia de Horas Cobrables con las Horas que ve el cliente en nota de Cobro
+ * |  \-- horas_no_cobrables: Total de Horas Trabajadas en asuntos no Facturables
+ * |
+ * +-- valor_trabajado: (no implementado)
+ * |  +-- valor_cobrable: (no implementado)
+ * |  |  +-- valor_visible: (no implementado)
+ * |  |  |  +-- valor_cobrado: Valor monetario que corresponde a cada Profesional, en una Liquidación ya Emitida
+ * |  |  |  +-- valor_tramites: Valor monetario de trámites que corresponde a cada Profesional, en una Liquidación ya Emitida
+ * |  |  |  |  +-- valor_pagado: Valor Cobrado que ha sido Pagado
+ * |  |  |  |  +-- valor_pagado_parcial: Valor Cobrado que ha sido Pagado parcialmente
+ * |  |  |  |  +-- valor_por_pagar: Valor Cobrado que aún no ha sido pagado
+ * |  |  |  |  \-- valor_por_pagar_parcial: Valor por pagar parcial
+ * |  |  |  +-- valor_por_cobrar: Valor monetario estimado que corresponde a cada Profesional en horas por cobrar
+ * |  |  |  \-- valor_incobrable: Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable
+ * |  |  +-- valor_castigado: (no implementado)
+ * |  +-- valor_no_cobrable: (no implementado)
+ * +-- valor_trabajado_estandar: Horas Trabajadas por THH Estándar, para todo Trabajo
+ * +-- valor_estandar: Valor Cobrado, si se hubiera usado THH Estándar
+ * +-- valor_cobrado_no_estandar: TODO: Documentacion
+ * +-- diferencia_valor_estandar: Valor Cobrado - Valor Estándar
+ * +-- valor_hora: Valor Cobrado / Horas Cobradas
+ * +-- rentabilidad_base: Valor Cobrado / Valor Trabajado Estándar
+ * +-- rentabilidad: Valor Cobrado / Valor Estándar
+ * +-- costo: Costo para la firma, por concepto de sueldos
+ * \-- costo_hh: Costo HH para la firma, por concepto de sueldos
+ */
 class ReporteCriteria {
 	// Sesion PHP
 	public $sesion = null;
-
+	// opciones para generar los reportes
 	private $options = null;
-	private $newCalculation = array(
+	// Establece el mapping entre el tipo de dato y la Clase que lo calcula
+	private $calculationMapping = array(
 		'horas_trabajadas' => 'HorasTrabajadas',
 		'horas_spot' => 'HorasSpot',
 		'horas_no_cobrables' => 'HorasNoCobrables',
@@ -50,39 +94,32 @@ class ReporteCriteria {
 	private $tipo_dato = null;
 	// String: establece los grupos y orden de la información
 	private $vista;
+	// Guarda los id de los agrupadores definidos en $agrupador:
+	// Ej: Agrupadores: gloa_estudio, nombre_usuario -> array('id_estudio', 'id_usuario')
+	private $id_agrupador = array();
+	// Utilizados para determinar los datos en el periodo. Default: cobro.fecha_emision.
+	private $campo_fecha = '';
+	// Determina como se calcula la proporcionalidad de los montos
+	private $proporcionalidad = 'cliente';
 
 	// Moneda en la que se quiere consultar el reporte accesible desde afuera
 	public $id_moneda = null;
 	// Arreglo con resultados, puede ser accedido desde afuera :(
 	public $row;
-
-	/*
-	TODO: Revisar desde aqui is deben ser públicas estas variables
-	 */
-	// El orden de los agrupadores
+	// Son los agrupadores por los que se pide devolver el reporte
+	// Este dato es consultado por las clases que usan Reporte
 	public $agrupador = array();
-	public $id_agrupador = array();
 
-	public $orden_agrupador = array();
-
-	// Campos utilizados para determinar los datos en el periodo. Default: trabajo.
-	public $campo_fecha = '';
-	public $campo_fecha_2 = '';
-	public $campo_fecha_3 = '';
-	public $campo_fecha_cobro = 'cobro.fecha_fin';
-	// Determina como se calcula la proporcionalidad de los montos en Flat Fee
-	public $proporcionalidad = 'estandar';
-
-	// Cuanto se repite la fila para cada agrupador
-	public $filas = array();
-
-	public static $tiposMoneda = array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
-	/*
-	TODO END
-	*/
 
 	public function __construct($sesion) {
 		$this->sesion = $sesion;
+		$this->setCampoFecha();
+	}
+
+	//Obtiene los tipos que son afectos a moneda
+	public static function getTiposMoneda() {
+		//TODO: Refactorizar a Abstractos
+		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
 	}
 
 	//Agrega un filtro personalizado
@@ -93,13 +130,16 @@ class ReporteCriteria {
 
 	//Indica si el tipo de dato se calcula usando Moneda.
 	public function requiereMoneda($tipo_dato) {
-		if (in_array($tipo_dato, self::$tiposMoneda)) {
+		//TODO: Refactorizar a Abstracto del tipo_dato
+		$tiposMoneda = self::getTiposMoneda();
+		if (in_array($tipo_dato, $tiposMoneda)) {
 			return true;
 		}
 		return false;
 	}
 
 	public function usaDivisor() {
+		//TODO: Esta información debería entregarla el tipo de datos
 		if (in_array($this->tipo_dato, array('rentabilidad', 'rentabilidad_base', 'valor_hora', 'costo_hh'))) {
 			return true;
 		}
@@ -108,40 +148,6 @@ class ReporteCriteria {
 
 	/**
 	 * Establece el tipo de dato a buscar, y agrega los filtros correspondientes
-	 * Tipos de dato disponibles:
-	 *
-	 * +-- horas_trabajadas: Total de Horas Trabajadas
-	 * |  +-- horas_cobrables: Total de Horas Trabajadas en asuntos Facturables
-	 * |  |  +-- horas_visibles: Horas que ve el Cliente en nota de liquidación (tras revisión)
-	 * |  |  |  +-- horas_cobradas: Horas Visibles en Liquidaciones que ya fueron Emitidas
-	 * |  |  |  |  +-- horas_pagadas: Horas Cobradas en Cobros con estado Pagado
-	 * |  |  |  |  \-- horas_por_pagar: Horas Cobradas que aún no han sido pagadas
-	 * |  |  |  +-- horas_por_cobrar: Horas Visibles que aún no se Emiten al Cliente
-	 * |  |  |  \-- horas_incobrables: Horas en Cobros Incobrables
-	 * |  |  \-- horas_castigadas: Diferencia de Horas Cobrables con las Horas que ve el cliente en nota de Cobro
-	 * |  \-- horas_no_cobrables: Total de Horas Trabajadas en asuntos no Facturables
-	 * |
-	 * +-- valor_trabajado: (no implementado)
-	 * |  +-- valor_cobrable: (no implementado)
-	 * |  |  +-- valor_visible: (no implementado)
-	 * |  |  |  +-- valor_cobrado: Valor monetario que corresponde a cada Profesional, en una Liquidación ya Emitida
-	 * |  |  |  +-- valor_tramites: Valor monetario de trámites que corresponde a cada Profesional, en una Liquidación ya Emitida
-	 * |  |  |  |  +-- valor_pagado: Valor Cobrado que ha sido Pagado
-	 * |  |  |  |  +-- valor_pagado_parcial: Valor Cobrado que ha sido Pagado parcialmente
-	 * |  |  |  |  +-- valor_por_pagar: Valor Cobrado que aún no ha sido pagado
-	 * |  |  |  |  \-- valor_por_pagar_parcial: Valor por pagar parcial
-	 * |  |  |  +-- valor_por_cobrar: Valor monetario estimado que corresponde a cada Profesional en horas por cobrar
-	 * |  |  |  \-- valor_incobrable: Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable
-	 * |  |  +-- valor_castigado: (no implementado)
-	 * |  +-- valor_no_cobrable: (no implementado)
-	 * +-- valor_trabajado_estandar: Horas Trabajadas por THH Estándar, para todo Trabajo
-	 * +-- valor_estandar: Valor Cobrado, si se hubiera usado THH Estándar
-	 * +-- diferencia_valor_estandar: Valor Cobrado - Valor Estándar
-	 * +-- valor_hora: Valor Cobrado / Horas Cobradas
-	 * +-- rentabilidad_base: Valor Cobrado / Valor Trabajado Estándar
-	 * +-- rentabilidad: Valor Cobrado / Valor Estándar
-	 * +-- costo: Costo para la firma, por concepto de sueldos
-	 * \-- costo_hh: Costo HH para la firma, por concepto de sueldos
 	 *
 	 * @param $nombre String tipo de dato a considerar en el reporte
 	 * @param $dato_extra Datos extras (usado para determinar si mostrar trabajos sin horas castigadas)
@@ -158,40 +164,13 @@ class ReporteCriteria {
 		$this->rango['fecha_fin'] = $valor2;
 	}
 
-	public function setProporcionalidad($valor = 'estandar') {
-		$this->proporcionalidad = $valor;
+	public function setProporcionalidad($proporcionalidad = 'cliente') {
+		$this->proporcionalidad = $proporcionalidad;
 	}
 
 	//Establece el Campo de la fecha
-	public function setCampoFecha($campo_fecha) {
-		if ($campo_fecha == 'cobro') {
-			$this->campo_fecha = 'cobro.fecha_fin';
-			$this->campo_fecha_2 = 'cobro.fecha_creacion';
-			$this->campo_fecha_3 = '';
-		}
-
-		if ($campo_fecha == 'emision') {
-			$this->campo_fecha = 'cobro.fecha_emision';
-			$this->campo_fecha_2 = '';
-			$this->campo_fecha_3 = '';
-
-			$this->campo_fecha_cobro = 'cobro.fecha_emision';
-		}
-
-		if ($campo_fecha == 'envio') {
-			$this->campo_fecha = 'cobro.fecha_enviado_cliente';
-			$this->campo_fecha_2 = '';
-			$this->campo_fecha_3 = '';
-
-			$this->campo_fecha_cobro = 'cobro.fecha_enviado_cliente';
-		}
-		if ($campo_fecha == 'facturacion') {
-			$this->campo_fecha = 'cobro.fecha_facturacion';
-			$this->campo_fecha_2 = '';
-			$this->campo_fecha_3 = '';
-
-			$this->campo_fecha_cobro = 'cobro.fecha_facturacion';
-		}
+	public function setCampoFecha($campo_fecha = 'emision') {
+		$this->campo_fecha = $campo_fecha;
 	}
 
 	//Los Agrupadores definen GROUP y ORDER en las queries.
@@ -268,10 +247,11 @@ class ReporteCriteria {
 	public function Query() {
 		$stringquery = "";
 		$this->row = array();
-		if (array_key_exists($this->tipo_dato, $this->newCalculation)
-				&& !empty($this->newCalculation[$this->tipo_dato])) {
+		if (array_key_exists($this->tipo_dato, $this->calculationMapping)
+				&& !empty($this->calculationMapping[$this->tipo_dato])) {
+
 			$filtersFields = array(
-				'campo_fecha' => $this->parametros['campo_fecha'],
+				'campo_fecha' => $this->campo_fecha,
 				'fecha_ini' => Utiles::fecha2sql($this->rango['fecha_ini']),
 				'fecha_fin' => Utiles::fecha2sql($this->rango['fecha_fin']),
 				'usuarios' => $this->sanitizeArray($this->parametros['usuarios']),
@@ -294,7 +274,7 @@ class ReporteCriteria {
 			}
 
 			$grouperFields = $this->agrupador;
-			$calculator_name = $this->newCalculation[$this->tipo_dato];
+			$calculator_name = $this->calculationMapping[$this->tipo_dato];
 			$reflectedClass = new ReflectionClass("{$calculator_name}DataCalculator");
 			$calculator = $reflectedClass->newInstance(
 				$this->sesion,

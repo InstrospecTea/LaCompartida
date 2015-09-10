@@ -2,12 +2,12 @@
 /**
  * El valor trabajado estándar corresponde
  * a la suma de "lo trabajado" valorizado según tarifa estándar.
- * 
+ *
  * Lo trabajado, para el caso de los trabajos, tiene relación con la duración. Los tipos de cambio utilizados
  * para valorizar el trabajo dependen de si el trabajo está o no en un cobro. Si esto fuera así, se utilizan
- * los tipos de cambio del cobro. En caso contrario, se utilizan los valores actuales del tipo de cambio de la 
+ * los tipos de cambio del cobro. En caso contrario, se utilizan los valores actuales del tipo de cambio de la
  * moneda por la que se va a cobrar, según el contrato del asunto al que pertenece el trabajo.
- * 
+ *
  * Para el caso de los trámites, lo trabajado tiene relación solamente con la tarifa estándar del trámite, y para
  * valorizar correctamente el valor según moneda se aplican las mismas reglas descritas en el caso de los trabajos.
  *
@@ -16,6 +16,15 @@
  *
  */
 class ValorTrabajadoEstandarDataCalculator extends AbstractCurrencyDataCalculator {
+
+
+	/**
+	 * Establece de dónde se obtiene la moneda y tipo de cambio
+	 * @return String prefijo de tabla desde donde se obtendrá la moneda
+	 */
+	function getCurrencySource() {
+		return 'cobro';
+	}
 
 	/**
 	 * Obtiene la query de trabajos correspondiente al valor cobrado estándar
