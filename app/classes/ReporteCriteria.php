@@ -134,8 +134,12 @@ class ReporteCriteria {
 	 * @param boolean $igual    Esteblce relación de igualdad o lo contrario
 	 */
 	public function addFiltro($tabla, $campo, $valor, $igual = true) {
-		$direction_key = $igual ? 'equals' : 'not_equal';
-		$this->filtros["{$tabla}.{$campo}.{$direction_key}"] = $valor;
+		$direction_key = $igual ? 'in' : 'not_in';
+		$filter_key = "{$tabla}.{$campo}.{$direction_key}";
+		if (empty($this->filtros[$filter_key])) {
+			$this->filtros[$filter_key] = array();
+		}
+		$this->filtros[$filter_key][] = $valor;
 	}
 
 	/**
@@ -293,6 +297,9 @@ class ReporteCriteria {
 			'encargados' => $this->sanitizeArray($this->parametros['encargados']),
 			'estado_cobro' => $this->sanitizeArray($this->parametros['estado_cobro'])
 		);
+
+		// Incluye filtros custom con addFiltro desde afuera
+		$filtersFields = array_merge($filtersFields, $this->filtros);
 
 		$options = array();
 

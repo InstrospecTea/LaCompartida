@@ -211,6 +211,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 						"{$class_prefix}Filter",
 						"translateFor{$type}"
 					);
+
 					if ($reflectedClass->getParentClass()->getName() == 'AbstractUndependantFilterTranslator') {
 						$Criteria = $reflectedMethod->invokeArgs(
 							$reflectedClass->newInstance($this->Session, $value),
@@ -236,10 +237,26 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 						);
 					}
 				} catch (ReflectionException $Exception) {
-					// Dejando pasasr ya que la clase no está implementada
-					// throw new ReportException($Exception->getMessage());
+					$Criteria = $this->addGenericFilterToCriteria($Criteria, $type, $key, $value);
 				}
 			}
+		}
+		return $Criteria;
+	}
+
+	function addGenericFilterToCriteria(Criteria $Criteria, $type, $key, $value) {
+		$result = preg_match('/(?P<table>\w+)\.(?P<field>\w+)\.(?P<parity>\w+)/', $key, $parts);
+		if ($result > 0) {
+			// apply Generic filter
+			$table = $parts['table'];
+			$field = $parts['field'];
+			$parity = $parts['parity'];
+			$filter = new GenericFilter($this->Session, $table, $field, $value, $parity);
+			$reflectedMethod = new ReflectionMethod(
+				'GenericFilter',
+				"translateFor{$type}"
+			);
+			$Criteria = $reflectedMethod->invokeArgs($filter, array($Criteria));
 		}
 		return $Criteria;
 	}

@@ -1,9 +1,13 @@
 <?php
 
 abstract class AbstractUndependantFilterTranslator extends BaseFilterTranslator implements IUndependantFilterTranslator {
-	public function __construct($Session, $data) {
+
+	protected $parity;
+
+	public function __construct($Session, $data, $parity = true) {
 		$this->Session = $Session;
 		$this->setFilterData($data);
+		$this->parity = $parity;
 	}
 
 	function setFilterData($data) {
@@ -18,19 +22,32 @@ abstract class AbstractUndependantFilterTranslator extends BaseFilterTranslator 
 		if (is_array($data)) {
 			return $this->addDataFromArray($data, $criteria);
 		} else {
-			return $criteria->add_restriction(
-				CriteriaRestriction::equals(
+			if ($this->parity) {
+				$restriction = CriteriaRestriction::equals(
 					$this->getFieldName(),
 					$data
-				)
-			);
+				);
+			} else {
+				$restriction = CriteriaRestriction::not_equals(
+					$this->getFieldName(),
+					$data
+				);
+			}
+			return $criteria->add_restriction($restriction);
 		}
 	}
 
 	private function addDataFromArray(array $data, Criteria $criteria) {
-		$and_wheres[] = CriteriaRestriction::in(
-			$this->getFieldName(), $data
-		);
+		if ($this->parity) {
+			$restriction = CriteriaRestriction::in(
+				$this->getFieldName(), $data
+			);
+		} else {
+			$restriction = CriteriaRestriction::not_in(
+				$this->getFieldName(), $data
+			);
+		}
+		$and_wheres[] = $restriction;
 		$criteria->add_restriction(
 			CriteriaRestriction::and_clause(
 				$and_wheres

@@ -1,6 +1,7 @@
 <?php
 
 abstract class BaseFilterTranslator implements IFilterTranslator {
+
 	public function addData($data, Criteria $criteria) {
 		if (is_array($data)) {
 			return $this->addDataFromArray($data, $criteria);
