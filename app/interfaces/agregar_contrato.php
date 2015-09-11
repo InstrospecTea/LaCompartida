@@ -2625,9 +2625,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 															errand_currency_id: errand_currency_id
 														}
 													}).done(function(data) {
-														var errand_value = data[0];
-														var value = errand_value.simbolo_moneda + ' ' + errand_value.tarifa;
-														jQuery('#included_errand_value').html(value);
+														if (errand_type_id == '' || data.length == 0) {
+															alert('La tarifa de este trámite no está definida.');
+														} else {
+															var errand_value = data[0];
+															var value = errand_value.simbolo_moneda + ' ' + errand_value.tarifa;
+															jQuery('#included_errand_value').html(value);
+														}
+
 													});
 												};
 
