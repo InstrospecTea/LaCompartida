@@ -34,6 +34,9 @@ class CobroAsunto extends Objeto {
 	}
 
 	public function eliminarAsuntos($id_cobro) {
+		if (empty($id_cobro)) {
+			return false;
+		}
 		$query = "DELETE FROM cobro_asunto WHERE id_cobro = '{$id_cobro}'";
 		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 	}
