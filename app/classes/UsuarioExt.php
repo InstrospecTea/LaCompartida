@@ -58,7 +58,7 @@ class UsuarioExt extends Usuario {
 	);
 	public $tabla = 'usuario';
 	public $campo_id = 'id_usuario';
-	public static $campo_glosa = "CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre)";
+	public $campo_glosa = "CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre)";
 	public $secretarios = null;
 
 	private $permisos_revisados = array();
@@ -939,7 +939,7 @@ class UsuarioExt extends Usuario {
 			foreach ($result as $key => $value) {
 				$rows[$value['id_usuario']] = $value['nombre'];
 			}
-			
+
 			return $rows;
 
 		} catch (Exception $e) {
@@ -1199,6 +1199,10 @@ class UsuarioExt extends Usuario {
 							$and
 						ORDER BY usuario.apellido1";
 		return $Objeto->Listar($query_extra);
+	}
+
+	public static function getCampoGlosa() {
+		return "CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre)";
 	}
 
 }

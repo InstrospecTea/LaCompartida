@@ -61,7 +61,7 @@ $formato_encabezado = & $wb->addFormat(array('Bold' => '1', 'Size' => 12, 'Align
 if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
 	$dato_usuario = "username";
 } else {
-	$dato_usuario = UsuarioExt::$campo_glosa;
+	$dato_usuario = UsuarioExt::getCampoGlosa();
 }
 
 if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
