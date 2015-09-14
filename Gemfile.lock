@@ -21,11 +21,11 @@ GEM
       i18n (~> 0.6)
       multi_json (~> 1.0)
     addressable (2.3.2)
-    aws-sdk (1.7.1)
-      httparty (~> 0.7)
+    aws-sdk (1.66.0)
+      aws-sdk-v1 (= 1.66.0)
+    aws-sdk-v1 (1.66.0)
       json (~> 1.4)
       nokogiri (>= 1.4.4)
-      uuidtools (~> 2.1)
     builder (3.0.4)
     capistrano (2.13.5)
       highline
@@ -56,12 +56,9 @@ GEM
     ffi (1.2.0-x86-mingw32)
     highline (1.6.15)
     hike (1.2.1)
-    httparty (0.9.0)
-      multi_json (~> 1.0)
-      multi_xml
     i18n (0.6.1)
     journey (1.0.4)
-    json (1.7.5)
+    json (1.8.3)
     launchy (2.1.2)
       addressable (~> 2.3)
     libwebsocket (0.1.7.1)
@@ -72,8 +69,8 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.19)
-    multi_json (1.3.7)
-    multi_xml (0.5.1)
+    mini_portile (0.6.2)
+    multi_json (1.11.2)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
     net-sftp (2.0.5)
@@ -81,8 +78,10 @@ GEM
     net-ssh (2.6.2)
     net-ssh-gateway (1.1.0)
       net-ssh (>= 1.99.1)
-    nokogiri (1.5.5)
-    nokogiri (1.5.5-x86-mingw32)
+    nokogiri (1.6.6.2)
+      mini_portile (~> 0.6.0)
+    nokogiri (1.6.6.2-x86-mingw32)
+      mini_portile (~> 0.6.0)
     polyglot (0.3.3)
     rack (1.4.1)
     rack-cache (1.2)
@@ -115,7 +114,6 @@ GEM
     treetop (1.4.12)
       polyglot
       polyglot (>= 0.3.1)
-    uuidtools (2.1.3)
     websocket (1.0.4)
     xpath (1.0.0)
       nokogiri (~> 1.3)
@@ -125,7 +123,7 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  aws-sdk
+  aws-sdk (< 2)
   capistrano
   capistrano-multiconfig
   capistrano-notifier
@@ -138,4 +136,4 @@ DEPENDENCIES
   rvm-capistrano
 
 BUNDLED WITH
-   1.10.2
+   1.10.6

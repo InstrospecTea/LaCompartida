@@ -32,7 +32,7 @@ class PrmPlugin extends Objeto {
 
 		try {
 			$result = $criteria->run();
-			return sizeof($result[0]['total']) > 0 ? TRUE : FALSE;
+			return $result[0]['total'] > 0 ? TRUE : FALSE;
 
 		} catch (Exception $e) {
 			echo "Error: {$e} {$criteria->__toString()}";

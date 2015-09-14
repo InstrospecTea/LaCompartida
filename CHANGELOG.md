@@ -1,4 +1,39 @@
 # Changelog
+## Hotfix 15.18.5
+Thursday 2015, September 10th
+* **Fix** [Se quita condición la cual impedía mostrar detalle del gasto (descarga masiva de cobros) pese a que el contrato lo indicara](https://github.com/LemontechSA/ttb/pull/1117)
+
+## Hotfix 15.18.4
+Thursday 2015, September 10th
+* **Fix** [Se corrige función que carga listado de usuarios profesional en interfaz Horas](https://github.com/LemontechSA/ttb/pull/1116)
+
+## Hotfix 15.18.3
+Thursday 2015, September 10th
+* **Fix** [Se corrige query para permitir ver al usuario seleccionado desde el formulario sin importar su condición y permisos](https://github.com/LemontechSA/ttb/pull/1115)
+
+## Hotfix 15.18.2
+Thursday 2015, September 10th
+* **Fix** [Se corrige query para permitir ver un usuario inactivo cuando se envía `id_usuario` como parámetro](https://github.com/LemontechSA/ttb/pull/1114)
+
+## Hotfix 15.18.1
+Wednesday 2015, September 9th
+* **Feature** [Nuevo parámetro id_cobro para la integración contable BMAJ](https://github.com/LemontechSA/ttb/pull/1113)
+
+## [Release 15.18.0](https://github.com/LemontechSA/ttb/pull/1104)
+Tuesday 2015, September 8th
+* **Feature** [Mejorar mensajes cobro masivo](https://github.com/LemontechSA/ttb/pull/1073)
+* **Feature** [Solicitud mejoras](https://github.com/LemontechSA/ttb/pull/1089)
+* **Feature** [Error SQL al actualizar cobro](https://github.com/LemontechSA/ttb/pull/1095)
+* **Feature** [nuevos datos facturacion electronica chile](https://github.com/LemontechSA/ttb/pull/1098)
+
+## Hotfix 15.17.11
+Monday 2015, September 7th
+* **Fix** [Formato en columna excel adelantos](https://github.com/LemontechSA/ttb/pull/1110)
+
+## Hotfix 15.17.10
+Friday 2015, September 4th
+* **Fix** [Se corrige API para historial asuntos](https://github.com/LemontechSA/ttb/pull/1109)
+
 ## Hotfix 15.17.9
 Thursday 2015, September 3rd
 * **Fix** [Corrección de las horas cobrables en el reporte avanzado](https://github.com/LemontechSA/ttb/pull/1106)
