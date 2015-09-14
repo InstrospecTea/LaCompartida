@@ -433,18 +433,6 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 }
 ?>
 <script type="text/javascript">
-	jQuery(function() {
-		jQuery(".formacobro").change(function() {
-			if (jQuery(this).val() != 'FLAT FEE' && jQuery("#tabla_fechas #id_body").children().length > 1) {
-				if(! confirm("El contrato tiene cobros programados, ¿está seguro que desea cambia la Forma de Tarificación?")) {
-					jQuery("#div_cobro label").removeClass('ui-state-focus');
-					jQuery("label[for='fc3']").trigger("click");
-					jQuery("input:radio#fc3").trigger("click");
-				};
-			};
-		});
-	});
-
 	function Volver(form) {
 			window.opener.location = 'agregar_cliente.php?id_cliente=<?php echo $Cliente->fields['id_cliente'] ?>';
 			window.close();
