@@ -100,7 +100,7 @@ class ReporteCriteria {
 	// Utilizados para determinar los datos en el periodo. Default: cobro.fecha_emision.
 	private $campo_fecha = '';
 	// Determina como se calcula la proporcionalidad de los montos
-	private $proporcionalidad = 'cliente';
+	private $proporcionalidad = 'estandar';
 
 	// Moneda en la que se quiere consultar el reporte accesible desde afuera
 	public $id_moneda = null;
@@ -115,6 +115,7 @@ class ReporteCriteria {
 	public function __construct($sesion) {
 		$this->sesion = $sesion;
 		$this->setCampoFecha();
+		$this->setProporcionalidad();
 	}
 
 	/**
@@ -201,7 +202,7 @@ class ReporteCriteria {
 	 * Establece la proporcionalidad del reporte
 	 * @param string $proporcionalidad cliente / estandar, default 'cliente'
 	 */
-	public function setProporcionalidad($proporcionalidad = 'cliente') {
+	public function setProporcionalidad($proporcionalidad = 'estandar') {
 		$this->proporcionalidad = $proporcionalidad;
 	}
 
@@ -209,7 +210,7 @@ class ReporteCriteria {
 	 * Establece el campo de fecha a utilizar
 	 * @param string $campo_fecha (emision, trabajo, cobro, etc)
 	 */
-	public function setCampoFecha($campo_fecha = 'emision') {
+	public function setCampoFecha($campo_fecha = 'trabajo') {
 		$this->campo_fecha = $campo_fecha;
 	}
 
@@ -282,7 +283,7 @@ class ReporteCriteria {
 	 */
 	public function Query() {
 		$this->row = array();
-
+		//pr($this->campo_fecha);exit;
 		// Filtros permitidos
 		$filtersFields = array(
 			'campo_fecha' => $this->campo_fecha,
@@ -309,8 +310,13 @@ class ReporteCriteria {
 		if ($this->ignorar_cobros_sin_horas) {
 			$options['ignore_charges_query'] = true;
 		}
-
 		$grouperFields = $this->agrupador;
+
+		// pr($filtersFields);
+		// pr($grouperFields);
+		// pr($options);
+		// pr($this->proporcionalidad);
+		// pr($this->id_moneda);
 
 		$calculator_name = $this->calculationMapping[$this->tipo_dato];
 
@@ -323,7 +329,7 @@ class ReporteCriteria {
 			$this->id_moneda,
 			$this->proporcionalidad
 		);
-
+		//pr($calculator->calculate());
 		$this->row = $calculator->calculate();
 
 	}
@@ -591,6 +597,7 @@ class ReporteCriteria {
 
 		$agrupador_temp = array('a', 'b', 'c', 'd', 'e', 'f');
 		$id_temp = array('id_a', 'id_b', 'id_c', 'id_d', 'id_e', 'id_f');
+
 		for ($k = 0; $k < 6; ++$k) {
 			${$agrupador_temp[$k]} = $this->agrupador[$k];
 

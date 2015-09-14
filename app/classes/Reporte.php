@@ -1228,6 +1228,7 @@ class Reporte {
 
     $agrupador_temp = array('a', 'b', 'c', 'd', 'e', 'f');
     $id_temp = array('id_a', 'id_b', 'id_c', 'id_d', 'id_e', 'id_f');
+
     for ($k = 0; $k < 6; ++$k) {
       ${$agrupador_temp[$k]} = $this->agrupador[$k];
 

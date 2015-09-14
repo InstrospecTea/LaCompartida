@@ -38,7 +38,9 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 
 	function translateForCharges(Criteria $Criteria) {
 		$filters = $this->getFilterData();
-
+		if ($this->getParentFilter() == 'trabajo') {
+			return $Criteria;
+		}
 		if ($this->getParentFilter() != 'trabajo') {
 			$field_name = $this->getFieldName();
 		} else {
@@ -67,7 +69,9 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 
 	function translateForErrands(Criteria $Criteria) {
 		$filters = $this->getFilterData();
-
+		if ($this->getParentFilter() == 'trabajo') {
+			return $Criteria;
+		}
 		if ($this->getParentFilter() != 'trabajo') {
 			$field_name = $this->getFieldName();
 		} else {

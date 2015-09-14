@@ -33,7 +33,7 @@ abstract class AbstractUndependantFilterTranslator extends BaseFilterTranslator 
 					$data
 				);
 			}
-			return $criteria->add_restriction($restriction);
+			return $criteria->add_restriction($restriction)->add_select($this->getFieldName());
 		}
 	}
 
@@ -52,7 +52,7 @@ abstract class AbstractUndependantFilterTranslator extends BaseFilterTranslator 
 			CriteriaRestriction::and_clause(
 				$and_wheres
 			)
-		);
+		)->add_select($this->getFieldName());
 		return $criteria;
 	}
 }

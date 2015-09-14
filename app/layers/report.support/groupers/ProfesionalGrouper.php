@@ -42,6 +42,7 @@ class ProfesionalGrouper extends AbstractGrouperTranslator {
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getUndefinedField(), 'profesional')
+			->add_select($this->getUndefinedField(), 'id_usuario')
 			->add_grouping($this->getUndefinedField())
 			->add_ordering($this->getUndefinedField());
 
@@ -56,6 +57,7 @@ class ProfesionalGrouper extends AbstractGrouperTranslator {
 	function translateForErrands(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'profesional')
+			->add_select($this->getGroupField())
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with(
@@ -77,6 +79,7 @@ class ProfesionalGrouper extends AbstractGrouperTranslator {
 	function translateForWorks(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'profesional')
+			->add_select($this->getGroupField())
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with(

@@ -43,6 +43,8 @@ class TipoAsuntoGrouper extends AbstractGrouperTranslator {
 		return $criteria->add_select(
 			$this->getSelectField(),
 			'tipo_asunto'
+		)->add_select(
+			$this->getGroupField()
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
@@ -76,6 +78,8 @@ class TipoAsuntoGrouper extends AbstractGrouperTranslator {
 		return $criteria->add_select(
 			$this->getSelectField(),
 			'tipo_asunto'
+		)->add_select(
+			$this->getGroupField()
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(
@@ -103,6 +107,8 @@ class TipoAsuntoGrouper extends AbstractGrouperTranslator {
 		return $criteria->add_select(
 			$this->getSelectField(),
 			'tipo_asunto'
+		)>add_select(
+			$this->getGroupField()
 		)->add_ordering(
 			$this->getOrderField()
 		)->add_grouping(

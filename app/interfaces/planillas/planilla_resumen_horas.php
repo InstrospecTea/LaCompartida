@@ -404,8 +404,8 @@ function imprimir_datos_columna($ws, $reporte, $tipo_dato, $ids, $columna, $form
 	$reporte->setVista($vista);
 	$reporte->Query();
 	$r = $reporte->toArray();
-	foreach ($r as $k_a => $a) {
-		if (is_array($a)) {
+
+	foreach ($r as $k_a => $a) {{
 			foreach ($a as $filtro) {
 				if ($filtro['filtro_campo'] == 'id_usuario' || $filtro['filtro_campo'] == 'codigo_cliente' || $filtro['filtro_campo'] == 'mes_reporte' || $filtro['filtro_campo'] == 'codigo_asunto') {
 					for ($t = 0; $t < count($ids); ++$t) {

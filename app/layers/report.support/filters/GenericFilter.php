@@ -11,7 +11,21 @@ class GenericFilter extends AbstractUndependantFilterTranslator {
 
 	private $tableName;
 	private $fieldName;
-
+	private $cancelWorksTable = array(
+		'tramite'
+	);
+	private $cancelErrandsTable = array(
+		'trabajo',
+		'prm_area_trabajo'
+	);
+	private $cancelChargesTable = array(
+		'trabajo',
+		'tramite',
+		'usuario',
+		'prm_area_usuario',
+		'prm_area_trabajo',
+		'prm_categoria_usuario'
+	);
 	public function __construct($Session, $tableName, $fieldName, $data, $parity) {
 		$this->Session = $Session;
 		$this->tableName = $tableName;
@@ -33,6 +47,9 @@ class GenericFilter extends AbstractUndependantFilterTranslator {
 	 * @return Criteria Query builder con las restricciones del filtro ya aplicadas.
 	 */
 	function translateForCharges(Criteria $criteria) {
+		if (in_array($this->tableName, $this->cancelChargesTable)) {
+			return $criteria;
+		}
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria
@@ -45,6 +62,9 @@ class GenericFilter extends AbstractUndependantFilterTranslator {
 	 * @return Criteria Query builder con las restricciones del filtro ya aplicadas.
 	 */
 	function translateForErrands(Criteria $criteria) {
+		if (in_array($this->tableName, $this->cancelErrandsTable)) {
+			return $criteria;
+		}
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria
@@ -57,6 +77,9 @@ class GenericFilter extends AbstractUndependantFilterTranslator {
 	 * @return Criteria Query builder con las restricciones del filtro ya aplicadas.
 	 */
 	function translateForWorks(Criteria $criteria) {
+		if (in_array($this->tableName, $this->cancelWorksTable)) {
+			return $criteria;
+		}
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria

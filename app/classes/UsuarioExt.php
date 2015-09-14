@@ -58,7 +58,7 @@ class UsuarioExt extends Usuario {
 	);
 	public $tabla = 'usuario';
 	public $campo_id = 'id_usuario';
-	public $campo_glosa = "CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre)";
+	public static $campo_glosa = "CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre)";
 	public $secretarios = null;
 
 	private $permisos_revisados = array();
@@ -1082,7 +1082,7 @@ class UsuarioExt extends Usuario {
 	/**
 	 * resumen_actividades.php
 	 *
-	 * Retorna listado de usuarios 
+	 * Retorna listado de usuarios
 	 *
 	 * @return array $rows contiene un arreglo con los usuarios según la query previa
 	 */
@@ -1217,7 +1217,7 @@ class UsuarioExt extends Usuario {
 	 */
 	public function ListarActivos($where = '', $con_permisos = false) {
 		$Objeto = new Objeto($this->sesion, '', '', $this->tabla, $this->campo_id, $this->campo_glosa);
-		
+
 		$permisos = '';
 		if ($con_permisos !== false) {
 			$and_permisos = $con_permisos === true ? '' : "AND usuario_permiso.codigo_permiso = '{$con_permisos}'";

@@ -42,6 +42,7 @@ class GlosaGrupoClienteGrouper extends AbstractGrouperTranslator {
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'glosa_grupo_cliente')
+			->add_select($this->getGroupField())
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with('contrato',
@@ -83,6 +84,7 @@ class GlosaGrupoClienteGrouper extends AbstractGrouperTranslator {
 	function translateForWorks(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'glosa_grupo_cliente')
+			->add_select($this->getGroupField())
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with('asunto',

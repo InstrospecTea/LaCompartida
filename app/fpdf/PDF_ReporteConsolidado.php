@@ -185,7 +185,7 @@
 
 		function getDatos($tipo_dato, $fecha_desde, $fecha_hasta, $detalles=false, $vista='mes_reporte-glosa_cliente', $campo_fecha='trabajo')
 		{
-			$reporte = new Reporte($this->sesion);
+			$reporte = new ReporteCriteria($this->sesion);
 			$reporte->id_moneda = $this->id_moneda;
 			$reporte->addRangoFecha($fecha_desde, $fecha_hasta);
 			$reporte->setTipoDato($tipo_dato);
@@ -193,7 +193,7 @@
 			$reporte->setCampoFecha($campo_fecha);
 			if($this->areas_excluidas[0])
 				foreach($this->areas_excluidas as $area)
-					$reporte->addFiltro('asunto', 'id_area_proyecto', $area, false);		
+					$reporte->addFiltro('asunto', 'id_area_proyecto', $area, false);
 			$reporte->Query();
 			if($detalles)
 				return $reporte->toBars();
@@ -207,15 +207,15 @@
 			$datos = array();
 			# Últimos 12 meses
 			$fecha_desde = '01-'.($this->fecha_mes==12?'01-'.$this->fecha_anio:$this->fecha_mes+1 .'-'.($this->fecha_anio-1));
-			$fecha_hasta = $this->largo_mes[$this->fecha_mes-1].'-'.$this->fecha_mes.'-'.$this->fecha_anio;		
+			$fecha_hasta = $this->largo_mes[$this->fecha_mes-1].'-'.$this->fecha_mes.'-'.$this->fecha_anio;
 			//Normalmente cada columna stackearía las 4 barras. Esto se arregla poniendo 'NoValue' para que no muestre una barra.
 			$datos[] = array($this->getDatos($tipo_dato, $fecha_desde, $fecha_hasta),NoValue,NoValue);
 			$por_cobrar_doce_meses = $this->getDatos('valor_por_cobrar', $fecha_desde, $fecha_hasta);
-			
+
 			# Año en curso
 			$fecha_desde = '01-01-'.$this->fecha_anio;
 			$fecha_hasta = $this->largo_mes[$this->fecha_mes-1].'-'.$this->fecha_mes.'-'.$this->fecha_anio;
-			$datos[] = array(NoValue,$this->getDatos($tipo_dato, $fecha_desde, $fecha_hasta),NoValue);			
+			$datos[] = array(NoValue,$this->getDatos($tipo_dato, $fecha_desde, $fecha_hasta),NoValue);
 			$por_cobrar_anyo_en_curso = $this->getDatos('valor_por_cobrar', $fecha_desde, $fecha_hasta);
 
 			# Mes actual
@@ -228,7 +228,7 @@
 			$nombres = array(__('Promedio mensual 12 meses'),
 							__('Promedio mensual año actual'),
 							__('Mes actual'));
-			
+
 
 			$opciones = array('no_aggregate_layer'=>true,'top_margin'=>40);
 			if( max($datos[0][0],$datos[1][1],($datos[2][2]+$datos[3][2])) > 10000)
@@ -246,7 +246,7 @@
 			$grafico->layer->AddDataSet($datos[2],$colores[2],'Cobrado');
 			$grafico->layer->AddDataSet($datos[3],$colores[3],'por Cobrar');
 
-			
+
 			$label_12_meses = '<*size=14*><*block*><*color=8855BB*>'.number_format($datos[3][0],2,',','.').'<*/*><*br*><*block*><*color=000000*>'.number_format($datos[0][0],2,',','.').'<*/*>';
 			$box[0] = $grafico->layer->addCustomGroupLabel(0, 0, $label_12_meses, 'arial.ttf', 14, 0);
 
@@ -647,13 +647,13 @@
 				if($nombres[0][$w] == null)
 				{
 					for($j=0; $j<3; ++$j)
-					{						
+					{
 						$datos_visibles[$j][$w] = NoValue;
 						$datos_castigadas[$j][$w] = NoValue;
 						$datos_no_cobrables[$j][$w] = NoValue;
 					}
 				}
-				else 
+				else
 				//-cuyo valor sea 0
 				{
 						for($j=0; $j<3; ++$j)
@@ -692,7 +692,7 @@
 							$labels_especiales[$k] .= '<*block,angle=90*><*color='.$color_castigadas.'*> '.number_format($datos_castigadas[$k][$i+$j],0,',','.').'<*/*><*br*>';
 						$labels_especiales[$k] .='<*block ,angle=90*><*color=000000*> '.number_format($datos_visibles[$k][$i+$j],0,',','.').'<*/*>';
 
-						
+
 						if( ceil($datos_castigadas[$k][$i+$j]) < 1)
 							$mostrar_vertical = false;
 					}
@@ -727,21 +727,21 @@
 			$dato_base[0][0] = $this->getDatos('valor_cobrado', $fecha_desde, $fecha_hasta, true, $campo_desglose);
 			$dato_base[0][1] = $this->getDatos('valor_por_cobrar', $fecha_desde, $fecha_hasta, true, $campo_desglose);
 
-			
+
 			// Año en curso
 			$fecha_desde = '01-01-'.$this->fecha_anio;
 
 			$dato_base[1][0] = $this->getDatos('valor_cobrado', $fecha_desde, $fecha_hasta, true, $campo_desglose);
 			$dato_base[1][1] = $this->getDatos('valor_por_cobrar', $fecha_desde, $fecha_hasta, true, $campo_desglose);
-			
+
 			// Mes actual
 			$fecha_desde = '01-'.$this->fecha_mes.'-'.$this->fecha_anio;
 
 			$dato_base[2][0] = $this->getDatos('valor_cobrado', $fecha_desde, $fecha_hasta, true, $campo_desglose);
 			$dato_base[2][1] = $this->getDatos('valor_por_cobrar', $fecha_desde, $fecha_hasta, true, $campo_desglose);
 
-			//Debo rellenar todos los 'agujeros': columnas que no existen en una barra se llenarán como 0. 
-			//toda_columna tendrá un arreglo de las columnas de cada barra con valor 0. Luego las barras reciben estas columnas. 
+			//Debo rellenar todos los 'agujeros': columnas que no existen en una barra se llenarán como 0.
+			//toda_columna tendrá un arreglo de las columnas de cada barra con valor 0. Luego las barras reciben estas columnas.
 			$toda_columna = array('total_divisor'=>0,'total'=>0,'barras'=>0);
 			for($i=0;$i<3;$i++)
 				for($j=0;$j<2;$j++)
@@ -753,8 +753,8 @@
 			//El rellenar los 'agujeros' dejó el orden de los labels-valores diferentes en los arreglos. Debo determinar el orden de los labels y luego ordenar los valores de acuerdo a ese orden. Utilizaré $toda_columna para guardar el valor a ordernar (mes actual: valor_cobrado + valor_por_cobrar)
 			foreach($toda_columna as $k => $v)
 				if(is_array($v))
-					$toda_columna[$k]['valor'] = $dato_base[2][0][$k]['valor'] + $dato_base[2][1][$k]['valor']; 
-			
+					$toda_columna[$k]['valor'] = $dato_base[2][0][$k]['valor'] + $dato_base[2][1][$k]['valor'];
+
 			//Se ordena por el valor de $toda_columna
 			arsort($toda_columna);
 
@@ -764,7 +764,7 @@
 					for($i=0;$i<3;$i++)
 						for($j=0;$j<2;$j++)
 							$dato_ordenado[$i][$j][$k] = $dato_base[$i][$j][$k];
-				
+
 
 			for($i=0;$i<3;$i++)
 			{
@@ -775,7 +775,7 @@
 			$nombres = array();
 			$datos = array();
 			$datos_por_cobrar = array();
-			
+
 			$total = array(); // Usado solo para ordenar los datos
 			$divisores = array(12, $this->fecha_mes, 1);
 
@@ -787,8 +787,8 @@
 
 						$datos[$j][] = $v['valor']/$divisores[$j]; //NoValue ;
 						$datos_por_cobrar[$j][] = $dato_por_cobrar;
-						
-						$total[$j][] += $v['valor']/$divisores[$j] + $valores_por_cobrar[$j][$k]['valor']/$divisores[$j]; 
+
+						$total[$j][] += $v['valor']/$divisores[$j] + $valores_por_cobrar[$j][$k]['valor']/$divisores[$j];
 						$nombres[$j][] = $v['label'];
 					}
 
@@ -832,12 +832,12 @@
 				if($nombres[0][$w] == null)
 				{
 					for($j=0; $j<3; ++$j)
-					{						
+					{
 						$datos[$j][$w] = NoValue;
 						$datos_por_cobrar[$j][$w] = NoValue;
 					}
 				}
-				else 
+				else
 				//-cuyo valor sea 0
 				{
 						for($j=0; $j<3; ++$j)
@@ -845,7 +845,7 @@
 								$datos_por_cobrar[$j][$w] = NoValue;
 				}
 			}
-				
+
 
 			for($i=0; $i<count($datos[0]); $i+=$this->max_por_grafico)
 			{

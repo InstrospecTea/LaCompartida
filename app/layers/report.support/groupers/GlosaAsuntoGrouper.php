@@ -61,6 +61,7 @@ class GlosaAsuntoGrouper extends AbstractGrouperTranslator {
 	function translateForErrands(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'glosa_asunto')
+			->add_select($this->getGroupField())
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with('asunto',
@@ -78,6 +79,7 @@ class GlosaAsuntoGrouper extends AbstractGrouperTranslator {
 	function translateForWorks(Criteria $Criteria) {
 		$Criteria
 			->add_select($this->getSelectField(), 'glosa_asunto')
+			->add_select($this->getGroupField())
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
 			->add_left_join_with('asunto',
