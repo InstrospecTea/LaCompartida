@@ -18,6 +18,9 @@ class CobroAsunto extends Objeto {
 	}
 
 	public function agregarAsuntos($id_cobro, $codigo_cliente, $asuntos_activos = true) {
+		if (empty($id_cobro)) {
+			return false;
+		}
 		$_asuntos_activos = $asuntos_activos ? '1' : '0';
 
 		$query = "SELECT id_moneda, codigo_asunto FROM asunto WHERE codigo_cliente = '{$codigo_cliente}' AND activo = '{$_asuntos_activos}'";
