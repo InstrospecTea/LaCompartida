@@ -1354,7 +1354,7 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('id_moneda', $this->fields['id_moneda']);
 					$trabajo->Edit('duracion_retainer', "$horas_retainer:$minutos_retainer:00");
 					$trabajo->Edit('fecha_cobro', date('Y-m-d H:i:s'));
-					$trabajo->Edit('tarifa_hh', $profesional[$id_usuario]['tarifa']);
+					$trabajo->Edit('tarifa_hh', number_format($profesional[$id_usuario]['tarifa'],6,'.',''));
 
 					$cache_key = "tarifa_defecto_{$id_usuario}_{$this->fields['id_moneda']}";
 					if (isset($tarifa_cache[$cache_key])) {

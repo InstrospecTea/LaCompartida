@@ -1,4 +1,9 @@
 # Changelog
+## Hotfix 15.18.6
+Friday 2015, September 11th
+* **Fix** [Corregir tarifa en cobro Excel](https://github.com/LemontechSA/ttb/pull/1118)
+* **Fix** [Corrección Error SQL eliminar asunto y validación al cambiar forma tarificación](https://github.com/LemontechSA/ttb/pull/1118)
+
 ## Hotfix 15.18.5
 Thursday 2015, September 10th
 * **Fix** [Se quita condición la cual impedía mostrar detalle del gasto (descarga masiva de cobros) pese a que el contrato lo indicara](https://github.com/LemontechSA/ttb/pull/1117)

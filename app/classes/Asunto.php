@@ -566,6 +566,27 @@ class Asunto extends Objeto {
 
     public function Eliminar() {
         $id_contrato_indep = $this->fields['id_contrato_indep'];
+
+        if (! empty($id_contrato_indep)) {
+            $criteria = new Criteria($this->sesion);
+            $criteria->add_select('COUNT(*)', 'total')
+                    ->add_from('cobro_pendiente')
+                    ->add_restriction(CriteriaRestriction::equals('id_contrato', $id_contrato_indep));
+
+            try {
+                $result = $criteria->run();
+                $cobro_pendiente = ($result[0]['total'] > 0) ? true : false;
+
+            } catch (Exception $e) {
+                echo "Error: {$e} {$criteria->__toString()}";
+            }
+
+            if ($cobro_pendiente) {
+                $this->error = __('El') . ' ' . __('contrato') . ' ' . __('del') . ' ' . __('asunto') . ' ' . __('tiene cobros programados configurados, no se puede eliminar el') . ' ' . __('asunto.');
+                return false;
+            }
+        }
+
         if ($this->Delete()) {
             if (!empty($id_contrato_indep)) {
                 $ContratoIndependiente = new Contrato($this->sesion);
