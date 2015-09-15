@@ -1,7 +1,7 @@
 # Changelog
 ## Hotfix 15.18.7
 Tuesday 2015, September 15th
-* **Fix** [Error SQL - Insertar Cobro Asunto]()
+* **Fix** [Error SQL - Insertar Cobro Asunto](https://github.com/LemontechSA/ttb/pull/1121)
 
 ## Hotfix 15.18.6
 Friday 2015, September 11th
