@@ -582,7 +582,7 @@ class Asunto extends Objeto {
             }
 
             if ($cobro_pendiente) {
-                $this->error = __('El') . ' ' . __('contrato') . ' ' . __('del') . ' ' . __('asunto') . ' ' . __('tiene cobros pendientes asiociados, no se puede eliminar el') . ' ' . __('asunto.');
+                $this->error = __('El') . ' ' . __('contrato') . ' ' . __('del') . ' ' . __('asunto') . ' ' . __('tiene cobros programados configurados, no se puede eliminar el') . ' ' . __('asunto.');
                 return false;
             }
         }

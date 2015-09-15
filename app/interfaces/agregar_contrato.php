@@ -636,7 +636,7 @@ $Html = new \TTB\Html();
 		}
 
 		if (laID != "fc3" && jQuery("#tabla_fechas #id_body").children().length > 1) {
-			if(! confirm("El contrato tiene cobros programados, ¿está seguro que desea cambia la Forma de Tarificación?")) {
+			if(! confirm("El contrato tiene cobros programados, ¿está seguro que desea cambia la Forma de Tarificación?. Al aceptar, los cobros programados serán eliminados.")) {
 				laID = "fc3";
 			};
 		};
