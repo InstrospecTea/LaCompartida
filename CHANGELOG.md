@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.18.8
+Tuesday 2015, September 15th
+* **Fix** [Se corrige API para historial asuntos](https://github.com/LemontechSA/ttb/pull/1124)
+
 ## Hotfix 15.18.7
 Tuesday 2015, September 15th
 * **Fix** [Error SQL - Insertar Cobro Asunto](https://github.com/LemontechSA/ttb/pull/1121)
