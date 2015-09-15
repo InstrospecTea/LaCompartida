@@ -330,6 +330,11 @@ class Factura extends Objeto {
 			'title' => 'Fecha Anulación',
 			'format' => 'date',
 			'visible' => false,
+		),
+		array(
+			'field' => 'dte_folio_fiscal',
+			'title' => 'Folio Fiscal',
+			'visible' => false
 		)
 	);
 
@@ -2592,7 +2597,8 @@ class Factura extends Objeto {
 								, GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
 								, factura.RUT_cliente
 								, prm_estudio.glosa_estudio
-								, factura.fecha_anulacion";
+								, factura.fecha_anulacion
+								, factura.dte_folio_fiscal";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (
