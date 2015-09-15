@@ -3026,8 +3026,8 @@ class Factura extends Objeto {
 	 * 
 	 * Obtiene el tipo de cambio para un cobro en especÌfico
 	 * 
-	 * @param string $id_moneda id correspondiente al tipo de moneda que se est· utilizando
-	 * @return float tipo cambio para la fecha que se emitiÛ el cobro
+	 * @param string $factura_id_moneda id correspondiente al tipo de moneda que se est· utilizando
+	 * @return float tipo cambio para la fecha que se emitió el cobro
 	 */
 	public function get_tipo_cambio($factura_id_moneda)
 	{
