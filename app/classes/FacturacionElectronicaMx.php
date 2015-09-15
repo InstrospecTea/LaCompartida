@@ -134,6 +134,9 @@ EOF;
 					$Factura->Edit('dte_estado', $estado_dte);
 					$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
 
+					preg_match('/UUID="([a-zA-Z0-9-]+)"/', $result->descripcion, $folio_fiscal);
+					$Factura->Edit('dte_folio_fiscal', $folio_fiscal[1]);
+
 					$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
 					$file_data = base64_decode($result->documentopdf);
 					$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
