@@ -255,13 +255,15 @@ if ($opcion == 'guardar') {
 
 				// Cobro pendiente
 				CobroPendiente::EliminarPorContrato($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-				for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
-					$CobroPendiente = new CobroPendiente($Sesion);
-					$CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-					$CobroPendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
-					$CobroPendiente->Edit("descripcion", $valor_descripcion[$i]);
-					$CobroPendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
-					$CobroPendiente->Write();
+				if ($contrato->fields['forma_cobro'] == 'FLAT FEE') {
+					for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
+						$CobroPendiente = new CobroPendiente($Sesion);
+						$CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+						$CobroPendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
+						$CobroPendiente->Edit("descripcion", $valor_descripcion[$i]);
+						$CobroPendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
+						$CobroPendiente->Write();
+					}
 				}
 
 				foreach (array_keys($hito_fecha) as $i) {
