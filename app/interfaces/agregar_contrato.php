@@ -634,16 +634,18 @@ $Html = new \TTB\Html();
 				laID='fc8';
 			}
 		}
+
 		if (laID != "fc3" && jQuery("#tabla_fechas #id_body").children().length > 1) {
-			jQuery("#div_cobro label").removeClass('ui-state-focus');
-			jQuery("#div_cobro label").removeClass('ui-state-active');
 			if(! confirm("El contrato tiene cobros programados, ¿está seguro que desea cambia la Forma de Tarificación?")) {
-				jQuery("[for='fc3']").addClass('ui-state-focus');
-				jQuery("[for='fc3']").addClass('ui-state-active');
-				jQuery("#fc3").attr('checked', true);
 				laID = "fc3";
 			};
 		};
+
+		jQuery("#div_cobro label").removeClass('ui-state-focus');
+		jQuery("#div_cobro label").removeClass('ui-state-active');
+		jQuery("[for='" + laID + "']").addClass('ui-state-focus');
+		jQuery("[for='" + laID + "']").addClass('ui-state-active');
+		jQuery("#" + laID).attr('checked', true);
 
 		jQuery("#div_forma_cobro").css({'width':'400px','margin-left':'21%'}).hide();
 		jQuery("#div_retainer_usuarios").css('display','inline').hide();
