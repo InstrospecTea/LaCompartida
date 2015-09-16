@@ -101,8 +101,8 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'glosa_estudio'
 	);
 
-	private $filtersFields = array();
-	private $grouperFields = array();
+	protected $filtersFields = array();
+	protected $grouperFields = array();
 	protected $options = array();
 
 	private $WorksCriteria;
@@ -315,25 +315,25 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	function getBaseChargeQuery($Criteria) {
 		$Criteria->add_from('cobro');
 
-		$Criteria
-			->add_left_join_with('cobro_asunto',
-				CriteriaRestriction::equals('cobro_asunto.id_cobro','cobro.id_cobro'))
-			->add_left_join_with('asunto',
-				CriteriaRestriction::equals('asunto.codigo_asunto','cobro_asunto.codigo_asunto'))
-			->add_grouping('asunto.id_asunto')
-			->add_grouping('cobro.id_cobro');
+		// $Criteria
+		// 	->add_left_join_with('cobro_asunto',
+		// 		CriteriaRestriction::equals('cobro_asunto.id_cobro','cobro.id_cobro'))
+		// 	->add_left_join_with('asunto',
+		// 		CriteriaRestriction::equals('asunto.codigo_asunto','cobro_asunto.codigo_asunto'))
+		// 	->add_grouping('asunto.id_asunto')
+		// 	->add_grouping('cobro.id_cobro');
 
-		$SubCriteria = new Criteria();
-		$SubCriteria->add_from('cobro_asunto')
-			->add_select('id_cobro')
-			->add_select('count(codigo_asunto)', 'total_asuntos')
-			->add_grouping('id_cobro');
+		// $SubCriteria = new Criteria();
+		// $SubCriteria->add_from('cobro_asunto')
+		// 	->add_select('id_cobro')
+		// 	->add_select('count(codigo_asunto)', 'total_asuntos')
+		// 	->add_grouping('id_cobro');
 
-		$Criteria->add_left_join_with_criteria(
-			$SubCriteria,
-			'asuntos_cobro',
-			CriteriaRestriction::equals('asuntos_cobro.id_cobro', 'cobro.id_cobro')
-		);
+		// $Criteria->add_left_join_with_criteria(
+		// 	$SubCriteria,
+		// 	'asuntos_cobro',
+		// 	CriteriaRestriction::equals('asuntos_cobro.id_cobro', 'cobro.id_cobro')
+		// );
 
 		// $and_wheres = array(
 		// 	CriteriaRestriction::equals('cobro.incluye_honorarios', '1'),
