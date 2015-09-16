@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.18.10
+Wednesday 2015, September 16th
+* **Fix** [Se cambia id_codigo por codigo en clase PrmCodigo](https://github.com/LemontechSA/ttb/pull/1126)
+
 ## Hotfix 15.18.9
 Wednesday 2015, September 16th
 * **Fix** [Se añade 00/100 en facturas](https://github.com/LemontechSA/ttb/pull/1125)
