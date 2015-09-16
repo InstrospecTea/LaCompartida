@@ -31,7 +31,7 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado_parcial')
 			->add_left_join_with(
-				'neteo_documento nd', 
+				'neteo_documento nd',
 				CriteriaRestriction::equals(
 					'nd.id_documento_cobro',
 					'documento.id_documento'
@@ -73,7 +73,7 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado_parcial')
 			->add_left_join_with(
-				'neteo_documento nd', 
+				'neteo_documento nd',
 				CriteriaRestriction::equals(
 					'nd.id_documento_cobro',
 					'documento.id_documento'
@@ -102,15 +102,19 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 	 */
 	function getReportChargeQuery(Criteria $Criteria) {
 		$billed_amount = '
-			SUM((nd.valor_pago_honorarios/(total_asuntos)) * cobro_moneda_documento.tipo_cambio)
-			*
-			(1 / cobro_moneda.tipo_cambio)
+			(
+				SUM(nd.valor_pago_honorarios * cobro_moneda_documento.tipo_cambio)
+				*
+				(1 / cobro_moneda.tipo_cambio)
+			)
+			/
+			asuntos_cobro.total_asuntos
 		';
 
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado_parcial')
 			->add_left_join_with(
-				'neteo_documento nd', 
+				'neteo_documento nd',
 				CriteriaRestriction::equals(
 					'nd.id_documento_cobro',
 					'documento.id_documento'
@@ -127,8 +131,7 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 						"'N'"
 					)
 				)
-			)
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL')));
+			)->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL')));
 	}
 
 }
