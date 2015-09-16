@@ -4,16 +4,16 @@
  *
  * * Filtra por:
  * * Cobros: El cliente al que pertenecen los asuntos del cobro.
- * * Tr√°mites: El cliente al que pertenece el asunto del tr√°mite.
+ * * Tr·mites: El cliente al que pertenece el asunto del tr·mite.
  * * Trabajos: El cliente al que pertenece el asunto del trabajo.
  *
- * M√°s info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Filtro:-Cliente
+ * M·s info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Filtro:-Cliente
  *
  */
 class ClientesFilter extends AbstractUndependantFilterTranslator {
 
 	/**
-	 * Obtiene el nombre del campo que se filtrar√°
+	 * Obtiene el nombre del campo que se filtrar·
 	 * @return String
 	 */
 	function getFieldName() {
@@ -30,26 +30,16 @@ class ClientesFilter extends AbstractUndependantFilterTranslator {
 			$this->getFilterData(),
 			$criteria
 		)->add_left_join_with(
-			'cobro_asunto as filtro_cliente_cobro_asunto',
-			CriteriaRestriction::equals(
-				'filtro_cliente_cobro_asunto.id_cobro', 'cobro.id_cobro'
-			)
-		)->add_left_join_with(
-			'asunto as filtro_cliente_asunto',
-			CriteriaRestriction::equals(
-				'filtro_cliente_asunto.codigo_asunto', 'filtro_cliente_cobro_asunto.codigo_asunto'
-			)
-		)->add_left_join_with(
 			'cliente as filtro_cliente',
 			CriteriaRestriction::equals(
-				'filtro_cliente.codigo_cliente', 'filtro_cliente_asunto.codigo_cliente'
+				'filtro_cliente.codigo_cliente', 'cobro.codigo_cliente'
 			)
 		);
 	}
 
 	/**
-	 * Traduce el filtro para el caso de los tr√°mites
-	 * @param  Criteria $criteria Query builder asociado a los tr√°mites
+	 * Traduce el filtro para el caso de los tr·mites
+	 * @param  Criteria $criteria Query builder asociado a los tr·mites
 	 * @return Criteria Query builder con las restricciones del filtro ya aplicadas.
 	 */
 	function translateForErrands(Criteria $criteria) {
