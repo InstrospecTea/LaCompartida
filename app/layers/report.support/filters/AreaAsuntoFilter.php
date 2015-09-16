@@ -26,6 +26,8 @@ class AreaAsuntoFilter extends AbstractUndependantFilterTranslator {
 	 * @return Criteria Query builder con las restricciones del filtro ya aplicadas.
 	 */
 	function translateForCharges(Criteria $criteria) {
+		$this->addMatterCountSubcriteria($criteria);
+		
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria

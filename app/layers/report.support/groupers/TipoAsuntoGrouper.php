@@ -40,6 +40,8 @@ class TipoAsuntoGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForCharges(Criteria $criteria) {
+		$this->addMatterCountSubcriteria($criteria);
+		
 		return $criteria->add_select(
 			$this->getSelectField(),
 			'tipo_asunto'

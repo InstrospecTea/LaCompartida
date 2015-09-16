@@ -40,6 +40,9 @@ class AreaAsuntoGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForCharges(Criteria $criteria) {
+		
+		$this->addMatterCountSubcriteria($criteria);
+
 		return $criteria->add_select(
 			$this->getSelectField(),
 			'area_asunto'

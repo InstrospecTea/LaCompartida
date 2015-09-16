@@ -131,4 +131,22 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGADO')));
 	}
 
+	function getChargeBilledAmount() {
+		if ($this->isFilteringByMatter() || $this->isGroupingByMatter()) {
+			return '
+				SUM(nd.valor_pago_honorarios * cobro_moneda_documento.tipo_cambio)
+				*
+				(1 / cobro_moneda.tipo_cambio)
+				/
+				asuntos_cobro.total_asuntos
+			';
+		} else {
+			return '
+				SUM(nd.valor_pago_honorarios * cobro_moneda_documento.tipo_cambio)
+				*
+				(1 / cobro_moneda.tipo_cambio)
+			';
+		}
+	}
+
 }

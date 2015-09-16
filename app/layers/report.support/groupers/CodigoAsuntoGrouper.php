@@ -40,6 +40,8 @@ class CodigoAsuntoGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForCharges(Criteria $Criteria) {
+		$this->addMatterCountSubcriteria($Criteria);
+
 		$Criteria
 			->add_select($this->getSelectField(), 'codigo_asunto')
 			->add_grouping($this->getGroupField())
