@@ -83,7 +83,7 @@ class FacturaPdfDatos extends Objeto {
 		$condicion_pago = $factura->ObtieneGlosaCondicionPago();
 		// Segmento Monto en palabra solicitado por @gtigre
 		$arreglo_monedas = Moneda::GetMonedas($this->sesion, null, true);
-		$monto_palabra=new MontoEnPalabra($this->sesion);
+		$monto_palabra = new MontoEnPalabra($this->sesion);
 
 		$monto_total_factura = $factura->fields['total'];
 
@@ -104,7 +104,7 @@ class FacturaPdfDatos extends Objeto {
 		if (empty($monto_parte_decimal)) {
 			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, $codigo));
 			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
-			$monto_en_palabra_cero_cien = $monto_total_palabra_fix;
+			$monto_en_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' 00/100 ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
 		} else {
 			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, $codigo));
 			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal * $fix_decimal, $codigo));
@@ -235,7 +235,7 @@ class FacturaPdfDatos extends Objeto {
 			'moneda_honorarios' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_gastos_con_iva' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
 			'moneda_gastos_sin_iva' => $arreglo_monedas[$factura->fields['id_moneda']]['simbolo'],
-			'monto_en_palabra' => mb_strtoupper($monto_en_palabra_cero_cien, 'ISO-8859-1'),
+			'monto_en_palabra' => mb_strtoupper($monto_total_palabra_fix, 'ISO-8859-1'),
 			'monto_total_palabra' => mb_strtoupper($monto_total_palabra_fix, 'ISO-8859-1'),
 			'monto_en_palabra_cero_cien' => mb_strtoupper($monto_en_palabra_cero_cien, 'ISO-8859-1'),
 			'porcentaje_impuesto' => $factura->fields['porcentaje_impuesto']."%",
