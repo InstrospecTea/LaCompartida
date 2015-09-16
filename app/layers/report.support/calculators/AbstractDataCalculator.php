@@ -142,17 +142,17 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$results = array();
 
 		if (!empty($this->WorksCriteria)) {
-			//pr($this->WorksCriteria->get_plain_query());
+			pr($this->WorksCriteria->get_plain_query());
 			$results = array_merge($results, $this->WorksCriteria->run());
 		}
 
 		if (!empty($this->ErrandsCriteria)) {
-			//pr($this->ErrandsCriteria->get_plain_query());
+			pr($this->ErrandsCriteria->get_plain_query());
 			$results = array_merge($results, $this->ErrandsCriteria->run());
 		}
 
 		if (!empty($this->ChargesCriteria)) {
-			//pr($this->ChargesCriteria->get_plain_query());
+			pr($this->ChargesCriteria->get_plain_query());
 			$results = array_merge($results, $this->ChargesCriteria->run());
 		}
 		return $results;
@@ -335,12 +335,32 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			CriteriaRestriction::equals('asuntos_cobro.id_cobro', 'cobro.id_cobro')
 		);
 
+		// $and_wheres = array(
+		// 	CriteriaRestriction::equals('cobro.incluye_honorarios', '1'),
+		// 	CriteriaRestriction::greater_than('cobro.monto_subtotal', '0'),
+		// 	CriteriaRestriction::equals('cobro.monto_thh', '0'),
+		// 	CriteriaRestriction::equals('cobro.monto_thh_estandar', '0'),
+		// 	CriteriaRestriction::equals('cobro.monto_tramites', '0')
+		// );
+
+		$Criteria->add_left_join_with(
+			'trabajo',
+			CriteriaRestriction::equals(
+				'cobro.id_cobro',
+				'trabajo.id_cobro'
+			)
+		)->add_left_join_with(
+			'tramite',
+			CriteriaRestriction::equals(
+				'cobro.id_cobro',
+				'tramite.id_cobro'
+			)
+		);
+
 		$and_wheres = array(
 			CriteriaRestriction::equals('cobro.incluye_honorarios', '1'),
-			CriteriaRestriction::greater_than('cobro.monto_subtotal', '0'),
-			CriteriaRestriction::equals('cobro.monto_thh', '0'),
-			CriteriaRestriction::equals('cobro.monto_thh_estandar', '0'),
-			CriteriaRestriction::equals('cobro.monto_tramites', '0')
+			CriteriaRestriction::is_null('trabajo.id_trabajo'),
+			CriteriaRestriction::is_null('tramite.id_tramite')
 		);
 		$Criteria->add_restriction(CriteriaRestriction::and_clause($and_wheres));
 

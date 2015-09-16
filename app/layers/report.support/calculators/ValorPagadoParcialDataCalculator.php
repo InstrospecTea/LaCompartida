@@ -4,7 +4,7 @@
  * Esta información se obtiene de: Trabajos, Trámites y Cobros sin trabajos ni trámites
  *
  * Condiciones para obtener un valor cobrado:
- * 	* Que exista un cobro en estado: PAGADO_PARCIAL
+ * 	* Que exista un cobro en estado: PAGO_PARCIAL
  *	* Que lo que se esté cobrando sea Cobrable
  *
  * Más info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Pagado-Parcial
@@ -22,28 +22,33 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 			{$factor}
 			*
 			(
-				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
+				nd.valor_pago_honorarios * cobro_moneda_documento.tipo_cambio
 			)
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
-		$partial_billed_amount = "(SUM(
-			{$factor}
-			*
-			(
-				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
-		)
-		*
-		(1 / cobro_moneda.tipo_cambio)) * (1 - (documento.saldo_honorarios / documento.honorarios))";
-
 		$Criteria
-			->add_select("({$billed_amount}) - ({$partial_billed_amount})", 'valor_pagado_parcial')
+			->add_select($billed_amount, 'valor_pagado_parcial')
+			->add_left_join_with(
+				'neteo_documento nd', 
+				CriteriaRestriction::equals(
+					'nd.id_documento_cobro',
+					'documento.id_documento'
+				)
+			)->add_left_join_with(
+				'documento documento_pago',
+				CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals(
+						'nd.id_documento_pago',
+						'documento_pago.id_documento'
+					),
+					CriteriaRestriction::not_equal(
+						'documento_pago.tipo_doc',
+						"'N'"
+					)
+				)
+			)
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
 			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL')));
 	}
@@ -59,28 +64,33 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 			{$factor}
 			*
 			(
-				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
+				nd.valor_pago_honorarios * cobro_moneda_documento.tipo_cambio
 			)
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
-		$partial_billed_amount = "(SUM(
-			{$factor}
-			*
-			(
-				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
-		)
-		*
-		(1 / cobro_moneda.tipo_cambio)) * (1 - (documento.saldo_honorarios / documento.honorarios))";
-
 		$Criteria
-			->add_select("({$billed_amount}) - ({$partial_billed_amount})", 'valor_pagado_parcial')
+			->add_select($billed_amount, 'valor_pagado_parcial')
+			->add_left_join_with(
+				'neteo_documento nd', 
+				CriteriaRestriction::equals(
+					'nd.id_documento_cobro',
+					'documento.id_documento'
+				)
+			)->add_left_join_with(
+				'documento documento_pago',
+				CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals(
+						'nd.id_documento_pago',
+						'documento_pago.id_documento'
+					),
+					CriteriaRestriction::not_equal(
+						'documento_pago.tipo_doc',
+						"'N'"
+					)
+				)
+			)
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
 			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL')));
 	}
@@ -91,15 +101,33 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 	 * @return void
 	 */
 	function getReportChargeQuery(Criteria $Criteria) {
-		$partial_billed_amount = "(1 / IFNULL(asuntos_cobro.total_asuntos, 1))
-			* SUM((cobro.monto_subtotal - cobro.descuento)
-				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-				* (1 - documento.saldo_honorarios / documento.honorarios)
-				/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-			)";
+		$billed_amount = '
+			SUM(nd.valor_pago_honorarios * cobro_moneda_documento.tipo_cambio)
+			*
+			(1 / cobro_moneda.tipo_cambio)
+		';
 
 		$Criteria
-			->add_select($partial_billed_amount, 'valor_pagado_parcial')
+			->add_select($billed_amount, 'valor_pagado_parcial')
+			->add_left_join_with(
+				'neteo_documento nd', 
+				CriteriaRestriction::equals(
+					'nd.id_documento_cobro',
+					'documento.id_documento'
+				)
+			)->add_left_join_with(
+				'documento documento_pago',
+				CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals(
+						'nd.id_documento_pago',
+						'documento_pago.id_documento'
+					),
+					CriteriaRestriction::not_equal(
+						'documento_pago.tipo_doc',
+						"'N'"
+					)
+				)
+			)
 			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL')));
 	}
 
