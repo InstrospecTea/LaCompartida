@@ -329,6 +329,19 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			)
 		);
 
+		$SubCriteria = new Criteria();
+		$SubCriteria->add_from('cobro_asunto')
+			->add_select('id_cobro')
+			->add_select('count(codigo_asunto)', 'total_asuntos')
+			->add_grouping('id_cobro');
+
+		$Criteria->add_left_join_with_criteria(
+			$SubCriteria,
+			'asuntos_cobro',
+			CriteriaRestriction::equals('asuntos_cobro.id_cobro', 'cobro.id_cobro')
+		);
+
+
 		$and_wheres = array(
 			CriteriaRestriction::equals('cobro.incluye_honorarios', '1'),
 			CriteriaRestriction::is_null('trabajo.id_trabajo'),
