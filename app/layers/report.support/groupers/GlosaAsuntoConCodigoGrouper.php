@@ -42,6 +42,9 @@ class GlosaAsuntoConCodigoGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForCharges(Criteria $Criteria) {
+
+		$this->addMatterCountSubcriteria($Criteria);
+
 		$Criteria
 			->add_select($this->getSelectField(), 'glosa_asunto_con_codigo')
 			->add_select($this->getGroupField())

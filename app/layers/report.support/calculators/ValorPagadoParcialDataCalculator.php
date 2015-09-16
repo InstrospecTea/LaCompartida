@@ -60,6 +60,7 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 	 */
 	function getReportErrandQuery(Criteria $Criteria) {
 		$factor = $this->getErrandsProportionalFactor();
+
 		$billed_amount =  "SUM(
 			{$factor}
 			*
@@ -101,15 +102,8 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 	 * @return void
 	 */
 	function getReportChargeQuery(Criteria $Criteria) {
-		$billed_amount = '
-			(
-				SUM(nd.valor_pago_honorarios * cobro_moneda_documento.tipo_cambio)
-				*
-				(1 / cobro_moneda.tipo_cambio)
-			)
-			/
-			asuntos_cobro.total_asuntos
-		';
+
+		$billed_amount = $this->getChargeBilledAmount();
 
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado_parcial')
@@ -132,6 +126,26 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 					)
 				)
 			)->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL')));
+	}
+
+	function getChargeBilledAmount() {
+		if ($this->isFilteringByMatter() || $this->isGroupingByMatter()) {
+			return '
+				(
+					SUM(nd.valor_pago_honorarios * cobro_moneda_documento.tipo_cambio)
+					*
+					(1 / cobro_moneda.tipo_cambio)
+				)
+				/
+				asuntos_cobro.total_asuntos
+			';
+		} else {
+			return '
+				SUM(nd.valor_pago_honorarios * cobro_moneda_documento.tipo_cambio)
+				*
+				(1 / cobro_moneda.tipo_cambio)
+			';
+		}
 	}
 
 }
