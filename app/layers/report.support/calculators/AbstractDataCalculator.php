@@ -315,34 +315,6 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	function getBaseChargeQuery($Criteria) {
 		$Criteria->add_from('cobro');
 
-		// $Criteria
-		// 	->add_left_join_with('cobro_asunto',
-		// 		CriteriaRestriction::equals('cobro_asunto.id_cobro','cobro.id_cobro'))
-		// 	->add_left_join_with('asunto',
-		// 		CriteriaRestriction::equals('asunto.codigo_asunto','cobro_asunto.codigo_asunto'))
-		// 	->add_grouping('asunto.id_asunto')
-		// 	->add_grouping('cobro.id_cobro');
-
-		// $SubCriteria = new Criteria();
-		// $SubCriteria->add_from('cobro_asunto')
-		// 	->add_select('id_cobro')
-		// 	->add_select('count(codigo_asunto)', 'total_asuntos')
-		// 	->add_grouping('id_cobro');
-
-		// $Criteria->add_left_join_with_criteria(
-		// 	$SubCriteria,
-		// 	'asuntos_cobro',
-		// 	CriteriaRestriction::equals('asuntos_cobro.id_cobro', 'cobro.id_cobro')
-		// );
-
-		// $and_wheres = array(
-		// 	CriteriaRestriction::equals('cobro.incluye_honorarios', '1'),
-		// 	CriteriaRestriction::greater_than('cobro.monto_subtotal', '0'),
-		// 	CriteriaRestriction::equals('cobro.monto_thh', '0'),
-		// 	CriteriaRestriction::equals('cobro.monto_thh_estandar', '0'),
-		// 	CriteriaRestriction::equals('cobro.monto_tramites', '0')
-		// );
-
 		$Criteria->add_left_join_with(
 			'trabajo',
 			CriteriaRestriction::equals(
@@ -466,6 +438,39 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		}
 		if ($this->filtersFields['campo_fecha'] == 'trabajo' && $kind == 'charge') {
 			return true;
+		}
+		return false;
+	}
+
+	protected $matterFilters = array(
+		'area_asunto',
+		'tipo_asunto'
+	);
+
+	function isFilteringByMatter() {
+		foreach ($this->matterFilters as $matterFilter) {
+			if (in_array($matterFilter, $this->filtersFields)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected $matterGroupers = array(
+		'area_asunto',
+		'codigo_asunto',
+		'codigo_asunto_secundario',
+		'glosa_asunto',
+		'glosa_asunto_con_codigo',
+		'glosa_cliente_asunto',
+		'tipo_asunto'
+	);
+
+	function isGroupingByMatter() {
+		foreach ($this->matterGroupers as $matterGrouper) {
+			if (in_array($matterGrouper, $this->grouperFields)) {
+				return true;
+			}
 		}
 		return false;
 	}
