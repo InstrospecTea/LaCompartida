@@ -137,6 +137,7 @@ $_LANG['Estimado'] = "Dear";
 $_LANG['Tipos de Cambio'] = "Exchange Rates";
 $_LANG['Dólar'] = "Dollar";
 $_LANG['Dólares'] = "Dollars";
+$_LANG['Dólares Americanos'] = "American Dollars";
 $_LANG['Euro'] = "Euro";
 $_LANG['Libra'] = "Pound";
 $_LANG['Libras'] = "Pounds";

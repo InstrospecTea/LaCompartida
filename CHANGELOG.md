@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.18.9
+Wednesday 2015, September 16th
+* **Fix** [Se añade 00/100 en facturas](https://github.com/LemontechSA/ttb/pull/1125)
+
 ## Hotfix 15.18.8
 Tuesday 2015, September 15th
 * **Fix** [Se corrige API para historial asuntos](https://github.com/LemontechSA/ttb/pull/1124)
