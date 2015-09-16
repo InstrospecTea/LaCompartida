@@ -102,7 +102,7 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 	 */
 	function getReportChargeQuery(Criteria $Criteria) {
 		$billed_amount = '
-			SUM(nd.valor_pago_honorarios * cobro_moneda_documento.tipo_cambio)
+			SUM((nd.valor_pago_honorarios/(total_asuntos)) * cobro_moneda_documento.tipo_cambio)
 			*
 			(1 / cobro_moneda.tipo_cambio)
 		';
