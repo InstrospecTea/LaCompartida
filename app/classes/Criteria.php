@@ -234,7 +234,9 @@ class Criteria {
 	 */
 	public function add_custom_join_with_criteria(Criteria $criteria, $alias, $join_condition, $join_type = 'LEFT') {
 		$new_clause = " $join_type JOIN ({$criteria->get_plain_query()}) AS $alias ON $join_condition ";
-		$this->join_clauses[] = $new_clause;
+		if (!$this->check_if_exists($this->join_clauses, $new_clause)) {
+			$this->join_clauses[] = $new_clause;
+		}
 		return $this;
 	}
 
