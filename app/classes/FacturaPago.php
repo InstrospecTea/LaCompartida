@@ -360,6 +360,7 @@ class FacturaPago extends Objeto {
 			,cuenta_banco.numero as numero_cuenta
 			,prm_moneda.glosa_moneda
 			,factura_pago.pago_retencion
+			,factura_pago.nro_documento
 		FROM factura_pago
 		LEFT JOIN cliente ON cliente.codigo_cliente = factura_pago.codigo_cliente
 		LEFT JOIN prm_banco ON prm_banco.id_banco = factura_pago.id_banco
@@ -368,7 +369,7 @@ class FacturaPago extends Objeto {
 		LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura_pago = factura_pago.id_factura_pago
 		WHERE factura_pago.id_factura_pago = '" . $this->Id() . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($id_mvto_pago, $glosa_cliente, $rut_cliente, $glosa_banco, $numero_cuenta, $glosa_moneda, $pago_retencion) = mysql_fetch_array($resp);
+		list($id_mvto_pago, $glosa_cliente, $rut_cliente, $glosa_banco, $numero_cuenta, $glosa_moneda, $pago_retencion, $nro_documento) = mysql_fetch_array($resp);
 
 		$mvto = new CtaCteFactMvto($this->sesion);
 		$lista = $mvto->GetNeteosSoyPago($id_mvto_pago);
@@ -415,7 +416,7 @@ class FacturaPago extends Objeto {
 				$html = str_replace('%cta_bco%', __('Cta. Bco.'), $html);
 				$html = str_replace('%moneda%', __('Moneda'), $html);
 
-				$html = str_replace('%Num_valor%', $this->fields['nro_documento'], $html);
+				$html = str_replace('%cheque_valor%', $nro_documento, $html);
 				$html = str_replace('%rut_valor%', $rut_cliente_encabezado, $html);
 				$html = str_replace('%cliente_valor%', $glosa_cliente_encabezado, $html);
 				$html = str_replace('%cheque_valor%', $this->fields['nro_cheque'], $html);
