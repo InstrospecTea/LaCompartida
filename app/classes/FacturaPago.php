@@ -416,7 +416,7 @@ class FacturaPago extends Objeto {
 				$html = str_replace('%cta_bco%', __('Cta. Bco.'), $html);
 				$html = str_replace('%moneda%', __('Moneda'), $html);
 
-				$html = str_replace('%Num_valor%', $nro_documento, $html);
+				$html = str_replace('%cheque_valor%', $nro_documento, $html);
 				$html = str_replace('%rut_valor%', $rut_cliente_encabezado, $html);
 				$html = str_replace('%cliente_valor%', $glosa_cliente_encabezado, $html);
 				$html = str_replace('%cheque_valor%', $this->fields['nro_cheque'], $html);
