@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 15.18.11
+Thursday 2015, September 17th
+* **Fix** [Se añade variable a query para mostrarla en voucher](https://github.com/LemontechSA/ttb/pull/1127)
+
 ## Hotfix 15.18.10
 Wednesday 2015, September 16th
 * **Fix** [Se cambia id_codigo por codigo en clase PrmCodigo](https://github.com/LemontechSA/ttb/pull/1126)
