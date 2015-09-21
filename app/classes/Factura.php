@@ -3027,4 +3027,25 @@ class Factura extends Objeto {
 
 		return $this->twig->render($template, $this->template_data);
 	}
+	
+	/**
+	 * 
+	 * Obtiene el tipo de cambio para un cobro en especÌfico
+	 * 
+	 * @param string $factura_id_moneda id correspondiente al tipo de moneda que se est· utilizando
+	 * @return float tipo cambio para la fecha que se emitió el cobro
+	 */
+	public function get_tipo_cambio($factura_id_moneda)
+	{
+		//  OBTENIENDO DATOS DE MONEDA PARA EL TIPO DE CAMBIO
+		$query_moneda_tipo_cambio = "SELECT cobro_moneda.tipo_cambio
+						FROM cobro_moneda
+						 LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro_moneda.id_moneda
+						WHERE cobro_moneda.id_cobro =  '" . $this->fields["id_cobro"] . "' AND cobro_moneda.id_moneda = '" . $factura_id_moneda . "' ";
+
+		$resp_tipo_cambio = mysql_query($query_moneda_tipo_cambio, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_tipo_cambio, __FILE__, __LINE__, $this->sesion->dbh);
+		list( $tipo_cambio_moneda ) = mysql_fetch_array($resp_tipo_cambio);
+		return $tipo_cambio_moneda;
+	}
+
 }

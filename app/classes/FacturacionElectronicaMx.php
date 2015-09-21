@@ -278,7 +278,7 @@ EOF;
 				'folio|' . $Factura->fields['numero'],
 				'fecha|' . Utiles::sql2date($Factura->fields['fecha'] . ' ' . $mx_hour, '%Y-%m-%dT%H:%M:%S'),
 				'formaDePago|' . 'PAGO EN UNA SOLA EXHIBICION',
-				'TipoCambio|' . number_format($Factura->fields['tipo_cambio'], 2, '.', ''),
+				'TipoCambio|' . number_format($Factura->get_tipo_cambio($Factura->fields['id_moneda']), 2, '.', ''),
 				'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],
 				'Moneda|' . ($monedas[$Factura->fields['id_moneda']]['codigo']),
 				'metodoDePago|' . self::PaymentMethod($Sesion, $Factura),
