@@ -386,7 +386,6 @@ function CargarTrabajo($usuario, $password, $id_trabajo_local, $codigo_asunto, $
 
 function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto, $codigo_actividad, $descripcion, $ordenado_por, $fecha, $duracion, $area_trabajo, $app_id) {
 	$sesion = new Sesion();
-	
 
 	$_SESSION['app_id'] = $app_id;
 
@@ -396,26 +395,42 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 
 	if ($sesion->VerificarPassword($usuario, $password)) {
 		if (Conf::GetConf($sesion, 'CodigoSecundario')) {
-			$query_codigo = "SELECT codigo_asunto FROM asunto WHERE codigo_asunto_secundario='$codigo_asunto'";
+			$codigo_asunto_secundario = $codigo_asunto;
+			$query_codigo = "SELECT asunto.codigo_asunto FROM asunto WHERE asunto.codigo_asunto_secundario = '{$codigo_asunto_secundario}'";
+
 			if (!($resp_codigo = mysql_query($query_codigo, $sesion->dbh))) {
 				return new soap_fault('Client', '', mysql_error(), '');
 			}
+
 			list($codigo_asunto) = mysql_fetch_array($resp_codigo);
+
+			if (empty($codigo_asunto)) {
+				return new soap_fault('Client', '', "Error al seleccionar un asunto, el asunto '{$codigo_asunto_secundario}' no existe.", '');
+			}
+		} else {
+			$query = "SELECT COUNT(*) AS existe_asunto FROM asunto WHERE asunto.codigo_asunto = '{$codigo_asunto}'";
+			$rs_asunto = mysql_query($query, $sesion->dbh);
+			$asunto = mysql_fetch_assoc($rs_asunto);
+
+			if ($asunto['existe_asunto'] == '0') {
+				return new soap_fault('Client', '', "Error al seleccionar un asunto, el asunto '{$codigo_asunto}' no existe.", '');
+			}
 		}
 
-		$query = "SELECT contrato.id_moneda, asunto.cobrable FROM contrato JOIN asunto on asunto.id_contrato = contrato.id_contrato WHERE codigo_asunto='$codigo_asunto'";
+		$query = "SELECT contrato.id_moneda, asunto.cobrable FROM contrato JOIN asunto on asunto.id_contrato = contrato.id_contrato WHERE codigo_asunto = '{$codigo_asunto}'";
 		if (!($resp = mysql_query($query, $sesion->dbh))) {
 			return new soap_fault('Client', '', mysql_error(), '');
 		}
+
 		list($id_moneda, $cobrable) = mysql_fetch_array($resp);
 
 		$minutos = $duracion / 60;
 		$min = $minutos % 60;
 		$hora = ($minutos - $min) / 60;
-		$min = $min < 10 ? "0$min" : $min;
-		$hora = $hora < 10 ? "0$hora" : $hora;
+		$min = $min < 10 ? "0{$min}" : $min;
+		$hora = $hora < 10 ? "0{$hora}" : $hora;
 
-		$query = "SELECT id_usuario, id_categoria_usuario ,dias_ingreso_trabajo FROM usuario WHERE rut='$usuario'";
+		$query = "SELECT id_usuario, id_categoria_usuario ,dias_ingreso_trabajo FROM usuario WHERE rut = '{$usuario}'";
 		if (!($resp = mysql_query($query, $sesion->dbh))) {
 			return new soap_fault('Client', '', mysql_error(), '');
 		}
@@ -427,7 +442,7 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		if ($codigo_actividad == '') {
 			$codigo_actividad = 'NULL';
 		} else {
-			$codigo_actividad = "'$codigo_actividad'";
+			$codigo_actividad = "'{$codigo_actividad}'";
 		}
 
 		if ($id_moneda == '') {
@@ -451,7 +466,7 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 
 		$trabajo = new Trabajo($sesion);
 		$date_time = new DateTime($fecha);
-		$fecha = $date_time->sub(date_interval_create_from_date_string("$duracion seconds"));
+		$fecha = $date_time->sub(date_interval_create_from_date_string("{$duracion} seconds"));
 
 		$trabajo->Edit('id_usuario', $id_usuario);
 		$trabajo->Edit('id_categoria_usuario', $id_categoria_usuario);
@@ -463,24 +478,22 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 		$trabajo->Edit('id_moneda', $id_moneda);
 		$trabajo->Edit('cobrable', $cobrable);
 		$trabajo->Edit('fecha', $fecha->format('Y-m-d'));
-		$trabajo->Edit('duracion', "$hora:$min:00");
-		$trabajo->Edit('duracion_cobrada', "$hora:$min:00");
+		$trabajo->Edit('duracion', "{$hora}:{$min}:00");
+		$trabajo->Edit('duracion_cobrada', "{$hora}:{$min}:00");
 		$trabajo->Edit('id_area_trabajo', $id_area_trabajo);
 
-
 		if (!$trabajo->Write()) {
-			return new soap_fault('Client', '', mysql_error() . ". Query: $query", '');
+			return new soap_fault('Client', '', mysql_error() . ". Query: {$query}", '');
 		} else {
 			$trabajo->InsertarTrabajoTarifa();
-			$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '$id_usuario'";
+			$query = "UPDATE usuario SET retraso_max_notificado = 0 WHERE id_usuario = '{$id_usuario}'";
 			mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		}
-
 	} else {
 		return new soap_fault('Client', '', 'Error de login.', '');
 	}
 
-	return new soapval('resultado', 'xsd:string', "OK");
+	return new soapval('resultado', 'xsd:string', 'OK');
 }
 
 function IngresarLog($usuario, $password, $inicio, $fin, $programas) {
