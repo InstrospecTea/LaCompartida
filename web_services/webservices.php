@@ -16,7 +16,7 @@ if (Conf::GetConf($sesion, 'NuevaLibreriaNusoap')) {
 
 $server = new soap_server();
 
-$endpoint = $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'];
+$endpoint = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'];
 $server->configureWSDL('TimeTrackingWebServices', $ns, $endpoint);
 $server->wsdl->schemaTargetNamespace = $ns;
 
