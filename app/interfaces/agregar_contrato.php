@@ -635,6 +635,18 @@ $Html = new \TTB\Html();
 			}
 		}
 
+		if (laID != "fc3" && jQuery("#tabla_fechas #id_body").children().length > 1) {
+			if(! confirm("El contrato tiene cobros programados, ¿está seguro que desea cambia la Forma de Tarificación?. Al aceptar, los cobros programados serán eliminados.")) {
+				laID = "fc3";
+			};
+		};
+
+		jQuery("#div_cobro label").removeClass('ui-state-focus');
+		jQuery("#div_cobro label").removeClass('ui-state-active');
+		jQuery("[for='" + laID + "']").addClass('ui-state-focus');
+		jQuery("[for='" + laID + "']").addClass('ui-state-active');
+		jQuery("#" + laID).attr('checked', true);
+
 		jQuery("#div_forma_cobro").css({'width':'400px','margin-left':'21%'}).hide();
 		jQuery("#div_retainer_usuarios").css('display','inline').hide();
 		jQuery("#div_monto").hide();
@@ -2626,9 +2638,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 															errand_currency_id: errand_currency_id
 														}
 													}).done(function(data) {
-														var errand_value = data[0];
-														var value = errand_value.simbolo_moneda + ' ' + errand_value.tarifa;
-														jQuery('#included_errand_value').html(value);
+														if (errand_type_id == '' || data.length == 0) {
+															alert('La tarifa de este trámite no está definida.');
+														} else {
+															var errand_value = data[0];
+															var value = errand_value.simbolo_moneda + ' ' + errand_value.tarifa;
+															jQuery('#included_errand_value').html(value);
+														}
+
 													});
 												};
 

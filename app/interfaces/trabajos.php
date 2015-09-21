@@ -93,7 +93,7 @@ if ($cobro) {
 // Calculado aquí para que la variable $select_usuario esté disponible al generar la tabla de trabajos.
 $usuario = new UsuarioExt($sesion);
 
-$select_usuario = $Form->select('id_usuario', $usuario->get_usuarios_trabajos($p_revisor), $id_usuario, array('empty' => 'Todos', 'style' => 'width: 200px'));
+$select_usuario = $Form->select('id_usuario', $usuario->get_usuarios_horas($p_revisor), $id_usuario, array('empty' => 'Todos', 'style' => 'width: 200px'));
 
 if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	$where = base64_decode($where);

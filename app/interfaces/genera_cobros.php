@@ -867,7 +867,7 @@ if ($proceso !== false) {
 								<b><?php echo __('Grupo') ?></b>&nbsp;
 							</td>
 							<td align=left colspan=2>
-								<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", __("Ninguno"), '280px') ?>
+								<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
 							</td>
 						</tr>
 						<tr>
@@ -1009,11 +1009,12 @@ if ($proceso !== false) {
 			<tr>
 				<td align="center" colspan="2">
 					<?php
-					echo $Form->button(__(__('Asuntos por') . ' ' . __('cobrar')), array('onclick' => "GeneraCobros(this.form, 'asuntos_liquidar', false)"));
-					echo $Form->button(__(__('Generar borradores').' '.__('masivamente')), array('onclick' => "GeneraCobros(this.form, 'genera', false)"));
+					echo $Form->button(__('Asuntos por') . ' ' . __('cobrar'), array('onclick' => "GeneraCobros(this.form, 'asuntos_liquidar', false)"));
+					echo $Form->button(__('Generar borradores').' '.__('masivamente'), array('onclick' => "GeneraCobros(this.form, 'genera', false)"));
 					echo $Form->button(__('Excel borradores'), array('onclick' => "GeneraCobros(this.form, 'excel', false)"));
 					echo $Form->button(__('Descargar borradores'), array('onclick' => "ImpresionCobros(true, false)"));
-					echo $Form->button(__(__('Emitir cobros').' '.__('masivamente')), array('onclick' => "GeneraCobros(this.form, 'emitir', false)"));
+					echo $Form->button(__('Emitir cobros').' '.__('masivamente'), array('onclick' => "GeneraCobros(this.form, 'emitir', false)"));
+					echo $Form->button(__('Pasar cobros a estado EN REVISIÓN'), array('onclick' => "GeneraCobros(this.form, 'en_revision', false)"));
 					?>
 				</td>
 			</tr>

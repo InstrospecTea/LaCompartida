@@ -393,6 +393,14 @@ if (!$popup) {
 }
 ?>
 
+<table class="alerta" width="90%" style="margin-bottom: 10px;">
+	<tr>
+		<td style="font-size:13px !important;">
+			<strong>Estimado usuario:</strong> Durante esta semana estamos mejorando el m&oacute;dulo de reportes avanzados, por lo tanto recomendamos no hacer uso de dichos reportes hasta nuevo aviso. De antemano muchas gracias por su comprensi&oacute;n.
+		</td>
+	</tr>
+</table>
+
 <form method="post" name="formulario" action="" id="formulario" autocomplete="off">
 	<input type="hidden" name="opc" id="opc" value="print">
 	<input type="hidden" name="debug" id="debug" value="<?php echo $debug; ?>">

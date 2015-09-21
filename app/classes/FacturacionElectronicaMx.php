@@ -134,6 +134,9 @@ EOF;
 					$Factura->Edit('dte_estado', $estado_dte);
 					$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
 
+					preg_match('/UUID="([a-zA-Z0-9-]+)"/', $result->descripcion, $folio_fiscal);
+					$Factura->Edit('dte_folio_fiscal', $folio_fiscal[1]);
+
 					$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$Factura->fields['serie_documento_legal']}-{$Factura->fields['numero']}.pdf";
 					$file_data = base64_decode($result->documentopdf);
 					$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
@@ -275,7 +278,7 @@ EOF;
 				'folio|' . $Factura->fields['numero'],
 				'fecha|' . Utiles::sql2date($Factura->fields['fecha'] . ' ' . $mx_hour, '%Y-%m-%dT%H:%M:%S'),
 				'formaDePago|' . 'PAGO EN UNA SOLA EXHIBICION',
-				'TipoCambio|' . number_format($Factura->fields['tipo_cambio'], 2, '.', ''),
+				'TipoCambio|' . number_format($Factura->get_tipo_cambio($Factura->fields['id_moneda']), 2, '.', ''),
 				'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],
 				'Moneda|' . ($monedas[$Factura->fields['id_moneda']]['codigo']),
 				'metodoDePago|' . self::PaymentMethod($Sesion, $Factura),

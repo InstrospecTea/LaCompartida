@@ -33,6 +33,10 @@ class FacturaPago extends Objeto {
 
 	public static $configuracion_reporte = array(
 			array(
+				'title' => 'N° Pago',
+				'field' => 'id_factura_pago',
+			),
+			array(
 					'format' => 'date',
 					'title' => 'Fecha Pago',
 					'field' => 'fecha_pago',
@@ -125,8 +129,8 @@ class FacturaPago extends Objeto {
 				'title' => 'Subtotal Honorarios',
 				'extras' =>
 				array(
-					'symbol' => 'simbolo',
-					'subtotal' => 'simbolo'
+					'symbol' => 'simbolo_factura',
+					'subtotal' => 'simbolo_factura'
 				),
 			),
 			array(
@@ -135,8 +139,8 @@ class FacturaPago extends Objeto {
 				'title' => 'Descuento Honorarios',
 				'extras' =>
 				array(
-					'symbol' => 'simbolo',
-					'subtotal' => 'simbolo'
+					'symbol' => 'simbolo_factura',
+					'subtotal' => 'simbolo_factura'
 				),
 			),
 			array(
@@ -198,9 +202,10 @@ class FacturaPago extends Objeto {
 					'extras' =>
 					array(
 							'symbol' => 'simbolo_factura',
+							'subtotal' => false,
 					),
-					'title' => 'Saldo Factura',
-					'field' => 'saldo_factura',
+					'title' => 'Saldo Actual',
+					'field' => 'saldo_actual',
 			),
 			array(
 					'format' => 'number',
@@ -211,7 +216,7 @@ class FacturaPago extends Objeto {
 					'format' => 'number',
 					'extras' =>
 					array(
-							'symbol' => 'simbolo_pago',
+							'symbol' => 'simbolo_factura',
 					),
 					'title' => 'Saldo Pago',
 					'field' => 'saldo_pago',
@@ -360,6 +365,7 @@ class FacturaPago extends Objeto {
 			,cuenta_banco.numero as numero_cuenta
 			,prm_moneda.glosa_moneda
 			,factura_pago.pago_retencion
+			,factura_pago.nro_documento
 		FROM factura_pago
 		LEFT JOIN cliente ON cliente.codigo_cliente = factura_pago.codigo_cliente
 		LEFT JOIN prm_banco ON prm_banco.id_banco = factura_pago.id_banco
@@ -368,7 +374,7 @@ class FacturaPago extends Objeto {
 		LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura_pago = factura_pago.id_factura_pago
 		WHERE factura_pago.id_factura_pago = '" . $this->Id() . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($id_mvto_pago, $glosa_cliente, $rut_cliente, $glosa_banco, $numero_cuenta, $glosa_moneda, $pago_retencion) = mysql_fetch_array($resp);
+		list($id_mvto_pago, $glosa_cliente, $rut_cliente, $glosa_banco, $numero_cuenta, $glosa_moneda, $pago_retencion, $nro_documento) = mysql_fetch_array($resp);
 
 		$mvto = new CtaCteFactMvto($this->sesion);
 		$lista = $mvto->GetNeteosSoyPago($id_mvto_pago);
@@ -415,7 +421,7 @@ class FacturaPago extends Objeto {
 				$html = str_replace('%cta_bco%', __('Cta. Bco.'), $html);
 				$html = str_replace('%moneda%', __('Moneda'), $html);
 
-				$html = str_replace('%Num_valor%', $this->fields['nro_documento'], $html);
+				$html = str_replace('%cheque_valor%', $nro_documento, $html);
 				$html = str_replace('%rut_valor%', $rut_cliente_encabezado, $html);
 				$html = str_replace('%cliente_valor%', $glosa_cliente_encabezado, $html);
 				$html = str_replace('%cheque_valor%', $this->fields['nro_cheque'], $html);
@@ -594,7 +600,7 @@ class FacturaPago extends Objeto {
 								JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
 								LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_pago = ccfm2.id_cta_cte_mvto
 								LEFT JOIN factura_pago fp ON ccfm2.id_factura_pago = fp.id_factura_pago
-								WHERE fp." . $col_condicion . " =  '" . $id . "'";
+								WHERE fp.{$col_condicion} = '{$id}'";
 		// echo $query; //FFF: Agrego comprobacion vs respaldo documento.//left join documento d on d.id_cobro=f.id_cobro and d.id_factura_pago=fp.id_factura_pago
 		return new ListaFacturas($this->sesion, null, $query);
 	}
@@ -645,7 +651,7 @@ class FacturaPago extends Objeto {
 	public function QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
 		$pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
 		$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda,
-		$grupo_ventas, $razon_social, $descripcion_factura) {
+		$grupo_ventas, $razon_social, $descripcion_factura, $codigo_cliente = null) {
 
 		if ($orden == '') {
 			$orden = 'fp.fecha DESC';
@@ -776,6 +782,7 @@ class FacturaPago extends Objeto {
 		}
 
 		return "SELECT SQL_CALC_FOUND_ROWS
+					fp.id_factura_pago,
 					factura.id_factura
 				, factura.fecha as fecha_factura
 				, factura.id_moneda
@@ -809,7 +816,7 @@ class FacturaPago extends Objeto {
 				, moneda_pago.simbolo as simbolo_pago
 				, moneda_pago.cifras_decimales as cifras_decimales_pago
 				, moneda_pago.tipo_cambio as tipo_cambio_pago
-				, -1 * ccfm2.saldo as saldo_factura
+				, -1 * ccfm2.saldo as saldo_actual
 				, -1 * ccfm.saldo as saldo_pago
 				, ccfm.monto_bruto as monto_pago
 				, -1 * ccfm2.monto_bruto as monto_factura
@@ -820,38 +827,42 @@ class FacturaPago extends Objeto {
 				, GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
 				, prm_estudio.glosa_estudio
 			FROM factura_pago AS fp
-			JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
-			JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
-			LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
-			LEFT JOIN factura ON ccfm2.id_factura = factura.id_factura
+			LEFT JOIN prm_moneda as moneda_pago ON moneda_pago.id_moneda = fp.id_moneda
+			LEFT JOIN prm_factura_pago_concepto AS co ON fp.id_concepto = co.id_concepto
 			LEFT JOIN prm_banco ON fp.id_banco = prm_banco.id_banco
 			LEFT JOIN cuenta_banco ON fp.id_cuenta = cuenta_banco.id_cuenta
+
+			LEFT JOIN cta_cte_fact_mvto AS ccfm ON fp.id_factura_pago = ccfm.id_factura_pago
+			LEFT JOIN cta_cte_fact_mvto_neteo AS ccfmn ON ccfmn.id_mvto_pago = ccfm.id_cta_cte_mvto
+			LEFT JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
+			LEFT JOIN factura ON ccfm2.id_factura = factura.id_factura
+
+
 			LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
-			left join factura_cobro fc ON fc.id_factura=factura.id_factura and fc.id_cobro=cobro.id_cobro
+			LEFT join factura_cobro fc ON fc.id_factura=factura.id_factura and fc.id_cobro=cobro.id_cobro
 			LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
 			LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
 			LEFT JOIN usuario ON usuario.id_usuario=contrato.id_usuario_responsable
 			LEFT JOIN prm_documento_legal ON (factura.id_documento_legal = prm_documento_legal.id_documento_legal)
 			LEFT JOIN prm_moneda as moneda_factura ON moneda_factura.id_moneda=factura.id_moneda
-			LEFT JOIN prm_moneda as moneda_pago ON moneda_pago.id_moneda = fp.id_moneda
-			LEFT JOIN prm_factura_pago_concepto AS co ON fp.id_concepto = co.id_concepto
+
 			LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 			LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
 			LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
 			LEFT JOIN prm_estudio ON prm_estudio.id_estudio = factura.id_estudio
 			WHERE $where
-			GROUP BY fp.id_factura_pago";
+			GROUP BY fp.id_factura_pago, factura.id_factura";
 	}
 
 	public function DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
 		$pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
 		$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda,
-		$grupo_ventas, $razon_social, $descripcion_factura) {
+		$grupo_ventas, $razon_social, $descripcion_factura, $codigo_cliente = null) {
 
 		$query = $this->QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta, $id_estado,
 			$pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
 			$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda,
-			$grupo_ventas, $razon_social, $descripcion_factura);
+			$grupo_ventas, $razon_social, $descripcion_factura, $codigo_cliente);
 
 		//agregar al reporte de factura las columnas, monto real - observaciones - Saldo - fecha último pago
 		$statement = $this->sesion->pdodbh->prepare($query);

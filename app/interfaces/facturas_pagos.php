@@ -51,14 +51,14 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 		$results = $FacturaPago->DatosReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta,
 			$id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
 			$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas,
-			$razon_social, $descripcion_factura);
+			$razon_social, $descripcion_factura, $codigo_cliente);
 		$FacturaPago->DownloadExcel($results);
 	}
 
 	$query = $FacturaPago->QueryReporte($orden, $where, $id_concepto, $id_banco, $id_cuenta,
 		$id_estado, $pago_retencion, $fecha1, $fecha2, $serie, $numero, $codigo_cliente_secundario,
 		$tipo_documento_legal_buscado, $codigo_asunto, $id_cobro, $id_estado, $id_moneda, $grupo_ventas,
-		$razon_social, $descripcion_factura);
+		$razon_social, $descripcion_factura, $codigo_cliente);
 
 	$resp = mysql_query($query . ' LIMIT 0,12', $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 	$monto_saldo_total = 0;
@@ -171,6 +171,7 @@ function SaldoPago(& $fila) {
 
 function Opciones(& $fila) {
 	global $Sesion;
+	$html_opcion = '';
 	$id_factura_pago = $fila->fields['id_factura_pago'];
 	$codigo_cliente = $fila->fields['cliente_pago'];
 	$html_opcion .= "<a href='javascript:void(0)' onclick=\"nuovaFinestra('Editar_Factura_Pago',730,580,'agregar_pago_factura.php?id_factura_pago=$id_factura_pago&codigo_cliente=$codigo_cliente&id_cobro={$fila->fields['id_cobro']}&popup=1');\" ><img src='" . Conf::ImgDir() . "/editar_on.gif' border=0 title=Editar></a>&nbsp;";
@@ -199,7 +200,7 @@ function GlosaCliente(& $fila) {
 function funcionTR(& $fila) {
 	global $Sesion;
 	static $i = 0;
-
+	$html = '';
 	$idioma = new Objeto($Sesion, '', '', 'prm_idioma', 'codigo_idioma');
 	if ($fila->fields['codigo_idioma']) {
 		$idioma->Load($fila->fields['codigo_idioma']);

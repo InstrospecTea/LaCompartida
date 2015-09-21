@@ -8,6 +8,7 @@ class NotaCobro extends Cobro {
 	// Twig, the flexible, fast, and secure template language for PHP
 	protected $twig;
 	protected $template_data;
+	private $detalle_en_asuntos = FALSE;
 
 	var $asuntos = array();
 	var $x_resultados = array();
@@ -1174,7 +1175,7 @@ class NotaCobro extends Cobro {
 		return compact('moneda_cliente_cambio', 'moneda_cli', 'lang', 'html2', 'idioma', 'cliente', 'moneda', 'moneda_base', 'trabajo', 'profesionales', 'gasto', 'totales', 'tipo_cambio_moneda_total', 'asunto');
 	}
 
-	function GeneraHTMLCobro($masivo = false, $formato = '', $funcion = '') {
+	function GeneraHTMLCobro($masivo = false, $formato = '', $funcion = '', $mostrar_asuntos_cobrables_sin_horas = FALSE) {
 		global $masi;
 		$masi = $masivo;
 
@@ -1246,7 +1247,78 @@ class NotaCobro extends Cobro {
 		$facturasRS = $this->FacturasDelContrato($this->sesion, $nuevomodulofactura);
 		$totalescontrato = $this->TotalesDelContrato($facturasRS, $nuevomodulofactura, $this->fields['id_cobro']);
 
-		return $this->$generador($parser, 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
+		$this->set_detalle_en_asuntos(FALSE);
+		$this->querys_detalle_en_asuntos();
+
+		return $this->$generador($parser, 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto, $mostrar_asuntos_cobrables_sin_horas);
+	}
+
+	/**
+	 *
+	 * Función para determinar si se debe mostrar o no los asuntos cobrados sin horas,
+	 * esto se muestra sólo cuando no hay detalle acerca de algún otro asunto.
+	 * Las querys determinan si los asuntos tienen información a ser mostrada, en caso
+	 * que así sea no se muestran los asuntos cobrables sin hora, en caso contrario sí.
+	 *
+	 */
+	private function querys_detalle_en_asuntos() {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('COUNT(*)', 'total')
+				->add_from('tramite')
+				->add_restriction(CriteriaRestriction::equals('id_cobro', $this->fields['id_cobro']))
+				->add_restriction(CriteriaRestriction::in('codigo_asunto', $this->asuntos));
+
+		try {
+			$result = $criteria->run();
+			$this->set_detalle_en_asuntos($result[0]['total'] == 0 ? FALSE : TRUE);
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('COUNT(*)', 'total')
+				->add_from('trabajo')
+				->add_restriction(CriteriaRestriction::equals('id_cobro', $this->fields['id_cobro']))
+				->add_restriction(CriteriaRestriction::equals('id_tramite', 0))
+				->add_restriction(CriteriaRestriction::in('codigo_asunto', $this->asuntos));
+
+		try {
+			$result = $criteria->run();
+			$this->set_detalle_en_asuntos(($result[0]['total'] == 0 ? FALSE : TRUE) || $this->get_detalle_en_asuntos());
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('COUNT(*)', 'total')
+				->add_from('cta_corriente')
+				->add_restriction(CriteriaRestriction::equals('id_cobro', $this->fields['id_cobro']))
+				->add_restriction(CriteriaRestriction::in('codigo_asunto', $this->asuntos));
+
+		try {
+			$result = $criteria->run();
+			$this->set_detalle_en_asuntos(($result[0]['total'] == 0 ? FALSE : TRUE) || $this->get_detalle_en_asuntos());
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	/**
+	 *
+	 * Setea valor a variable $detalle_en_asuntos
+	 *
+	 * @param $detalle_en_asunto valor a setear en variable 
+	 */
+	public function set_detalle_en_asuntos($detalle_en_asuntos) {
+		$this->detalle_en_asuntos = $detalle_en_asuntos;
+	}
+
+	/**
+	 *
+	 * @return valor variable $detalle_en_asunto
+	 */
+	public function get_detalle_en_asuntos() {
+		return $this->detalle_en_asuntos;
 	}
 
 	public function iniciales($nombre_encargado) {
@@ -3949,7 +4021,7 @@ class NotaCobro extends Cobro {
 		return $html;
 	}
 
-	function GenerarDocumento2($parser, $theTag = 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto) {
+	function GenerarDocumento2($parser, $theTag = 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto, $mostrar_asuntos_cobrables_sin_horas = FALSE) {
 
 		global $contrato;
 		global $cobro_moneda;
@@ -3962,6 +4034,7 @@ class NotaCobro extends Cobro {
 
 		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
+		$this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] = $mostrar_asuntos_cobrables_sin_horas ? TRUE : $this->fields['opc_mostrar_asuntos_cobrables_sin_horas'];
 
 		if (!isset($parser->tags[$theTag])) {
 			return;
@@ -5462,6 +5535,13 @@ class NotaCobro extends Cobro {
 							$row = str_replace('%TRABAJOS_TOTAL%', '', $row);
 						}
 						$row = str_replace('%DETALLE_PROFESIONAL%', $this->GenerarDocumento2($parser, 'DETALLE_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
+					} else if ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1) {
+						$row = str_replace('%espacio_trabajo%', '', $row);
+						$row = str_replace('%DETALLE_PROFESIONAL%', '', $row);
+						$row = str_replace('%servicios%', 'No existen trabajos asociados a este asunto.', $row);
+						$row = str_replace('%TRABAJOS_ENCABEZADO%', '', $row);
+						$row = str_replace('%TRABAJOS_FILAS%', '', $row);
+						$row = str_replace('%TRABAJOS_TOTAL%', '', $row);
 					} else {
 						$row = str_replace('%espacio_trabajo%', '', $row);
 						$row = str_replace('%DETALLE_PROFESIONAL%', '', $row);
@@ -5574,7 +5654,7 @@ class NotaCobro extends Cobro {
 					#especial mb
 					$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
 
-					if ($cont_trabajos > 0 || $cont_hitos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ( $cont_gastos > 0 && $templateNotaCobroGastosSeparados ) || Conf::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites')) {
+					if ($cont_trabajos > 0 || $cont_hitos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ( $cont_gastos > 0 && $templateNotaCobroGastosSeparados ) || Conf::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites') || ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1 && ! $this->get_detalle_en_asuntos())) {
 						$html .= $row;
 					}
 
@@ -11441,7 +11521,7 @@ class NotaCobro extends Cobro {
 		return $detalle_modalidad;
 	}
 
-	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas, $id_formato = null) {
+	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas, $id_formato = null, $mostrar_asuntos_cobrables_sin_horas = FALSE) {
 		global $_LANG;
 		$carta_multiple = null;
 
@@ -11502,10 +11582,6 @@ class NotaCobro extends Cobro {
 				$NotaCobro->fields['id_carta'] = null;
 			}
 
-			if ($NotaCobro->fields['subtotal_gastos'] == 0) {
-			   $NotaCobro->fields['opc_ver_gastos'] = 0;
-			}
-
 			if ($agrupar_cartas) {
 				$codigo_cliente = $NotaCobro->fields['codigo_cliente'];
 
@@ -11532,7 +11608,7 @@ class NotaCobro extends Cobro {
 			}
 
 			$NotaCobro->LoadAsuntos();
-			$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato);
+			$html = $NotaCobro->GeneraHTMLCobro(true, $id_formato, NULL, $mostrar_asuntos_cobrables_sin_horas);
 
 			if (empty($html)) {
 				continue;

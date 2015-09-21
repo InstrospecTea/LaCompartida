@@ -583,10 +583,6 @@ class Cliente extends Objeto {
 			$this->error = __('No se puede eliminar un') . ' ' . __('cliente') . ' ' . __('que tiene un') . ' ' . __('asunto') . ' ' . __('asociado.') . ' ' . __('Asunto') . ' ' . __('asociado:') . ' ' . $asunto;
 			return false;
 		}
-		#Valida que no tenga documentos asociados
-		$query = "SELECT COUNT(*) FROM archivo INNER JOIN contrato ON archivo.id_contrato=contrato.id_contrato WHERE contrato.codigo_cliente = '" . $this->fields['codigo_cliente'] . "'";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($count) = mysql_fetch_array($resp);
 
 		$query = "SELECT COUNT(*) FROM cta_corriente WHERE codigo_cliente = '" . $this->fields['codigo_cliente'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
@@ -603,6 +599,24 @@ class Cliente extends Objeto {
 			$this->error = __('No se puede eliminar un') . ' ' . __('cliente') . ' ' . __('que tiene un') . ' ' . __('documento') . ' ' . __('asociado.');
 			return false;
 		}
+
+		# Valida si existen documentos asociados al cliente.
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('COUNT(*)', 'total')
+				->add_from('archivo A')
+				->add_inner_join_with('contrato C', 'A.id_contrato = C.id_contrato')
+				->add_restriction(CriteriaRestriction::equals('C.codigo_cliente', "'" . $this->fields['codigo_cliente'] . "'"));
+
+		try {
+			$result = $criteria->run();
+			if ($result[0]['total'] > 0) {
+				$this->error = __('No se puede eliminar un') . ' ' . __('cliente') . ' ' . __('que tiene') . ' ' . __('documentos') . ' ' . __('asociados.');
+				return false;
+			}
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+
 		$query = "DELETE modificaciones_contrato FROM modificaciones_contrato JOIN contrato USING(id_contrato) WHERE contrato.codigo_cliente = '" . $this->fields['codigo_cliente'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 

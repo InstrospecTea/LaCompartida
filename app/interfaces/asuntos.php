@@ -247,7 +247,7 @@ $Form = new Form;
 
 echo $Form->script();
 
-if ($busqueda) {
+if ($busqueda || empty($id_cobro)) {
 	$link = 'Opciones';
 } else {
 	$link = __('Cobrar');

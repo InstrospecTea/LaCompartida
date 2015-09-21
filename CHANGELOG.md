@@ -1,4 +1,111 @@
 # Changelog
+## Hotfix 15.18.11
+Thursday 2015, September 17th
+* **Fix** [Se añade variable a query para mostrarla en voucher](https://github.com/LemontechSA/ttb/pull/1127)
+
+## Hotfix 15.18.10
+Wednesday 2015, September 16th
+* **Fix** [Se cambia id_codigo por codigo en clase PrmCodigo](https://github.com/LemontechSA/ttb/pull/1126)
+
+## Hotfix 15.18.9
+Wednesday 2015, September 16th
+* **Fix** [Se añade 00/100 en facturas](https://github.com/LemontechSA/ttb/pull/1125)
+
+## Hotfix 15.18.8
+Tuesday 2015, September 15th
+* **Fix** [Se corrige API para historial asuntos](https://github.com/LemontechSA/ttb/pull/1124)
+
+## Hotfix 15.18.7
+Tuesday 2015, September 15th
+* **Fix** [Error SQL - Insertar Cobro Asunto](https://github.com/LemontechSA/ttb/pull/1121)
+
+## Hotfix 15.18.6
+Friday 2015, September 11th
+* **Fix** [Corregir tarifa en cobro Excel](https://github.com/LemontechSA/ttb/pull/1118)
+* **Fix** [Corrección Error SQL eliminar asunto y validación al cambiar forma tarificación](https://github.com/LemontechSA/ttb/pull/1118)
+
+## Hotfix 15.18.5
+Thursday 2015, September 10th
+* **Fix** [Se quita condición la cual impedía mostrar detalle del gasto (descarga masiva de cobros) pese a que el contrato lo indicara](https://github.com/LemontechSA/ttb/pull/1117)
+
+## Hotfix 15.18.4
+Thursday 2015, September 10th
+* **Fix** [Se corrige función que carga listado de usuarios profesional en interfaz Horas](https://github.com/LemontechSA/ttb/pull/1116)
+
+## Hotfix 15.18.3
+Thursday 2015, September 10th
+* **Fix** [Se corrige query para permitir ver al usuario seleccionado desde el formulario sin importar su condición y permisos](https://github.com/LemontechSA/ttb/pull/1115)
+
+## Hotfix 15.18.2
+Thursday 2015, September 10th
+* **Fix** [Se corrige query para permitir ver un usuario inactivo cuando se envía `id_usuario` como parámetro](https://github.com/LemontechSA/ttb/pull/1114)
+
+## Hotfix 15.18.1
+Wednesday 2015, September 9th
+* **Feature** [Nuevo parámetro id_cobro para la integración contable BMAJ](https://github.com/LemontechSA/ttb/pull/1113)
+
+## [Release 15.18.0](https://github.com/LemontechSA/ttb/pull/1104)
+Tuesday 2015, September 8th
+* **Feature** [Mejorar mensajes cobro masivo](https://github.com/LemontechSA/ttb/pull/1073)
+* **Feature** [Solicitud mejoras](https://github.com/LemontechSA/ttb/pull/1089)
+* **Feature** [Error SQL al actualizar cobro](https://github.com/LemontechSA/ttb/pull/1095)
+* **Feature** [nuevos datos facturacion electronica chile](https://github.com/LemontechSA/ttb/pull/1098)
+
+## Hotfix 15.17.11
+Monday 2015, September 7th
+* **Fix** [Formato en columna excel adelantos](https://github.com/LemontechSA/ttb/pull/1110)
+
+## Hotfix 15.17.10
+Friday 2015, September 4th
+* **Fix** [Se corrige API para historial asuntos](https://github.com/LemontechSA/ttb/pull/1109)
+
+## Hotfix 15.17.9
+Thursday 2015, September 3rd
+* **Fix** [Corrección de las horas cobrables en el reporte avanzado](https://github.com/LemontechSA/ttb/pull/1106)
+
+## Hotfix 15.17.8
+Wednesday 2015, September 2nd
+* **Fix** [Corrección de las horas cobrables en el reporte avanzado](https://github.com/LemontechSA/ttb/pull/1106)
+
+## Hotfix 15.17.7
+Monday 2015, August 31th
+* **Fix** [Se corrige codificación en archivo MontoEnPalabra.php](https://github.com/LemontechSA/ttb/pull/1101)
+
+## Hotfix 15.17.6
+Monday 2015, August 31th
+* **Fix** [Se corrigen columnas a importar desde SAP para integración Moreno Baldivieso](https://github.com/LemontechSA/ttb/pull/1100)
+
+## Hotfix 15.17.5
+Monday 2015, August 31th
+* **Fix:** [Se crea validación de cobros al cargar Excel](https://github.com/LemontechSA/ttb/pull/1099)
+
+## Hotfix 15.17.4
+Thursday 2015, August 28th
+* **Fix:** [Corrige la carga de datos del contrato al crear una factura](https://github.com/LemontechSA/ttb/pull/1096)
+
+## Hotfix 15.17.3
+Thursday 2015, August 27th
+* **Fix:** [Se corrige moeda tarifa en integración Moreno Baldivieso](https://github.com/LemontechSA/ttb/pull/1094)
+
+## Hotfix 15.17.2
+Wednesday 2015, August 26th
+* **Fix:** [Se corrige generación de excel de facturas pago](https://github.com/LemontechSA/ttb/pull/1093)
+
+## Hotfix 15.17.1
+Tuesday 2015, August 25th
+* **Fix:** [Se corrige error SQL, no validaba que el cliente a eliminar tuviera contratos asociados.](https://github.com/LemontechSA/ttb/pull/1090)
+
+## [Release 15.17.0](https://github.com/LemontechSA/ttb/pull/1087)
+Thursday 2015, August 20th.
+* **Feature:** [Correcciones en reporte de Facturas Pago](https://github.com/LemontechSA/ttb/pull/1085)
+* **Feature:** [Impresión Reporte General IRU Abogados](https://github.com/LemontechSA/ttb/pull/1080)
+* **Feature:** [Opción Módulo Gastos](https://github.com/LemontechSA/ttb/pull/1079)
+* **Feature:** [Usar moneda_monto en lugar de moneda_contrato para la alerta de hito ](https://github.com/LemontechSA/ttb/pull/1078)
+* **Feature:** [Primera versión integración gastos PRC](https://github.com/LemontechSA/ttb/pull/1044)
+
+## Hotfix 15.16.11
+Tuesday 2015, August 18th
+* **Feature:** [Agrega mensaje en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1086)
 
 ## Hotfix 15.16.10
 Friday 2015, August 14th
