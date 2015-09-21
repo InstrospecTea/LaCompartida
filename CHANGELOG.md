@@ -1,4 +1,9 @@
 # Changelog
+
+## Hotfix 15.18.12
+Monday 2015, September 21th
+* **Fix** [Se valida código asunto al consumir WS](https://github.com/LemontechSA/ttb/pull/1129)
+
 ## Hotfix 15.18.11
 Thursday 2015, September 17th
 * **Fix** [Se añade variable a query para mostrarla en voucher](https://github.com/LemontechSA/ttb/pull/1127)
