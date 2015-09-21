@@ -1,5 +1,4 @@
 <?php
-
 require_once(dirname(__file__) . '/../app/conf.php');
 
 apache_setenv('force-response-1.0', 'TRUE');
@@ -16,7 +15,7 @@ if (Conf::GetConf($sesion, 'NuevaLibreriaNusoap')) {
 #First we must include our NuSOAP library and define the namespace of the service. It is usually recommended that you designate a distinctive URI for each one of your Web services.
 
 $server = new soap_server();
-$server->configureWSDL('TimeTrackingWebServices', $ns);
+$server->configureWSDL('TimeTrackingWebServices', $ns, $_SERVER['SERVER_HOST']);
 $server->wsdl->schemaTargetNamespace = $ns;
 
 $server->wsdl->addComplexType(
@@ -498,63 +497,6 @@ function CargarTrabajoDB($usuario, $password, $id_trabajo_local, $codigo_asunto,
 
 function IngresarLog($usuario, $password, $inicio, $fin, $programas) {
 	return 1; //Temporal, porque por el momento genera sobre carga en los servidores
-	$sesion = new Sesion();
-	if ($sesion->VerificarPassword($usuario, $password)) {
-		try {
-			$trabajos = array();
-
-			$id_usuario = _campo("id_usuario", "usuario", array("rut" => $usuario), $sesion);
-
-			$id_log = _insert("log", array(
-				"id_usuario" => $id_usuario,
-				"inicio" => $inicio,
-				"fin" => $fin), $sesion);
-		} catch (Exception $e) {
-			return _error('No se pudo crear el log: ' . $e->getMessage());
-		}
-
-		try {
-			foreach ($programas as $programa) {
-				$id_programa = _select_insert('id_programa', 'log_programa', array(
-					"path" => $programa['path'],
-					"nombre" => $programa['nombre']), $sesion);
-
-				foreach ($programa['documentos'] as $documento) {
-					$id_documento = _select_insert('id_documento', 'log_documento', array(
-						"id_programa" => $id_programa,
-						"nombre" => $documento['nombre']), $sesion);
-
-					foreach ($documento['trabajos'] as $trabajo) {
-						$idx = $trabajo['cliente'] . '_' . $trabajo['asunto'] . '_' . $trabajo['descripcion'];
-						if ($trabajo['cliente'] === null)
-							$id_trabajo = null;
-						else if (isset($trabajos[$idx]))
-							$id_trabajo = $trabajos[$idx];
-						else {
-							$id_trabajo = _select_insert('id_trabajo', 'log_trabajo', array(
-								"id_usuario" => $id_usuario,
-								"codigo_cliente" => $trabajo['cliente'] ? $trabajo['cliente'] : null,
-								"codigo_asunto" => $trabajo['asunto'] ? $trabajo['asunto'] : null,
-								"descripcion" => $trabajo['descripcion']), $sesion);
-
-							$trabajos[$idx] = $id_trabajo;
-						}
-
-						_insert("log_item", array(
-							"id_log" => $id_log,
-							"id_documento" => $id_documento,
-							"id_trabajo" => $id_trabajo ? $id_trabajo : null,
-							"tiempo" => $trabajo['tiempo']), $sesion);
-					}
-				}
-			}
-
-			return 1;
-		} catch (Exception $e) {
-			return _error('Error de datos: ' . $e->getMessage());
-		}
-	}
-	return _error('Usuario o Contraseña Incorrectos');
 }
 
 function _query($query, $sesion) {
@@ -592,8 +534,4 @@ function _error($msg) {
 	return new soap_fault('Client', '', $msg, '');
 }
 
-#Then we invoke the service using the following line of code:
-
-
 $server->service($HTTP_RAW_POST_DATA);
-#In fact, appending "?wsdl" to the end of any PHP NuSOAP server file will dynamically produce WSDL code. Here's how our CanadaTaxCalculator Web service is described using WSDL:
