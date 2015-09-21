@@ -15,7 +15,9 @@ if (Conf::GetConf($sesion, 'NuevaLibreriaNusoap')) {
 #First we must include our NuSOAP library and define the namespace of the service. It is usually recommended that you designate a distinctive URI for each one of your Web services.
 
 $server = new soap_server();
-$server->configureWSDL('TimeTrackingWebServices', $ns, $_SERVER['SERVER_HOST']);
+
+$endpoint = $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'];
+$server->configureWSDL('TimeTrackingWebServices', $ns, $endpoint);
 $server->wsdl->schemaTargetNamespace = $ns;
 
 $server->wsdl->addComplexType(
