@@ -47,6 +47,8 @@ $_LANG['Ninguno'] = 'Nenhum';
 $_LANG['ninguno'] = 'nenhum';
 $_LANG['Ninguna'] = 'Nenhum';
 $_LANG['ninguna'] = 'nenhum';
+$_LANG['Filtros'] = 'Filtro';
+$_LANG['filtros'] = 'filtro';
 
 // Clientes
 $_LANG['Nombre Cliente'] = 'Nome do Cliente';
@@ -247,6 +249,25 @@ $_LANG['Emitir cobros masivamente'] = 'Emissão de cobrança';
 $_LANG['Último Cobro'] = 'Última cobrança';
 $_LANG['Acuerdo'] = 'Acordo';
 $_LANG['Opción'] = 'Opção';
+$_LANG['opciones'] = 'opçoes';
+$_LANG['Usuario ingreso'] = 'Usuario Insersor';
+$_LANG['Agregar historial'] = 'Adicionar Histórico';
+$_LANG['mostrando'] = 'exibindo';
+$_LANG['Historial'] = 'Histórico';
+$_LANG['Guardar Cambios'] = 'Salvar alterações';
+$_LANG['con impuestos'] = 'com impostos';
+$_LANG['Se esta cobrando:'] = 'Se está cobrando:';
+$_LANG['Total Honorarios '] = 'Total Honorários ';
+$_LANG['Resumen total'] = 'Resumo total';
+$_LANG['Resumen final del Cobro'] = 'Resumo final da fatura';
+$_LANG['Actualizar tarifas'] = 'Atualizar tarifas';
+$_LANG['Actualizar a los tipos de cambio actuales'] = 'Atualizar às taxas de câmbio atuais';
+$_LANG['Ingresar decimales con punto. Ejemplo 23024.33'] = 'Insira casas decimais com ponto: Exemplo 2235.45';
+$_LANG['Parámetros del Cobro'] = 'Parâmetros da fatura';
+$_LANG['Revisar Cobro'] = 'Revisar Fatura';
+$_LANG['Emitir Cobro'] = 'Emitir Fatura';
+$_LANG['¿Desea generar el borrador?'] = 'Deseja gerar o rascunho?';
+$_LANG['Al generar este borrador se eliminarán todos los borradores antiguos asociados a este contrato'] = 'Ao gerar esse rascunho se eliminará todos os rascunhos antigos relacionados a este contrato';
 
 // Rastremento do Pagamento
 $_LANG['Periodo creación'] = 'Período de criação';

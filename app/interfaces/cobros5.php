@@ -1285,10 +1285,10 @@ else
 								<table width="100%">
 									<tr>
 										<td align="left">
-											<span style="font-size:9px; color:#FF7D7D; font-style:italic">Ingresar decimales con punto. Ejemplo 23024.33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											<span style="font-size:9px; color:#FF7D7D; font-style:italic"><?php echo __('Ingresar decimales con punto. Ejemplo 23024.33')?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										</td>
 										<td align=right>
-											<span "style"="font-size:9px; color:#FF7D7D; font-style:italic;">Actualizar a los tipos de cambio actuales</span>&nbsp;&nbsp;<img <?php echo TTip($tip_refresh) ?> style="cursor:pointer" src="<?php echo Conf::ImgDir() ?>/download_from_web.gif" onclick="UpdateTipoCambio(this.form)">
+											<span "style"="font-size:9px; color:#FF7D7D; font-style:italic;"><?php echo __('Actualizar a los tipos de cambio actuales') ?></span>&nbsp;&nbsp;<img <?php echo TTip($tip_refresh) ?> style="cursor:pointer" src="<?php echo Conf::ImgDir() ?>/download_from_web.gif" onclick="UpdateTipoCambio(this.form)">
 										</td>
 									</tr>
 								</table>
@@ -1611,7 +1611,7 @@ else
 			</tr>
 
 			<tr>
-				<td align="center" colspan="2"><a href="javascript:void(0)" onclick="ActualizarTarifas();" title="Actualizar las tarifas de todos los trabajos de este cobro">Actualizar tarifas</a></td>
+				<td align="center" colspan="2"><a href="javascript:void(0)" onclick="ActualizarTarifas();" title="Actualizar las tarifas de todos los trabajos de este cobro"><?php echo __('Actualizar tarifas') ?></a></td>
 			</tr>
 
 		</table>

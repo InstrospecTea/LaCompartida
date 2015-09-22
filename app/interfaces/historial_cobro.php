@@ -67,7 +67,7 @@
 <?php
     $buscador = new Buscador($sesion, $query, "Observacion", $desde, $x_pag, $orden);
     $buscador->color_mouse_over = "#ADFF2F";
-    $buscador->titulo = "<strong>Historial</strong>";
+    $buscador->titulo = "<strong>" . __('Historial') . "</strong>";
     $buscador->AgregarEncabezado("fecha",__('Fecha'),"align=center");
     $buscador->AgregarEncabezado("nombre",__('Nombre'),"align=center");
     $buscador->AgregarEncabezado("comentario",__('Observación'),"align=center");
