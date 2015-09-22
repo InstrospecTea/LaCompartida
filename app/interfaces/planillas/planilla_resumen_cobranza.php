@@ -151,10 +151,10 @@ if ($xls) {
 	$col_fecha_ultimo_trabajo = ++$col;
 	$col_horas_trabajadas = ++$col;
 	$col_horas_cobradas = ++$col;
-	$col_honorarios_original = ++$col;
-	$col_total_cobro_original = ++$col;
 	$col_monto_subtotal_original = ++$col;
 	$col_descuento = ++$col;
+	$col_honorarios_original = ++$col;
+	$col_total_cobro_original = ++$col;
 	if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 		$col_total_con_iva = ++$col;
 	} else {
