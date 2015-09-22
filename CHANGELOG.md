@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.19.1
+Tuesday 2015, September 22nd
+* **Fix** [Se añaden columnas a Reporte Liquidaciones](https://github.com/LemontechSA/ttb/pull/1133)
+
 ## [Release 15.19.0](https://github.com/LemontechSA/ttb/pull/1130)
 Monday 2015, September 21th
 * **Feature** [Formato factura fiscal MX](https://github.com/LemontechSA/ttb/pull/1122)
