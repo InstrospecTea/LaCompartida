@@ -29,14 +29,23 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 		);
 
 		$factor = $this->getWorksProportionalFactor();
-		$amount = "((documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
-		$valor_por_pagar = "SUM({$factor} * ({$amount}) * (documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
+		$billed_amount = "SUM(
+			{$factor}
+			*
+			(
+				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
+				*
+				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
+			)
+			* (documento.saldo_honorarios / documento.honorarios)
+		)
+		*
+		(1 / cobro_moneda.tipo_cambio)";
 
 		$Criteria->add_select(
-			$valor_por_pagar, 'valor_por_pagar'
+			$billed_amount, 'valor_por_pagar'
 		);
 	}
-
 
 	/**
 	 * Obtiene la query de trátmies correspondiente a Valor Por Cobrar
@@ -57,14 +66,23 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 		);
 
 		$factor = $this->getErrandsProportionalFactor();
-		$amount = "((documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
-		$valor_por_pagar = "SUM({$factor} * ({$amount}) * (documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
+		$billed_amount =  "SUM(
+			{$factor}
+			*
+			(
+				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
+				*
+				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
+			)
+			* (documento.saldo_honorarios / documento.honorarios)
+		)
+		*
+		(1 / cobro_moneda.tipo_cambio)";
 
 		$Criteria->add_select(
-			$valor_por_pagar, 'valor_por_pagar'
+			$billed_amount, 'valor_por_pagar'
 		);
 	}
-
 
 	/**
 	 * Obtiene la query de cobros sin trabajos ni trámites correspondiente a Valor Por Cobrar
@@ -73,17 +91,15 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {
-		$SubCriteria = new Criteria();
+		$billed_amount = '
+			(1 / IFNULL(asuntos_cobro.total_asuntos, 1)) *
+			SUM((cobro.monto_subtotal - cobro.descuento)
+				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+				* (documento.saldo_honorarios / documento.honorarios)
+			)
+		';
 
-		$valor_por_pagar = "(1 / IFNULL(asuntos_cobro.total_asuntos, 1)) *
-		(
-			(cobro.monto_subtotal - cobro.descuento)
-			* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
-			* (documento.saldo_honorarios / documento.honorarios)
-			/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
-		)";
-
-		$Criteria->add_select($valor_por_pagar, 'valor_por_pagar');
+		$Criteria->add_select($billed_amount, 'valor_por_pagar');
 		$Criteria->add_restriction(
 			CriteriaRestriction::in(
 				'cobro.estado',
