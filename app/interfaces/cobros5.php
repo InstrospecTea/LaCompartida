@@ -2142,7 +2142,7 @@ else
 								</tr>
 								<tr>
 									<td colspan="2" align="center">
-										<a href="#" style="font-size: 10px;" onclick="SubirExcel();">Subir excel modificado</a>
+										<a href="#" style="font-size: 10px;" onclick="SubirExcel();"><?php echo __('Subir excel modificado') ?></a>
 									</td>
 								</tr>
 								<tr>

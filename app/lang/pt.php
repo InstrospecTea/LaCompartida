@@ -316,7 +316,7 @@ $_LANG['Opciones'] = 'Opçoes';
 $_LANG['IVA'] = 'Imposto';
 $_LANG['Últ. Pago'] = 'Últimos Pagamento';
 
-// Tarifas 
+// Tarifas
 $_LANG['Ingreso de Tarifas'] = 'Inserção de Tarifas';
 $_LANG['copiando la actual'] = 'Copiando a atual';
 
@@ -527,7 +527,7 @@ $_LANG['Semana pasada'] = 'Semana Passada';
 $_LANG['Mes pasado'] = 'Mês Passado';
 $_LANG['Año en curso'] = 'Ano em curso';
 $_LANG['Emisión'] = 'Emissão';
-$_LANG['Facturación'] = 'Faturamento';
+$_LANG['Facturación'] = 'Faturação';
 $_LANG['Gráfico Torta'] = 'Gráfico Pizza';
 $_LANG['PERIODO RESUMEN'] = 'PERÍODO RESUMO';
 $_LANG['FECHA REPORTE'] = 'DATA DO RELATÓRIO';
@@ -1040,3 +1040,34 @@ $_LANG['Total horas trabajadas'] = 'Total horas trabalhadas';
 $_LANG['Total horas cobrables corregidas'] = 'Total horas faturáveis corrigidas';
 $_LANG['Hrs Trab./Cobro.'] = 'Horas trabalhadas / Cobradas';
 $_LANG['Hrs trab.'] = 'Horas trabalhadas';
+
+$_LANG['Formato Detalle Carta Cobro'] = "Formato Detalhe Carta de Cobrança";
+$_LANG['Subir excel modificado'] = "Upload Excel Modificado";
+$_LANG['Descargar Archivo'] = 'Download Arquivo';
+$_LANG['descargar_excel_modificable'] = 'Download Excel';
+$_LANG['Una vez efectuado'] = 'Uma vez efetuada';
+$_LANG['el cobro'] = 'a fatura';
+$_LANG['la información no podrá ser modificada sin reemitir'] = 'a informação não poderá ser modificada sem reemitir';
+$_LANG['¿Está seguro que desea Emitir'] = '¿Está seguro que deseja emitir';
+$_LANG['el Cobro'] = 'a cobrança';
+$_LANG['Selección'] = 'Seleção';
+$_LANG['BORRADOR'] = 'Rascunho';
+$_LANG['EMITIDO'] = 'Emitido';
+$_LANG['FACTURADO'] = 'Faturado';
+$_LANG['ENVIADO AL CLIENTE'] = 'Enviado ao Cliente';
+$_LANG['PAGO PARCIAL'] = 'Pagamento Parcial';
+$_LANG['PAGADO'] = 'Pagamento Integral';
+$_LANG['CREADO'] = 'Criado';
+$_LANG['EN REVISION'] = 'Em Revisão';
+$_LANG['INCOBRABLE'] = 'Incobrável';
+$_LANG['Cambiar a'] = 'Mudar para';
+$_LANG['c/IVA'] = 'com Impostos';
+$_LANG['s/IVA'] = 'sem Impostos';
+$_LANG['Impuesto'] = 'Imposto';
+$_LANG['Agregar Pago'] = 'Adicionar pagamento';
+$_LANG['por pagar'] = 'a pagar';
+$_LANG['Acciones'] = 'Ações';
+$_LANG['El monto liquidado'] = 'A quantia paga';
+$_LANG['no coincide con el monto facturado'] = 'não coincide com a quantia faturada';
+
+
