@@ -518,10 +518,10 @@ if ($xls) {
 			$ws1->write($filas, $col_fecha_ultimo_trabajo, __('Fecha ultimo trabajo'), $titulo_filas);
 			$ws1->write($filas, $col_horas_trabajadas, __('Hrs. Trabajadas'), $titulo_filas);
 			$ws1->write($filas, $col_horas_cobradas, __('Hrs. Cobradas'), $titulo_filas);
-			$ws1->write($filas, $col_honorarios_original, __('Monto Honorarios original'), $titulo_filas);
-			$ws1->write($filas, $col_total_cobro_original, __('Total Cobro Original'), $titulo_filas);
-			$ws1->write($filas, $col_monto_subtotal_original, __('Monto Subtotal Original'), $titulo_filas);
+			$ws1->write($filas, $col_monto_subtotal_original, __('Monto Subtotal'), $titulo_filas);
 			$ws1->write($filas, $col_descuento, __('Descuento'), $titulo_filas);
+			$ws1->write($filas, $col_honorarios_original, __('Monto Honorarios Total'), $titulo_filas);
+			$ws1->write($filas, $col_total_cobro_original, __('Total Cobro'), $titulo_filas);
 			if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 				if (Conf::GetConf($sesion, 'PermitirFactura')) {
 					$ws1->write($filas, $col_total_con_iva, __('Total facturado'), $titulo_filas);
@@ -791,9 +791,9 @@ if ($xls) {
 		$ws1->write($filas, $col_fecha_ultimo_trabajo, Utiles::sql2fecha($cobro['fecha_ultimo_trabajo'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_ultimo_trabajo'], $formato_fecha, '-') : ' - ', $fecha);
 		$ws1->writeNumber($filas, $col_horas_trabajadas, $duracion, $time_format);
 		$ws1->writeNumber($filas, $col_horas_cobradas, $duracion_cobrable, $time_format);
-		$ws1->writeNumber($filas, $col_honorarios_original, $x_monto_honorarios_original, $formatos_moneda[$cobro['id_moneda']]);
 		$ws1->writeNumber($filas, $col_monto_subtotal_original, $cobro['monto_subtotal'], $formatos_moneda[$cobro['id_moneda']]);
 		$ws1->writeNumber($filas, $col_descuento, $cobro['descuento'], $formatos_moneda[$cobro['id_moneda']]);
+		$ws1->writeNumber($filas, $col_honorarios_original, $x_monto_honorarios_original, $formatos_moneda[$cobro['id_moneda']]);
 		if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 			$ws1->writeNumber($filas, $col_total_cobro_original, $x_monto_cobro_original_con_iva, $formatos_moneda[$cobro['opc_moneda_total']]);
 		} else {
