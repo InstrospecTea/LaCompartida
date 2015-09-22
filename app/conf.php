@@ -10,9 +10,14 @@ $confFile = dirname(__FILE__) . '/../config/addbd.php';
 
 if( file_exists(dirname(__FILE__) . '/miconf.php') ) {
 	require_once dirname(__FILE__) . '/miconf.php';
-
 } elseif( file_exists($confFile) ) {
 	require_once $confFile;
+}
+
+if (!function_exists('apache_setenv')) {
+	function apache_setenv() {
+		return;
+	}
 }
 
 if (!class_exists('Conf')) {

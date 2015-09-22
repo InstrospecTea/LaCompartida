@@ -1,4 +1,15 @@
 # Changelog
+
+## [Release 15.19.0](https://github.com/LemontechSA/ttb/pull/1130)
+Monday 2015, September 21th
+* **Feature** [Formato factura fiscal MX](https://github.com/LemontechSA/ttb/pull/1122)
+* **Feature** [Cambiar columna reporte facturas pago](https://github.com/LemontechSA/ttb/pull/1111)
+* **Feature** [Folio fiscal factura MX](https://github.com/LemontechSA/ttb/pull/1105)
+
+## Hotfix 15.18.12
+Monday 2015, September 21th
+* **Fix** [Se valida código asunto al consumir WS](https://github.com/LemontechSA/ttb/pull/1129)
+
 ## Hotfix 15.18.11
 Thursday 2015, September 17th
 * **Fix** [Se añade variable a query para mostrarla en voucher](https://github.com/LemontechSA/ttb/pull/1127)
