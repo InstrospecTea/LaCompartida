@@ -23,7 +23,7 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
  * |  \-- horas_no_cobrables: Total de Horas Trabajadas en asuntos no Facturables
  * |
  * +-- valor_trabajado: (no implementado)
- * |  +-- valor_cobrable: (no implementado)
+ * |  +-- valor_cobrable: Valor monetario que corresponde a cada Profesional
  * |  |  +-- valor_visible: (no implementado)
  * |  |  |  +-- valor_cobrado: Valor monetario que corresponde a cada Profesional, en una Liquidación ya Emitida
  * |  |  |  +-- valor_tramites: Valor monetario de trámites que corresponde a cada Profesional, en una Liquidación ya Emitida
@@ -70,6 +70,7 @@ class ReporteCriteria {
 		'diferencia_valor_estandar' => 'DiferenciaValorEstandar',
 		'rentabilidad' => 'Rentabilidad',
 		'rentabilidad_base' => 'RentabilidadBase',
+		'valor_cobrable' => 'ValorCobrable',
 		'valor_cobrado_no_estandar' => 'ValorCobradoNoEstandar',
 		'valor_estandar' => 'ValorCobradoEstandar',
 		'valor_hora' => 'ValorHora',
@@ -124,7 +125,7 @@ class ReporteCriteria {
 	 * TODO: Refactorizar a Abstractos
 	 */
 	public static function getTiposMoneda() {
-		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base');
+		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base', 'valor_cobrable');
 	}
 
 	/**
@@ -879,8 +880,10 @@ class ReporteCriteria {
 			case "valor_por_cobrar":
 			case "valor_cobrado_no_estandar":
 			case "valor_cobrado":
+			case "valor_cobrable":
 			case "valor_tramites":
 			case "valor_pagado":
+			case "valor_cobrable":
 			case "valor_por_pagar":
 			case "valor_incobrable":
 			case "diferencia_valor_estandar":
@@ -926,6 +929,7 @@ class ReporteCriteria {
 				return "Hr.";
 			case "valor_por_cobrar":
 			case "valor_cobrado":
+			case "valor_cobrable":
 			case "valor_tramites":
 			case "valor_pagado":
 			case "valor_por_pagar":
@@ -958,6 +962,7 @@ class ReporteCriteria {
 			case "valor_tramites":
 			case "valor_cobrado_no_estandar":
 			case "valor_pagado":
+			case "valor_cobrable":
 			case "valor_por_pagar":
 			case "valor_incobrable":
 			case "valor_hora":

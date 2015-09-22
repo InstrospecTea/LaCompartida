@@ -73,6 +73,7 @@ $tipos_de_dato = array(
 	'horas_por_pagar',
 	'horas_incobrables',
 	'horas_spot',
+	'valor_cobrable',
 	'valor_por_cobrar',
 	'valor_cobrado',
 	'valor_por_pagar',
@@ -205,6 +206,7 @@ $ReporteAvanzado->glosa_dato['horas_castigadas'] = __("Diferencia de Horas Cobra
 $ReporteAvanzado->glosa_dato['horas_no_cobrables'] = __("Total de Horas Trabajadas en asuntos no Facturables");
 $ReporteAvanzado->glosa_dato['horas_spot'] = __("Horas cobrables de profesionales, en formas de cobro TASA y CAP");
 
+$ReporteAvanzado->glosa_dato['valor_cobrable'] = __("Valor monetario que corresponde a cada Profesional (por horas o trámites)");
 $ReporteAvanzado->glosa_dato['valor_cobrado'] = __("Valor monetario que corresponde a cada Profesional (por horas o trámites), en un Cobro ya Emitido");
 $ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario que corresponde a cada Profesional por concepto de trámites, en un Cobro ya Emitido");
 
@@ -933,12 +935,11 @@ if (!$popup) {
 							<tr>
 								<?php //echo $ReporteAvanzado->celda_disabled('valor_trabajado') ?>
 								<?php //echo $ReporteAvanzado->borde_abajo(2) ?>
-								<?php //echo $ReporteAvanzado->celda_disabled('valor_cobrable') ?>
 								<?php //echo $ReporteAvanzado->borde_abajo(2) ?>
 								<?php //echo $ReporteAvanzado->celda_disabled('valor_visible') ?>
-								<?php //echo $ReporteAvanzado->borde_abajo(2) ?>
-								<?php echo $ReporteAvanzado->nada(8) ?>
-								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->nada(6) ?>
+								<?php echo $ReporteAvanzado->celda('valor_cobrable') ?>
+								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
 								<?php echo $ReporteAvanzado->celda('valor_cobrado') ?>
 								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
 								<?php echo $ReporteAvanzado->celda('valor_pagado') ?>
