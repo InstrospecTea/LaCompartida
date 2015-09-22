@@ -532,7 +532,7 @@ if ($xls) {
 				if (Conf::GetConf($sesion, 'PermitirFactura')) {
 					$ws1->write($filas, $col_total_cobro, __('Total facturado'), $titulo_filas);
 				} else {
-					$ws1->write($filas, $col_total_cobro, __('Total Cobro'), $titulo_filas);
+					$ws1->write($filas, $col_total_cobro, __('Total Cobro Según Moneda Reporte'), $titulo_filas);
 				}
 			}
 			$ws1->write($filas, $col_honorarios, __('Honorarios'), $titulo_filas);
