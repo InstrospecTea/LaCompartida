@@ -153,6 +153,8 @@ if ($xls) {
 	$col_horas_cobradas = ++$col;
 	$col_honorarios_original = ++$col;
 	$col_total_cobro_original = ++$col;
+	$col_monto_subtotal_original = ++$col;
+	$col_descuento = ++$col;
 	if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 		$col_total_con_iva = ++$col;
 	} else {
@@ -210,6 +212,8 @@ if ($xls) {
 	$ws1->setColumn($col_horas_cobradas, $col_horas_cobradas, 15);
 	$ws1->setColumn($col_honorarios_original, $col_honorarios_original, 22);
 	$ws1->setColumn($col_total_cobro_original, $col_total_cobro_original, 22);
+	$ws1->setColumn($col_monto_subtotal_original, $col_monto_subtotal_original, 22);
+	$ws1->setColumn($col_descuento, $col_descuento, 22);
 	$ws1->setColumn($col_honorarios, $col_honorarios, 22); // Los trámites están incluídos aqu.
 	$ws1->setColumn($col_gastos, $col_gastos, 22);
 	if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
@@ -516,6 +520,8 @@ if ($xls) {
 			$ws1->write($filas, $col_horas_cobradas, __('Hrs. Cobradas'), $titulo_filas);
 			$ws1->write($filas, $col_honorarios_original, __('Monto Honorarios original'), $titulo_filas);
 			$ws1->write($filas, $col_total_cobro_original, __('Total Cobro Original'), $titulo_filas);
+			$ws1->write($filas, $col_monto_subtotal_original, __('Monto Subtotal Original'), $titulo_filas);
+			$ws1->write($filas, $col_descuento, __('Descuento'), $titulo_filas);
 			if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 				if (Conf::GetConf($sesion, 'PermitirFactura')) {
 					$ws1->write($filas, $col_total_con_iva, __('Total facturado'), $titulo_filas);
@@ -786,6 +792,8 @@ if ($xls) {
 		$ws1->writeNumber($filas, $col_horas_trabajadas, $duracion, $time_format);
 		$ws1->writeNumber($filas, $col_horas_cobradas, $duracion_cobrable, $time_format);
 		$ws1->writeNumber($filas, $col_honorarios_original, $x_monto_honorarios_original, $formatos_moneda[$cobro['id_moneda']]);
+		$ws1->writeNumber($filas, $col_monto_subtotal_original, $cobro['monto_subtotal'], $formatos_moneda[$cobro['id_moneda']]);
+		$ws1->writeNumber($filas, $col_descuento, $cobro['descuento'], $formatos_moneda[$cobro['id_moneda']]);
 		if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 			$ws1->writeNumber($filas, $col_total_cobro_original, $x_monto_cobro_original_con_iva, $formatos_moneda[$cobro['opc_moneda_total']]);
 		} else {
