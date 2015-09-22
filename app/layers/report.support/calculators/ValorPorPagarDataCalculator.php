@@ -1,6 +1,6 @@
 <?php
 /**
- * El valor por pagar corresponde a las liquidaciones que no están pagadas
+ * Corresponde al valor por pagar de las liquidaciones
  *
  * Condiciones para obtener un valor por pagar:
  * 	* Que exista un cobro en estado: EMITIDO, FACTURADO, ENVIADO AL CLIENTE o PAGO PARCIAL
@@ -30,7 +30,7 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 
 		$factor = $this->getWorksProportionalFactor();
 		$amount = "((documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
-		$valor_por_pagar = "SUM({$factor} * ({$amount}) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
+		$valor_por_pagar = "SUM({$factor} * ({$amount}) * (documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
 
 		$Criteria->add_select(
 			$valor_por_pagar, 'valor_por_pagar'
@@ -58,7 +58,7 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 
 		$factor = $this->getErrandsProportionalFactor();
 		$amount = "((documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
-		$valor_por_pagar = "SUM({$factor} * ({$amount}) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
+		$valor_por_pagar = "SUM({$factor} * ({$amount}) * (documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))";
 
 		$Criteria->add_select(
 			$valor_por_pagar, 'valor_por_pagar'
@@ -79,6 +79,7 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 		(
 			(cobro.monto_subtotal - cobro.descuento)
 			* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
+			* (documento.saldo_honorarios / documento.honorarios)
 			/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)
 		)";
 

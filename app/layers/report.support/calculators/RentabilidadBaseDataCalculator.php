@@ -36,7 +36,7 @@ class RentabilidadBaseDataCalculator extends AbstractProportionalDataCalculator 
 			SUM((TIME_TO_SEC(duracion) / 3600) *
 			IF(
 				cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
-				trabajo.tarifa_hh_estandar * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
+				IFNULL(usuario_tarifa.tarifa, IFNULL(categoria_tarifa.tarifa, 0)) * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
 				trabajo.tarifa_hh_estandar * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			))";
 
@@ -54,6 +54,11 @@ class RentabilidadBaseDataCalculator extends AbstractProportionalDataCalculator 
 			)
 		);
 
+		$on_usuario_trabajo = CriteriaRestriction::equals(
+			'usuario.id_usuario',
+			'trabajo.id_usuario'
+		);
+
 		$on_usuario_tarifa = CriteriaRestriction::and_clause(
 			CriteriaRestriction::equals(
 				'usuario_tarifa.id_usuario',
@@ -62,15 +67,35 @@ class RentabilidadBaseDataCalculator extends AbstractProportionalDataCalculator 
 			CriteriaRestriction::equals(
 				'usuario_tarifa.id_moneda',
 				'contrato.id_moneda'
+			),
+			CriteriaRestriction::equals(
+				'usuario_tarifa.id_tarifa',
+				'tarifa.id_tarifa'
 			)
 		);
 
-		$Criteria->add_left_join_with('usuario_tarifa', $on_usuario_tarifa);
+		$on_categoria_tarifa = CriteriaRestriction::and_clause(
+			CriteriaRestriction::equals(
+				'categoria_tarifa.id_categoria_usuario',
+				'usuario.id_categoria_usuario'
+			),
+			CriteriaRestriction::equals(
+				'categoria_tarifa.id_moneda',
+				'contrato.id_moneda'
+			),
+			CriteriaRestriction::equals(
+				'categoria_tarifa.id_tarifa',
+				'tarifa.id_tarifa'
+			)
+		);
 
-		$Criteria->add_inner_join_with('tarifa', CriteriaRestriction::and_clause(
-			CriteriaRestriction::equals('tarifa.id_tarifa', 'usuario_tarifa.id_tarifa'),
+		$Criteria->add_inner_join_with('tarifa',
 			CriteriaRestriction::equals('tarifa.tarifa_defecto', 1)
-		));
+		);
+
+		$Criteria->add_left_join_with('usuario', $on_usuario_trabajo);
+		$Criteria->add_left_join_with('usuario_tarifa', $on_usuario_tarifa);
+		$Criteria->add_left_join_with('categoria_tarifa', $on_categoria_tarifa);
 
 		$billed_amount = "IF(
 			cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO'),

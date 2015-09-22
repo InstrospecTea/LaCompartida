@@ -76,7 +76,6 @@ $tipos_de_dato = array(
 	'valor_por_cobrar',
 	'valor_cobrado',
 	'valor_por_pagar',
-	'valor_por_pagar_parcial',
 	'valor_pagado',
 	'valor_pagado_parcial',
 	'valor_incobrable',
@@ -967,8 +966,8 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->celda('valor_por_cobrar') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('valor_por_pagar') ?>
-								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda('valor_por_pagar_parcial') ?>
+								<?php echo $ReporteAvanzado->nada() ?>
+								<?php echo $ReporteAvanzado->nada() ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(7) ?>
