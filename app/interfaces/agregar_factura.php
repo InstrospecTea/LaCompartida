@@ -646,7 +646,7 @@ $Form->defaultLabel = false;
 				<tr>
 					<td align="right" colspan="1">Raz&oacute;n Referencia
 					<td align="left" colspan="3">
-						<input type='text' name='dte_razon_referencia' placeholder='Raz&oacute;n Referencia' value='" . $factura->fields['dte_razon_referencia'] . "' id='dte_razon_referencia' size='40' maxlength='90'>
+						<input type='text' name='dte_razon_referencia' placeholder='Raz&oacute;n Referencia' value='<?php echo $factura->fields['dte_razon_referencia'] ?>' id='dte_razon_referencia' size='40' maxlength='90'>
 					</td>
 				</tr>
 				<?php endif; ?>
