@@ -521,7 +521,8 @@ if ($xls) {
 			$ws1->write($filas, $col_monto_subtotal_original, __('Monto Subtotal'), $titulo_filas);
 			$ws1->write($filas, $col_descuento, __('Descuento'), $titulo_filas);
 			$ws1->write($filas, $col_honorarios_original, __('Monto Honorarios Total'), $titulo_filas);
-			$ws1->write($filas, $col_total_cobro_original, __('Total Cobro'), $titulo_filas);
+			$ws1->write($filas - 1, $col_total_cobro_original, __('Total Cobro'), $titulo_filas);
+			$ws1->write($filas, $col_total_cobro_original, __('Moneda Cobro'), $titulo_filas);
 			if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 				if (Conf::GetConf($sesion, 'PermitirFactura')) {
 					$ws1->write($filas, $col_total_con_iva, __('Total facturado'), $titulo_filas);
@@ -532,7 +533,7 @@ if ($xls) {
 				if (Conf::GetConf($sesion, 'PermitirFactura')) {
 					$ws1->write($filas, $col_total_cobro, __('Total facturado'), $titulo_filas);
 				} else {
-					$ws1->write($filas, $col_total_cobro, __('Total Cobro Según Moneda Reporte'), $titulo_filas);
+					$ws1->write($filas, $col_total_cobro, __('Moneda Reporte'), $titulo_filas);
 				}
 			}
 			$ws1->write($filas, $col_honorarios, __('Honorarios'), $titulo_filas);
