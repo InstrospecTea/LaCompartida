@@ -643,12 +643,6 @@ $Form->defaultLabel = false;
 						<input type="text" class="fechadiff" name="fecha_documento_referencia" id="fecha_documento_referencia" value="<?php echo ! empty($factura->fields['fecha_documento_referencia']) ? Utiles::sql2date($factura->fields['fecha_documento_referencia'], '%d-%m-%Y') : NULL ?>">
 					</td>
 				</tr>
-				<tr>
-					<td align="right" colspan="1">Raz&oacute;n Referencia
-					<td align="left" colspan="3">
-						<input type='text' name='dte_razon_referencia' placeholder='Raz&oacute;n Referencia' value='<?php echo $factura->fields['dte_razon_referencia'] ?>' id='dte_razon_referencia' size='40' maxlength='90'>
-					</td>
-				</tr>
 				<?php endif; ?>
 			<?php endif; ?>
 
