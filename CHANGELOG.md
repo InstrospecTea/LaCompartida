@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.19.2
+Tuesday 2015, September 23rd
+* **Fix** [Correción Facturación CL](https://github.com/LemontechSA/ttb/pull/1136)
+
 ## Hotfix 15.19.1
 Tuesday 2015, September 22nd
 * **Fix** [Se añaden columnas a Reporte Liquidaciones](https://github.com/LemontechSA/ttb/pull/1133)

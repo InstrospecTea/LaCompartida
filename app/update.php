@@ -10929,6 +10929,10 @@ QUERY;
 				$queries[] = "UPDATE factura SET dte_folio_fiscal = '{$folio_fiscal[1]}' WHERE id_factura = {$id_factura};";
 			}
 			break;
+
+		case 8.15;
+			$queries[] = "ALTER TABLE `factura` CHANGE `id_documento_referencia` `id_documento_referencia` VARCHAR(255) NULL DEFAULT NULL;";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10941,7 +10945,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.14;
+$max_update = 8.15;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
