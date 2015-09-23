@@ -26,6 +26,14 @@ if ($xls) {
 				'Bold' => '1',
 				'underline' => 1,
 				'Color' => 'black'));
+	$encabezado2 = & $wb->addFormat(array('Size' => 12,
+				'VAlign' => 'top',
+				'Align' => 'center',
+				'FgColor' => '35',
+				'Bold' => '1',
+				'Border' => 1,
+				'Locked' => 1,
+				'Color' => 'black'));
 	$txt_opcion = & $wb->addFormat(array('Size' => 11,
 				'Valign' => 'top',
 				'Align' => 'left',
@@ -151,6 +159,8 @@ if ($xls) {
 	$col_fecha_ultimo_trabajo = ++$col;
 	$col_horas_trabajadas = ++$col;
 	$col_horas_cobradas = ++$col;
+	$col_monto_subtotal_original = ++$col;
+	$col_descuento = ++$col;
 	$col_honorarios_original = ++$col;
 	$col_total_cobro_original = ++$col;
 	if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
@@ -210,6 +220,8 @@ if ($xls) {
 	$ws1->setColumn($col_horas_cobradas, $col_horas_cobradas, 15);
 	$ws1->setColumn($col_honorarios_original, $col_honorarios_original, 22);
 	$ws1->setColumn($col_total_cobro_original, $col_total_cobro_original, 22);
+	$ws1->setColumn($col_monto_subtotal_original, $col_monto_subtotal_original, 22);
+	$ws1->setColumn($col_descuento, $col_descuento, 22);
 	$ws1->setColumn($col_honorarios, $col_honorarios, 22); // Los trámites están incluídos aqu.
 	$ws1->setColumn($col_gastos, $col_gastos, 22);
 	if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
@@ -514,8 +526,13 @@ if ($xls) {
 			$ws1->write($filas, $col_fecha_ultimo_trabajo, __('Fecha ultimo trabajo'), $titulo_filas);
 			$ws1->write($filas, $col_horas_trabajadas, __('Hrs. Trabajadas'), $titulo_filas);
 			$ws1->write($filas, $col_horas_cobradas, __('Hrs. Cobradas'), $titulo_filas);
-			$ws1->write($filas, $col_honorarios_original, __('Monto Honorarios original'), $titulo_filas);
-			$ws1->write($filas, $col_total_cobro_original, __('Total Cobro Original'), $titulo_filas);
+			$ws1->write($filas, $col_monto_subtotal_original, __('Monto Subtotal'), $titulo_filas);
+			$ws1->write($filas, $col_descuento, __('Descuento'), $titulo_filas);
+			$ws1->write($filas, $col_honorarios_original, __('Monto Honorarios Total'), $titulo_filas);
+			$ws1->write($filas - 1, $col_total_cobro_original, __('Total Cobro'), $encabezado2);
+			$ws1->write($filas - 1, $col_total_cobro_original + 1, '', $encabezado2);
+			$ws1->mergeCells($filas - 1, $col_total_cobro_original, $filas - 1, $col_total_cobro_original + 1);
+			$ws1->write($filas, $col_total_cobro_original, __('Moneda Cobro'), $titulo_filas);
 			if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 				if (Conf::GetConf($sesion, 'PermitirFactura')) {
 					$ws1->write($filas, $col_total_con_iva, __('Total facturado'), $titulo_filas);
@@ -526,7 +543,7 @@ if ($xls) {
 				if (Conf::GetConf($sesion, 'PermitirFactura')) {
 					$ws1->write($filas, $col_total_cobro, __('Total facturado'), $titulo_filas);
 				} else {
-					$ws1->write($filas, $col_total_cobro, __('Total Cobro'), $titulo_filas);
+					$ws1->write($filas, $col_total_cobro, __('Moneda Reporte'), $titulo_filas);
 				}
 			}
 			$ws1->write($filas, $col_honorarios, __('Honorarios'), $titulo_filas);
@@ -785,6 +802,8 @@ if ($xls) {
 		$ws1->write($filas, $col_fecha_ultimo_trabajo, Utiles::sql2fecha($cobro['fecha_ultimo_trabajo'], $formato_fecha, '-') ? Utiles::sql2fecha($cobro['fecha_ultimo_trabajo'], $formato_fecha, '-') : ' - ', $fecha);
 		$ws1->writeNumber($filas, $col_horas_trabajadas, $duracion, $time_format);
 		$ws1->writeNumber($filas, $col_horas_cobradas, $duracion_cobrable, $time_format);
+		$ws1->writeNumber($filas, $col_monto_subtotal_original, $cobro['monto_subtotal'], $formatos_moneda[$cobro['id_moneda']]);
+		$ws1->writeNumber($filas, $col_descuento, $cobro['descuento'], $formatos_moneda[$cobro['id_moneda']]);
 		$ws1->writeNumber($filas, $col_honorarios_original, $x_monto_honorarios_original, $formatos_moneda[$cobro['id_moneda']]);
 		if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 			$ws1->writeNumber($filas, $col_total_cobro_original, $x_monto_cobro_original_con_iva, $formatos_moneda[$cobro['opc_moneda_total']]);
