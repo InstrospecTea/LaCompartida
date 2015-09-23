@@ -28,7 +28,7 @@ if ($xls) {
 				'Color' => 'black'));
 	$encabezado2 = & $wb->addFormat(array('Size' => 12,
 				'VAlign' => 'top',
-				'Align' => 'left',
+				'Align' => 'center',
 				'FgColor' => '35',
 				'Bold' => '1',
 				'Border' => 1,
