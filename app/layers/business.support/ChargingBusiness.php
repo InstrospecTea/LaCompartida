@@ -204,7 +204,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_child($td_workedTime)
 			->add_child($td_usedTime);
 		if ($scale->get('fixedAmount') == 0) {
-			$tr->add_child($th_value);
+			$tr->add_child($td_value);
 		}
 		return $thead->add_child($tr);
 	}
@@ -376,7 +376,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$this->loadBusiness('Working');
 			$work = $this->WorkingBusiness->getWork($workId);
 			$workFee = new WorkFee();
-			$workFee->set('id_moneda', $currency_id);
+			$workFee->set('id_moneda', $currencyId);
 			$workFee->set('valor', $work->get('tarifa_hh'));
 			$workFee->set('valor_estandar', $work->get('tarifa_hh_estandar'));
 			return $workFee;
@@ -647,8 +647,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	private function processSlidingScalesDiscount($slidingScales) {
 		foreach ($slidingScales as $slidingScale) {
 			$slidingScale = $this->processSlidingScaleDiscount($slidingScale);
+			$processedSlidingScales[] = $slidingScale;
 		}
-		return $slidingScales;
+		return $processedSlidingScales;
 	}
 
 	private function processSlidingScaleDiscount($slidingScale) {
@@ -669,9 +670,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 	private function proceessSlidingScalesLanguages($slidingScales, $language) {
 		foreach ($slidingScales as $slidingScale) {
-			$slidingScale = $this->proceessSlidingScaleLanguages($slidingScale, $language);
+			$processedSlidingScale[] = $this->proceessSlidingScaleLanguages($slidingScale, $language);
 		}
-		return $slidingScales;
+		return $processedSlidingScale;
 	}
 
 	private function proceessSlidingScaleLanguages($slidingScale, $language) {
@@ -704,12 +705,15 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		foreach ($slidingScales as $scale) {
 			$result = $this->slidingScaleTimeCalculation($works, $scale, $charge);
 			$works = $result['works'];
-			$scale->set('scaleWorks', $result['scaleWorks']);
-			$scale->set('amount', $result['scaleAmount'], false);
-			$scale->set('chargeCurrency', $charge->get('id_moneda'));
+			if ($result['scaleAmount'] > 0) {
+				$scale->set('scaleWorks', $result['scaleWorks']);
+				$scale->set('amount', $result['scaleAmount'], false);
+				$scale->set('chargeCurrency', $charge->get('id_moneda'));
+				$processedSlidingScales[] = $scale;
+			}
 		}
 
-		return $slidingScales;
+		return $processedSlidingScales;
 	}
 
 	private function slidingScaleTimeCalculation($works, $scale, $charge, $scaleAmount = 0) {
@@ -749,7 +753,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			} else {
 				$workedHours = $this->getWorkedHours($work);
 			}
-			//Si es el Ãºltimo escalón, entonces se utilizan todas las horas, por lo que el valor debe restarse
+			//Si es el último escalón, entonces se utilizan todas las horas, por lo que el valor debe restarse
 			// completamente.
 			if ($scale->get('scale_number') == 4) {
 				$remainingScaleHours = $workedHours;
@@ -773,7 +777,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 					$scaleAmount += $amount;
 				}
 				if ($remainingScaleHours == 0) {
-					// El trabajo se acabó y ademÃ¡s se llenó la bolsa del escalón. Hay que cambiar el escalón.
+					// El trabajo se acabó y además se llenó la bolsa del escalón. Hay que cambiar el escalón.
 					if ($scale->get('fixedAmount') != 0) {
 						$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
 					}
