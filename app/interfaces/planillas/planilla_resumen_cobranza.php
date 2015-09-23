@@ -530,7 +530,8 @@ if ($xls) {
 			$ws1->write($filas, $col_descuento, __('Descuento'), $titulo_filas);
 			$ws1->write($filas, $col_honorarios_original, __('Monto Honorarios Total'), $titulo_filas);
 			$ws1->write($filas - 1, $col_total_cobro_original, __('Total Cobro'), $encabezado2);
-			$ws1->mergeCells($filas - 1, $col_total_cobro_original, $filas - 1, $col_total_cobro_original + 2);
+			$ws1->write($filas - 1, $col_total_cobro_original + 1, '', $encabezado2);
+			$ws1->mergeCells($filas - 1, $col_total_cobro_original, $filas - 1, $col_total_cobro_original + 1);
 			$ws1->write($filas, $col_total_cobro_original, __('Moneda Cobro'), $titulo_filas);
 			if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 				if (Conf::GetConf($sesion, 'PermitirFactura')) {
