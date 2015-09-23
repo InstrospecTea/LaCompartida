@@ -32,7 +32,6 @@ if ($xls) {
 				'FgColor' => '35',
 				'Bold' => '1',
 				'Border' => 1,
-				'underline' => 1,
 				'Locked' => 1,
 				'Color' => 'black'));
 	$txt_opcion = & $wb->addFormat(array('Size' => 11,
@@ -530,7 +529,7 @@ if ($xls) {
 			$ws1->write($filas, $col_monto_subtotal_original, __('Monto Subtotal'), $titulo_filas);
 			$ws1->write($filas, $col_descuento, __('Descuento'), $titulo_filas);
 			$ws1->write($filas, $col_honorarios_original, __('Monto Honorarios Total'), $titulo_filas);
-			$ws1->write($filas - 1, $col_total_cobro_original, __('Total Cobro'), $encabezado2);
+			$ws1->write($filas - 1, $col_total_cobro_original + 1, __('Total Cobro'), $encabezado2);
 			$ws1->write($filas, $col_total_cobro_original, __('Moneda Cobro'), $titulo_filas);
 			if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 				if (Conf::GetConf($sesion, 'PermitirFactura')) {
