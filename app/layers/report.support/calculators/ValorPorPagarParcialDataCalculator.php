@@ -76,9 +76,10 @@ class ValorPorPagarParcialDataCalculator extends AbstractProportionalDataCalcula
 	function getReportChargeQuery($Criteria) {
 		$SubCriteria = new Criteria();
 
-		$valor_por_pagar = "(1 / IFNULL(asuntos_cobro.total_asuntos, 1)) *
+		$valor_por_pagar = "
 		(
 			(cobro.monto_subtotal - cobro.descuento)
+			* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
 			* (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio)
 			* (documento.saldo_honorarios / documento.honorarios)
 			/ (cobro_moneda.tipo_cambio / cobro_moneda_base.tipo_cambio)

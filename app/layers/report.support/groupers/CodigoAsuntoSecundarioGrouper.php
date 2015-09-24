@@ -41,15 +41,10 @@ class CodigoAsuntoSecundarioGrouper extends AbstractGrouperTranslator {
 	 */
 	function translateForCharges(Criteria $Criteria) {
 		$this->addMatterCountSubcriteria($Criteria);
-		
+
 		$Criteria
 			->add_select($this->getSelectField(), 'codigo_asunto')
-			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField())
-			->add_left_join_with('cobro_asunto',
-				CriteriaRestriction::equals('cobro_asunto.id_cobro', 'cobro.id_cobro'))
-			->add_left_join_with('asunto',
-				CriteriaRestriction::equals('asunto.codigo_asunto', 'cobro_asunto.codigo_asunto'));
+			->add_ordering($this->getOrderField());
 
 		return $Criteria;
 	}

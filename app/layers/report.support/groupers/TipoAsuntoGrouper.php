@@ -41,7 +41,7 @@ class TipoAsuntoGrouper extends AbstractGrouperTranslator {
 	 */
 	function translateForCharges(Criteria $criteria) {
 		$this->addMatterCountSubcriteria($criteria);
-		
+
 		return $criteria->add_select(
 			$this->getSelectField(),
 			'tipo_asunto'
@@ -51,18 +51,6 @@ class TipoAsuntoGrouper extends AbstractGrouperTranslator {
 			$this->getOrderField()
 		)->add_grouping(
 			$this->getGroupField()
-		)->add_left_join_with(
-			'cobro_asunto',
-			CriteriaRestriction::equals(
-				'cobro_asunto.id_cobro',
-				'cobro.id_cobro'
-			)
-		)->add_left_join_with(
-			'asunto',
-			CriteriaRestriction::equals(
-				'asunto.codigo_asunto',
-				'cobro_asunto.codigo_asunto'
-			)
 		)->add_left_join_with(
 			'prm_tipo_proyecto',
 			CriteriaRestriction::equals(

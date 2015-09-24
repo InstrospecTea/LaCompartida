@@ -172,8 +172,8 @@ class RentabilidadBaseDataCalculator extends AbstractProportionalDataCalculator 
 	 */
 	function getReportChargeQuery($Criteria) {
 				$billed_amount = '
-			(1 / IFNULL(asuntos_cobro.total_asuntos, 1)) *
 			SUM((cobro.monto_subtotal - cobro.descuento)
+				* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
 		';

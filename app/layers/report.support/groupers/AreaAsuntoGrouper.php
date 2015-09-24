@@ -40,7 +40,7 @@ class AreaAsuntoGrouper extends AbstractGrouperTranslator {
 	 * @return void
 	 */
 	function translateForCharges(Criteria $criteria) {
-		
+
 		$this->addMatterCountSubcriteria($criteria);
 
 		return $criteria->add_select(
@@ -50,18 +50,6 @@ class AreaAsuntoGrouper extends AbstractGrouperTranslator {
 			$this->getOrderField()
 		)->add_grouping(
 			$this->getGroupField()
-		)->add_left_join_with(
-			'cobro_asunto',
-			CriteriaRestriction::equals(
-				'cobro_asunto.id_cobro',
-				'cobro.id_cobro'
-			)
-		)->add_left_join_with(
-			'asunto',
-			CriteriaRestriction::equals(
-				'asunto.codigo_asunto',
-				'cobro_asunto.codigo_asunto'
-			)
 		)->add_left_join_with(
 			'prm_area_proyecto',
 			CriteriaRestriction::equals(
