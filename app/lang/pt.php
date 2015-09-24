@@ -16,6 +16,7 @@ $_LANG['Fecha inicio'] = 'Data inicial';
 $_LANG['Fecha fin'] = 'Data final';
 $_LANG['anterior'] = 'anterior';
 $_LANG['siguiente'] = 'seguinte';
+$_LANG['Siguiente'] = 'Seguinte';
 $_LANG['Nombre'] = 'Nome';
 $_LANG['del'] = 'do';
 $_LANG['Cerrar'] = 'Fechar';
@@ -469,6 +470,8 @@ $_LANG['Glosa Cliente'] = 'Descrição do Serviço ao Cliente';
 $_LANG['Monto Estimado'] = 'Quantia Estimada';
 $_LANG['Fecha Cobro'] = 'Data de Pagamento';
 $_LANG['Descripcion'] = 'Descripçao';
+$_LANG['Descripción'] = 'Descripçao';
+$_LANG['descripción'] = 'descripçao';
 $_LANG['Observaciones'] = 'Observações';
 $_LANG['Estado Cobro'] = 'Estado do Pagamento';
 $_LANG['Numero Cobro'] = 'Número de cobrança';
@@ -1091,4 +1094,6 @@ $_LANG['Acciones'] = 'Ações';
 $_LANG['El monto liquidado'] = 'A quantia paga';
 $_LANG['no coincide con el monto facturado'] = 'não coincide com a quantia faturada';
 
-
+$_LANG['Balance cuenta gastos'] = 'Balanco conta de gastos';
+$_LANG['Mostrando desde _START_ hasta _END_ de _TOTAL_ registros'] = 'Mostrando de _START_ até _END_ de _TOTAL_ registros';
+$_LANG['Mostrando desde 0 hasta 0 de 0 registros'] = 'Mostrando de 0 até 0 de 0 registros';
