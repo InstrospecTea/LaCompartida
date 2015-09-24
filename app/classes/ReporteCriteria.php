@@ -880,7 +880,6 @@ class ReporteCriteria {
 			case "valor_por_cobrar":
 			case "valor_cobrado_no_estandar":
 			case "valor_cobrado":
-			case "valor_cobrable":
 			case "valor_tramites":
 			case "valor_pagado":
 			case "valor_cobrable":
