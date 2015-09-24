@@ -144,6 +144,7 @@
 		}
 		$ws1->setColumn($col_moneda, $col_moneda, 14);
 		$ws1->setColumn($col_monto, $col_monto, 14);
+		$ws1->setColumn($col_subtotal_honorarios_pesos, $col_subtotal_honorarios_pesos, 30);
 		$ws1->setColumn($col_monto_honorarios_pesos, $col_monto_honorarios_pesos, 30);
 		$ws1->setColumn($col_monto_gastos_pesos, $col_monto_gastos_pesos, 26);
 
