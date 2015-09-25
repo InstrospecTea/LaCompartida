@@ -364,7 +364,7 @@ $_LANG['Solicitud de Adelanto'] = 'Solicitação de adiantamento';
 $_LANG['N° Solicitud'] = 'Número de solicitação';
 $_LANG['Si Ud. selecciona el assunto, se considerarán los assuntos que se cobrarán en la misma carta.'] = 'Se selecionar o assunto, serão considerados os assuntos que se cobraram na mesma carta';
 $_LANG['Usuario solicitante'] = 'Usuário solicitante';
-$_LANG['Descargar Excel'] = 'Download para Excel';
+$_LANG['Descargar Excel'] = 'Fazer download em Excel';
 
 // Adelantos
 $_LANG['Revisar Adelantos'] = 'Revisar adiantamentos';
