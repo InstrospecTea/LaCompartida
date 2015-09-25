@@ -1219,7 +1219,7 @@ foreach ($chargeResults as $charge) {
 	 *  Dejar espacio para el resumen profesional si es necesario.
 	 */
 
-	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales && ($cobro->fields['forma_cobro'] == 'ESCALONADA')) || $cobro->fields['opc_ver_profesional']) {
+	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales && ($cobro->fields['forma_cobro'] != 'ESCALONADA')) || $cobro->fields['opc_ver_profesional']) {
 		$fila_inicio_resumen_profesional = $filas - 1;
 		if ($num_usuarios > 0) {
 			$filas += $num_usuarios + 7;
@@ -1878,7 +1878,7 @@ foreach ($chargeResults as $charge) {
 		$filas += 2;
 	}
 
-	if ((( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] ) && is_array($detalle_profesional)) && ($cobro->fields['forma_cobro'] == 'ESCALONADA')) {
+	if ((( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] ) && is_array($detalle_profesional)) && ($cobro->fields['forma_cobro'] != 'ESCALONADA')) {
 
 		/*
 		 *  Si el resumen va al principio cambiar el índice de las filas.
