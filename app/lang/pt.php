@@ -255,6 +255,13 @@ $_LANG['Usuario ingreso'] = 'Usuario Insersor';
 $_LANG['Agregar historial'] = 'Adicionar Histórico';
 $_LANG['mostrando'] = 'exibindo';
 $_LANG['Historial'] = 'Histórico';
+$_LANG['Información de Pago'] = 'Informação de pagamento';
+$_LANG['Glosa Factura'] = 'Descritivo da fatura';
+$_LANG['Fecha Vencimento'] = 'Data de vencimento';
+$_LANG['Condición de Pago'] = 'Condição de pagamento';
+$_LANG['Actualizar Tipo de Cambio'] = 'Atualizar tipo de câmbio';
+$_LANG['Saldo Pendiente Gastos '] = 'Saldo Pendente de Gastos';
+$_LANG['Saldo Pendiente Honorarios'] = 'Saldo Pendente Honorários';
 $_LANG['Guardar Cambios'] = 'Salvar alterações';
 $_LANG['con impuestos'] = 'com impostos';
 $_LANG['Se esta cobrando:'] = 'Se está cobrando:';
@@ -283,6 +290,7 @@ $_LANG['Seguimiento de cobros'] = 'Rastremento de Pagamento';
 $_LANG['Nº Cobro'] = 'Número de cobrança';
 $_LANG['Nº Factura'] = 'Número de Fatura';
 $_LANG['Descripción del cobro'] = 'Descrição do Pagamento';
+$_LANG['Continuar con el cobro'] = 'Abrir uma cobrança';
 
 // Gastos
 $_LANG['Cobrado'] = 'Faturado';
