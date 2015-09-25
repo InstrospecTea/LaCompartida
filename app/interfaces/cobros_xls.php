@@ -1112,8 +1112,8 @@ foreach ($chargeResults as $charge) {
 
 		$resumen_encabezado = "";
 
-		$ws->write(++$filas, $col_id_trabajo, __('Detalle Tarifa Escalonada'), $formato_encabezado);
-		$ws->mergeCells($filas, $col_id_trabajo, $filas++, $col_fecha_fin);
+		$ws->write(++$filas, 5, __('Detalle Tarifa Escalonada'), $formato_encabezado);
+		$ws->mergeCells($filas, 5, $filas++, 9);
 
 		for ($i = 1; $i <= $cantidad_escalonadas; $i++) {
 
@@ -1134,8 +1134,8 @@ foreach ($chargeResults as $charge) {
 				$detalle_escala .= ": $simbolo_moneda {$monto_escala}";
 			}
 
-			$ws->write(++$filas, $col_id_trabajo, $detalle_escala, $formato_normal);
-			$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
+			$ws->write(++$filas, 5, $detalle_escala, $formato_normal);
+			$ws->mergeCells($filas, 5, $filas, 9);
 		}
 
 		if ($lang == 'es') {
@@ -1146,59 +1146,51 @@ foreach ($chargeResults as $charge) {
 		
 		$filas = $filas + 2;
 
-		$ws->write($filas, $col_id_trabajo, $resumen_detalle, $formato_encabezado);
-		$ws->mergeCells($filas, $col_id_trabajo, $filas++, $col_fecha_fin);
+		$ws->write($filas, 5, $resumen_detalle, $formato_encabezado);
+		$ws->mergeCells($filas, 5, $filas++, 9);
 
 		$esc = 0;
 		while (++$esc <= $cantidad_escalonadas) {
 			if (is_array($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'])) {
 				if ($cobro_valores['datos_escalonadas'][$esc]['monto'] > 0) {
-					$ws->write(++$filas, $col_id_trabajo, "Escalon {$esc}: Monto Fijo " . $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $cobro_valores['datos_escalonadas'][$esc]['monto'], $formato_encabezado);
+					$ws->write(++$filas, 5, "Escalon {$esc}: Monto Fijo " . $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $cobro_valores['datos_escalonadas'][$esc]['monto'], $formato_encabezado);
 				} else {
 					if ($cobro_valores['datos_escalonadas'][$esc]['descuento'] > 0) {
-						$ws->write(++$filas, $col_id_trabajo, "Escalon {$esc}: Tarifa HH con " . $cobro_valores['datos_escalonadas'][$esc]['descuento'] . '% de descuento', $formato_encabezado);
+						$ws->write(++$filas, 5, "Escalon {$esc}: Tarifa HH con " . $cobro_valores['datos_escalonadas'][$esc]['descuento'] . '% de descuento', $formato_encabezado);
 					} else {
-						$ws->write(++$filas, $col_id_trabajo, "Escalon {$esc}: Tarifa HH", $formato_encabezado);
+						$ws->write(++$filas, 5, "Escalon {$esc}: Tarifa HH", $formato_encabezado);
 					}
 				}
-				$ws->mergeCells($filas, $col_id_trabajo, $filas++, $col_fecha_fin);
+				$ws->mergeCells($filas, 5, $filas++, $col_fecha_fin);
 
-				$ws->write(++$filas, $col_id_trabajo, __('Nombre'), $formato_titulo);
-				$ws->mergeCells($filas, $col_id_trabajo, $filas, 1);
+				$ws->write(++$filas, 5, __('Nombre'), $formato_titulo);
 
 				if ($cobro->fields['opc_ver_profesional_categoria']) {
-					$ws->write($filas, 2, __($idioma->fields['codigo_idioma'] . '_CATEGORÍA'), $formato_titulo);
-					$ws->mergeCells($filas, 2, $filas, 3);
+					$ws->write($filas, 6, __($idioma->fields['codigo_idioma'] . '_CATEGORÍA'), $formato_titulo);
 				}
 
-				$ws->write($filas, 4, __('Hrs. Tarificadas'), $formato_titulo);
-				$ws->mergeCells($filas, 4, $filas, 5);
-
-				$ws->write($filas, 6, __('TARIFA'), $formato_encabezado);
-				$ws->write($filas, 7, __($idioma->fields['codigo_idioma'] . '_IMPORTE'), $formato_titulo);
+				$ws->write($filas, 7, __('Hrs. Tarificadas'), $formato_titulo);
+				$ws->write($filas, 8, __('TARIFA'), $formato_encabezado);
+				$ws->write($filas, 9, __($idioma->fields['codigo_idioma'] . '_IMPORTE'), $formato_titulo);
 
 				foreach ($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'] as $id_usuario => $usuarios) {
 					if (round($usuarios['duracion']) > 0) {
-						$ws->write(++$filas, $col_id_trabajo, $usuarios['usuario'], $formato_normal);
-						$ws->mergeCells($filas, $col_id_trabajo, $filas, 1);
+						$ws->write(++$filas, 5, $usuarios['usuario'], $formato_normal);;
 
 						if ($cobro->fields['opc_ver_profesional_categoria']) {
-							$ws->write($filas, 2, $usuarios['categoria'], $formato_normal);
-							$ws->mergeCells($filas, 2, $filas, 3);
+							$ws->write($filas, 6, $usuarios['categoria'], $formato_normal);
 						}
 
-						$ws->write($filas, 4, Utiles::Decimal2GlosaHora(round($usuarios['duracion'], 2)), $formato_normal);
-						$ws->mergeCells($filas, 4, $filas, 5);
-
-						$ws->write($filas, 6, number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
-						$ws->write($filas, 7, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
+						$ws->write($filas, 7, Utiles::Decimal2GlosaHora(round($usuarios['duracion'], 2)), $formato_normal);
+						$ws->write($filas, 8, number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
+						$ws->write($filas, 9, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
 					}
 				}
 
 				// Total
-				$ws->write(++$filas, $col_id_trabajo, __('Total'), $formato_total);
-				$ws->write($filas, 4, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $formato_total);
-				$ws->write($filas++, 7, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_total);
+				$ws->write(++$filas, 5, __('Total'), $formato_total);
+				$ws->write($filas, 7, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $formato_total);
+				$ws->write($filas++, 9, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_total);
 			};
 		}
 	}
