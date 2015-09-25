@@ -164,7 +164,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		foreach($slidingScales as $scale) {
 			if ($scale->get('amount') != 0) {
 				$title = new HtmlBuilder('h3');
-				$title->set_html('Escalón #'. $scale->get('scale_number'));
+				$title->set_html('Escalón #'. $scale->get('order_number'));
 				$container->add_child($title);
 				//Construct table
 				$table = new HtmlBuilder('table');
@@ -405,7 +405,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$listator = new EntitiesListator();
 		$listator->loadEntities($slidingScales);
 		$listator->setNumberFormatOptions($currency, $language);
-		$listator->addColumn('# Escalón', 'scale_number');
+		$listator->addColumn('# Escalón', 'order_number');
 		$listator->addColumn('Monto Bruto', 'amount');
 		$listator->addColumn('% Descuento', 'discountRate');
 		$listator->addColumn('Descuento', 'discount');
@@ -632,15 +632,23 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$slidingScale->set('hours', $charge->get("{$scaleLabel}_tiempo"), false);
 		$slidingScale->set('feeId', $charge->get("{$scaleLabel}_id_tarifa"), false);
 		$slidingScale->set('currencyId', $charge->get("{$scaleLabel}_id_moneda"), false);
+		if ($slidingScale->get('hours') == 0) {
+			return false;
+		}
 		return $slidingScale;
 	}
 
 	public function constructScaleObjects($charge) {
 		$slidingScales = array();
-		$slidingScales[] = $this->getSlidingScale($charge, 1);
-		$slidingScales[] = $this->getSlidingScale($charge, 2);
-		$slidingScales[] = $this->getSlidingScale($charge, 3);
-		$slidingScales[] = $this->getSlidingScale($charge, 4);
+		$order_number = 0;
+		for ($scale = 1; $scale < 5; $scale ++) {
+			$slidingScale = $this->getSlidingScale($charge, $scale);
+			if ($slidingScale) {
+				$order_number ++;
+				$slidingScale->set('order_number', $order_number, false);
+				$slidingScales[] = $slidingScale;
+			}
+		}
 		return $slidingScales;
 	}
 
@@ -705,12 +713,10 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		foreach ($slidingScales as $scale) {
 			$result = $this->slidingScaleTimeCalculation($works, $scale, $charge);
 			$works = $result['works'];
-			if ($result['scaleAmount'] > 0) {
-				$scale->set('scaleWorks', $result['scaleWorks']);
-				$scale->set('amount', $result['scaleAmount'], false);
-				$scale->set('chargeCurrency', $charge->get('id_moneda'));
-				$processedSlidingScales[] = $scale;
-			}
+			$scale->set('scaleWorks', $result['scaleWorks']);
+			$scale->set('amount', $result['scaleAmount'], false);
+			$scale->set('chargeCurrency', $charge->get('id_moneda'));
+			$processedSlidingScales[] = $scale;
 		}
 
 		return $processedSlidingScales;
