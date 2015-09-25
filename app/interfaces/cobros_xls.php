@@ -1163,31 +1163,47 @@ foreach ($chargeResults as $charge) {
 				$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 
 				$ws->write(++$filas, $col_id_trabajo, __('Nombre'), $formato_encabezado);
+				$ws->mergeCells($filas, $col_id_trabajo, $filas, 1);
+
 				if ($cobro->fields['opc_ver_profesional_categoria']) {
-					$ws->write($filas, $col_id_trabajo + 1, __($idioma->fields['codigo_idioma'] . '_CATEGORÍA'), $formato_encabezado);
+					$ws->write($filas, 2, __($idioma->fields['codigo_idioma'] . '_CATEGORÍA'), $formato_encabezado);
+					$ws->mergeCells($filas, 2, $filas, 3);
 				}
-				$ws->write($filas, $col_id_trabajo + 2, __('Hrs. Tarificadas'), $formato_encabezado);
-				$ws->write($filas, $col_id_trabajo + 3, __('TARIFA'), $formato_encabezado);
-				$ws->write($filas, $col_id_trabajo + 4, __($idioma->fields['codigo_idioma'] . '_IMPORTE'), $formato_encabezado);
+
+				$ws->write($filas, 4, __('Hrs. Tarificadas'), $formato_encabezado);
+				$ws->mergeCells($filas, 4, $filas, 5);
+
+				$ws->write($filas, 6, __('TARIFA'), $formato_encabezado);
+				$ws->mergeCells($filas, 6, $filas, 7);
+
+				$ws->write($filas, 8, __($idioma->fields['codigo_idioma'] . '_IMPORTE'), $formato_encabezado);
+				$ws->mergeCells($filas, 8, $filas, 9);
 
 				foreach ($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'] as $id_usuario => $usuarios) {
 					if (round($usuarios['duracion']) > 0) {
 						$ws->write(++$filas, $col_id_trabajo, $usuarios['usuario'], $formato_normal);
+						$ws->mergeCells($filas, $col_id_trabajo, $filas, 1);
 
 						if ($cobro->fields['opc_ver_profesional_categoria']) {
-							$ws->write($filas, $col_id_trabajo + 1, $usuarios['categoria'], $formato_normal);
+							$ws->write($filas, 2, $usuarios['categoria'], $formato_normal);
+							$ws->mergeCells($filas, 2, $filas, 3);
 						}
 
-						$ws->write($filas, $col_id_trabajo + 2, Utiles::Decimal2GlosaHora(round($usuarios['duracion'], 2)), $formato_normal);
-						$ws->write($filas, $col_id_trabajo + 3, number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
-						$ws->write($filas, $col_id_trabajo + 4, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
+						$ws->write($filas, 4, Utiles::Decimal2GlosaHora(round($usuarios['duracion'], 2)), $formato_normal);
+						$ws->mergeCells($filas, 4, $filas, 5);
+
+						$ws->write($filas, 6, number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
+						$ws->mergeCells($filas, 6, $filas, 7);
+
+						$ws->write($filas, 8, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
+						$ws->mergeCells($filas, 8, $filas, 9);
 					}
 				}
 
 				// Total
 				$ws->write(++$filas, $col_id_trabajo, __('Total'), $formato_encabezado);
-				$ws->write($filas, $col_id_trabajo + 2, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $formato_encabezado);
-				$ws->write($filas, $col_id_trabajo + 4, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_encabezado);
+				$ws->write($filas, $col_fecha_mes, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $formato_encabezado);
+				$ws->write($filas, $col_abogado, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_encabezado);
 			};
 		}
 	}
