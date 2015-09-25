@@ -1059,7 +1059,7 @@ foreach ($chargeResults as $charge) {
 		++$filas;
 	}
 
-	if (! Conf::GetConf($sesion, 'EsconderTarifaEscalonada')) {
+	if ($cobro->fields['forma_cobro'] == 'ESCALONADA') {
 		$cobro_moneda = new CobroMoneda($sesion);
 		$cobro_moneda->Load($id_cobro);
 		$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
@@ -1148,6 +1148,8 @@ foreach ($chargeResults as $charge) {
 
 		$ws->write($filas, 6, $resumen_detalle, $formato_encabezado);
 		$ws->mergeCells($filas, 6, $filas++, 10);
+		$celda_subtotales_horas = 0;
+		$celda_subtotales_totales = 0;
 
 		$esc = 0;
 		while (++$esc <= $cantidad_escalonadas) {
@@ -1187,16 +1189,29 @@ foreach ($chargeResults as $charge) {
 					}
 				}
 
-				// Total
-				$ws->write(++$filas, 6, __('Total'), $formato_total);
+				// Sub Total
+				$filas++;
+				$celda_subtotales_horas += $cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'];
+				$celda_subtotales_totales += number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', '');
+				$ws->write($filas, 6, __('Sub Total'), $formato_total);
 				$ws->write($filas, 7, '', $formato_total);
 				$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $formato_total);
 				$ws->write($filas, 9, '', $formato_total);
-				$ws->write($filas, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_total);
+				$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_total);
 			};
 		}
+
+		// Sub Total
+		$ws->write(++$filas, 6, __('Total'), $formato_total);
+		$ws->write($filas, 7, '', $formato_total);
+		$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($celda_subtotales_horas, 2)), $formato_total);
+		$ws->write($filas, 9, '', $formato_total);
+		$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $celda_subtotales_totales, $formato_total);
 	}
 
+		$wb->send('Resumen de ' . __('cobro') . '_' . $cobro->fields['id_cobro'] . '.xls');
+
+$wb->close();exit();
 	$filas += 2;
 
 	$query_num_usuarios = "SELECT DISTINCT id_usuario FROM trabajo WHERE id_cobro='{$cobro->fields['id_cobro']}'";
@@ -1207,7 +1222,7 @@ foreach ($chargeResults as $charge) {
 	 *  Dejar espacio para el resumen profesional si es necesario.
 	 */
 
-	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales && Conf::GetConf($sesion, 'EsconderTarifaEscalonada')) || $cobro->fields['opc_ver_profesional']) {
+	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales && ($cobro->fields['forma_cobro'] == 'ESCALONADA')) || $cobro->fields['opc_ver_profesional']) {
 		$fila_inicio_resumen_profesional = $filas - 1;
 		if ($num_usuarios > 0) {
 			$filas += $num_usuarios + 7;
@@ -1866,7 +1881,7 @@ foreach ($chargeResults as $charge) {
 		$filas += 2;
 	}
 
-	if ((( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] ) && is_array($detalle_profesional)) && Conf::GetConf($sesion, 'EsconderTarifaEscalonada')) {
+	if ((( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] ) && is_array($detalle_profesional)) && ($cobro->fields['forma_cobro'] == 'ESCALONADA')) {
 
 		/*
 		 *  Si el resumen va al principio cambiar el índice de las filas.
