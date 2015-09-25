@@ -1103,3 +1103,5 @@ $_LANG['Mostrando desde 0 hasta 0 de 0 registros'] = 'Mostrando de 0 até 0 de 0 
 $_LANG['Información del Proveedor'] = 'Informação do Provedor';
 $_LANG['y anterior a'] = 'E anterior a';
 $_LANG['Agregar Cobro'] = 'Adicionar Liquidação';
+$_LANG['Facturas_Pagos'] = 'Facturas_Pagamento';
+$_LANG['Nombre Banco'] = 'Nome Banco';

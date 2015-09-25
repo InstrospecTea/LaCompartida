@@ -38,7 +38,7 @@ class FacturaPago extends Objeto {
 			),
 			array(
 					'format' => 'date',
-					'title' => 'Fecha Pago',
+					'title' => 'Fecha pago',
 					'field' => 'fecha_pago',
 			),
 			array(
@@ -247,6 +247,10 @@ class FacturaPago extends Objeto {
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 		$this->log_update = true;
+
+		for ($i = 0; $i < count(self::$configuracion_reporte); $i++) {
+			self::$configuracion_reporte[$i]['title'] = __(self::$configuracion_reporte[$i]['title']);
+		}
 	}
 
 	function LoadByIdContabilidad($id_contabilidad) {
