@@ -1866,7 +1866,7 @@ foreach ($chargeResults as $charge) {
 		$filas += 2;
 	}
 
-	if (( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] ) && is_array($detalle_profesional)) {
+	if ((( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] ) && is_array($detalle_profesional)) && Conf::GetConf($sesion, 'EsconderTarifaEscalonada')) {
 
 		/*
 		 *  Si el resumen va al principio cambiar el índice de las filas.
