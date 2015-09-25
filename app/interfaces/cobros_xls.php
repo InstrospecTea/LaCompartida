@@ -1174,10 +1174,9 @@ foreach ($chargeResults as $charge) {
 				$ws->mergeCells($filas, 4, $filas, 5);
 
 				$ws->write($filas, 6, __('TARIFA'), $formato_encabezado);
-				$ws->mergeCells($filas, 6, $filas, 7);
 
-				$ws->write($filas, 8, __($idioma->fields['codigo_idioma'] . '_IMPORTE'), $formato_encabezado);
-				$ws->mergeCells($filas, 8, $filas, 9);
+				$ws->write($filas, 7, __($idioma->fields['codigo_idioma'] . '_IMPORTE'), $formato_encabezado);
+				$ws->mergeCells($filas, 7, $filas, 6);
 
 				foreach ($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'] as $id_usuario => $usuarios) {
 					if (round($usuarios['duracion']) > 0) {
@@ -1193,10 +1192,9 @@ foreach ($chargeResults as $charge) {
 						$ws->mergeCells($filas, 4, $filas, 5);
 
 						$ws->write($filas, 6, number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
-						$ws->mergeCells($filas, 6, $filas, 7);
 
-						$ws->write($filas, 8, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
-						$ws->mergeCells($filas, 8, $filas, 9);
+						$ws->write($filas, 7, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
+						$ws->mergeCells($filas, 7, $filas, 8);
 					}
 				}
 
