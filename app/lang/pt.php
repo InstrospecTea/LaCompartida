@@ -1101,3 +1101,5 @@ $_LANG['Balance cuenta gastos'] = 'Balanco conta de gastos';
 $_LANG['Mostrando desde _START_ hasta _END_ de _TOTAL_ registros'] = 'Mostrando de _START_ até _END_ de _TOTAL_ registros';
 $_LANG['Mostrando desde 0 hasta 0 de 0 registros'] = 'Mostrando de 0 até 0 de 0 registros';
 $_LANG['Información del Proveedor'] = 'Informação do Provedor';
+$_LANG['y anterior a'] = 'E anterior a';
+$_LANG['Agregar Cobro'] = 'Adicionar Liquidação';
