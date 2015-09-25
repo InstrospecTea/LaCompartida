@@ -291,11 +291,14 @@ $_LANG['Clientes activos'] = 'Clientes ativos';
 $_LANG['Descargar Resumen Excel'] = 'Download do resumo em Excel';
 $_LANG['Ingreso de Gastos'] = 'Inserção de gastos';
 $_LANG['Información de gasto'] = 'Informação de gastos';
+$_LANG['Información de'] = 'Informação de';
 $_LANG['Proveedor'] = 'Provedor';
 $_LANG['Monto cobrable'] = 'Moeda';
 $_LANG['N° OT'] = 'Número OT';
 $_LANG['Con Impuesto'] = 'Com imposto';
 $_LANG['Ingresado por'] = 'Inserido por';
+$_LANG['Descripción Parametrizada'] = 'Descrição Parametrizada';
+$_LANG['Nuevo gasto'] = 'Novo gasto';
 
 // Cuenta Corriente
 $_LANG['Con Fecha posterior a:'] = 'Com data posterior a:';
@@ -1097,3 +1100,4 @@ $_LANG['no coincide con el monto facturado'] = 'não coincide com a quantia fatur
 $_LANG['Balance cuenta gastos'] = 'Balanco conta de gastos';
 $_LANG['Mostrando desde _START_ hasta _END_ de _TOTAL_ registros'] = 'Mostrando de _START_ até _END_ de _TOTAL_ registros';
 $_LANG['Mostrando desde 0 hasta 0 de 0 registros'] = 'Mostrando de 0 até 0 de 0 registros';
+$_LANG['Información del Proveedor'] = 'Informação do Provedor';
