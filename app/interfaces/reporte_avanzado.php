@@ -72,26 +72,24 @@ $tipos_de_dato = array(
 	'horas_pagadas',
 	'horas_por_pagar',
 	'horas_incobrables',
-	'valor_cobrado',
+	'horas_spot',
+	'valor_cobrable',
 	'valor_por_cobrar',
-	'valor_pagado',
+	'valor_cobrado',
 	'valor_por_pagar',
+	'valor_pagado',
+	'valor_pagado_parcial',
 	'valor_incobrable',
 	'rentabilidad',
+	'rentabilidad_base',
 	'valor_hora',
 	'diferencia_valor_estandar',
 	'valor_estandar',
 	'valor_trabajado_estandar',
-	//'rentabilidad_base',
 	'costo',
 	'costo_hh',
 	'valor_tramites'
 );
-
-if ($debug == 1) {
-	$tipos_de_dato[] = 'valor_pagado_parcial';
-	$tipos_de_dato[] = 'valor_por_pagar_parcial';
-}
 
 $tipos_de_dato_select = array();
 foreach ($tipos_de_dato as $tipo) {
@@ -198,26 +196,34 @@ $ReporteAvanzado->id_moneda = $id_moneda;
 $ReporteAvanzado->glosa_dato['codigo_asunto'] = "Código " . __('Asunto');
 $ReporteAvanzado->glosa_dato['horas_trabajadas'] = "Total de Horas Trabajadas";
 $ReporteAvanzado->glosa_dato['horas_cobrables'] = __("Total de Horas Trabajadas en asuntos Facturables");
-$ReporteAvanzado->glosa_dato['horas_no_cobrables'] = __("Total de Horas Trabajadas en asuntos no Facturables");
-$ReporteAvanzado->glosa_dato['horas_castigadas'] = __("Diferencia de Horas Cobrables con las Horas que ve el cliente en nota de Cobro");
 $ReporteAvanzado->glosa_dato['horas_visibles'] = __("Horas que ve el Cliente en nota de cobro (tras revisión)");
 $ReporteAvanzado->glosa_dato['horas_cobradas'] = __("Horas Visibles en Cobros que ya fueron Emitidos");
-$ReporteAvanzado->glosa_dato['horas_por_cobrar'] = "Horas Visibles que aún no se Emiten al Cliente";
 $ReporteAvanzado->glosa_dato['horas_pagadas'] = __("Horas Cobradas en Cobros con estado Pagado");
 $ReporteAvanzado->glosa_dato['horas_por_pagar'] = __("Horas Cobradas que aún no han sido pagadas");
+$ReporteAvanzado->glosa_dato['horas_por_cobrar'] = "Horas Visibles que aún no se Emiten al Cliente";
 $ReporteAvanzado->glosa_dato['horas_incobrables'] = __("Horas en Cobros Incobrables");
-$ReporteAvanzado->glosa_dato['valor_por_cobrar'] = __("Valor monetario estimado que corresponde a cada Profesional en horas por cobrar");
-$ReporteAvanzado->glosa_dato['valor_cobrado'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro ya Emitido");
-$ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario de trámites que corresponde a cada Profesional, en un Cobro ya Emitido");
-$ReporteAvanzado->glosa_dato['valor_incobrable'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable");
-$ReporteAvanzado->glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado");
+$ReporteAvanzado->glosa_dato['horas_castigadas'] = __("Diferencia de Horas Cobrables con las Horas que ve el cliente en nota de Cobro");
+$ReporteAvanzado->glosa_dato['horas_no_cobrables'] = __("Total de Horas Trabajadas en asuntos no Facturables");
+$ReporteAvanzado->glosa_dato['horas_spot'] = __("Horas cobrables de profesionales, en formas de cobro TASA y CAP");
+
+$ReporteAvanzado->glosa_dato['valor_cobrable'] = __("Valor monetario que corresponde a cada Profesional (por horas o trámites)");
+$ReporteAvanzado->glosa_dato['valor_cobrado'] = __("Valor monetario que corresponde a cada Profesional (por horas o trámites), en un Cobro ya Emitido");
+$ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario que corresponde a cada Profesional por concepto de trámites, en un Cobro ya Emitido");
+
+$ReporteAvanzado->glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado totalmente");
+$ReporteAvanzado->glosa_dato['valor_pagado_parcial'] = __("Valor Pagado de un Cobro que ha sido parcialmente pagado");
 $ReporteAvanzado->glosa_dato['valor_por_pagar'] = __("Valor Cobrado que aún no ha sido pagado");
-$ReporteAvanzado->glosa_dato['rentabilidad'] = __("Valor Cobrado / Valor Estándar");
-$ReporteAvanzado->glosa_dato['valor_hora'] = __("Valor Cobrado / Horas Cobradas");
-$ReporteAvanzado->glosa_dato['diferencia_valor_estandar'] = __("Valor Cobrado - Valor Estándar");
-$ReporteAvanzado->glosa_dato['valor_estandar'] = __("Valor Cobrado, si se hubiera usado THH Estándar");
+$ReporteAvanzado->glosa_dato['valor_por_pagar_parcial'] = __("Valor Por Pagar de un Cobro que ha sido pagado parcialmente");
+$ReporteAvanzado->glosa_dato['valor_por_cobrar'] = __("Valor monetario estimado que corresponde a cada Profesional en horas por cobrar");
+$ReporteAvanzado->glosa_dato['valor_incobrable'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable");
 $ReporteAvanzado->glosa_dato['valor_trabajado_estandar'] = __("Horas Trabajadas por THH Estándar, para todo Trabajo");
+$ReporteAvanzado->glosa_dato['valor_estandar'] = __("Valor Cobrado, si se hubiera usado THH Estándar");
+$ReporteAvanzado->glosa_dato['diferencia_valor_estandar'] = __("Valor Cobrado - Valor Estándar");
+
+$ReporteAvanzado->glosa_dato['valor_hora'] = __("Valor Cobrado / Horas Cobradas");
 $ReporteAvanzado->glosa_dato['rentabilidad_base'] = __("Valor Cobrado / Valor Trabajado Estándar");
+$ReporteAvanzado->glosa_dato['rentabilidad'] = __("Valor Cobrado / Valor Estándar");
+
 $ReporteAvanzado->glosa_dato['costo'] = __("Costo para la firma, por concepto de sueldos");
 $ReporteAvanzado->glosa_dato['costo_hh'] = __("Costo HH para la firma, por concepto de sueldos");
 
@@ -362,6 +368,7 @@ if (!$popup) {
 
 	<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/reporte_avanzado.js"></script>
 	<script type="text/javascript">
+		var tipos_moneda = <?php echo json_encode(array_values(ReporteCriteria::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
 		var urlAjaxReporteAvanzado = '<?php echo Conf::RootDir(); ?>/app/interfaces/ajax/reporte_avanzado.php';
 		var buttonsReporte = {
@@ -392,14 +399,6 @@ if (!$popup) {
 	<?php
 }
 ?>
-
-<table class="alerta" width="90%" style="margin-bottom: 10px;">
-	<tr>
-		<td style="font-size:13px !important;">
-			<strong>Estimado usuario:</strong> Durante esta semana estamos mejorando el m&oacute;dulo de reportes avanzados, por lo tanto recomendamos no hacer uso de dichos reportes hasta nuevo aviso. De antemano muchas gracias por su comprensi&oacute;n.
-		</td>
-	</tr>
-</table>
 
 <form method="post" name="formulario" action="" id="formulario" autocomplete="off">
 	<input type="hidden" name="opc" id="opc" value="print">
@@ -936,15 +935,16 @@ if (!$popup) {
 							<tr>
 								<?php //echo $ReporteAvanzado->celda_disabled('valor_trabajado') ?>
 								<?php //echo $ReporteAvanzado->borde_abajo(2) ?>
-								<?php //echo $ReporteAvanzado->celda_disabled('valor_cobrable') ?>
 								<?php //echo $ReporteAvanzado->borde_abajo(2) ?>
 								<?php //echo $ReporteAvanzado->celda_disabled('valor_visible') ?>
-								<?php //echo $ReporteAvanzado->borde_abajo(2) ?>
-								<?php echo $ReporteAvanzado->nada(8) ?>
-								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->nada(6) ?>
+								<?php echo $ReporteAvanzado->celda('valor_cobrable') ?>
+								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
 								<?php echo $ReporteAvanzado->celda('valor_cobrado') ?>
 								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
 								<?php echo $ReporteAvanzado->celda('valor_pagado') ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('valor_pagado_parcial') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(7) ?>
@@ -967,11 +967,14 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->celda('valor_por_cobrar') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('valor_por_pagar') ?>
+								<?php echo $ReporteAvanzado->nada() ?>
+								<?php echo $ReporteAvanzado->nada() ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(7) ?>
 								<?php echo $ReporteAvanzado->borde_derecha() ?>
-								<?php echo $ReporteAvanzado->nada(3) ?>
+								<?php echo $ReporteAvanzado->nada() ?>
+								<?php echo $ReporteAvanzado->borde_derecha() ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(12) ?>
@@ -980,10 +983,27 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(8) ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('valor_incobrable') ?>
-								<?php echo $ReporteAvanzado->nada(3) ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('valor_hora') ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->nada(1) ?>
+								<?php echo $ReporteAvanzado->nada(7) ?>
+								<?php echo $ReporteAvanzado->borde_derecha() ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(7) ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(8) ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('valor_tramites') ?>
+								<?php echo $ReporteAvanzado->nada(2) ?>
+								<?php echo $ReporteAvanzado->celda('costo') ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('costo_hh') ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(9) ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(13) ?>
@@ -992,21 +1012,25 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->titulo_proporcionalidad() ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->moneda() ?>
+								<?php echo $ReporteAvanzado->nada(3) ?>
+
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('valor_estandar') ?>
-								<?php echo $ReporteAvanzado->nada(2) ?>
+								<?php echo $ReporteAvanzado->celda('valor_estandar'); ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('diferencia_valor_estandar') ?>
-								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('valor_hora'); ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('rentabilidad') ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->nada(1) ?>
+								<?php echo $ReporteAvanzado->nada(11) ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(1) ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(12) ?>
+
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->select_proporcionalidad() ?>
@@ -1014,9 +1038,10 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->select_moneda() ?>
 								<?php echo $ReporteAvanzado->nada(5) ?>
 								<?php echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
-								<?php // echo $ReporteAvanzado->celda_disabled('rentabilidad_base') ?>
-								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('rentabilidad') ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('rentabilidad_base') ?>
+
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(1) ?>
@@ -1030,9 +1055,7 @@ if (!$popup) {
 							<tr>
 								<?php echo $ReporteAvanzado->tinta() ?>
 								<?php echo $ReporteAvanzado->nada(8) ?>
-								<?php echo $ReporteAvanzado->celda('costo') ?>
 								<?php echo $ReporteAvanzado->nada(2) ?>
-								<?php echo $ReporteAvanzado->celda('costo_hh') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(9) ?>

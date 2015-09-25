@@ -213,7 +213,7 @@ if ($lista_usuarios == "") {
 $tipo_dato = array('horas_trabajadas', 'horas_cobradas', 'horas_por_cobrar', 'horas_castigadas', 'horas_no_cobrables', 'valor_cobrado');
 foreach ($usuarios as $usuario) {
 	foreach ($tipo_dato as $td) {
-		$reporte = new Reporte($Sesion);
+		$reporte = new ReporteCriteria($Sesion);
 		if (is_array($forma_cobro)) {
 			foreach ($forma_cobro as $fc) {
 				$reporte->addFiltro('cobro', 'forma_cobro', $fc);
@@ -229,7 +229,7 @@ foreach ($usuarios as $usuario) {
 			$reporte->Query();
 			$resultado[$usuario]['valor_cobrado_estandar'] = $reporte->toCross();
 			$reporte->setTipoDato($td);
-			$reporte->setProporcionalidad('no_estandar');
+			$reporte->setProporcionalidad('cliente');
 			$reporte->Query();
 			$resultado[$usuario]['valor_cobrado'] = $reporte->toCross();
 		} else {
