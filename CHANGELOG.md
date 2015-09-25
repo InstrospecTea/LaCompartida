@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.20.0
+Friday 2015, September 25
+* **Fix** [Reporte Avanzado Corregido](https://github.com/LemontechSA/ttb/pull/1140)
+
 ## Hotfix 15.19.2
 Tuesday 2015, September 23rd
 * **Fix** [Correción Facturación CL](https://github.com/LemontechSA/ttb/pull/1136)
