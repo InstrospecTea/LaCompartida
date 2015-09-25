@@ -1196,8 +1196,8 @@ foreach ($chargeResults as $charge) {
 
 				// Total
 				$ws->write(++$filas, $col_id_trabajo, __('Total'), $formato_encabezado);
-				$ws->write($filas, $col_fecha_mes, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $formato_encabezado);
-				$ws->write($filas, $col_abogado, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_encabezado);
+				$ws->write($filas, 4, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $formato_encabezado);
+				$ws->write($filas, 7, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_encabezado);
 			};
 		}
 	}
