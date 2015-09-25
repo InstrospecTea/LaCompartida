@@ -1192,7 +1192,7 @@ foreach ($chargeResults as $charge) {
 				$ws->write($filas, 7, '', $formato_total);
 				$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $formato_total);
 				$ws->write($filas, 9, '', $formato_total);
-				$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_total);
+				$ws->write($filas, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_total);
 			};
 		}
 	}
@@ -1207,7 +1207,7 @@ foreach ($chargeResults as $charge) {
 	 *  Dejar espacio para el resumen profesional si es necesario.
 	 */
 
-	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales ) || $cobro->fields['opc_ver_profesional']) {
+	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales && Conf::GetConf($sesion, 'EsconderTarifaEscalonada')) || $cobro->fields['opc_ver_profesional']) {
 		$fila_inicio_resumen_profesional = $filas - 1;
 		if ($num_usuarios > 0) {
 			$filas += $num_usuarios + 7;
