@@ -1161,7 +1161,7 @@ foreach ($chargeResults as $charge) {
 						$ws->write(++$filas, 6, "Escalon {$esc}: Tarifa HH", $formato_encabezado);
 					}
 				}
-				$ws->mergeCells($filas, 6, $filas++, $col_fecha_fin);
+				$ws->mergeCells($filas, 6, $filas++, 10);
 
 				$ws->write(++$filas, 6, __('Nombre'), $formato_titulo);
 
@@ -1182,7 +1182,7 @@ foreach ($chargeResults as $charge) {
 						}
 
 						$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($usuarios['duracion'], 2)), $formato_normal);
-						$ws->write($filas, 9, number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
+						$ws->write($filas, 9, number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal_centrado);
 						$ws->write($filas, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
 					}
 				}
