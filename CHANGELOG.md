@@ -2,7 +2,7 @@
 
 ## Hotfix 15.20.1
 Monday 2015, September 28th
-* **Fix** [Tarifa escalonada reporte Excel](https://github.com/LemontechSA/ttb/pull/1138)
+* **Fix** [Tarifa escalonada reporte Excel](https://github.com/LemontechSA/ttb/pull/1141)
 
 ## Hotfix 15.20.0
 Friday 2015, September 25
