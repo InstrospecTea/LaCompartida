@@ -1,8 +1,12 @@
 # Changelog
 
-## Hotfix 15.19.3
-Friday 2015, September 25th
+## Hotfix 15.20.1
+Monday 2015, September 28th
 * **Fix** [Tarifa escalonada reporte Excel](https://github.com/LemontechSA/ttb/pull/1138)
+
+## Hotfix 15.20.0
+Friday 2015, September 25
+* **Fix** [Reporte Avanzado Corregido](https://github.com/LemontechSA/ttb/pull/1140)
 
 ## Hotfix 15.19.2
 Tuesday 2015, September 23rd

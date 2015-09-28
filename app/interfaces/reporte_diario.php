@@ -43,7 +43,7 @@ if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
 	'estado',
 	'id_cobro',
 	'forma_cobro',
-	'prm_area_proyecto.glosa',
+	'area_asunto',
 	'categoria_usuario',
 	'area_usuario',
 	'glosa_grupo_cliente',

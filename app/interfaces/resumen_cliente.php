@@ -5,8 +5,9 @@
 	$pagina = new Pagina($sesion);
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 
-	if($fecha1 != '')
-		$pagina->Redirect("planillas/planilla_resumen_abogado.php?fecha_ini=$fecha1&fecha_fin=$fecha2");
+	if($fecha1 != '') {
+    $pagina->Redirect("planillas/planilla_resumen_abogado.php?fecha_ini=$fecha1&fecha_fin=$fecha2");
+  }
 	$pagina->titulo = __('Reporte de Ventas');
 	$pagina->PrintTop();
 
