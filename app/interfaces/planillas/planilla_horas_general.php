@@ -44,7 +44,7 @@
 
 	foreach($datos as $dato)
 	{
-		$reporte[$dato] = new Reporte($sesion);
+		$reporte[$dato] = new ReporteCriteria($sesion);
 
 		foreach($clientes as $cliente)
 			if($cliente)
@@ -187,7 +187,7 @@
 	{
 		foreach($datos as $col => $dato)
 		{
-			$resultado[$dato]= Reporte::fixBar($resultado[$dato],$resultado['horas_trabajadas']);
+			$resultado[$dato]= ReporteCriteria::fixBar($resultado[$dato],$resultado['horas_trabajadas']);
 			ksort($resultado[$dato]);
 		}
 		//TITULOS
@@ -239,7 +239,7 @@
 		}
 
 		foreach($datos as $col => $dato)
-			$resultado[$dato]= Reporte::fixArray($resultado[$dato],$resultado['horas_trabajadas']);
+			$resultado[$dato]= ReporteCriteria::fixArray($resultado[$dato],$resultado['horas_trabajadas']);
 		$ws1->write($fila-1,$columna,__("Cliente"), $encabezado);
 		$ws1->mergeCells($fila-1,$columna+1,$fila-1,$columna+2);
 		$ws1->write($fila-1,$columna+1,__("Asunto"), $encabezado);

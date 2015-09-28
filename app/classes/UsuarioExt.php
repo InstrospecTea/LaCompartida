@@ -939,7 +939,7 @@ class UsuarioExt extends Usuario {
 			foreach ($result as $key => $value) {
 				$rows[$value['id_usuario']] = $value['nombre'];
 			}
-			
+
 			return $rows;
 
 		} catch (Exception $e) {
@@ -1052,7 +1052,7 @@ class UsuarioExt extends Usuario {
 	/**
 	 * resumen_actividades.php
 	 *
-	 * Retorna listado de usuarios 
+	 * Retorna listado de usuarios
 	 *
 	 * @return array $rows contiene un arreglo con los usuarios según la query previa
 	 */
@@ -1187,7 +1187,7 @@ class UsuarioExt extends Usuario {
 	 */
 	public function ListarActivos($where = '', $con_permisos = false) {
 		$Objeto = new Objeto($this->sesion, '', '', $this->tabla, $this->campo_id, $this->campo_glosa);
-		
+
 		$permisos = '';
 		if ($con_permisos !== false) {
 			$and_permisos = $con_permisos === true ? '' : "AND usuario_permiso.codigo_permiso = '{$con_permisos}'";
@@ -1199,6 +1199,10 @@ class UsuarioExt extends Usuario {
 							$and
 						ORDER BY usuario.apellido1";
 		return $Objeto->Listar($query_extra);
+	}
+
+	public static function getCampoGlosa() {
+		return "CONCAT(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre)";
 	}
 
 }

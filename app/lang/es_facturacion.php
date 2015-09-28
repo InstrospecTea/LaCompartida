@@ -5,7 +5,7 @@ require_once dirname(__FILE__).'/es.php';
 
 $_LANG['Cobranza'] = 'Facturación';
 
-	
+
 	// Reportes Avanzados
 $_LANG['horas_cobrables'] = 'Horas Facturables';
 $_LANG['horas_no_cobrables'] = 'Horas no Facturables';
@@ -46,6 +46,8 @@ $_LANG['Valor cobrado'] = "Valor Facturado";
 $_LANG['cobrabilidad'] = 'Facturabilidad';
 $_LANG['horas_incobrables'] = "Horas no Facturables";
 $_LANG['valor_cobrado'] = "Valor Facturado";
+$_LANG['valor_tramites'] = "Valor Facturado Trámites";
+$_LANG['valor_estandar'] = "Valor Facturado Estándar";
 $_LANG['valor_por_cobrar'] = "Valor por Facturar";
 
 $_LANG['valor_incobrable'] = "Valor no Facturable";
@@ -56,7 +58,7 @@ $_LANG['horas_visibles'] = "Horas Facturables Corregidas";
 $_LANG['UsarImpuestoSeparado'] = "Facturar impuestos por separado";
 $_LANG['UsarImpuestoPorGastos'] = "Facturar impuestos por separado a los gastos";
 $_LANG['ValorImpuestoGastos'] = "Valor impuesto (%) que se cobra a los gastos";
-	
+
 $_LANG['Cobrado'] = "Facturado";
 
 $_LANG['Valor estimado p/cobrar'] = "Valor estimado p/facturar";

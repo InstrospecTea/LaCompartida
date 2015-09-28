@@ -12,13 +12,13 @@
 
 	$vista .= '-dia_reporte';
 	$agrupadores = explode('-',$vista);
-	
+
 	if(!$filtros_check)
 	{
 		$fecha_ultimo_dia = date('t',mktime(0,0,0,$fecha_mes,5,$fecha_anio));
 		$fecha_m = ''.$fecha_mes;
 		$fecha_fin = $fecha_ultimo_dia."-".$fecha_m."-".$fecha_anio;
-		$fecha_ini = "01-".$fecha_m."-".$fecha_anio;	
+		$fecha_ini = "01-".$fecha_m."-".$fecha_anio;
 	}
 	else
 	{
@@ -35,7 +35,7 @@
 	$titulo_reporte = __('Resumen - ').' '.__($tipo_dato).' '.__(' en vista por').' '.__($agrupadores[0]);
 
 
-	$reporte = new Reporte($sesion);
+	$reporte = new ReporteCriteria($sesion);
 
 	if($clientes)
 		foreach($clientes as $cliente)
@@ -51,7 +51,7 @@
 		foreach($tipos_asunto as $tipo)
 			if($tipo)
 				$reporte->addFiltro('asunto','id_tipo_asunto',$tipo);
-		
+
 	if($areas_asunto)
 		foreach($areas_asunto as $area)
 			if($area)
@@ -74,7 +74,7 @@
 	$reporte->setVista($vista);
 	$reporte->setTipoDato($tipo_dato);
 	$reporte->id_moneda = $id_moneda;
-	
+
 	$simbolo_tipo_dato = Reporte::simboloTipoDato($tipo_dato,$sesion,$id_moneda);
 
 	$reporte->Query();
@@ -104,14 +104,14 @@
 									'Bold' => '1',
 									'underline'=>1,
 									'Color' => 'black'));
-	
+
 		$txt_opcion =& $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'left',
 									'Border' => 1,
 									'Color' => 'black'));
 		$txt_opcion->setTextWrap();
-		
+
 		$txt_valor =& $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'right',
@@ -124,7 +124,7 @@
 									'Border' => 1,
 									'Color' => 'red'));
 		$txt_rojo->setTextWrap();
-		
+
 		$txt_derecha =& $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'right',
@@ -137,14 +137,14 @@
 									'Border' => 1,
 									'Bold' => 1,
 									'Color' => 'black'));
-		
+
 		$fecha =& $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'center',
 									'Border' => 1,
 									'Color' => 'black'));
 		$fecha->setTextWrap();
-		
+
 		$numeros =& $wb->addFormat(array('Size' => 12,
 									'VAlign' => 'top',
 									'Align' => 'right',
@@ -197,7 +197,7 @@
 									'Border' => 1,
 									'Locked' => 1,
 									'Color' => 'black'));
-	
+
 		$formato_moneda =& $wb->addFormat(array('Size' => 11,
 										'VAlign' => 'top',
 										'Align' => 'right',
@@ -217,7 +217,7 @@
 									'FgColor' => '37',
 									'underline'=>1,
 									'Color' => 'black'));
-	
+
 
 	/* TITULOS */
    $ws1 =& $wb->addWorksheet(__('Reportes'));
@@ -235,7 +235,7 @@
 			$ws1->setColumn( $fila_inicial+$i, $fila_inicial+$i,  8.00);
 			$i++;
 		}
-	
+
 	$fila = 1;
 
 	$ws1->write($fila,1,$titulo_reporte, $titulo);
@@ -246,10 +246,10 @@
 	$ws1->write($fila,6,'');
 	$ws1->write($fila,7,'');
 	$ws1->mergeCells($fila,1,$fila,7);
-	
+
 	$fila += 1;
 	$ws1->write($fila, 0, __('PERIODO RESUMEN').":", $titulo);
-	$ws1->write($fila, 1, '');	
+	$ws1->write($fila, 1, '');
 	$ws1->mergeCells($fila, 0, $fila, 1);
 
     $ws1->write($fila,2,$fecha_ini." ".__("al")." ".$fecha_fin, $titulo);
@@ -257,21 +257,21 @@
 	$ws1->write($fila,4,'');
 	$ws1->write($fila,5,'');
 	$ws1->mergeCells($fila,2,$fila,5);
-	
+
 	$fila += 1;
 
     $hoy = date("d-m-Y");
-	
+
 	$ws1->write($fila, 0, __('FECHA REPORTE'), $titulo);
-	$ws1->write($fila, 1, '');	
+	$ws1->write($fila, 1, '');
 	$ws1->mergeCells($fila, 0, $fila, 1);
-    
+
 
 	$ws1->write($fila, 2, $hoy, $titulo);
-	$ws1->write($fila, 3, '');	
-	$ws1->write($fila, 4, '');	
+	$ws1->write($fila, 3, '');
+	$ws1->write($fila, 4, '');
 	$ws1->mergeCells($fila, 2, $fila, 4);
-     
+
     $columna = 0;
 	$fila+= 3;
 
@@ -313,7 +313,7 @@
 		global $horas_minutos_bold;
 		global $tipo_dato;
 		global $sesion;
-		
+
 			if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'MostrarSoloMinutos') ) ||  ( method_exists('Conf','MostrarSoloMinutos') && Conf::MostrarSoloMinutos() )  )  && (strpos($tipo_dato,"oras_") || strpos($tipo_dato_comparado,"oras_")))
 				$ws1->write($fila,$columna,Reporte::FormatoValor($sesion,$valor,$tipo_dato,"excel"),$horas_minutos_bold);
 			else
@@ -365,7 +365,7 @@
 			$ws1->writeNote($fila,$columna,__("Agrupador no existe, o no está definido para estos datos."));
 		}
 		else
-			$ws1->write($fila,$columna,$valor,$txt_opcion); 
+			$ws1->write($fila,$columna,$valor,$txt_opcion);
 	}
 
 	$fila++;
@@ -373,7 +373,7 @@
 	{
 		//LABELS
 		$fil = $fila;
-		$ws1->write($fil-1,$col,__($agrupadores[0]),$encabezado);	
+		$ws1->write($fil-1,$col,__($agrupadores[0]),$encabezado);
 		foreach($r['labels'] as $id => $nombre)
 		{
 			texto($fil,$col,$nombre['nombre']);
@@ -412,7 +412,7 @@
 							else
 								$min[$id] = 0;
 						}
-						if(!$min[$id] || $min[$id] <= $r['celdas'][$id][$id_col]['valor'])					
+						if(!$min[$id] || $min[$id] <= $r['celdas'][$id][$id_col]['valor'])
 							dato($fil,$col,$r['celdas'][$id][$id_col]['valor']);
 						else
 							dato($fil,$col,$r['celdas'][$id][$id_col]['valor'],false,true);
@@ -439,7 +439,7 @@
 			$col++;
 		}
 		total($fil,$col,'=SUM('.fila_col($fila,$col).':'.fila_col($fil-1, $col).')');
-			
+
 	}
     $wb->close();
 ?>

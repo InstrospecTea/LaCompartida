@@ -430,15 +430,12 @@ EOF;
 			$FacturaPadre->Load($Factura->fields['id_factura_padre']);
 			$arrayPadre = self::FacturaToArray($Sesion, $FacturaPadre, $Estudio);
 
-			$PrmDocumentoLegal->Load($Factura->fields['id_documento_referencia']);
-			$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
-
-			$referenciaId = intval($Factura->fields['dte_codigo_referencia']);
+			$referenciaId = intval($Factura->fields['id_documento_referencia']);
 			$Referencia = new PrmCodigo($Sesion);
 			$Referencia->LoadById($referenciaId);
 			$codigoReferencia = $Referencia->Loaded() ? $Referencia->fields['codigo'] : 1;
 			$arrayFactura['referencia'] = array(
-				'tipo_dte'	=> $tipoDTE,
+				'tipo_dte'	=> $referenciaId,
 				'folio'	=> $Factura->fields['folio_documento_referencia'],
 				'fecha_emision'	=> Utiles::sql2date($Factura->fields['fecha_documento_referencia'], '%Y-%m-%d'),
 				/**

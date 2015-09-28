@@ -930,7 +930,7 @@ if (!class_exists('Cobro')) {
 
 				if ($trabajo->fields['cobrable']) {
 					// Revisa duración de la hora y suma duracion que sobro del trabajo anterior, si es que se cambió de escalonada
-					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
+					list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
 					$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 					$duracion_trabajo = $duracion;
 

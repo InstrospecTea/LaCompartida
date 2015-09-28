@@ -643,7 +643,6 @@ $Form->defaultLabel = false;
 						<input type="text" class="fechadiff" name="fecha_documento_referencia" id="fecha_documento_referencia" value="<?php echo ! empty($factura->fields['fecha_documento_referencia']) ? Utiles::sql2date($factura->fields['fecha_documento_referencia'], '%d-%m-%Y') : NULL ?>">
 					</td>
 				</tr>
-				<?php $buscar_padre = true; ?>
 				<?php endif; ?>
 			<?php endif; ?>
 

@@ -944,12 +944,12 @@ foreach ($chargeResults as $charge) {
 				$descuento += $scale->get('discount');
 				$neto += $scale->get('netAmount');
 			}
-			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'bruto_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-			$ws->writeNumber($filas2++, $col_valor_trabajo, $bruto, $formato_moneda_encabezado);
-			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-			$ws->writeNumber($filas2++, $col_valor_trabajo, $descuento, $formato_moneda_encabezado);
-			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'neto_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-			$ws->writeNumber($filas2++, $col_valor_trabajo, $neto, $formato_moneda_encabezado);
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'subtotal', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $bruto, $formato_moneda_resumen);
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $descuento, $formato_moneda_resumen);
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $neto, $formato_moneda_resumen);
 		}
 
 		$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'honorarios', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
@@ -1056,6 +1056,157 @@ foreach ($chargeResults as $charge) {
 		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 		$ws->write($filas, $col_abogado, $contrato->fields['observaciones'], $formato_encabezado);
 		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+		++$filas;
+	}
+
+	if ($cobro->fields['forma_cobro'] == 'ESCALONADA') {
+		$cobro_moneda = new CobroMoneda($sesion);
+		$cobro_moneda->Load($id_cobro);
+		$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
+		$idioma->Load($lang);
+		$cobro_valores = array();
+
+		$cobro_valores['totales'] = array();
+		$cobto_valores['datos_escalonadas'] = array();
+
+		$cobro->CargarEscalonadas('acá');
+		$cobro_valores['datos_escalonadas'] = $cobro->escalonadas;
+
+		$dato_monto_cobrado = " ( trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) ) / 3600 ";
+
+		// Se seleccionan todos los trabajos del cobro, se incluye que sea cobrable ya que a los trabajos visibles
+		// tambien se consideran dentro del cobro, tambien se incluye el valor del retainer del trabajo.
+
+		if ($lang == 'es') {
+			$query_categoria_lang = "prm_categoria_usuario.glosa_categoria as categoria";
+		} else {
+			$query_categoria_lang = "IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) as categoria";
+		}
+		$query = "SELECT SQL_CALC_FOUND_ROWS trabajo.duracion_cobrada,
+						trabajo.descripcion,
+						trabajo.fecha,
+						trabajo.id_usuario,
+						$dato_monto_cobrado as monto_cobrado,
+						trabajo.id_moneda as id_moneda_trabajo,
+						trabajo.id_trabajo,
+						trabajo.tarifa_hh,
+						trabajo.cobrable,
+						trabajo.visible,
+						trabajo.codigo_asunto,
+						CONCAT_WS(' ', nombre, apellido1) as usr_nombre,
+						$query_categoria_lang
+				FROM trabajo
+				JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
+				LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario
+				WHERE trabajo.id_cobro = '{$id_cobro}'
+				AND trabajo.id_tramite=0
+				ORDER BY trabajo.fecha ASC";
+		$lista_trabajos = new ListaTrabajos($sesion, '', $query);
+
+		list($cobro_total_honorario_cobrable, $total_minutos_tmp, $detalle_trabajos) = $cobro->MontoHonorariosEscalonados($lista_trabajos);
+
+		$cobro_valores['totales']['valor'] = $cobro_total_honorario_cobrable;
+		$cobro_valores['totales']['duracion'] = ($total_minutos_tmp / 60);
+		$cobro_valores['detalle'] = $detalle_trabajos;
+		$cantidad_escalonadas = $cobro_valores['datos_escalonadas']['num'];
+
+		$resumen_encabezado = "";
+
+		$ws->write(++$filas, 6, __('Detalle Tarifa Escalonada'), $formato_encabezado);
+		$ws->mergeCells($filas, 6, $filas++, 10);
+
+		for ($i = 1; $i <= $cantidad_escalonadas; $i++) {
+
+			$detalle_escala = "";
+			$detalle_escala .= $cobro->escalonadas[$i]['tiempo_inicial'] . " - ";
+			$detalle_escala .=!empty($cobro->escalonadas[$i]['tiempo_final']) && $cobro->escalonadas[$i]['tiempo_final'] != 'NULL' ? $cobro->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
+			$detalle_escala .=!empty($cobro->escalonadas[$i]['id_tarifa']) && $cobro->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
+
+			if (!empty($cobro->fields['esc' . $i . '_descuento']) && $cobro->fields['esc' . $i . '_descuento'] != 'NULL') {
+				$detalle_escala .= " " . __('con descuento') . " {$cobro->fields['esc' . $i . '_descuento']}% ";
+			}
+
+			if (!empty($cobro->fields['esc' . $i . '_monto']) && $cobro->fields['esc' . $i . '_monto'] != 'NULL') {
+				$query_glosa_moneda = "SELECT simbolo FROM prm_moneda WHERE id_moneda='{$cobro->escalonadas[$i]['id_moneda']}' LIMIT 1";
+				$resp = mysql_query($query_glosa_moneda, $cobro->sesion->dbh) or Utiles::errorSQL($query_glosa_moneda, __FILE__, __LINE__, $cobro->sesion->dbh);
+				list( $simbolo_moneda ) = mysql_fetch_array($resp);
+				$monto_escala = number_format($cobro->escalonadas[$i]['monto'], $cobro_moneda->moneda[$cobro->escalonadas[$i]['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$detalle_escala .= ": $simbolo_moneda {$monto_escala}";
+			}
+
+			$ws->write(++$filas, 6, $detalle_escala, $formato_normal);
+			$ws->mergeCells($filas, 6, $filas, 10);
+		}
+
+		if ($lang == 'es') {
+			$resumen_detalle = __('Resumen Detalle Profesional');
+		} else {
+			$resumen_detalle = __('TIMEKEEPER SUMMARY');
+		}
+		
+		$filas = $filas + 2;
+
+		$ws->write($filas, 6, $resumen_detalle, $formato_encabezado);
+		$ws->mergeCells($filas, 6, $filas++, 10);
+		$celda_subtotales_horas = 0;
+		$celda_subtotales_totales = 0;
+
+		$esc = 0;
+		while (++$esc <= $cantidad_escalonadas) {
+			if (is_array($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'])) {
+				if ($cobro_valores['datos_escalonadas'][$esc]['monto'] > 0) {
+					$ws->write(++$filas, 6, "Escalón {$esc}: Monto Fijo " . $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $cobro_valores['datos_escalonadas'][$esc]['monto'], $formato_encabezado);
+				} else {
+					if ($cobro_valores['datos_escalonadas'][$esc]['descuento'] > 0) {
+						$ws->write(++$filas, 6, "Escalón {$esc}: Tarifa HH con " . $cobro_valores['datos_escalonadas'][$esc]['descuento'] . '% de descuento', $formato_encabezado);
+					} else {
+						$ws->write(++$filas, 6, "Escalón {$esc}: Tarifa HH", $formato_encabezado);
+					}
+				}
+				$ws->mergeCells($filas, 6, $filas++, 10);
+
+				$ws->write(++$filas, 6, __('Nombre'), $formato_titulo);
+
+				if ($cobro->fields['opc_ver_profesional_categoria']) {
+					$ws->write($filas, 7, __($idioma->fields['codigo_idioma'] . '_CATEGORÍA'), $formato_titulo);
+				}
+
+				$ws->write($filas, 8, __('Hrs. Tarificadas'), $formato_titulo);
+				$ws->write($filas, 9, __('TARIFA'), $formato_titulo);
+				$ws->write($filas, 10, __($idioma->fields['codigo_idioma'] . '_IMPORTE'), $formato_titulo);
+
+				foreach ($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'] as $id_usuario => $usuarios) {
+					if (round($usuarios['duracion']) > 0) {
+						$ws->write(++$filas, 6, $usuarios['usuario'], $formato_normal);;
+
+						if ($cobro->fields['opc_ver_profesional_categoria']) {
+							$ws->write($filas, 7, $usuarios['categoria'], $formato_normal);
+						}
+
+						$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($usuarios['duracion'], 2)), $formato_normal);
+						$ws->write($filas, 9, number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal_centrado);
+						$ws->write($filas, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
+					}
+				}
+
+				// Sub Total
+				$filas++;
+				$celda_subtotales_horas += $cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'];
+				$celda_subtotales_totales += number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', '');
+				$ws->write($filas, 6, __('Sub Total'), $formato_total);
+				$ws->write($filas, 7, '', $formato_total);
+				$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $formato_total);
+				$ws->write($filas, 9, '', $formato_total);
+				$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_total);
+			};
+		}
+
+		// Sub Total
+		$ws->write(++$filas, 6, __('Total'), $formato_total);
+		$ws->write($filas, 7, '', $formato_total);
+		$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($celda_subtotales_horas, 2)), $formato_total);
+		$ws->write($filas, 9, '', $formato_total);
+		$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $celda_subtotales_totales, $formato_total);
 	}
 
 	$filas += 2;
@@ -1068,7 +1219,7 @@ foreach ($chargeResults as $charge) {
 	 *  Dejar espacio para el resumen profesional si es necesario.
 	 */
 
-	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales ) || $cobro->fields['opc_ver_profesional']) {
+	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales && ($cobro->fields['forma_cobro'] != 'ESCALONADA')) || $cobro->fields['opc_ver_profesional']) {
 		$fila_inicio_resumen_profesional = $filas - 1;
 		if ($num_usuarios > 0) {
 			$filas += $num_usuarios + 7;
@@ -1727,7 +1878,7 @@ foreach ($chargeResults as $charge) {
 		$filas += 2;
 	}
 
-	if (( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] ) && is_array($detalle_profesional)) {
+	if ((( $opc_ver_profesional || $cobro->fields['opc_ver_profesional'] ) && is_array($detalle_profesional)) && ($cobro->fields['forma_cobro'] != 'ESCALONADA')) {
 
 		/*
 		 *  Si el resumen va al principio cambiar el índice de las filas.

@@ -259,7 +259,7 @@ Log::write(memory_get_usage(true) . ' bites', 'cps');
 $numero_reportes_horas = 8;
 if ($usa_reporte_horas) {
 	for ($i = 0; $i < $numero_reportes_horas; ++$i) {
-		$reporte[$i] = new Reporte($sesion);
+		$reporte[$i] = new ReporteCriteria($sesion);
 		$reporte[$i]->addRangoFecha($fecha_ini, $fecha_fin);
 		if ($clientes) {
 			foreach ($clientes as $cliente) {
@@ -294,7 +294,7 @@ $numero_reportes_valores = 6;
 $id_moneda = 3;
 if ($usa_reporte_valores) {
 	for ($i = $numero_reportes_horas; $i < $numero_reportes_horas + $numero_reportes_valores; ++$i) {
-		$reporte[$i] = new Reporte($sesion);
+		$reporte[$i] = new ReporteCriteria($sesion);
 		$reporte[$i]->addRangoFecha($fecha_ini, $fecha_fin);
 		if ($clientes) {
 			foreach ($clientes as $cliente) {

@@ -235,9 +235,11 @@ if (!$filtros_check) {
 /* Se crea el reporte según el Input del usuario */
 $reporte = new ReporteCriteria($sesion);
 $dato = $tipo_dato;
+
 $filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 	'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
 	'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
+
 $reporte->setFiltros($filtros);
 $reporte->Query();
 $r = $reporte->toArray();
