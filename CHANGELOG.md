@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.20.2
+Monday 2015, September 28th
+* **Fix** [Filtros extra Resumen Actividades](https://github.com/LemontechSA/ttb/pull/1142)
+
 ## Hotfix 15.20.1
 Monday 2015, September 28th
 * **Fix** [Tarifa escalonada reporte Excel](https://github.com/LemontechSA/ttb/pull/1141)
