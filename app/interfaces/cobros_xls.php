@@ -944,12 +944,12 @@ foreach ($chargeResults as $charge) {
 				$descuento += $scale->get('discount');
 				$neto += $scale->get('netAmount');
 			}
-			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'bruto_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-			$ws->writeNumber($filas2++, $col_valor_trabajo, $bruto, $formato_moneda_encabezado);
-			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-			$ws->writeNumber($filas2++, $col_valor_trabajo, $descuento, $formato_moneda_encabezado);
-			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'neto_escalonada', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
-			$ws->writeNumber($filas2++, $col_valor_trabajo, $neto, $formato_moneda_encabezado);
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'subtotal', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $bruto, $formato_moneda_resumen);
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'descuento', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $descuento, $formato_moneda_resumen);
+			$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'total_cobro', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
+			$ws->writeNumber($filas2++, $col_valor_trabajo, $neto, $formato_moneda_resumen);
 		}
 
 		$ws->write($filas2, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'honorarios', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado_derecha);
@@ -1155,12 +1155,12 @@ foreach ($chargeResults as $charge) {
 		while (++$esc <= $cantidad_escalonadas) {
 			if (is_array($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'])) {
 				if ($cobro_valores['datos_escalonadas'][$esc]['monto'] > 0) {
-					$ws->write(++$filas, 6, "Escalon {$esc}: Monto Fijo " . $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $cobro_valores['datos_escalonadas'][$esc]['monto'], $formato_encabezado);
+					$ws->write(++$filas, 6, "Escalón {$esc}: Monto Fijo " . $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $cobro_valores['datos_escalonadas'][$esc]['monto'], $formato_encabezado);
 				} else {
 					if ($cobro_valores['datos_escalonadas'][$esc]['descuento'] > 0) {
-						$ws->write(++$filas, 6, "Escalon {$esc}: Tarifa HH con " . $cobro_valores['datos_escalonadas'][$esc]['descuento'] . '% de descuento', $formato_encabezado);
+						$ws->write(++$filas, 6, "Escalón {$esc}: Tarifa HH con " . $cobro_valores['datos_escalonadas'][$esc]['descuento'] . '% de descuento', $formato_encabezado);
 					} else {
-						$ws->write(++$filas, 6, "Escalon {$esc}: Tarifa HH", $formato_encabezado);
+						$ws->write(++$filas, 6, "Escalón {$esc}: Tarifa HH", $formato_encabezado);
 					}
 				}
 				$ws->mergeCells($filas, 6, $filas++, 10);
