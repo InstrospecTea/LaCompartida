@@ -2,7 +2,7 @@ require 'capistrano/cli'
 
 load 'config/cap_notify'
 load 'config/cap_shared'
-load 'config/cap_servers_production'
+load 'config/cap_servers'
 
 set :current_stage, "feature"
 default_branch = `git symbolic-ref HEAD 2> /dev/null`.strip.gsub(/^refs\/heads\//, '')
@@ -29,7 +29,7 @@ namespace :deploy do
   task :finalize_update, :except => { :no_release => true } do
     transaction do
       # We need create the symbolic link for this feature
-      run "ln -nsf #{current_path} #{nginx_root}/time_tracking_#{feature_name}"
+      # run "ln -nsf #{current_path} #{nginx_root}/time_tracking_#{feature_name}"
 
       run "chmod -R g+w #{releases_path}/#{release_name}"
       run "echo 'stage: #{current_stage}' > #{releases_path}/#{release_name}/environment.txt"

@@ -321,7 +321,7 @@ foreach ($datos_reporte as $tipo_dato => $config) {
 	$reporte = new ReporteCriteria($Sesion);
 	$reporte->id_moneda = $id_moneda;
 	if (!empty($proporcionalidad)) {
-		$reporte->proporcionalidad = $proporcionalidad;
+		$reporte->setProporcionalidad($proporcionalidad);
 	}
 	// $fecha1 y $fecha2 deben estar en formato dd-mm-aaaa
 	$reporte->addRangoFecha($fecha1, $fecha2);
@@ -404,8 +404,8 @@ function imprimir_datos_columna($ws, $reporte, $tipo_dato, $ids, $columna, $form
 	$reporte->setVista($vista);
 	$reporte->Query();
 	$r = $reporte->toArray();
-	foreach ($r as $k_a => $a) {
-		if (is_array($a)) {
+
+	foreach ($r as $k_a => $a) {{
 			foreach ($a as $filtro) {
 				if ($filtro['filtro_campo'] == 'id_usuario' || $filtro['filtro_campo'] == 'codigo_cliente' || $filtro['filtro_campo'] == 'mes_reporte' || $filtro['filtro_campo'] == 'codigo_asunto') {
 					for ($t = 0; $t < count($ids); ++$t) {
