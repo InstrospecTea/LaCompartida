@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 15.20.3
+Tuesday 2015, September 29th
+* **Fix** [Corregir configuración editorconfig y ; en update](https://github.com/LemontechSA/ttb/pull/1143)
+
+## Hotfix 15.20.2
+Monday 2015, September 28th
+* **Fix** [Filtros extra Resumen Actividades](https://github.com/LemontechSA/ttb/pull/1142)
+
 ## Hotfix 15.20.1
 Monday 2015, September 28th
 * **Fix** [Tarifa escalonada reporte Excel](https://github.com/LemontechSA/ttb/pull/1141)
