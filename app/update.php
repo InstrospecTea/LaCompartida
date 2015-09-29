@@ -10910,7 +10910,7 @@ QUERY;
 			$queries[] = "ALTER TABLE `bloqueo_procesos` CHANGE COLUMN `estado` `estado` TEXT NOT NULL DEFAULT ''";
 			break;
 
-		case 8.14;
+		case 8.14:
 			$queries[] = "ALTER TABLE `factura` ADD `dte_folio_fiscal` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `dte_comentario`;";
 
 			$query = "SELECT id_factura,
@@ -10930,7 +10930,7 @@ QUERY;
 			}
 			break;
 
-		case 8.15;
+		case 8.15:
 			$queries[] = "ALTER TABLE `factura` CHANGE `id_documento_referencia` `id_documento_referencia` VARCHAR(255) NULL DEFAULT NULL;";
 			break;
 	}
