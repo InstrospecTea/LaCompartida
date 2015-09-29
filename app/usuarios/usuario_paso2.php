@@ -512,25 +512,12 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 		<table id="secretario_tabla" style="display:none">
 			<tr>
-				<td>
-
-				<?php
-				$where = '';
-				if ($usuario->loaded) {	$where = "id_usuario <> " . $usuario->fields['id_usuario'];	}
-				if (!$where) { $where = 1; }
-
-				$lista_usuarios = new ListaObjetos($sesion, '', "SELECT id_usuario,CONCAT_WS(' ',nombre,apellido1,apellido2) as name FROM usuario WHERE activo=1 AND $where ORDER BY nombre");
-
-				echo "<select name='usuario_secretario[]' id='usuario_secretario' multiple size=6 $tooltip_select  style='width: 200px;'>";
-
-				for ($x = 0; $x < $lista_usuarios->num; $x++) {
-					$us = $lista_usuarios->Get($x);
-				?>
-
-				<option value='<?php echo $us->fields['id_usuario'] ?>' <?php echo $usuario->LoadSecretario($us->fields['id_usuario']) ? "selected" : "" ?>><?php echo $us->fields['name'] ?></option>
+				<td><!-- Nuevo Select -->
 					<?php
-				} echo "</select>";	?>
-
+					$usuarioExt = new UsuarioExt($sesion);
+					$seleccionados = $usuarioExt->get_usuarios_secretario_seleccionados($usuario->fields['id_usuario']);
+					echo $Form->select('usuario_secretario[]', $sesion->usuario->ListarActivos('', 'PRO'), $seleccionados, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6'));
+					?>
 				</td>
 			</tr>
 		</table>
@@ -549,7 +536,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					<?php echo __('Usuarios disponibles') ?>:
 				</td>
 				<td align="left">
-					<?php echo $usuario->select_no_revisados() ?>
+					<?php echo $Form->select('usuarios_fuera', $usuarioExt->get_usuarios_revisor($usuario->fields['id_usuario']), NULL, array('empty' => FALSE, 'style' => 'width: 170px')); ?>
 				</td>
 				<td>
 					<?php echo $Form->button(__('Añadir'), array('onclick' => 'AgregarUsuarioRevisado()')); ?>
@@ -560,7 +547,10 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					<?php echo __('Usuarios revisados') ?>:
 				</td>
 				<td align="left">
-					<?php echo $usuario->select_revisados(); ?>
+					<?php
+					echo $Form->select('usuarios_revisados', $usuarioExt->get_usuarios_revisor_seleccionados($usuario->fields['id_usuario']), NULL, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6')); 
+					?>
+					<input type="hidden" name="arreglo_revisados" id="arreglo_revisados" value="">
 				</td>
 				<td>
 					<?php echo $Form->button(__('Eliminar'), array('onclick' => 'EliminarUsuarioRevisado()')); ?>
