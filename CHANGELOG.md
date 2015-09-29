@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.20.4
+Tuesday 2015, September 29th
+* **Fix** [Correción query selector usuarios](https://github.com/LemontechSA/ttb/pull/1144)
+
 ## Hotfix 15.20.3
 Tuesday 2015, September 29th
 * **Fix** [Corregir configuración editorconfig y ; en update](https://github.com/LemontechSA/ttb/pull/1143)
