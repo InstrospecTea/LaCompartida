@@ -795,8 +795,6 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 
 	/* CLIENTES */
 	$clients = explode(',', $clientes);
-
-
 	foreach ($clients as $cliente) {
 		if ($cliente) {
 			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
