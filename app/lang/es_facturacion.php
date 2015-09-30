@@ -80,7 +80,7 @@ $_LANG['Trabajo ya cobrado'] = "No se puede modificar un trabajo que ya ha sido 
 $_LANG['Trabajos masivos ya cobrados'] = "Uno o varios de los trabajos seleccionados ya han sido facturados, por favor intente nuevamente sin seleccionarlo(s).";
 
 $_LANG['HORAS COBRADAS'] = "HORAS FACTURADAS";
-$_LANG['HORAS NO COBRABLES'] = "HORAS NO FACTURADAS";
+$_LANG['HORAS NO COBRABLES'] = "HORAS NO FACTURABLES";
 $_LANG['HORAS POR COBRAR'] = "HORAS POR FACTURAR";
 $_LANG['Hrs. Cobradas'] = "Hrs. Facturadas";
 $_LANG['Hrs. No Cobrables'] = "Hrs. No Facturables";
