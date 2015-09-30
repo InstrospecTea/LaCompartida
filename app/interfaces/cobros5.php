@@ -668,6 +668,7 @@ echo $refrescar;
 							}
 							disableButton(button);
 							var modulo_facturacion = <?php echo Conf::GetConf($sesion, 'NuevoModuloFactura') ? 'true' : 'false'; ?>;
+							var asociar_adelantos = <?php echo Conf::GetConf($sesion, 'AsociarAdelantosALiquidacion') ? 'true' : 'false'; ?>;
 							if( !AgregarParametros( form ) ) {
 								enableButton(button);
 								return false;
@@ -681,6 +682,12 @@ echo $refrescar;
 									seleccionarAdelanto();
 									return false;
 								}
+
+								var adelantos_msg = 'Tiene disponible adelantos. ¿Desea asociarlos a esta liquidación?';
+								if (modulo_facturacion && asociar_adelantos && adelantos && confirm(adelantos_msg)) {
+									jQuery('#usar_adelantos').val(1);
+								}
+
 								jQuery('#accion').val('emitir');
 								jQuery('#opc').val('guardar_cobro');
 								jQuery(form).submit();
