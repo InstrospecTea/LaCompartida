@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require_once "GraficoBarras.php";
 require_once "../../../fw/classes/Sesion.php";
@@ -7,14 +7,14 @@ $sesion = new Sesion();
 $total_tiempo = 0;
 $query = "SELECT glosa_actividad, SUM(TIME_TO_SEC(duracion))/3600 as tiempo
 			FROM actividad LEFT JOIN trabajo USING (codigo_actividad)
-				WHERE 
+				WHERE
 				(fecha BETWEEN '$fecha1' AND '$fecha2')
 			GROUP BY actividad.codigo_actividad
 			ORDER BY tiempo DESC LIMIT 0,14";
 $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 for($i = 0; $fila = mysql_fetch_array($resp); $i++)
 {
-	$actividad[$i] = $fila[glosa_actividad];	
+	$actividad[$i] = $fila[glosa_actividad];
 	$tiempo[$i] = $fila[tiempo];
 	$total_tiempo += $fila[tiempo];
 }

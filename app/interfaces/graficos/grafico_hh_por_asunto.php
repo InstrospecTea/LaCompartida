@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require_once "GraficoBarras.php";
 require_once "../../../fw/classes/Sesion.php";
@@ -6,36 +6,55 @@ require_once "../../../fw/classes/Utiles.php";
 
 $sesion = new Sesion();
 
-if($usuarios)
-	$where_usuario = ' AND trabajo.id_usuario IN ('.$usuarios.')';
-else
-	$where_usuario = '';
+$Criteria = new Criteria($sesion);
 
-if($solo_activos)
-	$where_usuario = ' AND usuario.activo = 1 ';
+if (!empty($usuarios)) {
+	$Criteria->add_restriction(
+		CriteriaRestriction::in('trabajo.id_usuario', explode(',', $usuarios))
+	);
+}
 
-if($clientes)
-	$where_cliente = ' AND cliente.codigo_cliente IN ('.$clientes.')';
-else
-	$where_cliente = '';
+if($solo_activos) {
+	$Criteria->add_restriction(
+		CriteriaRestriction::equals('usuario.activo ', 1)
+	);
+}
+
+if(!empty($clientes)) {
+	$Criteria->add_restriction(
+		CriteriaRestriction::in('cliente.codigo_cliente', explode(',', $clientes))
+	);
+}
 
 $total_tiempo = 0;
-$query = "SELECT 
-						asunto.codigo_asunto, 
-						SUM(TIME_TO_SEC(duracion))/3600 as tiempo
-					FROM trabajo 
-					JOIN asunto ON (trabajo.codigo_asunto = asunto.codigo_asunto) 
-					JOIN cliente ON (cliente.codigo_cliente = asunto.codigo_cliente)
-						WHERE 1 ".$where_cliente.$where_usuario." AND
-						trabajo.fecha BETWEEN '".$fecha_ini."' AND '".$fecha_fin."'  
-					GROUP BY asunto.codigo_asunto 
-					ORDER BY tiempo DESC LIMIT 0,14";
 
+$Criteria
+	->add_select('asunto.codigo_asunto')
+	->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
+	->add_from('trabajo')
+	->add_inner_join_with(
+			'usuario',
+			CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario')
+		)
+	->add_inner_join_with(
+			'asunto',
+			CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto')
+		)
+	->add_inner_join_with(
+			'cliente',
+			CriteriaRestriction::equals('cliente.codigo_cliente', 'asunto.codigo_cliente')
+		)
+	->add_restriction(
+			CriteriaRestriction::between('trabajo.fecha', "'{$fecha_ini}'", "'{$fecha_fin}'")
+		)
+	->add_grouping('asunto.codigo_asunto')
+	->add_ordering('tiempo', 'DESC')
+	->add_limit(14, 0);
 
-$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-for($i = 0; $fila = mysql_fetch_array($resp); $i++)
-{
-	$asunto[$i] = $fila[codigo_asunto];	
+$resp = $Criteria->run();
+
+foreach ($resp as $i => $fila) {
+	$asunto[$i] = $fila[codigo_asunto];
 	$tiempo[$i] = $fila[tiempo];
 	$total_tiempo += $fila[tiempo];
 }
