@@ -300,16 +300,25 @@ if ($opcion == "guardar") {
 				# Esto se puede descomentar para imprimir facturas desde la edición
 
 				if ($id_cobro) {
+					$cobro->Load($id_cobro);
 
-					if ($cobro->Load($id_cobro)) {
+					if ($cobro->Loaded($id_cobro)) {
+						$cobro->AgregarFactura($factura);
+
+						if ($usar_adelantos && empty($factura->fields['anulado']) && $codigo_tipo_doc != 'NC') {
+							
+							if (Conf::GetConf($sesion, 'AsociarAdelantosALiquidacion')) {
+								$factura->PagarUsandoAdelantos();
+							} else {
+								$documento = $cobro->DocumentoCobro();
+								$documento->GenerarPagosDesdeAdelantos(
+									$documento->fields['id_documento'], 
+									array($factura->fields['id_factura'] => $factura->fields['total']), 
+									$id_adelanto);		
+							}						
+						}
+						
 						$cobro->CambiarEstadoSegunFacturas();
-					}
-
-					$cobro->AgregarFactura($factura);
-
-					if ($usar_adelantos && empty($factura->fields['anulado']) && $codigo_tipo_doc != 'NC') {
-						$documento = $cobro->DocumentoCobro();
-						$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento'], array($factura->fields['id_factura'] => $factura->fields['total']), $id_adelanto);
 					}
 				}
 			}
@@ -1500,29 +1509,49 @@ $Form->defaultLabel = false;
 
 		<?php
 		if (!$factura->loaded() && $id_cobro && $id_documento_legal != 2) {
-			$documento = new Documento($sesion);
-			$hh = $honorario;
-			$gg = $gastos_con_iva + $gastos_sin_iva;
+			if (Conf::GetConf($sesion, 'AsociarAdelantosALiquidacion')) {
+				$query = "SELECT SUM(ccfm.saldo * fp.monto_moneda_cobro / fp.monto)
+						FROM cta_cte_fact_mvto ccfm
+						JOIN factura_pago fp ON fp.id_factura_pago = ccfm.id_factura_pago
+						JOIN neteo_documento nd ON nd.id_neteo_documento = fp.id_neteo_documento_adelanto
+						JOIN documento dc ON dc.id_documento = nd.id_documento_cobro
+						WHERE dc.id_cobro = '$id_cobro'";
+				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+				list($saldo) = mysql_fetch_array($resp);
 
-			$saldo = $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $hh>0, $gg>0, $cobro->fields['opc_moneda_total']);
-			if ($saldo) {
-				?>
-				if (!jQuery('#id_adelanto').val() && confirm("<?php echo __('Existen adelantos') . ' ' . __('asociados a esta liquidación. ¿Desea utilizarlos para saldar esta') . " $tipo_documento_legal" . '?' ?>")) {
-					var params = {
-						popup: 1,
-						id_cobro: '<?php echo $id_cobro ?>',
-						codigo_cliente: '<?php echo $codigo_cliente ?>',
-						elegir_para_pago: 1,
-						id_contrato: '<?php echo $cobro->fields['id_contrato'] ?>',
-						desde_factura_pago: 0,
-						pago_honorarios: monto_honorarios_legales_value > 0 ? 1 : 0,
-						pago_gastos: monto_gastos_sin_iva_validacion + monto_gastos_con_iva_value > 0 ? 1 : 0,
-						como_funcion: 1
-					};
-					nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?' + decodeURIComponent(jQuery.param(params)), 'top=100, left=125, scrollbars=yes');
-					return false;
+				if ($saldo > 0) { ?>
+					if (confirm('<?php echo __('Existen adelantos por ') . $simbolo . ' ' . number_format($saldo, $cifras_decimales) . __(' asociados a esta liquidación. ¿Desea utilizarlos para saldar esta ') . $tipo_documento_legal . '?' ?>')) {
+						$('usar_adelantos').value = '1';
+					}
+			<?php 
 				}
-			<?php }
+
+			} else {
+				$documento = new Documento($sesion);
+				$hh = $honorario;
+				$gg = $gastos_con_iva + $gastos_sin_iva;
+
+				$saldo = $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $hh>0, $gg>0, $cobro->fields['opc_moneda_total']);
+				if ($saldo) {
+				?>
+					if (!jQuery('#id_adelanto').val() && confirm("<?php echo __('Existen adelantos') . ' ' . __('asociados a esta liquidación. ¿Desea utilizarlos para saldar esta') . " $tipo_documento_legal" . '?' ?>")) {
+						var params = {
+							popup: 1,
+							id_cobro: '<?php echo $id_cobro ?>',
+							codigo_cliente: '<?php echo $codigo_cliente ?>',
+							elegir_para_pago: 1,
+							id_contrato: '<?php echo $cobro->fields['id_contrato'] ?>',
+							desde_factura_pago: 0,
+							pago_honorarios: monto_honorarios_legales_value > 0 ? 1 : 0,
+							pago_gastos: monto_gastos_sin_iva_validacion + monto_gastos_con_iva_value > 0 ? 1 : 0,
+							como_funcion: 1
+						};
+						nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?' + decodeURIComponent(jQuery.param(params)), 'top=100, left=125, scrollbars=yes');
+						return false;
+					}
+				<?php 
+				} 
+			}
 		}
 		?>
 
