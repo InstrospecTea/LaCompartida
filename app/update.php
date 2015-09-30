@@ -10933,6 +10933,10 @@ QUERY;
 		case 8.15;
 			$queries[] = "ALTER TABLE `factura` CHANGE `id_documento_referencia` `id_documento_referencia` VARCHAR(255) NULL DEFAULT NULL;";
 			break;
+		case 8.16:
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+			VALUES ('AsociarAdelantosALiquidacion', '0', 'Si está activo los adelantos se asocian a las liquidaciones al momento de realizar la emisión', 'boolean', 6, -1);";
+			break;
 	}
 
 	if (!empty($queries)) {
