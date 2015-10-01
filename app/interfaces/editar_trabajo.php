@@ -811,9 +811,9 @@ $duracion_cobrada = '';
 				&nbsp;&nbsp;&nbsp;&nbsp;
 				<!-- Nuevo Select -->
 				<?php
-				$usuarios = $usuario->get_usuarios_editar_trabajo($id_usuario, $permiso_revisor);
+				$usuarios = $usuario->get_usuarios_editar_trabajo($id_usuario, $permiso_revisor, $permiso_secretaria);
 
-				if (sizeof($usuarios) > 1 || $permiso_secretaria) {
+				if ($permiso_revisor || $permiso_secretaria) {
 					echo __('Usuario');
 					echo $Form->select('id_usuario', $usuarios, $id_usuario, array('empty' => FALSE, 'style' => 'width: 200px', 'onchange' => 'CargarTarifa()'));
 				} else {

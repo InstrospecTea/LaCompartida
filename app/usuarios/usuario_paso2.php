@@ -96,7 +96,7 @@ if ($opc == 'edit') {
 		if ($usuario->loaded) {
 
 			if ($usuario->Write()) {
-				$usuario->GuardarSecretario($usuario_secretario);
+				$usuario->GuardarSecretario($arreglo_secretarios);
 				$usuario->GuardarRevisado($arreglo_revisados);
 
 				if ( $id_categoria_anterior != $id_categoria_usuario) {
@@ -116,7 +116,7 @@ if ($opc == 'edit') {
 			$usuario->Edit('password', md5($new_password));
 
 			if ($usuario->Write()) {
-				$usuario->GuardarSecretario($usuario_secretario);
+				$usuario->GuardarSecretario($arreglo_secretarios);
 				$usuario->GuardarRevisado($arreglo_revisados);
 				$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
 
@@ -225,6 +225,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		}
 
 		ArregloRevisados();
+		ArregloSecretarios();
 		necesitaConfirmar = false;
 		return true;
 	}
@@ -293,6 +294,39 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		necesitaConfirmar = true;
 	}
 
+	function AgregarUsuarioSecretario()
+	{
+		var fuera = $('usuarios_secretario_fuera');
+		var dentro = $('usuarios_secretario');
+
+		if (fuera.selectedIndex==-1) return;
+
+		valor = fuera.value;
+		txt = fuera.options[fuera.selectedIndex].text;
+
+		fuera.options[fuera.selectedIndex]=null;
+
+		opc = new Option(txt,valor);
+		dentro.options[dentro.options.length]=opc;
+
+		necesitaConfirmar = true;
+	}
+
+	function EliminarUsuarioSecretario()
+	{
+		var dentro =$('usuarios_secretario');
+		var fuera = $('usuarios_secretario_fuera');
+
+		if (dentro.selectedIndex==-1) return;
+		valor=dentro.value;
+		txt=dentro.options[dentro.selectedIndex].text;
+		dentro.options[dentro.selectedIndex]=null;
+		opc = new Option(txt,valor);
+		fuera.options[fuera.options.length]=opc;
+
+		necesitaConfirmar = true;
+	}
+
 	function ArregloRevisados()
 	{
 		var usuarios = new Array();
@@ -303,6 +337,18 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			usuarios[i] = dentro.options[i].value;
 		}
 		$('arreglo_revisados').value = usuarios.join('::');
+	}
+
+	function ArregloSecretarios()
+	{
+		var usuarios = new Array();
+		var dentro = $('usuarios_secretario');
+
+		for(i = 0; i < dentro.options.length; i++ )
+		{
+			usuarios[i] = dentro.options[i].value;
+		}
+		$('arreglo_secretarios').value = usuarios.join('::');
 	}
 
 	function preguntarGuardar()
@@ -504,7 +550,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		</table>
 	</fieldset>
 
-	<fieldset>
+	<fieldset id="fieldset-usuarios_secretario">
 		<legend onClick="Expandir('secretario')" style="cursor:pointer">
 			<span id="secretario_img"><img src= "<?php echo Conf::ImgDir() ?>/mas.gif" border="0" ></span>
 			<?php echo __('Usuario secretario de') ?>
@@ -512,19 +558,35 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 		<table id="secretario_tabla" style="display:none">
 			<tr>
-				<td><!-- Nuevo Select -->
+				<td align="right">
+					<?php echo __('Usuarios disponibles') ?>:
+				</td>
+				<td align="left">
+					<?php $usuarioExt = new UsuarioExt($sesion); ?>
+					<?php echo $Form->select('usuarios_secretario_fuera', $usuarioExt->get_usuarios_secretario($usuario->fields['id_usuario']), NULL, array('empty' => FALSE, 'style' => 'width: 170px')); ?>
+				</td>
+				<td>
+					<?php echo $Form->button(__('Añadir'), array('onclick' => 'AgregarUsuarioSecretario()')); ?>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">
+					<?php echo __('Usuarios secretario') ?>:
+				</td>
+				<td align="left">
 					<?php
-					$usuarioExt = new UsuarioExt($sesion);
-					$seleccionados = $usuarioExt->get_usuarios_secretario_seleccionados($usuario->fields['id_usuario']);
-					echo $Form->select('usuario_secretario[]', $sesion->usuario->ListarActivos('', 'PRO'), $seleccionados, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6'));
+					echo $Form->select('usuarios_secretario', $usuarioExt->get_usuarios_secretario_seleccionados($usuario->fields['id_usuario']), NULL, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6'));
 					?>
+					<input type="hidden" name="arreglo_secretarios" id="arreglo_secretarios" value="">
+				</td>
+				<td>
+					<?php echo $Form->button(__('Eliminar'), array('onclick' => 'EliminarUsuarioSecretario()')); ?>
 				</td>
 			</tr>
 		</table>
-
 	</fieldset>
 
-	<fieldset>
+	<fieldset id="fieldset-usuario_revisor">
 		<legend onClick="Expandir('revisor')" style="cursor:pointer">
 			<span id="revisor_img"><img src= "<?php echo Conf::ImgDir() ?>/mas.gif" border="0" ></span>
 			<?php echo __('Usuario revisor de') ?>
@@ -548,7 +610,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 				</td>
 				<td align="left">
 					<?php
-					echo $Form->select('usuarios_revisados', $usuarioExt->get_usuarios_revisor_seleccionados($usuario->fields['id_usuario']), NULL, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6')); 
+					echo $Form->select('usuarios_revisados', $usuarioExt->get_usuarios_revisor_seleccionados($usuario->fields['id_usuario']), NULL, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6'));
 					?>
 					<input type="hidden" name="arreglo_revisados" id="arreglo_revisados" value="">
 				</td>
@@ -1002,7 +1064,26 @@ function CargarPermisos() {
 					});
 				}
 			});
+
+			jQuery("#REV9").trigger("change");
+			jQuery("#SEC12").trigger("change");
 		<?php } ?>
+	});
+
+	jQuery("#REV9").on("change", function() {
+		if (jQuery(this).is(":checked")) {
+			jQuery("#fieldset-usuario_revisor").show();
+		} else {
+			jQuery("#fieldset-usuario_revisor").hide();
+		};
+	});
+
+	jQuery("#SEC12").on("change", function() {
+		if (jQuery(this).is(":checked")) {
+			jQuery("#fieldset-usuarios_secretario").show();
+		} else {
+			jQuery("#fieldset-usuarios_secretario").hide();
+		};
 	});
 
 	window.onbeforeunload = function(){
