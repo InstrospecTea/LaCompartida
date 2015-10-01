@@ -3010,7 +3010,7 @@ if (!class_exists('Cobro')) {
 		}
 
 		function MontoSaldoAdelantos() {
-			if ($this->Loaded() && Conf::GetConf(this->sesion, 'AsociarAdelantosALiquidacion')) {
+			if ($this->Loaded() && Conf::GetConf($this->sesion, 'AsociarAdelantosALiquidacion')) {
 				$query = "SELECT SUM(ccfm.saldo * fp.monto_moneda_cobro / fp.monto)
 						FROM cta_cte_fact_mvto ccfm
 						JOIN factura_pago fp ON fp.id_factura_pago = ccfm.id_factura_pago
