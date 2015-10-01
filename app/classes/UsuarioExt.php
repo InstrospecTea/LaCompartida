@@ -1023,7 +1023,7 @@ class UsuarioExt extends Usuario {
 
 		$clauses = array();
 
-		if (! $revisor) {
+		if ($revisor) {
 			$revisor = new Criteria($this->sesion);
 			$revisor->add_select('id_revisado')
 					->add_from('usuario_revisor')
@@ -1035,10 +1035,12 @@ class UsuarioExt extends Usuario {
 				$rows[] = $revisado['id_revisado'];
 			}
 
-			$clauses[] = CriteriaRestriction::equals('U.id_usuario', $this->sesion->usuario->fields['id_usuario']);
-			$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
+			if (sizeof($rows) > 0) {
+				$clauses[] = CriteriaRestriction::equals('U.id_usuario', $this->sesion->usuario->fields['id_usuario']);
+				$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
+				$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
+			}
 
-			$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
 		}
 
 		try {
