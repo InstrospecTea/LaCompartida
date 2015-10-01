@@ -583,6 +583,11 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					<?php echo $Form->button(__('Eliminar'), array('onclick' => 'EliminarUsuarioSecretario()')); ?>
 				</td>
 			</tr>
+			<tr>
+				<td colspan="3">
+					El perfil por defecto es secretario de todos los profesionales, en caso que desee que sea sólo de algunos debe seleccionarlos.
+				</td>
+			</tr>
 		</table>
 	</fieldset>
 
@@ -616,6 +621,11 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 				</td>
 				<td>
 					<?php echo $Form->button(__('Eliminar'), array('onclick' => 'EliminarUsuarioRevisado()')); ?>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					El perfil por defecto es revisor de todos los profesionales, en caso que desee que sea sólo de algunos debe seleccionarlos.
 				</td>
 			</tr>
 		</table>
