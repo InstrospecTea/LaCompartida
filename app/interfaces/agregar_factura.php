@@ -302,7 +302,7 @@ if ($opcion == "guardar") {
 				if ($id_cobro) {
 					$cobro->Load($id_cobro);
 
-					if ($cobro->Loaded($id_cobro)) {
+					if ($cobro->Loaded()) {
 						$cobro->AgregarFactura($factura);
 
 						if ($usar_adelantos && empty($factura->fields['anulado']) && $codigo_tipo_doc != 'NC') {
@@ -1510,17 +1510,12 @@ $Form->defaultLabel = false;
 		<?php
 		if (!$factura->loaded() && $id_cobro && $id_documento_legal != 2) {
 			if (Conf::GetConf($sesion, 'AsociarAdelantosALiquidacion')) {
-				$query = "SELECT SUM(ccfm.saldo * fp.monto_moneda_cobro / fp.monto)
-						FROM cta_cte_fact_mvto ccfm
-						JOIN factura_pago fp ON fp.id_factura_pago = ccfm.id_factura_pago
-						JOIN neteo_documento nd ON nd.id_neteo_documento = fp.id_neteo_documento_adelanto
-						JOIN documento dc ON dc.id_documento = nd.id_documento_cobro
-						WHERE dc.id_cobro = '$id_cobro'";
-				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-				list($saldo) = mysql_fetch_array($resp);
+				$cobro_facturado = new Cobro($sesion);
+				$cobro_facturado->Load($id_cobro);
+				$saldo = $cobro_facturado->MontoSaldoAdelantos();
 
 				if ($saldo > 0) { ?>
-					if (confirm('<?php echo __('Existen adelantos por ') . $simbolo . ' ' . number_format($saldo, $cifras_decimales) . __(' asociados a esta liquidación. ¿Desea utilizarlos para saldar esta ') . $tipo_documento_legal . '?' ?>')) {
+					if (confirm('<?php echo __('Existen adelantos por ') . $simbolo . ' ' . number_format($saldo, $cifras_decimales) . __('asociados a esta liquidación. ¿Desea utilizarlos para saldar esta') . $tipo_documento_legal . '?' ?>')) {
 						$('usar_adelantos').value = '1';
 					}
 			<?php 

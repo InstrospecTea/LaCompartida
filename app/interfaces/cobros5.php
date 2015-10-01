@@ -683,7 +683,7 @@ echo $refrescar;
 									return false;
 								}
 
-								var adelantos_msg = 'Tiene disponible adelantos. ¿Desea asociarlos a esta liquidación?';
+								var adelantos_msg = <?php echo __('Tiene disponible adelantos. ¿Desea asociarlos a esta liquidación?'); ?>;
 								if (modulo_facturacion && asociar_adelantos && adelantos && confirm(adelantos_msg)) {
 									jQuery('#usar_adelantos').val(1);
 								}
