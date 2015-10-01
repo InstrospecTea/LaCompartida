@@ -3020,6 +3020,8 @@ if (!class_exists('Cobro')) {
 				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 				list($saldo) = mysql_fetch_array($resp);
 				return $saldo;
+			} else {
+				return 0;
 			}
 		}
 	}
