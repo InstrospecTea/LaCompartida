@@ -1004,13 +1004,14 @@ class UsuarioExt extends Usuario {
 
 	/**
 	 *
-	 * Retorna listado de usuarios según los parámetros dados
+	 * Retorna listado de usuarios, para revisores o secretaría retornará todos los profesionales del sistema a menos que tenga algunos
+	 * seleccionados para revisar.
 	 *
 	 * @param bool $revisor indica si el usuario tiene permisos de REV
 	 *
-	 * @return array $rows contiene un arreglo con los usuarios según la query previa
+	 * @return stdClass rows contiene un arreglo con los usuarios según la query previa, todos retorna false | 'Todos'
 	 */
-	public function get_usuarios_horas($revisor) {
+	public function get_usuarios_horas($permiso_revisor, $permiso_secretaria) {
 		$criteria = new Criteria($this->sesion);
 		$criteria->add_select('U.id_usuario')
 				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
@@ -1023,7 +1024,7 @@ class UsuarioExt extends Usuario {
 
 		$clauses = array();
 
-		if ($revisor) {
+		if ($permiso_revisor) {
 			$revisor = new Criteria($this->sesion);
 			$revisor->add_select('id_revisado')
 					->add_from('usuario_revisor')
@@ -1038,12 +1039,35 @@ class UsuarioExt extends Usuario {
 			if (sizeof($rows) > 0) {
 				$clauses[] = CriteriaRestriction::equals('U.id_usuario', $this->sesion->usuario->fields['id_usuario']);
 				$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
-				$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
+			}
+		}
+
+		if ($permiso_secretaria) {
+			$secretario = new Criteria($this->sesion);
+			$secretario->add_select('id_profesional')
+					->add_from('usuario_secretario')
+					->add_restriction(CriteriaRestriction::equals('id_secretario', $this->sesion->usuario->fields['id_usuario']));
+			$result = $secretario->run();
+
+			$rows = array();
+			foreach ($result as $revisado) {
+				$rows[] = $revisado['id_profesional'];
 			}
 
+			if (sizeof($rows) > 0) {
+				$clauses[] = CriteriaRestriction::in('U.id_usuario', array($id_usuario, $this->sesion->usuario->fields['id_usuario']));
+				$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
+			}
+		}
+
+		if (($permiso_revisor || $permiso_secretaria) && sizeof($clauses) > 0) {
+			$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
 		}
 
 		try {
+			$respuesta = new stdClass();
+			$respuesta->todos = sizeof($rows) > 0 ? false : 'Todos';
+
 			$result = $criteria->run();
 			$rows = array();
 
@@ -1051,7 +1075,9 @@ class UsuarioExt extends Usuario {
 				$rows[$value['id_usuario']] = $value['nombre'];
 			}
 
-			return $rows;
+			$respuesta->rows = $rows;
+
+			return $respuesta;
 
 		} catch (Exception $e) {
 			echo "Error: {$e} {$criteria->__toString()}";

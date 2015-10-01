@@ -7,7 +7,7 @@ $pagina = new Pagina($sesion);
 $Form = new Form;
 
 $p_revisor = $sesion->usuario->Es('REV');
-
+$p_secretaria = $sesion->usuario->Es('SEC');
 $p_cobranza = $sesion->usuario->Es('COB');
 
 if ($p_cobranza) {
@@ -90,10 +90,11 @@ if ($cobro) {
 }
 
 
-// Calculado aquÃ­ para que la variable $select_usuario estÃ© disponible al generar la tabla de trabajos.
+// Calculado aquí para que la variable $select_usuario está disponible al generar la tabla de trabajos.
 $usuario = new UsuarioExt($sesion);
+$usuarios = $usuario->get_usuarios_horas($p_revisor, $p_secretaria);
 
-$select_usuario = $Form->select('id_usuario', $usuario->get_usuarios_horas($p_revisor), $id_usuario, array('empty' => 'Todos', 'style' => 'width: 200px'));
+$select_usuario = $Form->select('id_usuario', $usuarios->rows, $id_usuario, array('empty' => $usuarios->todos, 'style' => 'width: 200px'));
 
 if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	$where = base64_decode($where);
