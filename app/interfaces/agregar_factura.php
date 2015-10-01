@@ -1515,7 +1515,7 @@ $Form->defaultLabel = false;
 				$saldo = $cobro_facturado->MontoSaldoAdelantos();
 
 				if ($saldo > 0) { ?>
-					if (confirm('<?php echo __('Existen adelantos por ') . $simbolo . ' ' . number_format($saldo, $cifras_decimales) . __('asociados a esta liquidación. ¿Desea utilizarlos para saldar esta') . $tipo_documento_legal . '?' ?>')) {
+					if (confirm('<?php echo __('Existen adelantos por ') . $simbolo . ' ' . number_format($saldo, $cifras_decimales) . ' ' .  __('asociados a esta liquidación. ¿Desea utilizarlos para saldar esta') . $tipo_documento_legal . '?' ?>')) {
 						$('usar_adelantos').value = '1';
 					}
 			<?php 
