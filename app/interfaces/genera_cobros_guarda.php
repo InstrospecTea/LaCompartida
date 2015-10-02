@@ -22,7 +22,7 @@ if ((isset($_POST['cobrosencero']) && $_POST['cobrosencero'] == 1) || (isset($_G
 	$incluir_cobros_en_cero = true;
 }
 
-// Setea estado como 'En Revisiï¿½n'
+// Setea estado como 'En Revisión'
 $cobros_en_revision = FALSE;
 if (isset($_POST['cobros_en_revision']) && $_POST['cobros_en_revision'] == 1) {
 	$cobros_en_revision = TRUE;
@@ -186,21 +186,20 @@ if ($print) {
 	$mincartas = $mincartaST->fetchAll(PDO::FETCH_COLUMN, 0);
 	$mincarta = $mincartas[0];
 
-	$query = "
-		SELECT
-			cobro.id_cobro,
-			cobro.id_usuario,
-			cobro.codigo_cliente,
-			cobro.id_contrato,
-			contrato.id_carta,
-			contrato.codigo_idioma,
-			cobro.estado,
-			cobro.opc_papel,
-			cobro.subtotal_gastos
-		FROM cobro
-			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-			LEFT JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
-				WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' ) ORDER BY cliente.glosa_cliente";
+	$query = "SELECT
+							cobro.id_cobro,
+							cobro.id_usuario,
+							cobro.codigo_cliente,
+							cobro.id_contrato,
+							contrato.id_carta,
+							contrato.codigo_idioma,
+							cobro.estado,
+							cobro.opc_papel,
+							cobro.subtotal_gastos
+						FROM cobro
+							JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+							LEFT JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
+								WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' ) ORDER BY cliente.glosa_cliente";
 
 	try {
 		$cobroST = $Sesion->pdodbh->query($query);
@@ -216,7 +215,7 @@ if ($print) {
 		} else {
 			$detalle_error = '<div id="sql_error" style="margin: 0px auto  0px; width: 414px; border: 1px solid #00782e; padding: 5px; font-family: Arial, Helvetica, sans_serif;font-size:12px;">
 				<div style="background:#00782e;"><img src="' . Conf::ImgDir() . '/logo_top.png" border="0"></div>
-				<div style="padding:10px;text-align:center"><strong style="font-size:14px">Atenciï¿½n</strong><br/><br/>Error al intentar generar los borradores segï¿½n periodo, no hay datos para los filtros que Ud. ha seleccionado</div>
+				<div style="padding:10px;text-align:center"><strong style="font-size:14px">Atención</strong><br/><br/>Error al intentar generar los borradores según periodo, no hay datos para los filtros que Ud. ha seleccionado</div>
 			</div>
 			<script type="text/javascript">setTimeout("window.history.back()", 4000);</script>';
 			exit($detalle_error);
@@ -237,18 +236,18 @@ if ($print) {
 	$total_cobros_emitidos = 0;
 
 	$query = "SELECT
-			cobro.id_cobro,
-			cobro.id_usuario,
-			cobro.codigo_cliente,
-			cobro.id_contrato,
-			contrato.id_carta,
-			cobro.estado,
-			cobro.opc_papel,
-			contrato.id_carta
-		FROM cobro
-			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-			LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
-		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
+							cobro.id_cobro,
+							cobro.id_usuario,
+							cobro.codigo_cliente,
+							cobro.id_contrato,
+							contrato.id_carta,
+							cobro.estado,
+							cobro.opc_papel,
+							contrato.id_carta
+						FROM cobro
+							JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
+						WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
 
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 
@@ -295,22 +294,25 @@ if ($print) {
 	$total_cobros_procesados = 0;
 	$total_cobros_emitidos = 0;
 
-	$query = "SELECT
-			cobro.id_cobro
-		FROM cobro
-			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-			LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
-		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
+	$query = "SELECT cobro.id_cobro
+						FROM cobro
+							JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
+						WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-	
+
 	$cobros = array();
 	while ($cobro = mysql_fetch_array($resp)) {
 		$cobros[] = $cobro['id_cobro'];
 	}
 
-	$query = "UPDATE cobro SET estado = 'EN REVISION' WHERE estado IN ('CREADO', 'EN REVISION') AND id_cobro IN (" . implode(', ', $cobros) . ");";
-	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+	if (sizeof($cobros) > 0) {
+		$query = "UPDATE cobro SET estado = 'EN REVISION' WHERE estado IN ('CREADO', 'EN REVISION') AND id_cobro IN (" . implode(', ', $cobros) . ");";
+		$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+		$url .= '&cobros_en_revision=1';
+	} else {
+		$url .= '&cobros_en_revision=0';
+	}
 
-	$url .= '&cobros_en_revision=1';
 	echo json_encode(array('url_redirect' => $url));
 }

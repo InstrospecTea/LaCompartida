@@ -44,8 +44,11 @@ if ($opc == 'asuntos_liquidar') {
 	else if ($cobros_emitidos) {
 		$pagina->AddInfo(__('Cobros emitidos con &eacute;xito'));
 	}
-	else if ($cobros_en_revision) {
+	else if ($cobros_en_revision == 1) {
 		$pagina->AddInfo(__('Cobros cambiados a EN REVISION con &eacute;xito'));
+	}
+	else if ($cobros_en_revision == 0) {
+		$pagina->AddInfo(__('No se encontraron cobros para cambiar de estado'));
 	}
 	if ($codigo_cliente_secundario) {
 		$cliente = new Cliente($sesion);
