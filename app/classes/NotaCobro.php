@@ -10572,9 +10572,10 @@ class NotaCobro extends Cobro {
 
 			case 'RESUMEN_PROFESIONAL':
 				if ($this->fields['forma_cobro'] == 'ESCALONADA') {
+					// Obtener datos escalonados
 					$chargingBusiness = new ChargingBusiness($this->sesion);
 					$slidingScales = $chargingBusiness->getSlidingScalesArrayDetail($this->fields['id_cobro']);
-					//Debug::pr($slidingScales);exit;
+
 					$cobro_valores = array();
 
 					$cobro_valores['totales'] = array();
@@ -10620,8 +10621,8 @@ class NotaCobro extends Cobro {
 
 					$cobro_valores['totales']['valor'] = $cobro_total_honorario_cobrable;
 					$cobro_valores['totales']['duracion'] = ($total_minutos_tmp / 60);
+					// Asignar datos escalonados que vienen de ChargingBusiness
 					$cobro_valores['detalle'] = $slidingScales['detalle'];
-					//$cobro_valores['detalle'] = $detalle_trabajos;
 
 					$cantidad_escalonadas = $cobro_valores['datos_escalonadas']['num'];
 
