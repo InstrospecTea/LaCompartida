@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.20.6
+Friday 2015, October 2nd
+* **Fix** [Título dinámico en mensajes de actualización](https://github.com/LemontechSA/ttb/pull/1151)
+
 ## Hotfix 15.20.5
 Friday 2015, October 2nd
 * **Fix** [Espaciado Excel](https://github.com/LemontechSA/ttb/pull/1145)
