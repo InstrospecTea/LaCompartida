@@ -1307,7 +1307,7 @@ class NotaCobro extends Cobro {
 	 *
 	 * Setea valor a variable $detalle_en_asuntos
 	 *
-	 * @param $detalle_en_asunto valor a setear en variable 
+	 * @param $detalle_en_asunto valor a setear en variable
 	 */
 	public function set_detalle_en_asuntos($detalle_en_asuntos) {
 		$this->detalle_en_asuntos = $detalle_en_asuntos;
@@ -10572,6 +10572,9 @@ class NotaCobro extends Cobro {
 
 			case 'RESUMEN_PROFESIONAL':
 				if ($this->fields['forma_cobro'] == 'ESCALONADA') {
+					$chargingBusiness = new ChargingBusiness($this->sesion);
+					$slidingScales = $chargingBusiness->getSlidingScalesArrayDetail($this->fields['id_cobro']);
+					//Debug::pr($slidingScales);exit;
 					$cobro_valores = array();
 
 					$cobro_valores['totales'] = array();
@@ -10617,7 +10620,8 @@ class NotaCobro extends Cobro {
 
 					$cobro_valores['totales']['valor'] = $cobro_total_honorario_cobrable;
 					$cobro_valores['totales']['duracion'] = ($total_minutos_tmp / 60);
-					$cobro_valores['detalle'] = $detalle_trabajos;
+					$cobro_valores['detalle'] = $slidingScales['detalle'];
+					//$cobro_valores['detalle'] = $detalle_trabajos;
 
 					$cantidad_escalonadas = $cobro_valores['datos_escalonadas']['num'];
 
