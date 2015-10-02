@@ -81,7 +81,7 @@ if ($mostrar_aviso) {
 
 		function avisar_actualizacion() {
 			mensaje = jQuery.gritter.add({
-				title: 'Aviso de actualización',
+				title: aviso.titulo,
 				text: aviso.mensaje,
 				image: '//static.thetimebilling.com/cartas/img/icon-48x48.png',
 				sticky: true,

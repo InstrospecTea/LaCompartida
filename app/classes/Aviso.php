@@ -56,5 +56,4 @@ class Aviso {
 		}
 		return self::$mostrar_aviso;
 	}
-
 }
