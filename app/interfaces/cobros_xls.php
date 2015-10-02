@@ -1065,11 +1065,14 @@ foreach ($chargeResults as $charge) {
 		$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 		$idioma->Load($lang);
 		$cobro_valores = array();
+		// Obtener datos escalonados
+		$chargingBusiness = new ChargingBusiness($sesion);
+		$slidingScales = $chargingBusiness->getSlidingScalesArrayDetail($id_cobro);
 
 		$cobro_valores['totales'] = array();
 		$cobto_valores['datos_escalonadas'] = array();
 
-		$cobro->CargarEscalonadas('acá');
+		$cobro->CargarEscalonadas();
 		$cobro_valores['datos_escalonadas'] = $cobro->escalonadas;
 
 		$dato_monto_cobrado = " ( trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) ) / 3600 ";
@@ -1107,7 +1110,7 @@ foreach ($chargeResults as $charge) {
 
 		$cobro_valores['totales']['valor'] = $cobro_total_honorario_cobrable;
 		$cobro_valores['totales']['duracion'] = ($total_minutos_tmp / 60);
-		$cobro_valores['detalle'] = $detalle_trabajos;
+		$cobro_valores['detalle'] = $slidingScales['detalle'];
 		$cantidad_escalonadas = $cobro_valores['datos_escalonadas']['num'];
 
 		$resumen_encabezado = "";
