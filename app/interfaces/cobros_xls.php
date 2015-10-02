@@ -1143,7 +1143,7 @@ foreach ($chargeResults as $charge) {
 		} else {
 			$resumen_detalle = __('TIMEKEEPER SUMMARY');
 		}
-		
+
 		$filas = $filas + 2;
 
 		$ws->write($filas, 6, $resumen_detalle, $formato_encabezado);
@@ -1219,7 +1219,7 @@ foreach ($chargeResults as $charge) {
 	 *  Dejar espacio para el resumen profesional si es necesario.
 	 */
 
-	if (( $opc_ver_profesional && $mostrar_resumen_de_profesionales && ($cobro->fields['forma_cobro'] != 'ESCALONADA')) || $cobro->fields['opc_ver_profesional']) {
+	if ((( $opc_ver_profesional && $mostrar_resumen_de_profesionales ) || $cobro->fields['opc_ver_profesional']) && ($cobro->fields['forma_cobro'] != 'ESCALONADA')) {
 		$fila_inicio_resumen_profesional = $filas - 1;
 		if ($num_usuarios > 0) {
 			$filas += $num_usuarios + 7;
