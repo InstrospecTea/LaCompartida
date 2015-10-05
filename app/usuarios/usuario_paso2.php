@@ -116,8 +116,6 @@ if ($opc == 'edit') {
 			$usuario->Edit('password', md5($new_password));
 
 			if ($usuario->Write()) {
-				$usuario->GuardarSecretario($arreglo_secretarios);
-				$usuario->GuardarRevisado($arreglo_revisados);
 				$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
 
 				if (CargarPermisos()) {
@@ -332,11 +330,13 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		var usuarios = new Array();
 		var dentro = $('usuarios_revisados');
 
-		for(i = 0; i < dentro.options.length; i++ )
-		{
-			usuarios[i] = dentro.options[i].value;
-		}
-		$('arreglo_revisados').value = usuarios.join('::');
+		if (dentro != null) {
+			for(i = 0; dentro != null && i < dentro.options.length; i++ )
+			{
+				usuarios[i] = dentro.options[i].value;
+			}
+			$('arreglo_revisados').value = usuarios.join('::');
+		};
 	}
 
 	function ArregloSecretarios()
@@ -344,11 +344,13 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		var usuarios = new Array();
 		var dentro = $('usuarios_secretario');
 
-		for(i = 0; i < dentro.options.length; i++ )
-		{
-			usuarios[i] = dentro.options[i].value;
-		}
-		$('arreglo_secretarios').value = usuarios.join('::');
+		if (dentro != null) {
+			for(i = 0; i < dentro.options.length; i++ )
+			{
+				usuarios[i] = dentro.options[i].value;
+			}
+			$('arreglo_secretarios').value = usuarios.join('::');
+		};
 	}
 
 	function preguntarGuardar()
@@ -550,6 +552,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		</table>
 	</fieldset>
 
+	<?php if ($usuario->loaded): ?>
 	<fieldset id="fieldset-usuarios_secretario">
 		<legend onClick="Expandir('secretario')" style="cursor:pointer">
 			<span id="secretario_img"><img src= "<?php echo Conf::ImgDir() ?>/mas.gif" border="0" ></span>
@@ -630,6 +633,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			</tr>
 		</table>
 	</fieldset>
+	<?php endif; ?>
 
 	<fieldset>
 		<legend onClick="Expandir('restricciones')" style="cursor:pointer">
