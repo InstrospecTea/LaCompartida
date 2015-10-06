@@ -3011,14 +3011,37 @@ if (!class_exists('Cobro')) {
 
 		function MontoSaldoAdelantos() {
 			if ($this->Loaded() && Conf::GetConf($this->sesion, 'AsociarAdelantosALiquidacion')) {
-				$query = "SELECT SUM(ccfm.saldo * fp.monto_moneda_cobro / fp.monto)
-						FROM cta_cte_fact_mvto ccfm
-						JOIN factura_pago fp ON fp.id_factura_pago = ccfm.id_factura_pago
-						JOIN neteo_documento nd ON nd.id_neteo_documento = fp.id_neteo_documento_adelanto
-						JOIN documento dc ON dc.id_documento = nd.id_documento_cobro
-						WHERE dc.id_cobro = '{$this->fields['id_cobro']}'";
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list($saldo) = mysql_fetch_array($resp);
+				$criteria = new Criteria($this->sesion);
+				$criteria->add_select(
+					'SUM(ccfm.saldo * fp.monto_moneda_cobro / fp.monto)', 'saldo'
+				)->add_from(
+					'cta_cte_fact_mvto', 'ccfm'
+				)->add_inner_join_with(
+					array('factura_pago', 'fp'),
+					CriteriaRestriction::equals(
+						'fp.id_factura_pago',
+						'ccfm.id_factura_pago'
+					)
+				)->add_inner_join_with(
+					array('neteo_documento', 'nd'),
+					CriteriaRestriction::equals(
+						'nd.id_neteo_documento',
+						'fp.id_neteo_documento_adelanto'
+					)
+				)->add_inner_join_with(
+					array('documento', 'dc'),
+					CriteriaRestriction::equals(
+						'dc.id_documento',
+						'nd.id_documento_cobro'
+					)
+				)->add_restriction(
+					CriteriaRestriction::equals(
+						'dc.id_cobro',
+						"{$this->fields['id_cobro']}"
+					)
+				);
+				$result = $criteria->run();
+				$saldo = $result[0]['saldo'];
 				return $saldo;
 			} else {
 				return 0;
