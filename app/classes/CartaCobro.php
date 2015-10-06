@@ -433,7 +433,7 @@ class CartaCobro extends NotaCobro {
 					$asuntos_rel[] = $data;
 				}
 
-				$asuntosrelacionados = '';
+				$asuntos_relacionados = '';
 
 				for ($k = 0; $k < count($asuntos_rel); $k++) {
 					$espace_rel = $k < count($asuntos_rel) - 1 ? ', ' : '';
