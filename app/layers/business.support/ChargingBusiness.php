@@ -206,13 +206,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 					'valor' => $work->fields['actual_amount'],
 					'usuario' => $nombre
 				);
-
+				$tarifa_usuario = $this->getUserFee($work->fields['id_usuario'], $scale->fields['feeId'], $scale->fields['currencyId']);
 				// resumen por usuario por escalón
 				$id_usuario = $work->fields['id_usuario'];
-				$usuario[$id_usuario]['duracion'] = ($usuario[$work->fields['id_usuario']]['duracion']/60) + ($work->fields['usedTime']/60);
+				$usuario[$id_usuario]['duracion'] = $usuario[$work->fields['id_usuario']]['duracion'] + $work->fields['usedTime'];
 				$usuario[$id_usuario]['valor'] = $usuario[$work->fields['id_usuario']]['valor'] + $work->fields['actual_amount'];
 				$usuario[$id_usuario]['usuario'] = $nombre;
-				$usuario[$id_usuario]['tarifa'] = $work->fields['tarifa_hh'];
+				$usuario[$id_usuario]['tarifa'] = $tarifa_usuario->get('tarifa');
 				$usuario[$id_usuario]['descuento'] = $scale->fields['discountRate'];
 				$detalle_escalonadas[$scale->fields['order_number']]['usuarios'] = $usuario;
 
@@ -221,7 +221,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				$descuento = $neto * ($scale->fields['discountRate'] / 100);
 				$monto = $neto - $descuento;
 				$totales['valor'] = $totales['valor'] + $monto;
-				$totales['duracion'] = $totales['duracion'] + ($work->fields['usedTime']/60);
+				$totales['duracion'] = $totales['duracion'] + $work->fields['usedTime'];
 				$detalle_escalonadas[$scale->fields['order_number']]['totales'] = $totales;
 
 			}

@@ -1185,8 +1185,7 @@ foreach ($chargeResults as $charge) {
 						if ($cobro->fields['opc_ver_profesional_categoria']) {
 							$ws->write($filas, 7, $usuarios['categoria'], $formato_normal);
 						}
-
-						$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($usuarios['duracion'], 2)), $formato_normal);
+						$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($usuarios['duracion']/60, 2)), $formato_normal);
 						$ws->write($filas, 9, number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal_centrado);
 						$ws->write($filas, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
 					}
@@ -1198,7 +1197,7 @@ foreach ($chargeResults as $charge) {
 				$celda_subtotales_totales += number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$ws->write($filas, 6, __('Sub Total'), $formato_total);
 				$ws->write($filas, 7, '', $formato_total);
-				$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $formato_total);
+				$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion']/60, 2)), $formato_total);
 				$ws->write($filas, 9, '', $formato_total);
 				$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_total);
 			};
@@ -1207,7 +1206,7 @@ foreach ($chargeResults as $charge) {
 		// Sub Total
 		$ws->write(++$filas, 6, __('Total'), $formato_total);
 		$ws->write($filas, 7, '', $formato_total);
-		$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($celda_subtotales_horas, 2)), $formato_total);
+		$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($celda_subtotales_horas/60, 2)), $formato_total);
 		$ws->write($filas, 9, '', $formato_total);
 		$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $celda_subtotales_totales, $formato_total);
 	}
