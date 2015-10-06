@@ -243,6 +243,13 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		return $this->report;
 	}
 
+	/**
+	 * Get works by charge
+	 * @param $chargeId Charge Id
+	 * @param bool|false $chargeable Gets only chargeable works
+	 * @return mixed
+	 * @throws UtilityException
+	 */
 	function getWorksByCharge($chargeId, $chargeable = false) {
 		$searchCriteria = new SearchCriteria('Work');
 		$searchCriteria->related_with('Charge');
