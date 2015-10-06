@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix 15.20.7
+Tuesday 2015, October 6th
+* **Fix** [Comportamiento de tarifas escalonadas](https://github.com/LemontechSA/ttb/pull/1153)
 
 ## Hotfix 15.20.6
 Friday 2015, October 2nd
