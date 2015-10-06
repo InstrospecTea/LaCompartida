@@ -473,7 +473,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$this->loadBusiness('Working');
 		$charge = $this->ChargeService->get($chargeId);
 		$slidingScales = $this->constructScaleObjects($charge);
-		$works = $this->WorkingBusiness->getWorksByCharge($chargeId);
+		// Traer sólo los trabajos cobrables
+		$works = $this->WorkingBusiness->getWorksByCharge($chargeId, true);
 		$works = $works->toArray();
 		$slidingScales = $this->processSlidngScales($works, $slidingScales, $charge);
 		$slidingScales = $this->processSlidingScalesDiscount($slidingScales);
