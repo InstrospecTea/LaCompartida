@@ -10575,8 +10575,7 @@ class NotaCobro extends Cobro {
 					// Obtener datos escalonados
 					$chargingBusiness = new ChargingBusiness($this->sesion);
 					$slidingScales = $chargingBusiness->getSlidingScalesArrayDetail($this->fields['id_cobro']);
-//					Debug::pr($slidingScales);
-//					exit;
+
 					$cobro_valores = array();
 
 					$cobro_valores['totales'] = array();
