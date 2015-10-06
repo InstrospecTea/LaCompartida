@@ -185,6 +185,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	public function getSlidingScalesArrayDetail($charge_id) {
 		$slidingScales = $this->getSlidingScales($charge_id);
 		$detail = array();
+		$detalle_escalonadas = array();
+		$trabajos = array();
 		foreach ($slidingScales as $scale) {
 			$detail['datos_escalonadas'][$scale->fields['order_number']]= array(
 				'monto' => $scale->fields['fixedAmount'],
