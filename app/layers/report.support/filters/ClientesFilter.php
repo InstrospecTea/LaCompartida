@@ -47,16 +47,10 @@ class ClientesFilter extends AbstractUndependantFilterTranslator {
 			$this->getFilterData(),
 			$criteria
 		)->add_left_join_with(
-			'asunto as filtro_cliente_asunto',
-			CriteriaRestriction::equals(
-				'filtro_cliente_asunto.codigo_asunto',
-				'tramite.codigo_asunto'
-			)
-		)->add_left_join_with(
 			'cliente as filtro_cliente',
 			CriteriaRestriction::equals(
 				'filtro_cliente.codigo_cliente',
-				'filtro_cliente_asunto.codigo_cliente'
+				'asunto.codigo_cliente'
 			)
 		);
 	}
@@ -71,16 +65,10 @@ class ClientesFilter extends AbstractUndependantFilterTranslator {
 			$this->getFilterData(),
 			$criteria
 		)->add_left_join_with(
-			'asunto as filtro_cliente_asunto',
-			CriteriaRestriction::equals(
-				'filtro_cliente_asunto.codigo_asunto',
-				'trabajo.codigo_asunto'
-			)
-		)->add_left_join_with(
 			'cliente as filtro_cliente',
 			CriteriaRestriction::equals(
 				'filtro_cliente.codigo_cliente',
-				'filtro_cliente_asunto.codigo_cliente'
+				'asunto.codigo_cliente'
 			)
 		);
 	}
