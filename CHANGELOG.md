@@ -1,4 +1,9 @@
 # Changelog
+
+## [Release 15.21.0](https://github.com/LemontechSA/ttb/pull/1154)
+Monday 2015, September 21th
+* **Feature** [Reestablecer flujo de adelantos para PRC](https://github.com/LemontechSA/ttb/pull/1148)
+
 ## Hotfix 15.20.7
 Tuesday 2015, October 6th
 * **Fix** [Comportamiento de tarifas escalonadas](https://github.com/LemontechSA/ttb/pull/1153)
@@ -27,7 +32,7 @@ Monday 2015, September 28th
 Monday 2015, September 28th
 * **Fix** [Tarifa escalonada reporte Excel](https://github.com/LemontechSA/ttb/pull/1141)
 
-## Hotfix 15.20.0
+## [Release 15.20.0](https://github.com/LemontechSA/ttb/pull/1140)
 Friday 2015, September 25
 * **Fix** [Reporte Avanzado Corregido](https://github.com/LemontechSA/ttb/pull/1140)
 
