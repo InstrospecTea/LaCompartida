@@ -65,12 +65,6 @@ class EncargadosFilter extends AbstractUndependantFilterTranslator {
 			$this->getFilterData(),
 			$criteria
 		)->add_left_join_with(
-			'asunto',
-			CriteriaRestriction::equals(
-				'asunto.codigo_asunto',
-				'tramite.codigo_asunto'
-			)
-		)->add_left_join_with(
 			'contrato as encargado_comercial_contrato',
 			CriteriaRestriction::equals(
 				'encargado_comercial_contrato.id_contrato',
@@ -94,12 +88,6 @@ class EncargadosFilter extends AbstractUndependantFilterTranslator {
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria
-		)->add_left_join_with(
-			'asunto',
-			CriteriaRestriction::equals(
-				'asunto.codigo_asunto',
-				'trabajo.codigo_asunto'
-			)
 		)->add_left_join_with(
 			'contrato as encargado_comercial_contrato',
 			CriteriaRestriction::equals(

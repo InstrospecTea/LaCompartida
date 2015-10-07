@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require_once "GraficoBarras.php";
 require_once dirname(__FILE__).'/../../conf.php';
@@ -10,7 +10,7 @@ $sesion = new Sesion();
 		$letra_profesional = 'username';
 	else
 		$letra_profesional = 'usuario';
-	
+
 	if($usuarios)
 		$where_usuario = ' AND trabajo.id_usuario IN ('.$usuarios.')';
 	else
@@ -28,19 +28,19 @@ $sesion = new Sesion();
 
 
 $total_tiempo = 0;
-$query = "SELECT 
-						CONCAT_WS(', ',apellido1,nombre) as usuario, 
+$query = "SELECT
+						CONCAT_WS(', ',apellido1,nombre) as usuario,
 						username,
 						SUM(TIME_TO_SEC(duracion))/3600 as tiempo
-					FROM trabajo 
-					JOIN usuario ON (usuario.id_usuario = trabajo.id_usuario) 
+					FROM trabajo
+					JOIN usuario ON (usuario.id_usuario = trabajo.id_usuario)
 					JOIN asunto ON (trabajo.codigo_asunto = asunto.codigo_asunto)
 					JOIN cliente ON (asunto.codigo_cliente = cliente.codigo_cliente)
 					WHERE
 						(fecha BETWEEN '$fecha_ini' AND '$fecha_fin') ".$where_cliente.$where_usuario."
 					GROUP BY usuario.id_usuario";
-
 $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+
 for($i = 0; $fila = mysql_fetch_array($resp); $i++)
 {
 	$total_tiempo += $fila[tiempo];

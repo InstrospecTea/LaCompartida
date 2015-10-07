@@ -1,39 +1,58 @@
-<?php 
+<?php
 
 require_once "GraficoBarras.php";
 require_once "../../../fw/classes/Sesion.php";
 
 $sesion = new Sesion();
+$Criteria = new Criteria($sesion);
+
+if (!empty($usuarios)) {
+	$Criteria->add_restriction(
+		CriteriaRestriction::in('trabajo.id_usuario', explode(',', $usuarios))
+	);
+}
+
+if($solo_activos) {
+	$Criteria->add_restriction(
+		CriteriaRestriction::equals('usuario.activo ', 1)
+	);
+}
+
+if(!empty($clientes)) {
+	$Criteria->add_restriction(
+		CriteriaRestriction::in('cliente.codigo_cliente', explode(',', $clientes))
+	);
+}
+
 $total_tiempo = 0;
 
-	if($usuarios)
-		$where_usuario = ' AND trabajo.id_usuario IN ('.$usuarios.')';
-	else
-		$where_usuario = '';
+$Criteria
+	->add_select('cliente.glosa_cliente')
+	->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
+	->add_from('cliente')
+	->add_left_join_with(
+			'asunto',
+			CriteriaRestriction::equals('asunto.codigo_cliente', 'cliente.codigo_cliente')
+		)
+	->add_left_join_with(
+			'trabajo',
+			CriteriaRestriction::equals('trabajo.codigo_asunto', 'asunto.codigo_asunto')
+		)
+	->add_inner_join_with(
+			'usuario',
+			CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario')
+		)
+	->add_restriction(
+			CriteriaRestriction::between('trabajo.fecha', "'{$fecha_ini}'", "'{$fecha_fin}'")
+		)
+	->add_grouping('cliente.codigo_cliente')
+	->add_ordering('tiempo', 'DESC')
+	->add_limit(14, 0);
 
-	if($solo_activos)
-		$where_usuario = ' AND usuario.activo = 1 ';
+$resp = $Criteria->run();
 
-	if($clientes)
-		$where_cliente = ' AND cliente.codigo_cliente IN ('.$clientes.')';
-	else
-		$where_cliente = '';
-
-$query = "SELECT 
-						cliente.glosa_cliente, 
-						SUM(TIME_TO_SEC(duracion))/3600 as tiempo
-					FROM cliente 
-					LEFT JOIN asunto USING(codigo_cliente) 
-					LEFT JOIN trabajo USING (codigo_asunto)
-						WHERE 
-						(fecha BETWEEN '$fecha_ini' AND '$fecha_fin') ".$where_usuario.$where_cliente."
-					GROUP BY cliente.codigo_cliente
-					ORDER BY tiempo DESC LIMIT 0,14";
-
-$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-for($i = 0; $fila = mysql_fetch_array($resp); $i++)
-{
-	$cliente[$i] = $fila[glosa_cliente];	
+foreach ($resp as $i => $fila) {
+	$cliente[$i] = $fila[glosa_cliente];
 	$tiempo[$i] = $fila[tiempo];
 	$total_tiempo += $fila[tiempo];
 }
