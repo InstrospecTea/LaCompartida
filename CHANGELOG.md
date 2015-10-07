@@ -2,7 +2,7 @@
 
 ## [Release 15.22.0](https://github.com/LemontechSA/ttb/pull/1155)
 Wednesday 2015, October 7th
-* **Fix** [Correcciones reporte avanzado](https://github.com/LemontechSA/ttb/pull/1155)
+* **Fix** [Correcciones reporte avanzado](https://github.com/LemontechSA/ttb/pull/1152)
 
 ## [Release 15.21.0](https://github.com/LemontechSA/ttb/pull/1154)
 Tuesday 2015, October 6th
