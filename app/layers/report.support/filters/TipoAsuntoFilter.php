@@ -27,22 +27,10 @@ class TipoAsuntoFilter extends AbstractUndependantFilterTranslator {
 	 */
 	function translateForCharges(Criteria $criteria) {
 		$this->addMatterCountSubcriteria($criteria);
-		
+
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria
-		)->add_left_join_with(
-			'cobro_asunto',
-			CriteriaRestriction::equals(
-				'cobro_asunto.id_cobro',
-				'cobro.id_cobro'
-			)
-		)->add_left_join_with(
-			'asunto',
-			CriteriaRestriction::equals(
-				'asunto.codigo_asunto',
-				'cobro_asunto.codigo_asunto'
-			)
 		);
 	}
 
@@ -55,12 +43,6 @@ class TipoAsuntoFilter extends AbstractUndependantFilterTranslator {
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria
-		)->add_left_join_with(
-			'asunto',
-			CriteriaRestriction::equals(
-				'asunto.codigo_asunto',
-				'tramite.codigo_asunto'
-			)
 		);
 	}
 
@@ -73,12 +55,6 @@ class TipoAsuntoFilter extends AbstractUndependantFilterTranslator {
 		return $this->addData(
 			$this->getFilterData(),
 			$criteria
-		)->add_left_join_with(
-			'asunto',
-			CriteriaRestriction::equals(
-				'asunto.codigo_asunto',
-				'trabajo.codigo_asunto'
-			)
 		);
 	}
 }
