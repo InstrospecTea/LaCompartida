@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.22.1
+Thursday 2015, October 8th
+* **Fix** [Corrección error SQL al actualizar cobros](https://github.com/LemontechSA/ttb/pull/1156)
+
 ## [Release 15.22.0](https://github.com/LemontechSA/ttb/pull/1155)
 Wednesday 2015, October 7th
 * **Fix** [Correcciones reporte avanzado](https://github.com/LemontechSA/ttb/pull/1152)
