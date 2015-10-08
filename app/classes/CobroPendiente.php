@@ -167,7 +167,8 @@ class CobroPendiente extends Objeto {
 			LEFT JOIN asunto ON contrato.id_contrato = asunto.id_contrato
 		WHERE
 			cobro_pendiente.hito = 1 AND
-			cobro_pendiente.notificado = 0
+			cobro_pendiente.notificado = 0 AND
+			cobro_pendiente.fecha_cobro IS NOT NULL AND
 			cobro_pendiente.fecha_cobro <= NOW() AND
 			cobro_pendiente.id_cobro IS NULL AND
 			(contrato.id_usuario_responsable IS NOT NULL OR contrato.id_usuario_secundario IS NOT NULL)
