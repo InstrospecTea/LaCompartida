@@ -167,7 +167,7 @@ class CobroPendiente extends Objeto {
 			LEFT JOIN asunto ON contrato.id_contrato = asunto.id_contrato
 		WHERE
 			cobro_pendiente.hito = 1 AND
-			cobro_pendiente.fecha_cobro IS NOT NULL AND
+			cobro_pendiente.notificado = 0
 			cobro_pendiente.fecha_cobro <= NOW() AND
 			cobro_pendiente.id_cobro IS NULL AND
 			(contrato.id_usuario_responsable IS NOT NULL OR contrato.id_usuario_secundario IS NOT NULL)
@@ -214,7 +214,7 @@ class CobroPendiente extends Objeto {
 				);
 			}
 
-			$sql = "UPDATE cobro_pendiente SET fecha_cobro = NULL WHERE hito = 1 AND id_cobro_pendiente = " . $hito['id_cobro_pendiente'];
+			$sql = "UPDATE cobro_pendiente SET notificado = 1 WHERE hito = 1 AND id_cobro_pendiente = " . $hito['id_cobro_pendiente'];
 			mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
 		}
 
