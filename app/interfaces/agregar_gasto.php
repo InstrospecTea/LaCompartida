@@ -769,7 +769,7 @@ $Form = new Form;
 					<?php echo __('Ordenado por'); ?>
 				</td>
 				<td align=left><!-- Nuevo Select -->
-					<?php echo $Form->select('id_usuario_orden', $usuario->get_usuarios_gatos(), $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
+					<?php echo $Form->select('id_usuario_orden', $usuario->get_usuarios_gastos(), $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
 				</td>
 			</tr>
 		<?php } ?>
@@ -778,7 +778,7 @@ $Form = new Form;
 				<?php echo __('Ingresado por'); ?>
 			</td>
 			<td align=left><!-- Nuevo Select -->
-				<?php echo $Form->select('id_usuario', $usuario->get_usuarios_gatos(), isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
+				<?php echo $Form->select('id_usuario', $usuario->get_usuarios_gastos(), isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
 			</td>
 		</tr>
 	</table>
