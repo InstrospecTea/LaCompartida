@@ -192,21 +192,20 @@ if ($print) {
 	$mincartas = $mincartaST->fetchAll(PDO::FETCH_COLUMN, 0);
 	$mincarta = $mincartas[0];
 
-	$query = "
-		SELECT
-			cobro.id_cobro,
-			cobro.id_usuario,
-			cobro.codigo_cliente,
-			cobro.id_contrato,
-			contrato.id_carta,
-			contrato.codigo_idioma,
-			cobro.estado,
-			cobro.opc_papel,
-			cobro.subtotal_gastos
-		FROM cobro
-			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-			LEFT JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
-				WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' ) ORDER BY cliente.glosa_cliente";
+	$query = "SELECT
+							cobro.id_cobro,
+							cobro.id_usuario,
+							cobro.codigo_cliente,
+							cobro.id_contrato,
+							contrato.id_carta,
+							contrato.codigo_idioma,
+							cobro.estado,
+							cobro.opc_papel,
+							cobro.subtotal_gastos
+						FROM cobro
+							JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+						LEFT JOIN cliente ON cliente.codigo_cliente = contrato.codigo_cliente
+							WHERE $where AND cobro.estado IN ( 'CREADO', 'EN REVISION' ) ORDER BY cliente.glosa_cliente";
 
 	try {
 		$cobroST = $Sesion->pdodbh->query($query);
@@ -243,18 +242,18 @@ if ($print) {
 	$total_cobros_emitidos = 0;
 
 	$query = "SELECT
-			cobro.id_cobro,
-			cobro.id_usuario,
-			cobro.codigo_cliente,
-			cobro.id_contrato,
-			contrato.id_carta,
-			cobro.estado,
-			cobro.opc_papel,
-			contrato.id_carta
-		FROM cobro
-			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-			LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
-		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
+							cobro.id_cobro,
+							cobro.id_usuario,
+							cobro.codigo_cliente,
+							cobro.id_contrato,
+							contrato.id_carta,
+							cobro.estado,
+							cobro.opc_papel,
+							contrato.id_carta
+						FROM cobro
+							JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
+						WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
 
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 
@@ -303,10 +302,10 @@ if ($print) {
 	$total_cobros_emitidos = 0;
 
 	$query = "SELECT cobro.id_cobro
-		FROM cobro
-			JOIN contrato ON cobro.id_contrato = contrato.id_contrato
-			LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
-		WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
+						FROM cobro
+							JOIN contrato ON cobro.id_contrato = contrato.id_contrato
+							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
+						WHERE {$where} AND cobro.estado IN ('CREADO', 'EN REVISION');";
 	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 
 	$cobros = array();
@@ -314,8 +313,13 @@ if ($print) {
 		$cobros[] = $cobro['id_cobro'];
 	}
 
-	$query = "UPDATE cobro SET estado = 'EN REVISION' WHERE estado IN ('CREADO', 'EN REVISION') AND id_cobro IN (" . implode(', ', $cobros) . ");";
-	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+	if (sizeof($cobros) > 0) {
+		$query = "UPDATE cobro SET estado = 'EN REVISION' WHERE estado IN ('CREADO', 'EN REVISION') AND id_cobro IN (" . implode(', ', $cobros) . ");";
+		$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+		$url .= '&cobros_en_revision=1';
+	} else {
+		$url .= '&cobros_en_revision=0';
+	}
 
 	$url.= '&cobros_en_revision=1';
 	echo json_encode(array(
