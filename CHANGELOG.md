@@ -1,5 +1,5 @@
 # Changelog
-## [Release 15.23.0](https://github.com/LemontechSA/ttb/pull/1155)
+## [Release 15.23.0](https://github.com/LemontechSA/ttb/pull/1160)
 Thursday 2015, October 8th
 * **Feature** [Cambiar notificaciones de Hitos](https://github.com/LemontechSA/ttb/pull/1159)
 
