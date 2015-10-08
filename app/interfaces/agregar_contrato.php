@@ -190,6 +190,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 			$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
 			$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
 			$cobro_pendiente->Edit("hito", '1');
+			$cobro_pendiente->Edit("notificado", 0);
 			$cobro_pendiente->Write();
 		}
 
