@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.22.2
+Thursday 2015, October 8th
+* **Fix** [ucfirst por defecto al generar facturas pdf](https://github.com/LemontechSA/ttb/pull/1161)
+
 ## Hotfix 15.22.1
 Thursday 2015, October 8th
 * **Fix** [Corrección error SQL al actualizar cobros](https://github.com/LemontechSA/ttb/pull/1156)
