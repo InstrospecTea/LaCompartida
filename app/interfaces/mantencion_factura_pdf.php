@@ -272,6 +272,10 @@ $pagina->PrintTop();
 			jQuery('#caja_' + ID).css(Css);
 		});
 
+		String.prototype.ucfirst = function() {
+			return this.charAt(0).toUpperCase() + this.substr(1);
+		}
+
 		jQuery('.facmayus').live('change', function () {
 			var ID = jQuery(this).attr('rel');
 			var Mayus = jQuery('#fac_mayuscula_' + ID).val();
@@ -281,6 +285,9 @@ $pagina->PrintTop();
 			if (Mayus == 'min')
 				transform = 'lowercase';
 			jQuery('#caja_' + ID).css({'text-transform': transform});
+
+			if (Mayus == 'ucf')
+				jQuery('#caja_' + ID).text(jQuery('#caja_' + ID).text().ucfirst());
 		});
 
 		jQuery('.fontsize').live('change', function () {
