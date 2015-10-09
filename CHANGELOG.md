@@ -1,4 +1,9 @@
 # Changelog
+
+## Hotfix 15.23.1
+Friday 2015, October 9th
+* **Fix** [Transformar el texto a sólo la primera en mayúscula](https://github.com/LemontechSA/ttb/pull/1162)
+
 ## [Release 15.23.0](https://github.com/LemontechSA/ttb/pull/1160)
 Thursday 2015, October 8th
 * **Feature** [Cambiar notificaciones de Hitos](https://github.com/LemontechSA/ttb/pull/1159)
