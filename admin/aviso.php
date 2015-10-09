@@ -82,19 +82,19 @@ $Pagina->PrintTop();
 		<input type="hidden" id="opc" name="opc" value="guardar"/>
 		<div class="form-group">
 			<label class="control-label" for="fecha">Fecha:</label>
-			<input class="form-control fechadiff" id="fecha" name="aviso[fecha]" value="<?php echo $aviso['fecha']; ?>" readonly>
+			<input type="text" class="form-control fechadiff" id="fecha" name="aviso[fecha]" value="<?php echo $aviso['fecha']; ?>">
 		</div>
 		<div class="form-group">
 			<label class="control-label" for="hora">Hora (Chile):</label>
-			<input class="form-control" id="hora" name="aviso[hora]" value="<?php echo $aviso['hora']; ?>">
+			<input type="text" class="form-control" id="hora" name="aviso[hora]" value="<?php echo $aviso['hora']; ?>">
 		</div>
 		<div class="form-group">
 			<label class="control-label" for="link">Link detalle:</label>
-			<input class="form-control" id="link" name="aviso[link]" value="<?php echo $aviso['link']; ?>">
+			<input type="text" class="form-control" id="link" name="aviso[link]" value="<?php echo $aviso['link']; ?>">
 		</div>
 		<div class="form-group">
 			<label class="control-label" for="titulo">Título:</label>
-			<input class="form-control" id="titulo" name="aviso[titulo]" value="<?php echo $aviso['titulo']; ?>">
+			<input type="text" class="form-control" id="titulo" name="aviso[titulo]" value="<?php echo $aviso['titulo']; ?>">
 		</div>
 		<div class="form-group">
 			<label class="control-label" for="mensaje">Mensaje:</label>
