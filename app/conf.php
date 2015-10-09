@@ -24,6 +24,7 @@ if (!class_exists('Conf')) {
 	class Conf {
 		public static function AppName() { return APPNAME; }
 		public static function ServerDir() { return dirname(__FILE__); }
+		public static function ASDBKey() { return 'avisos-ttbc'; }
 		public static function ImgDir() { return  '//static.thetimebilling.com/templates/default/img'; }
 		public static function MaxLoggedTime() { return 48800; }
 		public static function dbHost() { return DBHOST; }
