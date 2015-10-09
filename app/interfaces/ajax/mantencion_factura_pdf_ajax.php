@@ -182,6 +182,7 @@ if ($opc == 'dibuja_tabla') {
 						<option value='' " . ($row['mayuscula'] == '' ? 'selected' : '') . ">Normal</option>
 						<option value='may' " . ($row['mayuscula'] == 'may' ? 'selected' : '') . ">Mayúscula</option>
 						<option value='min' " . ($row['mayuscula'] == 'min' ? 'selected' : '') . ">Minúscula</option>
+						<option value='ucf' " . ($row['mayuscula'] == 'ucf' ? 'selected' : '') . ">Primera Mayúscula</option>
 					</select></li>";
 
 			echo "<li class='th10cellx'>
