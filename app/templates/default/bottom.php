@@ -104,7 +104,6 @@
 			visitor: {
 				name: "<?php echo $sesion->usuario->NombreCompleto(); ?>",
 				email: "<?php echo $sesion->usuario->fields['email']; ?>"
-
 			}
 		})
 	});
