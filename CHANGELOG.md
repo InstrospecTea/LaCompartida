@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 15.23.3
+Wednesday 2015, October 14th
+* **Fix** [Se añaden separador de miles y decimales según configuración cliente](https://github.com/LemontechSA/ttb/pull/1165)
+
+## Hotfix 15.23.2
+Friday 2015, October 9th
+* **Fix** [Mensajes masivos](https://github.com/LemontechSA/ttb/pull/1163)
+
 ## Hotfix 15.23.1
 Friday 2015, October 9th
 * **Fix** [Transformar el texto a sólo la primera en mayúscula](https://github.com/LemontechSA/ttb/pull/1162)
