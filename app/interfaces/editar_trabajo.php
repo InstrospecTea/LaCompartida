@@ -1542,6 +1542,9 @@ if ($t->fields['codigo_asunto']) {
 						xhr.overrideMimeType("text/html; charset=ISO-8859-1");
 					}
 				}).done(function (response) {
+					if (response == "VACIO") {
+						return;
+					};
 					var idio = response.split("|");
 					if (idio[1].length == 0) {
 						idio[1] = 'Español';
