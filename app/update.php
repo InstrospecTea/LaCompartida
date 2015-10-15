@@ -10940,6 +10940,11 @@ QUERY;
 		case 8.17:
 			$queries[] = "ALTER TABLE `cobro_pendiente` ADD `notificado` TINYINT(1)  UNSIGNED  DEFAULT '0'";
 			break;
+		case 8.18:
+			$queries[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_tipo_dato`, `id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES ('', '1', 'fecha_mes_entre_de', 'Fecha mes entre de);";
+			$queries[] = "INSERT INTO `factura_pdf_datos` (`id_dato`, `id_tipo_dato`, `id_documento_legal`, `id_estudio`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`, `Ejemplo`, `align`) VALUES ('', '42', '1', '1', '1', '39', '49', '27', '4', 'Courier', 'B', 'may', '10', 'de Mayo de', 'L');
+";
+			break;
 	}
 
 	if (!empty($queries)) {
