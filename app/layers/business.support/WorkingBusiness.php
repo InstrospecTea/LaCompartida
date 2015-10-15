@@ -260,7 +260,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		}
 		$searchCriteria->add_scope('orderFromOlderToNewer');
 		$this->loadBusiness('Searching');
-		return $this->SearchingBusiness->searchByCriteria($searchCriteria, array('Work.fecha', 'Work.descripcion', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda','User.username', 'User.nombre', 'User.apellido1', 'User.apellido2'));
+		return $this->SearchingBusiness->searchByCriteria($searchCriteria, array('Work.fecha', 'Work.descripcion', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda','User.username', 'User.nombre', 'User.apellido1', 'User.apellido2', 'Work.monto_cobrado'));
 	}
 
 	function getWork($id) {
