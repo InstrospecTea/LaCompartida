@@ -192,4 +192,6 @@ if (!function_exists('apache_setenv')) {
 	}
 }
 
-
+// Let's Talk credentials
+define('LT_KEY', 'Ija1Kg0AVx2B33P3AXdDdw');
+define('LT_TOKEN', '5TspRDk1LbYL7jArFhQSVQ');
