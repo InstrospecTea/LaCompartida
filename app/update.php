@@ -10941,9 +10941,16 @@ QUERY;
 			$queries[] = "ALTER TABLE `cobro_pendiente` ADD `notificado` TINYINT(1)  UNSIGNED  DEFAULT '0'";
 			break;
 		case 8.18:
-			$queries[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_tipo_dato`, `id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES ('', '1', 'fecha_mes_entre_de', 'Fecha mes entre de);";
-			$queries[] = "INSERT INTO `factura_pdf_datos` (`id_dato`, `id_tipo_dato`, `id_documento_legal`, `id_estudio`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`, `Ejemplo`, `align`) VALUES ('', '42', '1', '1', '1', '39', '49', '27', '4', 'Courier', 'B', 'may', '10', 'de Mayo de', 'L');
-";
+			$queries[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES ('1', 'fecha_mes_entre_de', 'Fecha mes entre de');";
+
+			$query = "SELECT id_estudio
+								FROM prm_estudio;";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+			while (list($id_estudio) = (mysql_fetch_array($resp))) {
+				$queries[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `id_estudio`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`, `Ejemplo`, `align`) VALUES ((SELECT id_tipo_dato FROM factura_pdf_tipo_datos WHERE codigo_tipo_dato = 'fecha_mes_entre_de'), '1', '{$id_estudio}', '0', '39', '49', '27', '4', 'Courier', 'B', 'may', '10', 'de Mayo de', 'L');";
+			}
+
 			break;
 	}
 
