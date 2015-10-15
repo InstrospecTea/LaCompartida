@@ -92,7 +92,7 @@
 <?php } ?>
 <script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/google_analytics.js"></script>
 
-<?php if (!empty($sesion)) { ?>
+<?php if (!empty($sesion)) { /*?>
 <script type="application/javascript" src="//widget.letsta.lk/beta/widget/script/112.js"></script>
 <script type="application/javascript">
 	window.$LT(function (messenger) {
@@ -108,6 +108,7 @@
 		})
 	});
 </script>
-<?php } ?>
+<?php */} ?>
+
 </body>
 </html>
