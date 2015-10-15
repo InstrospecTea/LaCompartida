@@ -10937,6 +10937,9 @@ QUERY;
 			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
 			VALUES ('AsociarAdelantosALiquidacion', '0', 'Si está activo los adelantos se asocian a las liquidaciones al momento de realizar la emisión', 'boolean', 6, -1);";
 			break;
+		case 8.17:
+			$queries[] = "ALTER TABLE `cobro_pendiente` ADD `notificado` TINYINT(1)  UNSIGNED  DEFAULT '0'";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10949,7 +10952,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.16;
+$max_update = 8.17;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

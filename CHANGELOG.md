@@ -1,5 +1,25 @@
 # Changelog
 
+## Hotfix 15.23.3
+Wednesday 2015, October 14th
+* **Fix** [Se añaden separador de miles y decimales según configuración cliente](https://github.com/LemontechSA/ttb/pull/1165)
+
+## Hotfix 15.23.2
+Friday 2015, October 9th
+* **Fix** [Mensajes masivos](https://github.com/LemontechSA/ttb/pull/1163)
+
+## Hotfix 15.23.1
+Friday 2015, October 9th
+* **Fix** [Transformar el texto a sólo la primera en mayúscula](https://github.com/LemontechSA/ttb/pull/1162)
+
+## [Release 15.23.0](https://github.com/LemontechSA/ttb/pull/1160)
+Thursday 2015, October 8th
+* **Feature** [Cambiar notificaciones de Hitos](https://github.com/LemontechSA/ttb/pull/1159)
+
+## Hotfix 15.22.2
+Thursday 2015, October 8th
+* **Fix** [ucfirst por defecto al generar facturas pdf](https://github.com/LemontechSA/ttb/pull/1161)
+
 ## Hotfix 15.22.1
 Thursday 2015, October 8th
 * **Fix** [Corrección error SQL al actualizar cobros](https://github.com/LemontechSA/ttb/pull/1156)

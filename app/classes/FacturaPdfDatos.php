@@ -374,6 +374,10 @@ class FacturaPdfDatos extends Objeto {
 				$datos['dato_letra'] = strtolower($datos['dato_letra']);
 			} else if( $datos['mayuscula'] == 'cap') {
 				$datos['dato_letra'] = ucwords(strtolower($datos['dato_letra']));
+			} else if( $datos['mayuscula'] == 'ucf') {
+				$datos['dato_letra'] = ucfirst(strtolower($datos['dato_letra']));
+			} else {
+				$datos['dato_letra'] = $datos['dato_letra'];
 			}
 
 			if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {
