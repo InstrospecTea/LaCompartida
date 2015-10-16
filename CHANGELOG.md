@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 15.23.5
+Thursday 2015, October 15th
+* **Fix** [Corregir descarga de documento Word de una liquidación con forma de liquidación escalonada](https://github.com/LemontechSA/ttb/pull/1172)
+
+## Hotfix 15.23.4
+Thursday 2015, October 15th
+* **Feature** [Implementación chat Let's Talk](https://github.com/LemontechSA/ttb/pull/1166)
+
 ## Hotfix 15.23.3
 Wednesday 2015, October 14th
 * **Fix** [Se añaden separador de miles y decimales según configuración cliente](https://github.com/LemontechSA/ttb/pull/1165)
