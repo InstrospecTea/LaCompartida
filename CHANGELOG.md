@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.23.7
+Friday 2015, October 16th
+* **Fix** [Agregar formato numerico a hitos](https://github.com/LemontechSA/ttb/pull/1174)
+
 ## Hotfix 15.23.6
 Friday 2015, October 16th
 * **Fix** [Horas inexistentes en Resumen Semana](https://github.com/LemontechSA/ttb/pull/1173)
