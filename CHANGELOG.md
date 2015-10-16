@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.23.6
+Friday 2015, October 16th
+* **Fix** [Horas inexistentes en Resumen Semana](https://github.com/LemontechSA/ttb/pull/1173)
+
 ## Hotfix 15.23.5
 Thursday 2015, October 15th
 * **Fix** [Corregir descarga de documento Word de una liquidación con forma de liquidación escalonada](https://github.com/LemontechSA/ttb/pull/1172)
