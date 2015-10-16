@@ -1,6 +1,6 @@
 # Changelog
 
-## Hotfix 15.23.6
+## Hotfix 15.23.7
 Friday 2015, October 16th
 * **Fix** [Agregar formato numerico a hitos](https://github.com/LemontechSA/ttb/pull/1174)
 
