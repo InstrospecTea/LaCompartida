@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.23.8
+Friday 2015, October 16th
+* **Fix** [Área trabajo en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1175)
+
 ## Hotfix 15.23.7
 Friday 2015, October 16th
 * **Fix** [Agregar formato numerico a hitos](https://github.com/LemontechSA/ttb/pull/1174)
