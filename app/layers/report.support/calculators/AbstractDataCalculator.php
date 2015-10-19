@@ -77,6 +77,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'id_cobro',
 		'id_trabajo',
 		'mes_emision',
+		'mes_facturacion',
 		'mes_reporte',
 		'profesional',
 		'solicitante',
