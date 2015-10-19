@@ -410,7 +410,6 @@ class Reporte {
 					' . (in_array('dia_corte', $this->agrupador) ? 'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,' : '') . '
 					' . (in_array('dia_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\')) as dia_emision,' : '') . '
 					' . (in_array('mes_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%m-%Y\')) as mes_emision,' : '') . '
-					' . (in_array('mes_facturacion', $this->agrupador) ? 'IF(cobro.fecha_facturacion IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_facturacion , \'%m-%Y\')) as mes_facturacion,' : '') . '
 					cobro.id_cobro,
 					cobro.estado AS estado,
 					cobro.forma_cobro AS forma_cobro,
@@ -605,7 +604,6 @@ class Reporte {
 						' . (in_array('dia_corte', $this->agrupador) ? 'DATE_FORMAT( cobro.fecha_fin , \'%d-%m-%Y\') as dia_corte,' : '') . '
 						' . (in_array('dia_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%d-%m-%Y\')) as dia_emision,' : '') . '
 						' . (in_array('mes_emision', $this->agrupador) ? 'IF(cobro.fecha_emision IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_emision , \'%m-%Y\')) as mes_emision,' : '') . '
-						' . (in_array('mes_facturacion', $this->agrupador) ? 'IF(cobro.fecha_facturacion IS NULL,\'' . __('Por Emitir') . '\',DATE_FORMAT( cobro.fecha_facturacion , \'%m-%Y\')) as mes_facturacion,' : '') . '
 						IFNULL(cobro.id_cobro,\'Indefinido\') as id_cobro,
 
 						IFNULL(cobro.id_estudio, IFNULL(estudio_contrato.id_estudio,  \'Indefinido\')) as id_estudio,
