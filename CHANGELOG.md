@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.23.9
+Monday 2015, October 19th
+* **Fix** [Nuevo campo de agrupación en RA](https://github.com/LemontechSA/ttb/pull/1176)
+
 ## Hotfix 15.23.8
 Friday 2015, October 16th
 * **Fix** [Área trabajo en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1175)
