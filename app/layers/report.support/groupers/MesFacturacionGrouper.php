@@ -6,7 +6,7 @@
  * * Muestra: IF(cobro.fecha_facturacion IS NULL, 'Por Emitir', DATE_FORMAT(cobro.fecha_facturacion, '%m-%Y'))
  * * Ordena por:  cobro.fecha_facturacion
  *
- * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Mes-Emision
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Mes-Facturación
  */
 class MesFacturacionGrouper extends AbstractGrouperTranslator {
 
