@@ -139,6 +139,7 @@ EOF;
 						jQuery('#glosa_asunto').val(response.glosa_asunto).data('autoselect', 1);
 					} else {
 						jQuery('#glosa_asunto').val('');
+						jQuery('#{$campo_codigo_asunto}').val('');
 					}
 					CargarSelectCliente(jQuery('#{$campo_codigo_asunto}').val());
 				}, 'json');
