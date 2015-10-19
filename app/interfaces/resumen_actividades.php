@@ -62,7 +62,8 @@ $agrupadores = array(
 	'id_usuario_responsable',
 	'mes_reporte',
 	'dia_reporte',
-	'mes_emision'
+	'mes_emision',
+	'mes_facturacion'
 );  // vista
 
 $hoy = date("Y-m-d");
