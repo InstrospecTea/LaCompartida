@@ -15,7 +15,7 @@ class MesFacturacionGrouper extends AbstractGrouperTranslator {
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
-		return "IF(cobro.fecha_facturacion IS NULL, 'Por Emitir', DATE_FORMAT(cobro.fecha_facturacion, '%m-%Y'))";
+		return "IF(cobro.fecha_facturacion IS NULL OR cobro.fecha_facturacion = '0000-00-00 00:00:00', 'Por Emitir', DATE_FORMAT(cobro.fecha_facturacion, '%m-%Y'))";
 	}
 
 	/**
@@ -23,7 +23,7 @@ class MesFacturacionGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return "IF(cobro.fecha_facturacion IS NULL, 'Por Emitir', DATE_FORMAT(cobro.fecha_facturacion, '%m-%Y'))";
+		return "IF(cobro.fecha_facturacion IS NULL OR cobro.fecha_facturacion = '0000-00-00 00:00:00', 'Por Emitir', DATE_FORMAT(cobro.fecha_facturacion, '%m-%Y'))";
 	}
 
 	/**
