@@ -980,7 +980,7 @@ class UsuarioExt extends Usuario {
 			}
 
 			if (sizeof($rows) > 0) {
-				$clauses[] = CriteriaRestriction::in('U.id_usuario', array($id_usuario, $this->sesion->usuario->fields['id_usuario']));
+				$clauses[] = CriteriaRestriction::equals('U.id_usuario', $this->sesion->usuario->fields['id_usuario']);
 				$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
 				$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
 			}
@@ -1054,7 +1054,7 @@ class UsuarioExt extends Usuario {
 			}
 
 			if (sizeof($rows) > 0) {
-				$clauses[] = CriteriaRestriction::in('U.id_usuario', array($id_usuario, $this->sesion->usuario->fields['id_usuario']));
+				$clauses[] = CriteriaRestriction::equals('U.id_usuario', $this->sesion->usuario->fields['id_usuario']);
 				$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
 			}
 		}
