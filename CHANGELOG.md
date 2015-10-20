@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.23.10
+Monday 2015, October 19th
+* **Fix** [Modificar horas en asuntos inactivos](https://github.com/LemontechSA/ttb/pull/1177)
+
 ## Hotfix 15.23.9
 Monday 2015, October 19th
 * **Fix** [Nuevo campo de agrupación en RA](https://github.com/LemontechSA/ttb/pull/1176)
