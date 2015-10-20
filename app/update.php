@@ -10941,6 +10941,11 @@ QUERY;
 			$queries[] = "ALTER TABLE `cobro_pendiente` ADD `notificado` TINYINT(1)  UNSIGNED  DEFAULT '0'";
 			break;
 		case 8.18:
+			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE `fecha_accion` `fecha_accion` DATETIME  NOT NULL;";
+			$queries[] = "ALTER TABLE `tramite_historial` CHANGE `fecha_accion` `fecha_accion` DATETIME  NOT NULL;";
+			$queries[] = "ALTER TABLE `cobro_movimiento` CHANGE `fecha` `fecha` DATETIME  NOT NULL;";
+			break;
+		case 8.19:
 			$queries[] = "DELETE FROM `menu_permiso` WHERE (`codigo_permiso` = 'SEC' AND `codigo_menu` = 'MIS_HRS');";
 			break;
 	}
@@ -10955,7 +10960,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.18;
+$max_update = 8.19;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
