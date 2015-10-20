@@ -1,5 +1,33 @@
 # Changelog
 
+## Hotfix 15.23.10
+Monday 2015, October 19th
+* **Fix** [Modificar horas en asuntos inactivos](https://github.com/LemontechSA/ttb/pull/1177)
+
+## Hotfix 15.23.9
+Monday 2015, October 19th
+* **Fix** [Nuevo campo de agrupación en RA](https://github.com/LemontechSA/ttb/pull/1176)
+
+## Hotfix 15.23.8
+Friday 2015, October 16th
+* **Fix** [Área trabajo en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1175)
+
+## Hotfix 15.23.7
+Friday 2015, October 16th
+* **Fix** [Agregar formato numerico a hitos](https://github.com/LemontechSA/ttb/pull/1174)
+
+## Hotfix 15.23.6
+Friday 2015, October 16th
+* **Fix** [Horas inexistentes en Resumen Semana](https://github.com/LemontechSA/ttb/pull/1173)
+
+## Hotfix 15.23.5
+Thursday 2015, October 15th
+* **Fix** [Corregir descarga de documento Word de una liquidación con forma de liquidación escalonada](https://github.com/LemontechSA/ttb/pull/1172)
+
+## Hotfix 15.23.4
+Thursday 2015, October 15th
+* **Feature** [Implementación chat Let's Talk](https://github.com/LemontechSA/ttb/pull/1166)
+
 ## Hotfix 15.23.3
 Wednesday 2015, October 14th
 * **Fix** [Se añaden separador de miles y decimales según configuración cliente](https://github.com/LemontechSA/ttb/pull/1165)

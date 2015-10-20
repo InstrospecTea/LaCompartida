@@ -91,5 +91,24 @@
 </script>
 <?php } ?>
 <script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/google_analytics.js"></script>
+
+<?php if (!empty($sesion)) { /*?>
+<script type="application/javascript" src="//widget.letsta.lk/beta/widget/script/112.js"></script>
+<script type="application/javascript">
+	window.$LT(function (messenger) {
+		messenger.settings({
+			consumer: {
+				key: '<?php echo LT_KEY; ?>',
+				token: '<?php echo LT_TOKEN; ?>'
+			},
+			visitor: {
+				name: "<?php echo $sesion->usuario->NombreCompleto(); ?>",
+				email: "<?php echo $sesion->usuario->fields['email']; ?>"
+			}
+		})
+	});
+</script>
+<?php */} ?>
+
 </body>
 </html>

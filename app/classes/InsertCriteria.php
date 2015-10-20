@@ -1,7 +1,7 @@
 <?php
 
 /**
-* 	
+*
 */
 class InsertCriteria
 {
@@ -10,7 +10,7 @@ class InsertCriteria
 	 * @var [type]
 	 */
 	private $sesion;
-	
+
 	/*
 		CRITERIA QUERY BUILDER PARAMS.
 	 */
@@ -43,14 +43,16 @@ class InsertCriteria
 		$statement->execute();
 	}
 
-	public function add_pivot_with_value($column_key, $value) {
+	public function add_pivot_with_value($column_key, $value, $default = false) {
 		if (array_key_exists($column_key, $this->insert_value_clause)){
 			throw new Exception("Criteria dice: Usted está sobrescribiendo un valor para la columna $column_key que ya está definido");
 		} else {
 			if (is_null($value) || $value == 'NULL' ) {
 				$this->insert_value_clause[$column_key] = 'NULL';
+			} else if ($default) {
+				$this->insert_value_clause[$column_key] = $value;
 			} else {
-				$this->insert_value_clause[$column_key] = "'".addslashes($value)."'";
+				$this->insert_value_clause[$column_key] = "'" . addslashes($value) . "'";
 			}
 			return $this;
 		}
@@ -93,14 +95,11 @@ class InsertCriteria
 	}
 
 	public function get_plain_query() {
-		
-		return $this->insert.$this->table_name.' '.$this->get_pivotes_fragment().' VALUES '.$this->get_values_fragment();
+		return $this->insert . $this->table_name . ' ' . $this->get_pivotes_fragment() . ' VALUES ' . $this->get_values_fragment();
 
 	}
 
 	public function get_plain_query_from_criteria(){
 		throw new Exception("No implementado aún.");
 	}
-
-
 }

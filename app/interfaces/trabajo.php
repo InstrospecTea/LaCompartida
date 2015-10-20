@@ -489,7 +489,7 @@ $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Ut
 									if ($p_revisor->fields['permitido']) {
 										$usuario = new UsuarioExt($sesion);
 										echo (__('Usuario') . "&nbsp;");
-										echo $Form->select('id_usuario', $usuario->get_usuarios_trabajo($id_usuario, $p_revisor->fields['permitido']), $id_usuario, array('empty' => FALSE, 'style' => 'width: 170px', 'onchange' => 'Refrescar()'));
+										echo $Form->select('id_usuario', $usuario->get_usuarios_trabajo($p_revisor->fields['permitido']), $id_usuario, array('empty' => FALSE, 'style' => 'width: 170px', 'onchange' => 'Refrescar()'));
 									} else {
 										echo '<input type="hidden" id="id_usuario" value="' . $id_usuario . '"/>';
 									}

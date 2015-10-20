@@ -177,6 +177,10 @@ if ($opcion == "guardar") {
 		if (!$asunto->fields['activo']) {
 			$pagina->AddError('Debe seleccionar un ' . __('Asunto') . ' activo');
 		}
+	}	else if (! empty($codigo_asunto_temp) && trim($codigo_asunto_temp) != $codigo_asunto) {
+		if (!$asunto->fields['activo']) {
+			$pagina->AddError('Debe seleccionar un ' . __('Asunto') . ' activo');
+		}
 	}
 
 	$errores = $pagina->GetErrors();
@@ -436,6 +440,7 @@ if ($refresh_parent) {
 	<input type="hidden" name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
 	<input type="hidden" name="max_hora" id="max_hora" value=<?php echo Conf::GetConf($sesion, 'MaxDuracionTrabajo') ?> />
 	<input type="hidden" name='codigo_asunto_hide' id='codigo_asunto_hide' value="<?php echo Conf::GetConf($sesion, 'CodigoSecundario') ? $asunto->fields['codigo_asunto_secundario'] : $t->fields['codigo_asunto']; ?>" />
+	<input type="hidden" name='codigo_asunto_temp' id='codigo_asunto_temp' value="<?php echo $t->fields['codigo_asunto']?>" />
 	<?php if ($opcion != 'nuevo') { ?>
 		<input type="hidden" name='id_trabajo' value="<?php echo $t->fields['id_trabajo'] ?>" id='id_trabajo' />
 		<input type="hidden" name='edit' value="<?php echo $opcion == 'edit' ? 1 : '' ?>" id='edit' />
@@ -811,9 +816,9 @@ $duracion_cobrada = '';
 				&nbsp;&nbsp;&nbsp;&nbsp;
 				<!-- Nuevo Select -->
 				<?php
-				$usuarios = $usuario->get_usuarios_editar_trabajo($id_usuario, $permiso_revisor);
+				$usuarios = $usuario->get_usuarios_editar_trabajo($id_usuario, $permiso_revisor, $permiso_secretaria);
 
-				if (sizeof($usuarios) > 1 || $permiso_secretaria) {
+				if ($permiso_revisor || $permiso_secretaria) {
 					echo __('Usuario');
 					echo $Form->select('id_usuario', $usuarios, $id_usuario, array('empty' => FALSE, 'style' => 'width: 200px', 'onchange' => 'CargarTarifa()'));
 				} else {
@@ -1542,6 +1547,9 @@ if ($t->fields['codigo_asunto']) {
 						xhr.overrideMimeType("text/html; charset=ISO-8859-1");
 					}
 				}).done(function (response) {
+					if (response == "VACIO") {
+						return;
+					};
 					var idio = response.split("|");
 					if (idio[1].length == 0) {
 						idio[1] = 'Español';
