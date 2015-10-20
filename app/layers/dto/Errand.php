@@ -55,7 +55,21 @@ class Errand extends LoggeableEntity {
 	}
 
 	public function getInmutableLoggeableProperties() {
-		return array('id_tramite');
+		return array(
+			'id_tramite'
+		);
+	}
+
+	/**
+	 * Obtiene los campos por defecto que debe llevar la entidad historial.
+	 * @return array
+	 */
+	public function getDefaultHistoryProperties() {
+		return array(
+			true => array(
+				'fecha_accion' => 'NOW()'
+			)
+		);
 	}
 
 	public function getTableDefaults() {

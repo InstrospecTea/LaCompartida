@@ -321,7 +321,6 @@ if ($print) {
 		$url .= '&cobros_en_revision=0';
 	}
 
-	$url.= '&cobros_en_revision=1';
 	echo json_encode(array(
 		'url_redirect' => $url
 	));

@@ -6,30 +6,30 @@
  */
 class Charge extends LoggeableEntity {
 
-    /**
-     * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
-     * @return string
-     */
-    public function getIdentity() {
-        return 'id_cobro';
-    }
+	/**
+	 * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
+	 * @return string
+	 */
+	public function getIdentity() {
+	    return 'id_cobro';
+	}
 
-    /**
-     * Obtiene el nombre del objeto del medio persistente que almacena las distintas instancias del objeto que hereda
-     * a esta clase.
-     * @return string
-     */
-    public function getPersistenceTarget() {
-        return 'cobro';
-    }
+	/**
+	 * Obtiene el nombre del objeto del medio persistente que almacena las distintas instancias del objeto que hereda
+	 * a esta clase.
+	 * @return string
+	 */
+	public function getPersistenceTarget() {
+	    return 'cobro';
+	}
 
-    /**
-     * Obtiene el nombre de la entidad del medio persistente en donde se escribirá el log.
-     * @return string
-     */
-    public function getLoggingTable() {
-        return 'cobro_movimiento';
-    }
+	/**
+	 * Obtiene el nombre de la entidad del medio persistente en donde se escribirá el log.
+	 * @return string
+	 */
+	public function getLoggingTable() {
+	    return 'cobro_movimiento';
+	}
 
 	/**
 	 * Obtiene un array con los nombres de las propiedades que serán consideradas al momento de escribir el log de la
@@ -55,6 +55,18 @@ class Charge extends LoggeableEntity {
 		);
 	}
 
+	/**
+	 * Obtiene los campos por defecto que debe llevar la entidad historial.
+	 * @return array
+	 */
+	public function getDefaultHistoryProperties() {
+		return array(
+			true => array(
+				'fecha' => 'NOW()'
+			)
+		);
+	}
+
 	public function getTableDefaults() {
 		return array('modalidad_calculo');
 	}
@@ -62,5 +74,4 @@ class Charge extends LoggeableEntity {
 	protected function getFixedDefaults() {
 		return array('estado' => 'CREADO');
 	}
-
 }
