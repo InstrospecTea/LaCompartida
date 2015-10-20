@@ -10941,14 +10941,9 @@ QUERY;
 			$queries[] = "ALTER TABLE `cobro_pendiente` ADD `notificado` TINYINT(1)  UNSIGNED  DEFAULT '0'";
 			break;
 		case 8.18:
-			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE `fecha_accion` `fecha_accion` DATETIME  NOT NULL;";
-			$queries[] = "ALTER TABLE `tramite_historial` CHANGE `fecha_accion` `fecha_accion` DATETIME  NOT NULL;";
-			$queries[] = "ALTER TABLE `cobro_movimiento` CHANGE `fecha` `fecha` DATETIME  NOT NULL;";
-			break;
-		case 8.19:
 			$queries[] = "DELETE FROM `menu_permiso` WHERE (`codigo_permiso` = 'SEC' AND `codigo_menu` = 'MIS_HRS');";
 			break;
-		case 8.20:
+		case 8.19:
 			$queries[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES ('1', 'fecha_mes_entre_de', 'Fecha mes entre de');";
 
 			$query = "SELECT id_estudio
@@ -10958,6 +10953,11 @@ QUERY;
 			while (list($id_estudio) = (mysql_fetch_array($resp))) {
 				$queries[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `id_estudio`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`, `Ejemplo`, `align`) VALUES ((SELECT id_tipo_dato FROM factura_pdf_tipo_datos WHERE codigo_tipo_dato = 'fecha_mes_entre_de'), '1', '{$id_estudio}', '0', '39', '49', '27', '4', 'Courier', 'B', 'may', '10', 'de Mayo de', 'L');";
 			}
+			break;
+		case 8.20:
+			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE `fecha_accion` `fecha_accion` DATETIME  NOT NULL;";
+			$queries[] = "ALTER TABLE `tramite_historial` CHANGE `fecha_accion` `fecha_accion` DATETIME  NOT NULL;";
+			$queries[] = "ALTER TABLE `cobro_movimiento` CHANGE `fecha` `fecha` DATETIME  NOT NULL;";
 			break;
 	}
 
