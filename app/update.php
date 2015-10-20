@@ -10948,6 +10948,17 @@ QUERY;
 		case 8.19:
 			$queries[] = "DELETE FROM `menu_permiso` WHERE (`codigo_permiso` = 'SEC' AND `codigo_menu` = 'MIS_HRS');";
 			break;
+		case 8.20:
+			$queries[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES ('1', 'fecha_mes_entre_de', 'Fecha mes entre de');";
+
+			$query = "SELECT id_estudio
+								FROM prm_estudio;";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+			while (list($id_estudio) = (mysql_fetch_array($resp))) {
+				$queries[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `id_estudio`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`, `Ejemplo`, `align`) VALUES ((SELECT id_tipo_dato FROM factura_pdf_tipo_datos WHERE codigo_tipo_dato = 'fecha_mes_entre_de'), '1', '{$id_estudio}', '0', '39', '49', '27', '4', 'Courier', 'B', 'may', '10', 'de Mayo de', 'L');";
+			}
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10960,7 +10971,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.19;
+$max_update = 8.20;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
