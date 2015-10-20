@@ -142,6 +142,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'mes_reporte',
 		'dia_reporte',
 		'mes_emision',
+		'mes_facturacion',
 		'grupo_o_cliente',
 		'solicitante'
 	);
@@ -166,6 +167,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'mes_reporte',
 		'dia_reporte',
 		'mes_emision',
+		'mes_facturacion',
 		'grupo_o_cliente',
 		'solicitante'
 	);
