@@ -1,5 +1,11 @@
 # Changelog
 
+## [Release 15.24.0](https://github.com/LemontechSA/ttb/pull/1178)
+Tuesday 2015, October 20th
+* **Feature** [Texto factura](https://github.com/LemontechSA/ttb/pull/1169)
+* **Feature** [Diferencia horas](https://github.com/LemontechSA/ttb/pull/1164)
+* **Feature** [Selector usuarios](https://github.com/LemontechSA/ttb/pull/1157)
+
 ## Hotfix 15.23.10
 Monday 2015, October 19th
 * **Fix** [Modificar horas en asuntos inactivos](https://github.com/LemontechSA/ttb/pull/1177)
