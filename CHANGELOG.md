@@ -1,5 +1,7 @@
 # Changelog
 
+## [Mejoreas Lloreda Camacho [WIP]](https://github.com/LemontechSA/ttb/pull/)
+
 ## [Release 15.24.0](https://github.com/LemontechSA/ttb/pull/1178)
 Tuesday 2015, October 20th
 * **Feature** [Texto factura](https://github.com/LemontechSA/ttb/pull/1169)
