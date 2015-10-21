@@ -686,7 +686,7 @@ $Pagina->PrintTop();
 	<br/>
 	<br/>
 
-	<?php if (1 || $id_cliente > 0 && $cliente->fields['activo'] == 1): ?>
+	<?php if ($id_cliente > 0 && $cliente->fields['activo'] == 1): ?>
 	<table width="100%">
 		<tr>
 			<td class="cvs" align="center">
