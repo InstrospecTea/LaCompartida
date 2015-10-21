@@ -94,7 +94,6 @@ if ($Cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "g
 }
 
 if ($opcion == 'guardar') {
-	#Debug::pr($_POST);exit();
 	$enviar_mail = 1;
 
 	if (empty($glosa_asunto)) {
