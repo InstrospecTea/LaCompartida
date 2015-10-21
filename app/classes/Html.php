@@ -178,12 +178,19 @@ class Html extends \Html {
 	 * Devuelve un calendario. Si la fecha está en blanco se desplegara la fecha actual.
 	 * @param string $input_name
 	 * @param string $value
+	 * @param int $size
+	 * @param string $clase
+	 * @param boolean $blank
 	 * @return string
 	 */
-	public static function PrintCalendar($input_name, $value) {
-		if ($value == '')
-			return "<input type='text' name='" . $input_name . "' class='fechadiff' value='" . date('d-m-Y') . "' />";
-		else
-			return "<input type='text' name='" . $input_name . "' class='fechadiff' value='" . $value . "' />";
+	public static function PrintCalendar($input_name, $value, $size = 12, $clase = "fechadiff", $blank = false) {
+		if ($value == '') {
+			if ($blank)
+				return "<input type='text' name='" . $input_name . "' class='" . $clase . "' value='' size='" . $size . "' />";
+			else
+				return "<input type='text' name='" . $input_name . "' class='" . $clase . "' value='" . date('d-m-Y') . "' size='" . $size . "' />";
+		} else
+			return "<input type='text' name='" . $input_name . "' class='" . $clase . "' value='" . $value . "' size='" . $size . "' />";
+		
 	}
 }
