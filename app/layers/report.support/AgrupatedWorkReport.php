@@ -322,7 +322,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		}
 		$period = $this->buildPeriod($since, $until);
 		$currency = $this->parameters['filterCurrency'];
-		$values = $this->parameters['showHours'] == 0 ? 'Horas Trabajadas' : 'Horas Facturables';
+		$values = $this->parameters['showHours'] == 0 ? __('Horas Trabajadas') : __('Horas Facturables Corregidas');
 		if (!$this->parameters['invoicedValue']) {
 			return <<<HTML
 				<h1 id="doc_header">
