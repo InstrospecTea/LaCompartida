@@ -117,9 +117,7 @@
 		while( $col < 4 * $cantidad_meses + 2 )
 		{
 			$ws1->mergeCells($filas, $col, $filas, $col+3);
-			$ws1->write($filas, $col+1, $meses[$x_mes].' '.$x_anio, $formato_titulo);
-			$ws1->write($filas, $col,'', $formato_titulo);
-			$ws1->write($filas, $col+2,'', $formato_titulo);
+			$ws1->write($filas, $col, $meses[$x_mes] . ' ' . $x_anio, $formato_titulo);
 			$ws1->write($filas, $col+3,'', $formato_titulo);
 			$ws1->write($filas+1, $col++, 'Mayor', $formato_titulo);
 			$ws1->write($filas+1, $col++, 'Menor', $formato_titulo);
