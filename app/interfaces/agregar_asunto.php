@@ -96,6 +96,10 @@ if ($Cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "g
 if ($opcion == 'guardar') {
 	$enviar_mail = 1;
 
+	if (! $Cliente->Loaded()) {
+		$Pagina->AddError(__('El cliente seleccionado no existe en el sistema'));
+	}
+
 	if (empty($glosa_asunto)) {
 		$Pagina->AddError(__('Por favor ingrese un título para el ') . __('asunto'));
 	}
