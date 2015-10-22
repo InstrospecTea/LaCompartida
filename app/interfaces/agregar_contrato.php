@@ -114,11 +114,8 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$enviar_mail = 1;
 
 	$Cliente = new Cliente($Sesion);
-	$loaded = Conf::GetConf($Sesion, 'CodigoSecundario') ?
-		$Cliente->LoadByCodigoSecundario($codigo_cliente) :
-		$Cliente->LoadByCodigo($codigo_cliente);
 
-	if (! $loaded) {
+	if (!$Cliente->LoadByCodigo($codigo_cliente)) {
 		$Pagina->AddError(__('El cliente seleccionado no existe en el sistema'));
 	}
 
@@ -154,7 +151,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$activo_antes = $contrato->fields['activo'];
 	$contrato->Fill($_REQUEST, true);
 
-	if (! $Pagina->GetErrors() && $contrato->Write()) {
+	if (!$Pagina->GetErrors() && $contrato->Write()) {
 		if ($activo_antes != $contrato->fields['activo'] && $contrato->fields['activo'] == 'NO') {
 			// Desactiva asuntos del contrato.
 			$where = new CriteriaRestriction("id_contrato = '{$contrato->fields['id_contrato']}' AND activo");
