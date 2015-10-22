@@ -14,6 +14,11 @@ if ($p_cobranza) {
 	$p_revisor = true;
 }
 
+$campo_asunto = 'codigo_asunto';
+if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+	$campo_asunto = 'codigo_asunto_secundario';
+}
+
 $p_profesional = $sesion->usuario->Es('PRO');
 
 if ($motivo == 'cobros' && $id_cobro) {
@@ -1191,7 +1196,7 @@ echo $Form->script();
 <script type="text/javascript">
 
 	function CargarActividad() {
-		CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
+		CargarSelect('<?php echo $campo_asunto ?>', 'codigo_actividad', 'cargar_actividades');
 	}
 
 	jQuery(document).ready(function() {
