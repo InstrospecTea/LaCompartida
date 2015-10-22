@@ -602,6 +602,9 @@ class ReporteCriteria {
 		for ($k = 0; $k < 6; ++$k) {
 			${$agrupador_temp[$k]} = $this->agrupador[$k];
 
+			if ($this->agrupador[$k] == 'area_trabajo') {
+				${$agrupador_temp[$k]} = 'prm_area_trabajo.glosa';
+			}
 			if ($this->agrupador[$k] == 'id_usuario_responsable') {
 				${$agrupador_temp[$k]} = 'nombre_usuario_responsable';
 			}

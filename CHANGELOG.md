@@ -1,5 +1,23 @@
 # Changelog
 
+## [Release 15.24.0](https://github.com/LemontechSA/ttb/pull/1178)
+Tuesday 2015, October 20th
+* **Feature** [Texto factura](https://github.com/LemontechSA/ttb/pull/1169)
+* **Feature** [Diferencia horas](https://github.com/LemontechSA/ttb/pull/1164)
+* **Feature** [Selector usuarios](https://github.com/LemontechSA/ttb/pull/1157)
+
+## Hotfix 15.23.10
+Monday 2015, October 19th
+* **Fix** [Modificar horas en asuntos inactivos](https://github.com/LemontechSA/ttb/pull/1177)
+
+## Hotfix 15.23.9
+Monday 2015, October 19th
+* **Fix** [Nuevo campo de agrupación en RA](https://github.com/LemontechSA/ttb/pull/1176)
+
+## Hotfix 15.23.8
+Friday 2015, October 16th
+* **Fix** [Área trabajo en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1175)
+
 ## Hotfix 15.23.7
 Friday 2015, October 16th
 * **Fix** [Agregar formato numerico a hitos](https://github.com/LemontechSA/ttb/pull/1174)

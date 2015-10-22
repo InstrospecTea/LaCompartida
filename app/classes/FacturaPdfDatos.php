@@ -164,6 +164,7 @@ class FacturaPdfDatos extends Objeto {
 			'telefono' => $contrato->fields['factura_telefono'],
 			'fecha_dia' => date("d", strtotime($factura->fields['fecha'])),
 			'fecha_mes' => strftime("%B", strtotime($factura->fields['fecha'])),
+			'fecha_mes_entre_de' => 'de ' . ucfirst(strftime("%B", strtotime($factura->fields['fecha']))) . ' de',
 			'fecha_numero_mes' => strftime("%m", strtotime($factura->fields['fecha'])),
 			'fecha_ano' => date("Y", strtotime($factura->fields['fecha'])),
 			'fecha_ano_ultima_cifra' => substr(date("Y",strtotime($factura->fields['fecha'])),-1),
