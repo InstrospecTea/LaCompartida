@@ -27,6 +27,22 @@ class FacturaProduccion {
 			'title' => 'Cliente'
 		),
 		array(
+			'field' => 'razon_social',
+			'title' => 'Razón Social'
+		),
+		array(
+			'field' => 'encargado_comercial',
+			'title' => 'Encargado Comercial'
+		),
+		array(
+			'field' => 'encargado_comercial_username',
+			'title' => 'Username Encargado Comercial'
+		),
+		array(
+			'field' => 'glosa_estudio',
+			'title' => 'Estudio'
+		),
+		array(
 			'field' => 'tipo',
 			'title' => 'Tipo Doc.'
 		),
@@ -167,6 +183,18 @@ class FacturaProduccion {
 		array(
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente'
+		),
+		array(
+			'field' => 'razon_social',
+			'title' => 'Razón Social'
+		),
+		array(
+			'field' => 'encargado_comercial',
+			'title' => 'Encargado Comercial'
+		),
+		array(
+			'field' => 'glosa_estudio',
+			'title' => 'Estudio'
 		),
 		array(
 			'field' => 'tipo',
@@ -310,7 +338,6 @@ class FacturaProduccion {
 			'field' => 'glosas_asunto',
 			'title' => 'Glosa Asunto',
 		),
-
 		array(
 			'field' => 'codigo_cliente',
 			'title' => 'Código cliente',
@@ -318,6 +345,18 @@ class FacturaProduccion {
 		array(
 			'field' => 'glosa_cliente',
 			'title' => 'Cliente'
+		),
+		array(
+			'field' => 'razon_social',
+			'title' => 'Razón Social'
+		),
+		array(
+			'field' => 'encargado_comercial',
+			'title' => 'Encargado Comercial'
+		),
+		array(
+			'field' => 'glosa_estudio',
+			'title' => 'Estudio'
 		),
 		array(
 			'field' => 'tipo',
@@ -622,6 +661,10 @@ public static $configuracion_gastos = array(
 						factura.id_factura,
 						contrato.id_contrato AS id_contrato,
 						cliente.glosa_cliente,
+						factura.cliente AS razon_social,
+						estudio.glosa_estudio,
+						encargado.username AS encargado_comercial_username,
+						CONCAT(encargado.apellido1, ' ', encargado.apellido2, ', ', encargado.nombre) AS encargado_comercial,
 						factura.serie_documento_legal,
 						factura.numero,
 						prm_estado_factura.codigo estado_factura,
@@ -660,6 +703,8 @@ public static $configuracion_gastos = array(
 					 JOIN prm_moneda prm_moneda_filtro  ON prm_moneda_filtro.id_moneda = moneda_filtro.id_moneda
 					 JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 					 JOIN contrato ON contrato.id_contrato = cobro.id_contrato
+					 INNER JOIN prm_estudio estudio ON estudio.id_estudio = factura.id_estudio
+					 LEFT JOIN usuario encargado ON encargado.id_usuario = factura.id_usuario_responsable
 					 LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = factura.id_cobro
 					 LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
 					 LEFT JOIN factura_generador ON factura_generador.id_factura = factura.id_factura
@@ -673,6 +718,10 @@ public static $configuracion_gastos = array(
 							ccfm2.id_factura,
 							factura.id_contrato AS id_contrato,
 							cliente.glosa_cliente,
+							factura.cliente AS razon_social,
+							estudio.glosa_estudio,
+							encargado.username AS encargado_comercial_username,
+							CONCAT(encargado.apellido1, ' ', encargado.apellido2, ', ', encargado.nombre) AS encargado_comercial,
 							factura.serie_documento_legal,
 							factura.numero,
 							prm_estado_factura.codigo estado_factura,
@@ -724,6 +773,8 @@ public static $configuracion_gastos = array(
 				JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 
 				JOIN cliente ON cliente.codigo_cliente = factura.codigo_cliente
+				INNER JOIN prm_estudio estudio ON estudio.id_estudio = factura.id_estudio
+			  LEFT JOIN usuario encargado ON encargado.id_usuario = factura.id_usuario_responsable
 				LEFT JOIN factura_generador ON factura_generador.id_factura = factura.id_factura
 				LEFT JOIN usuario ON usuario.id_usuario = factura_generador.id_usuario
 				LEFT JOIN prm_area_usuario ON prm_area_usuario.id = usuario.id_area_usuario
