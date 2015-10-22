@@ -2774,6 +2774,7 @@ if ($cont_hitos > 0) {
 	WHERE
 		id_contrato = {$cobro->fields['id_contrato']} ";
 
+
 	$resp_hitos = mysql_query($query_hitos, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	$filas+=2;
 
@@ -2781,53 +2782,16 @@ if ($cont_hitos > 0) {
 	$ws->setRow($filas, 20);
 	$filas++;
 
-	$ws->write($filas, $col_descripcion, __('Descripción'), $formato_titulo_vcentrado);
-	$ws->write($filas, $col_descripcion + 1, __('Estado'), $formato_titulo_vcentrado);
+	$ws->write($filas, $col_descripcion, 'Descripcion', $formato_titulo_vcentrado);
+	$ws->write($filas, $col_descripcion + 1, 'Estado', $formato_titulo_vcentrado);
 	$ws->write($filas, $col_descripcion + 2, __('Fecha de Emisión'), $formato_titulo_vcentrado);
 	$ws->write($filas, $col_descripcion + 3, __('Número de Horas'), $formato_titulo_vcentrado);
-	$ws->write($filas, $col_descripcion + 4, __('Monto del Hito'), $formato_titulo_vcentrado);
+	$ws->write($filas, $col_descripcion + 4, 'Monto del Hito', $formato_titulo_vcentrado);
 	$ws->write($filas, $col_descripcion + 5, __('Valor Real Actualizado'), $formato_titulo_vcentrado);
 
 	$totalhito = 0;
 	$totalthh = 0;
 	$totalminutos = 0;
-
-	$criteria = new Criteria($sesion);
-	$criteria->add_select('pm.simbolo', 'simbolo')
-			->add_select('pm.cifras_decimales', 'cifras_decimales')
-			->add_from('cobro_pendiente cp')
-	 		->add_inner_join_with('contrato c', 'cp.id_contrato = c.id_contrato')
-	 		->add_inner_join_with('prm_moneda pm', 'pm.id_moneda = c.id_moneda_monto')
-			->add_restriction(CriteriaRestriction::equals('cp.hito', 1))
-			->add_restriction(CriteriaRestriction::equals('cp.id_contrato', $cobro->fields['id_contrato']));
-
-	$moneda_hitos = $criteria->run();
-	$moneda_hitos = $moneda_hitos[0];
-
-	$simbolo_moneda = $moneda_hitos['simbolo'];
-	$cifras_decimales = $moneda_hitos['cifras_decimales'];
-
-	if ($cifras_decimales) {
-		$decimales = '.';
-		while ($cifras_decimales-- > 0) {
-			$decimales .= '0';
-		}
-	} else {
-		$decimales = '';
-	}
-
-	$formato_moneda_hito = & $wb->addFormat(array('Size' => 7,
-				'VAlign' => 'top',
-				'Align' => 'right',
-				'Color' => 'black',
-				'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
-	$formato_moneda_total_hito = & $wb->addFormat(array('Size' => 10,
-				'VAlign' => 'top',
-				'Align' => 'right',
-				'Bold' => 1,
-				'Top' => 1,
-				'Color' => 'black',
-				'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 
 	while ($fila_hitos = mysql_fetch_array($resp_hitos)) {
 		$totalhito+=floatval($fila_hitos['monto_estimado']);
@@ -2845,8 +2809,8 @@ if ($cont_hitos > 0) {
 		$minutos_cobrables = sprintf("%02d", $fila_hitos['total_minutos'] % 60);
 
 		$ws->write($filas, $col_descripcion + 3, "$horas_cobrables:$minutos_cobrables", $formato_normal);
-		$ws->write($filas, $col_descripcion + 4, $fila_hitos['monto_estimado'], $formato_moneda_hito);
-		$ws->write($filas, $col_descripcion + 5, $monto_thh, $formato_moneda_hito);
+		$ws->write($filas, $col_descripcion + 4, $fila_hitos['monto_estimado'], $formato_moneda);
+		$ws->write($filas, $col_descripcion + 5, $monto_thh, $formato_moneda);
 
 		$filas++;
 		$ws->write($filas, $col_descripcion, $fila_hitos['observaciones'], $formato_observacion);
@@ -2860,8 +2824,8 @@ if ($cont_hitos > 0) {
 	$minutos_cobrables = sprintf("%02d", $totalminutos % 60);
 
 	$ws->write($filas, $col_descripcion + 3, "$horas_cobrables:$minutos_cobrables", $formato_total);
-	$ws->write($filas, $col_descripcion + 5, intval($totalthh), $formato_moneda_total_hito);
-	$ws->write($filas, $col_descripcion + 4, $totalhito, $formato_moneda_total_hito);
+	$ws->write($filas, $col_descripcion + 5, intval($totalthh), $formato_moneda_total);
+	$ws->write($filas, $col_descripcion + 4, $totalhito, $formato_moneda_total);
 }
 
 /*
