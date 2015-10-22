@@ -1,6 +1,10 @@
 # Changelog
 
-## Hotfix 15.24.1
+## Hotfix 15.24.3
+Thursday 2015, October 22nd
+* **Fix** [Rollback de Hotfix/15.23.7](https://github.com/LemontechSA/ttb/pull/1188)
+
+## Hotfix 15.24.2
 Wednesday 2015, October 21st
 * **Fix** [Diferenica de horas en excel asuntos por cobrar](https://github.com/LemontechSA/ttb/pull/1187)
 
