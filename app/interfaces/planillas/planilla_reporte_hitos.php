@@ -154,7 +154,7 @@ if ($xls) {
 	$columna_numero_factura = 12;
 	$columna_fecha_facturacion = 13;
 
-	$worksheet->write($celda_fecha_creacion, 0, 'Fecha Creación : ' . date('d-m-Y'), $glosa_detalle_documento_left);
+	$worksheet->write($celda_fecha_creacion, 0, __('Fecha Creación') . ' : ' . date('d-m-Y'), $glosa_detalle_documento_left);
 	$periodo = 'Periodo : Desde ' . $fecha1 . ' Hasta ' . $fecha2;
 	$worksheet->write($celda_periodo_reporte, 0, $periodo, $glosa_detalle_documento_left);
 
