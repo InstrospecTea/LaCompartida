@@ -186,13 +186,12 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 			if (empty($hito_monto_estimado[$i])) {
 				continue;
 			}
-			$monto_estimado = str_replace(',', '.',str_replace('.', '', $hito_monto_estimado[$i]));
 			$cobro_pendiente = new CobroPendiente($Sesion);
 			$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 			$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
 			$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
 			$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
-			$cobro_pendiente->Edit("monto_estimado", $monto_estimado);
+			$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
 			$cobro_pendiente->Edit("hito", '1');
 			$cobro_pendiente->Edit("notificado", 0);
 			$cobro_pendiente->Write();
@@ -2253,7 +2252,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 											</td>
 											<td align="right" nowrap>
 												<span class="moneda_tabla"></span>&nbsp;
-												<input type="text" name="hito_monto_estimado[<?php echo $i ?>]" value='<?php echo empty($temp['monto_estimado']) ? '' : number_format($temp['monto_estimado'], 2, ',', '.') ?>' id="hito_monto_estimado_<?php echo $i ?>" size="7" <?php echo $disabled ?>/>
+												<input type="text" name="hito_monto_estimado[<?php echo $i ?>]" value='<?php echo empty($temp['monto_estimado']) ? '' : number_format($temp['monto_estimado'], 2, '.', '') ?>' id="hito_monto_estimado_<?php echo $i ?>" size="20" <?php echo $disabled ?>/>
 											</td>
 											<td align="center">
 												<?php if (!$disabled) { ?>
@@ -2276,7 +2275,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										</td>
 										<td align="right" nowrap>
 											<span class="moneda_tabla"></span>&nbsp;
-											<input type="text" name="hito_monto_estimado[1]" value='' id="hito_monto_estimado_1" size="7" />
+											<input type="text" name="hito_monto_estimado[1]" value='' id="hito_monto_estimado_1" size="20" />
 										</td>
 										<td align="center">
 											<img src="<?php echo Conf::ImgDir() ?>/mas.gif" style="cursor:pointer" onclick="agregarHito();" />
