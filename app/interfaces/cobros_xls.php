@@ -2795,6 +2795,7 @@ if ($cont_hitos > 0) {
 	$criteria = new Criteria($sesion);
 	$criteria->add_select('pm.simbolo', 'simbolo')
 			->add_select('pm.cifras_decimales', 'cifras_decimales')
+			->add_select('pm.glosa_moneda', 'glosa_moneda')
 			->add_from('cobro_pendiente cp')
 	 		->add_inner_join_with('contrato c', 'cp.id_contrato = c.id_contrato')
 	 		->add_inner_join_with('prm_moneda pm', 'pm.id_moneda = c.id_moneda_monto')
@@ -2804,7 +2805,11 @@ if ($cont_hitos > 0) {
 	$moneda_hitos = $criteria->run();
 	$moneda_hitos = $moneda_hitos[0];
 
-	$simbolo_moneda = $moneda_hitos['simbolo'];
+	if ($moneda_hitos['glosa_moneda'] == "Euro") {
+		$simbolo_moneda = "EUR";
+	} else {
+		$simbolo_moneda = $moneda_hitos['simbolo'];
+	}
 	$cifras_decimales = $moneda_hitos['cifras_decimales'];
 
 	if ($cifras_decimales) {
