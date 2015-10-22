@@ -112,9 +112,15 @@ if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contra
 // CONTRATO GUARDA
 if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$enviar_mail = 1;
+
+	$Cliente = new Cliente($Sesion);
+
+	if (!$Cliente->LoadByCodigo($codigo_cliente)) {
+		$Pagina->AddError(__('El cliente seleccionado no existe en el sistema'));
+	}
+
 	if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
 		$Pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
-		$val = true;
 	} else if ($forma_cobro == 'TASA') {
 		$monto = '0';
 	}
@@ -122,7 +128,6 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	if ($tipo_tarifa == 'flat') {
 		if (empty($tarifa_flat)) {
 			$Pagina->AddError(__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto'));
-			$val = true;
 		} else {
 			$tarifa = new Tarifa($Sesion);
 			$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
@@ -132,12 +137,10 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 
 	if ($usuario_responsable_obligatorio && empty($id_usuario_responsable) or $id_usuario_responsable == '-1') {
 		$Pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Principal'));
-		$val = true;
 	}
 
 	if (Conf::GetConf($Sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
 		$Pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Secundario'));
-		$val = true;
 	}
 
 	if (isset($_REQUEST['nombre_contacto'])) {
@@ -148,7 +151,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$activo_antes = $contrato->fields['activo'];
 	$contrato->Fill($_REQUEST, true);
 
-	if ($contrato->Write()) {
+	if (!$Pagina->GetErrors() && $contrato->Write()) {
 		if ($activo_antes != $contrato->fields['activo'] && $contrato->fields['activo'] == 'NO') {
 			// Desactiva asuntos del contrato.
 			$where = new CriteriaRestriction("id_contrato = '{$contrato->fields['id_contrato']}' AND activo");

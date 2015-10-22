@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.24.1
+Wednesday 2015, October 21st
+* **Fix** [Error SQL - Actualizar Contrato](https://github.com/LemontechSA/ttb/pull/1183)
+
 ## [Release 15.24.0](https://github.com/LemontechSA/ttb/pull/1178)
 Tuesday 2015, October 20th
 * **Feature** [Texto factura](https://github.com/LemontechSA/ttb/pull/1169)

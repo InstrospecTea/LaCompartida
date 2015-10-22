@@ -96,6 +96,10 @@ if ($Cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "g
 if ($opcion == 'guardar') {
 	$enviar_mail = 1;
 
+	if (! $Cliente->Loaded()) {
+		$Pagina->AddError(__('El cliente seleccionado no existe en el sistema'));
+	}
+
 	if (empty($glosa_asunto)) {
 		$Pagina->AddError(__('Por favor ingrese un título para el ') . __('asunto'));
 	}
@@ -591,20 +595,6 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 			}, 'text');
 	}
 
-	function ShowContrato(form, valor) {
-			var tbl = $('tbl_contrato');
-			var check = $(valor);
-			var td = $('tbl_copiar_datos');
-
-			if (check.checked) {
-					tbl.style['display'] = 'inline';
-					td.style['display'] = 'inline';
-			} else {
-					tbl.style['display'] = 'none';
-					td.style['display'] = 'none';
-			}
-	}
-
 	function SetearLetraCodigoSecundario() {
 			var codigo_cliente_secundario = $('codigo_cliente_secundario').value;
 			$('glosa_codigo_cliente_secundario').innerHTML = '&nbsp;&nbsp;' + codigo_cliente_secundario + '-';
@@ -612,316 +602,276 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 </script>
 
 <form name="formulario" id="formulario" method="post">
-		<input type="hidden" name="opcion" value="guardar" />
-		<input type="hidden" name="opc_copiar" value="" />
-		<input type="hidden" name="id_asunto" id="id_asunto" value="<?php echo $Asunto->fields['id_asunto'] ?>" />
-		<input type="hidden" name="desde" id="desde" value="agregar_asunto" />
+	<input type="hidden" name="opcion" value="guardar" />
+	<input type="hidden" name="opc_copiar" value="" />
+	<input type="hidden" name="id_asunto" id="id_asunto" value="<?php echo $Asunto->fields['id_asunto'] ?>" />
+	<input type="hidden" name="desde" id="desde" value="agregar_asunto" />
 
-		<table width="90%">
-				<tr>
-						<td align="center">
-								<fieldset class="border_plomo tb_base">
-										<legend><?php echo __('Datos generales') ?></legend>
-										<table>
-												<tr>
-														<td align="right">
-															<?php echo __('Código'); ?>
-														</td>
-													<td align="left">
-														<input id="codigo_asunto"
-														       name="codigo_asunto" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?>
-														       size="10" maxlength="10" value="<?php echo $Asunto->fields['codigo_asunto'] ?>"
-														       onchange="this.value = this.value.toUpperCase(); <?php echo !$Asunto->Loaded() ? 'CheckCodigo();' : ''; ?>"/>
-														&nbsp;&nbsp;&nbsp;
-														<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) { ?>
-															<?php echo __('Código secundario'); ?>
-															<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;">&nbsp;&nbsp;<?php echo !empty($Cliente->fields['codigo_cliente_secundario']) ? "{$Cliente->fields['codigo_cliente_secundario']}-" : ''; ?></div>
-															<input id="codigo_asunto_secundario" name="codigo_asunto_secundario" size="15"
-															       maxlength="20"
-															       value="<?php echo array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario'])); ?>"
-															       onchange='this.value=this.value.toUpperCase();'
-															       style='text-transform: uppercase;'/>
-															<span style="color:#FF0000; font-size:10px">*</span>
-														<?php } ?>
-													</td>
-
-												</tr>
-																<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
-													<tr>
-															<td align="right" title="<?php echo __('Código con el que el cliente identifica internamente el asunto. Es obligatorio si se desea generar un archivo en formato LEDES'); ?>">
-	<?php echo __('Código de homologación'); ?>
-															</td>
-															<td align="left">
-																	<input name="codigo_homologacion" size="45" value="<?php echo $Asunto->fields['codigo_homologacion']; ?>" />
-															</td>
-													</tr>
-																<?php } ?>
-												<tr>
-														<td align="right">
-<?php echo __('Título') ?>
-														</td>
-														<td align="left">
-																<input name="glosa_asunto" size=45 value="<?php echo $Asunto->fields['glosa_asunto'] ?>" />
-																<span style="color:#FF0000; font-size:10px">*</span>
-														</td>
-												</tr>
-
-												<tr>
-														<td align="right">
-																<?php echo __('Cliente') ?>
-														</td>
-														<td align="left">
-																<?php
-																if (!$Asunto->Loaded()) {
-																	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-																		echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
-																	} else {
-																		echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
-																	}
-																} else {
-																	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-																		$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'nuevo_codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' class="nuevo_codigo_cliente secundario" ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
-																		$_codigo_cliente = $Cliente->fields['codigo_cliente_secundario'];
-																		$_name = 'codigo_cliente_secundario';
-																	} else {
-																		$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'nuevo_codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' class="nuevo_codigo_cliente" ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
-																		$_codigo_cliente = ($Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente']);
-																		$_name = 'codigo_cliente';
-																	}
-																	echo '<input type="text" id="campo_' . $_name . '" size="15" value="' . $_codigo_cliente . '" readonly="readonly">';
-																	echo '<input type="text" id="glosa_' . $_name . '" name="glosa_' . $_name . '" size="45" value="' . $Cliente->fields['glosa_cliente'] . '" readonly="readonly">';
-																	echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $_codigo_cliente . '">';
-																}
-
-																if ($Asunto->Loaded()) {
- 																?>
-																<a href='#' id='change_client'><img src='//static.thetimebilling.com/images/editar_on.gif' border='0' title='Cambiar Cliente'></a>
-																<span style="color:#FF0000; font-size:10px">*</span>
-																<div id="nuevo_codigo" class="hidden" style="padding: 5px 0px 5px 5px; background-color: yellowgreen">Asociar a cliente</br>
-																<?php echo $input_cliente; ?>
-																</div>
-																<?php
-																}
-																?>
-														</td>
-												</tr>
-
-												<tr>
-														<td align="right">
-																<?php echo __('Idioma') ?>
-														</td>
-														<td align="left">
-																<?php echo Html::SelectQuery($Sesion, "SELECT * FROM prm_idioma", 'id_idioma', $Asunto->fields['id_idioma'] ? $Asunto->fields['id_idioma'] : $id_idioma_default); ?>&nbsp;&nbsp;
-																<?php echo __('Categoría de asunto') ?>
-<?php
-echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden, glosa_tipo_proyecto ASC'), 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']);
-?>
-														</td>
-												</tr>
-												<tr>
-														<td align="right">
-																<?php echo __('Área') . ' ' . __('asunto') ?>
-														</td>
-														<td align="left">
-
-																<?php
-																echo $SelectHelper->ajax_select(
-																				'id_area_proyecto', $Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : $id_area_proyecto, array('class' => 'span3', 'style' => 'display:inline'), array(
-																		'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose&order_by=orden,glosa&order_by_type=asc',
-																		'onChange' => '
-											var element = selected_id_area_proyecto;
-											jQuery("#id_desglose_area_container").hide();
-											jQuery("#desglose_area").hide()
-											if (element && element.requiere_desglose == "1") {
-												jQuery("#id_desglose_area_container").show();
-												FormSelectHelper.reload_id_desglose_area();
-											}
-										'
-																				)
-																);
-																?>
-
-																<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
-																	<span style="color:#FF0000; font-size:10px">*</span>
-																<?php } ?>
-
-																<?php
-																echo $SelectHelper->checkboxes(
-																				'id_desglose_area', array(), $Asunto->getAreaDetails(), array('class' => 'span6', 'style' => 'display:inline'), array(
-																		'autoload' => false,
-																		'source' => 'ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1&fields=glosa,id_area_proyecto,requiere_desglose',
-																		'onSource' => '
-												source = source + "&q=id_area_proyecto:" + jQuery("#id_area_proyecto").val();
-											',
-																		'onChange' => '
-												var element = selected_id_desglose_area;
-												if (element && element.requiere_desglose == "1") {
-													if (checked) {
-														jQuery("#desglose_area").show();
-													} else {
-														jQuery("#desglose_area").val("").hide();
-													}
-												}
-											'
-																				)
-																);
-																echo $Form->input('desglose_area', $Asunto->fields['desglose_area'], array('placeholder' => 'Desglose', 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'desglose_area'));
-																?>
-														</td>
-												</tr>
-												<tr>
-														<td align="right">
-<?php echo __('Descripción') ?>
-														</td>
-														<td align="left">
-																<textarea name="descripcion_asunto" cols="50"><?php echo $Asunto->fields['descripcion_asunto'] ?></textarea>
-														</td>
-												</tr>
-
-<?php
-$prmGiro = new PrmGiro($Sesion);
-$giros = $prmGiro->Listar();
-if (count($giros) > 0) {
-	?>
-													<tr>
-															<td align="right">
-	<?php echo __('Giro') ?>
-															</td>
-															<td align="left">
-	<?php
-	echo $SelectHelper->checkboxes(
-					'id_asunto_giro', array(), $Asunto->getEconomicActivities(), array('class' => 'span6', 'style' => 'display:inline'), array(
-			'autoload' => true,
-			'source' => 'ajax/ajax_prm.php?prm=Giro&fields=glosa,requiere_desglose',
-			'onChange' => '
-												var element = selected_id_asunto_giro;
-												if (element && element.requiere_desglose == "1") {
-													if (checked) {
-														jQuery("#giro").show();
-													} else {
-														jQuery("#giro").val("").hide();
-													}
-												}
-											'
-					)
-	);
-	echo $Form->input('giro', $Asunto->fields['giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'giro'));
-	?>
-															</td>
-													</tr>
-																<?php } ?>
-												<tr>
-														<td align="right">
-<?php echo __('Usuario responsable'); ?>
-														</td>
-														<td align="left"><!-- Nuevo Select -->
-<?php
-echo $Form->select('id_encargado', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado'], array('empty' => __('Seleccione'), 'style' => 'width: 200px'));
-if (isset($encargado_obligatorio) && $encargado_obligatorio) {
-	echo $obligatorio;
-}
-?>
-														</td>
-												</tr>
-																<?php if (Conf::GetConf($Sesion, 'AsuntosEncargado2')) { ?>
-													<tr>
-															<td align="right">
-	<?php echo __('Encargado 2'); ?>
-															</td>
-															<td align="left">'<!-- Nuevo Select -->
-<?php echo $Form->select('id_encargado2', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado2'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
-															</td>
-													</tr>';
-<?php } ?>
-												<tr>
-														<td align="right">
-<?php echo __('Contraparte') ?>
-														</td>
-														<td align="left">
-																<input name="contraparte" size="50" value="<?php echo $Asunto->fields['contraparte'] ?>" />
-														</td>
-												</tr>
-												<tr>
-														<td align="right">
-<?php echo __('Cotizado conjuntamente con') ?>
-														</td>
-														<td align="left">
-																<input name="cotizado_con" size="50" value="<?php echo $Asunto->fields['cotizado_con'] ?>" />
-														</td>
-												</tr>
-												<tr>
-														<td align="right">
-<?php echo __('Contacto solicitante') ?>
-														</td>
-														<td align="left">
-																<input name="asunto_contacto" size="30" value="<?php echo $Asunto->fields['contacto'] ?>" />
-														</td>
-												</tr>
-												<tr>
-														<td align="right">
-<?php echo __('Teléfono Contacto') ?>
-														</td>
-														<td align="left">
-																<input name="fono_contacto" value="<?php echo $Asunto->fields['fono_contacto'] ?>" />
-																&nbsp;&nbsp;&nbsp;
-																<?php echo __('E-mail contacto') ?>
-																<input name="email_contacto" value="<?php echo $Asunto->fields['email_contacto'] ?>" />
-														</td>
-												</tr>
-												<tr>
-														<td align="right">
-																<label for="activo"><?php echo __('Activo') ?></label>
-														</td>
-														<td align="left">
-																<input type="checkbox" name="activo" id="activo" value="1" <?php echo $Asunto->fields['activo'] == 1 ? "checked" : "" ?> <?php echo!$Asunto->Loaded() ? 'checked' : '' ?> />
-																&nbsp;&nbsp;&nbsp;
-																<label for="cobrable"><?php echo __('Cobrable') ?></label>
-																<input  type="checkbox" name="cobrable" id="cobrable" value="1" <?php echo $Asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo!$Asunto->Loaded() ? 'checked' : '' ?>  />
-																&nbsp;&nbsp;&nbsp;
-																<label for="actividades_obligatorias"><?php echo __('Actividades obligatorias') ?></label>
-																<input type="checkbox" id="actividades_obligatorias" name="actividades_obligatorias" value="1" <?php echo $Asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
-														</td>
-												</tr>
-										</table>
-								</fieldset>
-								<br/>
-
-<?php
-if ($Asunto->fields['id_contrato'] && ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) && ($Asunto->fields['codigo_cliente'] == $Cliente->fields['codigo_cliente'])) {
-	$checked = true;
-} else {
-	$checked = false;
-}
-
-$hide_areas = false;
-if ($Sesion->usuario->Es('SASU')) {
-	$hide_areas = true;
-} else {
-	if ((!isset($codigo_cliente) || $codigo_cliente == '') && $Asunto->Loaded()) {
-		$codigo_cliente = $Asunto->fields['codigo_cliente'];
-	}
-}
-?>
-
-								<table width="100%" cellspacing="0" cellpadding="0">
-										<tr>
-												<td id="td_cobro_independiente" <?php echo $hide_areas ? 'style="display:none;"' : ''; ?>>
-								<?php echo $Form->checkbox('cobro_independiente', 1, $checked, array('label' => __('Se cobrará de forma independiente'), 'onclick' => 'ShowContrato(this.form, this)', 'id' => 'cobro_independiente')); ?>
-												</td>
-												<td id="tbl_copiar_datos" style="display:<?php echo!empty($checked) ? 'inline' : 'none'; ?>;">
-														&nbsp;
-												</td>
-										</tr>
-								</table>
+	<table width="90%">
+		<tr>
+			<td align="center">
+				<fieldset class="border_plomo tb_base">
+				<legend><?php echo __('Datos generales') ?></legend>
+					<table>
+						<tr>
+							<td align="right"><?php echo __('Código'); ?></td>
+							<td align="left">
+								<input 	id="codigo_asunto"
+												name="codigo_asunto" <?php echo !$CodigoClienteAsuntoModificable ? 'readonly="readonly"' : ''; ?>
+												size="10"
+												maxlength="10"
+												value="<?php echo $Asunto->fields['codigo_asunto'] ?>"
+												onchange="this.value = this.value.toUpperCase(); <?php echo !$Asunto->Loaded() ? 'CheckCodigo();' : ''; ?>"/>
+								&nbsp;&nbsp;&nbsp;
+								<?php if (Conf::GetConf($Sesion, 'CodigoSecundario')) { ?>
+									<?php echo __('Código secundario'); ?>
+									<div id="glosa_codigo_cliente_secundario" style="width: 50px; display: inline;">&nbsp;&nbsp;<?php echo !empty($Cliente->fields['codigo_cliente_secundario']) ? "{$Cliente->fields['codigo_cliente_secundario']}-" : ''; ?></div>
+									<input 	id="codigo_asunto_secundario"
+													name="codigo_asunto_secundario"
+													size="15"
+													maxlength="20"
+													value="<?php echo array_pop(explode('-', $Asunto->fields['codigo_asunto_secundario'])); ?>"
+													onchange='this.value=this.value.toUpperCase();'
+													style='text-transform: uppercase;'/>
+									<span style="color:#FF0000; font-size:10px">*</span>
+								<?php } ?>
+							</td>
+						</tr>
+						<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
+							<tr>
+								<td align="right" title="<?php echo __('Código con el que el cliente identifica internamente el asunto. Es obligatorio si se desea generar un archivo en formato LEDES'); ?>">
+								<?php echo __('Código de homologación'); ?>
+								</td>
+								<td align="left">
+									<input name="codigo_homologacion" size="45" value="<?php echo $Asunto->fields['codigo_homologacion']; ?>" />
+								</td>
+							</tr>
+						<?php } ?>
+						<tr>
+							<td align="right"><?php echo __('Título') ?></td>
+							<td align="left">
+								<input name="glosa_asunto" size=45 value="<?php echo $Asunto->fields['glosa_asunto'] ?>" />
+								<span style="color:#FF0000; font-size:10px">*</span>
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><?php echo __('Cliente') ?></td>
+							<td align="left">
+								<?php
+								if (!$Asunto->Loaded()) {
+									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
+									} else {
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
+									}
+								} else {
+									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+										$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'nuevo_codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' class="nuevo_codigo_cliente secundario" ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
+										$_codigo_cliente = $Cliente->fields['codigo_cliente_secundario'];
+										$_name = 'codigo_cliente_secundario';
+									} else {
+										$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'nuevo_codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' class="nuevo_codigo_cliente" ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
+										$_codigo_cliente = ($Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente']);
+										$_name = 'codigo_cliente';
+									}
+									echo '<input type="text" id="campo_' . $_name . '" size="15" value="' . $_codigo_cliente . '" readonly="readonly">';
+									echo '<input type="text" id="glosa_' . $_name . '" name="glosa_' . $_name . '" size="45" value="' . $Cliente->fields['glosa_cliente'] . '" readonly="readonly">';
+									echo '<input type="hidden" id="' . $_name . '" name="' . $_name . '" value="' . $_codigo_cliente . '">';
+								}
+								if ($Asunto->Loaded()) { ?>
+									<a href='#' id='change_client'><img src='//static.thetimebilling.com/images/editar_on.gif' border='0' title='Cambiar Cliente'></a>
+									<span style="color:#FF0000; font-size:10px">*</span>
+									<div id="nuevo_codigo" class="hidden" style="padding: 5px 0px 5px 5px; background-color: yellowgreen">Asociar a cliente</br>
+										<?php echo $input_cliente; ?>
+									</div>
+								<?php } ?>
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><?php echo __('Idioma') ?></td>
+							<td align="left">
+								<?php echo Html::SelectQuery($Sesion, "SELECT * FROM prm_idioma", 'id_idioma', $Asunto->fields['id_idioma'] ? $Asunto->fields['id_idioma'] : $id_idioma_default); ?>&nbsp;&nbsp;
+								<?php echo __('Categoría de asunto') ?>
+								<?php echo Html::SelectArrayDecente($PrmTipoProyecto->Listar('ORDER BY orden, glosa_tipo_proyecto ASC'), 'id_tipo_asunto', $Asunto->fields['id_tipo_asunto']); ?>
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><?php echo __('Área') . ' ' . __('asunto') ?></td>
+							<td align="left">
+								<?php echo $SelectHelper->ajax_select(
+																		'id_area_proyecto',
+																		$Asunto->fields['id_area_proyecto'] ? $Asunto->fields['id_area_proyecto'] : $id_area_proyecto,
+																		array(
+																			'class' => 'span3',
+																			'style' => 'display:inline'
+																		),
+																		array(
+																			'source' => 'ajax/ajax_prm.php?prm=AreaProyecto&single_class=1&fields=orden,requiere_desglose&order_by=orden,glosa&order_by_type=asc',
+																			'onChange' => 'var element = selected_id_area_proyecto;
+																										jQuery("#id_desglose_area_container").hide();
+																										jQuery("#desglose_area").hide()
+																										if (element && element.requiere_desglose == "1") {
+																											jQuery("#id_desglose_area_container").show();
+																											FormSelectHelper.reload_id_desglose_area();
+																										}'
+																					)); ?>
+								<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
+									<span style="color:#FF0000; font-size:10px">*</span>
+								<?php } ?>
+								<?php echo $SelectHelper->checkboxes(
+																		'id_desglose_area',
+																		array(),
+																		$Asunto->getAreaDetails(),
+																		array(
+																			'class' => 'span6',
+																			'style' => 'display:inline'
+																		),
+																		array(
+																			'autoload' => false,
+																			'source' => 'ajax/ajax_prm.php?prm=AreaProyectoDesglose&single_class=1&fields=glosa,id_area_proyecto,requiere_desglose',
+																			'onSource' => 'source = source + "&q=id_area_proyecto:" + jQuery("#id_area_proyecto").val();',
+																			'onChange' => 'var element = selected_id_desglose_area;
+																										if (element && element.requiere_desglose == "1") {
+																											if (checked) {
+																												jQuery("#desglose_area").show();
+																											} else {
+																												jQuery("#desglose_area").val("").hide();
+																											}
+																										}'
+																		)); ?>
+							<?php echo $Form->input('desglose_area', $Asunto->fields['desglose_area'], array('placeholder' => 'Desglose', 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'desglose_area')); ?>
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><?php echo __('Descripción') ?></td>
+							<td align="left"><textarea name="descripcion_asunto" cols="50"><?php echo $Asunto->fields['descripcion_asunto'] ?></textarea></td>
+						</tr>
+						<?php
+						$prmGiro = new PrmGiro($Sesion);
+						$giros = $prmGiro->Listar();
+						if (count($giros) > 0) { ?>
+						<tr>
+							<td align="right"><?php echo __('Giro') ?></td>
+							<td align="left">
+								<?php
+								echo $SelectHelper->checkboxes(
+																'id_asunto_giro',
+																array(),
+																$Asunto->getEconomicActivities(),
+																array(
+																	'class' => 'span6',
+																	'style' => 'display:inline'
+																),
+																array(
+																'autoload' => true,
+																'source' => 'ajax/ajax_prm.php?prm=Giro&fields=glosa,requiere_desglose',
+																'onChange' => 'var element = selected_id_asunto_giro;
+																							if (element && element.requiere_desglose == "1") {
+																								if (checked) {
+																									jQuery("#giro").show();
+																								} else {
+																									jQuery("#giro").val("").hide();
+																								}
+																							}'
+																)); ?>
+								<?php echo $Form->input('giro', $Asunto->fields['giro'], array('placeholder' => __('Giro'), 'style' => 'display:none', 'size' => '50', 'label' => false, 'id' => 'giro')); ?>
+							</td>
+						</tr>
+						<?php } ?>
+						<tr>
+							<td align="right"><?php echo __('Usuario responsable'); ?></td>
+							<td align="left"><!-- Nuevo Select -->
+							<?php echo $Form->select('id_encargado', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
+							<?php
+							if (isset($encargado_obligatorio) && $encargado_obligatorio) {
+								echo $obligatorio;
+							} ?>
+							</td>
+						</tr>
+						<?php if (Conf::GetConf($Sesion, 'AsuntosEncargado2')) { ?>
+						<tr>
+							<td align="right"><?php echo __('Encargado 2'); ?></td>
+							<td align="left">'<!-- Nuevo Select -->
+								<?php echo $Form->select('id_encargado2', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado2'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
+							</td>
+						</tr>
+						<?php } ?>
+						<tr>
+							<td align="right"><?php echo __('Contraparte') ?></td>
+							<td align="left">
+								<input name="contraparte" size="50" value="<?php echo $Asunto->fields['contraparte'] ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><?php echo __('Cotizado conjuntamente con') ?></td>
+							<td align="left">
+								<input name="cotizado_con" size="50" value="<?php echo $Asunto->fields['cotizado_con'] ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><?php echo __('Contacto solicitante') ?></td>
+							<td align="left">
+								<input name="asunto_contacto" size="30" value="<?php echo $Asunto->fields['contacto'] ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><?php echo __('Teléfono Contacto') ?></td>
+							<td align="left">
+								<input name="fono_contacto" value="<?php echo $Asunto->fields['fono_contacto'] ?>" />
+								&nbsp;&nbsp;&nbsp;
+								<?php echo __('E-mail contacto') ?>
+								<input name="email_contacto" value="<?php echo $Asunto->fields['email_contacto'] ?>" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><label for="activo"><?php echo __('Activo') ?></label></td>
+							<td align="left">
+								<input type="checkbox" name="activo" id="activo" value="1" <?php echo $Asunto->fields['activo'] == 1 ? "checked" : "" ?> <?php echo!$Asunto->Loaded() ? 'checked' : '' ?> />
+								&nbsp;&nbsp;&nbsp;
+								<label for="cobrable"><?php echo __('Cobrable') ?></label>
+								<input  type="checkbox" name="cobrable" id="cobrable" value="1" <?php echo $Asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo!$Asunto->Loaded() ? 'checked' : '' ?>  />
+								&nbsp;&nbsp;&nbsp;
+								<label for="actividades_obligatorias"><?php echo __('Actividades obligatorias') ?></label>
+								<input type="checkbox" id="actividades_obligatorias" name="actividades_obligatorias" value="1" <?php echo $Asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
+							</td>
+						</tr>
+					</table>
+				</fieldset>
 
 				<br/>
-				<div id='tbl_contrato' style="display:<?php echo $checked != '' ? 'inline-table' : 'none' ?>;">
+				<?php
+				if ($Asunto->fields['id_contrato'] && ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato']) && ($Asunto->fields['codigo_cliente'] == $Cliente->fields['codigo_cliente'])) {
+					$checked = true;
+				} else {
+					$checked = false;
+				}
+
+				$hide_areas = false;
+				if ($Sesion->usuario->Es('SASU')) {
+					$hide_areas = true;
+				} else {
+					if ((!isset($codigo_cliente) || $codigo_cliente == '') && $Asunto->Loaded()) {
+						$codigo_cliente = $Asunto->fields['codigo_cliente'];
+					}
+				} ?>
+
+				<table width="100%" cellspacing="0" cellpadding="0">
+					<tr>
+						<td id="td_cobro_independiente" <?php echo $hide_areas ? 'style="display:none;"' : ''; ?>>
+							<?php echo $Form->checkbox('cobro_independiente', 1, $checked, array('label' => __('Se cobrará de forma independiente'), 'id' => 'cobro_independiente')); ?>
+						</td>
+						<td id="tbl_copiar_datos" style="display:<?php echo !empty($checked) ? 'inline' : 'none'; ?>;">&nbsp;</td>
+					</tr>
+				</table>
+
+				<br/>
+				<div id="tbl_contrato">
 					<?php
-						if (!$Sesion->usuario->Es('SASU')) {
-							$contrato_nuevo = $Asunto->fields['id_contrato_indep'] == 0;
-							$cliente = &$Cliente;
-							require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
-						}
+					if (!$Sesion->usuario->Es('SASU')) {
+						$contrato_nuevo = $Asunto->fields['id_contrato_indep'] == 0;
+						$cliente = &$Cliente;
+						require_once Conf::ServerDir() . '/interfaces/agregar_contrato.php';
+					}
 					?>
 				</div>
 
@@ -962,35 +912,32 @@ if ($Sesion->usuario->Es('SASU')) {
 				</fieldset>
 				<br>
 
-								<!-- GUARDAR -->
-								<fieldset class="border_plomo tb_base">
-										<legend><?php echo __('Guardar datos') ?></legend>
-										<table>
-												<tr>
-														<td colspan=6 align="center">
-<?php
-if (!$Sesion->usuario->Es('SASU') && Conf::GetConf($Sesion, 'RevisarTarifas')) {
-	$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario').get(0), false);";
-} else {
-	$funcion_validar = "return Validar(jQuery('#formulario')[0]);";
-}
-
-echo $Form->button(__('Guardar'), array('onclick' => $funcion_validar));
-echo $Form->script();
-?>
-														</td>
-												</tr>
-										</table>
-								</fieldset>
-						</td>
-				</tr>
-		</table>
-		<br/>
+				<!-- GUARDAR -->
+				<fieldset class="border_plomo tb_base">
+				<legend><?php echo __('Guardar datos') ?></legend>
+					<table>
+						<tr>
+							<td colspan=6 align="center">
+							<?php
+							if (!$Sesion->usuario->Es('SASU') && Conf::GetConf($Sesion, 'RevisarTarifas')) {
+								$funcion_validar = "return RevisarTarifas('id_tarifa', 'id_moneda', jQuery('#formulario').get(0), false);";
+							} else {
+								$funcion_validar = "return Validar(jQuery('#formulario')[0]);";
+							}
+							echo $Form->button(__('Guardar'), array('onclick' => $funcion_validar));
+							echo $Form->script();
+							?>
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+			</td>
+		</tr>
+	</table>
 </form>
 
 <script type="text/javascript">
 var form = $('formulario');
-ShowContrato(form, 'cobro_independiente');
 
 jQuery('document').ready(function () {
 	jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function () {
@@ -1009,6 +956,17 @@ jQuery('document').ready(function () {
 		select_nuevo_codigo.val(codigo_cliente);
 	});
 
+	jQuery(document).on("change", "#cobro_independiente", function() {
+		if (jQuery(this).is(":checked")) {
+			jQuery("#tbl_contrato").show();
+			jQuery("#tbl_copiar_datos").show();
+		} else {
+			jQuery("#tbl_contrato").hide();
+			jQuery("#tbl_copiar_datos").hide();
+		};
+	});
+
+	jQuery("#cobro_independiente").trigger("change");
 });
 
 function CambioEncargadoSegunCliente(idcliente) {
