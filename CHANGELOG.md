@@ -2,7 +2,7 @@
 
 ## Hotfix 15.24.1
 Wednesday 2015, October 21st
-* **Fix** [Dierenia de horas en excel asuntos por cobrar](https://github.com/LemontechSA/ttb/pull/1187)
+* **Fix** [Diferenica de horas en excel asuntos por cobrar](https://github.com/LemontechSA/ttb/pull/1187)
 
 ## Hotfix 15.24.1
 Wednesday 2015, October 21st
