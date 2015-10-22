@@ -40,49 +40,39 @@ if ($codigo_cliente) {
 $where = 1;
 $where_subquery = 1;
 $where_trabajo = "";
-$filtros = array();
-$filtros_trabajos = array();
+
 if ($activo) {
 	$where_subquery .= " AND co.activo = 'SI' ";
-	$filtros['contrato.activo'] = 'SI';
 } else {
 	$where_subquery .= " AND co.activo = 'NO' ";
-	$filtros['contrato.activo'] = 'NO';
 }
 if ($id_usuario) {
 	$where_subquery .= " AND co.id_usuario_responsable = '$id_usuario' ";
-	$filtros['contrato.id_usuario_responsable'] = $id_usuario;
 }
 if ($forma_cobro) {
 	$where_subquery .= " AND co.forma_cobro = '$forma_cobro' ";
-	$filtros['contrato.forma_cobro'] = $forma_cobro;
 }
 
 //1-2 = honorarios-gastos, 3 = mixtas
 if ($tipo_liquidacion) {
 	$where_subquery .= " AND co.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "' ";
-	$filtro['contrato.separar_liquidaciones'] = ($tipo_liquidacion == '3' ? 0 : 1);
 }
 
 if ($codigo_cliente) {
 	$where_subquery .= " AND cl.codigo_cliente = '$codigo_cliente' ";
-	$filtros['cliente.codigo_cliente'] = $codigo_cliente;
-
 }
+
 if ($id_grupo_cliente) {
 	$where_subquery .= " AND cl.id_grupo_cliente = '$id_grupo_cliente' ";
-	$filtros['liente.id_grupo_cliente'] = $id_grupo_cliente;
 }
 
 if ($fecha_ini) {
 	$fecha = \Carbon\Carbon::createFromFormat('d-m-Y', $fecha_ini);
 	$where_trabajo .= " AND trabajo.fecha >= '{$fecha->format('Y-m-d')}' ";
-	$filtros_trabajo['fecha_ini'] = "trabajo.fecha >= '{$fecha->format('Y-m-d')}'";
 }
 if ($fecha_fin) {
 	$fecha = \Carbon\Carbon::createFromFormat('d-m-Y',$fecha_fin);
 	$where_trabajo .= " AND trabajo.fecha <= '{$fecha->format('Y-m-d')}' ";
-	$filtros_trabajo['fecha_fin'] = "trabajo.fecha <= '{$fecha->format('Y-m-d')}'";
 }
 
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
