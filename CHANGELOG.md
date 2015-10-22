@@ -2,6 +2,10 @@
 
 ## Hotfix 15.24.1
 Wednesday 2015, October 21st
+* **Fix** [Diferenica de horas en excel asuntos por cobrar](https://github.com/LemontechSA/ttb/pull/1187)
+
+## Hotfix 15.24.1
+Wednesday 2015, October 21st
 * **Fix** [Error SQL - Actualizar Contrato](https://github.com/LemontechSA/ttb/pull/1183)
 
 ## [Release 15.24.0](https://github.com/LemontechSA/ttb/pull/1178)
