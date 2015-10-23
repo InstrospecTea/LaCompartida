@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.24.4
+Thursday 2015, October 22nd
+* **Fix** [Corrección tipo moneda a mostrar en hitos Excel](https://github.com/LemontechSA/ttb/pull/1189)
+
 ## Hotfix 15.24.3
 Thursday 2015, October 22nd
 * **Fix** [Rollback de Hotfix/15.23.7](https://github.com/LemontechSA/ttb/pull/1188)
