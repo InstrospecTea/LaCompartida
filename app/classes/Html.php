@@ -183,14 +183,15 @@ class Html extends \Html {
 	 * @param boolean $blank
 	 * @return string
 	 */
-	public static function PrintCalendar($input_name, $value, $size = 12, $clase = "fechadiff", $blank = false) {
+	public static function PrintCalendar($input_name, $value, $size = 12, $clase = 'fechadiff', $blank = false) {
 		if ($value == '') {
-			if ($blank)
-				return "<input type='text' name='" . $input_name . "' class='" . $clase . "' value='' size='" . $size . "' />";
-			else
-				return "<input type='text' name='" . $input_name . "' class='" . $clase . "' value='" . date('d-m-Y') . "' size='" . $size . "' />";
-		} else
-			return "<input type='text' name='" . $input_name . "' class='" . $clase . "' value='" . $value . "' size='" . $size . "' />";
-		
+			if ($blank) {
+				return "<input type='text' id='" . $input_name . "' name='" . $input_name . "' class='" . $clase . "' value='' size='" . $size . "' />";
+			} else {
+				return "<input type='text' id='" . $input_name . "' name='" . $input_name . "' class='" . $clase . "' value='" . date('d-m-Y') . "' size='" . $size . "' />";
+			}
+		} else {
+			return "<input type='text' id='" . $input_name . "' name='" . $input_name . "' class='" . $clase . "' value='" . $value . "' size='" . $size . "' />";
+		}
 	}
 }
