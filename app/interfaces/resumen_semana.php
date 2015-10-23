@@ -7,6 +7,7 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $Form = new Form($sesion);
 $usuario = new UsuarioExt($sesion);
+$Html = new \TTB\Html;
 
 // Revisamos si el usuario tiene categoría de revisor.
 $params_array['codigo_permiso'] = 'REV';
@@ -43,11 +44,11 @@ $style = $diseno_nuevo ? 'style="border: 1px solid #BDBDBD;"' : '';
 				<table width="90%">
 					<tr>
 						<td>
-							<input type='hidden' name='accion' value=''>
-							<input type='hidden' name='opcion' value=''>
+							<input type="hidden" name="accion" value="">
+							<input type="hidden" name="opcion" value="">
 							&nbsp;</td>
 						<td>
-							<?php echo Html::PrintCalendar("semana", $semana); ?>
+							<?php echo $Html::PrintCalendar('semana', $semana); ?>
 						</td>
 					</tr>
 					<tr>
@@ -69,10 +70,10 @@ $style = $diseno_nuevo ? 'style="border: 1px solid #BDBDBD;"' : '';
 							<?php echo __('Tipo de Dato') ?>:
 						</td>
 						<td align="left">
-							<select name='tipo_dato'>
-								<option value='horas_trabajadas'><?php echo __('Horas Trabajadas') ?></option>
-								<option value='horas_cobrables' <?php echo $tipo_dato == 'horas_cobrables' ? 'selected' : '' ?>><?php echo __('Horas Cobrables') ?></option>
-								<option value='horas_castigadas'<?php echo $tipo_dato == 'horas_castigadas' ? 'selected' : '' ?>><?php echo __('Horas Castigadas') ?></option>
+							<select name="tipo_dato">
+								<option value="horas_trabajadas"><?php echo __('Horas Trabajadas') ?></option>
+								<option value="horas_cobrables" <?php echo $tipo_dato == 'horas_cobrables' ? 'selected' : '' ?>><?php echo __('Horas Cobrables') ?></option>
+								<option value="horas_castigadas"<?php echo $tipo_dato == 'horas_castigadas' ? 'selected' : '' ?>><?php echo __('Horas Castigadas') ?></option>
 							</select>
 						</td>
 					</tr>
@@ -104,20 +105,21 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 		echo "<table class=\"tb_base\" width=\"85%\" style=\"border: 1px solid #BDBDBD;\"><tr><td align=\"center\">";
 	}
 
-	if ($semana == "") {
-		$semana2 = "CURRENT_DATE()";
-		$sql_f = "SELECT DATE_ADD( CURDATE(), INTERVAL - ( DAYOFWEEK(CURDATE()) - 2 ) DAY ) AS semana_inicio";
+	if ($semana == '') {
+		$semana2 = 'CURRENT_DATE()';
+		$sql_f = 'SELECT DATE_ADD( CURDATE(), INTERVAL - ( DAYOFWEEK(CURDATE()) - 2 ) DAY ) AS semana_inicio';
 		$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f, __FILE__, __LINE__, $sesion->dbh);
 		list($semana_actual) = mysql_fetch_array($resp);
-		$semana_anterior = date("Y-m-d", strtotime("$semana_actual-7 days"));
-		$semana_siguiente = date("Y-m-d", strtotime("$semana_actual+7 days"));
+		$semana_anterior = date('Y-m-d', strtotime('$semana_actual-7 days'));
+		$semana_siguiente = date('Y-m-d', strtotime('$semana_actual+7 days'));
 	} else {
+		$semana = date('Y-m-d', strtotime($semana));
 		$semana2 = "'$semana'";
 		$sql_f = "SELECT DATE_ADD( '" . $semana . "', INTERVAL - ( DAYOFWEEK('" . $semana . "') - 2 ) DAY ) AS semana_inicio";
 		$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f, __FILE__, __LINE__, $sesion->dbh);
 		list($semana_actual) = mysql_fetch_array($resp);
-		$semana_anterior = date("Y-m-d", strtotime("$semana_actual-7 days"));
-		$semana_siguiente = date("Y-m-d", strtotime("$semana_actual+7 days"));
+		$semana_anterior = date('Y-m-d', strtotime('$semana_actual-7 days'));
+		$semana_siguiente = date('Y-m-d', strtotime('$semana_actual+7 days'));
 	}
 
 	switch ($tipo_dato) {
