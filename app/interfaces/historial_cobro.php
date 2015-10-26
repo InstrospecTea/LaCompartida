@@ -13,83 +13,89 @@
 
     $sesion = new Sesion('');
     $pagina = new Pagina($sesion);
+    $Html = new \TTB\Html;
 
-	if($id_cobro)
-	{
+	if ($id_cobro) {
 	    $cobro = new Cobro($sesion);
-	    if(!$cobro->Load($id_cobro))
+	    if (!$cobro->Load($id_cobro)) {
     	    $pagina->FatalError(__('Cobro inválido'));
+        }
 	}
 
-	if(!$id_cobro)
+	if (!$id_cobro) {
 		$pagina->FatalError(__('Debe especificar un cobro'));
+    }
 
-    if($opc == "guardar")
-    {
+    if ($opc == 'guardar') {
         $his = new Observacion($sesion);
-        $his->Edit('fecha',$fecha_obs);
-        $his->Edit('comentario',$observacion_obs);
-        $his->Edit('id_usuario',$usuario_ingreso_obs);
-        $his->Edit('id_cobro',$id_cobro);
+        $his->Edit('fecha', date('Y-m-d', strtotime($fecha_obs)));
+        $his->Edit('comentario', $observacion_obs);
+        $his->Edit('id_usuario', $usuario_ingreso_obs);
+        $his->Edit('id_cobro', $id_cobro);
 
-		if($id_persona)
-			$his->Edit('id_persona',$id_persona);
+		if ($id_persona) {
+			$his->Edit('id_persona', $id_persona);
+        }
 
-        if($his->Write())
+        if ($his->Write()) {
             $pagina->AddInfo(__('Historial ingresado'));
+        }
     }
 
 
-    if($desde=="")
+    if ($desde=='') {
         $desde=0;
-    if($x_pag=="")
+    }
+    if ($x_pag=='') {
         $x_pag=5;
-    if($orden == '')
+    }
+    if ($orden == '') {
         $orden= 'cobro_historial.fecha_creacion DESC';
+    }
 
 
 	$where = '';
-	if(!$where)
+	if (!$where) {
 		$where = 1;
+    }
 
     $query = "SELECT SQL_CALC_FOUND_ROWS id_cobro_historial, fecha, comentario, CONCAT_WS(' ',usuario.nombre, usuario.apellido1) as nombre
-											FROM cobro_historial
-                                            LEFT JOIN usuario ON usuario.id_usuario = cobro_historial.id_usuario
-                                            WHERE id_cobro = '$id_cobro' AND $where";
+    			FROM cobro_historial
+                LEFT JOIN usuario ON usuario.id_usuario = cobro_historial.id_usuario
+                WHERE id_cobro = '$id_cobro' AND $where";
 
     $pagina->PrintHeaders();
     $pagina->PrintTop(1);
 ?>
 
-<table   width="100%">
-       <tr>
-			<td colspan=4>
+<table width="100%">
+    <tr>
+        <td colspan=4>
 <?php
     $buscador = new Buscador($sesion, $query, "Observacion", $desde, $x_pag, $orden);
     $buscador->color_mouse_over = "#ADFF2F";
     $buscador->titulo = "<strong>Historial</strong>";
-    $buscador->AgregarEncabezado("fecha",__('Fecha'),"align=center");
-    $buscador->AgregarEncabezado("nombre",__('Nombre'),"align=center");
-    $buscador->AgregarEncabezado("comentario",__('Observación'),"align=center");
+    $buscador->AgregarEncabezado("fecha", __('Fecha'), "align=center");
+    $buscador->AgregarEncabezado("nombre", __('Nombre'), "align=center");
+    $buscador->AgregarEncabezado("comentario", __('Observación'), "align=center");
     $buscador->Imprimir();
-    
 ?>
-	</td>
-</tr>
-<script>
+        </td>
+    </tr>
 
-function Validar(form)
-{
-	if(form.observacion_obs.value == '')
-	{
-		alert("<?php echo __('Debe ingresar observación')?>");
+<script>
+function Validar(form) {
+	if (form.observacion_obs.value == '') {
+		alert("<?php echo __('Debe ingresar observación'); ?>");
 		return false;
 	}
+
 	form.opc.value='guardar';
 	return true;
 }
 </script>
 </table>
+
 <form name="formulario" method="post" id="formulario">
 <input type="hidden" name="opc" id="opcion">
 <input type="hidden" name="id_persona" value="<?=$id_persona?>">
@@ -102,7 +108,7 @@ function Validar(form)
 </tr>
 <tr>
 	<td colspan=4>
-		<strong><img src="<?=Conf::ImgDir()?>/agregar.gif"> <?php echo __('Agregar historial')?></strong>
+		<strong><img src="<?=Conf::ImgDir()?>/agregar.gif"> <?php echo __('Agregar historial'); ?></strong>
 	</td>
 </tr>
 <tr>
@@ -112,10 +118,10 @@ function Validar(form)
 </tr>
 <tr>
 	<td class="cvs">
-		 <?php echo __('Fecha')?>
+		 <?php echo __('Fecha'); ?>
 	</td>
 	<td>
-        <?php echo  Html::PrintCalendar('fecha_obs',''); ?>	
+        <?php echo $Html::PrintCalendar('fecha_obs', $fecha_obs); ?>	
 	</td>
 </tr>
 <tr>
@@ -128,15 +134,15 @@ function Validar(form)
 </tr>
 <tr>
     <td class="cvs">
-         <?php echo __('Usuario ingreso')?>
+         <?php echo __('Usuario ingreso'); ?>
     </td>
     <td>
-		 <?php echo Html::SelectQuery($sesion,"SELECT id_usuario, CONCAT_WS(', ',apellido1,nombre) FROM usuario WHERE id_usuario <> -1 ORDER BY apellido1",'usuario_ingreso_obs',$sesion->usuario->fields['id_usuario'])?>
+		 <?php echo Html::SelectQuery($sesion,"SELECT id_usuario, CONCAT_WS(', ',apellido1,nombre) FROM usuario WHERE id_usuario <> -1 ORDER BY apellido1",'usuario_ingreso_obs',$sesion->usuario->fields['id_usuario']); ?>
     </td>
 </tr>
 <tr>
 	<td colspan=4 align=right>
-		<input type=submit value="<?php echo __('Guardar')?>" onclick="return Validar(this.form);">
+		<input type=submit value="<?php echo __('Guardar'); ?>" onclick="return Validar(this.form);">
 	</td>
 </tr>
 </table>
@@ -144,5 +150,3 @@ function Validar(form)
 <?php
     $pagina->PrintBottom(1);
 ?>
-
-

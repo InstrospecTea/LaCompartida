@@ -6,6 +6,7 @@ $pagina = new Pagina($sesion);
 $esRut = strtolower(UtilesApp::GetConf($sesion, 'NombreIdentificador')) == 'rut';
 $rut_limpio = $esRut ? Utiles::LimpiarRut($rut) : preg_replace('/[,\.-]+/', '', $rut);
 $usuario = new UsuarioExt($sesion, $rut_limpio);
+$Html = new \TTB\Html;
 
 $total_contracts = 0;
 $total_clients_contracts = 0;
@@ -741,15 +742,13 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			<tr>
 				<td align="right"><label for="alerta_diaria" align="right"><?php echo __('Fecha inicio') ?></label></td>
 				<td colspan="2" align="left">
-					<input type="text" name="vacaciones_fecha_inicio" value="" id="vacaciones_fecha_inicio" class="cls_fecha_vacaciones" size="11" maxlength="10"/>
-					<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_vacaciones_fecha_inicio" style="cursor:pointer" />
+					<?php echo $Html::PrintCalendar('vacaciones_fecha_inicio', '', 12, 'fechadiff', true); ?>
 				</td>
 			</tr>
 			<tr>
 				<td align="right"><label for="alerta_diaria" align="right"><?php echo __('Fecha fin') ?></label></td>
 				<td colspan="2" align="left">
-					<input type="text" name="vacaciones_fecha_fin" value="" id="vacaciones_fecha_fin" class="cls_fecha_vacaciones" size="11" maxlength="10"/>
-					<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_vacaciones_fecha_fin" style="cursor:pointer" />
+					<?php echo $Html::PrintCalendar('vacaciones_fecha_fin', '', 12, 'fechadiff', true); ?>
 					&nbsp;&nbsp;<?php echo $Form->button(__('Guardar'), array('id' => 'btn_guardar_vacacion')); ?>
 				</td>
 			</tr>
