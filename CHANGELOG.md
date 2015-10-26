@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.24.5
+Monday 2015, October 26th
+* **Fix** [Validación variable `id_usuario`](https://github.com/LemontechSA/ttb/pull/1190)
+
 ## Hotfix 15.24.4
 Thursday 2015, October 22nd
 * **Fix** [Corrección tipo moneda a mostrar en hitos Excel](https://github.com/LemontechSA/ttb/pull/1189)
