@@ -2,7 +2,7 @@
 
 ## Hotfix 15.24.7
 Tuesday 2015, October 27th
-* **Fix** [Corregir usuario al subir gastos por SAP](https://github.com/LemontechSA/ttb/pull/1191)
+* **Fix** [Corregir usuario al subir gastos por SAP](https://github.com/LemontechSA/ttb/pull/1192)
 
 ## Hotfix 15.24.6
 Tuesday 2015, October 27th
