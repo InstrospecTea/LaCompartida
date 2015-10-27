@@ -1,6 +1,28 @@
 # Changelog
 
-## [Mejoreas Lloreda Camacho [WIP]](https://github.com/LemontechSA/ttb/pull/)
+## Hotfix 15.24.6
+Tuesday 2015, October 27th
+* **Fix** [Corregir método para generar codigo de actividad](https://github.com/LemontechSA/ttb/pull/1191)
+
+## Hotfix 15.24.5
+Monday 2015, October 26th
+* **Fix** [Validación variable `id_usuario`](https://github.com/LemontechSA/ttb/pull/1190)
+
+## Hotfix 15.24.4
+Thursday 2015, October 22nd
+* **Fix** [Corrección tipo moneda a mostrar en hitos Excel](https://github.com/LemontechSA/ttb/pull/1189)
+
+## Hotfix 15.24.3
+Thursday 2015, October 22nd
+* **Fix** [Rollback de Hotfix/15.23.7](https://github.com/LemontechSA/ttb/pull/1188)
+
+## Hotfix 15.24.2
+Wednesday 2015, October 21st
+* **Fix** [Diferenica de horas en excel asuntos por cobrar](https://github.com/LemontechSA/ttb/pull/1187)
+
+## Hotfix 15.24.1
+Wednesday 2015, October 21st
+* **Fix** [Error SQL - Actualizar Contrato](https://github.com/LemontechSA/ttb/pull/1183)
 
 ## [Release 15.24.0](https://github.com/LemontechSA/ttb/pull/1178)
 Tuesday 2015, October 20th

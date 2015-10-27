@@ -41,28 +41,39 @@ $where = 1;
 $where_subquery = 1;
 $where_trabajo = "";
 
-if ($activo)
+if ($activo) {
 	$where_subquery .= " AND co.activo = 'SI' ";
-else
+} else {
 	$where_subquery .= " AND co.activo = 'NO' ";
-if ($id_usuario)
+}
+if ($id_usuario) {
 	$where_subquery .= " AND co.id_usuario_responsable = '$id_usuario' ";
-if ($forma_cobro)
+}
+if ($forma_cobro) {
 	$where_subquery .= " AND co.forma_cobro = '$forma_cobro' ";
+}
 
 //1-2 = honorarios-gastos, 3 = mixtas
-if ($tipo_liquidacion)
+if ($tipo_liquidacion) {
 	$where_subquery .= " AND co.separar_liquidaciones = '" . ($tipo_liquidacion == '3' ? 0 : 1) . "' ";
+}
 
-if ($codigo_cliente)
+if ($codigo_cliente) {
 	$where_subquery .= " AND cl.codigo_cliente = '$codigo_cliente' ";
-if ($id_grupo_cliente)
-	$where_subquery .= " AND cl.id_grupo_cliente = '$id_grupo_cliente' ";
+}
 
-if ($fecha_ini)
-	$where_trabajo .= " AND DATE_FORMAT(trabajo.fecha,'%Y-%m-%d') >= DATE_FORMAT('$fecha_ini','%Y-%m-%d') ";
-if ($fecha_fin)
-	$where_trabajo .= " AND DATE_FORMAT(trabajo.fecha,'%Y-%m-%d') <= DATE_FORMAT('$fecha_fin','%Y-%m-%d') ";
+if ($id_grupo_cliente) {
+	$where_subquery .= " AND cl.id_grupo_cliente = '$id_grupo_cliente' ";
+}
+
+if ($fecha_ini) {
+	$fecha = \Carbon\Carbon::createFromFormat('d-m-Y', $fecha_ini);
+	$where_trabajo .= " AND trabajo.fecha >= '{$fecha->format('Y-m-d')}' ";
+}
+if ($fecha_fin) {
+	$fecha = \Carbon\Carbon::createFromFormat('d-m-Y',$fecha_fin);
+	$where_trabajo .= " AND trabajo.fecha <= '{$fecha->format('Y-m-d')}' ";
+}
 
 if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 	$cod_asunto .= "";
@@ -83,9 +94,9 @@ if (UtilesApp::GetConf($sesion, 'CodigoSecundario')) {
 // Buscar todos los borradores o cargar de nuevo el cobro especifico que hay que imprimir
 
 $query_asuntos_liquidar = "
-	
+
 							SELECT
-								idcontrato 
+								idcontrato
 								,glosa_cliente
 								$cod_cliente
 								$sel_cod_cli_sec
@@ -98,7 +109,7 @@ $query_asuntos_liquidar = "
 								,simbolo_moneda
 								,idmoneda
 								,ultimo_id_cobro
-								,'' AS ultimo_monto_cobro -- SE CALCULA CON ProcesaCobroIdMoneda(idcobra,idmoneda) --
+								,'' AS ultimo_monto_cobro
 								,if(DATE_FORMAT(cobro.fecha_fin,'%Y-%m-%d')>DATE_FORMAT('0000-00-00','%Y-%m-%d'),DATE_FORMAT(cobro.fecha_fin,'%Y-%m-%d'),'') as fecha_ultimo_cobro
 								,cobro.se_esta_cobrando AS glosa_ultimo_cobro
 								,'' AS horas_castigadas
@@ -119,7 +130,7 @@ $query_asuntos_liquidar = "
 
 								$cod_asunto_secundario
 								$cod_cliente_secundario
-								
+
 								,(SELECT id_cobro FROM cobro WHERE cobro.id_contrato = co.id_contrato AND cobro.estado NOT IN ('CREADO','REVISION') ORDER BY fecha_fin DESC LIMIT 1 ) AS ultimo_id_cobro
 								FROM asunto a
 								LEFT JOIN contrato co ON a.id_contrato = co.id_contrato
@@ -208,7 +219,7 @@ $col_num = count($lista_suntos_liquidar->Get()->fields);
 $arr_col = array();
 $col = 0;
 for ($i = 0; $i < $col_num; ++$i) {
-	
+
 // ocultar celdas
 
 	if (in_array($col_name[$i], array('idcontrato', 'listado_codigo_asuntos', 'idmoneda', 'ultimo_id_cobro', 'hh_val_trabajo', 'monto_total'))) {
@@ -365,7 +376,8 @@ for ($j = 0; $j < $lista_suntos_liquidar->num; ++$j, ++$fila) {
 					$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $x_fecha_ult_cobro, $arr_col[$col_name[$i]]['css']);
 				}
 			} else if ($col_name[$i] == 'hh_val_cobrado') {
-				$wip = $contrato->ProximoCobroEstimado('', Utiles::fecha2sql($proc->fields['fecha_ultimo_cobro']), $proc->fields['idcontrato'], true);
+				$fecha_ultimo_cobro = \Carbon\Carbon::parse($proc->fields['fecha_ultimo_cobro']);
+				$wip = $contrato->ProximoCobroEstimado('', $fecha_ultimo_cobro->format('Y-m-d'), $proc->fields['idcontrato'], true);
 				if ($wip[0] == '0:00:00') {
 					$hh_cobradas = '';
 				} else {
@@ -377,7 +389,8 @@ for ($j = 0; $j < $lista_suntos_liquidar->num; ++$j, ++$fila) {
 				}
 				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $hh_cobradas, $arr_col[$col_name[$i]]['css']);
 			} else if ($col_name[$i] == 'horas_castigadas') {
-				$wip = $contrato->ProximoCobroEstimado('', Utiles::fecha2sql($proc->fields['fecha_ultimo_cobro']), $proc->fields['idcontrato'], true);
+				$fecha_ultimo_cobro = \Carbon\Carbon::parse($proc->fields['fecha_ultimo_cobro']);
+				$wip = $contrato->ProximoCobroEstimado('', $fecha_ultimo_cobro->format('Y-m-d'), $proc->fields['idcontrato'], true);
 				if ($wip[2] == '0:00:00') {
 					$hh_castigadas = '';
 				} else {
@@ -393,10 +406,9 @@ for ($j = 0; $j < $lista_suntos_liquidar->num; ++$j, ++$fila) {
 			} else {
 				$ws1->write($fila, $arr_col[$col_name[$i]]['celda'], $proc->fields[$col_name[$i]], $arr_col[$col_name[$i]]['css']);
 			}
-			
+
 		}
 	}
 }
 $wb->close();
 exit;
-?>

@@ -108,7 +108,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	if ($where == '') {
 		$where = 1;
 	}
-	if ($id_usuario != '') {
+	if (is_numeric((int) $id_usuario) && ((int) $id_usuario) > 0) {
 		$where .= " AND trabajo.id_usuario= " . $id_usuario;
 	} else if (!$p_revisor) {
 		// Se buscan trabajos de los usuarios a los que se puede revisar.
