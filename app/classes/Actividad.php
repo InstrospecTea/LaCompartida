@@ -157,17 +157,45 @@ class Actividad extends Objeto {
 	}
 
 	//funcion que asigna el nuevo codigo automatico para un actividad
-	function AsignarCodigoActividad() {
-		$query = "SELECT id_actividad FROM actividad ORDER BY id_actividad DESC LIMIT 1";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($codigo) = mysql_fetch_array($resp);
+	function AsignarCodigoActividad($codigo_actividad = null) {
+		// buscar el último id_actividad
+		if (is_null($codigo_actividad)) {
+			$Criteria = new Criteria($this->sesion);
+			$Criteria->add_select('MAX(actividad.id_actividad)', 'id_actividad')->add_from('actividad');
+			$actividad = $Criteria->run();
 
-		if (empty($codigo)) {
-			$codigo = 0;
+			$id_actividad = (int) $actividad[0]['id_actividad'];
+		} else {
+			$id_actividad = (int) $codigo_actividad;
 		}
 
-		$codigo_actividad = sprintf("%04d", $codigo + 1);
+		$codigo_actividad = sprintf("%04d", $id_actividad + 1);
+
+		// verificar si el nuevo código existe
+		if ($this->existeCodigoActividad($codigo_actividad)) {
+			$codigo_actividad = $this->AsignarCodigoActividad($codigo_actividad);
+		}
+
 		return $codigo_actividad;
+	}
+
+	public function existeCodigoActividad($codigo_actividad = null) {
+		$existe_codigo_actividad = false;
+
+		if (!is_null($codigo_actividad)) {
+			$Criteria = new Criteria($this->sesion);
+			$Criteria->add_select('COUNT(*)', 'total')
+				->add_from('actividad')
+				->add_restriction(CriteriaRestriction::equals('codigo_actividad', $codigo_actividad));
+
+			$actividad = $Criteria->run();
+
+			if ($actividad[0]['total'] > 0) {
+				$existe_codigo_actividad = true;
+			}
+		}
+
+		return $existe_codigo_actividad;
 	}
 
 	/**
