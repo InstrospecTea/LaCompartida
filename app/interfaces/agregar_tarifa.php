@@ -330,19 +330,19 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 		$cont++;
 		$glosa_categoria_2 = preg_replace("/_/", " ", $glosa_categoria);
 		$glosa_categoria = str_replace('/', '', $glosa_categoria);
+		$glosa_categoria_usuario = 'Categoria' . $id_categoria_usuario;
 		$td_categoria_tarifas .= '<tr><td align=left class="border_plomo">' . $glosa_categoria_2 .
 			UtilesApp::LogDialog($Sesion, 'categoria_tarifa', 1000000 * $id_tarifa + $id_categoria_usuario) . '</td>';
 		$tab = $cont;
 		for ($j = 0; $j < $lista_monedas->num; $j++) {
 			$tab += ($total_categoria * ($j + 1)) + $j;
 			$money = $lista_monedas->Get($j);
-			$glosa_moneda = preg_replace("/ó/", "o", $money->fields['glosa_moneda']);
-
+			$glosa_moneda = 'Moneda' . $id_moneda;
 			if ($id_moneda == $money->fields['id_moneda'] && $id_categoria_usuario_tarifa == $id_categoria_usuario) {
-				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][" . $money->fields['id_moneda'] . "]' value='" . $valor . "' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria',this.value,'$glosa_moneda','$valor');\"></td> \n";
+				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][" . $money->fields['id_moneda'] . "]' value='" . $valor . "' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria_usuario',this.value,'$glosa_moneda','$valor');\"></td> \n";
 				list($id_categoria_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp_categoria);
 			} else {
-				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][" . $money->fields['id_moneda'] . "]' value='' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria',this.value,'$glosa_moneda');\"></td> \n";
+				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][" . $money->fields['id_moneda'] . "]' value='' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria_usuario',this.value,'$glosa_moneda');\"></td> \n";
 			}
 		}
 		$td_categoria_tarifas .= '</tr>';
@@ -380,7 +380,7 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 	$query = "SELECT
 				usuario.id_usuario,
 				CONCAT(usuario.apellido1,' ',usuario.apellido2,' ',usuario.nombre) AS nombre_usuario,
-				REPLACE(prm_categoria_usuario.glosa_categoria,' ','_') as glosa_categoria
+				REPLACE(prm_categoria_usuario.id_categoria_usuario,' ','_') as id_categoria_usuario
 			FROM usuario
 			JOIN usuario_permiso USING(id_usuario)
 			LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario
@@ -389,17 +389,16 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 	$result = mysql_query("SELECT FOUND_ROWS()");
 	$row = mysql_fetch_row($result);
 	$total = $row[0];
-	while (list($id_usuario, $nombre_usuario, $glosa_categoria) = mysql_fetch_array($resp2)) {
+	while (list($id_usuario, $nombre_usuario, $id_categoria_usuario) = mysql_fetch_array($resp2)) {
 		$cont++;
-		$glosa_categoria = str_replace('/', '', $glosa_categoria);
+		$id_categoria_usuario = str_replace('/', '', $id_categoria_usuario);
 		$td_tarifas .= '<tr><td align=left class="border_plomo">' . $nombre_usuario .
 			UtilesApp::LogDialog($Sesion, 'usuario_tarifa', 1000000 * $id_tarifa + $id_usuario) . '</td>';
 		$tab = $cont;
 		for ($j = 0; $j < $lista_monedas->num; $j++) {
 			$tab += ($total * ($j + 1)) + $j;
 			$money = $lista_monedas->Get($j);
-			$glosa_moneda = str_replace(' ', '', $money->fields['glosa_moneda']);
-			$nombre_clase = preg_replace("/ó/", "o", $glosa_categoria . $glosa_moneda);
+			$nombre_clase = 'Categoria' . $id_categoria_usuario . 'Moneda' . $money->fields['id_moneda'];
 
 			if ($id_moneda == $money->fields['id_moneda'] && $id_usuario_tarifa == $id_usuario) {
 				$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='$nombre_clase' id='' name='tarifa_moneda[$id_usuario][" . $money->fields['id_moneda'] . "]' value='" . $valor . "' $active tabindex=$tab></td> \n";
