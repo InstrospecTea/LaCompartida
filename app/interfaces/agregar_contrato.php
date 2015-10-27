@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('DAT'));
+$Html = new \TTB\Html;
 
 //Tooltips para las modalidades de cobro.
 $tip_tasa = __('Tip tasa');
@@ -2412,10 +2413,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 													<?php echo __('Generar ') . __('Cobros') . __(' a partir del') ?>
 												</td>
 												<td align="left">
-													<input type="text" name="periodo_fecha_inicio" id="periodo_fecha_inicio"
-														size="11" maxlength="10" value="<?php echo $fecha_ini ?>" />
-													<img src="<?php echo Conf::ImgDir() ?>/calendar.gif"
-														id="img_periodo_fecha_inicio" style="cursor:pointer" />
+													<?php echo $Html::PrintCalendar('periodo_fecha_inicio', $fecha_ini); ?>
 													&nbsp;
 													<?php if ($ultimo_cobro) { ?>
 														<span style="font-size:10px">
@@ -3312,14 +3310,6 @@ echo $Form->script();
 			echo "SetBanco('id_cuenta','id_banco');";
 		}
 		?>
-	}
-
-	if (jQuery('#periodo_fecha_inicio').length != 0) {
-		Calendar.setup({
-			inputField	: "periodo_fecha_inicio",				// ID of the input field
-			ifFormat		: "%d-%m-%Y",			// the date format
-			button			: "img_periodo_fecha_inicio"		// ID of the button
-		});
 	}
 
 	if (jQuery('#fecha_inicio_cap').length != 0) {
