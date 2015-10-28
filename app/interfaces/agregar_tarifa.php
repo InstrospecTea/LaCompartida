@@ -337,7 +337,8 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 		for ($j = 0; $j < $lista_monedas->num; $j++) {
 			$tab += ($total_categoria * ($j + 1)) + $j;
 			$money = $lista_monedas->Get($j);
-			$glosa_moneda = 'Moneda' . $id_moneda;
+			$glosa_moneda = 'Moneda' . $money->fields['id_moneda'];
+
 			if ($id_moneda == $money->fields['id_moneda'] && $id_categoria_usuario_tarifa == $id_categoria_usuario) {
 				$td_categoria_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 class='text_box' name='tarifa_categoria_moneda[$id_categoria_usuario][" . $money->fields['id_moneda'] . "]' value='" . $valor . "' $active tabindex=$tab onChange=\"ActualizarTarifaUsuario('$glosa_categoria_usuario',this.value,'$glosa_moneda','$valor');\"></td> \n";
 				list($id_categoria_usuario_tarifa, $id_tarifa, $valor, $id_moneda) = mysql_fetch_array($resp_categoria);
