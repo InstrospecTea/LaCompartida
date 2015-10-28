@@ -1,8 +1,8 @@
 # Changelog
 
-## Hotfix 15.24.7
+## Hotfix 15.24.8
 Wednesday 2015, October 28th
-* **Fix** [Corregir usuario al subir gastos por SAP](https://github.com/LemontechSA/ttb/pull/1192)
+* **Fix** [Corregir edición de tarifas](https://github.com/LemontechSA/ttb/pull/1193)
 
 ## Hotfix 15.24.7
 Tuesday 2015, October 27th
