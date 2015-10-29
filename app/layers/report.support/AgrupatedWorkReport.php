@@ -584,6 +584,6 @@ HTML;
 	}
 
 	private function minutes_to_hours($minutos) {
-		return str_pad(floor($minutos / 60), 2, '0', STR_PAD_LEFT) . ':' . str_pad(($minutos % 60), 2, '0', STR_PAD_RIGHT);
+		return str_pad(floor($minutos / 60), 2, '0', STR_PAD_LEFT) . ':' . str_pad(($minutos % 60), 2, '0', STR_PAD_LEFT);
 	}
 }
