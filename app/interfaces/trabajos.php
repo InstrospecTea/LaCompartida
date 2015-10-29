@@ -1305,6 +1305,7 @@ echo $Form->script();
 								var isInvoiced = jQuery('#valor_facturado:checked').val();
 								var showHours = jQuery('#mostrar_valores').val();
 								var filterCurrency = jQuery('#moneda_filtro').val();
+								var time = jQuery('#tiempo_en').val();
 
 								if (!groupedBy) {
 									alert("Debe seleccionar una agrupación");
@@ -1328,6 +1329,7 @@ echo $Form->script();
 								form.append('<input type="hidden" name="invoicedValue" value="' + isInvoiced + '" id="invoicedValue" />');
 								form.append('<input type="hidden" name="showHours" value="' + showHours + '" id="showHours" />');
 								form.append('<input type="hidden" name="filterCurrency" value="' + filterCurrency + '" id="filterCurrency" />');
+								form.append('<input type="hidden" name="time" value="' + time + '" id="time" />');
 
 								if (groupedBy === 'client') {
 									form.append('<input type="hidden" name="groupByPartner" value="' + isGrouped + '" id="groupByPartner" />');
