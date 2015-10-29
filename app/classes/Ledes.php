@@ -55,6 +55,7 @@ class Ledes extends Objeto {
 		$fecha_min = date('Y-m-d');
 		$codigo_asunto = null;
 		$last_client_matter_id = "";
+		$suma_unit = 0;
 
 		/**
 		 * Obtener los trabajos
@@ -93,7 +94,7 @@ class Ledes extends Objeto {
 				$codigo_asunto = $trabajo['codigo_asunto'];
 			}
 
-			$monto = $trabajo['cobrable'] == '1' && !empty($trabajo['monto_cobrado']) ? $trabajo['monto_cobrado'] : 0;
+			$monto = $trabajo['cobrable'] == '1' && !empty($trabajo['monto_cobrado']) ? $trabajo['monto_cobrado'] : 1;
 			$monto *= $cambios[$trabajo['id_moneda']];
 			$tarifa = $trabajo['tarifa_hh'] * $cambios[$trabajo['id_moneda']];
 
@@ -105,10 +106,11 @@ class Ledes extends Objeto {
 			$tarifa = $this->round($tarifa);
 
 			if ($Cobro->fields['forma_cobro'] == 'FLAT FEE') {
-				$tarifa = 0;
+				$ajuste = 0;
+				$tarifa = $monto;
+			} else {
+				$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
 			}
-
-			$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
 
 			$descripcion = trim(str_replace("\n", ' ', $trabajo['descripcion']));
 
@@ -132,6 +134,8 @@ class Ledes extends Objeto {
 			);
 
 			$suma += $fila['LINE_ITEM_TOTAL'];
+
+			$suma_unit += $fila['LINE_ITEM_UNIT_COST'];
 
 			$filas[] = $fila;
 
@@ -209,6 +213,8 @@ class Ledes extends Objeto {
 
 			$suma += $fila['LINE_ITEM_TOTAL'];
 
+			$suma_unit += $fila['LINE_ITEM_UNIT_COST'];
+
 			$filas[] = $fila;
 
 			$last_client_matter_id = $tramite['codigo_homologacion'];
@@ -273,6 +279,8 @@ class Ledes extends Objeto {
 
 			$suma += $fila['LINE_ITEM_TOTAL'];
 
+			$suma_unit += $fila['LINE_ITEM_UNIT_COST'];
+
 			$filas[] = $fila;
 
 			$last_client_matter_id = $datos['codigo_homologacion'];
@@ -318,8 +326,12 @@ class Ledes extends Objeto {
 		}
 
 		$monto_total = $datos_cobro['INVOICE_TOTAL'] * 1;
+		$ajuste = 0;
 		if (abs($suma - $monto_total) > $monto_total / 100) {
 			$monto = $monto_total - $suma;
+			if ($Cobro->fields['forma_cobro'] == 'FLAT FEE') {
+				$ajuste = $monto_total - $suma_unit;
+			}
 			$fila = array(
 				'LAW_FIRM_MATTER_ID' => $codigo_asunto,
 				'LINE_ITEM_NUMBER' => 'IF1',
@@ -333,13 +345,15 @@ class Ledes extends Objeto {
 				'LINE_ITEM_ACTIVITY_CODE' => '',
 				'TIMEKEEPER_ID' => '',
 				'LINE_ITEM_DESCRIPTION' => 'Ajuste',
-				'LINE_ITEM_UNIT_COST' => 0,
+				'LINE_ITEM_UNIT_COST' => $ajuste,
 				'TIMEKEEPER_NAME' => '',
 				'TIMEKEEPER_CLASSIFICATION' => '',
 				'CLIENT_MATTER_ID' => $last_client_matter_id
 			);
 
 			$suma += $fila['LINE_ITEM_TOTAL'];
+
+			$suma_unit += $fila['LINE_ITEM_UNIT_COST'];
 
 			$filas[] = $fila;
 		}
