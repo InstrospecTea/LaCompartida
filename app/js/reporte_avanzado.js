@@ -604,8 +604,7 @@ function RevisarMoneda() {
 	var tipo_de_dato = jQuery('#tipo_dato');
 	var tipo_de_dato_comparado = jQuery('#tipo_dato_comparado');
 	var comparar = jQuery('#comparar');
-	var tipos = {'costo': '', 'costo_hh': '', 'valor_pagado': '', 'valor_cobrado': '', 'valor_por_cobrar': '', 'valor_por_pagar': '', 'valor_incobrable': '', 'valor_hora': '', 'diferencia_valor_estandar': '', 'valor_trabajado_estandar': ''};
-	if (tipo_de_dato.val() in tipos || (comparar.is(':checked') && tipo_de_dato_comparado.val() in tipos)) {
+	if (jQuery.inArray(tipo_de_dato.val(), tipos_moneda) > -1 || (comparar.is(':checked') && jQuery.inArray(tipo_de_dato_comparado.val(), tipos_moneda) > -1)) {
 		Monedas(true);
 	} else {
 		Monedas(false);

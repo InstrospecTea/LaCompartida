@@ -10910,7 +10910,7 @@ QUERY;
 			$queries[] = "ALTER TABLE `bloqueo_procesos` CHANGE COLUMN `estado` `estado` TEXT NOT NULL DEFAULT ''";
 			break;
 
-		case 8.14;
+		case 8.14:
 			$queries[] = "ALTER TABLE `factura` ADD `dte_folio_fiscal` VARCHAR(255)  NULL  DEFAULT NULL  AFTER `dte_comentario`;";
 
 			$query = "SELECT id_factura,
@@ -10929,6 +10929,36 @@ QUERY;
 				$queries[] = "UPDATE factura SET dte_folio_fiscal = '{$folio_fiscal[1]}' WHERE id_factura = {$id_factura};";
 			}
 			break;
+
+		case 8.15:
+			$queries[] = "ALTER TABLE `factura` CHANGE `id_documento_referencia` `id_documento_referencia` VARCHAR(255) NULL DEFAULT NULL;";
+			break;
+		case 8.16:
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+			VALUES ('AsociarAdelantosALiquidacion', '0', 'Si está activo los adelantos se asocian a las liquidaciones al momento de realizar la emisión', 'boolean', 6, -1);";
+			break;
+		case 8.17:
+			$queries[] = "ALTER TABLE `cobro_pendiente` ADD `notificado` TINYINT(1)  UNSIGNED  DEFAULT '0'";
+			break;
+		case 8.18:
+			$queries[] = "DELETE FROM `menu_permiso` WHERE (`codigo_permiso` = 'SEC' AND `codigo_menu` = 'MIS_HRS');";
+			break;
+		case 8.19:
+			$queries[] = "INSERT INTO `factura_pdf_tipo_datos` (`id_factura_pdf_datos_categoria`, `codigo_tipo_dato`, `glosa_tipo_dato`) VALUES ('1', 'fecha_mes_entre_de', 'Fecha mes entre de');";
+
+			$query = "SELECT id_estudio
+								FROM prm_estudio;";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+			while (list($id_estudio) = (mysql_fetch_array($resp))) {
+				$queries[] = "INSERT INTO `factura_pdf_datos` (`id_tipo_dato`, `id_documento_legal`, `id_estudio`, `activo`, `coordinateX`, `coordinateY`, `cellW`, `cellH`, `font`, `style`, `mayuscula`, `tamano`, `Ejemplo`, `align`) VALUES ((SELECT id_tipo_dato FROM factura_pdf_tipo_datos WHERE codigo_tipo_dato = 'fecha_mes_entre_de'), '1', '{$id_estudio}', '0', '39', '49', '27', '4', 'Courier', 'B', 'may', '10', 'de Mayo de', 'L');";
+			}
+			break;
+		case 8.20:
+			$queries[] = "ALTER TABLE `trabajo_historial` CHANGE `fecha_accion` `fecha_accion` DATETIME  NOT NULL;";
+			$queries[] = "ALTER TABLE `tramite_historial` CHANGE `fecha_accion` `fecha_accion` DATETIME  NOT NULL;";
+			$queries[] = "ALTER TABLE `cobro_movimiento` CHANGE `fecha` `fecha` DATETIME  NOT NULL;";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10941,7 +10971,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.14;
+$max_update = 8.20;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

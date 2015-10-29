@@ -198,6 +198,8 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 	$total[4] = 0;
 	$total[5] = 0;
 	$total[6] = 0;
+	$total[7] = 0;
+	$total[8] = 0;
 
 	for ($i = 0; $i < $lista->num; $i++) {
 		$asunto = new Asunto($sesion);

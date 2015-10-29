@@ -96,7 +96,7 @@ if ($opc == 'edit') {
 		if ($usuario->loaded) {
 
 			if ($usuario->Write()) {
-				$usuario->GuardarSecretario($usuario_secretario);
+				$usuario->GuardarSecretario($arreglo_secretarios);
 				$usuario->GuardarRevisado($arreglo_revisados);
 
 				if ( $id_categoria_anterior != $id_categoria_usuario) {
@@ -116,8 +116,6 @@ if ($opc == 'edit') {
 			$usuario->Edit('password', md5($new_password));
 
 			if ($usuario->Write()) {
-				$usuario->GuardarSecretario($usuario_secretario);
-				$usuario->GuardarRevisado($arreglo_revisados);
 				$usuario->GuardarTarifaSegunCategoria($usuario->fields['id_usuario'], $usuario->fields['id_categoria_usuario']);
 
 				if (CargarPermisos()) {
@@ -225,6 +223,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		}
 
 		ArregloRevisados();
+		ArregloSecretarios();
 		necesitaConfirmar = false;
 		return true;
 	}
@@ -293,16 +292,65 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		necesitaConfirmar = true;
 	}
 
+	function AgregarUsuarioSecretario()
+	{
+		var fuera = $('usuarios_secretario_fuera');
+		var dentro = $('usuarios_secretario');
+
+		if (fuera.selectedIndex==-1) return;
+
+		valor = fuera.value;
+		txt = fuera.options[fuera.selectedIndex].text;
+
+		fuera.options[fuera.selectedIndex]=null;
+
+		opc = new Option(txt,valor);
+		dentro.options[dentro.options.length]=opc;
+
+		necesitaConfirmar = true;
+	}
+
+	function EliminarUsuarioSecretario()
+	{
+		var dentro =$('usuarios_secretario');
+		var fuera = $('usuarios_secretario_fuera');
+
+		if (dentro.selectedIndex==-1) return;
+		valor=dentro.value;
+		txt=dentro.options[dentro.selectedIndex].text;
+		dentro.options[dentro.selectedIndex]=null;
+		opc = new Option(txt,valor);
+		fuera.options[fuera.options.length]=opc;
+
+		necesitaConfirmar = true;
+	}
+
 	function ArregloRevisados()
 	{
 		var usuarios = new Array();
 		var dentro = $('usuarios_revisados');
 
-		for(i = 0; i < dentro.options.length; i++ )
-		{
-			usuarios[i] = dentro.options[i].value;
-		}
-		$('arreglo_revisados').value = usuarios.join('::');
+		if (dentro != null) {
+			for(i = 0; dentro != null && i < dentro.options.length; i++ )
+			{
+				usuarios[i] = dentro.options[i].value;
+			}
+			$('arreglo_revisados').value = usuarios.join('::');
+		};
+	}
+
+	function ArregloSecretarios()
+	{
+		var usuarios = new Array();
+		var dentro = $('usuarios_secretario');
+
+		if (dentro != null) {
+			for(i = 0; i < dentro.options.length; i++ )
+			{
+				usuarios[i] = dentro.options[i].value;
+			}
+			$('arreglo_secretarios').value = usuarios.join('::');
+		};
 	}
 
 	function preguntarGuardar()
@@ -470,7 +518,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					}
 					?>
 					<br/>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-size: 9px;">(<?php echo __('') ?>)</span>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-size: 9px;">(<?php echo __('(sólo los usuarios activos pueden ingresar al sistema)'); ?>)</span>
 					<div id="activo_status" class="alert alert-error" style="display:none;width:300px;margin-top:20px;padding:5px;"></div>
 				</td>
 			</tr>
@@ -504,7 +552,8 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		</table>
 	</fieldset>
 
-	<fieldset>
+	<?php if ($usuario->loaded): ?>
+	<fieldset id="fieldset-usuarios_secretario">
 		<legend onClick="Expandir('secretario')" style="cursor:pointer">
 			<span id="secretario_img"><img src= "<?php echo Conf::ImgDir() ?>/mas.gif" border="0" ></span>
 			<?php echo __('Usuario secretario de') ?>
@@ -512,32 +561,40 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 		<table id="secretario_tabla" style="display:none">
 			<tr>
+				<td align="right">
+					<?php echo __('Usuarios disponibles') ?>:
+				</td>
+				<td align="left">
+					<?php $usuarioExt = new UsuarioExt($sesion); ?>
+					<?php echo $Form->select('usuarios_secretario_fuera', $usuarioExt->get_usuarios_secretario($usuario->fields['id_usuario']), NULL, array('empty' => FALSE, 'style' => 'width: 170px')); ?>
+				</td>
 				<td>
-
-				<?php
-				$where = '';
-				if ($usuario->loaded) {	$where = "id_usuario <> " . $usuario->fields['id_usuario'];	}
-				if (!$where) { $where = 1; }
-
-				$lista_usuarios = new ListaObjetos($sesion, '', "SELECT id_usuario,CONCAT_WS(' ',nombre,apellido1,apellido2) as name FROM usuario WHERE activo=1 AND $where ORDER BY nombre");
-
-				echo "<select name='usuario_secretario[]' id='usuario_secretario' multiple size=6 $tooltip_select  style='width: 200px;'>";
-
-				for ($x = 0; $x < $lista_usuarios->num; $x++) {
-					$us = $lista_usuarios->Get($x);
-				?>
-
-				<option value='<?php echo $us->fields['id_usuario'] ?>' <?php echo $usuario->LoadSecretario($us->fields['id_usuario']) ? "selected" : "" ?>><?php echo $us->fields['name'] ?></option>
+					<?php echo $Form->button(__('Añadir'), array('onclick' => 'AgregarUsuarioSecretario()')); ?>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">
+					<?php echo __('Usuarios secretario') ?>:
+				</td>
+				<td align="left">
 					<?php
-				} echo "</select>";	?>
-
+					echo $Form->select('usuarios_secretario', $usuarioExt->get_usuarios_secretario_seleccionados($usuario->fields['id_usuario']), NULL, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6'));
+					?>
+					<input type="hidden" name="arreglo_secretarios" id="arreglo_secretarios" value="">
+				</td>
+				<td>
+					<?php echo $Form->button(__('Eliminar'), array('onclick' => 'EliminarUsuarioSecretario()')); ?>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					El perfil por defecto es secretario de todos los profesionales, en caso que desee que sea sólo de algunos debe seleccionarlos.
 				</td>
 			</tr>
 		</table>
-
 	</fieldset>
 
-	<fieldset>
+	<fieldset id="fieldset-usuario_revisor">
 		<legend onClick="Expandir('revisor')" style="cursor:pointer">
 			<span id="revisor_img"><img src= "<?php echo Conf::ImgDir() ?>/mas.gif" border="0" ></span>
 			<?php echo __('Usuario revisor de') ?>
@@ -549,7 +606,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					<?php echo __('Usuarios disponibles') ?>:
 				</td>
 				<td align="left">
-					<?php echo $usuario->select_no_revisados() ?>
+					<?php echo $Form->select('usuarios_fuera', $usuarioExt->get_usuarios_revisor($usuario->fields['id_usuario']), NULL, array('empty' => FALSE, 'style' => 'width: 170px')); ?>
 				</td>
 				<td>
 					<?php echo $Form->button(__('Añadir'), array('onclick' => 'AgregarUsuarioRevisado()')); ?>
@@ -560,14 +617,23 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					<?php echo __('Usuarios revisados') ?>:
 				</td>
 				<td align="left">
-					<?php echo $usuario->select_revisados(); ?>
+					<?php
+					echo $Form->select('usuarios_revisados', $usuarioExt->get_usuarios_revisor_seleccionados($usuario->fields['id_usuario']), NULL, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6'));
+					?>
+					<input type="hidden" name="arreglo_revisados" id="arreglo_revisados" value="">
 				</td>
 				<td>
 					<?php echo $Form->button(__('Eliminar'), array('onclick' => 'EliminarUsuarioRevisado()')); ?>
 				</td>
 			</tr>
+			<tr>
+				<td colspan="3">
+					<?php echo __('El perfil por defecto es revisor de todos los profesionales, en caso que desee que sea sólo de algunos debe seleccionarlos.'); ?>
+				</td>
+			</tr>
 		</table>
 	</fieldset>
+	<?php endif; ?>
 
 	<fieldset>
 		<legend onClick="Expandir('restricciones')" style="cursor:pointer">
@@ -729,17 +795,20 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 	<fieldset>
 		<legend><?php echo __('Guardar datos') ?></legend>
-			<?php if ($sesion->usuario->fields['id_visitante'] == 0) { ?>
-				<?php echo $Form->submit(__('Guardar')); ?>
-			<?php } else { ?>
-				<?php echo $Form->button(__('Guardar'), array('onclick' => "alert('Usted se encuentra en un sistema demo, no tiene derecho de modificar datos.')")); ?>
-			<?php } ?>
+		<?php
+			if ($sesion->usuario->fields['id_visitante'] == 0) {
+				echo $Form->submit(__('Guardar'));
+			} else {
+				echo $Form->button(__('Guardar'), array('onclick' => "alert('Usted se encuentra en un sistema demo, no tiene derecho de modificar datos.')"));
+				echo $Form->button(__('Eliminar') . ' ' . ('Usuario'), array('onclick' => "Eliminar()", 'class' => 'btn_rojo'));
+			}
 
-			<?php echo $Form->button(__('Cancelar'), array('onclick' => "Cancelar(jQuery('#form_usuario')[0])")); ?>
+			echo $Form->button(__('Cancelar'), array('onclick' => "Cancelar(jQuery('#form_usuario')[0])"));
 
-			<?php if ($usuario->loaded && $sesion->usuario->fields['id_visitante'] == 0 && $rut != '99511620') { ?>
-				<?php echo $Form->button(__('Eliminar') . ' ' . ('Usuario'), array('onclick' => "Eliminar()", 'class' => 'btn_rojo')); ?>
-			<?php } ?>
+			if ($usuario->loaded && $sesion->usuario->fields['id_visitante'] == 0 && $rut != '99511620') {
+				echo $Form->button(__('Eliminar Usuario'), array('onclick' => "Eliminar()", 'class' => 'btn_rojo'));
+			}
+		?>
 	</fieldset>
 
 </form>
@@ -1012,7 +1081,26 @@ function CargarPermisos() {
 					});
 				}
 			});
+
+			jQuery("#REV9").trigger("change");
+			jQuery("#SEC12").trigger("change");
 		<?php } ?>
+	});
+
+	jQuery("#REV9").on("change", function() {
+		if (jQuery(this).is(":checked")) {
+			jQuery("#fieldset-usuario_revisor").show();
+		} else {
+			jQuery("#fieldset-usuario_revisor").hide();
+		};
+	});
+
+	jQuery("#SEC12").on("change", function() {
+		if (jQuery(this).is(":checked")) {
+			jQuery("#fieldset-usuarios_secretario").show();
+		} else {
+			jQuery("#fieldset-usuarios_secretario").hide();
+		};
 	});
 
 	window.onbeforeunload = function(){
@@ -1057,8 +1145,7 @@ function CargarPermisos() {
 	$$('.cls_eliminar_vacacion').each(function(elemento){
 		elemento.observe('click', function(evento){
 			evento.stop();
-			if( confirm('¿Está seguro que quiere borrar las vacaciones de este usuario?') )
-			{
+			if (confirm(<?php echo __('¿Está seguro que quiere borrar las vacaciones de este usuario?'); ?>)) {
 				var ide = elemento.id;
 				var tmp = ide.split('_');
 				$('opc').value = 'elimina_vacacion';

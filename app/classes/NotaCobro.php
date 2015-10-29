@@ -1307,7 +1307,7 @@ class NotaCobro extends Cobro {
 	 *
 	 * Setea valor a variable $detalle_en_asuntos
 	 *
-	 * @param $detalle_en_asunto valor a setear en variable 
+	 * @param $detalle_en_asunto valor a setear en variable
 	 */
 	public function set_detalle_en_asuntos($detalle_en_asuntos) {
 		$this->detalle_en_asuntos = $detalle_en_asuntos;
@@ -10572,6 +10572,10 @@ class NotaCobro extends Cobro {
 
 			case 'RESUMEN_PROFESIONAL':
 				if ($this->fields['forma_cobro'] == 'ESCALONADA') {
+					// Obtener datos escalonados
+					$chargingBusiness = new ChargingBusiness($this->sesion);
+					$slidingScales = $chargingBusiness->getSlidingScalesArrayDetail($this->fields['id_cobro']);
+
 					$cobro_valores = array();
 
 					$cobro_valores['totales'] = array();
@@ -10617,7 +10621,9 @@ class NotaCobro extends Cobro {
 
 					$cobro_valores['totales']['valor'] = $cobro_total_honorario_cobrable;
 					$cobro_valores['totales']['duracion'] = ($total_minutos_tmp / 60);
-					$cobro_valores['detalle'] = $detalle_trabajos;
+
+					// Asignar datos escalonados que vienen de ChargingBusiness
+					$cobro_valores['detalle'] = $slidingScales['detalle'];
 
 					$cantidad_escalonadas = $cobro_valores['datos_escalonadas']['num'];
 
@@ -10637,7 +10643,7 @@ class NotaCobro extends Cobro {
 						if (is_array($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'])) {
 							$html .= "<h4>Escalon $esc: ";
 							if ($cobro_valores['datos_escalonadas'][$esc]['monto'] > 0) {
-								$html .= " Monto Fijo " . $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . $cobro_valores['datos_escalonadas'][$esc]['monto'] . "</h4>";
+								$html .= " Monto Fijo " . $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_valores['datos_escalonadas'][$esc]['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</h4>";
 							} else {
 								$html .= " Tarifa HH";
 								if ($cobro_valores['datos_escalonadas'][$esc]['descuento'] > 0) {
@@ -10657,7 +10663,7 @@ class NotaCobro extends Cobro {
 								} else {
 									$resumen_fila = str_replace('%categoria%', '', $resumen_fila);
 								}
-								$resumen_fila = str_replace('%hh_demo%', Utiles::Decimal2GlosaHora(round($usuarios['duracion'], 2)), $resumen_fila);
+								$resumen_fila = str_replace('%hh_demo%', Utiles::Decimal2GlosaHora(round($usuarios['duracion']/60, 2)), $resumen_fila);
 								$resumen_fila = str_replace('%hh_trabajada%', '', $resumen_fila);
 								if ($this->fields['opc_ver_profesional_tarifa']) {
 									$resumen_fila = str_replace('%td_tarifa%', '<td align="center">%tarifa_horas_demo%</td>', $resumen_fila);
@@ -10666,7 +10672,7 @@ class NotaCobro extends Cobro {
 									$resumen_fila = str_replace('%td_tarifa%', '', $resumen_fila);
 									$resumen_fila = str_replace('%td_tarifa_ajustada%', '', $resumen_fila);
 								}
-								$resumen_fila = str_replace('%tarifa_horas_demo%', number_format($usuarios['tarifa'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', ''), $resumen_fila);
+								$resumen_fila = str_replace('%tarifa_horas_demo%', number_format($usuarios['tarifa'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_fila);
 								if ($this->fields['opc_ver_profesional_importe']) {
 									$resumen_fila = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $resumen_fila);
 									$resumen_fila = str_replace('%td_importe_ajustado%', '<td align="right">%total_horas_demo%</td>', $resumen_fila);
@@ -10674,7 +10680,7 @@ class NotaCobro extends Cobro {
 									$resumen_fila = str_replace('%td_importe%', '', $resumen_fila);
 									$resumen_fila = str_replace('%td_importe_ajustado%', '', $resumen_fila);
 								}
-								$resumen_fila = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($usuarios['valor'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', ''), $resumen_fila);
+								$resumen_fila = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($usuarios['valor'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_fila);
 
 								$resumen_fila = str_replace('%td_descontada%', '', $resumen_fila);
 								$resumen_fila = str_replace('%td_cobrable%', '', $resumen_fila);
@@ -10691,7 +10697,7 @@ class NotaCobro extends Cobro {
 							$resumen_total = str_replace('%td_descontada%', '', $resumen_total);
 							$resumen_total = str_replace('%td_cobrable%', '', $resumen_total);
 							$resumen_total = str_replace('%td_retainer%', '', $resumen_total);
-							$resumen_total = str_replace('%hh_demo%', Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion'], 2)), $resumen_total);
+							$resumen_total = str_replace('%hh_demo%', Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion']/60, 2)), $resumen_total);
 							if ($this->fields['opc_ver_profesional_tarifa']) {
 								$resumen_total = str_replace('%td_tarifa%', '<td>&nbsp;</td>', $resumen_total);
 								$resumen_total = str_replace('%td_tarifa_ajustada%', '<td>&nbsp;</td>', $resumen_total);
@@ -10706,7 +10712,7 @@ class NotaCobro extends Cobro {
 								$resumen_total = str_replace('%td_importe%', '', $resumen_total);
 								$resumen_total = str_replace('%td_importe_ajustado%', '', $resumen_total);
 							}
-							$resumen_total = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], '.', ''), $resumen_total);
+							$resumen_total = str_replace('%total_horas_demo%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_total);
 							$html .= $resumen_total;
 							$html .= "</table>";
 						}

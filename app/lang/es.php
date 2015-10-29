@@ -997,21 +997,22 @@ $_LANG['horas_por_cobrar'] = "Horas por Cobrar";
 $_LANG['horas_pagadas'] = "Horas Pagadas";
 $_LANG['horas_por_pagar'] = "Horas por Pagar";
 $_LANG['horas_incobrables'] = "Horas Incobrables";
+$_LANG['horas_spot'] = "Horas Spot";
 $_LANG['valor_cobrado'] = "Valor Cobrado";
-$_LANG['valor_tramites'] = "Valor trámites";
+$_LANG['valor_tramites'] = "Valor Cobrado Trámites";
 $_LANG['valor_por_cobrar'] = "Valor por Cobrar";
 $_LANG['valor_pagado'] = "Valor Pagado";
 $_LANG['valor_por_pagar'] = "Valor por Pagar";
+$_LANG['valor_por_pagar_parcial'] = "Valor por Pagar Parcial";
+$_LANG['valor_pagado_parcial'] = "Valor Pagado Parcial";
 $_LANG['valor_incobrable'] = "Valor Incobrable";
 $_LANG['rentabilidad'] = "Rentabilidad";
 $_LANG['valor_hora'] = "Valor Hora";
-$_LANG['diferencia_valor_estandar'] = "Diferencia Valor Estándar";
-$_LANG['valor_estandar'] = "Valor Estándar";
+$_LANG['diferencia_valor_estandar'] = "Diferencia Valor Cobrado Estándar";
+$_LANG['valor_estandar'] = "Valor Cobrado Estándar";
 
 $_LANG['valor_trabajado_estandar'] = "Valor Trabajado Estándar";
 $_LANG['rentabilidad_base'] = "Rentabilidad Base";
-
-$_LANG['mes_emision'] = 'Emisión (mes)';
 
 $_LANG['valor_trabajado'] = "Valor Trabajado";
 $_LANG['valor_cobrable'] = "Valor Cobrable";
@@ -1019,6 +1020,7 @@ $_LANG['valor_no_cobrable'] = "Valor no Cobrable";
 $_LANG['valor_visible'] = "Valor Cobrable Corregido";
 $_LANG['valor_castigado'] = "Valor Castigado";
 
+$_LANG['mes_facturacion'] = 'Facturación (mes)';
 $_LANG['mes_reporte'] = 'Trabajo (mes)';
 $_LANG['dia_reporte'] = 'Trabajo (día)';
 $_LANG['mes_emision'] = 'Emisión (mes)';

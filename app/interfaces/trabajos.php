@@ -7,11 +7,16 @@ $pagina = new Pagina($sesion);
 $Form = new Form;
 
 $p_revisor = $sesion->usuario->Es('REV');
-
+$p_secretaria = $sesion->usuario->Es('SEC');
 $p_cobranza = $sesion->usuario->Es('COB');
 
 if ($p_cobranza) {
 	$p_revisor = true;
+}
+
+$campo_asunto = 'codigo_asunto';
+if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+	$campo_asunto = 'codigo_asunto_secundario';
 }
 
 $p_profesional = $sesion->usuario->Es('PRO');
@@ -90,10 +95,11 @@ if ($cobro) {
 }
 
 
-// Calculado aquÃ­ para que la variable $select_usuario estÃ© disponible al generar la tabla de trabajos.
+// Calculado aquí para que la variable $select_usuario está disponible al generar la tabla de trabajos.
 $usuario = new UsuarioExt($sesion);
+$usuarios_object = $usuario->get_usuarios_horas($p_revisor, $p_secretaria);
 
-$select_usuario = $Form->select('id_usuario', $usuario->get_usuarios_horas($p_revisor), $id_usuario, array('empty' => 'Todos', 'style' => 'width: 200px'));
+$select_usuario = $Form->select('id_usuario', $usuarios_object->rows, $id_usuario, array('empty' => $usuarios_object->todos, 'style' => 'width: 200px'));
 
 if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	$where = base64_decode($where);
@@ -102,7 +108,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	if ($where == '') {
 		$where = 1;
 	}
-	if ($id_usuario != '') {
+	if (is_numeric((int) $id_usuario) && ((int) $id_usuario) > 0) {
 		$where .= " AND trabajo.id_usuario= " . $id_usuario;
 	} else if (!$p_revisor) {
 		// Se buscan trabajos de los usuarios a los que se puede revisar.
@@ -1190,7 +1196,7 @@ echo $Form->script();
 <script type="text/javascript">
 
 	function CargarActividad() {
-		CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
+		CargarSelect('<?php echo $campo_asunto ?>', 'codigo_actividad', 'cargar_actividades');
 	}
 
 	jQuery(document).ready(function() {

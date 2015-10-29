@@ -73,6 +73,8 @@ if ($xls) {
 		->add_select("IF(cob.id_cobro IS NULL,'', pmcob.simbolo)", 'moneda_cobrada')
 		->add_select('cob.documento', 'numero_factura')
 		->add_select('con.id_moneda')
+		->add_select('IF(IFNULL(cob.fecha_facturacion, "0000-00-00 00:00:00") = "0000-00-00 00:00:00", "",
+			DATE_FORMAT(cob.fecha_facturacion, "%d-%m-%Y"))', 'fecha_facturacion')
 		->add_from('cobro_pendiente', 'cp')
 		->add_left_join_with('contrato as con', CriteriaRestriction::equals('cp.id_contrato', 'con.id_contrato'))
 		->add_left_join_with('prm_moneda as pmcp', CriteriaRestriction::equals('con.id_moneda', 'pmcp.id_moneda'))
@@ -150,8 +152,9 @@ if ($xls) {
 	$columna_monto_cobrado = 10;
 	$columna_moneda_cobrada = 11;
 	$columna_numero_factura = 12;
+	$columna_fecha_facturacion = 13;
 
-	$worksheet->write($celda_fecha_creacion, 0, __('Fecha Creación : ') . date('d-m-Y'), $glosa_detalle_documento_left);
+	$worksheet->write($celda_fecha_creacion, 0, __('Fecha Creación') . ' : ' . date('d-m-Y'), $glosa_detalle_documento_left);
 	$periodo = __('Periodo : Desde ') . $fecha1 . __(' Hasta ') . $fecha2;
 	$worksheet->write($celda_periodo_reporte, 0, $periodo, $glosa_detalle_documento_left);
 
@@ -159,7 +162,7 @@ if ($xls) {
 	$worksheet->write($fila_encabezado, $columna_glosa_asunto, __('Asuntos'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_monto_estimado, __('Monto Estimado'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_moneda_estimada, __('Moneda'), $encabezados_borde);
-	$worksheet->write($fila_encabezado, $columna_fecha_cobro, __('Fecha Cobro'), $encabezados_borde);
+	$worksheet->write($fila_encabezado, $columna_fecha_cobro, __('Fecha Hito'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_codigo_asunto, __('Cliente').'-'. __('Asunto'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_descripcion, __('Descripcion'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_observaciones, __('Observaciones'), $encabezados_borde);
@@ -168,6 +171,7 @@ if ($xls) {
 	$worksheet->write($fila_encabezado, $columna_monto_cobrado, __('Monto Cobrado'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_moneda_cobrada, __('Moneda'), $encabezados_borde);
 	$worksheet->write($fila_encabezado, $columna_numero_factura, __('Numero Factura'), $encabezados_borde);
+	$worksheet->write($fila_encabezado, $columna_fecha_facturacion, __('Fecha Factura'), $encabezados_borde);
 
 	// Filas del documento
 	foreach ($resultado as $row) {
@@ -199,6 +203,7 @@ if ($xls) {
 		$worksheet->write($fila_encabezado, $columna_monto_cobrado, $monto_cobrado, $formato_moneda_monto);
 		$worksheet->write($fila_encabezado, $columna_moneda_cobrada, $moneda_cobrada, $general);
 		$worksheet->write($fila_encabezado, $columna_numero_factura, $numero_factura, $general);
+		$worksheet->write($fila_encabezado, $columna_fecha_facturacion, $fecha_facturacion, $general);
 	}
 
 	$workbook->close();

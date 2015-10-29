@@ -111,6 +111,7 @@
 		}
 		$col_moneda = $indice_columnas++;
 		$col_monto = $indice_columnas++;
+		$col_subtotal_honorarios_pesos = $indice_columnas++;
 		$col_monto_honorarios_pesos = $indice_columnas++;
 		$col_monto_gastos_pesos = $indice_columnas++;
 		unset($indice_columnas);
@@ -143,6 +144,7 @@
 		}
 		$ws1->setColumn($col_moneda, $col_moneda, 14);
 		$ws1->setColumn($col_monto, $col_monto, 14);
+		$ws1->setColumn($col_subtotal_honorarios_pesos, $col_subtotal_honorarios_pesos, 30);
 		$ws1->setColumn($col_monto_honorarios_pesos, $col_monto_honorarios_pesos, 30);
 		$ws1->setColumn($col_monto_gastos_pesos, $col_monto_gastos_pesos, 26);
 
@@ -220,14 +222,17 @@
 					cobro.documento,
 					CONCAT(usuario.nombre, ' ', usuario.apellido1) AS nombre,
 					CONCAT(usuario_secundario.nombre, ' ', usuario_secundario.apellido1) AS nombre_secundario,
+					documento.honorarios,
+					documento.honorarios * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS honorarios_pesos,
+					documento.subtotal_sin_descuento * (cobro_moneda_cobro.tipo_cambio / cobro_moneda_base.tipo_cambio) AS subtotal_sin_descuento_pesos,
 					documento.saldo_honorarios,
 					documento.saldo_gastos,
 					documento.saldo_honorarios*(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) as saldo_honorarios_pesos,
 					documento.saldo_gastos*(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio) as saldo_gastos_pesos,
 					cobro.estado,
 					cobro.id_cobro,
-					documento_moneda.simbolo,
-					documento_moneda.glosa_moneda,
+					moneda_documento.simbolo,
+					moneda_documento.glosa_moneda,
 					documento.id_moneda,
 					moneda_base.id_moneda as id_moneda_base,
 					cobro.modalidad_calculo
@@ -237,13 +242,14 @@
 					LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 					LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
 					LEFT JOIN usuario as usuario_secundario ON usuario_secundario.id_usuario = contrato.id_usuario_secundario
-					LEFT JOIN prm_moneda as documento_moneda ON documento_moneda.id_moneda = documento.id_moneda
+					LEFT JOIN prm_moneda as moneda_documento ON moneda_documento.id_moneda = documento.id_moneda
 					LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1
-					LEFT JOIN cobro_moneda as cobro_moneda_cobro ON cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = documento.id_moneda
-					LEFT JOIN cobro_moneda as cobro_moneda_base ON cobro_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_base.id_moneda = moneda_base.id_moneda
+					LEFT JOIN documento_moneda as cobro_moneda_cobro ON cobro_moneda_cobro.id_documento = documento.id_documento AND cobro_moneda_cobro.id_moneda = documento.id_moneda
+					LEFT JOIN documento_moneda as cobro_moneda_base ON cobro_moneda_base.id_documento = documento.id_documento AND cobro_moneda_base.id_moneda = moneda_base.id_moneda
 				WHERE $where
 				ORDER BY $orderby;";
 		// Obtener los asuntos de cada cobro
+
 
 
 		$query_asuntos = "SELECT cobro.id_cobro,
@@ -320,6 +326,7 @@
 				}
 				$ws1->write($filas, $col_moneda, __('Moneda'), $titulo_filas);
 				$ws1->write($filas, $col_monto, __('Monto'), $titulo_filas);
+				$ws1->write($filas, $col_subtotal_honorarios_pesos, __('Subtotal Honorarios en '.Moneda::GetGlosaPluralMonedaBase($sesion)), $titulo_filas);
 				$ws1->write($filas, $col_monto_honorarios_pesos, __('Monto Honorarios en '.Moneda::GetGlosaPluralMonedaBase($sesion)), $titulo_filas);
 				$ws1->write($filas, $col_monto_gastos_pesos, __('Monto Gastos en '.Moneda::GetGlosaPluralMonedaBase($sesion)), $titulo_filas);
 				$fila_inicial_tabla = $filas+1;
@@ -627,19 +634,29 @@
 			/*
 			 * Implementación FunciónProcesaCobroIdMoneda
 			 */
-			if($cobro['modalidad_calculo']==1) {
+			if ($cobro['modalidad_calculo'] == 1) {
 				$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro['id_cobro']);
 				$x_saldo_honorarios_pesos = $x_resultados['saldo_honorarios'][$cobro['id_moneda_base']];
 				$x_saldo_gastos_pesos = $x_resultados['saldo_gastos'][$cobro['id_moneda_base']];
-			}
-			else {
+
+				$x_honorarios = $x_resultados['honorarios'][$cobro['id_moneda_base']];
+				$x_subtotal_honorarios = $x_resultados['subtotal_honorarios'][$cobro['id_moneda_base']];
+				$x_descuento_honorarios = $x_resultados['descuento'][$cobro['id_moneda_base']];
+				$x_subtotal_honorarios_pesos = ($x_subtotal_honorarios - $x_descuento_honorarios)
+					* ($x_saldo_honorarios_pesos / $x_honorarios);
+			} else {
 				$x_saldo_honorarios_pesos = $cobro['saldo_honorarios_pesos'];
 				$x_saldo_gastos_pesos = $cobro['saldo_gastos_pesos'];
+
+				$x_honorarios = $cobro['honorarios_pesos'];
+				$x_subtotal_honorarios = $cobro['subtotal_sin_descuento_pesos'];
+				$x_subtotal_honorarios_pesos = $x_subtotal_honorarios * ($x_saldo_honorarios_pesos / $x_honorarios);
 			}
 			$total_cliente += $cobro['saldo_honorarios']+$cobro['saldo_gastos'];
 			$total_cliente_pesos += $x_saldo_honorarios_pesos+$x_saldo_gastos_pesos;
 			$total_moneda +=  $cobro['saldo_honorarios'];
 			$total_pesos += $x_saldo_honorarios_pesos;
+
 			$total_gastos_moneda += $cobro['saldo_gastos'];
 			$total_gastos_pesos += $x_saldo_gastos_pesos;
 
@@ -672,6 +689,7 @@
 			if($sin_desglose||($desglosar_por_encargado&&!$desglosar_por_moneda))
 			{
 				$ws1->writeNumber($filas, $col_monto, ($cobro['saldo_honorarios']+$cobro['saldo_gastos']), $formato_moneda);
+				$ws1->writeNumber($filas, $col_subtotal_honorarios_pesos, $x_subtotal_honorarios_pesos, $formato_moneda);
 				$ws1->writeNumber($filas, $col_monto_honorarios_pesos, $x_saldo_honorarios_pesos, $formato_moneda);
 				$ws1->writeNumber($filas, $col_monto_gastos_pesos, $x_saldo_gastos_pesos, $formato_moneda);
 			}

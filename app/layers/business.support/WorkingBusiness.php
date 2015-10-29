@@ -243,14 +243,24 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		return $this->report;
 	}
 
-	function getWorksByCharge($chargeId) {
+	/**
+	 * Get works by charge
+	 * @param $chargeId Charge Id
+	 * @param bool|false $chargeable Gets only chargeable works
+	 * @return mixed
+	 * @throws UtilityException
+	 */
+	function getWorksByCharge($chargeId, $chargeable = false) {
 		$searchCriteria = new SearchCriteria('Work');
 		$searchCriteria->related_with('Charge');
 		$searchCriteria->related_with('User');
 		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($chargeId);
+		if ($chargeable) {
+			$searchCriteria->filter('cobrable')->restricted_by('equals')->compare_with(1);
+		}
 		$searchCriteria->add_scope('orderFromOlderToNewer');
 		$this->loadBusiness('Searching');
-		return $this->SearchingBusiness->searchByCriteria($searchCriteria, array('Work.fecha', 'Work.descripcion', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda','User.username', 'User.nombre', 'User.apellido1', 'User.apellido2'));
+		return $this->SearchingBusiness->searchByCriteria($searchCriteria, array('Work.fecha', 'Work.descripcion', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda','User.username', 'User.nombre', 'User.apellido1', 'User.apellido2', 'Work.monto_cobrado'));
 	}
 
 	function getWork($id) {

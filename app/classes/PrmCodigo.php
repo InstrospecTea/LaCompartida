@@ -19,7 +19,7 @@ class PrmCodigo extends Objeto {
 
 	/**
 	 *
-	 * Retorna listado de prm_codigo segÃºn grupo deseado
+	 * Retorna listado de prm_codigo según grupo deseado
 	 *
 	 * @param string $grupo grupo a buscar
 	 *
@@ -27,7 +27,7 @@ class PrmCodigo extends Objeto {
 	 */
 	public function getCodigosByGrupo($grupo) {
 		$criteria = new Criteria($this->sesion);
-		$criteria->add_select('P.id_codigo', 'id_codigo')
+		$criteria->add_select('P.codigo', 'codigo')
 				->add_select('P.glosa', 'glosa')
 				->add_from('prm_codigo P')
 				->add_restriction(CriteriaRestriction::equals('grupo', "'$grupo'"))
@@ -37,7 +37,7 @@ class PrmCodigo extends Objeto {
 			$rows = array();
 
 			foreach ($result as $key => $value) {
-				$rows[$value['id_codigo']] = $value['glosa'];
+				$rows[$value['codigo']] = $value['glosa'];
 			}
 
 			return $rows;

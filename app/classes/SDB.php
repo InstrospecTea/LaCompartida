@@ -59,5 +59,4 @@ class SDB {
 			return false;
 		}
 	}
-
 }

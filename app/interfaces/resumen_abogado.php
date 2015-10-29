@@ -13,6 +13,7 @@ if ($fecha1 != '') {
 $Pagina->titulo = __('Reporte Resumen Profesional');
 $Pagina->PrintTop();
 ?>
+
 <form method="post" name="formulario" action="planillas/planilla_resumen_abogado.php">
 <table class="border_plomo tb_base">
 	<tr>
@@ -35,13 +36,13 @@ $Pagina->PrintTop();
 		<td align="right">
 			<?php echo __('Profesionales')?>
 		</td>
-		<td align="left"><!-- Nuevo Select -->
+		<td align="left">
 			<?php echo $Form->select('usuarios[]', $Sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => FALSE, 'style' => 'width: 200px', 'multiple' => 'multiple','size' => '7')); ?>
 		</td>
 	</tr>
 	<tr>
 		<td align="right">
-			<?php echo __('Forma TarificaciÃ³n')?>
+			<?php echo __('Forma Tarificación')?>
 		</td>
 		<td align="left">
 			<?php echo Html::SelectQuery($Sesion,"SELECT forma_cobro, descripcion FROM prm_forma_cobro ORDER BY forma_cobro", "forma_cobro[]",$forma_cobro,"multiple size=5","","200"); ?>
@@ -64,20 +65,16 @@ $Pagina->PrintTop();
 </form>
 
 <script type="text/javascript">
-<!-- //
-function setDateDefecto()
-{
-		hoy = new Date();//tiene hora actual
-		hoy.setHours(0,0,0,0);
-		ninety_days = new Date();
-		ninety_days.setDate(hoy.getDate()-30);
+	function setDateDefecto() {
+			hoy = new Date();//tiene hora actual
+			hoy.setHours(0,0,0,0);
+			ninety_days = new Date();
+			ninety_days.setDate(hoy.getDate()-30);
 
-		if (fecha1_Object.picked.date.getTime() == hoy.getTime()) {
-			fecha1_Object.setValor(ninety_days);
-		}
-}
-//setDateDefecto();
-// ->
+			if (fecha1_Object.picked.date.getTime() == hoy.getTime()) {
+				fecha1_Object.setValor(ninety_days);
+			}
+	}
 </script>
 
 <?php

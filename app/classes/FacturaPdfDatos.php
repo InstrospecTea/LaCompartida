@@ -164,6 +164,7 @@ class FacturaPdfDatos extends Objeto {
 			'telefono' => $contrato->fields['factura_telefono'],
 			'fecha_dia' => date("d", strtotime($factura->fields['fecha'])),
 			'fecha_mes' => strftime("%B", strtotime($factura->fields['fecha'])),
+			'fecha_mes_entre_de' => 'de ' . ucfirst(strftime("%B", strtotime($factura->fields['fecha']))) . ' de',
 			'fecha_numero_mes' => strftime("%m", strtotime($factura->fields['fecha'])),
 			'fecha_ano' => date("Y", strtotime($factura->fields['fecha'])),
 			'fecha_ano_ultima_cifra' => substr(date("Y",strtotime($factura->fields['fecha'])),-1),
@@ -374,6 +375,10 @@ class FacturaPdfDatos extends Objeto {
 				$datos['dato_letra'] = strtolower($datos['dato_letra']);
 			} else if( $datos['mayuscula'] == 'cap') {
 				$datos['dato_letra'] = ucwords(strtolower($datos['dato_letra']));
+			} else if( $datos['mayuscula'] == 'ucf') {
+				$datos['dato_letra'] = ucfirst(strtolower($datos['dato_letra']));
+			} else {
+				$datos['dato_letra'] = $datos['dato_letra'];
 			}
 
 			if( $datos['cellH'] > 0 || $datos['cellW'] > 0 ) {

@@ -537,7 +537,7 @@ function IngresoGasto($fecha, $codigo_asunto, $monto, $desc_param, $descripcion,
 		}
 
 		$query = "INSERT INTO cta_corriente SET
-			id_usuario = 1,
+			id_usuario = 52,
 			fecha = '{$fecha}',
 			codigo_cliente = '{$codigo_cliente}',
 			codigo_asunto = '{$codigo_cliente}-{$_codigo_asunto}',

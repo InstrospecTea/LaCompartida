@@ -55,6 +55,18 @@ class Work extends LoggeableEntity {
 		);
 	}
 
+	/**
+	 * Obtiene los campos por defecto que debe llevar la entidad historial.
+	 * @return array
+	 */
+	public function getDefaultHistoryProperties() {
+		return array(
+			true => array(
+				'fecha_accion' => 'NOW()'
+			)
+		);
+	}
+
 	public function getTableDefaults() {
 		return array();
 	}
@@ -62,5 +74,4 @@ class Work extends LoggeableEntity {
 	protected function getFixedDefaults() {
 		return array();
 	}
-
 }

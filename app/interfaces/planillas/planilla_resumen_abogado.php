@@ -213,7 +213,7 @@ if ($lista_usuarios == "") {
 $tipo_dato = array('horas_trabajadas', 'horas_cobradas', 'horas_por_cobrar', 'horas_castigadas', 'horas_no_cobrables', 'valor_cobrado');
 foreach ($usuarios as $usuario) {
 	foreach ($tipo_dato as $td) {
-		$reporte = new Reporte($Sesion);
+		$reporte = new ReporteCriteria($Sesion);
 		if (is_array($forma_cobro)) {
 			foreach ($forma_cobro as $fc) {
 				$reporte->addFiltro('cobro', 'forma_cobro', $fc);
@@ -229,7 +229,7 @@ foreach ($usuarios as $usuario) {
 			$reporte->Query();
 			$resultado[$usuario]['valor_cobrado_estandar'] = $reporte->toCross();
 			$reporte->setTipoDato($td);
-			$reporte->setProporcionalidad('no_estandar');
+			$reporte->setProporcionalidad('cliente');
 			$reporte->Query();
 			$resultado[$usuario]['valor_cobrado'] = $reporte->toCross();
 		} else {
@@ -367,7 +367,7 @@ function Print_Prof(& $ws1, $td) {
 		$ws1->write($fila_titulos + 5, 2, '', $formato_titulo);
 		$ws1->mergeCells($fila_titulos + 5, 1, $fila_titulos + 5, 2);
 
-		$ws1->write($fila_titulos + 6, 1, __('monto_facturado') . __('(E)'), $formato_titulo);
+		$ws1->write($fila_titulos + 6, 1, __('monto_facturado') . __('(Prop. Estándar)'), $formato_titulo);
 		$ws1->write($fila_titulos + 6, 2, '', $formato_titulo);
 		$ws1->mergeCells($fila_titulos + 6, 1, $fila_titulos + 6, 2);
 
@@ -443,7 +443,7 @@ function Print_Prof(& $ws1, $td) {
 			$ws1->write($fila_titulos + 7, $col + 2, __('Hrs. Castigadas'), $formato_titulo_rotado);
 			$ws1->write($fila_titulos + 7, $col + 3, __('Hrs. no Cobrables'), $formato_titulo_rotado);
 			$ws1->write($fila_titulos + 7, $col + 4, __('Cobrado'), $formato_titulo_rotado);
-			$ws1->write($fila_titulos + 7, $col + 5, __('Cobrado') . __(' (E)'), $formato_titulo_rotado);
+			$ws1->write($fila_titulos + 7, $col + 5, __('Cobrado') . __(' (Prop. Estándar)'), $formato_titulo_rotado);
 			$ws1->setColumn($col + 5, $col + 5, 15);
 
 			// Celdas
@@ -487,7 +487,7 @@ function Print_Prof(& $ws1, $td) {
 		$ws1->write($filas, 2, '=SUM(D' . ($fila_titulos + 6) . ':FF' . ($fila_titulos + 6) . ')', $formatos_moneda_morado[CTEMONEDA]); // ojo, para la clase la fila titulos+6 es la 20, para el excel es la 19
 		$ws1->mergeCells($filas, 2, $filas, 2 + 4);
 
-		$ws1->write( ++$filas, 1, __('MONTO FACTURADO') . __(' (E)'), $formato_morado);
+		$ws1->write( ++$filas, 1, __('MONTO FACTURADO') . __(' (Prop. Estándar)'), $formato_morado);
 		//$ws1->write($filas, 2, $td['valor_cobrado']['total'], $formatos_moneda_morado[CTEMONEDA]);
 		$ws1->write($filas, 2, '=SUM(D' . ($fila_titulos + 7) . ':FF' . ($fila_titulos + 7) . ')', $formatos_moneda_morado[CTEMONEDA]); // ojo, para la clase la fila titulos+6 es la 20, para el excel es la 19
 		$ws1->mergeCells($filas, 2, $filas, 2 + 4);

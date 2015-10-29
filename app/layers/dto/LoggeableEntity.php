@@ -27,4 +27,12 @@ abstract class LoggeableEntity extends Entity {
 	 */
 	abstract public function getInmutableLoggeableProperties();
 
+	/**
+	 * Obtiene los campos por defecto que debe llevar la entidad historial.
+	 * @return array
+	 */
+	public function getDefaultHistoryProperties() {
+		return array();
+	}
+
 }

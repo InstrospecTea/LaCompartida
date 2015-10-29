@@ -1207,8 +1207,8 @@ HTML;
 			$datos_cobro->LoadByCobro($id_cobro);
 			if ($datos_cobro->Loaded()) {
 				$xtabla = 'documento';
-				$cobro_moneda = new CobroMoneda($sesion); // Cuando DocumentoMoneda esta averiguado hay que cambiar $cobro_moneda a un objeto Documento Moneda.
-				$cobro_moneda->Load($id_cobro);
+				$cobro_moneda = new DocumentoMoneda($sesion); // Cuando DocumentoMoneda esta averiguado hay que cambiar $cobro_moneda a un objeto Documento Moneda.
+				$cobro_moneda->LoadByCobro($id_cobro);
 			}
 		}
 		if ($xtabla == 'cobro') {

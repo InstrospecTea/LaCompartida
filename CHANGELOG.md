@@ -1,5 +1,147 @@
 # Changelog
 
+## [Release 15.25.0](https://github.com/LemontechSA/ttb/pull/1195)
+Wednesday 2015, October 28th
+* **Feature** [Mejoras en reportes LloredaCamacho](https://github.com/LemontechSA/ttb/pull/1184)
+
+## Hotfix 15.24.8
+Wednesday 2015, October 28th
+* **Fix** [Corregir edición de tarifas](https://github.com/LemontechSA/ttb/pull/1193)
+
+## Hotfix 15.24.7
+Tuesday 2015, October 27th
+* **Fix** [Corregir usuario al subir gastos por SAP](https://github.com/LemontechSA/ttb/pull/1192)
+
+## Hotfix 15.24.6
+Tuesday 2015, October 27th
+* **Fix** [Corregir método para generar codigo de actividad](https://github.com/LemontechSA/ttb/pull/1191)
+
+## Hotfix 15.24.5
+Monday 2015, October 26th
+* **Fix** [Validación variable `id_usuario`](https://github.com/LemontechSA/ttb/pull/1190)
+
+## Hotfix 15.24.4
+Thursday 2015, October 22nd
+* **Fix** [Corrección tipo moneda a mostrar en hitos Excel](https://github.com/LemontechSA/ttb/pull/1189)
+
+## Hotfix 15.24.3
+Thursday 2015, October 22nd
+* **Fix** [Rollback de Hotfix/15.23.7](https://github.com/LemontechSA/ttb/pull/1188)
+
+## Hotfix 15.24.2
+Wednesday 2015, October 21st
+* **Fix** [Diferenica de horas en excel asuntos por cobrar](https://github.com/LemontechSA/ttb/pull/1187)
+
+## Hotfix 15.24.1
+Wednesday 2015, October 21st
+* **Fix** [Error SQL - Actualizar Contrato](https://github.com/LemontechSA/ttb/pull/1183)
+
+## [Release 15.24.0](https://github.com/LemontechSA/ttb/pull/1178)
+Tuesday 2015, October 20th
+* **Feature** [Texto factura](https://github.com/LemontechSA/ttb/pull/1169)
+* **Feature** [Diferencia horas](https://github.com/LemontechSA/ttb/pull/1164)
+* **Feature** [Selector usuarios](https://github.com/LemontechSA/ttb/pull/1157)
+
+## Hotfix 15.23.10
+Monday 2015, October 19th
+* **Fix** [Modificar horas en asuntos inactivos](https://github.com/LemontechSA/ttb/pull/1177)
+
+## Hotfix 15.23.9
+Monday 2015, October 19th
+* **Fix** [Nuevo campo de agrupación en RA](https://github.com/LemontechSA/ttb/pull/1176)
+
+## Hotfix 15.23.8
+Friday 2015, October 16th
+* **Fix** [Área trabajo en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1175)
+
+## Hotfix 15.23.7
+Friday 2015, October 16th
+* **Fix** [Agregar formato numerico a hitos](https://github.com/LemontechSA/ttb/pull/1174)
+
+## Hotfix 15.23.6
+Friday 2015, October 16th
+* **Fix** [Horas inexistentes en Resumen Semana](https://github.com/LemontechSA/ttb/pull/1173)
+
+## Hotfix 15.23.5
+Thursday 2015, October 15th
+* **Fix** [Corregir descarga de documento Word de una liquidación con forma de liquidación escalonada](https://github.com/LemontechSA/ttb/pull/1172)
+
+## Hotfix 15.23.4
+Thursday 2015, October 15th
+* **Feature** [Implementación chat Let's Talk](https://github.com/LemontechSA/ttb/pull/1166)
+
+## Hotfix 15.23.3
+Wednesday 2015, October 14th
+* **Fix** [Se añaden separador de miles y decimales según configuración cliente](https://github.com/LemontechSA/ttb/pull/1165)
+
+## Hotfix 15.23.2
+Friday 2015, October 9th
+* **Fix** [Mensajes masivos](https://github.com/LemontechSA/ttb/pull/1163)
+
+## Hotfix 15.23.1
+Friday 2015, October 9th
+* **Fix** [Transformar el texto a sólo la primera en mayúscula](https://github.com/LemontechSA/ttb/pull/1162)
+
+## [Release 15.23.0](https://github.com/LemontechSA/ttb/pull/1160)
+Thursday 2015, October 8th
+* **Feature** [Cambiar notificaciones de Hitos](https://github.com/LemontechSA/ttb/pull/1159)
+
+## Hotfix 15.22.2
+Thursday 2015, October 8th
+* **Fix** [ucfirst por defecto al generar facturas pdf](https://github.com/LemontechSA/ttb/pull/1161)
+
+## Hotfix 15.22.1
+Thursday 2015, October 8th
+* **Fix** [Corrección error SQL al actualizar cobros](https://github.com/LemontechSA/ttb/pull/1156)
+
+## [Release 15.22.0](https://github.com/LemontechSA/ttb/pull/1155)
+Wednesday 2015, October 7th
+* **Fix** [Correcciones reporte avanzado](https://github.com/LemontechSA/ttb/pull/1152)
+
+## [Release 15.21.0](https://github.com/LemontechSA/ttb/pull/1154)
+Tuesday 2015, October 6th
+* **Feature** [Reestablecer flujo de adelantos para PRC](https://github.com/LemontechSA/ttb/pull/1148)
+
+## Hotfix 15.20.7
+Tuesday 2015, October 6th
+* **Fix** [Comportamiento de tarifas escalonadas](https://github.com/LemontechSA/ttb/pull/1153)
+
+## Hotfix 15.20.6
+Friday 2015, October 2nd
+* **Fix** [Título dinámico en mensajes de actualización](https://github.com/LemontechSA/ttb/pull/1151)
+
+## Hotfix 15.20.5
+Friday 2015, October 2nd
+* **Fix** [Espaciado Excel](https://github.com/LemontechSA/ttb/pull/1145)
+
+## Hotfix 15.20.4
+Wednesday 2015, September 30th
+* **Fix** [Emisión masiva de liquidaciones](https://github.com/LemontechSA/ttb/pull/1146)
+
+## Hotfix 15.20.3
+Tuesday 2015, September 29th
+* **Fix** [Corregir configuración editorconfig y ; en update](https://github.com/LemontechSA/ttb/pull/1143)
+
+## Hotfix 15.20.2
+Monday 2015, September 28th
+* **Fix** [Filtros extra Resumen Actividades](https://github.com/LemontechSA/ttb/pull/1142)
+
+## Hotfix 15.20.1
+Monday 2015, September 28th
+* **Fix** [Tarifa escalonada reporte Excel](https://github.com/LemontechSA/ttb/pull/1141)
+
+## [Release 15.20.0](https://github.com/LemontechSA/ttb/pull/1140)
+Friday 2015, September 25
+* **Fix** [Reporte Avanzado Corregido](https://github.com/LemontechSA/ttb/pull/1140)
+
+## Hotfix 15.19.2
+Tuesday 2015, September 23rd
+* **Fix** [Correción Facturación CL](https://github.com/LemontechSA/ttb/pull/1136)
+
+## Hotfix 15.19.1
+Tuesday 2015, September 22nd
+* **Fix** [Se añaden columnas a Reporte Liquidaciones](https://github.com/LemontechSA/ttb/pull/1133)
+
 ## [Release 15.19.0](https://github.com/LemontechSA/ttb/pull/1130)
 Monday 2015, September 21th
 * **Feature** [Formato factura fiscal MX](https://github.com/LemontechSA/ttb/pull/1122)

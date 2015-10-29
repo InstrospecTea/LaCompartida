@@ -930,7 +930,7 @@ if (!class_exists('Cobro')) {
 
 				if ($trabajo->fields['cobrable']) {
 					// Revisa duración de la hora y suma duracion que sobro del trabajo anterior, si es que se cambió de escalonada
-					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
+					list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
 					$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 					$duracion_trabajo = $duracion;
 
@@ -3007,6 +3007,45 @@ if (!class_exists('Cobro')) {
 			$query = "INSERT INTO factura_cobro (id_factura, id_cobro, id_documento, monto_factura, impuesto_factura, id_moneda_factura, id_moneda_documento)
 			VALUES ('" . implode("','", $valores) . "')";
 			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		}
+
+		function MontoSaldoAdelantos() {
+			if ($this->Loaded() && Conf::GetConf($this->sesion, 'AsociarAdelantosALiquidacion')) {
+				$criteria = new Criteria($this->sesion);
+				$criteria->add_select(
+					'SUM(ccfm.saldo * fp.monto_moneda_cobro / fp.monto)', 'saldo'
+				)->add_from(
+					'cta_cte_fact_mvto', 'ccfm'
+				)->add_inner_join_with(
+					array('factura_pago', 'fp'),
+					CriteriaRestriction::equals(
+						'fp.id_factura_pago',
+						'ccfm.id_factura_pago'
+					)
+				)->add_inner_join_with(
+					array('neteo_documento', 'nd'),
+					CriteriaRestriction::equals(
+						'nd.id_neteo_documento',
+						'fp.id_neteo_documento_adelanto'
+					)
+				)->add_inner_join_with(
+					array('documento', 'dc'),
+					CriteriaRestriction::equals(
+						'dc.id_documento',
+						'nd.id_documento_cobro'
+					)
+				)->add_restriction(
+					CriteriaRestriction::equals(
+						'dc.id_cobro',
+						"{$this->fields['id_cobro']}"
+					)
+				);
+				$result = $criteria->run();
+				$saldo = $result[0]['saldo'];
+				return $saldo;
+			} else {
+				return 0;
+			}
 		}
 	}
 }

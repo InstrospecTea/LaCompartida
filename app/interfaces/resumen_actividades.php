@@ -62,7 +62,8 @@ $agrupadores = array(
 	'id_usuario_responsable',
 	'mes_reporte',
 	'dia_reporte',
-	'mes_emision'
+	'mes_emision',
+	'mes_facturacion'
 );  // vista
 
 $hoy = date("Y-m-d");
@@ -86,7 +87,7 @@ if ($rango && ($fecha_ini != '' && $fecha_fin != '')) {
 	$periodo_txt = ucfirst(Utiles::sql2fecha($fecha_ini, '%B')) . ' ' . $fecha_anio;
 }
 
-$reporte = new Reporte($sesion);
+$reporte = new ReporteCriteria($sesion);
 
 /* SELECTS MULTIPLES */
 
@@ -780,7 +781,8 @@ $agrupadores = explode('-', $vista);
 
 if ($opc == 'print' || $opc == 'grafico' || $popup) {
 	$reporte->setCampoFecha($campo_fecha);
-	$reporte->setTipoDato($tipo_dato, $ocultar_horas_castigadas);
+	$reporte->setTipoDato($tipo_dato);
+	$reporte->setHiddePenalizedHours($ocultar_horas_castigadas);
 	$reporte->setVista($vista);
 	$reporte->addRangoFecha($fecha_ini, $fecha_fin);
 
@@ -794,8 +796,6 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 
 	/* CLIENTES */
 	$clients = explode(',', $clientes);
-
-
 	foreach ($clients as $cliente) {
 		if ($cliente) {
 			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
@@ -861,7 +861,7 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 	$r_c = $r;
 
 	if ($tipo_dato_comparado) {
-		$reporteC = new Reporte($sesion);
+		$reporteC = new ReporteCriteria($sesion);
 		foreach ($users as $usuario) {
 			if ($usuario) {
 				$reporteC->addFiltro('usuario', 'id_usuario', $usuario);
