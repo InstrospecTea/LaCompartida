@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 15.25.0](https://github.com/LemontechSA/ttb/pull/1195)
+Wednesday 2015, October 28th
+* **Feature** [Mejoras en reportes LloredaCamacho](https://github.com/LemontechSA/ttb/pull/1184)
+
 ## Hotfix 15.24.8
 Wednesday 2015, October 28th
 * **Fix** [Corregir edición de tarifas](https://github.com/LemontechSA/ttb/pull/1193)

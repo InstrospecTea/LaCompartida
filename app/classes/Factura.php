@@ -335,6 +335,31 @@ class Factura extends Objeto {
 			'field' => 'dte_folio_fiscal',
 			'title' => 'Folio Fiscal',
 			'visible' => false
+		),
+		array(
+			'field' => 'fecha_vencimiento',
+			'title' => 'Fecha Vencimiento',
+			'visible' => false
+		),
+		array(
+			'field' => 'dias_vencimiento',
+			'title' => 'Días Vencimiento',
+			'visible' => false
+		),
+		array(
+			'field' => 'nombre_contacto',
+			'title' => 'Nombre Contacto',
+			'visible' => false
+		),
+		array(
+			'field' => 'telefono_contacto',
+			'title' => 'Teléfono Contacto',
+			'visible' => false
+		),
+		array(
+			'field' => 'email_contacto',
+			'title' => 'E-mail Contacto',
+			'visible' => false
 		)
 	);
 
@@ -2598,7 +2623,12 @@ class Factura extends Objeto {
 								, factura.RUT_cliente
 								, prm_estudio.glosa_estudio
 								, factura.fecha_anulacion
-								, factura.dte_folio_fiscal";
+								, factura.dte_folio_fiscal
+								, factura.fecha_vencimiento as fecha_vencimiento
+								, IF(factura.fecha < NOW(), DATEDIFF(NOW(), factura.fecha), '') as dias_vencimiento
+								, contrato.contacto as nombre_contacto
+								, contrato.fono_contacto as telefono_contacto
+								, contrato.email_contacto as email_contacto";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (
@@ -3027,11 +3057,11 @@ class Factura extends Objeto {
 
 		return $this->twig->render($template, $this->template_data);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Obtiene el tipo de cambio para un cobro en especÌfico
-	 * 
+	 *
 	 * @param string $factura_id_moneda id correspondiente al tipo de moneda que se est· utilizando
 	 * @return float tipo cambio para la fecha que se emitió el cobro
 	 */
