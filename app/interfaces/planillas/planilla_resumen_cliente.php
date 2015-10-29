@@ -192,7 +192,7 @@ $query = "SELECT
 						$select_col
 						FROM cobro
 						LEFT JOIN cliente AS cliente ON cobro.codigo_cliente=cliente.codigo_cliente
-						WHERE cobro.estado <> 'CREADO' 
+						WHERE cobro.estado <> 'CREADO'
 						AND cobro.estado <> 'EN REVISION'
 						AND cobro.fecha_emision BETWEEN '$fecha_ini 00:00:00' AND '$fecha_fin 23:59:59' $where
 						)ZZ
@@ -200,7 +200,7 @@ $query = "SELECT
 						ORDER BY glosa_cliente";
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 //echo $query.'<br><br>';
-$campo_monto = "monto";
+$campo_monto = "monto_honorarios";
 $campo_monto_thh = $tarifa;
 
 $glosa_comentario = array();
@@ -233,8 +233,8 @@ while ($row = mysql_fetch_array($resp)) {
 				if (count($arr_idcobro_cliente) >= 0) {
 					for ($o = 0; $o < count($arr_idcobro_cliente); $o++) {
 						$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $arr_idcobro_cliente[$o]);
-						$x_monto[$row['codigo_cliente']]['monto_' . $a . $m] +=$x_resultados[$campo_monto][$id_moneda];
-						$x_monto[$row['codigo_cliente']]['monto_thh_' . $a . $m] +=$x_resultados[$campo_monto_thh][$id_moneda];
+						$x_monto[$row['codigo_cliente']]['monto_' . $a . $m] += $x_resultados[$campo_monto][$id_moneda];
+						$x_monto[$row['codigo_cliente']]['monto_thh_' . $a . $m] += $x_resultados[$campo_monto_thh][$id_moneda];
 						$x_monto[$row['codigo_cliente']]['id_cobro_' . $a . $m] .= $arr_idcobro_cliente[$o] . " , ";
 
 						if ($arr_idcobro_cliente[$o] > 0) {
@@ -243,8 +243,8 @@ while ($row = mysql_fetch_array($resp)) {
 					}
 				} else {
 					$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $row['list_idcobro_' . $a . $m]);
-					$x_monto[$row['codigo_cliente']]['monto_' . $a . $m] +=$x_resultados[$campo_monto][$id_moneda];
-					$x_monto[$row['codigo_cliente']]['monto_thh_' . $a . $m] +=$x_resultados[$campo_monto_thh][$id_moneda];
+					$x_monto[$row['codigo_cliente']]['monto_' . $a . $m] += $x_resultados[$campo_monto][$id_moneda];
+					$x_monto[$row['codigo_cliente']]['monto_thh_' . $a . $m] += $x_resultados[$campo_monto_thh][$id_moneda];
 					$x_monto[$row['codigo_cliente']]['id_cobro_' . $a . $m] .= $row['list_idcobro_' . $a . $m] . " , ";
 
 					if ($row['list_idcobro_' . $a . $m] > 0) {
