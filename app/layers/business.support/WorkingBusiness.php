@@ -142,7 +142,8 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 				'filterCurrency' => $filter_currency,
 				'baseCurrency' => $base_currency,
 				'since' => $data['fecha_ini'],
-				'until' => $data['fecha_fin']
+				'until' => $data['fecha_fin'],
+				'time' => $data['time']
 			)
 		);
 		$this->report->setData($reportData);
