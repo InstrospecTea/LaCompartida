@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.25.2
+Friday 2015, October 30th
+* **Fix** [Columna País en Excel Clientes](https://github.com/LemontechSA/ttb/pull/1198)
+
 ## Hotfix 15.25.1
 Thursday 2015, October 29th
 * **Fix** [Corrección Reporte Ventas](https://github.com/LemontechSA/ttb/pull/1196)
