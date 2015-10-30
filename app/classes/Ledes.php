@@ -7,9 +7,12 @@ class Ledes extends Objeto {
 	/**
 	 * numero de decimales a mostrar, el oficial es 4 pero esta gente quiere 2...
 	 */
-	private $decimales = 2;
+	protected $decimales = 2;
 
-	function Ledes($Sesion) {
+	/**
+	 * @param $Sesion
+	 */
+	function __construct($Sesion) {
 		$this->sesion = $Sesion;
 	}
 
@@ -18,7 +21,7 @@ class Ledes extends Objeto {
 	 * @param mixed $ids_cobros id del cobro o array de ids
 	 * @return string contenido del archivo
 	 */
-	function ExportarCobrosLedes($ids_cobros) {
+	public function ExportarCobrosLedes($ids_cobros) {
 		$datos = array();
 		if (!is_array($ids_cobros)) {
 			$ids_cobros = array($ids_cobros);
@@ -35,7 +38,7 @@ class Ledes extends Objeto {
 	 * @param int $id_cobro
 	 * @return array datos
 	 */
-	function CobroLedes($id_cobro) {
+	public function CobroLedes($id_cobro) {
 		$filas = array();
 
 		//cargar datos de la bd
@@ -56,7 +59,131 @@ class Ledes extends Objeto {
 		$codigo_asunto = null;
 		$last_client_matter_id = "";
 		$suma_unit = 0;
+		$linea = 1;
 
+		$filas_trabajos = $this->generarFilasTrabajos($Cobro, $linea, $fecha_min, $cambios, $codigo_asunto, $last_client_matter_id, $suma, $suma_unit);
+		$filas = array_merge($filas, $filas_trabajos['filas']);
+
+		$filas_tramites = $this->generarFilasTramites($Cobro, $linea, $fecha_min, $cambios, $codigo_asunto, $last_client_matter_id, $suma, $suma_unit, $filas_trabajos['trabajo']);
+		$filas = array_merge($filas, $filas_tramites);
+
+		$filas_gastos = $this->generarFilasGastos($Cobro, $linea, $fecha_min, $cambios, $codigo_asunto, $last_client_matter_id, $suma, $suma_unit, $gastos);
+		$filas = array_merge($filas, $filas_gastos);
+
+		if (!$codigo_asunto) {
+			$query = "SELECT codigo_asunto FROM asunto WHERE id_contrato = " . $Cobro->fields['id_contrato'] . " LIMIT 1";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			list($codigo_asunto) = mysql_fetch_assoc($resp);
+		}
+
+		if (empty($last_client_matter_id)) {
+			$Cobro->LoadAsuntos();
+			$codigo_asunto = $Cobro->asuntos[0];
+
+			$Asunto = new Asunto($this->sesion);
+			$Asunto->LoadByCodigo($codigo_asunto);
+
+			$last_client_matter_id = $Asunto->fields['codigo_homologacion'];
+		}
+
+		//Ajustes del cobro
+		$filas_ajuste = $this->ajustesCobro($Cobro, $x_resultados, $moneda_cobro, $fecha_min, $codigo_asunto, $last_client_matter_id, $suma, $suma_unit);
+		$filas = array_merge($filas, $filas_ajuste['filas']);
+		$datos_cobro = $filas_ajuste['datos_cobro'];
+
+		foreach ($filas as $k => $fila) {
+			// Será así?
+			$fila['LAW_FIRM_MATTER_ID'] = $datos_cobro['LAW_FIRM_ID'];
+
+			$filas[$k] = $datos_cobro + $fila;
+		}
+
+		return $filas;
+	}
+
+	/**
+	 * Genera la fila de ajustes a nivel de cobro para corregir segun forma de cobro, descuentos, etc
+	 * @param $Cobro
+	 * @param $x_resultados
+	 * @param $moneda_cobro
+	 * @param $fecha_min
+	 * @param $codigo_asunto
+	 * @param $last_client_matter_id
+	 * @param $suma
+	 * @param $suma_unit
+	 * @return array
+	 * @internal param $datos_cobro
+	 */
+	public function ajustesCobro(&$Cobro, &$x_resultados, &$moneda_cobro, $fecha_min, $codigo_asunto, &$last_client_matter_id, &$suma, &$suma_unit) {
+		$id_cobro = $Cobro->fields['id_cobro'];
+		//Obtener los datos de la liquidación
+		// Obtengo el código secundario del cliente
+		$Cliente = new Cliente($this->sesion);
+		$Cliente->LoadByCodigo($Cobro->fields['codigo_cliente']);
+
+		$datos_cobro = array(
+			'INVOICE_DATE' => $Cobro->fields['fecha_emision'],
+			'INVOICE_NUMBER' => $id_cobro,
+			'CLIENT_ID' => $Cliente->fields['codigo_homologacion'],
+			'INVOICE_TOTAL' => $x_resultados['monto_total_cobro'][$moneda_cobro],
+			'BILLING_START_DATE' => $Cobro->fields['fecha_ini'],
+			'BILLING_END_DATE' => $Cobro->fields['fecha_fin'],
+			'INVOICE_DESCRIPTION' => $Cobro->fields['se_esta_cobrando'],
+			'LAW_FIRM_ID' => UtilesApp::GetConf($this->sesion, 'IdentificadorEstudio')
+		);
+		if ($datos_cobro['BILLING_START_DATE'] < '2000-01-01') {
+			$datos_cobro['BILLING_START_DATE'] = $fecha_min;
+		}
+		$monto_total = $datos_cobro['INVOICE_TOTAL'] * 1;
+		$ajuste = 0;
+		$filas = array();
+		if (abs($suma - $monto_total) > $monto_total / 100) {
+			$monto = $monto_total - $suma;
+
+			$fila = array(
+				'LAW_FIRM_MATTER_ID' => $codigo_asunto,
+				'LINE_ITEM_NUMBER' => 'IF1',
+				'EXP/FEE/INV_ADJ_TYPE' => 'IF',
+				'LINE_ITEM_NUMBER_OF_UNITS' => 0,
+				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $monto,
+				'LINE_ITEM_TOTAL' => $monto,
+				'LINE_ITEM_DATE' => $datos_cobro['INVOICE_DATE'],
+				'LINE_ITEM_TASK_CODE' => '',
+				'LINE_ITEM_EXPENSE_CODE' => '',
+				'LINE_ITEM_ACTIVITY_CODE' => '',
+				'TIMEKEEPER_ID' => '',
+				'LINE_ITEM_DESCRIPTION' => 'Ajuste',
+				'LINE_ITEM_UNIT_COST' => $ajuste,
+				'TIMEKEEPER_NAME' => '',
+				'TIMEKEEPER_CLASSIFICATION' => '',
+				'CLIENT_MATTER_ID' => $last_client_matter_id
+			);
+
+			$suma += $fila['LINE_ITEM_TOTAL'];
+
+			$suma_unit += $fila['LINE_ITEM_UNIT_COST'];
+
+			$filas[] = $fila;
+		}
+		return array('filas' => $filas, 'datos_cobro' => $datos_cobro);
+	}
+
+	/**
+	 * Genera las líneas correspondientes a los trabajos del cobro
+	 * @param $Cobro
+	 * @param $linea
+	 * @param $fecha_min
+	 * @param $cambios
+	 * @param $codigo_asunto
+	 * @param $last_client_matter_id
+	 * @param $suma
+	 * @param $suma_unit
+	 * @return array
+	 */
+	public function generarFilasTrabajos(&$Cobro, &$linea, $fecha_min, $cambios, &$codigo_asunto, &$last_client_matter_id, &$suma, &$suma_unit) {
+
+		$id_cobro = $Cobro->fields['id_cobro'];
+		$filas = array();
 		/**
 		 * Obtener los trabajos
 		 */
@@ -83,7 +210,6 @@ class Ledes extends Objeto {
 			JOIN asunto a ON t.codigo_asunto = a.codigo_asunto
 			WHERE t.id_cobro = $id_cobro AND t.id_tramite = 0";
 
-		$linea = 1;
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while ($trabajo = mysql_fetch_assoc($resp)) {
@@ -106,11 +232,9 @@ class Ledes extends Objeto {
 			$tarifa = $this->round($tarifa);
 
 			if ($Cobro->fields['forma_cobro'] == 'FLAT FEE') {
-				$ajuste = 0;
-				$tarifa = $monto;
-			} else {
-				$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
+				$tarifa = 0;
 			}
+			$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
 
 			$descripcion = trim(str_replace("\n", ' ', $trabajo['descripcion']));
 
@@ -141,7 +265,26 @@ class Ledes extends Objeto {
 
 			$last_client_matter_id = $trabajo['codigo_homologacion'];
 		}
+		return array('filas' => $filas, 'trabajo' => $trabajo);
+	}
 
+	/**
+	 * Genera las líneas correspondientes a los trámites del cobro
+	 * @param $Cobro
+	 * @param $linea
+	 * @param $fecha_min
+	 * @param $cambios
+	 * @param $codigo_asunto
+	 * @param $last_client_matter_id
+	 * @param $suma
+	 * @param $suma_unit
+	 * @param $trabajo
+	 * @return array
+	 */
+	public function generarFilasTramites(&$Cobro, &$linea, $fecha_min, $cambios, &$codigo_asunto, &$last_client_matter_id, &$suma, &$suma_unit, $trabajo) {
+
+		$id_cobro = $Cobro->fields['id_cobro'];
+		$filas = array();
 		/**
 		 * Obtener los trámites
 		 */
@@ -219,7 +362,26 @@ class Ledes extends Objeto {
 
 			$last_client_matter_id = $tramite['codigo_homologacion'];
 		}
+		return $filas;
+	}
 
+	/**
+	 * Genera las filas correspondiente a los gastos del cobro
+	 * @param $Cobro
+	 * @param $linea
+	 * @param $fecha_min
+	 * @param $cambios
+	 * @param $codigo_asunto
+	 * @param $last_client_matter_id
+	 * @param $suma
+	 * @param $suma_unit
+	 * @param $gastos
+	 * @return array
+	 */
+	public function generarFilasGastos(&$Cobro, &$linea, $fecha_min, $cambios, &$codigo_asunto, &$last_client_matter_id, &$suma, &$suma_unit, $gastos) {
+
+		$id_cobro = $Cobro->fields['id_cobro'];
+		$filas = array();
 		/**
 		 * Obtener los gastos
 		 */
@@ -285,96 +447,6 @@ class Ledes extends Objeto {
 
 			$last_client_matter_id = $datos['codigo_homologacion'];
 		}
-
-		/**
-		 * Obtener los datos de la liquidación
-		 */
-		// Obtengo el código secundario del cliente
-		$Cliente = new Cliente($this->sesion);
-		$Cliente->LoadByCodigo($Cobro->fields['codigo_cliente']);
-
-		$datos_cobro = array(
-			'INVOICE_DATE' => $Cobro->fields['fecha_emision'],
-			'INVOICE_NUMBER' => $id_cobro,
-			'CLIENT_ID' => $Cliente->fields['codigo_homologacion'],
-			'INVOICE_TOTAL' => $x_resultados['monto_total_cobro'][$moneda_cobro],
-			'BILLING_START_DATE' => $Cobro->fields['fecha_ini'],
-			'BILLING_END_DATE' => $Cobro->fields['fecha_fin'],
-			'INVOICE_DESCRIPTION' => $Cobro->fields['se_esta_cobrando'],
-			'LAW_FIRM_ID' => UtilesApp::GetConf($this->sesion, 'IdentificadorEstudio')
-		);
-		if ($datos_cobro['BILLING_START_DATE'] < '2000-01-01') {
-			$datos_cobro['BILLING_START_DATE'] = $fecha_min;
-		}
-
-		if (!$codigo_asunto) {
-			$query = "SELECT codigo_asunto FROM asunto WHERE id_contrato = " . $Cobro->fields['id_contrato'] . " LIMIT 1";
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			list($codigo_asunto) = mysql_fetch_assoc($resp);
-		}
-
-		// Ajuste a nivel de cobro para corregir segun forma de cobro, descuentos, etc
-
-		if (empty($last_client_matter_id)) {
-			$Cobro->LoadAsuntos();
-			$codigo_asunto = $Cobro->asuntos[0];
-
-			$Asunto = new Asunto($this->sesion);
-			$Asunto->LoadByCodigo($codigo_asunto);
-
-			$last_client_matter_id = $Asunto->fields['codigo_homologacion'];
-		}
-
-		$monto_total = $datos_cobro['INVOICE_TOTAL'] * 1;
-		$ajuste = 0;
-		if (abs($suma - $monto_total) > $monto_total / 100) {
-			$monto = $monto_total - $suma;
-			if ($Cobro->fields['forma_cobro'] == 'FLAT FEE') {
-				$ajuste = $monto_total - $suma_unit;
-			}
-			$fila = array(
-				'LAW_FIRM_MATTER_ID' => $codigo_asunto,
-				'LINE_ITEM_NUMBER' => 'IF1',
-				'EXP/FEE/INV_ADJ_TYPE' => 'IF',
-				'LINE_ITEM_NUMBER_OF_UNITS' => 0,
-				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $monto,
-				'LINE_ITEM_TOTAL' => $monto,
-				'LINE_ITEM_DATE' => $datos_cobro['INVOICE_DATE'],
-				'LINE_ITEM_TASK_CODE' => '',
-				'LINE_ITEM_EXPENSE_CODE' => '',
-				'LINE_ITEM_ACTIVITY_CODE' => '',
-				'TIMEKEEPER_ID' => '',
-				'LINE_ITEM_DESCRIPTION' => 'Ajuste',
-				'LINE_ITEM_UNIT_COST' => $ajuste,
-				'TIMEKEEPER_NAME' => '',
-				'TIMEKEEPER_CLASSIFICATION' => '',
-				'CLIENT_MATTER_ID' => $last_client_matter_id
-			);
-
-			$suma += $fila['LINE_ITEM_TOTAL'];
-
-			$suma_unit += $fila['LINE_ITEM_UNIT_COST'];
-
-			$filas[] = $fila;
-		}
-
-		/* echo '<pre>';
-		  print_r(array(
-		  'cobro' => $Cobro->fields,
-		  'x_resultados' => $x_resultados,
-		  'gastos' => $gastos,
-		  'filas' => $filas,
-		  'cambios' => $cambios,
-		  'datos_cobro' => $datos_cobro
-		  )); */
-
-		foreach ($filas as $k => $fila) {
-			// Será así?
-			$fila['LAW_FIRM_MATTER_ID'] = $datos_cobro['LAW_FIRM_ID'];
-
-			$filas[$k] = $datos_cobro + $fila;
-		}
-
 		return $filas;
 	}
 
@@ -384,7 +456,7 @@ class Ledes extends Objeto {
 	 * @param string $formato por ahora solo LEDES1998B (default), se podrian agregar LEDES1998BI y LEDES1998BI V2
 	 * @return string contenido del archivo
 	 */
-	function GenerarArchivoLedes($datos, $formato = 'LEDES1998B') {
+	public function GenerarArchivoLedes($datos, $formato = 'LEDES1998B') {
 		//nombre del formato en la primera fila
 		$out = $formato . "[]" . "\r\n";
 
@@ -457,7 +529,7 @@ class Ledes extends Objeto {
 	 * @param int $id_cobro
 	 * @return array array(descripcionDelError => array(glosas, de, los, datos, fallados))
 	 */
-	function ValidarDatos($id_cobro) {
+	public function ValidarDatos($id_cobro) {
 		$codigos_asuntos = array();
 		$queries = array(
 			"SELECT codigo_asunto FROM trabajo WHERE id_cobro = $id_cobro AND id_tramite = 0",
@@ -476,7 +548,7 @@ class Ledes extends Objeto {
 
 		$queries = array(
 			'Asuntos sin código de homologación' =>
-			"SELECT glosa_asunto
+				"SELECT glosa_asunto
 					FROM asunto
 					WHERE codigo_asunto IN (" . implode(',', $codigos_asuntos) . ")
 						AND codigo_homologacion IS NULL",
@@ -488,29 +560,29 @@ class Ledes extends Objeto {
 			  AND codigo_homologacion IS NULL
 			  AND c.id_cobro = $id_cobro", */
 			'Trabajos sin código de actividad' =>
-			"SELECT descripcion
+				"SELECT descripcion
 					FROM trabajo
 					WHERE id_cobro = $id_cobro
 					AND id_tramite = 0
 					AND codigo_actividad IS NULL",
 			'Trabajos sin código UTBMS' =>
-			"SELECT descripcion
+				"SELECT descripcion
 					FROM trabajo
 					WHERE id_cobro = $id_cobro
 					AND id_tramite = 0
 					AND codigo_tarea IS NULL",
 			'Trámites sin código de actividad' =>
-			"SELECT descripcion
+				"SELECT descripcion
 					FROM tramite
 					WHERE id_cobro = $id_cobro
 					AND codigo_actividad IS NULL",
 			'Trámites sin código UTBMS' =>
-			"SELECT descripcion
+				"SELECT descripcion
 					FROM tramite
 					WHERE id_cobro = $id_cobro
 					AND codigo_tarea IS NULL",
 			'Gastos sin código UTBMS' =>
-			"SELECT descripcion
+				"SELECT descripcion
 					FROM cta_corriente
 					WHERE id_cobro = $id_cobro
 					AND codigo_gasto IS NULL"
@@ -534,7 +606,7 @@ class Ledes extends Objeto {
 	 * @param type $numero
 	 * @return type
 	 */
-	private function round($numero) {
+	protected function round($numero) {
 		$n = 10;
 		for ($i = 1; $i < $this->decimales; $i++) {
 			$n *= 10;
