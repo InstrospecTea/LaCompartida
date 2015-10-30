@@ -36,7 +36,7 @@ $codigo_asunto = $Actividad->fields['codigo_asunto'];
 	<input type="hidden" name="opc" id="opc" value="buscar">
 	<input type="hidden" name="id_actividad" id="id_actividad" value="">
 
-	<div style="width: 95%; text-align: "right"; margin: 4px auto;" align="right">
+	<div style="width: 95%; margin-bottom: 5px;" align="right">
 		<?php echo $Form->icon_button(__('Agregar') . ' ' . __('Actividad'), 'agregar', array('id' => 'agregar_actividad')); ?>
 	</div>
 
@@ -142,13 +142,13 @@ function acciones(& $fila) {
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		jQuery("#agregar_actividad").click(function() {
-			nuovaFinestra('Agregar_Actividad', 670, 300, 'agregar_actividades.php?popup=1');
+			nuovaFinestra('Agregar_Actividad', 670, 325, 'agregar_actividades.php?popup=1');
 		});
 	});
 
 	function EditarActividad(id) {
 		var url = 'agregar_actividades.php?id_actividad=' + id + '&popup=1';
-		return nuovaFinestra('Editar_Actividad', 670, 300, url);
+		return nuovaFinestra('Editar_Actividad', 670, 325, url);
 	}
 
 	function EliminarActividad(id) {

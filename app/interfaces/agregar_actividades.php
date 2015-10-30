@@ -21,17 +21,10 @@ if ($opcion == 'guardar') {
 
 	$Actividad->Fill($_REQUEST, true);
 
-	if ($_REQUEST['activo'] == 1) {
-		$Actividad->Edit('activo', '1');
-	} else {
-		$Actividad->Edit('activo', '0');
-	}
-
-	if (empty($Actividad->fields['codigo_asunto'])){
-		$Actividad->Edit('codigo_asunto', 'NULL');
-	} else {
-		$Actividad->Edit('codigo_asunto', $codigo_asunto);
-	}
+	$Actividad->Edit('activo', $_REQUEST['activo'] == 1 ? '1': '0');
+	$Actividad->Edit('codigo_asunto', empty($Actividad->fields['codigo_asunto']) ? 'NULL': $Actividad->fields['codigo_asunto']);
+	$Actividad->Edit('id_area_proyecto', empty($Actividad->fields['id_area_proyecto']) ? 'NULL': $Actividad->fields['id_area_proyecto']);
+	$Actividad->Edit('id_tipo_proyecto', empty($Actividad->fields['id_tipo_proyecto']) ? 'NULL': $Actividad->fields['id_tipo_proyecto']);
 
 	if ($Actividad->Write()) {
 		$Pagina->AddInfo(__('Actividad guardada con éxito'));
@@ -181,7 +174,7 @@ echo $Form->hidden('id_actividad', $Actividad->fields['id_actividad'], array('id
 			</tr>
 			<?php if ($Actividad->Loaded()) { ?>
 				<tr>
-					<td><label for="activo"><?php echo __('Activa'); ?></label></td>
+					<td align="right"><label for="activo"><?php echo __('Activa'); ?></label></td>
 					<td style="text-align:left">
 						<?php
 						$activo = ($Actividad->fields['activo'] == 1);
@@ -193,13 +186,13 @@ echo $Form->hidden('id_actividad', $Actividad->fields['id_actividad'], array('id
 			<tr>
 				<td align="right"><?php echo __('Área') . ' ' . __('asunto'); ?></td>
 				<td align="left">
-					<?php echo $Form->select('id_area_proyecto', $AreaProyecto->Listar('ORDER BY orden ASC')); ?>
+					<?php echo $Form->select('id_area_proyecto', $AreaProyecto->Listar('ORDER BY orden ASC'), $Actividad->fields['id_area_proyecto']); ?>
 				</td>
 			</tr>
 			<tr>
 				<td align="right"><?php echo __('Categoría') . ' ' . __('asunto'); ?></td>
 				<td align="left">
-					<?php echo $Form->select('id_tipo_proyecto', $PrmTipoProyecto->Listar('ORDER BY orden, glosa_tipo_proyecto ASC')); ?>
+					<?php echo $Form->select('id_tipo_proyecto', $PrmTipoProyecto->Listar('ORDER BY orden, glosa_tipo_proyecto ASC'), $Actividad->fields['id_tipo_proyecto']); ?>
 				</td>
 			</tr>
 		</table>
