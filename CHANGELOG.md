@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.25.4
+Friday 2015, October 30th
+* **Fix** [Selectores ordenados alfabeticamente](https://github.com/LemontechSA/ttb/pull/1200)
+
 ## Hotfix 15.25.3
 Friday 2015, October 30th
 * **Fix** [Opción tiempo en horas PDF Revisar Horas](https://github.com/LemontechSA/ttb/pull/1199)
