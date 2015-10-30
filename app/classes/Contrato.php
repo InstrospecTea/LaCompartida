@@ -1212,14 +1212,14 @@ class Contrato extends Objeto {
 
 		/*
 		 * Se añade este código para validar los cambios hechos en la tabla 'contrato'
-		 * la revisión anterior arrojó que no se estaba realizando bien la comparación, 
+		 * la revisión anterior arrojó que no se estaba realizando bien la comparación,
 		 * es por esto que se crea la query para comparar datos antiguos con los nuevos.
 		 *
 		 */
 		if (array_key_exists('id_contrato', $parametros) && ! empty($parametros['id_contrato'])) {
 			$query = "SELECT * FROM contrato WHERE id_contrato = {$parametros['id_contrato']};";
 			$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		
+
 			foreach (mysql_fetch_object($result) as $key => $value){
 				$this->valor_antiguo[$key] = $value;
 			}
@@ -1227,7 +1227,7 @@ class Contrato extends Objeto {
 		} else if (array_key_exists('id_asunto', $parametros) && ! empty($parametros['id_asunto'])) {
 			$query = "SELECT C.* FROM asunto A INNER JOIN contrato C ON C.id_contrato = A.id_contrato WHERE A.id_asunto = {$parametros['id_asunto']};";
 			$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		
+
 			foreach (mysql_fetch_object($result) as $key => $value) {
 				$this->valor_antiguo[$key] = $value;
 			}
@@ -1319,6 +1319,7 @@ class Contrato extends Objeto {
 
 		if (Conf::GetConf($this->sesion, 'ExportacionLedes')) {
 			$this->Edit('exportacion_ledes', empty($this->extra_fields['exportacion_ledes']) ? '0' : '1');
+			$this->Edit('formato_ledes', empty($this->extra_fields['formato_ledes']) ? null : $this->extra_fields['formato_ledes']);
 		}
 
 		if (isset($this->extra_fields['factura_rut']) && $this->extra_fields['factura_rut'] != '') {

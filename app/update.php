@@ -10959,6 +10959,9 @@ QUERY;
 			$queries[] = "ALTER TABLE `tramite_historial` CHANGE `fecha_accion` `fecha_accion` DATETIME  NOT NULL;";
 			$queries[] = "ALTER TABLE `cobro_movimiento` CHANGE `fecha` `fecha` DATETIME  NOT NULL;";
 			break;
+		case 8.21:
+					$queries[] = "ALTER TABLE `contrato` ADD COLUMN `formato_ledes` VARCHAR(50) NULL";
+					$queries[] = "UPDATE `contrato` SET `formato_ledes` = 'serengeti' WHERE `exportacion_ledes` = 1";
 	}
 
 	if (!empty($queries)) {
@@ -10971,7 +10974,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.20;
+$max_update = 8.21;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

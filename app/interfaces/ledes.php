@@ -1,10 +1,20 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../app/classes/Ledes.php';
 
 $sesion = new Sesion('');
-$Ledes = new Ledes($sesion);
+$cobro = new Cobro($sesion);
+$contrato = new Contrato($sesion);
+$cobro->Load($id_cobro);
+$contrato->Load($cobro->fields['id_contrato']);
+
+if ($contrato->fields['formato_ledes'] == 'serengeti') {
+	$Ledes = new Serengeti($sesion);
+}
+
+if ($contrato->fields['formato_ledes'] == 'tymetrix') {
+	$Ledes = new TyMetrix($sesion);
+}
+
 $data =  $Ledes->ExportarCobrosLedes($id_cobro);
 
 header("Content-type: text");
