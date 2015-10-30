@@ -4,7 +4,14 @@ require_once dirname(__FILE__) . '/../conf.php';
 $Sesion = new Sesion(array('DAT'));
 $Pagina = new Pagina($Sesion);
 $Actividad = new Actividad($Sesion);
+$AreaProyecto = new AreaProyecto($Sesion);
+$PrmTipoProyecto = new PrmTipoProyecto($Sesion);
+
+$SelectHelper = new FormSelectHelper();
+$Form = new Form;
+
 $refresh_parent = false;
+
 if ($opcion == 'guardar') {
 	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 		$asunto = new Asunto($Sesion);
@@ -67,7 +74,6 @@ if ($Actividad->Loaded()) {
 }
 
 $Pagina->PrintTop($popup);
-$Form = new Form;
 
 if ($refresh_parent) {
 	$Form->Html->script_block('if (window.opener !== undefined && window.opener.Refrescar) {window.opener.Refrescar();}');
@@ -125,19 +131,24 @@ if ($refresh_parent) {
 	}
 </script>
 
-<form method="POST" action="#" name="form_actividades" id="form_actividades">
-	<input type="hidden"  name="opcion" id="opcion" value="guardar">
-	<input type="hidden" name="id_actividad" value="<?php echo $Actividad->fields['id_actividad']; ?>" />
-
+<?php
+echo $Form->create('form_actividades', array('method' => 'POST', 'action' => '#'));
+echo $Form->hidden('opcion', 'guardar', array('id' => 'opcion'));
+echo $Form->hidden('id_actividad', $Actividad->fields['id_actividad'], array('id' => 'id_actividad'));
+?>
 	<fieldset class="border_plomo tb_base">
-		<legend>Ingreso de Actividades</legend>
+		<legend><?php echo __('Ingreso de Actividades'); ?></legend>
 		<table style="border: 1px solid #BDBDBD;" class="" width="100%">
 			<tr>
 				<td align="right">
 					<?php echo __('Código'); ?>
 				</td>
 				<td align="left">
-					<input id="codigo_actividad" name="codigo_actividad" size="5" maxlength="5" value="<?php echo empty($codigo_actividad) ? $Actividad->fields['codigo_actividad'] : $codigo_actividad; ?>" />
+					<?php echo $Form->input(
+						'codigo_actividad',
+						empty($codigo_actividad) ? $Actividad->fields['codigo_actividad'] : $codigo_actividad,
+						array('size' => 5, 'maxlength' => 5, 'label' => false)
+					); ?>
 				</td>
 			</tr>
 			<tr>
@@ -145,7 +156,11 @@ if ($refresh_parent) {
 					<?php echo __('Título'); ?>
 				</td>
 				<td align="left">
-					<input id='glosa_actividad' name='glosa_actividad' size='35' value="<?php echo $Actividad->fields['glosa_actividad']; ?>" />
+					<?php echo $Form->input(
+						'glosa_actividad',
+						$Actividad->fields['glosa_actividad'],
+						array('size' => 35, 'label' => false)
+					); ?>
 				</td>
 			</tr>
 			<tr>
@@ -175,6 +190,18 @@ if ($refresh_parent) {
 					</td>
 				</tr>
 			<?php } ?>
+			<tr>
+				<td align="right"><?php echo __('Área') . ' ' . __('asunto'); ?></td>
+				<td align="left">
+					<?php echo $Form->select('id_area_proyecto', $AreaProyecto->Listar('ORDER BY orden ASC')); ?>
+				</td>
+			</tr>
+			<tr>
+				<td align="right"><?php echo __('Categoría') . ' ' . __('asunto'); ?></td>
+				<td align="left">
+					<?php echo $Form->select('id_tipo_proyecto', $PrmTipoProyecto->Listar('ORDER BY orden, glosa_tipo_proyecto ASC')); ?>
+				</td>
+			</tr>
 		</table>
 	</fieldset>
 	<br />
@@ -184,8 +211,7 @@ if ($refresh_parent) {
 		echo $Form->icon_button(__('Cancelar'), 'exit', array('onclick' => "window.close();"));
 		?>
 	</div>
-</form>
-
 <?php
+echo $Form->end();
 echo $Form->script();
 $Pagina->PrintBottom($popup);
