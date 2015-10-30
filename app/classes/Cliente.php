@@ -105,8 +105,8 @@ class Cliente extends Objeto {
 			)
 		),
 		array(
-			'field' => 'nombre_pais_grupo',
-			'title' => 'País Grupo',
+			'field' => 'nombre_pais',
+			'title' => 'País',
 			'extras' => array(
 				'width' => 20
 			)
@@ -724,6 +724,7 @@ class Cliente extends Objeto {
 			->add_select('contrato.direccion_contacto')
 			->add_select('contrato.forma_cobro')
 			->add_select('contrato.monto')
+			->add_select('prm_pais.nombre', 'nombre_pais')
 			->add_select('prm_cliente_referencia.glosa_cliente_referencia')
 			->add_select('tarifa.glosa_tarifa')
 			->add_select('contrato.id_moneda_monto')
@@ -744,6 +745,7 @@ class Cliente extends Objeto {
 			->add_left_join_with('usuario as usuario_secundario', 'contrato.id_usuario_secundario = usuario_secundario.id_usuario')
 			->add_left_join_with('tarifa', 'contrato.id_tarifa=tarifa.id_tarifa')
 			->add_left_join_with('cuenta_banco', 'contrato.id_cuenta = cuenta_banco.id_cuenta')
+			->add_left_join_with('prm_pais', 'contrato.id_pais = prm_pais.id_pais')
 			->add_ordering('cliente.glosa_cliente');
 		if (!empty($wheres)) {
 			$Criteria->add_restriction(CriteriaRestriction::and_clause($wheres));
