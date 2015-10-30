@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.25.3
+Friday 2015, October 30th
+* **Fix** [Opción tiempo en horas PDF Revisar Horas](https://github.com/LemontechSA/ttb/pull/1199)
+
 ## Hotfix 15.25.2
 Friday 2015, October 30th
 * **Fix** [Columna País en Excel Clientes](https://github.com/LemontechSA/ttb/pull/1198)
