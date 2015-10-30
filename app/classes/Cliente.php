@@ -724,7 +724,7 @@ class Cliente extends Objeto {
 			->add_select('contrato.direccion_contacto')
 			->add_select('contrato.forma_cobro')
 			->add_select('contrato.monto')
-			->add_select('prm_pais.nombre nombre_pais')
+			->add_select('prm_pais.nombre', 'nombre_pais')
 			->add_select('prm_cliente_referencia.glosa_cliente_referencia')
 			->add_select('tarifa.glosa_tarifa')
 			->add_select('contrato.id_moneda_monto')
