@@ -9,6 +9,8 @@ $pagina = new Pagina($sesion);
 if (isset($_POST['accion'])) {
 	$accion = $_POST['accion'];
 }
+$codigo_asunto = mysql_real_escape_string($codigo_asunto);
+$id = mysql_real_escape_string($id);
 
 switch ($accion) {
 
