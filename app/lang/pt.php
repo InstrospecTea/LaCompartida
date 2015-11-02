@@ -50,6 +50,10 @@ $_LANG['Ninguna'] = 'Nenhum';
 $_LANG['ninguna'] = 'nenhum';
 $_LANG['Filtros'] = 'Filtro';
 $_LANG['filtros'] = 'filtro';
+$_LANG['Adelanto'] = 'Adiantamento';
+$_LANG['Adelantos'] = 'Adiantamentos';
+$_LANG['adelanto'] = 'adiantamento';
+$_LANG['adelantos'] = 'adiantamentos';
 
 // Clientes
 $_LANG['Nombre Cliente'] = 'Nome do Cliente';

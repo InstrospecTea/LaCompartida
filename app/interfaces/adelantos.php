@@ -101,11 +101,11 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 		        var ukDatea = a.split('-');
 		        return (ukDatea[2] + ukDatea[1] + ukDatea[0]) * 1;
 		    },
-		 
+
 		    "date-asc": function ( a, b ) {
 		        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
 		    },
-		 
+
 		    "date-desc": function ( a, b ) {
 		        return ((a < b) ? 1 : ((a > b) ? -1 : 0));
 		    }
@@ -129,14 +129,14 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 					"aButtons": []
 				},
 				"oLanguage": {
-						"sProcessing": "Procesando...", 
+						"sProcessing": "Procesando...",
 						"sLengthMenu": "Mostrar _MENU_ registros",
-						"sZeroRecords": "No se encontraron resultados", "sInfo": 
+						"sZeroRecords": "No se encontraron resultados", "sInfo":
 						"Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
-						"sInfoEmpty": "Mostrando desde 0 hasta 0 de 0 registros", 
+						"sInfoEmpty": "Mostrando desde 0 hasta 0 de 0 registros",
 						"sInfoFiltered": "(filtrado de _MAX_ registros en total)",
-						"sInfoPostFix": "", "sSearch": 
-						"Filtrar:", "sUrl": "", 
+						"sInfoPostFix": "", "sSearch":
+						"Filtrar:", "sUrl": "",
 						"oPaginate": {"sPrevious": "Anterior", "sNext": "Siguiente"
 					}
 				},
@@ -318,13 +318,13 @@ $p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 	<table cellpadding="0" cellspacing="0" border="0" class="display" id="tablon" style="width:920px;display:none;">
 		<thead>
 			<tr class="encabezadolight">
-				<th>ID Adelanto</th>
-				<th width="200"><?php echo __('Cliente'); ?></th>
-				<th>Fecha</th>
-				<th width="250">Descripción<br><small>(<?php echo __('Asunto'); ?>)</small></th>
-				<th>Monto</th>
-				<th>Saldo</th>
-				<th width="60">Acciones</th>
+				<th>ID <?php echo __('Adelanto') ?></th>
+				<th width="200"><?php echo __('Cliente') ?></th>
+				<th><?php echo __('Fecha') ?></th>
+				<th width="250"><?php echo __('Descripción') ?><br><small>(<?php echo __('Asunto') ?>)</small></th>
+				<th><?php echo __('Monto') ?></th>
+				<th><?php echo __('Saldo') ?></th>
+				<th width="60"><?php echo __('Acciones') ?></th>
 				<th>idcobro</th>
 			</tr>
 		</thead>
