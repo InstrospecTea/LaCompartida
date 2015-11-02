@@ -113,16 +113,13 @@ jQuery(document).ready(function() {
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="diffs" style="width:920px;display:none;">
 	<thead>
 		<tr>
-
-			<th width="80px"><?php echo __('Cobro');?></th>
-			<th width="95px"><?php echo __('Fecha Emitido')?></th>
+			<th width="80px"><?php echo __('Cobro') ?></th>
+			<th width="95px"><?php echo __('Fecha Emitido') ?></th>
 			<th width="0px">idcontrato</th>
-			<th width="330px" style="overflow:hidden;">Cliente</th>
-			<th width="90px">$ Emitido</th>
-			<th width="90px">$ <?php echo __('Facturado')?></th>
-			<th width="85px"><?php echo __('Diferencia')?></th>
-
-
+			<th width="330px" style="overflow:hidden;"><?php echo __('Cliente') ?></th>
+			<th width="90px">$ <?php echo __('Emitido') ?></th>
+			<th width="90px">$ <?php echo __('Facturado') ?></th>
+			<th width="85px"><?php echo __('Diferencia') ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -130,17 +127,14 @@ jQuery(document).ready(function() {
 	</tbody>
 	<tfoot style="font-size:10px;">
 		<tr>
-
-			<th><?php echo __('Cobro');?></th>
-			<th ><?php echo __('Fecha Emitido')?></th>
-		    <th width="0px">idcontrato</th>
-		    <th >Cliente</th>
-			<th >$ Emitido</th>
-			<th width="90px">$ <?php echo __('Facturado')?></th>
-			<th width="90px"><?php echo __('Diferencia')?></th>
-
+			<th><?php echo __('Cobro') ?></th>
+			<th ><?php echo __('Fecha Emitido') ?></th>
+			<th width="0px">idcontrato</th>
+			<th><?php echo __('Cliente') ?></th>
+			<th>$ <?php echo __('Emitido') ?></th>
+			<th width="90px">$ <?php echo __('Facturado') ?></th>
+			<th width="90px"><?php echo __('Diferencia') ?></th>
 		</tr>
-
 	</tfoot>
 </table>
 
