@@ -38,7 +38,7 @@ class FacturaPago extends Objeto {
 			),
 			array(
 					'format' => 'date',
-					'title' => 'Fecha pago',
+					'title' => 'Fecha Pago',
 					'field' => 'fecha_pago',
 			),
 			array(
