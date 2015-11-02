@@ -21,11 +21,6 @@ if (Conf::GetConf($sesion, 'EsAmbientePrueba')) {
 	Debug::pr('Neteos borrados');
 
 	/* Query para borrar factura */
-	$query = "TRUNCATE TABLE  `cta_cte_fact_mvto_moneda`;";
-	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	echo 'Movimientos moneda borrados.<br>';
-
-	/* Query para borrar factura */
 	$query = "TRUNCATE TABLE  `cta_cte_fact_mvto`;";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	Debug::pr('Movimientos borrados');
