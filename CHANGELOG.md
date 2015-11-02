@@ -1,5 +1,21 @@
 # Changelog
 
+## Hotfix 15.25.4
+Friday 2015, October 30th
+* **Fix** [Selectores ordenados alfabeticamente](https://github.com/LemontechSA/ttb/pull/1200)
+
+## Hotfix 15.25.3
+Friday 2015, October 30th
+* **Fix** [Opción tiempo en horas PDF Revisar Horas](https://github.com/LemontechSA/ttb/pull/1199)
+
+## Hotfix 15.25.2
+Friday 2015, October 30th
+* **Fix** [Columna País en Excel Clientes](https://github.com/LemontechSA/ttb/pull/1198)
+
+## Hotfix 15.25.1
+Thursday 2015, October 29th
+* **Fix** [Corrección Reporte Ventas](https://github.com/LemontechSA/ttb/pull/1196)
+
 ## [Release 15.25.0](https://github.com/LemontechSA/ttb/pull/1195)
 Wednesday 2015, October 28th
 * **Feature** [Mejoras en reportes LloredaCamacho](https://github.com/LemontechSA/ttb/pull/1184)
