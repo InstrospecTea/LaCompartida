@@ -427,38 +427,11 @@ switch ($accion) {
 		break;
 
 	case "cargar_actividades":
-		$query = "SELECT codigo_actividad,glosa_actividad FROM actividad WHERE codigo_asunto = '$id' OR codigo_asunto IS NULL ORDER BY glosa_actividad";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
-		for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
-			if ($i > 0) {
-				echo('~');
-			}
-			echo(join('|', $fila));
-		}
-
-		if ($i == 0) {
-			echo('VACIO|');
-		}
-
+		echo cargarActividades($sesion, $id);
 		break;
 
 	case "cargar_actividades_activas":
-
-		$query = "SELECT codigo_actividad,glosa_actividad FROM actividad WHERE activo = '1' AND codigo_asunto = '$id' OR codigo_asunto IS NULL ORDER BY glosa_actividad";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-
-		for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
-			if ($i > 0) {
-				echo('~');
-			}
-			echo(join('|', $fila));
-		}
-
-		if ($i == 0) {
-			echo('VACIO|');
-		}
-
+		echo cargarActividades($sesion, $id, true);
 		break;
 
 	case 'cargar_cargos':
@@ -562,3 +535,63 @@ switch ($accion) {
 	default:
 		echo("ERROR");
 };
+
+function cargarActividades(Sesion $Sesion, $codigo_asunto, $activa = false) {
+	$retorno = '';
+	$and_clauses = array();
+	$Criteria = new Criteria($Sesion);
+	$Criteria
+		->add_select('id_area_proyecto')
+		->add_select('id_tipo_asunto')
+		->add_from('asunto')
+		->add_restriction(CriteriaRestriction::equals('codigo_asunto', "'$codigo_asunto'"));
+	$asunto = $Criteria->run();
+
+	if (!empty($asunto)) {
+		if (!empty($asunto[0]['id_area_proyecto'])) {
+			$and_clauses[] = CriteriaRestriction::equals('id_area_proyecto', "'{$asunto[0]['id_area_proyecto']}'");
+		} else {
+			$and_clauses[] = CriteriaRestriction::is_null('id_area_proyecto');
+		}
+		if (!empty($asunto[0]['id_tipo_asunto'])) {
+			$and_clauses[] = CriteriaRestriction::equals('id_tipo_proyecto', "'{$asunto[0]['id_tipo_asunto']}'");
+		} else {
+			$and_clauses[] = CriteriaRestriction::is_null('id_tipo_proyecto');
+		}
+	}
+
+	if ($activa == true) {
+		$and_clauses[] = CriteriaRestriction::equals('activo', 1);
+	}
+
+	$or_clauses = array(
+		CriteriaRestriction::equals('codigo_asunto', "'$codigo_asunto'"),
+		CriteriaRestriction::is_null('codigo_asunto')
+	);
+
+	$Criteria = new Criteria($Sesion);
+	$Criteria
+		->add_select('codigo_actividad')
+		->add_select('glosa_actividad')
+		->add_from('actividad')
+		->add_restriction(CriteriaRestriction::or_clause($or_clauses));
+
+	if (!empty($and_clauses)) {
+		$Criteria->add_restriction(CriteriaRestriction::and_clause($and_clauses));
+	}
+
+	$actividad = $Criteria->run();
+
+	if (!empty($actividad)) {
+		for($i = 0; $i < count($actividad); $i++) {
+			if ($i > 0) {
+				$retorno .= '~';
+			}
+			$retorno .= join('|', $actividad[$i]);
+		}
+	} else {
+		$retorno = 'VACIO|';
+	}
+
+	return utf8_encode($retorno);
+}
