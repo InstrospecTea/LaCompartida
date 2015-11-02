@@ -12,6 +12,12 @@ require_once dirname(__FILE__) . '/../conf.php';
 class TyMetrix extends Ledes{
 
 	/**
+	 * Número de decimales a mostrar
+	 * @var int
+	 */
+	protected $decimales = 2;
+
+	/**
 	 * TyMetrix constructor.
 	 * @param $Sesion
 	 */

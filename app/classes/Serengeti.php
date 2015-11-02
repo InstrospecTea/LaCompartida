@@ -10,6 +10,13 @@ require_once dirname(__FILE__) . '/../conf.php';
  * Adaptación para el formato LEDES de Serengeti
  */
 class Serengeti  extends Ledes{
+
+	/**
+	 * Número de decimales a mostrar, el oficial es 4 pero esta gente quiere 2...
+	 * @var int
+	 */
+	protected $decimales = 2;
+
 	/**
 	 * Serengeti constructor.
 	 * @param $Sesion

@@ -5,9 +5,10 @@ require_once dirname(__FILE__) . '/../conf.php';
 class Ledes extends Objeto {
 
 	/**
-	 * numero de decimales a mostrar, el oficial es 4 pero esta gente quiere 2...
+	 * Número de decimales a mostrar.
+	 * @var int
 	 */
-	protected $decimales = 2;
+	protected $decimales = 4;
 
 	/**
 	 * @param $Sesion
@@ -612,6 +613,22 @@ class Ledes extends Objeto {
 			$n *= 10;
 		}
 		return floatval(round($numero * $n)) / $n;
+	}
+
+	/**
+	 * Obtiene los decimales predeterminados
+	 * @return mixed
+	 */
+	public function getDecimales() {
+		return $this->decimales;
+	}
+
+	/**
+	 * Establece los decimales a utilizar
+	 * @param mixed $decimales
+	 */
+	public function setDecimales($decimales) {
+		$this->decimales = $decimales;
 	}
 
 
