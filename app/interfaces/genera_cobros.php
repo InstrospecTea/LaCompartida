@@ -73,7 +73,7 @@ if ($opc == 'asuntos_liquidar') {
 
 	###### BUSCADOR ######
 	$CobroQuery = new CobroQuery($sesion);
-	$query = $CobroQuery->genera_cobros($_POST);
+	$query = $CobroQuery->genera_cobros(($_POST['opc'] == 'buscar') ? $_POST : $_GET);
 	$x_pag = 20;
 	$orden = 'cliente.glosa_cliente, asunto_lista';
 	$b = new Buscador($sesion, $query, "Contrato", $desde, $x_pag, $orden);
