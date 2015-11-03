@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 15.25.7
+Tuesday 2015, November 3rd
+* **Fix** [Corregir despliegue de usuarios segun perfil](https://github.com/LemontechSA/ttb/pull/1206)
+
+## Hotfix 15.25.6
+Tuesday 2015, November 3rd
+* **Fix** [Se añade escape a variables](https://github.com/LemontechSA/ttb/pull/1205)
+
+## Hotfix 15.25.5
+Friday 2015, October 30th
+* **Fix** [Corrección a selector de países](https://github.com/LemontechSA/ttb/pull/1202)
+
 ## Hotfix 15.25.4
 Friday 2015, October 30th
 * **Fix** [Selectores ordenados alfabeticamente](https://github.com/LemontechSA/ttb/pull/1200)
