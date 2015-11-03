@@ -1125,6 +1125,7 @@ if (!$popup) {
 									echo $Form->icon_button(__('Excel'), 'xls', array('name' => 'excel', 'id' => 'excel', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'excel');", 'class' => 'submit_buttons', 'rel' => 'excel'));
 									echo $Form->icon_button(__('Dispersión'), 'icon-chart', array('name' => 'dispersion', 'id' => 'dispersion', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'dispersion');", 'class' => 'submit_buttons', 'rel' => 'dispersion'));
 									echo $Form->icon_button(__('Tabla'), 'icon-table', array('name' => 'tabla', 'id' => 'tabla', 'title' => 'Genera un Documento Excel con una tabla cruzada.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'tabla');", 'class' => 'submit_buttons', 'rel' => 'tabla'));
+									echo $Form->icon_button(__('Barras'), 'icon-bar', array('name' => 'barras', 'id' => 'barras', 'title' => 'Despliega un Gr·fico de Barras, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'barra');", 'class' => 'submit_buttons', 'rel' => 'barras'));
 									echo $Form->icon_button(__('Gráfico Torta'), 'pie-chart', array('name' => 'circular', 'id' => 'circular', 'title' => 'Despliega un Gráfico de Torta, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'circular');", 'class' => 'submit_buttons', 'rel' => 'torta'));
 									echo $Form->script();
 									?>
