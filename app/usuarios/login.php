@@ -17,11 +17,11 @@ if (isset($ldap_user)){
 }
 
 if($desde == 'sitio' && Conf::GetConf($sesion, 'LoginDesdeSitio')) {
-	$email = mysql_escape_string($email);
-	$nombre = mysql_escape_string($nombre);
-	$empresa = mysql_escape_string($empresa);
-	$telefono = mysql_escape_string($telefono);
-	$pais = mysql_escape_string($pais);
+	$email = mysql_real_escape_string($email);
+	$nombre = mysql_real_escape_string($nombre);
+	$empresa = mysql_real_escape_string($empresa);
+	$telefono = mysql_real_escape_string($telefono);
+	$pais = mysql_real_escape_string($pais);
 
 	$query = "SELECT id_visitante, email, rut, nombre, apellido1, apellido2, empresa, telefono, cont_visitas
 						FROM visitante WHERE email = '" . $email . "'";
@@ -33,10 +33,10 @@ if($desde == 'sitio' && Conf::GetConf($sesion, 'LoginDesdeSitio')) {
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($id_visitante) = mysql_fetch_array($resp);
 		$id_visitante++;
-		$rut = mysql_escape_string(sprintf('%18d', $cont));
+		$rut = mysql_real_escape_string(sprintf('%18d', $cont));
 		$apellidos = explode(' ', $apellido);
-		$apellido1 = mysql_escape_string($apellidos[0]);
-		$apellido2 = mysql_escape_string($apellidos[1]);
+		$apellido1 = mysql_real_escape_string($apellidos[0]);
+		$apellido2 = mysql_real_escape_string($apellidos[1]);
 		$query = "INSERT INTO visitante( id_visitante, email, rut, nombre, apellido1, apellido2, empresa, telefono, pais )
 							VALUES(" . $id_visitante . ", '" . $email . "', " . $rut . ", '" . $nombre . "', '" . $apellido1 . "', '" . $apellido2 . "', '" . $empresa . "', '" . $telefono . "', '" . $pais . "')";
 		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -108,9 +108,9 @@ if($infix) {
 	$password = base64_decode($password);
 }
 
-$rut = mysql_escape_string($rut);
-$dvrut = mysql_escape_string($dvrut);
-$password = mysql_escape_string($password);
+$rut = mysql_real_escape_string($rut);
+$dvrut = mysql_real_escape_string($dvrut);
+$password = mysql_real_escape_string($password);
 
 if($desde == 'sitio' && (UtilesApp::GetConf($sesion, 'LoginDesdeSitio'))) {
 	$sesion->Login($rut, '', '12345', $recordar, $desde, $use_ad);

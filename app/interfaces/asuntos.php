@@ -289,13 +289,13 @@ if ($buscar || $opc == "entregar_asunto") {
 
 	if ($codigo_asunto != '' || $codigo_asunto_secundario != '') {
 		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-			$where .= " AND a1.codigo_asunto_secundario Like '" . mysql_escape_string($codigo_asunto_secundario) . "%'";
+			$where .= " AND a1.codigo_asunto_secundario Like '" . mysql_real_escape_string($codigo_asunto_secundario) . "%'";
 		} else {
-			$where .= " AND a1.codigo_asunto Like '" . mysql_escape_string($codigo_asunto) . "%'";
+			$where .= " AND a1.codigo_asunto Like '" . mysql_real_escape_string($codigo_asunto) . "%'";
 		}
 	} else if ($glosa_asunto != '') {
 		$nombre = strtr($glosa_asunto, ' ', '%');
-		$where .= " AND a1.glosa_asunto Like '%{" . mysql_escape_string($glosa_asunto) . "}%'";
+		$where .= " AND a1.glosa_asunto Like '%{" . mysql_real_escape_string($glosa_asunto) . "}%'";
 	}
 
 	if (!empty($codigo_cliente_secundario) && $usocodigosecundario == true) {
@@ -307,12 +307,12 @@ if ($buscar || $opc == "entregar_asunto") {
 
 	if ($opc == "entregar_asunto") {
 		if ($id_contrato) {
-			$where .= " AND (a1.codigo_cliente = '" . mysql_escape_string($codigo_cliente) . "' OR a1.id_contrato='$id_contrato') ";
+			$where .= " AND (a1.codigo_cliente = '" . mysql_real_escape_string($codigo_cliente) . "' OR a1.id_contrato='$id_contrato') ";
 		} else {
-			$where .= " AND a1.codigo_cliente = '" . mysql_escape_string($codigo_cliente) . "' ";
+			$where .= " AND a1.codigo_cliente = '" . mysql_real_escape_string($codigo_cliente) . "' ";
 		}
 	} else if ($codigo_cliente) {
-		$where .= " AND cliente.codigo_cliente = '" . mysql_escape_string($codigo_cliente) . "' ";
+		$where .= " AND cliente.codigo_cliente = '" . mysql_real_escape_string($codigo_cliente) . "' ";
 	}
 
 	if ($motivo == "cobros") {
