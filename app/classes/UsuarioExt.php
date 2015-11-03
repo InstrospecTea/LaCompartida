@@ -1059,13 +1059,16 @@ class UsuarioExt extends Usuario {
 			}
 		}
 
-		if (($permiso_revisor || $permiso_secretaria) && sizeof($clauses) > 0) {
+		if (!empty($clauses)) {
 			$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
+		} else {
+			if (!$permiso_revisor && !$permiso_secretaria && $this->sesion->usuario->fields['rut'] != '99511620') {
+				$criteria->add_restriction(CriteriaRestriction::equals('U.id_usuario', $this->sesion->usuario->fields['id_usuario']));
+			}
 		}
 
 		try {
 			$respuesta = new stdClass();
-			$respuesta->todos = sizeof($rows) > 0 ? false : 'Todos';
 
 			$result = $criteria->run();
 			$rows = array();

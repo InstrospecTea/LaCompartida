@@ -99,7 +99,7 @@ if ($cobro) {
 $usuario = new UsuarioExt($sesion);
 $usuarios_object = $usuario->get_usuarios_horas($p_revisor, $p_secretaria);
 
-$select_usuario = $Form->select('id_usuario', $usuarios_object->rows, $id_usuario, array('empty' => $usuarios_object->todos, 'style' => 'width: 200px'));
+$select_usuario = $Form->select('id_usuario', $usuarios_object->rows, $id_usuario, array('empty' => __('Todos'), 'style' => 'width: 200px'));
 
 if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	$where = base64_decode($where);
@@ -110,9 +110,27 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	}
 	if (is_numeric((int) $id_usuario) && ((int) $id_usuario) > 0) {
 		$where .= " AND trabajo.id_usuario= " . $id_usuario;
-	} else if (!$p_revisor) {
-		// Se buscan trabajos de los usuarios a los que se puede revisar.
-		$where .= " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields['id_usuario'] . ") OR usuario.id_usuario=" . $sesion->usuario->fields['id_usuario'] . ") ";
+	} else {
+		if ($p_revisor) {
+			// Se buscan trabajos de los usuarios a los que se puede revisar.
+			$where .= " AND (
+				IF ((SELECT count(*) FROM usuario_revisor WHERE id_revisor = {$sesion->usuario->fields['id_usuario']}) > 0,
+					trabajo.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor = {$sesion->usuario->fields['id_usuario']}),
+					1)
+			)";
+		}
+
+		if ($p_secretaria) {
+			$where .= " AND (
+				IF ((SELECT count(*) FROM usuario_secretario WHERE id_secretario = {$sesion->usuario->fields['id_usuario']}) > 0,
+					trabajo.id_usuario IN (SELECT id_profesional FROM usuario_secretario WHERE id_secretario = {$sesion->usuario->fields['id_usuario']}),
+					1)
+			)";
+		}
+
+		if (!$p_revisor && !$p_secretaria && $sesion->usuario->fields['rut'] != '99511620') {
+			$where .= " AND trabajo.id_usuario = {$sesion->usuario->fields['id_usuario']} ";
+		}
 	}
 
 	if ($revisado == 'NO') {
