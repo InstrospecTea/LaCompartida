@@ -142,13 +142,13 @@ function acciones(& $fila) {
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		jQuery("#agregar_actividad").click(function() {
-			nuovaFinestra('Agregar_Actividad', 670, 325, 'agregar_actividades.php?popup=1');
+			nuovaFinestra('Agregar_Actividad', 670, 350, 'agregar_actividades.php?popup=1');
 		});
 	});
 
 	function EditarActividad(id) {
 		var url = 'agregar_actividades.php?id_actividad=' + id + '&popup=1';
-		return nuovaFinestra('Editar_Actividad', 670, 325, url);
+		return nuovaFinestra('Editar_Actividad', 670, 350, url);
 	}
 
 	function EliminarActividad(id) {

@@ -172,17 +172,19 @@ echo $Form->hidden('id_actividad', $Actividad->fields['id_actividad'], array('id
 					<?php UtilesApp::CampoAsunto($Sesion, $Actividad->extra_fields['codigo_cliente'], $codigo_cliente_secundario, $Actividad->fields['codigo_asunto'], $codigo_asunto_secundario); ?>
 				</td>
 			</tr>
-			<?php if ($Actividad->Loaded()) { ?>
-				<tr>
-					<td align="right"><label for="activo"><?php echo __('Activa'); ?></label></td>
-					<td style="text-align:left">
-						<?php
-						$activo = ($Actividad->fields['activo'] == 1);
-						echo $Form->checkbox('activo', 1, $activo, array('id' => 'activo', 'title' => 'Al inactivar no sera listada en ingreso de horas', 'label' => false));
-						?>
-					</td>
-				</tr>
-			<?php } ?>
+			<tr>
+				<td align="right"><label for="activo"><?php echo __('Activa'); ?></label></td>
+				<td style="text-align:left">
+					<?php
+					$activo = true;
+					if ($Actividad->Loaded()) {
+						$activo = $Actividad->fields['activo'] == '1' ? true : false;
+					}
+
+					echo $Form->checkbox('activo', 1, $activo, array('id' => 'activo', 'title' => 'Al inactivar no sera listada en ingreso de horas', 'label' => false));
+					?>
+				</td>
+			</tr>
 			<tr>
 				<td align="right"><?php echo __('Área') . ' ' . __('asunto'); ?></td>
 				<td align="left">
