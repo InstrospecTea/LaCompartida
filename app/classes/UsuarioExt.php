@@ -1077,6 +1077,7 @@ class UsuarioExt extends Usuario {
 				$rows[$value['id_usuario']] = $value['nombre'];
 			}
 
+			$respuesta->todos = sizeof($rows) == 1 ? false : __('Todos');
 			$respuesta->rows = $rows;
 
 			return $respuesta;
