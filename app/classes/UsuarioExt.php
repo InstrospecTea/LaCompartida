@@ -1011,7 +1011,7 @@ class UsuarioExt extends Usuario {
 	 *
 	 * @return stdClass rows contiene un arreglo con los usuarios según la query previa, todos retorna false | 'Todos'
 	 */
-	public function get_usuarios_horas($permiso_revisor, $permiso_secretaria) {
+	public function get_usuarios_horas($permiso_revisor) {
 		$criteria = new Criteria($this->sesion);
 		$criteria->add_select('U.id_usuario')
 				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
@@ -1041,28 +1041,10 @@ class UsuarioExt extends Usuario {
 			}
 		}
 
-		if ($permiso_secretaria) {
-			$secretario = new Criteria($this->sesion);
-			$secretario->add_select('id_profesional')
-					->add_from('usuario_secretario')
-					->add_restriction(CriteriaRestriction::equals('id_secretario', $this->sesion->usuario->fields['id_usuario']));
-			$result = $secretario->run();
-
-			$rows = array();
-			foreach ($result as $revisado) {
-				$rows[] = $revisado['id_profesional'];
-			}
-
-			if (sizeof($rows) > 0) {
-				$clauses[] = CriteriaRestriction::equals('U.id_usuario', $this->sesion->usuario->fields['id_usuario']);
-				$clauses[] = CriteriaRestriction::in('U.id_usuario', $rows);
-			}
-		}
-
 		if (!empty($clauses)) {
 			$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
 		} else {
-			if (!$permiso_revisor && !$permiso_secretaria && $this->sesion->usuario->fields['rut'] != '99511620') {
+			if (!$permiso_revisor && $this->sesion->usuario->fields['rut'] != '99511620') {
 				$criteria->add_restriction(CriteriaRestriction::equals('U.id_usuario', $this->sesion->usuario->fields['id_usuario']));
 			}
 		}
