@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.25.7
+Tuesday 2015, November 3rd
+* **Fix** [Corregir despliegue de usuarios segun perfil](https://github.com/LemontechSA/ttb/pull/1206)
+
 ## Hotfix 15.25.6
 Tuesday 2015, November 3rd
 * **Fix** [Se añade escape a variables](https://github.com/LemontechSA/ttb/pull/1205)
