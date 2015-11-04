@@ -209,6 +209,7 @@ if ($opcion == 'guardar') {
 		$Asunto->Edit("alerta_monto", $asunto_alerta_monto);
 		$Asunto->Edit("limite_hh", $asunto_limite_hh);
 		$Asunto->Edit("limite_monto", $asunto_limite_monto);
+		$cobro_pendiente = false;
 
 		if ($cobro_independiente) {
 			// CONTRATO
@@ -317,40 +318,54 @@ if ($opcion == 'guardar') {
 				$Pagina->AddError($contrato->error);
 			}
 		} else {
-			$Contrato_indep = $Asunto->fields['id_contrato_indep'];
-			$Asunto->Edit("id_contrato", $Cliente->fields['id_contrato']);
-			$Asunto->Edit("id_contrato_indep", null);
-		}
+			$criteria = new Criteria($Sesion);
+			$criteria->add_select('COUNT(*)', 'total')
+				->add_from('cobro_pendiente')
+				->add_restriction(CriteriaRestriction::equals('id_contrato', $Asunto->fields['id_contrato']));
 
-		$existeCodigoAsuntoSecundario = false;
-		if (!$Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
-			$existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundario($Asunto->fields['codigo_asunto_secundario']);
-		} else if ($Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
-			$existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundarioParaOtroIdAsunto($Asunto->fields['codigo_asunto_secundario'], $Asunto->fields['id_asunto']);
-		}
+			$result = $criteria->run();
+			$cobro_pendiente = ($result[0]['total'] > 0) ? true : false;
 
-		if ($existeCodigoAsuntoSecundario) {
-			$Pagina->AddError(sprintf(__("El código de %s secundario ingresado ya está siendo utilizado por otro %s"), __('asunto'), __('asunto')));
-		} else {
-			if ($Asunto->Write()) {
-				$Asunto->writeAreaDetails($id_desglose_area);
-				$Asunto->writeEconomicActivities($id_asunto_giro);
-				$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
-
-				if ($Asunto->fields['id_contrato_indep'] === null && isset($Contrato_indep)) {
-					$ContratoObj = new Contrato($Sesion);
-					$ContratoObj->Load($Contrato_indep);
-					$ContratoObj->Eliminar();
-				}
+			if ($cobro_pendiente) {
+				$Pagina->AddError(__('El') . ' ' . __('contrato') . ' ' . __('tiene cobros programados configurados, no se puede desvincular del') . ' ' . __('asunto') . ' ' . __('hasta que quite los cobros programados.'));
 			} else {
-				$Pagina->AddError($Asunto->error);
+				$Contrato_indep = $Asunto->fields['id_contrato_indep'];
+				$Asunto->Edit("id_contrato", $Cliente->fields['id_contrato']);
+				$Asunto->Edit("id_contrato_indep", null);
 			}
 		}
 
-		$MailAsuntoNuevo = Conf::GetConf($Sesion, 'MailAsuntoNuevo');
+		if (!$cobro_pendiente) {
+			$existeCodigoAsuntoSecundario = false;
+			if (!$Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
+				$existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundario($Asunto->fields['codigo_asunto_secundario']);
+			} else if ($Asunto->Loaded() && $Asunto->fields['codigo_asunto_secundario']) {
+				$existeCodigoAsuntoSecundario = $Asunto->existeCodigoAsuntoSecundarioParaOtroIdAsunto($Asunto->fields['codigo_asunto_secundario'], $Asunto->fields['id_asunto']);
+			}
 
-		if ($enviar_mail && $MailAsuntoNuevo) {
-			EnviarEmail($Asunto);
+			if ($existeCodigoAsuntoSecundario) {
+				$Pagina->AddError(sprintf(__("El código de %s secundario ingresado ya está siendo utilizado por otro %s"), __('asunto'), __('asunto')));
+			} else {
+				if ($Asunto->Write()) {
+					$Asunto->writeAreaDetails($id_desglose_area);
+					$Asunto->writeEconomicActivities($id_asunto_giro);
+					$Pagina->AddInfo(__('Asunto') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
+
+					if ($Asunto->fields['id_contrato_indep'] === null && isset($Contrato_indep)) {
+						$ContratoObj = new Contrato($Sesion);
+						$ContratoObj->Load($Contrato_indep);
+						$ContratoObj->Eliminar();
+					}
+				} else {
+					$Pagina->AddError($Asunto->error);
+				}
+			}
+
+			$MailAsuntoNuevo = Conf::GetConf($Sesion, 'MailAsuntoNuevo');
+
+			if ($enviar_mail && $MailAsuntoNuevo) {
+				EnviarEmail($Asunto);
+			}
 		}
 	}
 
