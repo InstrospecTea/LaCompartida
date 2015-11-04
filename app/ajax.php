@@ -576,7 +576,7 @@ function cargarActividades(Sesion $Sesion, $codigo_asunto, $activa = false) {
 		$and_clauses[] = CriteriaRestriction::and_clause($and_area_tipo_proyecto);
 	}
 
-	if ($activa == false) {
+	if ($activa == true) {
 		$and_clauses[] = CriteriaRestriction::and_clause(CriteriaRestriction::equals('activo', 1));
 	}
 
