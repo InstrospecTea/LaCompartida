@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.25.11
+Wednesday 2015, November 4th
+* **Fix** [Error al agregar asunto](https://github.com/LemontechSA/ttb/pull/1210)
+
 ## Hotfix 15.25.10
 Wednesday 2015, November 4th
 * **Fix** [Error al actualizar tarifa](https://github.com/LemontechSA/ttb/pull/1209)
