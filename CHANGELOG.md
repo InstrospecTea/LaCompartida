@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.25.8
+Wednesday 2015, November 4th
+* **Fix** [Limpiar saltos de línea en query](https://github.com/LemontechSA/ttb/pull/1207)
+
 ## Hotfix 15.25.7
 Tuesday 2015, November 3rd
 * **Fix** [Corregir despliegue de usuarios segun perfil](https://github.com/LemontechSA/ttb/pull/1206)
