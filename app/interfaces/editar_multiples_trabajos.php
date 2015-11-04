@@ -19,29 +19,30 @@
 	$permiso_profesional = $sesion->usuario->Es('PRO');
 
 	if($listado) {
-		$where_query_listado_completo = mysql_real_escape_string(base64_decode($listado));
+		$where_query_listado_completo = preg_replace("/\r\n|\r|\n/", '', base64_decode($listado));
+		$where_query_listado_completo = mysql_real_escape_string($where_query_listado_completo);
 		$where_query_listado_completo = str_replace("\'","'",$where_query_listado_completo);
 		$where_query_listado_completo = str_replace(";","",$where_query_listado_completo);
 		$where_query_listado_completo = ereg_replace("[dD][rR][oO][pP]","",$where_query_listado_completo);
 		$where_query_listado_completo = ereg_replace("[dD][eE][lL][eE][tT][eE]","",$where_query_listado_completo);
 		$where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][bB][lL][eE]","",$where_query_listado_completo);
-		if($where_query_listado_completo)
-		{
+		$where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][bB][lL][eE]","",$where_query_listado_completo);
+
+		if($where_query_listado_completo) {
 			$query_listado_completo = "SELECT trabajo.id_trabajo
-																			 FROM trabajo
-																			 JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
-																			 LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
-																			 LEFT JOIN cliente ON cliente.codigo_cliente=asunto.codigo_cliente
-																			 LEFT JOIN cobro ON cobro.id_cobro=trabajo.id_cobro
-																			 LEFT JOIN contrato ON asunto.id_contrato=contrato.id_contrato
-																			 LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-																			WHERE $where_query_listado_completo";
+																	FROM trabajo
+																	JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
+																	LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
+																	LEFT JOIN cliente ON cliente.codigo_cliente=asunto.codigo_cliente
+																	LEFT JOIN cobro ON cobro.id_cobro=trabajo.id_cobro
+																	LEFT JOIN contrato ON asunto.id_contrato=contrato.id_contrato
+																	LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
+																	WHERE $where_query_listado_completo";
 
 			//$query = mcrypt_decrypt(MCRYPT_CRYPT,Conf::Hash(),$listado_completo,MCRYPT_ENCRYPT);
 			$resp = mysql_query($query_listado_completo, $sesion->dbh) or Utiles::errorSQL($query_listado_completo,__FILE__,__LINE__,$sesion->dbh);
 			$ids="";
-			while($trabajo_temporal_query=mysql_fetch_array($resp))
-			{
+			while($trabajo_temporal_query=mysql_fetch_array($resp)) {
 				$ids.="t".$trabajo_temporal_query['id_trabajo'];
 			}
 		}
