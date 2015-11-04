@@ -1448,7 +1448,7 @@ if (!class_exists('Cobro')) {
 					if (isset($tarifa_cache[$cache_key])) {
 						$valor = $tarifa_cache[$cache_key];
 					} else {
-						$valor = Funciones::TarifaDefecto($this->sesion, $id_usuario, $trabajo->fields['id_moneda']);
+						$valor = Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $trabajo->fields['id_moneda']);
 						$tarifa_cache[$cache_key] = $valor;
 					}
 					$valor_estandar = $valor;
