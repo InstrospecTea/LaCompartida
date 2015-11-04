@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.25.9
+Wednesday 2015, November 4th
+* **Fix** [Error al guardar contrato](https://github.com/LemontechSA/ttb/pull/1208)
+
 ## Hotfix 15.25.8
 Wednesday 2015, November 4th
 * **Fix** [Limpiar saltos de línea en query](https://github.com/LemontechSA/ttb/pull/1207)
