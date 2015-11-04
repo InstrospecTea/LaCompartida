@@ -318,13 +318,15 @@ if ($opcion == 'guardar') {
 				$Pagina->AddError($contrato->error);
 			}
 		} else {
-			$criteria = new Criteria($Sesion);
-			$criteria->add_select('COUNT(*)', 'total')
-				->add_from('cobro_pendiente')
-				->add_restriction(CriteriaRestriction::equals('id_contrato', $Asunto->fields['id_contrato']));
+			if ($Asunto->fields['id_contrato'] > 0) {
+				$criteria = new Criteria($Sesion);
+				$criteria->add_select('COUNT(*)', 'total')
+					->add_from('cobro_pendiente')
+					->add_restriction(CriteriaRestriction::equals('id_contrato', $Asunto->fields['id_contrato']));
 
-			$result = $criteria->run();
-			$cobro_pendiente = ($result[0]['total'] > 0) ? true : false;
+				$result = $criteria->run();
+				$cobro_pendiente = ($result[0]['total'] > 0) ? true : false;
+			}
 
 			if ($cobro_pendiente) {
 				$Pagina->AddError(__('El') . ' ' . __('contrato') . ' ' . __('tiene cobros programados configurados, no se puede desvincular del') . ' ' . __('asunto') . ' ' . __('hasta que quite los cobros programados.'));
