@@ -2,7 +2,7 @@
 
 ## Hotfix 15.26.2
 Thursday 2015, November 5th
-* **Fix** [Error SQL - Editar solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/)
+* **Fix** [Error SQL - Editar solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/1215)
 
 ## Hotfix 15.26.1
 Thursday 2015, November 5th
