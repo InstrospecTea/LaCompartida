@@ -17,6 +17,13 @@ class Html extends \Html {
 		return $this->tag('div', $text, $attrs);
 	}
 
+	public function form(array $attrs = array(), $closed = false) {
+		$attrs = $this->attributes($attrs);
+		$html = !$closed ? sprintf("<form%s>\n", $attrs) : "</form>\n";
+
+		return $html;
+	}
+
 	/**
 	 * Construye un tag html
 	 * @param string $tag
@@ -31,9 +38,9 @@ class Html extends \Html {
 		$attributes = $this->attributes($attributes);
 
 		if ($closed) {
-			$html = sprintf('<%s%s />', $tag, $attributes);
+			$html = sprintf("<%s%s />\n", $tag, $attributes);
 		} else {
-			$html = sprintf('<%s%s>%s</%s>', $tag, $attributes, $content, $tag);
+			$html = sprintf("<%s%s>%s</%s>\n", $tag, $attributes, $content, $tag);
 		}
 
 		return $html;
