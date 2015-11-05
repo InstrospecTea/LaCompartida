@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.26.2
+Thursday 2015, November 5th
+* **Fix** [Error SQL - Editar solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/1215)
+
 ## Hotfix 15.26.1
 Thursday 2015, November 5th
 * **Fix** [Eliminar salto de linea al crear input con helper Form](https://github.com/LemontechSA/ttb/pull/1212)
