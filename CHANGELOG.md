@@ -1,5 +1,21 @@
 # Changelog
 
+## Hotfix 15.26.1
+Thursday 2015, November 5th
+* **Fix** [Eliminar salto de linea al crear input con helper Form](https://github.com/LemontechSA/ttb/pull/1212)
+
+## [Release 15.26.0](https://github.com/LemontechSA/ttb/pull/1211)
+Wednesday 2015, November 4th
+* **Feature** [Agrupar actividades](https://github.com/LemontechSA/ttb/pull/1204)
+
+## Hotfix 15.25.11
+Wednesday 2015, November 4th
+* **Fix** [Error al agregar asunto](https://github.com/LemontechSA/ttb/pull/1210)
+
+## Hotfix 15.25.10
+Wednesday 2015, November 4th
+* **Fix** [Error al actualizar tarifa](https://github.com/LemontechSA/ttb/pull/1209)
+
 ## Hotfix 15.25.9
 Wednesday 2015, November 4th
 * **Fix** [Error al guardar contrato](https://github.com/LemontechSA/ttb/pull/1208)
