@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.26.1
+Thursday 2015, November 5th
+* **Fix** [Eliminar salto de linea al crear input con helper Form](https://github.com/LemontechSA/ttb/pull/1212)
+
 ## [Release 15.26.0](https://github.com/LemontechSA/ttb/pull/1211)
 Wednesday 2015, November 4th
 * **Feature** [Agrupar actividades](https://github.com/LemontechSA/ttb/pull/1204)
