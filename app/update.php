@@ -10959,6 +10959,23 @@ QUERY;
 			$queries[] = "ALTER TABLE `tramite_historial` CHANGE `fecha_accion` `fecha_accion` DATETIME  NOT NULL;";
 			$queries[] = "ALTER TABLE `cobro_movimiento` CHANGE `fecha` `fecha` DATETIME  NOT NULL;";
 			break;
+		case 8.21:
+			$queries[] = "ALTER TABLE `actividad`
+				ADD COLUMN `id_area_proyecto` INT(11) DEFAULT NULL,
+				ADD COLUMN `id_tipo_proyecto` INT(11) DEFAULT NULL,
+				ADD INDEX id_area_proyecto (`id_area_proyecto`),
+				ADD INDEX id_tipo_proyecto (`id_tipo_proyecto`),
+				ADD CONSTRAINT `actividad_fk_area_proyecto`
+					FOREIGN KEY (id_area_proyecto)
+					REFERENCES `prm_area_proyecto` (id_area_proyecto)
+					ON DELETE SET NULL
+					ON UPDATE CASCADE,
+				ADD CONSTRAINT `actividad_fk_tipo_proyecto`
+					FOREIGN KEY (id_tipo_proyecto)
+					REFERENCES `prm_tipo_proyecto` (id_tipo_proyecto)
+					ON DELETE SET NULL
+					ON UPDATE CASCADE;";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10971,7 +10988,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.20;
+$max_update = 8.21;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

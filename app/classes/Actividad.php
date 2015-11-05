@@ -11,7 +11,9 @@ class Actividad extends Objeto {
 		'id_actividad',
 		'codigo_actividad',
 		'glosa_actividad',
-		'codigo_asunto'
+		'codigo_asunto',
+		'id_area_proyecto',
+		'id_tipo_proyecto'
 	);
 
 	/*
