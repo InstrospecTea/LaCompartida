@@ -38,9 +38,9 @@ class Html extends \Html {
 		$attributes = $this->attributes($attributes);
 
 		if ($closed) {
-			$html = sprintf("<%s%s />\n", $tag, $attributes);
+			$html = sprintf('<%s%s />', $tag, $attributes);
 		} else {
-			$html = sprintf("<%s%s>%s</%s>\n", $tag, $attributes, $content, $tag);
+			$html = sprintf('<%s%s>%s</%s>', $tag, $attributes, $content, $tag);
 		}
 
 		return $html;
