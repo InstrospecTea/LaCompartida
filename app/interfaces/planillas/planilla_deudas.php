@@ -75,7 +75,7 @@ $Pagina->PrintTop();
 								<?php echo __('Encargado Comercial') ?>
 							</td>
 							<td align='left' colspan="2"><!-- Nuevo Select -->
-						        <?php echo $Form->select('id_encargado_comercial', UsuarioExt::QueryComerciales($sesion), $id_encargado_comercial, array('empty' => 'Ninguno', 'style' => 'width:100px;')); ?>
+						        <?php echo $Form->select('id_encargado_comercial', UsuarioExt::QueryComerciales($sesion), $id_encargado_comercial, array('empty' => __('Ninguno'), 'style' => 'width:100px;')); ?>
 							</td>
 						</tr>
 

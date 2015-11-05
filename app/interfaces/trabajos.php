@@ -616,7 +616,7 @@ $pagina->PrintTop($popup);
 						<?php echo __('Grupo Cliente')?>
 					</td>
 					<td align="left">
-						<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo", $id_grupo, "", "Ninguno","width=100px")  ?>
+						<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo", $id_grupo, "", __("Ninguno"),"width=100px")  ?>
 					</td>
 				</tr>
 
@@ -625,7 +625,7 @@ $pagina->PrintTop($popup);
 						<?php echo __('Encargado Comercial') ?>
 					</td>
 					<td align='left' colspan="2"><!-- Nuevo Select -->
-						<?php echo $Form->select('id_encargado_comercial', $sesion->usuario->ListarActivos('', 'SOC'), $id_encargado_comercial, array('empty' => 'Ninguno', 'style' => 'width: 100px')); ?>
+						<?php echo $Form->select('id_encargado_comercial', $sesion->usuario->ListarActivos('', 'SOC'), $id_encargado_comercial, array('empty' => __('Ninguno'), 'style' => 'width: 100px')); ?>
 					</td>
 				</tr>
 
@@ -691,7 +691,7 @@ $pagina->PrintTop($popup);
 												LEFT JOIN prm_area_usuario AS padre ON area.id_padre = padre.id
 												ORDER BY  IFNULL(padre.glosa, area.glosa), padre.glosa, area.glosa ASC ';
 							}
-							echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario, "", "Ninguna")
+							echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario, "", __("Ninguna"))
 							?>
 					</td>
 				</tr>
@@ -756,14 +756,14 @@ $pagina->PrintTop($popup);
 	<?php $b->Imprimir('', array('check_trabajo')); //Excluyo Checktrabajo); ?>
 	<form>
 		<center>
-			<a href="#" onclick="seleccionarTodo(true); return false;">Seleccionar todo</a>
+			<a href="#" onclick="seleccionarTodo(true); return false;"><?php echo __('Seleccionar todo') ?></a>
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<a href="#" onclick="seleccionarTodo(false); return false;">Desmarcar todo</a>
+			<a href="#" onclick="seleccionarTodo(false); return false;"><?php echo __('Desmarcar todo') ?></a>
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trabajos">Editar seleccionados</a>
+			<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trabajos"><?php echo __('Editar seleccionados') ?></a>
 			<br />
 			<input type='hidden' name='where_query_listado_completo' id='where_query_listado_completo' value='<?php echo urlencode(base64_encode($where)) ?>'>
-			<a href="#" onclick="EditarTodosLosArchivos(); return false;" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
+			<a href="#" onclick="EditarTodosLosArchivos(); return false;" title="Editar trabajos de todo el listado"><?php echo __('Editar trabajos de todo el listado') ?></a>
 			<br />
 			<br />
 			<?php echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('id' => 'descargapro')); ?>

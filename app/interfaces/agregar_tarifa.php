@@ -255,14 +255,12 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 		<tr>
 			<td colspan="<?php echo $colspan - 1 ?>" align="right" style="text-align:right;" >
 				<input type=submit value='<?php echo __('Guardar') ?>' class=btn > &nbsp;
-
-
 				<input type="button" id="fix_tarifas" value='<?php echo __('Completar Tarifas') ?>' class='btn' title="Esta función completará las tarifas faltantes de los profesionales basándose en su categoría, para todas las tarifas" />
-
 				<input type="button" onclick="self.location.href = 'tarifas_xls.php?id_tarifa_edicion=<?php echo $id_tarifa_edicion ?>&glosa=<?php echo $tarifa->fields['glosa_tarifa'] ?>'" value='<?php echo __('Imprimir tarifas') ?>' class='btn' >
 				<input type="button" onclick="self.location.href = 'tarifas_clientes.php'" value='<?php echo __('Imprimir Todas') ?>' class='btn' title="Exporta todas las tarifas a un excel. Incluye qué contratos estan afectos a cada una" >
-			</td><td  style="text-align:left;vertical-align: middle;width:202px;" >
-				<input type="button" onclick="CrearTarifa(this.form, '<?php echo $id_tarifa_edicion ?>');" value='<?php echo __('Crear nueva tarifa') ?>' class=btn title="Crea una nueva tarifa. Active el checkbox inferior para basarse en los datos de la actual">
+			</td>
+			<td style="text-align:left;vertical-align: middle;width:202px;" >
+				<input type="button" onclick="CrearTarifa(this.form, '<?php echo $id_tarifa_edicion ?>');" value='<?php echo __('Crear nueva tarifa') ?>' class="btn" title="Crea una nueva tarifa. Active el checkbox inferior para basarse en los datos de la actual">
 				<input type="button" onclick="Eliminar();" value='<?php echo __('Eliminar Tarifa') ?>' class="btn_rojo" >
 			</td>
 		</tr>
@@ -275,8 +273,8 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 				$colspan = 4;
 			}
 			?>
-			<td colspan="<?php echo $colspan ?>"></td><td  align=left>
-				<input type=checkbox id=usar_tarifa_previa value='1' <?php $usar_tarifa_previa ? 'checked' : '' ?> /> copiando la actual
+			<td colspan="<?php echo $colspan ?>"></td><td  align="left">
+				<input type="checkbox" id="usar_tarifa_previa" value='1' <?php $usar_tarifa_previa ? 'checked' : '' ?> /> <?php echo __('copiando la actual') ?>
 			</td>
 		</tr>
 		<?php } ?>

@@ -101,30 +101,30 @@ jQuery(document).ready(function() {
 
         <tr>
             <td></td>
-            <td align="left"><?php echo _('Periodo') ?></td>
+            <td align="left"><?php echo __('Periodo') ?></td>
         </tr>
 
         <tr>
             <td align=right>
-                <?php echo _('Desde') ?>
+                <?php echo __('Desde') ?>
             </td>
             <td align=left>
                 <?php
                 $fecha_mes_desde = $fecha_mes_desde != '' ? $fecha_mes_desde : date('m') - 1;
                 ?>
                 <select name="fecha_mes_desde" style='width:100px' id="fecha_mes_desde">
-                    <option value='1' <?php echo $fecha_mes_desde == 1 ? 'selected' : '' ?>><?php echo _('Enero') ?></option>
-                    <option value='2' <?php echo $fecha_mes_desde == 2 ? 'selected' : '' ?>><?php echo _('Febrero') ?></option>
-                    <option value='3' <?php echo $fecha_mes_desde == 3 ? 'selected' : '' ?>><?php echo _('Marzo') ?></option>
-                    <option value='4' <?php echo $fecha_mes_desde == 4 ? 'selected' : '' ?>><?php echo _('Abril') ?></option>
-                    <option value='5' <?php echo $fecha_mes_desde == 5 ? 'selected' : '' ?>><?php echo _('Mayo') ?></option>
-                    <option value='6' <?php echo $fecha_mes_desde == 6 ? 'selected' : '' ?>><?php echo _('Junio') ?></option>
-                    <option value='7' <?php echo $fecha_mes_desde == 7 ? 'selected' : '' ?>><?php echo _('Julio') ?></option>
-                    <option value='8' <?php echo $fecha_mes_desde == 8 ? 'selected' : '' ?>><?php echo _('Agosto') ?></option>
-                    <option value='9' <?php echo $fecha_mes_desde == 9 ? 'selected' : '' ?>><?php echo _('Septiembre') ?></option>
-                    <option value='10' <?php echo $fecha_mes_desde == 10 ? 'selected' : '' ?>><?php echo _('Octubre') ?></option>
-                    <option value='11' <?php echo $fecha_mes_desde == 11 ? 'selected' : '' ?>><?php echo _('Noviembre') ?></option>
-                    <option value='12' <?php echo $fecha_mes_desde == 12 ? 'selected' : '' ?>><?php echo _('Diciembre') ?></option>
+                    <option value='1' <?php echo $fecha_mes_desde == 1 ? 'selected' : '' ?>><?php echo __('Enero') ?></option>
+                    <option value='2' <?php echo $fecha_mes_desde == 2 ? 'selected' : '' ?>><?php echo __('Febrero') ?></option>
+                    <option value='3' <?php echo $fecha_mes_desde == 3 ? 'selected' : '' ?>><?php echo __('Marzo') ?></option>
+                    <option value='4' <?php echo $fecha_mes_desde == 4 ? 'selected' : '' ?>><?php echo __('Abril') ?></option>
+                    <option value='5' <?php echo $fecha_mes_desde == 5 ? 'selected' : '' ?>><?php echo __('Mayo') ?></option>
+                    <option value='6' <?php echo $fecha_mes_desde == 6 ? 'selected' : '' ?>><?php echo __('Junio') ?></option>
+                    <option value='7' <?php echo $fecha_mes_desde == 7 ? 'selected' : '' ?>><?php echo __('Julio') ?></option>
+                    <option value='8' <?php echo $fecha_mes_desde == 8 ? 'selected' : '' ?>><?php echo __('Agosto') ?></option>
+                    <option value='9' <?php echo $fecha_mes_desde == 9 ? 'selected' : '' ?>><?php echo __('Septiembre') ?></option>
+                    <option value='10' <?php echo $fecha_mes_desde == 10 ? 'selected' : '' ?>><?php echo __('Octubre') ?></option>
+                    <option value='11' <?php echo $fecha_mes_desde == 11 ? 'selected' : '' ?>><?php echo __('Noviembre') ?></option>
+                    <option value='12' <?php echo $fecha_mes_desde == 12 ? 'selected' : '' ?>><?php echo __('Diciembre') ?></option>
                 </select>
                 <?php
                 if (!$fecha_anio_desde) {
@@ -141,25 +141,25 @@ jQuery(document).ready(function() {
 
         <tr>
             <td align=right>
-                <?php echo _('Hasta') ?>
+                <?php echo __('Hasta') ?>
             </td>
             <td align=left>
                 <?php
                 $fecha_mes_hasta = $fecha_mes_hasta != '' ? $fecha_mes_hasta : date('m');
                 ?>
                 <select name="fecha_mes_hasta" style='width:100px' id="fecha_mes_hasta">
-                    <option value='1' <?php echo $fecha_mes_hasta == 1 ? 'selected' : '' ?>><?php echo _('Enero') ?></option>
-                    <option value='2' <?php echo $fecha_mes_hasta == 2 ? 'selected' : '' ?>><?php echo _('Febrero') ?></option>
-                    <option value='3' <?php echo $fecha_mes_hasta == 3 ? 'selected' : '' ?>><?php echo _('Marzo') ?></option>
-                    <option value='4' <?php echo $fecha_mes_hasta == 4 ? 'selected' : '' ?>><?php echo _('Abril') ?></option>
-                    <option value='5' <?php echo $fecha_mes_hasta == 5 ? 'selected' : '' ?>><?php echo _('Mayo') ?></option>
-                    <option value='6' <?php echo $fecha_mes_hasta == 6 ? 'selected' : '' ?>><?php echo _('Junio') ?></option>
-                    <option value='7' <?php echo $fecha_mes_hasta == 7 ? 'selected' : '' ?>><?php echo _('Julio') ?></option>
-                    <option value='8' <?php echo $fecha_mes_hasta == 8 ? 'selected' : '' ?>><?php echo _('Agosto') ?></option>
-                    <option value='9' <?php echo $fecha_mes_hasta == 9 ? 'selected' : '' ?>><?php echo _('Septiembre') ?></option>
-                    <option value='10' <?php echo $fecha_mes_hasta == 10 ? 'selected' : '' ?>><?php echo _('Octubre') ?></option>
-                    <option value='11' <?php echo $fecha_mes_hasta == 11 ? 'selected' : '' ?>><?php echo _('Noviembre') ?></option>
-                    <option value='12' <?php echo $fecha_mes_hasta == 12 ? 'selected' : '' ?>><?php echo _('Diciembre') ?></option>
+                    <option value='1' <?php echo $fecha_mes_hasta == 1 ? 'selected' : '' ?>><?php echo __('Enero') ?></option>
+                    <option value='2' <?php echo $fecha_mes_hasta == 2 ? 'selected' : '' ?>><?php echo __('Febrero') ?></option>
+                    <option value='3' <?php echo $fecha_mes_hasta == 3 ? 'selected' : '' ?>><?php echo __('Marzo') ?></option>
+                    <option value='4' <?php echo $fecha_mes_hasta == 4 ? 'selected' : '' ?>><?php echo __('Abril') ?></option>
+                    <option value='5' <?php echo $fecha_mes_hasta == 5 ? 'selected' : '' ?>><?php echo __('Mayo') ?></option>
+                    <option value='6' <?php echo $fecha_mes_hasta == 6 ? 'selected' : '' ?>><?php echo __('Junio') ?></option>
+                    <option value='7' <?php echo $fecha_mes_hasta == 7 ? 'selected' : '' ?>><?php echo __('Julio') ?></option>
+                    <option value='8' <?php echo $fecha_mes_hasta == 8 ? 'selected' : '' ?>><?php echo __('Agosto') ?></option>
+                    <option value='9' <?php echo $fecha_mes_hasta == 9 ? 'selected' : '' ?>><?php echo __('Septiembre') ?></option>
+                    <option value='10' <?php echo $fecha_mes_hasta == 10 ? 'selected' : '' ?>><?php echo __('Octubre') ?></option>
+                    <option value='11' <?php echo $fecha_mes_hasta == 11 ? 'selected' : '' ?>><?php echo __('Noviembre') ?></option>
+                    <option value='12' <?php echo $fecha_mes_hasta == 12 ? 'selected' : '' ?>><?php echo __('Diciembre') ?></option>
                 </select>
                 <?php
                 if (!$fecha_anio_hasta)
@@ -174,7 +174,7 @@ jQuery(document).ready(function() {
         </tr>
         <tr>
             <td align="right">
-                <?php echo _('Cliente') ?>
+                <?php echo __('Cliente') ?>
             </td>
             <td align="left">
                 <?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes, "class=\"selectMultiple\" multiple size=6 ", "", "200"); ?>
@@ -182,7 +182,7 @@ jQuery(document).ready(function() {
         </tr>
         <tr>
             <td align="right">
-                <?php echo _('Profesionales') ?>
+                <?php echo __('Profesionales') ?>
             </td>
             <td align="left">
                 <!-- Nuevo Select -->
@@ -191,26 +191,26 @@ jQuery(document).ready(function() {
         </tr>
         <tr>
             <td align="right">
-                <?php echo _('Tipo de reporte') ?>
+                <?php echo __('Tipo de reporte') ?>
             </td>
             <td align="left">
                 <select id="tipo_reporte" name="tipo_reporte" style="width:200px">
-                    <option <?php echo $tipo_reporte == "trabajos_por_estudio" ? "selected" : "" ?> value="trabajos_por_estudio"><?php echo _('Simple') ?></option>
-                    <option <?php echo $tipo_reporte == "trabajos_por_empleado" ? "selected" : "" ?> value="trabajos_por_empleado"><?php echo _('Desglose profesional') ?></option>
-                    <option <?php echo $tipo_reporte == "trabajos_por_cliente" ? "selected" : "" ?> value="trabajos_por_cliente"><?php echo _('Desglose cliente') ?></option>
+                    <option <?php echo $tipo_reporte == "trabajos_por_estudio" ? "selected" : "" ?> value="trabajos_por_estudio"><?php echo __('Simple') ?></option>
+                    <option <?php echo $tipo_reporte == "trabajos_por_empleado" ? "selected" : "" ?> value="trabajos_por_empleado"><?php echo __('Desglose profesional') ?></option>
+                    <option <?php echo $tipo_reporte == "trabajos_por_cliente" ? "selected" : "" ?> value="trabajos_por_cliente"><?php echo __('Desglose cliente') ?></option>
                 </select>
             </td>
         </tr>
         <tr>
             <td align="right">
-                <?php echo _('Dato') ?><br/>
+                <?php echo __('Dato') ?><br/>
             </td>
             <td align="left">
                 <select id="tipo_duracion" name="tipo_duracion" style="width:200px">
-                    <option <?php echo $tipo_duracion == "trabajada" ? "selected" : "" ?> value="trabajada"><?php echo _('Trabajadas') ?></option>
-                    <option <?php echo $tipo_duracion == "cobrable" ? "selected" : "" ?> value="cobrable"><?php echo _('Cobrables') ?></option>
-                    <option <?php echo $tipo_duracion == "no_cobrable" ? "selected" : "" ?> value="no_cobrable"><?php echo _('No Cobrables') ?></option>
-                    <option <?php echo $tipo_duracion == "cobrada" ? "selected" : "" ?> value="cobrada"><?php echo _('Cobradas') ?></option>
+                    <option <?php echo $tipo_duracion == "trabajada" ? "selected" : "" ?> value="trabajada"><?php echo __('Trabajadas') ?></option>
+                    <option <?php echo $tipo_duracion == "cobrable" ? "selected" : "" ?> value="cobrable"><?php echo __('Cobrables') ?></option>
+                    <option <?php echo $tipo_duracion == "no_cobrable" ? "selected" : "" ?> value="no_cobrable"><?php echo __('No Cobrables') ?></option>
+                    <option <?php echo $tipo_duracion == "cobrada" ? "selected" : "" ?> value="cobrada"><?php echo __('Cobradas') ?></option>
 
                 </select>
             </td>
@@ -227,14 +227,14 @@ jQuery(document).ready(function() {
 
         <tr>
             <td align="right">
-                <?php echo _('Con') ?><br/>
+                <?php echo __('Con') ?><br/>
             </td>
             <td align="left">
                 <select id="tipo_duracion_comparada" name="tipo_duracion_comparada" style="width:200px;" >
-                    <option <?php echo $tipo_duracion_comparada == "trabajada" ? "selected" : "" ?> value="trabajada"><?php echo _('Trabajadas') ?></option>
-                    <option <?php echo $tipo_duracion_comparada == "cobrable" ? "selected" : "" ?> value="cobrable"><?php echo _('Cobrables') ?></option>
-                    <option <?php echo $tipo_duracion_comparada == "no_cobrable" ? "selected" : "" ?> value="no_cobrable"><?php echo _('No Cobrables') ?></option>
-                    <option <?php echo $tipo_duracion_comparada == "cobrada" ? "selected" : "" ?> value="cobrada"><?php echo _('Cobradas') ?></option>
+                    <option <?php echo $tipo_duracion_comparada == "trabajada" ? "selected" : "" ?> value="trabajada"><?php echo __('Trabajadas') ?></option>
+                    <option <?php echo $tipo_duracion_comparada == "cobrable" ? "selected" : "" ?> value="cobrable"><?php echo __('Cobrables') ?></option>
+                    <option <?php echo $tipo_duracion_comparada == "no_cobrable" ? "selected" : "" ?> value="no_cobrable"><?php echo __('No Cobrables') ?></option>
+                    <option <?php echo $tipo_duracion_comparada == "cobrada" ? "selected" : "" ?> value="cobrada"><?php echo __('Cobradas') ?></option>
 
                 </select>
             </td>
@@ -247,7 +247,7 @@ jQuery(document).ready(function() {
 
         <tr>
             <td colspan="4" align="center">
-                <input type=button class=btn value="<?php echo _('Generar Gráfico') ?>" onclick="Validar(this.form, 'desplegar');" >
+                <input type=button class=btn value="<?php echo __('Generar Gráfico') ?>" onclick="Validar(this.form, 'desplegar');" >
             </td>
         </tr>
 

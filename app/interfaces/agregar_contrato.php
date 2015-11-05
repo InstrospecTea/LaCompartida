@@ -1964,15 +1964,16 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<table  style="float:left;" class="span7">
 								<tr>
 									<td class="span4">
-										<div   class="controls controls-row ">
+										<div class="controls controls-row">
 											<input type="radio" name="tipo_tarifa" id="tipo_tarifa_variable" value="variable" <?php echo empty($valor_tarifa_flat) ? 'checked' : '' ?>/>
 											<?php echo Html::SelectArrayDecente($tarifa->Listar('WHERE tarifa.tarifa_flat IS NULL ORDER BY tarifa.glosa_tarifa'), 'id_tarifa', $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, 'onclick="$(\'tipo_tarifa_variable\').checked = true;" ' . ( strlen($config_validar_tarifa) > 0 ? 'onchange="' . $config_validar_tarifa . '"' : '')); ?>
 											<input type="hidden" name="id_tarifa_hidden" id="id_tarifa_hidden" value="<?php echo $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default; ?>" />
 										</div>
 
-										<div   class="controls controls-row ">
-											 <label for="tipo_tarifa_flat" class="span2"><input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?php echo empty($valor_tarifa_flat) ? '' : 'checked' ?>/>
-												 Plana por </label>
+										<div class="controls controls-row">
+											<label for="tipo_tarifa_flat" class="span2"><input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?php echo empty($valor_tarifa_flat) ? '' : 'checked' ?>/>
+												 <?php echo __('Plana por'); ?>
+											</label>
 											<input id="tarifa_flat" class="input-small" type="text" name="tarifa_flat" onclick="$('tipo_tarifa_flat').checked = true" value="<?php echo $valor_tarifa_flat ?>"/>
 											<input type="hidden" id="id_tarifa_flat"  name="id_tarifa_flat" value="<?php echo empty($valor_tarifa_flat) ? '' : $contrato->fields['id_tarifa'] ?>"/>
 										</div>
@@ -2010,7 +2011,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<input type="hidden" id="forma_cobro_posterior"  name="forma_cobro_posterior" value="<?php echo $contrato_forma_cobro ?>"/>
 							<div id="div_cobro" class="buttonset">
 								<input class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?php echo $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
-								<label <?php echo TTip($tip_tasa) ?>  for="fc1">Tasas/HH</label>&nbsp;
+								<label <?php echo TTip($tip_tasa) ?>  for="fc1"><?php echo __('Tasas/HH'); ?></label>&nbsp;
 								<input class="formacobro"  id="fc2" type=radio name="forma_cobro" value="RETAINER" <?php echo $contrato_forma_cobro == "RETAINER" ? "checked='checked'" : "" ?> />
 								<label <?php echo TTip($tip_retainer) ?>  for="fc2">Retainer</label> &nbsp;
 								<input class="formacobro"  id="fc3" type="radio" name="forma_cobro"  value="FLAT FEE" <?php echo $contrato_forma_cobro == "FLAT FEE" ? "checked='checked'" : "" ?> />
@@ -2799,7 +2800,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									<?php echo __('Otros'); ?></label><br />
 									<input type="text" name="notificar_otros_correos" size="65" value="<?php echo $contrato->fields['notificar_otros_correos']; ?>" />
 									<br />
-									<small><em>Separados por coma <strong>(,)</strong> Ej: correo@dominio.com<strong>,</strong>usuario@estudio.net</em></small>
+									<small><em><?php echo __('Separados por coma'); ?> <strong>(,)</strong> Ej: correo@dominio.com<strong>,</strong>usuario@estudio.net</em></small>
 								</td>
 							</tr>
 						</table>
@@ -3135,11 +3136,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							.done(function(data) {
 								rows = $('<tbody>');
 								header = $("<tr bgcolor='#A3D55C'>")
-								header.append('<td align="left" class="border_plomo"><b>Usuario</b></td>');
-								header.append('<td align="left" class="border_plomo"><b>Area Usuario</b></td>');
-								header.append('<td align="right" class="border_plomo"><b>Porcentaje Genera</b></td>');
-								header.append('<td align="right" class="border_plomo"><b>Acciones</b></td>');
-
+								header.append('<td align="left" class="border_plomo"><b><?php echo __('Usuario'); ?></b></td>');
+								header.append('<td align="left" class="border_plomo"><b><?php echo __('Área Usuario'); ?></b></td>');
+								header.append('<td align="right" class="border_plomo"><b><?php echo __('Porcentaje Genera'); ?></b></td>');
+								header.append('<td align="right" class="border_plomo"><b><?php echo __('Acciones'); ?></b></td>');
 								rows.append(header);
 
 								$.each(data, function(i, generator) {
@@ -3243,7 +3243,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_user_generator', '', '', 'Seleccione', '200px'); ?>
 							</td>
 							<td>
-								Porcentaje Genera:
+								<?php echo __('Porcentaje Genera'); ?>:
 							</td>
 							<td>
 								<input type="text" size="6" class="text_box" name='percent_generator' id="percent_generator" value="" style="border: 1px solid rgb(204, 204, 204);">

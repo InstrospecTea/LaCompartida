@@ -1044,7 +1044,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 				<label>
 					<input type="checkbox" name="como_trabajo" id="como_trabajo" value="1" onClick="ShowTime();
 							ToggleCantidad(this.checked);" <?php echo $tramite->fields['trabajo_si_no'] || $como_trabajo ? 'checked' : '' ?>>
-					Ingresar como trabajo
+					<?php echo __('Ingresar como trabajo') ?>
 				</label>
 			</td>
 		</tr>

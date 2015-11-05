@@ -363,7 +363,7 @@ if (Conf::GetConf($sesion, 'ExcelGastosDesglosado')) {
 			jQuery('#totalcta').text('');
 			jQuery.getJSON(ajax_url, function(data) {
 				var onclick_html = "nuevaVentana('',1000,700,'" + html_url + "', '');";
-				var result_html = '<b>Balance cuenta gastos: <input type="hidden" id="codcliente" name="codcliente" value="0"/><a href="#" onclick="' + onclick_html + '">' + data.resultado + '</a></b>';
+				var result_html = '<b><?php echo __("Balance cuenta gastos"); ?>: <input type="hidden" id="codcliente" name="codcliente" value="0"/><a href="#" onclick="' + onclick_html + '">' + data.resultado + '</a></b>';
 				jQuery('#totalcta').html(result_html);
 			});
 <?php } else { ?>
@@ -377,18 +377,18 @@ if (Conf::GetConf($sesion, 'ExcelGastosDesglosado')) {
 				"bDestroy": true,
 				"bServerSide": true,
 				"oLanguage": {
-					"sProcessing": "Procesando...",
-					"sLengthMenu": "Mostrar _MENU_ registros",
-					"sZeroRecords": "No se encontraron resultados",
-					"sInfo": "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
-					"sInfoEmpty": "Mostrando desde 0 hasta 0 de 0 registros",
-					"sInfoFiltered": "(filtrado de _MAX_ registros en total)",
+					"sProcessing": "<?php echo __('Procesando'); ?>...",
+					"sLengthMenu": "<?php echo __('Mostrar'); ?> _MENU_ <?php echo __('registros'); ?>",
+					"sZeroRecords": "<?php echo __('No se encontraron resultados'); ?>",
+					"sInfo": "<?php echo __('Mostrando desde _START_ hasta _END_ de _TOTAL_ registros'); ?>",
+					"sInfoEmpty": "<?php echo __('Mostrando desde 0 hasta 0 de 0 registros'); ?>",
+					"sInfoFiltered": "(<?php echo __('filtrado de _MAX_ registros en total'); ?>)",
 					"sInfoPostFix": "",
-					"sSearch": "Filtrar:",
+					"sSearch": "<?php echo __('Filtrar'); ?>:",
 					"sUrl": "",
 					"oPaginate": {
-					"sPrevious": "Anterior",
-						"sNext": "Siguiente"
+					"sPrevious": "<?php echo __('Anterior'); ?>",
+						"sNext": "<?php echo __('Siguiente'); ?>"
 					}
 				},
 				"bFilter": false,
@@ -492,7 +492,7 @@ if (!Conf::GetConf($sesion, 'UsarGastosCobrable')) {
 <?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_js_gastos') : false; ?>  {
 					"sExtends":    "copy",
 					"sAction":     "flash_copy",
-					"sButtonText": "Copiar esta consulta",
+					"sButtonText": "<?php echo __('Copiar esta consulta'); ?>",
 					"fnClick": function (nButton, oConfig, oFlash) {
 							var uri = '<?php echo Conf:: Server() . $_SERVER['REQUEST_URI']; ?>';
 							oFlash.setText(uri + '?buscar=1&' + serialized_form);
@@ -502,7 +502,7 @@ if (!Conf::GetConf($sesion, 'UsarGastosCobrable')) {
 						}
 					}, {
 						"sExtends":    "text",
-						"sButtonText": "Editar Seleccionados",
+						"sButtonText": "<?php echo __('Editar seleccionados'); ?>",
 						"fnClick": function (nButton, oConfig, oFlash) {
 							top.window.jQuery('#dialogomodal .divloading').hide();
 							if (jQuery('#selectodos').is(':checked')) {
@@ -747,21 +747,21 @@ function Refrescar() {
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="tablon" style="width:920px;display:none;">
     <thead>
         <tr class="encabezadolight">
-            <th>Correlativo</th>
-            <th>Fecha</th>
-            <th>Nº OT</th>
+            <th><?php echo __('Correlativo'); ?></th>
+            <th><?php echo __('Fecha'); ?></th>
+            <th><?php echo __('Nº OT'); ?></th>
             <th width="190"><?php echo __('Cliente'); ?></th>
-            <th width="260"><?php echo __('Asunto'); ?><br><small>(descripcion)</small></th>
-            <th>Descripción</th>
-            <th>Egreso<br/><small>(<?php echo __('Cobrable'); ?>)</small></th>
-            <th>Ingreso</th>
+            <th width="260"><?php echo __('Asunto'); ?><br><small>(<?php echo __('descripción'); ?>)</small></th>
+            <th><?php echo __('Descripción'); ?></th>
+            <th><?php echo __('Egreso'); ?><br/><small>(<?php echo __('Cobrable'); ?>)</small></th>
+            <th><?php echo __('Ingreso'); ?></th>
             <th><?php echo __('Impuesto'); ?></th>
-            <th width="70"><?php echo __('Cobro'); ?><br/><small>(estado)</small></th>
-            <th>Cobro</th>
+            <th width="70"><?php echo __('Cobro'); ?><br/><small>(<?php echo __('estado'); ?>)</small></th>
+            <th><?php echo __('Cobro'); ?></th>
             <th width="60"><?php echo __('Cobrable'); ?></th>
-            <th><?php echo __('Contrato'); ?><br>Activo</th>
-            <th width="60">Opción <input type="checkbox" id="selectodos"/></th>
-            <th>contrato </th>
+            <th><?php echo __('Contrato'); ?><br><?php echo __('Activo'); ?></th>
+            <th width="60"><?php echo __('Opción'); ?> <input type="checkbox" id="selectodos"/></th>
+            <th><?php echo __('contrato'); ?> </th>
         </tr>
     </thead>
     <tbody>

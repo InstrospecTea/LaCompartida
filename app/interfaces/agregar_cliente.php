@@ -396,7 +396,7 @@ $Pagina->PrintTop();
 			<tr  class="controls controls-row " >
 				<td class="ar"  width="200">
 					<div class="span2">
-						<?php echo __('Codigo'); ?>
+						<?php echo __('Código'); ?>
 						<?php echo $obligatorio; ?>
 					</div >
 				</td>

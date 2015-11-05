@@ -1079,7 +1079,7 @@ if ($opc == 'print' || $popup) {
 	$array_a_num = array('a', 'b', 'c', 'd', 'e', 'f');
 	for ($i = 0; $i < 6; $i++) {
 		echo "<td class='td_header td_h" . ($i + 1) . "' style='width:80px; border-right: 1px solid #CCCCCC;'>";
-		echo __($reporte->agrupador[$i]);
+		echo ucfirst(__($reporte->agrupador[$i]));
 		echo "</td>";
 		echo "<td class='td_header td_h" . ($i + 1) . "' style='width:50px; border-right: 1px solid #CCCCCC;'>";
 		echo __(Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda));

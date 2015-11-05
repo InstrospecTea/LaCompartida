@@ -196,7 +196,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 
 	<div style="width:95%; text-align:right; margin-bottom:5px;">
 		<input type="button" onclick="CrearTarifa(this.form , <?php echo $id_tramite_tarifa_edicion ;?>);" value='<?php echo __('Crear nueva tarifa'); ?>' class="btn">
-		<label><input type="checkbox" id="usar_tarifa_previa" value="1" <?php echo $usar_tarifa_previa ? 'checked' : '' ?> />Copiar Datos</label>
+		<label><input type="checkbox" id="usar_tarifa_previa" value="1" <?php echo $usar_tarifa_previa ? 'checked' : '' ?> /><?php echo __('Copiar Datos'); ?></label>
 	</div>
 	<table width='95%' border="0" style="border: 1px solid #BDBDBD">
 		<tr valign="middle">
@@ -220,9 +220,9 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 						<?php
 					} else {
 						?>
-						<td align="right">Nueva <?php echo __('Tarifa'); ?></td>
+						<td align="right"><?php echo __('Nueva ' . __('Tarifa')); ?></td>
 						<td align="left">
-							<input type="text" name="glosa_tramite_tarifa" value="<?php echo $tramite_tarifa->fields['glosa_tramite_tarifa']; ?>" <?php echo $active; ?> placeholder="Nombre">
+							<input type="text" name="glosa_tramite_tarifa" value="<?php echo $tramite_tarifa->fields['glosa_tramite_tarifa']; ?>" <?php echo $active; ?> placeholder="<?php echo __('Nombre') ?>">
 							<label><input type="checkbox" name="tarifa_defecto" value="1" <?php echo $tramite_tarifa->fields['tarifa_defecto'] ? 'checked' : ''; ?>> <?php echo __('Defecto')?></label>
 						</td>
 						<?php
