@@ -1277,8 +1277,8 @@ function funcionTR(& $contrato) {
 
 	$html .= "</b></td>";
 
-	$lista_asuntos = print_as_list($contrato->fields['asuntos']);
-	$html .= "<td style='font-size:10px' align=left id=tip_$i valing=top><b>{$lista_asuntos}</b></td>";
+	$lista_asuntos = $contrato->MattersByContract($contrato->fields['id_contrato']);
+	$html .= "<td style='font-size:10px' align='left' id='tip_{$i}' valing='top'><b>{$lista_asuntos->limitado}</b></td>";
 	$html .= "<td style='font-size:10px' align=center valing=top><b>" . $fecha_ultimo_cobro . "</b></td>";
 
 	if ($contrato->fields['forma_cobro'] == 'RETAINER' || $contrato->fields['forma_cobro'] == 'PROPORCIONAL') {
@@ -1527,7 +1527,7 @@ function funcionTR(& $contrato) {
 	#FIN WIP
 
 	$html .="<tr border=1 bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\"><td colspan=5>&nbsp;</td></tr>";
-	$html .="<script> new Tip('tip_$i', '$lista_asuntos', {title : '" . __('Listado de asuntos') . "', effect: '', offset: {x:-2, y:10}}); </script>";
+	$html .="<script> new Tip('tip_$i', '{$lista_asuntos->completo}', {title : '" . __('Listado de asuntos') . "', effect: '', offset: {x:-2, y:10}}); </script>";
 	$html .="<input type=hidden name=opc value='" . $opc . "'>";
 
 	$i++;
@@ -1555,13 +1555,4 @@ function url_cobro_individual($id_contrato, $codigo_cliente, $glosa_cliente, $fo
 	}
 }
 
-function print_as_list($data) {
-	$aData = explode('|', $data);
-	$Form = new Form();
-	$lis = array();
-	foreach ($aData as $li) {
-		$lis[] = $Form->Html->tag('li', $li);
-	}
-	return $Form->Html->tag('ul', implode('', $lis));
-}
 $pagina->PrintBottom($popup);
