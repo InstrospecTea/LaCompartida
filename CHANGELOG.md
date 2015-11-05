@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 15.26.0](https://github.com/LemontechSA/ttb/pull/1211)
+Wednesday 2015, November 4th
+* **Feature** [Agrupar actividades](https://github.com/LemontechSA/ttb/pull/1204)
+
 ## Hotfix 15.25.11
 Wednesday 2015, November 4th
 * **Fix** [Error al agregar asunto](https://github.com/LemontechSA/ttb/pull/1210)
