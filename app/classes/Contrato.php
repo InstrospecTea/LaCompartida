@@ -1701,14 +1701,22 @@ class Contrato extends Objeto {
 			$Form = new Form();
 			$lis = array();
 
-			foreach ($rows as $li) {
-				$lis[] = $Form->Html->tag('li', $li);
+			foreach ($rows as $key => $value) {
+				if ($key < 10){
+					$lis[] = $Form->Html->tag('li', $value);
+				} else if ($key == 10) {
+					$lis[] = $Form->Html->tag('li', '<a class="mostrar-asuntos" href="javascript:void(0)">Mostrar más...</a>');
+					$lis[] = $Form->Html->tag('li', $value, ' class="asuntos-ocultos" style="display: none;"');
+				} else {
+					$lis[] = $Form->Html->tag('li', $value, ' class="asuntos-ocultos" style="display: none;"');
+				}
 			}
 
-			$respuesta->completo = $Form->Html->tag('ul', implode('', $lis));
-			$respuesta->limitado = $Form->Html->tag('ul', implode('', array_slice($lis, 0, 10)));
+			if (!empty($rows) && sizeof($rows) > 10){
+				$lis[] = $Form->Html->tag('li', '<a class="ocultar-asuntos" href="javascript:void(0)">Ocultar...</a>', ' class="asuntos-ocultos" style="display: none;"');
+			}
 
-			return $respuesta;
+			return $Form->Html->tag('ul', implode('', $lis));
 		} catch (Exception $e) {
 			echo "Error: {$e} {$criteria->__toString()}";
 		}
