@@ -1212,14 +1212,14 @@ class Contrato extends Objeto {
 
 		/*
 		 * Se añade este código para validar los cambios hechos en la tabla 'contrato'
-		 * la revisión anterior arrojó que no se estaba realizando bien la comparación, 
+		 * la revisión anterior arrojó que no se estaba realizando bien la comparación,
 		 * es por esto que se crea la query para comparar datos antiguos con los nuevos.
 		 *
 		 */
 		if (array_key_exists('id_contrato', $parametros) && ! empty($parametros['id_contrato'])) {
 			$query = "SELECT * FROM contrato WHERE id_contrato = {$parametros['id_contrato']};";
 			$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		
+
 			foreach (mysql_fetch_object($result) as $key => $value){
 				$this->valor_antiguo[$key] = $value;
 			}
@@ -1227,7 +1227,7 @@ class Contrato extends Objeto {
 		} else if (array_key_exists('id_asunto', $parametros) && ! empty($parametros['id_asunto'])) {
 			$query = "SELECT C.* FROM asunto A INNER JOIN contrato C ON C.id_contrato = A.id_contrato WHERE A.id_asunto = {$parametros['id_asunto']};";
 			$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		
+
 			foreach (mysql_fetch_object($result) as $key => $value) {
 				$this->valor_antiguo[$key] = $value;
 			}
@@ -1672,6 +1672,54 @@ class Contrato extends Objeto {
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		list($fecha_fin_ultimo_cobro) = mysql_fetch_array($resp);
 		return $fecha_fin_ultimo_cobro;
+	}
+
+	/**
+	 * Se retorna listado de asuntos según el id_contrato
+	 *
+	 * @param int $id_contrato        Id del contrato a consultar
+	 *
+	 * @return array 	listado de asuntos
+	 */
+	public function MattersByContract($id_contrato) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('glosa_asunto')
+				->add_from('asunto')
+				->add_restriction(CriteriaRestriction::equals('id_contrato', $id_contrato))
+		 		->add_ordering('glosa_asunto');
+
+		$respuesta = new stdClass();
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $asunto) {
+				$rows[] = $asunto['glosa_asunto'];
+			}
+
+			$Form = new Form();
+			$lis = array();
+
+			foreach ($rows as $key => $value) {
+				if ($key < 10){
+					$lis[] = $Form->Html->tag('li', $value);
+				} else if ($key == 10) {
+					$lis[] = $Form->Html->tag('li', '<a class="mostrar-asuntos" href="javascript:void(0)">Mostrar más...</a>');
+					$lis[] = $Form->Html->tag('li', $value, ' class="asuntos-ocultos" style="display: none;"');
+				} else {
+					$lis[] = $Form->Html->tag('li', $value, ' class="asuntos-ocultos" style="display: none;"');
+				}
+			}
+
+			if (!empty($rows) && sizeof($rows) > 10){
+				$lis[] = $Form->Html->tag('li', '<a class="ocultar-asuntos" href="javascript:void(0)">Ocultar...</a>', ' class="asuntos-ocultos" style="display: none;"');
+			}
+
+			return $Form->Html->tag('ul', implode('', $lis));
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
 	}
 }
 
