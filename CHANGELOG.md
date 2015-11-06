@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.26.3
+Friday 2015, November 6th
+* **Fix** [Mejora listado asuntos en cobros masivos](https://github.com/LemontechSA/ttb/pull/1217)
+
 ## Hotfix 15.26.2
 Thursday 2015, November 5th
 * **Fix** [Error SQL - Editar solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/1215)
