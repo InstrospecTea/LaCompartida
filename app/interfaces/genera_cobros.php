@@ -1537,7 +1537,6 @@ function funcionTR(& $contrato) {
 	#FIN WIP
 
 	$html .="<tr border=1 bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\"><td colspan=5>&nbsp;</td></tr>";
-	#$html .="<script> new Tip('tip_$i', '{$lista_asuntos->completo}', {title : '" . __('Listado de asuntos') . "', effect: '', offset: {x:-2, y:10}}); </script>";
 	$html .="<input type=hidden name=opc value='" . $opc . "'>";
 
 	$i++;
