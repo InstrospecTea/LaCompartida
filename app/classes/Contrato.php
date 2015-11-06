@@ -1706,7 +1706,7 @@ class Contrato extends Objeto {
 			}
 
 			$respuesta->completo = $Form->Html->tag('ul', implode('', $lis));
-			$respuesta->limitado = $Form->Html->tag('ul', implode('', array_push(array_slice($lis, 0, 10), $Form->Html->tag('li', '...'))));
+			$respuesta->limitado = $Form->Html->tag('ul', implode('', array_slice($lis, 0, 10)));
 
 			return $respuesta;
 		} catch (Exception $e) {
