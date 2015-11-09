@@ -1705,7 +1705,7 @@ class Contrato extends Objeto {
 				if ($key < 10){
 					$lis[] = $Form->Html->tag('li', $value);
 				} else if ($key == 10) {
-					$lis[] = $Form->Html->tag('li', '<a class="mostrar-asuntos" href="javascript:void(0)">Mostrar más...</a>');
+					$lis[] = $Form->Html->tag('li', '<a class="mostrar-asuntos" href="javascript:void(0)">' . __('Mostrar más') . '...</a>');
 					$lis[] = $Form->Html->tag('li', $value, ' class="asuntos-ocultos" style="display: none;"');
 				} else {
 					$lis[] = $Form->Html->tag('li', $value, ' class="asuntos-ocultos" style="display: none;"');
@@ -1713,7 +1713,7 @@ class Contrato extends Objeto {
 			}
 
 			if (!empty($rows) && sizeof($rows) > 10){
-				$lis[] = $Form->Html->tag('li', '<a class="ocultar-asuntos" href="javascript:void(0)">Ocultar...</a>', ' class="asuntos-ocultos" style="display: none;"');
+				$lis[] = $Form->Html->tag('li', '<a class="ocultar-asuntos" href="javascript:void(0)">' . __('Ocultar') . '...</a>', ' class="asuntos-ocultos" style="display: none;"');
 			}
 
 			return $Form->Html->tag('ul', implode('', $lis));
