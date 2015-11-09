@@ -15,6 +15,7 @@
 
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
+	$Html = new \TTB\Html;
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 
 	$documento = new Documento($sesion);
@@ -190,10 +191,10 @@ function CheckEliminaIngreso(chk)
 window.opener.Refrescar();
 
 </script>
-<form method=post action="<?= $SERVER[PHP_SELF] ?>" onsubmit="return Validar(this);" id="form_documentos" autocomplete='off'>
+<form method=post action="<?php echo $SERVER[PHP_SELF]; ?>" onsubmit="return Validar(this);" id="form_documentos" autocomplete='off'>
 <input type=hidden name=opcion value="guardar" />
-<input type=hidden name=id_documento value="<?= $documento->fields['id_documento'] ?>" />
-<input type=hidden name='pago' value='<?=$pago?>'>
+<input type=hidden name=id_documento value="<?php echo $documento->fields['id_documento']; ?>" />
+<input type=hidden name='pago' value='<?php echo $pago; ?>'>
 <input type=hidden name=elimina_ingreso id=elimina_ingreso value=''>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
@@ -203,7 +204,7 @@ window.opener.Refrescar();
 <br>
 <table width='90%'>
 	<tr>
-		<td align=left><b><?=$txt_pagina ?></b></td>
+		<td align=left><b><?php echo $txt_pagina; ?></b></td>
 	</tr>
 </table>
 <br>
@@ -211,18 +212,17 @@ window.opener.Refrescar();
 <table style="border: 0px solid black;" width='90%'>
 	<tr>
 		<td align=left>
-			<b><?=__('Información de Documento') ?> </b>
+			<b><?php echo __('Información de Documento'); ?> </b>
 		</td>
 	</tr>
 </table>
 <table style="border: 1px solid black;" width='90%'>
 	<tr>
 		<td align=right>
-			<?=__('Fecha')?>
+			<?php echo __('Fecha'); ?>
 		</td>
 		<td align=left>
-			<input type="text" name="fecha" value="<?=$documento->fields[fecha] ? Utiles::sql2date($documento->fields[fecha]) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
+			<?php echo $Html::PrintCalendar('fecha', $documento->fields[fecha]); ?>
 		</td>
 	</tr>
 	<tr>
@@ -239,40 +239,40 @@ window.opener.Refrescar();
 			<span style="color:#FF0000; font-size:10px">*</span>
 		</td>
 */?>
-		<td align=right width='30%'><?=__('Cliente ')?></td>
-		<td colspan=3 align=left><?= InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente," ","", 280) ?></td>
+		<td align=right width='30%'><?php echo  __('Cliente '); ?></td>
+		<td colspan=3 align=left><?php echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente," ","", 280); ?></td>
 		</td>
 	</tr>
 
 	<tr>
 		<td align=right>
-			<?=__('Monto Honorarios')?>
+			<?php echo __('Monto Honorarios'); ?>
 		</td>
 		<td align=left>
-			<input name=monto_honorarios size=10 value="<? echo str_replace("-","",$documento->fields['honorarios']);  ?>" />
+			<input name=monto_honorarios size=10 value="<?php echo str_replace("-","",$documento->fields['honorarios']); ?>" />
 			<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-			<?=__('Moneda')?>&nbsp;
-			<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $documento->fields['id_moneda'] ? $documento->fields['id_moneda'] : '', '','',"80"); ?>
+			<?php echo __('Moneda'); ?>&nbsp;
+			<?php echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $documento->fields['id_moneda'] ? $documento->fields['id_moneda'] : '', '','',"80"); ?>
 			<span style="color:#FF0000; font-size:10px">*</span>
 		</td>
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Monto Gastos')?>
+			<?php echo __('Monto Gastos');?>
 		</td>
 		<td align=left>
-			<input name=monto_gastos size=10 value="<? echo str_replace("-","",$documento->fields['gastos']);  ?>" />
+			<input name=monto_gastos size=10 value="<?php echo str_replace("-","",$documento->fields['gastos']); ?>" />
 			<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		</td>
 	</tr>
 
 	<tr>
 		<td align=right>
-			<?=__('Descripción')?>
+			<?php echo __('Descripción'); ?>
 		</td>
 		<td align=left>
-			<textarea name=glosa_documento cols="45" rows="3"><?= $documento->fields['glosa_documento']? $documento->fields['glosa_documento']: "Cobro externo al sistema de Time Tracking."?></textarea>
+			<textarea name=glosa_documento cols="45" rows="3"><?php echo $documento->fields['glosa_documento']? $documento->fields['glosa_documento']: "Cobro externo al sistema de Time Tracking."; ?></textarea>
 		</td>
 	</tr>
 	<tr>
@@ -284,7 +284,7 @@ window.opener.Refrescar();
 <table style="border: 0px solid black;" width='90%'>
 	<tr>
 		<td align=left>
-			<input type=submit class=btn value="<?=__('Guardar')?>" onclick='return Validar(this.form);' /> <input type=button class=btn value="<?=__('Cerrar')?>" onclick="Cerrar();" />
+			<input type=submit class=btn value="<?php echo __('Guardar'); ?>" onclick='return Validar(this.form);' /> <input type=button class=btn value="<?php echo __('Cerrar'); ?>" onclick="Cerrar();" />
 		</td>
 	</tr>
 </table>
@@ -298,23 +298,7 @@ window.opener.Refrescar();
 ?>
 
 </form>
-<script type="text/javascript">
 
-Calendar.setup(
-	{
-		inputField	: "fecha",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha_pago",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_pago"		// ID of the button
-	}
-);
-</script>
 <?
 	echo InputId::Javascript($sesion);
 	$pagina->PrintBottom($popup);

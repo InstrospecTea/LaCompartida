@@ -20,6 +20,7 @@
 
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
+	$Html = new \TTB\Html;
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 
@@ -63,8 +64,8 @@
 			{
 				$cliente = new Cliente($sesion);
 				$codigo_cliente = $cliente->CodigoSecundarioACodigo( $codigo_cliente_secundario );
-			} 
-			
+			}
+
 		if($codigo_cliente)
 			$where .= " AND doc.codigo_cliente = '$codigo_cliente' ";
 
@@ -81,7 +82,7 @@
 								doc.codigo_cliente,
 								cliente.glosa_cliente AS nombre_cliente
 							FROM documento as doc
-								LEFT JOIN cobro USING( id_cobro ) 
+								LEFT JOIN cobro USING( id_cobro )
 								JOIN prm_moneda moneda ON doc.id_moneda = moneda.id_moneda
 								LEFT JOIN cliente ON cliente.codigo_cliente=doc.codigo_cliente
 							WHERE 1 ".$where." GROUP BY doc.id_documento ";
@@ -124,7 +125,7 @@
 
 			return $html_opcion;
 		}
-		
+
 		function Monto(& $fila)
 		{
 			global $sesion;
@@ -135,7 +136,7 @@
 				$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
 			return $fila->fields['monto'] > 0 ? $fila->fields['simbolo'] . " " .number_format($fila->fields['monto'],$fila->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']) : '';
 		}
-		
+
 		function Ingreso(& $fila)
 		{
 			global $sesion;
@@ -151,11 +152,11 @@
 	{
 		require_once 'Spreadsheet/Excel/Writer.php';
 
-		$query_todas_monedas = 'SELECT id_moneda, simbolo, cifras_decimales, tipo_cambio 
+		$query_todas_monedas = 'SELECT id_moneda, simbolo, cifras_decimales, tipo_cambio
 				FROM prm_moneda
 				ORDER BY id_moneda';
 		$resp_todas_monedas = mysql_query($query_todas_monedas, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		
+
 		// Obtener datos de la moneda base.
 		$query = 'SELECT simbolo, cifras_decimales, tipo_cambio, id_moneda FROM prm_moneda WHERE moneda_base=1;';
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -170,13 +171,13 @@
 			$where = " AND fecha BETWEEN '".($fecha1? Utiles::fecha2sql($fecha1):'01-01-1800')."' AND '".Utiles::fecha2sql($fecha2).' 23:59:59'."' ";
 		else
 			$where = '';
-			
+
 		if( $codigo_cliente_secundario != '' && $codigo_cliente == '' )
 			{
 				$cliente = new Cliente($sesion);
 				$codigo_cliente = $cliente->CodigoSecundarioACodigo( $codigo_cliente_secundario );
-			} 
-		
+			}
+
 		$query = "SELECT id_documento AS num_docs
 				, glosa_documento
 				, fecha
@@ -188,8 +189,8 @@
 					WHERE codigo_cliente = '$codigo_cliente' $where
 					GROUP BY id_documento
 					ORDER BY id_documento DESC";
-			
-	
+
+
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 		// Crear la planilla.
@@ -233,7 +234,7 @@
 		}
 		else
 			$decimales = '';
-		
+
 		// inicio formato para todas las monedas
 		$formatos_monedas = array();
 		while(list($id_moneda, $simbolo_moneda, $cifras_decimales, $tipo_cambio) = mysql_fetch_array($resp_todas_monedas)){
@@ -248,9 +249,9 @@
 			{
 				$decimales = '';
 			}
-			
+
 			$formatos_monedas[$id_moneda]['tipo_cambio']=$tipo_cambio;
-			$formatos_monedas[$id_moneda]['cifras_decimales']=$cifras_decimales;	
+			$formatos_monedas[$id_moneda]['cifras_decimales']=$cifras_decimales;
 			$formatos_monedas[$id_moneda]['xls'] =& $wb->addFormat(array('Size' => 12,
 																'VAlign' => 'top',
 																'Align' => 'right',
@@ -323,8 +324,8 @@
 		{
 			$egreso_moneda_base  = UtilesApp::CambiarMoneda($egresos,$formatos_monedas[$id_moneda_documento]['tipo_cambio'],$formatos_monedas[$id_moneda_documento]['cifras_decimales'],$formatos_monedas[$id_moneda_base]['tipo_cambio'],$formatos_monedas[$id_moneda_base]['cifras_decimales']);
 			$ingreso_moneda_base = UtilesApp::CambiarMoneda($ingresos,$formatos_monedas[$id_moneda_documento]['tipo_cambio'],$formatos_monedas[$id_moneda_documento]['cifras_decimales'],$formatos_monedas[$id_moneda_base]['tipo_cambio'],$formatos_monedas[$id_moneda_base]['cifras_decimales']);
-			
-			
+
+
 			++$filas;
 			// monto negativo <-> ingreso
 			$ws->write($filas, $col_num, $numero, $formato_celda);
@@ -353,12 +354,12 @@
 	elseif($opc=='excel_todos')
 	{
 		require_once 'Spreadsheet/Excel/Writer.php';
-		
-		$query_todas_monedas = 'SELECT id_moneda, simbolo, cifras_decimales, tipo_cambio 
+
+		$query_todas_monedas = 'SELECT id_moneda, simbolo, cifras_decimales, tipo_cambio
 				FROM prm_moneda
 				ORDER BY id_moneda';
 		$resp_todas_monedas = mysql_query($query_todas_monedas, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		
+
 		// Obtener datos de la moneda base.
 		$query = 'SELECT simbolo, cifras_decimales, tipo_cambio, id_moneda FROM prm_moneda WHERE moneda_base=1;';
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -415,7 +416,7 @@
 												'Border' => 1,
 												'Color' => 'black',
 												'Bold' => '1'));
-		
+
 		// inicio formato para todas las monedas
 		$formatos_monedas = array();
 		while(list($id_moneda, $simbolo_moneda, $cifras_decimales, $tipo_cambio) = mysql_fetch_array($resp_todas_monedas)){
@@ -430,9 +431,9 @@
 			{
 				$decimales = '';
 			}
-			
+
 			$formatos_monedas[$id_moneda]['tipo_cambio']=$tipo_cambio;
-			$formatos_monedas[$id_moneda]['cifras_decimales']=$cifras_decimales;	
+			$formatos_monedas[$id_moneda]['cifras_decimales']=$cifras_decimales;
 			$formatos_monedas[$id_moneda]['xls'] =& $wb->addFormat(array('Size' => 12,
 																'VAlign' => 'top',
 																'Align' => 'right',
@@ -446,9 +447,9 @@
 																'Bold' => '1'));
 		}
 		// fin formato para todas las monedas
-		
-		
-		
+
+
+
 		// Imprimir encabezado
 		$ws->mergeCells(1, 1, 1, 5);
 		$ws->mergeCells(3, 1, 3, 2);
@@ -501,11 +502,11 @@
 		{
 			if($num_docs==0)
 				continue;
-				
+
 			$egreso_moneda_base  = UtilesApp::CambiarMoneda($egresos,$formatos_monedas[$id_moneda_documento]['tipo_cambio'],$formatos_monedas[$id_moneda_documento]['cifras_decimales'],$formatos_monedas[$id_moneda_base]['tipo_cambio'],$formatos_monedas[$id_moneda_base]['cifras_decimales']);
 			$ingreso_moneda_base = UtilesApp::CambiarMoneda($ingresos,$formatos_monedas[$id_moneda_documento]['tipo_cambio'],$formatos_monedas[$id_moneda_documento]['cifras_decimales'],$formatos_monedas[$id_moneda_base]['tipo_cambio'],$formatos_monedas[$id_moneda_base]['cifras_decimales']);
-			
-			
+
+
 			++$filas;
 			// monto negativo <-> ingreso
 			$ws->write($filas, $col_nombre, $glosa_cliente, $formato_celda);
@@ -558,11 +559,11 @@ function BuscarGastos( form, from )
 
 	var fecha1 = $('fecha1').value;
 	var fecha2 = $('fecha2').value;
-	<?php 
+	<?php
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 	 { ?>
 		var codigo_cliente = '&codigo_cliente_secundario='+$('codigo_cliente_secundario').value;
-<?php } 
+<?php }
 	else
 	 { ?>
 		var codigo_cliente = '&codigo_cliente='+$('codigo_cliente').value;
@@ -584,9 +585,9 @@ function BuscarGastos( form, from )
 
 function AgregarNuevo(tipo)
 {
-	if( $('codigo_cliente_secundario') ) 
+	if( $('codigo_cliente_secundario') )
 		var valor_cliente = '&codigo_cliente_secundario=' + $('codigo_cliente_secundario').value;
-	else if( $('codigo_cliente') ) 
+	else if( $('codigo_cliente') )
 		var valor_cliente = '&codigo_cliente=' + $('codigo_cliente').value;
 
 	if(tipo == 'ingreso')
@@ -644,12 +645,12 @@ function MostrarOcultarExcel(value)
 	<tr>
 		<td align=right width='30%'><b><?php echo __('Cliente ')?></b></td>
 		<td colspan=3 align=left>
-			<?php 
+			<?php
 	 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 						echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
-					else	
+					else
 						echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
 				}
 			else
@@ -666,15 +667,13 @@ function MostrarOcultarExcel(value)
 			<?php echo __('Con Fecha posterior a:')?>
 		</td>
 		<td nowrap align=center width='100px'>
-			<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-			<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
+			<?php echo $Html::PrintCalendar('fecha1', $fecha1, 12, 'fechadiff', true); ?>
 		</td>
 		<td align=left width='80px'>
 			<?php echo __(' y anterior a:')?>
 		</td>
 		<td nowrap align=left>
-			<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-			<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
+			<?php echo $Html::PrintCalendar('fecha2', $fecha2, 12, 'fechadiff', true); ?>
 		</td>
 	</tr>
 	<tr>
@@ -698,22 +697,7 @@ function MostrarOcultarExcel(value)
 </td></tr></table>
 </form>
 <br>
-<script type="text/javascript">
-Calendar.setup(
-	{
-		inputField	: "fecha1",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha1"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha2",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha2"		// ID of the button
-	}
-);
-</script>
+
 <?php 	if($opc == 'buscar')
 	{
 		echo($total_cta ? "<table width=100%><tr><td align=left><span style='font-size:11px'><b>".__('Balance cuenta corriente').": ".$simbolo_moneda." ".number_format($total_cta,$cifras_decimales,',','.')."</b></span></td></tr></table>":"");
