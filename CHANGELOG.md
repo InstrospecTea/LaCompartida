@@ -2,7 +2,7 @@
 
 ## Hotfix 15.26.4
 Monday 2015, November 9th
-* **Fix** [html_entities_decode a nombre estudio](https://github.com/LemontechSA/ttb/pull/1218)
+* **Fix** [html_entity_decode a nombre estudio](https://github.com/LemontechSA/ttb/pull/1218)
 
 ## Hotfix 15.26.3
 Friday 2015, November 6th
