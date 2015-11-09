@@ -42,6 +42,13 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			$searchCriteria->filter('codigo_actividad')->restricted_by('equals')->compare_with($data['codigo_actividad']);
 		}
 
+		//Cobrado
+		if ($data['cobrado'] == 'NO') {
+			$searchCriteria->add_scope('conditionNotPaid');
+		} else if ($data['cobrado'] == 'SI') {
+			$searchCriteria->add_scope('conditionPaid');
+		}
+
 		//Cliente
 		if ($data['codigo_cliente_secundario'] || $data['codigo_cliente']) {
 			$codigo = 'codigo_cliente';
