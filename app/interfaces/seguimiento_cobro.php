@@ -279,7 +279,11 @@ if ($opc == 'buscar') {
 			($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_imprimir_buscador') : false;
 
 			$html .= "</b></td>";
-			$html .= "<td style='font-size:10px' class='btpopover' title='Listado de " . __('Asuntos') . "' id='tip_{$cobro->fields['id_contrato']}' align=left valing=top></td>";
+
+			$contrato = new Contrato($sesion);
+			$lista_asuntos = $contrato->MattersByContract($cobro->fields['id_contrato']);
+
+			$html .= "<td style='font-size:10px' title='Listado de " . __('Asuntos') . "' align='left' valing='top'><b>{$lista_asuntos}</b></td>";
 
 			if ($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL') {
 				$texto_acuerdo = $cobro->fields['forma_cobro'] . " de " . $cobro->fields['simbolo_moneda_contrato'] . " " . number_format($cobro->fields['monto'], $cobro->fields['cifras_decimales_moneda_contrato'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . " por " . number_format($cobro->fields['retainer_horas'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . " Hrs.";
@@ -423,34 +427,14 @@ $pagina->PrintTop();
 			}
 		});
 
-		jQueryUI.done(function() {
+		jQuery(document).on('click', '.mostrar-asuntos', function() {
+			jQuery('.asuntos-ocultos').slideToggle();
+			jQuery('.mostrar-asuntos').parent().slideToggle();
+		});
 
-			jQuery('.btpopover').each(function() {
-
-				var self = jQuery(this);
-				var idContrato = jQuery(this).attr('id').replace('tip_', '');
-				jQuery.ajax({url: 'ajax/ajax_asuntos.php?id_contrato=' + idContrato, dataType: 'json'}).done(function(data) {
-
-				if (data == '' || data == null) {
-					jQuery('#tip_' + idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'>No hay informaci&oacute;n sobre <?php echo __('Asuntos'); ?></span>");
-				} else {
-
-					var popover = data[idContrato];
-
-					if (popover.length > 10) {
-						var popover2 = popover.slice(0, 10);
-						var sobra = popover.length - 10;
-						popover2.push('<small>(hay otros ' + sobra + ' <?php echo __('asuntos'); ?> ocultos por falta de espacio en pantalla)</small>');
-					} else {
-						var popover2 = popover;
-					}
-					var contenido = popover2.join('<li>');
-					var contenidofull = popover.join('<li>');
-					jQuery('#tip_' + idContrato).data('content', '<li>' + contenido);
-					jQuery('#tip_' + idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'><li>" + contenidofull + "</span>");
-					}
-				});
-			});
+		jQuery(document).on('click', '.ocultar-asuntos', function() {
+			jQuery('.asuntos-ocultos').slideToggle();
+			jQuery('.mostrar-asuntos').parent().slideToggle();
 		});
 	});
 
