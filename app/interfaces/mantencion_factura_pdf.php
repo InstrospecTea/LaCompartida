@@ -588,8 +588,8 @@ $pagina->PrintTop();
 <?php echo Html::SelectQuery($sesion, "SELECT id_factura_pdf_datos_categoria, glosa FROM factura_pdf_datos_categoria", "select_id_factura_pdf_datos_categoria", $id_factura_pdf_datos_categoria, 'style="width:100px;"'); ?>
 		</td>
 		<td>
-			<input type="button" id="botonguardar" value="Guardar" style="width:80px;">&nbsp;
-			<input type="button" id="botonimprimir" value="Imprimir Documento" style="width:120px;">
+			<input type="button" id="botonguardar" value="<?php echo __('Guardar'); ?>" style="width:80px;">&nbsp;
+			<input type="button" id="botonimprimir" value="<?php echo __('Imprimir Documento'); ?>" style="width:120px;">
 		</td>
 	</tr>
 </table>
@@ -668,51 +668,24 @@ if (defined('SUBDOMAIN') && defined('ROOTDIR')) {
 	<input type="hidden" name="id_factura_pdf_datos_categoria" id="id_factura_pdf_datos_categoria" value="<?php echo $id_factura_pdf_datos_categoria ?>" />
 	<table align="center" style="width:1100px" cellpadding="0" cellspacing="0">
 		<div class="cabecerax"><ul>
-				<li class="st1cellx encabezado">Tipo Dato</li>
-				<li class="nd2cellx encabezado">Activo</li>
-				<li class="rd3cellx encabezado">Posici&oacute;n<br>Horizontal</li>
-				<li class="rd3cellx encabezado">Posici&oacute;n<br>Vertical</li>
-				<li class="rd3cellx encabezado">Ancho<br>[mm]</li>
-				<li class="rd3cellx encabezado">Alto<br>[mm]</li>
-				<li style="width:110px;" class="encabezado">Tipograf&iacute;a</li>
-				<li style="width:100px;" class="encabezado">Estilo</li>
-				<li style="width:90px;" class="encabezado">Mayúscula</li>
-				<li style="width:80px;" class="encabezado">Alineacion</li>
-				<li style="width:60px;text-align:left;" class="encabezado">Tamaño</li>
+				<li class="st1cellx encabezado"><?php echo __('Tipo Dato') ?></li>
+				<li class="nd2cellx encabezado"><?php echo __('Activo') ?></li>
+				<li class="rd3cellx encabezado"><?php echo __('Posición') ?><br><?php echo __('Horizontal') ?></li>
+				<li class="rd3cellx encabezado"><?php echo __('Posición') ?><br><?php echo __('Vertical') ?></li>
+				<li class="rd3cellx encabezado"><?php echo __('Ancho') ?><br>[mm]</li>
+				<li class="rd3cellx encabezado"><?php echo __('Alto') ?><br>[mm]</li>
+				<li style="width:110px;" class="encabezado"><?php echo __('Tipografía') ?></li>
+				<li style="width:100px;" class="encabezado"><?php echo __('Estilo') ?></li>
+				<li style="width:90px;" class="encabezado"><?php echo __('Mayúscula') ?></li>
+				<li style="width:80px;" class="encabezado"><?php echo __('Alineación') ?></li>
+				<li style="width:60px;text-align:left;" class="encabezado"><?php echo __('Tamaño') ?></li>
 			</ul></div>
 		<div id="contienecoordenadas"><div id="tabla_coordenadas"></div></div>
 	</table>
 </form>
 
-<div id="mensaje" style="clear:both; display:block; margin:10px auto; color:#999; font-size:14px;">Vista Previa: las cajas en torno al texto son puramente referenciales</div>
+<div id="mensaje" style="clear:both; display:block; margin:10px auto; color:#999; font-size:14px;"><?php __('Vista Previa: las cajas en torno al texto son puramente referenciales') ?></div>
 <div id="pizarra" class="divloading" style="text-align:left; position:relative; border: 1px solid #CCC; width:800px; height:300px;margin:10px auto;">&nbsp;</div>
 
 <?php
-echo "<form id='datospdf' action=\"#\" style='display:none;' method=\"POST\">";
-echo '<input type="hidden" value="' . $underscan . '" name="underscan" id="underscan"/>';
-echo "<input type=\"hidden\" name=\"opc\" id=\"opc\" value=\"guardar\" />";
-echo "<input type=\"hidden\" name=\"id_estudio\" id=\"id_estudio\" value=\"$id_estudio\" />";
-echo "<input type=\"hidden\" name=\"id_documento_legal\" id=\"id_documento_legal\" value=\"$id_documento_legal\" />";
-echo "<input type=\"hidden\" name=\"id_factura_pdf_datos_categoria\" id=\"id_factura_pdf_datos_categoria\" value=\"$id_factura_pdf_datos_categoria\" />";
-echo "<table align=\"center\" style='width:1100px'; cellpadding=\"0\" cellspacing=\"0\">";
-echo "<div class='cabecerax'><ul>";
-echo "<li class=\"st1cellx encabezado\">Tipo Dato</li>";
-echo "<li class=\"nd2cellx encabezado\">Activo</li>";
-echo "<li class=\"rd3cellx encabezado\">Posici&oacute;n<br>Horizontal</li>";
-echo "<li class=\"rd3cellx encabezado\">Posici&oacute;n<br>Vertical</li>";
-echo "<li class=\"rd3cellx encabezado\">Ancho<br>[mm]</li>";
-echo "<li class=\"rd3cellx encabezado\">Alto<br>[mm]</li>";
-echo "<li style='width:110px;' class=\"encabezado\">Tipograf&iacute;a</li>";
-echo "<li style='width:100px;' class=\"encabezado\">Estilo</li>";
-echo "<li style='width:90px;' class=\"encabezado\">Mayï¿½scula</li>";
-echo "<li style='width:80px;' class=\"encabezado\">Alineacion</li>";
-echo "<li style='width:60px;text-align:left;' class=\"encabezado\">Tamaï¿½o</li>";
-echo "</ul></div>";
-echo "<div id='contienecoordenadas'><div id='tabla_coordenadas'></div></div>";
-echo "</table>";
-echo "</form>";
-
-echo '<div id="mensaje" style="clear:both;display:block;margin:10px auto ;color:#999;font-size:14px;">Vista Previa: las cajas en torno al texto son puramente referenciales</div>';
-echo '<div id="pizarra" class="divloading" style="text-align:left; position:relative; border: 1px solid #CCC;width:800px;height:300px;margin:10px auto;">&nbsp;</div>';
-
 $pagina->PrintBottom();

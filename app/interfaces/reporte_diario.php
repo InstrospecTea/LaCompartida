@@ -567,7 +567,7 @@ if(!$popup)
 					echo "<option value='".$tipo."'";
 					if($tipo_dato == $tipo)
 						echo "selected";
-					echo "> ".__($tipo)."</option>";
+					echo ">".__($tipo)."</option>";
 				}
 			?>
 			</select>
@@ -586,7 +586,7 @@ if(!$popup)
 					echo "<option value='".$tipo."'";
 					if($tipo_dato_comparado == $tipo)
 						echo "selected";
-					echo "> ".__($tipo)."</option>";
+					echo ">".__($tipo)."</option>";
 				}
 			?>
 			</select>

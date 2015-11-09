@@ -13,7 +13,7 @@
 		if ($fecha2 != '' AND !DateTime::createFromFormat('Y-m-d', $fecha2)) {
 			$fecha2 = date('Y-m-d', strtotime($fecha2));
 		}
-		
+
 		switch ($tipo_reporte) {
 			case 'prof_vs_asunto':
 				$pagina->Redirect("planillas/planilla_prof_vs_asunto.php?fecha1=$fecha1&fecha2=$fecha2&horas=$horas&moneda_mostrar=$moneda_mostrar");
@@ -93,7 +93,7 @@
 	</tr>
     <tr>
         <td align="right">
-            <?php echo _('Moneda'); ?><br/>
+            <?php echo __('Moneda') ?><br/>
         </td>
         <td align="left">
 			<?php echo '&nbsp;&nbsp;&nbsp;' . Html::SelectQuery($Sesion, 'SELECT id_moneda, glosa_moneda FROM prm_moneda', 'moneda_mostrar', $moneda_mostrar, '', '' , 80); ?>

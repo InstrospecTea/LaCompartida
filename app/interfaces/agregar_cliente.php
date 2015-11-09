@@ -396,7 +396,7 @@ $Pagina->PrintTop();
 			<tr  class="controls controls-row " >
 				<td class="ar"  width="200">
 					<div class="span2">
-						<?php echo __('Codigo'); ?>
+						<?php echo __('Código'); ?>
 						<?php echo $obligatorio; ?>
 					</div >
 				</td>
@@ -448,7 +448,7 @@ $Pagina->PrintTop();
 						$cliente->fields['id_grupo_cliente'] ? $cliente->fields['id_grupo_cliente'] : $id_grupo_cliente,
 						array('id' => 'id_grupo_cliente', 'class' => 'span3', 'style' => 'display:inline'),
 						array(
-						  'source' => 'ajax/ajax_prm.php?prm=GrupoCliente&single_class=1&fields=glosa_grupo_cliente,codigo_cliente,id_pais,id_grupo_cliente',
+						  'source' => 'ajax/ajax_prm.php?prm=GrupoCliente&single_class=1&order_by=glosa_grupo_cliente&fields=glosa_grupo_cliente,codigo_cliente,id_pais,id_grupo_cliente',
 						  'selectedName' => 'selected_group',
 						  'onLoad' => '
 							var element = selected_group;
@@ -686,6 +686,7 @@ $Pagina->PrintTop();
 	<br/>
 	<br/>
 
+	<?php if ($id_cliente > 0 && $cliente->fields['activo'] == 1): ?>
 	<table width="100%">
 		<tr>
 			<td class="cvs" align="center">
@@ -725,6 +726,7 @@ $Pagina->PrintTop();
 			</td>
 		</tr>
 	</table>
+	<?php endif; ?>
 
 </form>
 <?php echo $Form->script(); ?>

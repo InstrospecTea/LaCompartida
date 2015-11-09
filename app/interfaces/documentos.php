@@ -71,7 +71,7 @@ $pagina->PrintTop(1);
 		<table width="100%">
 			<tr>
 				<td align=right>
-					Documento:
+					<?php echo __('Documento'); ?>:
 				</td>
 				<td align=left>
 					<input type=file id="archivo_data" name="archivo_data">
@@ -79,7 +79,7 @@ $pagina->PrintTop(1);
 			</tr>
 			<tr>
 				<td align=right>
-					Descripci&oacute;n:
+					<?php echo __('Descripción'); ?>:
 				</td>
 				<td align=left>
 					<textarea cols=30 rows=2 name="descripcion"></textarea>
@@ -87,7 +87,7 @@ $pagina->PrintTop(1);
 			</tr>
 			<tr>
 				<td colspan=2 align=center>
-					<input type=button onclick="return Guardar(this);" value="<?php echo __('Cargar Documento') ?>" class="btn" />
+					<input type="button" onclick="return Guardar(this);" value="<?php echo __('Cargar Documento') ?>" class="btn" />
 				</td>
 			</tr>
 		</table>
@@ -173,6 +173,7 @@ printf('<script type="text/javascript" src="%s/app/templates/default/js/uploader
 	var max_file_uploads = <?php echo ini_get('max_file_uploads') ?>;
 	var upload_max_filesize = <?php echo sizeInBytes(ini_get('upload_max_filesize')); ?>;
 	var upload_max_filesize_h = '<?php echo ini_get('upload_max_filesize'); ?>';
+	var file_empty_msg = "<?php echo __('Usted debe ingresar un archivo'); ?>.";
 	observeFile('archivo_data');
 
 	function Guardar(t) {
@@ -188,7 +189,7 @@ printf('<script type="text/javascript" src="%s/app/templates/default/js/uploader
 	}
 	function Eliminar(id) {
 		var form = $('form_archivo');
-		if (confirm("<?= __('¿Desea eliminar el archivo seleccionado?') ?>") && id) {
+		if (confirm("<?php echo __('¿Desea eliminar el archivo seleccionado?'); ?>") && id) {
 			$('id_archivo').value = id;
 			$('accion').value = 'eliminar';
 			form.submit();

@@ -311,7 +311,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		$title = $this->getTitle();
 		$col1 = __('FECHA');
 		$col2 = __('ABOGADO');
-		$col3 = __('TIEMPO EN MINUTOS');
+		$col3 = __('TIEMPO EN ' . strtoupper($this->parameters['time']));
 		$col4 = __('VALOR FACTURABLE ESTANDAR');
 		$since = $until = '';
 		if (!empty($this->parameters['since'])) {
@@ -322,7 +322,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 		}
 		$period = $this->buildPeriod($since, $until);
 		$currency = $this->parameters['filterCurrency'];
-		$values = $this->parameters['showHours'] == 0 ? 'Horas Trabajadas' : 'Horas Facturables';
+		$values = $this->parameters['showHours'] == 0 ? __('Horas Trabajadas') : __('Horas Facturables Corregidas');
 		if (!$this->parameters['invoicedValue']) {
 			return <<<HTML
 				<h1 id="doc_header">
@@ -399,6 +399,9 @@ HTML;
 					$total_minutos_cliente += $trabajos['minutos'];
 					$total_facturado_cliente += $trabajos['total_facturado'];
 				}
+				if ($this->parameters['time'] == 'horas') {
+					$total_minutos_cliente = $this->minutes_to_hours($total_minutos_cliente);
+				}
 				if ($with_invoiced) {
 					$trs = $this->Html->tag(
 						'tr',
@@ -445,22 +448,29 @@ HTML;
 					$total_minutos_cliente += $trabajos['minutos'];
 					$total_facturado_cliente += $trabajos['total_facturado'];
 				}
+				$minutos_cliente = $total_minutos_cliente;
+				if ($this->parameters['time'] == 'horas') {
+					$minutos_cliente = $this->minutes_to_hours($total_minutos_cliente);
+				}
 				if ($with_invoiced) {
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
 						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
-						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
+						$this->Html->tag('th', $minutos_cliente, array('class' => 'col3')) .
 						$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_cliente, $currency, $this->defaultLanguage), array('class' => 'col3'))
 					);
 				} else {
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
 						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
-						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3'))
+						$this->Html->tag('th', $minutos_cliente, array('class' => 'col3'))
 					);
 				}
 				$html_asuntos .= $this->Html->tag('table', $trs, array('class' => 'table'));
 				$html_clientes .= $this->Html->tag('div', $nombre_cliente . $html_asuntos, array('class' => 'margin'));
 				$total_minutos_abogado += $total_minutos_cliente;
 				$total_facturado_abogado += $total_facturado_cliente;
+			}
+			if ($this->parameters['time'] == 'horas') {
+				$total_minutos_abogado = $this->minutes_to_hours($total_minutos_abogado);
 			}
 			if ($with_invoiced) {
 				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
@@ -494,10 +504,14 @@ HTML;
 				$this->CoiningBusiness->getCurrency($fila['id_moneda']),
 				$moneda_filtro
 			);
+			$duracion_minutos =  $fila['duracion_minutos'];
+			if ($this->parameters['time'] == 'horas') {
+				$duracion_minutos = $this->minutes_to_hours($fila['duracion_minutos']);
+			}
 			if ($with_invoiced) {
 				$tds .= $this->Html->tag('td', $this->formatDate($fila['fecha'], true), array('class' => 'col1'));
 				$tds .= $this->Html->tag('td', "{$fila['usr_nombre']}<br/>{$fila['descripcion']}");
-				$tds .= $this->Html->tag('td', $fila['duracion_minutos'], array('class' => 'col3'));
+				$tds .= $this->Html->tag('td', $duracion_minutos, array('class' => 'col3'));
 				$tds .= $this->Html->tag(
 					'td',
 					"{$moneda_filtro->get('simbolo')} " .
@@ -513,7 +527,7 @@ HTML;
 			} else {
 				$tds .= $this->Html->tag('td', $this->formatDate($fila['fecha'], true), array('class' => 'col1'));
 				$tds .= $this->Html->tag('td', "{$fila['usr_nombre']}<br/>{$fila['descripcion']}");
-				$tds .= $this->Html->tag('td', $fila['duracion_minutos'], array('class' => 'col3'));
+				$tds .= $this->Html->tag('td', $duracion_minutos, array('class' => 'col3'));
 
 				$trs .= $this->Html->tag('tr', $tds);
 			}
@@ -522,10 +536,14 @@ HTML;
 			$total_facturado += $valor_facturado;
 		}
 
+		$total_asuntos = $total;
+		if ($this->parameters['time'] == 'horas') {
+			$total_asuntos = $this->minutes_to_hours($total);
+		}
 		if ($with_invoiced) {
 			$ths .= $this->Html->tag('th', '', array('class' => 'col1'));
 			$ths .= $this->Html->tag('th', __('Total asunto'), array('class' => 'col2'));
-			$ths .= $this->Html->tag('th', $total, array('class' => 'col3'));
+			$ths .= $this->Html->tag('th', $total_asuntos, array('class' => 'col3'));
 			$ths .= $this->Html->tag(
 				'th',
 				"{$moneda_filtro->get('simbolo')} " .
@@ -541,7 +559,7 @@ HTML;
 		} else {
 			$ths .= $this->Html->tag('th', '', array('class' => 'col1'));
 			$ths .= $this->Html->tag('th', __('Total asunto'), array('class' => 'col2'));
-			$ths .= $this->Html->tag('th', $total, array('class' => 'col3'));
+			$ths .= $this->Html->tag('th', $total_asuntos, array('class' => 'col3'));
 
 			$trs .= $this->Html->tag('tr', $ths);
 		}
@@ -563,5 +581,9 @@ HTML;
 		}
 		setlocale(LC_ALL, 'es_ES');
 		return strftime('%d-%b-%y', $date->getTimestamp());
+	}
+
+	private function minutes_to_hours($minutos) {
+		return str_pad(floor($minutos / 60), 2, '0', STR_PAD_LEFT) . ':' . str_pad(($minutos % 60), 2, '0', STR_PAD_LEFT);
 	}
 }

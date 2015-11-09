@@ -169,7 +169,7 @@ $Form = new Form;
 						<b><?php echo __('Grupo'); ?></b>&nbsp;
 					</td>
 					<td class="al">
-						<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), 'id_grupo_cliente', $id_grupo_cliente, '', 'Ninguno', '280px'); ?>
+						<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), 'id_grupo_cliente', $id_grupo_cliente, '', __('Ninguno'), '280px'); ?>
 					</td>
 				</tr>
 				<tr>
@@ -183,7 +183,7 @@ $Form = new Form;
 
 				<tr>
 					<td width="25%" class="ar" style="font-weight:bold;">
-						<?php echo __('C&oacute;digo asunto'); ?>
+						<?php echo __('Código asunto'); ?>
 					</td>
 					<td nowrap class="al" colspan="4">
 						<?php UtilesApp::CampoAsunto($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, null, $glosa_asunto, false); ?>
@@ -192,7 +192,7 @@ $Form = new Form;
 
 				<tr>
 					<td class="ar" style="font-weight:bold;">
-						<?php echo __('Fecha creaci&oacute;n'); ?>
+						<?php echo __('Fecha creación'); ?>
 					</td>
 					<td nowrap class="al" colspan="3">
 						<input onkeydown="if (event.keyCode == 13) Listar(this.form, 'buscar');" type="text" name="fecha1" class="fechadiff" value="<?php echo $fecha1; ?>" id="fecha1" size="11" maxlength="10" />
@@ -211,7 +211,7 @@ $Form = new Form;
 				</tr>
 				<tr>
 					<td class="ar" style="font-weight:bold;">
-						<?php echo __('&Aacute;rea'); ?>
+						<?php echo __('Área'); ?>
 					</td>
 					<td class="al" colspan="3">
 						<?php echo Html::SelectArrayDecente($AreaProyecto->Listar('ORDER BY orden ASC'), 'id_area_proyecto', $id_area_proyecto, '', 'Todos', '300px'); ?>
@@ -289,13 +289,13 @@ if ($buscar || $opc == "entregar_asunto") {
 
 	if ($codigo_asunto != '' || $codigo_asunto_secundario != '') {
 		if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-			$where .= " AND a1.codigo_asunto_secundario Like '$codigo_asunto_secundario%'";
+			$where .= " AND a1.codigo_asunto_secundario Like '" . mysql_real_escape_string($codigo_asunto_secundario) . "%'";
 		} else {
-			$where .= " AND a1.codigo_asunto Like '$codigo_asunto%'";
+			$where .= " AND a1.codigo_asunto Like '" . mysql_real_escape_string($codigo_asunto) . "%'";
 		}
 	} else if ($glosa_asunto != '') {
 		$nombre = strtr($glosa_asunto, ' ', '%');
-		$where .= " AND a1.glosa_asunto Like '%{$glosa_asunto}%'";
+		$where .= " AND a1.glosa_asunto Like '%{" . mysql_real_escape_string($glosa_asunto) . "}%'";
 	}
 
 	if (!empty($codigo_cliente_secundario) && $usocodigosecundario == true) {
@@ -307,12 +307,12 @@ if ($buscar || $opc == "entregar_asunto") {
 
 	if ($opc == "entregar_asunto") {
 		if ($id_contrato) {
-			$where .= " AND (a1.codigo_cliente = '$codigo_cliente' OR a1.id_contrato='$id_contrato') ";
+			$where .= " AND (a1.codigo_cliente = '" . mysql_real_escape_string($codigo_cliente) . "' OR a1.id_contrato='$id_contrato') ";
 		} else {
-			$where .= " AND a1.codigo_cliente = '$codigo_cliente' ";
+			$where .= " AND a1.codigo_cliente = '" . mysql_real_escape_string($codigo_cliente) . "' ";
 		}
 	} else if ($codigo_cliente) {
-		$where .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
+		$where .= " AND cliente.codigo_cliente = '" . mysql_real_escape_string($codigo_cliente) . "' ";
 	}
 
 	if ($motivo == "cobros") {
@@ -406,7 +406,7 @@ if ($buscar || $opc == "entregar_asunto") {
 	$b->AgregarEncabezado("horas_trabajadas", __('Horas Trabajadas'), "class='al'");
 	$b->AgregarEncabezado("horas_no_cobradas", __('Horas a cobrar'), "class='al'");
 	$b->AgregarEncabezado("fecha_ultimo_cobro", __('Fecha último cobro'));
-	$b->AgregarEncabezado("fecha_creacion", __('Fecha de creación"'));
+	$b->AgregarEncabezado("fecha_creacion", __('Fecha de creación'));
 
 	if ($Sesion->usuario->Es('DAT') || $Sesion->usuario->Es('SASU')) {
 		$b->AgregarFuncion("$link", 'Opciones', "align=center' nowrap");

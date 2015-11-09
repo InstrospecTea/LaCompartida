@@ -92,12 +92,12 @@
 
 		$filas = 1;
 		$ws1->mergeCells($filas,1,$filas,2);
-		$ws1->write($filas,1,'Reporte sobre la demora en el ingreso de horas',$encabezado);
+		$ws1->write($filas,1,__('Reporte sobre la demora en el ingreso de horas'),$encabezado);
 		$ws1->write($filas,2,'',$encabezado);
 		$filas += 2;
-		$ws1->write($filas,1,'Trabajos desde: ',$formato_texto_sin_color);
+		$ws1->write($filas,1,__('Trabajos desde: '),$formato_texto_sin_color);
 		$ws1->write($filas++,2,$fecha1,$formato_texto_sin_color);
-		$ws1->write($filas,1,'Trabajos hasta: ',$formato_texto_sin_color);
+		$ws1->write($filas,1,__('Trabajos hasta: '),$formato_texto_sin_color);
 		$ws1->write($filas,2,$fecha2,$formato_texto_sin_color);
 		$filas += 2;
 		$cantidad_meses = Utiles::CantidadMeses( $fecha1, $fecha2 );
@@ -119,13 +119,13 @@
 			$ws1->mergeCells($filas, $col, $filas, $col+3);
 			$ws1->write($filas, $col, $meses[$x_mes] . ' ' . $x_anio, $formato_titulo);
 			$ws1->write($filas, $col+3,'', $formato_titulo);
-			$ws1->write($filas+1, $col++, 'Mayor', $formato_titulo);
-			$ws1->write($filas+1, $col++, 'Menor', $formato_titulo);
-			$ws1->write($filas+1, $col++, 'Promedio', $formato_titulo);
-			$ws1->write($filas+1, $col++, 'N° Trabajos', $formato_titulo);
-			if($x_mes == 12) {
-				$x_anio++;
-				$x_mes = 1;
+			$ws1->write($filas+1, $col++, __('Mayor'), $formato_titulo);
+			$ws1->write($filas+1, $col++, __('Menor'), $formato_titulo);
+			$ws1->write($filas+1, $col++, __('Promedio'), $formato_titulo);
+			$ws1->write($filas+1, $col++, __('N° Trabajos'), $formato_titulo);
+			if( $x_mes == 12 ) {
+					$x_anio++;
+					$x_mes = 1;
 			} else {
 				$x_mes++;
 			}
@@ -166,7 +166,7 @@
 				$arreglo_datos[$i] = abs($AvgDemoraIngreso) ? $AvgDemoraIngreso : "0";$i++;
 				$arreglo_datos[$i] = $CantidadHoras ? $CantidadHoras : "0";$i++;
 			}
-			
+
 			foreach ($arreglo_datos as $col => $val) {
 				if (0 < ($col-1)%8 && ($col-1)%8 < 5) {
 					if (($col-1)%4 == 3) {

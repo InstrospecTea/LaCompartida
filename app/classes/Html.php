@@ -17,6 +17,13 @@ class Html extends \Html {
 		return $this->tag('div', $text, $attrs);
 	}
 
+	public function form(array $attrs = array(), $closed = false) {
+		$attrs = $this->attributes($attrs);
+		$html = !$closed ? sprintf("<form%s>\n", $attrs) : "</form>\n";
+
+		return $html;
+	}
+
 	/**
 	 * Construye un tag html
 	 * @param string $tag

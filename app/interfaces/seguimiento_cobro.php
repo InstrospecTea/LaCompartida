@@ -232,7 +232,7 @@ if ($opc == 'buscar') {
 	$b->AgregarEncabezado("glosa_cliente", __('Cliente'), "", "", "SplitDuracion");
 	$b->AgregarEncabezado("asuntos", __('Asunto'), "align=left");
 	$b->AgregarEncabezado("id_contrato", __('Acuerdo'), "align=left");
-	$b->AgregarFuncion("Opci&oacute;n", 'Opciones', "align=center nowrap width=8%");
+	$b->AgregarFuncion(__("Opción"), 'Opciones', "align=center nowrap width=8%");
 	$b->funcionTR = "funcionTR";
 
 	function funcionTR(&$cobro) {
@@ -279,7 +279,11 @@ if ($opc == 'buscar') {
 			($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_imprimir_buscador') : false;
 
 			$html .= "</b></td>";
-			$html .= "<td style='font-size:10px' class='btpopover' title='Listado de " . __('Asuntos') . "' id='tip_{$cobro->fields['id_contrato']}' align=left valing=top></td>";
+
+			$contrato = new Contrato($sesion);
+			$lista_asuntos = $contrato->MattersByContract($cobro->fields['id_contrato']);
+
+			$html .= "<td style='font-size:10px' title='Listado de " . __('Asuntos') . "' align='left' valing='top'><b>{$lista_asuntos}</b></td>";
 
 			if ($cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL') {
 				$texto_acuerdo = $cobro->fields['forma_cobro'] . " de " . $cobro->fields['simbolo_moneda_contrato'] . " " . number_format($cobro->fields['monto'], $cobro->fields['cifras_decimales_moneda_contrato'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . " por " . number_format($cobro->fields['retainer_horas'], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . " Hrs.";
@@ -298,15 +302,15 @@ if ($opc == 'buscar') {
 							</td>";
 
 			$ht .= "<td style='font-size:10px; ' align=left>
-								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
+								<b>&nbsp;&nbsp;&nbsp;" . __('Descripción'. " " . __('del cobro')) . "</b>
 							</td>";
 			if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 				$ht .= "<td align=center style='font-size:10px; width: 70px;'>
-								<b>Nº Factura</b>
+								<b>" . __('Nº Factura') . "</b>
 							</td>";
 			}
 			$ht .= "<td style='font-size:10px; width: 52px;' align=center>
-								<b>Opción</b>
+								<b>" . __('Opción') . "</b>
 							</td></tr>";
 			$ht .= "<tr bgcolor='#F2F2F2'><td align=center colspan=4><hr size=1px style='font-size:10px; border:1px dashed #CECECE'></td><tr>";
 
@@ -423,34 +427,14 @@ $pagina->PrintTop();
 			}
 		});
 
-		jQueryUI.done(function() {
+		jQuery(document).on('click', '.mostrar-asuntos', function() {
+			jQuery('.asuntos-ocultos').slideToggle();
+			jQuery('.mostrar-asuntos').parent().slideToggle();
+		});
 
-			jQuery('.btpopover').each(function() {
-
-				var self = jQuery(this);
-				var idContrato = jQuery(this).attr('id').replace('tip_', '');
-				jQuery.ajax({url: 'ajax/ajax_asuntos.php?id_contrato=' + idContrato, dataType: 'json'}).done(function(data) {
-
-				if (data == '' || data == null) {
-					jQuery('#tip_' + idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'>No hay informaci&oacute;n sobre <?php echo __('Asuntos'); ?></span>");
-				} else {
-
-					var popover = data[idContrato];
-
-					if (popover.length > 10) {
-						var popover2 = popover.slice(0, 10);
-						var sobra = popover.length - 10;
-						popover2.push('<small>(hay otros ' + sobra + ' <?php echo __('asuntos'); ?> ocultos por falta de espacio en pantalla)</small>');
-					} else {
-						var popover2 = popover;
-					}
-					var contenido = popover2.join('<li>');
-					var contenidofull = popover.join('<li>');
-					jQuery('#tip_' + idContrato).data('content', '<li>' + contenido);
-					jQuery('#tip_' + idContrato).html("<span class='asuntos_del_contrato' style='font-weight:bold;'><li>" + contenidofull + "</span>");
-					}
-				});
-			});
+		jQuery(document).on('click', '.ocultar-asuntos', function() {
+			jQuery('.asuntos-ocultos').slideToggle();
+			jQuery('.mostrar-asuntos').parent().slideToggle();
 		});
 	});
 
@@ -710,7 +694,7 @@ $pagina->PrintTop();
 				</td>
 				<td align="left" colspan="2">
 					<?php $GrupoCliente = new GrupoCliente($sesion); ?>
-					<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
+					<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), "id_grupo_cliente", $id_grupo_cliente, "", __("Ninguno"), '280px') ?>
 				</td>
 			</tr>
 
@@ -822,7 +806,7 @@ $pagina->PrintTop();
 
 			<tr>
 				<td align="right">
-					<b><?php echo __('Estado') . ' de ' . __('Cobro'); ?></b>
+					<b><?php echo __(__('Estado') . ' de ' . __('Cobro')); ?></b>
 				</td>
 				<td align="left" colspan="2">
 					<?php echo Html::SelectQuery($sesion, "SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden", "estado[]", $estado, 'multiple="multiple" size="7"', __('Vacio'), '150') ?>
@@ -831,10 +815,10 @@ $pagina->PrintTop();
 
 			<tr>
 				<div style="text-align: left;position: absolute;left: 600px;top: 300px;">
-					<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Honorarios'); ?>
-					<br/><input type="checkbox" name="tienegastos"   value="1" id="tienegastos"  <?php if (isset($_POST['tienegastos'])) echo 'checked="checked"'; ?>/> Tiene <?php echo __('Gastos'); ?>
-					<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Trámites'); ?>
-					<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> Hay <?php echo __('Adelantos'); ?>  disponibles
+					<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene ' . __('Honorarios')); ?>
+					<br/><input type="checkbox" name="tienegastos"   value="1" id="tienegastos"  <?php if (isset($_POST['tienegastos'])) echo 'checked="checked"'; ?>/> <?php echo __('Tiene ' . __('Gastos')); ?>
+					<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene ' . __('Trámites')); ?>
+					<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> <?php echo __('Hay ' . __('Adelantos') . ' disponibles'); ?> 
 				</div>
 			</tr>
 

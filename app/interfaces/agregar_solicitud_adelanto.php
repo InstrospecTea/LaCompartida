@@ -10,6 +10,10 @@ $SolicitudAdelanto = new SolicitudAdelanto($Sesion);
 if ($_POST['opcion'] == 'guardar') {
 	$SolicitudAdelanto->Fill($_REQUEST, true);
 	$SolicitudAdelanto->Edit('id_usuario_ingreso', $Sesion->usuario->fields['id_usuario']);
+
+	if ($SolicitudAdelanto->fields['codigo_asunto'] == '') {
+		$SolicitudAdelanto->fields['codigo_asunto'] = NULL;
+	}
 	
 	if ($SolicitudAdelanto->Write()) {
 		$Pagina->AddInfo(__('Solicitud de Adelanto guardada con éxito'));

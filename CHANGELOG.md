@@ -1,5 +1,111 @@
 # Changelog
 
+## Hotfix 15.26.4
+Monday 2015, November 9th
+* **Fix** [html_entity_decode a nombre estudio](https://github.com/LemontechSA/ttb/pull/1218)
+
+## Hotfix 15.26.3
+Friday 2015, November 6th
+* **Fix** [Mejora listado asuntos en cobros masivos](https://github.com/LemontechSA/ttb/pull/1217)
+
+## Hotfix 15.26.2
+Thursday 2015, November 5th
+* **Fix** [Error SQL - Editar solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/1215)
+
+## Hotfix 15.26.1
+Thursday 2015, November 5th
+* **Fix** [Eliminar salto de linea al crear input con helper Form](https://github.com/LemontechSA/ttb/pull/1212)
+
+## [Release 15.26.0](https://github.com/LemontechSA/ttb/pull/1211)
+Wednesday 2015, November 4th
+* **Feature** [Agrupar actividades](https://github.com/LemontechSA/ttb/pull/1204)
+
+## Hotfix 15.25.11
+Wednesday 2015, November 4th
+* **Fix** [Error al agregar asunto](https://github.com/LemontechSA/ttb/pull/1210)
+
+## Hotfix 15.25.10
+Wednesday 2015, November 4th
+* **Fix** [Error al actualizar tarifa](https://github.com/LemontechSA/ttb/pull/1209)
+
+## Hotfix 15.25.9
+Wednesday 2015, November 4th
+* **Fix** [Error al guardar contrato](https://github.com/LemontechSA/ttb/pull/1208)
+
+## Hotfix 15.25.8
+Wednesday 2015, November 4th
+* **Fix** [Limpiar saltos de línea en query](https://github.com/LemontechSA/ttb/pull/1207)
+
+## Hotfix 15.25.7
+Tuesday 2015, November 3rd
+* **Fix** [Corregir despliegue de usuarios segun perfil](https://github.com/LemontechSA/ttb/pull/1206)
+
+## Hotfix 15.25.6
+Tuesday 2015, November 3rd
+* **Fix** [Se añade escape a variables](https://github.com/LemontechSA/ttb/pull/1205)
+
+## Hotfix 15.25.5
+Friday 2015, October 30th
+* **Fix** [Corrección a selector de países](https://github.com/LemontechSA/ttb/pull/1202)
+
+## Hotfix 15.25.4
+Friday 2015, October 30th
+* **Fix** [Selectores ordenados alfabeticamente](https://github.com/LemontechSA/ttb/pull/1200)
+
+## Hotfix 15.25.3
+Friday 2015, October 30th
+* **Fix** [Opción tiempo en horas PDF Revisar Horas](https://github.com/LemontechSA/ttb/pull/1199)
+
+## Hotfix 15.25.2
+Friday 2015, October 30th
+* **Fix** [Columna País en Excel Clientes](https://github.com/LemontechSA/ttb/pull/1198)
+
+## Hotfix 15.25.1
+Thursday 2015, October 29th
+* **Fix** [Corrección Reporte Ventas](https://github.com/LemontechSA/ttb/pull/1196)
+
+## [Release 15.25.0](https://github.com/LemontechSA/ttb/pull/1195)
+Wednesday 2015, October 28th
+* **Feature** [Mejoras en reportes LloredaCamacho](https://github.com/LemontechSA/ttb/pull/1184)
+
+## Hotfix 15.24.8
+Wednesday 2015, October 28th
+* **Fix** [Corregir edición de tarifas](https://github.com/LemontechSA/ttb/pull/1193)
+
+## Hotfix 15.24.7
+Tuesday 2015, October 27th
+* **Fix** [Corregir usuario al subir gastos por SAP](https://github.com/LemontechSA/ttb/pull/1192)
+
+## Hotfix 15.24.6
+Tuesday 2015, October 27th
+* **Fix** [Corregir método para generar codigo de actividad](https://github.com/LemontechSA/ttb/pull/1191)
+
+## Hotfix 15.24.5
+Monday 2015, October 26th
+* **Fix** [Validación variable `id_usuario`](https://github.com/LemontechSA/ttb/pull/1190)
+
+## Hotfix 15.24.4
+Thursday 2015, October 22nd
+* **Fix** [Corrección tipo moneda a mostrar en hitos Excel](https://github.com/LemontechSA/ttb/pull/1189)
+
+## Hotfix 15.24.3
+Thursday 2015, October 22nd
+* **Fix** [Rollback de Hotfix/15.23.7](https://github.com/LemontechSA/ttb/pull/1188)
+
+## Hotfix 15.24.2
+Wednesday 2015, October 21st
+* **Fix** [Diferenica de horas en excel asuntos por cobrar](https://github.com/LemontechSA/ttb/pull/1187)
+
+## Hotfix 15.24.1
+Wednesday 2015, October 21st
+* **Fix** [Error SQL - Actualizar Contrato](https://github.com/LemontechSA/ttb/pull/1183)
+
+## [Release 15.24.0](https://github.com/LemontechSA/ttb/pull/1178)
+Tuesday 2015, October 20th
+* **Feature** [Texto factura](https://github.com/LemontechSA/ttb/pull/1169)
+* **Feature** [Diferencia horas](https://github.com/LemontechSA/ttb/pull/1164)
+* **Feature** [Selector usuarios](https://github.com/LemontechSA/ttb/pull/1157)
+
 ## Hotfix 15.23.10
 Monday 2015, October 19th
 * **Fix** [Modificar horas en asuntos inactivos](https://github.com/LemontechSA/ttb/pull/1177)

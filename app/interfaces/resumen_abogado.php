@@ -35,13 +35,13 @@ $Pagina->PrintTop();
 		<td align="right">
 			<?php echo __('Profesionales')?>
 		</td>
-		<td align="left"><!-- Nuevo Select -->
+		<td align="left">
 			<?php echo $Form->select('usuarios[]', $Sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => FALSE, 'style' => 'width: 200px', 'multiple' => 'multiple','size' => '7')); ?>
 		</td>
 	</tr>
 	<tr>
 		<td align="right">
-			<?php echo __('Forma TarificaciÃ³n')?>
+			<?php echo __('Forma Tarificación')?>
 		</td>
 		<td align="left">
 			<?php echo Html::SelectQuery($Sesion,'SELECT forma_cobro, descripcion FROM prm_forma_cobro ORDER BY forma_cobro', 'forma_cobro[]', $forma_cobro, 'multiple size=5', '', '200'); ?>

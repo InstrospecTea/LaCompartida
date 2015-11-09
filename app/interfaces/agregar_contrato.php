@@ -113,9 +113,15 @@ if (isset($cargar_datos_contrato_cliente_defecto) && !empty($cargar_datos_contra
 // CONTRATO GUARDA
 if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$enviar_mail = 1;
+
+	$Cliente = new Cliente($Sesion);
+
+	if (!$Cliente->LoadByCodigo($codigo_cliente)) {
+		$Pagina->AddError(__('El cliente seleccionado no existe en el sistema'));
+	}
+
 	if ($forma_cobro != 'TASA' && $forma_cobro != 'HITOS' && $forma_cobro != 'ESCALONADA' && $monto == 0) {
 		$Pagina->AddError(__('Ud. ha seleccionado forma de ') . __('cobro') . ': ' . $forma_cobro . ' ' . __('y no ha ingresado monto'));
-		$val = true;
 	} else if ($forma_cobro == 'TASA') {
 		$monto = '0';
 	}
@@ -123,7 +129,6 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	if ($tipo_tarifa == 'flat') {
 		if (empty($tarifa_flat)) {
 			$Pagina->AddError(__('Ud. ha seleccionado una tarifa plana pero no ha ingresado el monto'));
-			$val = true;
 		} else {
 			$tarifa = new Tarifa($Sesion);
 			$id_tarifa = $tarifa->GuardaTarifaFlat($tarifa_flat, $id_moneda, $id_tarifa_flat);
@@ -133,12 +138,10 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 
 	if ($usuario_responsable_obligatorio && empty($id_usuario_responsable) or $id_usuario_responsable == '-1') {
 		$Pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Principal'));
-		$val = true;
 	}
 
 	if (Conf::GetConf($Sesion, 'EncargadoSecundario') && (empty($id_usuario_secundario) or $id_usuario_secundario == '-1')) {
 		$Pagina->AddError(__("Debe ingresar el") . " " . __('Encargado Secundario'));
-		$val = true;
 	}
 
 	if (isset($_REQUEST['nombre_contacto'])) {
@@ -149,7 +152,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	$activo_antes = $contrato->fields['activo'];
 	$contrato->Fill($_REQUEST, true);
 
-	if ($contrato->Write()) {
+	if (!$Pagina->GetErrors() && $contrato->Write()) {
 		if ($activo_antes != $contrato->fields['activo'] && $contrato->fields['activo'] == 'NO') {
 			// Desactiva asuntos del contrato.
 			$where = new CriteriaRestriction("id_contrato = '{$contrato->fields['id_contrato']}' AND activo");
@@ -184,13 +187,12 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 			if (empty($hito_monto_estimado[$i])) {
 				continue;
 			}
-			$monto_estimado = str_replace(',', '.',str_replace('.', '', $hito_monto_estimado[$i]));
 			$cobro_pendiente = new CobroPendiente($Sesion);
 			$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 			$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
 			$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
 			$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
-			$cobro_pendiente->Edit("monto_estimado", $monto_estimado);
+			$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
 			$cobro_pendiente->Edit("hito", '1');
 			$cobro_pendiente->Edit("notificado", 0);
 			$cobro_pendiente->Write();
@@ -1743,7 +1745,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo __('País') . $obligatorios('id_pais'); ?>
 					</td>
 					<td align="left" colspan='3'>
-						<?php echo Html::SelectArrayDecente($PrmPais->Listar('ORDER BY preferencia, nombre ASC'), 'id_pais', $contrato->fields['id_pais'] ? $contrato->fields['id_pais'] : $id_pais, 'class ="span3"', 'Vacío', '260px'); ?>
+						<?php echo Html::SelectArrayDecente($PrmPais->Listar('ORDER BY preferencia DESC, nombre ASC'), 'id_pais', $contrato->fields['id_pais'] ? $contrato->fields['id_pais'] : $id_pais, 'class ="span3"', 'Vacío', '260px'); ?>
 					</td>
 				</tr>
 
@@ -1963,15 +1965,16 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<table  style="float:left;" class="span7">
 								<tr>
 									<td class="span4">
-										<div   class="controls controls-row ">
+										<div class="controls controls-row">
 											<input type="radio" name="tipo_tarifa" id="tipo_tarifa_variable" value="variable" <?php echo empty($valor_tarifa_flat) ? 'checked' : '' ?>/>
 											<?php echo Html::SelectArrayDecente($tarifa->Listar('WHERE tarifa.tarifa_flat IS NULL ORDER BY tarifa.glosa_tarifa'), 'id_tarifa', $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default, 'onclick="$(\'tipo_tarifa_variable\').checked = true;" ' . ( strlen($config_validar_tarifa) > 0 ? 'onchange="' . $config_validar_tarifa . '"' : '')); ?>
 											<input type="hidden" name="id_tarifa_hidden" id="id_tarifa_hidden" value="<?php echo $contrato->fields['id_tarifa'] ? $contrato->fields['id_tarifa'] : $tarifa_default; ?>" />
 										</div>
 
-										<div   class="controls controls-row ">
-											 <label for="tipo_tarifa_flat" class="span2"><input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?php echo empty($valor_tarifa_flat) ? '' : 'checked' ?>/>
-												 Plana por </label>
+										<div class="controls controls-row">
+											<label for="tipo_tarifa_flat" class="span2"><input type="radio" name="tipo_tarifa" id="tipo_tarifa_flat" value="flat" <?php echo empty($valor_tarifa_flat) ? '' : 'checked' ?>/>
+												 <?php echo __('Plana por'); ?>
+											</label>
 											<input id="tarifa_flat" class="input-small" type="text" name="tarifa_flat" onclick="$('tipo_tarifa_flat').checked = true" value="<?php echo $valor_tarifa_flat ?>"/>
 											<input type="hidden" id="id_tarifa_flat"  name="id_tarifa_flat" value="<?php echo empty($valor_tarifa_flat) ? '' : $contrato->fields['id_tarifa'] ?>"/>
 										</div>
@@ -2009,7 +2012,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<input type="hidden" id="forma_cobro_posterior"  name="forma_cobro_posterior" value="<?php echo $contrato_forma_cobro ?>"/>
 							<div id="div_cobro" class="buttonset">
 								<input class="formacobro" id="fc1" type="radio" name="forma_cobro" value="TASA" <?php echo $contrato_forma_cobro == "TASA" ? "checked='checked'" : "" ?> />
-								<label <?php echo TTip($tip_tasa) ?>  for="fc1">Tasas/HH</label>&nbsp;
+								<label <?php echo TTip($tip_tasa) ?>  for="fc1"><?php echo __('Tasas/HH'); ?></label>&nbsp;
 								<input class="formacobro"  id="fc2" type=radio name="forma_cobro" value="RETAINER" <?php echo $contrato_forma_cobro == "RETAINER" ? "checked='checked'" : "" ?> />
 								<label <?php echo TTip($tip_retainer) ?>  for="fc2">Retainer</label> &nbsp;
 								<input class="formacobro"  id="fc3" type="radio" name="forma_cobro"  value="FLAT FEE" <?php echo $contrato_forma_cobro == "FLAT FEE" ? "checked='checked'" : "" ?> />
@@ -2251,7 +2254,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 											</td>
 											<td align="right" nowrap>
 												<span class="moneda_tabla"></span>&nbsp;
-												<input type="text" name="hito_monto_estimado[<?php echo $i ?>]" value='<?php echo empty($temp['monto_estimado']) ? '' : number_format($temp['monto_estimado'], 2, ',', '.') ?>' id="hito_monto_estimado_<?php echo $i ?>" size="7" <?php echo $disabled ?>/>
+												<input type="text" name="hito_monto_estimado[<?php echo $i ?>]" value='<?php echo empty($temp['monto_estimado']) ? '' : number_format($temp['monto_estimado'], 2, '.', '') ?>' id="hito_monto_estimado_<?php echo $i ?>" size="20" <?php echo $disabled ?>/>
 											</td>
 											<td align="center">
 												<?php if (!$disabled) { ?>
@@ -2274,7 +2277,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										</td>
 										<td align="right" nowrap>
 											<span class="moneda_tabla"></span>&nbsp;
-											<input type="text" name="hito_monto_estimado[1]" value='' id="hito_monto_estimado_1" size="7" />
+											<input type="text" name="hito_monto_estimado[1]" value='' id="hito_monto_estimado_1" size="20" />
 										</td>
 										<td align="center">
 											<img src="<?php echo Conf::ImgDir() ?>/mas.gif" style="cursor:pointer" onclick="agregarHito();" />
@@ -2795,7 +2798,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									<?php echo __('Otros'); ?></label><br />
 									<input type="text" name="notificar_otros_correos" size="65" value="<?php echo $contrato->fields['notificar_otros_correos']; ?>" />
 									<br />
-									<small><em>Separados por coma <strong>(,)</strong> Ej: correo@dominio.com<strong>,</strong>usuario@estudio.net</em></small>
+									<small><em><?php echo __('Separados por coma'); ?> <strong>(,)</strong> Ej: correo@dominio.com<strong>,</strong>usuario@estudio.net</em></small>
 								</td>
 							</tr>
 						</table>
@@ -3131,11 +3134,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							.done(function(data) {
 								rows = $('<tbody>');
 								header = $("<tr bgcolor='#A3D55C'>")
-								header.append('<td align="left" class="border_plomo"><b>Usuario</b></td>');
-								header.append('<td align="left" class="border_plomo"><b>Area Usuario</b></td>');
-								header.append('<td align="right" class="border_plomo"><b>Porcentaje Genera</b></td>');
-								header.append('<td align="right" class="border_plomo"><b>Acciones</b></td>');
-
+								header.append('<td align="left" class="border_plomo"><b><?php echo __('Usuario'); ?></b></td>');
+								header.append('<td align="left" class="border_plomo"><b><?php echo __('Área Usuario'); ?></b></td>');
+								header.append('<td align="right" class="border_plomo"><b><?php echo __('Porcentaje Genera'); ?></b></td>');
+								header.append('<td align="right" class="border_plomo"><b><?php echo __('Acciones'); ?></b></td>');
 								rows.append(header);
 
 								$.each(data, function(i, generator) {
@@ -3239,7 +3241,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_user_generator', '', '', 'Seleccione', '200px'); ?>
 							</td>
 							<td>
-								Porcentaje Genera:
+								<?php echo __('Porcentaje Genera'); ?>:
 							</td>
 							<td>
 								<input type="text" size="6" class="text_box" name='percent_generator' id="percent_generator" value="" style="border: 1px solid rgb(204, 204, 204);">

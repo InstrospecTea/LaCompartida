@@ -141,21 +141,21 @@ $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Ut
 			callback: function(key, options) {},
 			items: {
 				"edit": {
-					name: "Editar",
+					name: "<?php echo __('Editar') ?>",
 					icon: "edit",
 					callback: function(key, options) {
 						OpcionesTrabajo(trabajoid, '', '')
 					}
 				},
 				"paste": {
-					name: "Ingresar como nueva hora",
+					name: "<?php echo __('Ingresar como nueva hora') ?>",
 					icon: "paste",
 					callback: function(key, options) {
 						OpcionesTrabajo(trabajoid,'nuevo','');
 					}
 				},
 				"delete": {
-					name: "Eliminar",
+					name: "<?php echo __('Eliminar') ?>",
 					icon: "delete",
 					callback: function(key, options) {
 						if (confirm('<?php echo __("¿Desea eliminar este trabajo?") ?>')) {
@@ -165,7 +165,7 @@ $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Ut
 				},
 				"sep1": "---------",
 				"quit": {
-					name: "Cancelar",
+					name: "<?php echo __('Cancelar') ?>",
 					icon: "quit"
 				}
 			}
@@ -182,7 +182,7 @@ $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Ut
 			callback: function(key, options) {},
 			items: {
 				"paste": {
-					name: "Ingresar como nueva hora",
+					name: "<?php echo __('Ingresar como nueva hora') ?>",
 					icon: "paste",
 					callback: function(key, options) {
 						OpcionesTrabajo(trabajoid, 'nuevo', '');
@@ -213,7 +213,7 @@ $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Ut
 			},
 			items: {
 				"add": {
-					name: "Nueva hora",
+					name: "<?php echo __('Nueva hora') ?>",
 					icon: "add"
 				}
 			}
@@ -499,7 +499,7 @@ $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Ut
 								<input type="text" class="fechadiff" value="<?php echo ($semana ? $semana : date('d-m-Y')); ?>" name="semana" id="semanactual">
 							</td>
 							<td align ='left' width='19%'>
-								<input type='button' class='btn' value="Ver semana" id="versemana">
+								<input type='button' class='btn' value="<?php echo __('Ver semana'); ?>" id="versemana">
 							</td>
 							<td align='right' width='3%'>
 								<?php if (Conf::GetConf($sesion, 'UsaDisenoNuevo')) { ?>
@@ -515,7 +515,7 @@ $tip_siguiente = Html::Tooltip("<b>" . __('Semana siguiente') . ":</b><br>" . Ut
 		</tr>
 	<tr>
 		<td style="text-align: center; font-weight: bold; padding: 10px;">
-			Haga click con el botón derecho sobre algún trabajo para modificarlo
+			<?php echo __('Haga click con el botón derecho sobre algún trabajo para modificarlo'); ?>
 		</td>
 	</tr>
 </table>

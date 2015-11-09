@@ -376,7 +376,7 @@ function Refrescar()
 	?>
 	<table <?php echo $width_table ?>><tr><td>
 	<fieldset <?php echo $clase_fieldset ?> width="100%">
-		<legend><?php echo $opcion=='agregar' ? __('Agregar Trámite') : __('Trámites')?></legend>
+		<legend><?php echo $opcion=='agregar' ? __('Agregar') . ' ' . __('Trámite') : __('Trámites')?></legend>
 		<table width='90%' cellspacing=3 cellpadding=3>
 			<tr>
 				<td colspan="2" align=right width=35% class=cvs>
@@ -448,7 +448,7 @@ function Refrescar()
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2"><b><?php echo __('Valores Tarifa Standard:')?></b></td><td colspan="4"></td>
+				<td colspan="2"><b><?php echo __('Valores Tarifa Standard') . ':'; ?></b></td><td colspan="4"></td>
 			</tr>
 			<tr>
 					<?php

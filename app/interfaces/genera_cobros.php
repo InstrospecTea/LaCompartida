@@ -963,12 +963,22 @@ if ($opc == 'buscar') {
 						}
 					}
 				});
-
 			return true;
 		}
-
 		return false;
 	}
+
+	jQuery(function() {
+		jQuery(document).on('click', '.mostrar-asuntos', function() {
+			jQuery('.asuntos-ocultos').slideToggle();
+			jQuery('.mostrar-asuntos').parent().slideToggle();
+		});
+
+		jQuery(document).on('click', '.ocultar-asuntos', function() {
+			jQuery('.asuntos-ocultos').slideToggle();
+			jQuery('.mostrar-asuntos').parent().slideToggle();
+		});
+	});
 </script>
 
 <?php
@@ -1001,7 +1011,7 @@ if ($proceso !== false) {
 		<tr>
 			<td>
 				<fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
-					<legend><?php echo 'Filtros' ?></legend>
+					<legend><?php echo __('Filtros') ?></legend>
 					<table width='720px' style='border:0px dotted #999999'>
 						<tr>
 							<td align=right width='30%'>
@@ -1277,8 +1287,8 @@ function funcionTR(& $contrato) {
 
 	$html .= "</b></td>";
 
-	$lista_asuntos = print_as_list($contrato->fields['asuntos']);
-	$html .= "<td style='font-size:10px' align=left id=tip_$i valing=top><b>{$lista_asuntos}</b></td>";
+	$lista_asuntos = $contrato->MattersByContract($contrato->fields['id_contrato']);
+	$html .= "<td style='font-size:10px' align='left' valing='top'><b>{$lista_asuntos}</b></td>";
 	$html .= "<td style='font-size:10px' align=center valing=top><b>" . $fecha_ultimo_cobro . "</b></td>";
 
 	if ($contrato->fields['forma_cobro'] == 'RETAINER' || $contrato->fields['forma_cobro'] == 'PROPORCIONAL') {
@@ -1527,7 +1537,6 @@ function funcionTR(& $contrato) {
 	#FIN WIP
 
 	$html .="<tr border=1 bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\"><td colspan=5>&nbsp;</td></tr>";
-	$html .="<script> new Tip('tip_$i', '$lista_asuntos', {title : '" . __('Listado de asuntos') . "', effect: '', offset: {x:-2, y:10}}); </script>";
 	$html .="<input type=hidden name=opc value='" . $opc . "'>";
 
 	$i++;
@@ -1555,13 +1564,4 @@ function url_cobro_individual($id_contrato, $codigo_cliente, $glosa_cliente, $fo
 	}
 }
 
-function print_as_list($data) {
-	$aData = explode('|', $data);
-	$Form = new Form();
-	$lis = array();
-	foreach ($aData as $li) {
-		$lis[] = $Form->Html->tag('li', $li);
-	}
-	return $Form->Html->tag('ul', implode('', $lis));
-}
 $pagina->PrintBottom($popup);
