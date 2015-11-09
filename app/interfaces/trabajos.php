@@ -97,7 +97,7 @@ if ($cobro) {
 
 // Calculado aquí para que la variable $select_usuario está disponible al generar la tabla de trabajos.
 $usuario = new UsuarioExt($sesion);
-$usuarios_object = $usuario->get_usuarios_horas($p_revisor, $p_secretaria);
+$usuarios_object = $usuario->get_usuarios_horas($p_revisor);
 
 $select_usuario = $Form->select('id_usuario', $usuarios_object->rows, $id_usuario, array('empty' => $usuarios_object->todos, 'style' => 'width: 200px'));
 
@@ -110,9 +110,20 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	}
 	if (is_numeric((int) $id_usuario) && ((int) $id_usuario) > 0) {
 		$where .= " AND trabajo.id_usuario= " . $id_usuario;
-	} else if (!$p_revisor) {
-		// Se buscan trabajos de los usuarios a los que se puede revisar.
-		$where .= " AND (usuario.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor=" . $sesion->usuario->fields['id_usuario'] . ") OR usuario.id_usuario=" . $sesion->usuario->fields['id_usuario'] . ") ";
+	} else {
+		if ($p_revisor) {
+			// Se buscan trabajos de los usuarios a los que se puede revisar.
+			$where .= " AND (
+				IF ((SELECT count(*) FROM usuario_revisor WHERE id_revisor = {$sesion->usuario->fields['id_usuario']}) > 0,
+					trabajo.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor = {$sesion->usuario->fields['id_usuario']}),
+					1)
+				OR trabajo.id_usuario = {$sesion->usuario->fields['id_usuario']}
+			)";
+		}
+
+		if (!$p_revisor && $sesion->usuario->fields['rut'] != '99511620') {
+			$where .= " AND trabajo.id_usuario = {$sesion->usuario->fields['id_usuario']} ";
+		}
 	}
 
 	if ($revisado == 'NO') {
@@ -605,7 +616,7 @@ $pagina->PrintTop($popup);
 						<?php echo __('Grupo Cliente')?>
 					</td>
 					<td align="left">
-						<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo", $id_grupo, "", "Ninguno","width=100px")  ?>
+						<?php echo  Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo", $id_grupo, "", __("Ninguno"),"width=100px")  ?>
 					</td>
 				</tr>
 
@@ -614,7 +625,7 @@ $pagina->PrintTop($popup);
 						<?php echo __('Encargado Comercial') ?>
 					</td>
 					<td align='left' colspan="2"><!-- Nuevo Select -->
-						<?php echo $Form->select('id_encargado_comercial', $sesion->usuario->ListarActivos('', 'SOC'), $id_encargado_comercial, array('empty' => 'Ninguno', 'style' => 'width: 100px')); ?>
+						<?php echo $Form->select('id_encargado_comercial', $sesion->usuario->ListarActivos('', 'SOC'), $id_encargado_comercial, array('empty' => __('Ninguno'), 'style' => 'width: 100px')); ?>
 					</td>
 				</tr>
 
@@ -680,7 +691,7 @@ $pagina->PrintTop($popup);
 												LEFT JOIN prm_area_usuario AS padre ON area.id_padre = padre.id
 												ORDER BY  IFNULL(padre.glosa, area.glosa), padre.glosa, area.glosa ASC ';
 							}
-							echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario, "", "Ninguna")
+							echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario, "", __("Ninguna"))
 							?>
 					</td>
 				</tr>
@@ -745,14 +756,14 @@ $pagina->PrintTop($popup);
 	<?php $b->Imprimir('', array('check_trabajo')); //Excluyo Checktrabajo); ?>
 	<form>
 		<center>
-			<a href="#" onclick="seleccionarTodo(true); return false;">Seleccionar todo</a>
+			<a href="#" onclick="seleccionarTodo(true); return false;"><?php echo __('Seleccionar todo') ?></a>
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<a href="#" onclick="seleccionarTodo(false); return false;">Desmarcar todo</a>
+			<a href="#" onclick="seleccionarTodo(false); return false;"><?php echo __('Desmarcar todo') ?></a>
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trabajos">Editar seleccionados</a>
+			<a href="#" onclick="editarMultiplesArchivos(); return false;" title="Editar múltiples trabajos"><?php echo __('Editar seleccionados') ?></a>
 			<br />
 			<input type='hidden' name='where_query_listado_completo' id='where_query_listado_completo' value='<?php echo urlencode(base64_encode($where)) ?>'>
-			<a href="#" onclick="EditarTodosLosArchivos(); return false;" title="Editar trabajos de todo el listado">Editar trabajos de todo el listado</a>
+			<a href="#" onclick="EditarTodosLosArchivos(); return false;" title="Editar trabajos de todo el listado"><?php echo __('Editar trabajos de todo el listado') ?></a>
 			<br />
 			<br />
 			<?php echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('id' => 'descargapro')); ?>

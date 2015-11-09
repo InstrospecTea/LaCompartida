@@ -136,7 +136,7 @@ $Form = new Form();
 <table style="border: 1px solid black;" width='90%'>
 	<tr>
 		<td align=right width="30%">
-			<?php echo __('Rut')?>
+			<?php echo __('ROL/RUT'); ?>
 		</td>
 		<td align=left colspan="3">
 			<input type="text" name="rut" value="<?php echo $proveedor->fields['rut'] ? $proveedor->fields['rut'] : '' ?>" id="rut" size="30" maxlength="50" />
@@ -144,7 +144,7 @@ $Form = new Form();
 	</tr>
 	<tr>
 		<td align="right">
-			<?php echo __('Glosa')?>
+			<?php echo __('Nombre'); ?>
 		</td>
 		<td colspan="3" align="left">
 			<input type="text" name="glosa" value="<?php echo $proveedor->fields['glosa'] ? $proveedor->fields['glosa'] : '' ?>" id="glosa" size="50" maxlength="50" />
@@ -170,10 +170,10 @@ $Form = new Form();
 	$b->nombre = "busc_facturas";
 	$b->titulo = __('Listado de').' '.__('Proveedores');
 	$b->titulo .= "<table width=100%>";
-	$b->AgregarEncabezado("id_proveedor",__('id'),"align=center");
-	$b->AgregarEncabezado("rut",__('Rut'),"align=center");
-	$b->AgregarEncabezado("glosa",__('Glosa'),"align=center");
-	$b->AgregarFuncion("Opciones",'Opciones',"align=center nowrap");
+	$b->AgregarEncabezado('id_proveedor', __('id'), "align=center");
+	$b->AgregarEncabezado('rut', __('ROL/RUT'), 'align="center"');
+	$b->AgregarEncabezado('glosa', __('Nombre'), 'align="center"');
+	$b->AgregarFuncion(__('Opciones'), 'Opciones', 'align="center" nowrap');
 	$b->color_mouse_over = "#bcff5c";
 
 	$b->Imprimir("",array(),false);
@@ -186,10 +186,10 @@ $Form = new Form();
 		$opc_html .= "<img src=".Conf::ImgDir()."/editar_on.gif' border=0 title='Editar' onClick='Editar(this.form,".$fila->fields['id_proveedor'].")'/>";
 		return $opc_html;
 	}
-	function Opciones(& $fila)
-    {
+
+	function Opciones(& $fila) {
 		$id_proveedor = $fila->fields['id_proveedor'];
-        $opc_html = "<input type='hidden' value='".$fila->fields['rut']."' id='rut_".$id_proveedor."'  name='rut_".$id_proveedor."'>";
+		$opc_html = "<input type='hidden' value='".$fila->fields['rut']."' id='rut_".$id_proveedor."'  name='rut_".$id_proveedor."'>";
 		$opc_html .= "<input type='hidden' value='".$fila->fields['glosa']."' id='glosa_".$id_proveedor."'  name='glosa_".$id_proveedor."'>";
 		$opc_html .= "<a target=\"_parent\" onClick=EditarProveedor($id_proveedor)><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar Proveedor></a>";
 		$opc_html .= "<a target=\"_parent\" onClick=EliminarProveedor($id_proveedor)><img src='".Conf::ImgDir()."/cruz_roja_nuevo.gif' border=0 title=Eliminar Proveedor></a>";
@@ -199,8 +199,6 @@ $Form = new Form();
 ?>
 </form>
 
-
 <?php
 echo $Form->script();
 $pagina->PrintBottom($popup);
-?>

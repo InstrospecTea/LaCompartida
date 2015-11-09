@@ -17,12 +17,26 @@ class Form {
 		$this->Html = new \TTB\Html();
 	}
 
+	public function create($name, array $attrs = array()) {
+		$attrs['name'] = $name;
+
+		if (!isset($attrs['id'])) {
+			$attrs['id'] = $name;
+		}
+
+		return $this->Html->form($attrs);
+	}
+
+	public function end() {
+		return $this->Html->form(array(), true);
+	}
+
 	/**
 	 * Construye un select a partir de un Array
 	 *
 	 * @param string $name Nombre del selector en el formulario
 	 * @param array $options Opciones para crear elementos <option/>
-	 * @param string $selected OpciÃ³n seleccionada por default
+	 * @param string $selected Opción seleccionada por default
 	 * @param array $attrs Atributos del elemento HTML, ej: id, type, etc.
 	 *
 	 * @return string HTML que contiene el selector
@@ -451,14 +465,14 @@ class Form {
 	}
 
 	private function button_script() {
-		$script = <<<SCRIPT
+		$script = "
 			jQuery('.form-btn').on('mouseover', function() {
 				jQuery(this).addClass('ui-state-hover');
 			});
 			jQuery('.form-btn').on('mouseout', function() {
 				jQuery(this).removeClass('ui-state-hover');
 			});
-SCRIPT;
+		";
 		return $script;
 	}
 

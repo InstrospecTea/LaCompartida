@@ -134,7 +134,7 @@ if ($xls) {
 	$worksheet->setColumn(11, 11, 15);
 	$worksheet->setColumn(12, 12, 20);
 
-	$worksheet->writeString(1, 0, 'Reporte Hitos', $titulo);
+	$worksheet->writeString(1, 0, _('Reporte Hitos'), $titulo);
 
 	$celda_fecha_creacion = 2;
 	$celda_periodo_reporte = 3;
@@ -155,7 +155,7 @@ if ($xls) {
 	$columna_fecha_facturacion = 13;
 
 	$worksheet->write($celda_fecha_creacion, 0, __('Fecha Creación') . ' : ' . date('d-m-Y'), $glosa_detalle_documento_left);
-	$periodo = 'Periodo : Desde ' . $fecha1 . ' Hasta ' . $fecha2;
+	$periodo = __('Periodo : Desde ') . $fecha1 . __(' Hasta ') . $fecha2;
 	$worksheet->write($celda_periodo_reporte, 0, $periodo, $glosa_detalle_documento_left);
 
 	$worksheet->write($fila_encabezado, $columna_glosa_cliente, __('Glosa Cliente'), $encabezados_borde);

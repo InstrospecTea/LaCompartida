@@ -126,7 +126,7 @@ echo Autocompletador::Javascript($sesion,false);
 					<?php echo __('Grupo')?>
 				</td>
 				<td class="al">
-					<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente ORDER BY glosa_grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno","width=100px")  ?>
+					<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente ORDER BY glosa_grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", __("Ninguno"),"width=100px")  ?>
 				</td>
 			</tr>
 		<?php if (Conf::GetConf($sesion, 'UsaGiroClienteParametrizable')) { ?>

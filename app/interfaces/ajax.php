@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion('');
 #$pagina = new Pagina ($sesion); //no se estaba usando, se comentó por el tema de los headers (SIG 15/12/2009)
+$codigo_asunto = mysql_real_escape_string($codigo_asunto);
 
 if ($accion == "consistencia_cliente_asunto") {
 	if (Conf::GetConf($sesion, 'CodigoSecundario')) {

@@ -32,7 +32,7 @@ if ($opcion == 'eliminar') { #ELIMINAR TRABAJO
 $pagina->titulo = __('Resumen semana');
 $pagina->PrintTop();
 
-$dias = array('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo');
+$dias = array(__('Lunes'), __('Martes'), __('Miércoles'), __('Jueves'), __('Viernes'), __('Sábado'), __('Domingo'));
 $diseno_nuevo = ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() );
 $style = $diseno_nuevo ? 'style="border: 1px solid #BDBDBD;"' : '';
 ?>
@@ -55,7 +55,7 @@ $style = $diseno_nuevo ? 'style="border: 1px solid #BDBDBD;"' : '';
 							<?php echo __('Área Usuario') ?>:
 						</td>
 						<td valign="top" class="texto" align="left">
-							<?php echo AreaUsuario::SelectAreas($sesion, 'id_area_usuario', $id_area_usuario, '', 'Cualquiera') ?>
+							<?php echo AreaUsuario::SelectAreas($sesion, 'id_area_usuario', $id_area_usuario, '', __('Cualquiera')) ?>
 						</td>
 					</tr>
 					<tr>

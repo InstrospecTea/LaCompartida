@@ -35,7 +35,8 @@ switch ($_POST['accion']) {
 HTML;
 
 		if (!empty($msg_cobros)) {
-			$titulo = __('Asuntos') . ' del ' . __('contrato');
+			$titulo = __('Asuntos') . ' ' . __('del') . ' ' . __('contrato');
+			$cerrar = __('Cerrar');
 			$script = <<<SCRIPT
 				function ver_cobros_contrato() {
 					jQuery('<p/>')
@@ -46,7 +47,7 @@ HTML;
 								width: 350,
 								height: 300,
 								'buttons': {
-									'Cerrar': function() {
+									'{$cerrar}': function() {
 										jQuery(this).dialog('close');
 									}
 								}

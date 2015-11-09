@@ -10960,8 +10960,26 @@ QUERY;
 			$queries[] = "ALTER TABLE `cobro_movimiento` CHANGE `fecha` `fecha` DATETIME  NOT NULL;";
 			break;
 		case 8.21:
-					$queries[] = "ALTER TABLE `contrato` ADD COLUMN `formato_ledes` VARCHAR(50) NULL";
-					$queries[] = "UPDATE `contrato` SET `formato_ledes` = 'serengeti' WHERE `exportacion_ledes` = 1";
+			$queries[] = "ALTER TABLE `actividad`
+				ADD COLUMN `id_area_proyecto` INT(11) DEFAULT NULL,
+				ADD COLUMN `id_tipo_proyecto` INT(11) DEFAULT NULL,
+				ADD INDEX id_area_proyecto (`id_area_proyecto`),
+				ADD INDEX id_tipo_proyecto (`id_tipo_proyecto`),
+				ADD CONSTRAINT `actividad_fk_area_proyecto`
+					FOREIGN KEY (id_area_proyecto)
+					REFERENCES `prm_area_proyecto` (id_area_proyecto)
+					ON DELETE SET NULL
+					ON UPDATE CASCADE,
+				ADD CONSTRAINT `actividad_fk_tipo_proyecto`
+					FOREIGN KEY (id_tipo_proyecto)
+					REFERENCES `prm_tipo_proyecto` (id_tipo_proyecto)
+					ON DELETE SET NULL
+					ON UPDATE CASCADE;";
+			break;
+		case 8.22:
+			$queries[] = "ALTER TABLE `contrato` ADD COLUMN `formato_ledes` VARCHAR(50) NULL";
+			$queries[] = "UPDATE `contrato` SET `formato_ledes` = 'serengeti' WHERE `exportacion_ledes` = 1";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10974,7 +10992,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.21;
+$max_update = 8.22;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

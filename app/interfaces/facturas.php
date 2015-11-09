@@ -175,7 +175,7 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 								<?php echo __('Tipo de Documento'); ?>
 							</td>
 							<td align="left">
-								<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal_buscado', $tipo_documento_legal_buscado, '', 'Cualquiera', 150); ?>
+								<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal_buscado', $tipo_documento_legal_buscado, '', __('Cualquiera'), 150); ?>
 							</td>
 							<td align="right">
 								<?php echo __('Grupo Ventas'); ?>
@@ -187,7 +187,7 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 								<?php echo __('Estado'); ?>
 							</td>
 							<td align="left">
-								<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $id_estado, 'onchange="mostrarAccionesEstado(this.form)"', 'Cualquiera', "150"); ?>
+								<?php echo Html::SelectQuery($sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $id_estado, 'onchange="mostrarAccionesEstado(this.form)"', __('Cualquiera'), "150"); ?>
 							</td>
 						</tr>
 						<tr>
@@ -195,7 +195,7 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 								<?php echo __('Moneda'); ?>
 							</td>
 							<td align="left">
-								<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY glosa_moneda ASC", "id_moneda", $id_moneda, '', 'Cualquiera', "150"); ?>
+								<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY glosa_moneda ASC", "id_moneda", $id_moneda, '', __('Cualquiera'), "150"); ?>
 							</td>
 						</tr>
 
@@ -289,7 +289,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 
 	$x_pag = 25;
 	$b = new Buscador($sesion, $search_query, 'Factura', $desde, $x_pag, $orden);
-	$b->titulo = "Documentos Tributarios<br />$glosa_monto_saldo_total";
+	$b->titulo = __("Documentos Tributarios") . "<br />$glosa_monto_saldo_total";
 	$b->AgregarEncabezado('cliente', __('Destinatario Documento'), 'width="30%" align="left"', '', 'FormatoDestinatario', true);
 	$b->AgregarEncabezado('fecha', __('Fecha Documento'), 'align="center"');
 	$b->AgregarEncabezado('numero', __('Datos Documento'), 'width="10%" align="left"', '', 'FormatoDatos', true);
@@ -368,14 +368,16 @@ function FormatoPagos($fila) {
 	$pagos = FormatoMoneda($sesion, $fila->fields['pagos'], $fila->fields['id_moneda']);
 	$saldo = FormatoMoneda($sesion, $fila->fields['saldo'], $fila->fields['id_moneda']);
 	$fecha_ultimo_pago = Utiles::sql2fecha($fila->fields['fecha_ultimo_pago'], "%d/%m/%Y");
+	$glosa_pagos = __('Pagos');
+	$glosa_ultpago = __('Últ. Pago');
 	if ($fecha_ultimo_pago == 'No existe fecha') {
 		$fecha_ultimo_pago = 'N/A';
 	}
 
 	$html =<<<HTML
-	<strong>Pagos:</strong>&nbsp;&nbsp;&nbsp;&nbsp;$pagos<br />
+	<strong>$glosa_pagos:</strong>&nbsp;&nbsp;&nbsp;&nbsp;$pagos<br />
 	<strong>Saldo:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$saldo<br />
-	<strong>Últ.&nbsp;Pago:</strong>&nbsp;$fecha_ultimo_pago
+	<strong>$glosa_ultpago:</strong>&nbsp;$fecha_ultimo_pago
 HTML;
 
 	return $html;

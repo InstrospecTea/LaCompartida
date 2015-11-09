@@ -84,7 +84,7 @@ $pagina->PrintTop();
 	</tr>
     <tr>
         <td align="right">
-            <?php echo _('Moneda') ?><br/>
+            <?php echo __('Moneda') ?><br/>
         </td>
         <td align="left">
 			<?php echo '&nbsp;&nbsp;&nbsp;'.Html::SelectQuery($Sesion, 'SELECT id_moneda, glosa_moneda FROM prm_moneda', 'moneda_mostrar', $moneda_mostrar, '', '' , 80); ?>

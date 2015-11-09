@@ -122,11 +122,11 @@ $actions = array(
 
 $pagina->PrintTop();
 ?>
-<h3>Consideraciones:</h3>
+<h3><?php echo __('Consideraciones') ?>:</h3>
 <ul style="text-align: left;">
-	<li>Antes de filtrar, <b>debe siempre</b> establecer o el inicio o el fin del rango de fechas a consultar. El rango de fecha se completará según lo definido, 31 días hacia adelante o hacia atrás, dependiendo de si ha seleccionado la fecha desde o la fecha hasta, respectivamente.</li>
-	<li>Además, <b>debe filtrar por al menos uno</b> de los siguientes datos: <?php echo __('Cliente') ?>, <?php echo __('Asunto') ?>, <?php echo __('Usuario') ?>, <?php echo __('Código') ?> o Nº de <?php echo __('Cobro') ?>.</li>
-	<li><b>No es posible</b> realizar consultas por un rango superior a 31 días.</li>
+	<li><?php echo __('Antes de filtrar') ?>, <b><?php echo __('debe siempre') ?></b> <?php echo __('establecer o el inicio o el fin del rango de fechas a consultar. El rango de fecha se completará según lo definido, 31 días hacia adelante o hacia atrás, dependiendo de si ha seleccionado la fecha desde o la fecha hasta, respectivamente.') ?></li>
+	<li><?php echo __('Además') ?>, <b><?php echo __('debe filtrar por al menos uno') ?></b> <?php echo __('de los siguientes datos:') ?> <?php echo __('Cliente') ?>, <?php echo __('Asunto') ?>, <?php echo __('Usuario') ?>, <?php echo __('Código') ?> <?php echo __('o Nº de') ?> <?php echo __('Cobro') ?>.</li>
+	<li><b><?php echo __('No es posible') ?></b> <?php echo __('realizar consultas por un rango superior a 31 días.') ?></li>
 </ul>
 <form id="form_reporte" method="POST">
 	<fieldset class="tb_base" style="border: 1px solid #BDBDBD;" width="100%">
@@ -162,7 +162,7 @@ $pagina->PrintTop();
 						<?php echo $form->select('id_usuario', $sesion->usuario->ListarActivos('', 'PRO'), $id_usuario, array('empty' => 'Cualquiera', 'style' => 'width:440px;')); ?>
 					</td>
 				</tr>
-				
+
 				<tr>
 					<td class="buscadorlabel">
 						<?php echo __('Dato') ?>

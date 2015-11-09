@@ -1390,7 +1390,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 
 				function TArriba($celda, $estado) {
 					if (($celda == 'BORRADOR' && ($estado == 'CREADO' || $estado == 'EN REVISION')) || $celda == $estado) {
-						return "<td rowspan = '3' style=\"text-align:center; vertical-align: middle; border: 1px solid #5bde5b; background: #fefeaa ; font-size: 12px;\"> " . $estado . " </td>";
+						return "<td rowspan = '3' style=\"text-align:center; vertical-align: middle; border: 1px solid #5bde5b; background: #fefeaa ; font-size: 12px;\"> " . __($estado) . " </td>";
 					} else {
 						return "<td> </td>";
 					}
@@ -1400,7 +1400,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
 					if (($celda == 'BORRADOR' && ($estado == 'CREADO' || $estado == 'EN REVISION')) || $celda == $estado) {
 						return " ";
 					} else {
-						return "<td  style=\"text-align:center; border: 1px solid #9f9f9f; background: #efefef; font-size: 9px;\"> " . $celda . "</td>";
+						return "<td  style=\"text-align:center; border: 1px solid #9f9f9f; background: #efefef; font-size: 9px;\"> " . __($celda) . "</td>";
 					}
 				}
 

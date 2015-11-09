@@ -98,14 +98,14 @@ jQuery(document).ready(function() {
 
 </script>
 
-<div style="margin:auto;padding:10px;border:1px solid #CCC;">Buscar <?php echo __('Cobros emitidos');?> con diferencias entre el monto Emitido y el Facturado<br/><br/>
-    Emitidos entre el
+<div style="margin:auto;padding:10px;border:1px solid #CCC;"><?php echo __('Buscar ' . __('Cobros emitidos') . ' con diferencias entre el monto Emitido y el Facturado');?><br/><br/>
+    <?php echo __('Emitidos entre el')?>
     <input type="text" class="fechadiff" id="fechai" style="width:100px;">
-    &nbsp;y el&nbsp;
+    &nbsp;<?php echo __('y el')?>&nbsp;
     <input class="fechadiff" type="text" id="fechaf" style="width:100px;">
-    y desplegar los montos en&nbsp;
+    <?php echo __('y desplegar los montos en')?>&nbsp;
     <?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", '','', 'la moneda del contrato '); ?>
-     <br/><input id="buscar" value="buscar" type="button"/>&nbsp;&nbsp;<input type="checkbox" id="todo" name="todo"> Incluir liquidaciones saldadas (Gran cantidad de datos)
+     <br/><input id="buscar" value="<?php echo __('Buscar')?>" type="button"/>&nbsp;&nbsp;<input type="checkbox" id="todo" name="todo"> <?php echo __('Incluir liquidaciones saldadas (Gran cantidad de datos)')?>
 
 <br/>	<br/>
 <?php print_r($moneda->fields); ?>
@@ -113,15 +113,13 @@ jQuery(document).ready(function() {
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="diffs" style="width:920px;display:none;">
 	<thead>
 		<tr>
-
-			<th width="80px"><?php echo __('Cobro');?></th>
-			<th width="95px">Fecha Emitido</th>    <th width="0px">idcontrato</th>
-			<th width="330px" style="overflow:hidden;">Cliente</th>
-			<th width="90px">$ Emitido</th>
-			<th width="90px">$ Facturado</th>
-			<th width="85px">Diferencia</th>
-
-
+			<th width="80px"><?php echo __('Cobro') ?></th>
+			<th width="95px"><?php echo __('Fecha Emitido') ?></th>
+			<th width="0px">idcontrato</th>
+			<th width="330px" style="overflow:hidden;"><?php echo __('Cliente') ?></th>
+			<th width="90px">$ <?php echo __('Emitido') ?></th>
+			<th width="90px">$ <?php echo __('Facturado') ?></th>
+			<th width="85px"><?php echo __('Diferencia') ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -129,16 +127,14 @@ jQuery(document).ready(function() {
 	</tbody>
 	<tfoot style="font-size:10px;">
 		<tr>
-
-			<th><?php echo __('Cobro');?></th>
-			<th >Fecha Emitido</th>
-			    <th width="0px">idcontrato</th><th >Cliente</th>
-			<th >$ Emitido</th>
-			<th width="90px">$ Facturado</th>
-			<th width="90px">Diferencia</th>
-
+			<th><?php echo __('Cobro') ?></th>
+			<th ><?php echo __('Fecha Emitido') ?></th>
+			<th width="0px">idcontrato</th>
+			<th><?php echo __('Cliente') ?></th>
+			<th>$ <?php echo __('Emitido') ?></th>
+			<th width="90px">$ <?php echo __('Facturado') ?></th>
+			<th width="90px"><?php echo __('Diferencia') ?></th>
 		</tr>
-
 	</tfoot>
 </table>
 

@@ -46,7 +46,7 @@ if (!Conf::GetConf($sesion,'ActualizacionTerminado')) {
 				<a href="#" id="mostrar_aviso">Avisos</a>
 				|
 			<?php } ?>
-			<span class="text_bold">Usuario</span>:
+			<span class="text_bold"><?php echo __("Usuario"); ?></span>:
 				<?php echo $sesion->usuario->fields['nombre'] . ' ' . $sesion->usuario->fields['apellido1'] . ' ' . $sesion->usuario->fields['apellido2']; ?>
 				| <a style="color: white;" href="#" onClick="irIntranet('/fw/usuarios/index.php');">Inicio</a>
 				<?php if (isset($_SESSION['ACTIVO_JUICIO']) && Conf::GetConf($sesion, 'HostJuicios') ) { ?>
