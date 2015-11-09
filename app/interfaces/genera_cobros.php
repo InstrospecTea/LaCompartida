@@ -1288,7 +1288,7 @@ function funcionTR(& $contrato) {
 	$html .= "</b></td>";
 
 	$lista_asuntos = $contrato->MattersByContract($contrato->fields['id_contrato']);
-	$html .= "<td style='font-size:10px' align='left' id='tip_{$i}' valing='top'><b>{$lista_asuntos}</b></td>";
+	$html .= "<td style='font-size:10px' align='left' valing='top'><b>{$lista_asuntos}</b></td>";
 	$html .= "<td style='font-size:10px' align=center valing=top><b>" . $fecha_ultimo_cobro . "</b></td>";
 
 	if ($contrato->fields['forma_cobro'] == 'RETAINER' || $contrato->fields['forma_cobro'] == 'PROPORCIONAL') {
