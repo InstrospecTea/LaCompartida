@@ -2,13 +2,13 @@
 
 /**
 * Class WorkScope
-* 		
+*
 */
 class WorkScope implements IWorkScope {
-	
+
 	/**
-	 * Ordena los trabajos desde el mÃ¡s viejo al mÃ¡s nuevo.
-	 * @param  Criteria $criteria 
+	 * Ordena los trabajos desde el más viejo al más nuevo.
+	 * @param  Criteria $criteria
 	 * @return Criteria $criteria
 	 */
 	function orderFromOlderToNewer(Criteria $criteria) {
@@ -17,7 +17,7 @@ class WorkScope implements IWorkScope {
 	}
 
   /**
-   * AÃ±ade una selecciÃ³n de datos sumados relacionados a la duraciÃ³n
+   * Añade una selección de datos sumados relacionados a la duración
    * @param $criteria
    * @return mixed
    */
@@ -32,7 +32,7 @@ class WorkScope implements IWorkScope {
   }
 
   /**
-   * AÃ±ade un grupo por periodo YYYY-MM
+   * Añade un grupo por periodo YYYY-MM
    * @param $criteria
    * @return mixed
    */
@@ -50,6 +50,42 @@ class WorkScope implements IWorkScope {
   function orderByMatterGloss(Criteria $criteria) {
     $criteria->add_ordering('Matter.glosa_asunto', 'ASC');
     return $criteria;
-  }
+	}
+
+	/**
+	 * Obtiene condición para cuando el trabajo no está cobrado
+	 * @param  Criteria $criteria
+	 * @return mixed
+	 */
+	function conditionNotPaid(Criteria $criteria) {
+		$clauses = array(
+			CriteriaRestriction::is_null('Work.id_cobro'),
+			CriteriaRestriction::in('Charge.estado', array(
+				'CREADO',
+				'EN REVISION'
+			))
+		);
+		$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
+
+		return $criteria;
+	}
+
+	/**
+	 * Obtiene condición para cuando el trabajo está cobrado
+	 * @param  Criteria $criteria
+	 * @return mixed
+	 */
+	function conditionPaid(Criteria $criteria) {
+		$clauses = array(
+			CriteriaRestriction::is_not_null('Work.id_cobro'),
+			CriteriaRestriction::not_in('Charge.estado', array(
+				'CREADO',
+				'EN REVISION'
+			))
+		);
+		$criteria->add_restriction(CriteriaRestriction::and_clause($clauses));
+
+		return $criteria;
+	}
 
 }
