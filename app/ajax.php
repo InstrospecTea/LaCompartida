@@ -550,7 +550,7 @@ function cargarActividades(Sesion $Sesion, $codigo_asunto, $activas = false) {
 			if ($i > 0) {
 				$retorno .= '~';
 			}
-			$retorno .= $actividades[$i]['codigo_actividad'] . '|' . utf8_encode($actividades[$i]['glosa_actividad']);
+			$retorno .= join('|', $actividades[$i]);
 		}
 	} else {
 		$retorno = 'VACIO|';
