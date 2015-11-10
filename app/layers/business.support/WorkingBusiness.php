@@ -42,6 +42,38 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			$searchCriteria->filter('codigo_actividad')->restricted_by('equals')->compare_with($data['codigo_actividad']);
 		}
 
+		//Cobrado
+		if ($data['cobrado'] == 'NO') {
+			$searchCriteria->add_scope('conditionNotPaid');
+		} else if ($data['cobrado'] == 'SI') {
+			$searchCriteria->add_scope('conditionPaid');
+		}
+
+		//Cobrable
+		if (!empty($data['cobrable'])) {
+			$searchCriteria->filter('cobrable')->restricted_by('equals')->compare_with($data['cobrable'] == 'SI' ? '1' : '0')->for_entity('Work');
+		}
+
+		//Revisado
+		if (!empty($data['revisado'])) {
+			$searchCriteria->filter('revisado')->restricted_by('equals')->compare_with($data['revisado'] == 'SI' ? '1' : '0')->for_entity('Work');
+		}
+
+		//Grupo Cliente
+		if (!empty($data['id_grupo'])) {
+			$searchCriteria->filter('id_grupo_cliente')->restricted_by('equals')->compare_with($data['id_grupo'])->for_entity('Client');
+		}
+
+		//Encargado Asunto
+		if ($data['id_encargado_asunto']) {
+			$searchCriteria->filter('id_encargado_asunto')->restricted_by('equals')->compare_with($data['id_encargado_asunto'])->for_entity('Matter');
+		}
+
+		//Área Usuario
+		if ($data['id_area_usuario']) {
+			$searchCriteria->filter('id_area_usuario')->restricted_by('equals')->compare_with($data['id_area_usuario'])->for_entity('User');
+		}
+
 		//Cliente
 		if ($data['codigo_cliente_secundario'] || $data['codigo_cliente']) {
 			$codigo = 'codigo_cliente';

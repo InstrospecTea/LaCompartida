@@ -1486,9 +1486,13 @@ if ($opcion != 'nuevo') {
 						echo 'codigo_asunto: \'' . $t->fields['codigo_asunto'] . '\'';
 					} else {
 						if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial')) {
-							echo 'codigo_asunto: jQuery(\'#codigo_asunto\').val()';
+							echo 'codigo_asunto: campo_asuntos.val()';
 						} else {
-							echo 'codigo_asunto: jQuery(\'#campo_codigo_asunto\').val()';
+							if (UtilesApp::GetConf($sesion,'CodigoSecundario')) {
+								echo 'codigo_asunto: jQuery(\'#campo_codigo_asunto_secundario\').val()';
+							} else {
+								echo 'codigo_asunto: jQuery(\'#campo_codigo_asunto\').val()';
+							}
 						}
 					}
 					?>
