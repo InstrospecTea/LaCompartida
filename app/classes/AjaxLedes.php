@@ -1,8 +1,6 @@
 <?php
 require_once dirname(__FILE__).'/../conf.php';
 
-################################################################################################
-
 /**
 * Controlador que maneja y responde a los request AJAX.
 */
@@ -15,41 +13,57 @@ class AjaxLedes {
 		$this->Sesion = New Sesion();
 	}
 
-
-	// /**
-	//  * Método que renderiza los controladores de LEDES, según corresponda.
-	//  * Parámetros:
-	//  *	- $conf_activa: True o False dependiendo si la configuración ExportacionLedes está activa.
-	//  *	- $codigo_tarea:
-	//  *	- $permiso_revisor:  True o False dependiendo si el usuario tiene permiso de revisor o no.
-	//  *	- $permiso_profesional: True o False dependiendo si el usuario tiene permiso profesional o no.
-	//  */
+	/**
+	 * Método que renderiza los controladores de LEDES, según corresponda.
+	 * Parámetros:
+	 *	- $conf_activa: True o False dependiendo si la configuración ExportacionLedes está activa.
+	 *	- $codigo_tarea:
+	 *	- $permiso_revisor:  True o False dependiendo si el usuario tiene permiso de revisor o no.
+	 *	- $permiso_profesional: True o False dependiendo si el usuario tiene permiso profesional o no.
+	 */
 
 	public function renderizaControlesLedes($codigo_tarea) {
-		return '<td colspan="2" align=right>'.__('C&oacute;digo UTBMS').'</td><td align=left width="440" nowrap>'.InputId::ImprimirCodigo($this->Sesion, 'UTBMS_TASK', 'codigo_tarea', $codigo_tarea).'</td>';
+		return '<td colspan="2" align="right">' . __('C&oacute;digo UTBMS') . '</td><td align="left" width="440" nowrap>' . InputId::ImprimirCodigo($this->Sesion, 'UTBMS_TASK', 'codigo_tarea', $codigo_tarea) . '</td>';
 	}
 
 	public function renderizaControlesActividades($codigo_actividad, $codigo_asunto) {
-		$html = InputId::Imprimir($this->Sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $codigo_actividad, '', '', 320, $codigo_asunto);
-		return '<td colspan="2" align=right>'.__('Actividad').'</td>'.'<td align=left width="440" nowrap>'.$html.'</td>';
+		$Form = new Form;
+		$Actividad = new Actividad($this->Sesion);
+
+		$html = '';
+
+		$attrs = array('label' => false, 'size' => 15, 'maxlength' => 15, 'onchange' => "this.value=this.value.toUpperCase();SetSelectInputId('campo_codigo_actividad','codigo_actividad');");
+		$html .= $Form->input('campo_codigo_actividad', $codigo_actividad, $attrs);
+
+		$options = array();
+		$actividades = $Actividad->obtenerActividadesSegunAsunto($codigo_asunto, true);
+
+		foreach ($actividades as $actividad) {
+			$options[$actividad['codigo_actividad']] = htmlentities($actividad['glosa_actividad']);
+		}
+
+		$attrs = array('empty' => __('Cualquiera'), 'onchange' => "SetCampoInputId('codigo_actividad','campo_codigo_actividad');", 'style' => 'width: 320px');
+		$html .= $Form->select('codigo_actividad', $options, $codigo_actividad, $attrs);
+
+		return '<td colspan="2" align="right">' . __('Actividad') . '</td><td align="left" width="440" nowrap>' . $html . '</td>';
 	}
 
-	// /**
-	// *
-	// * Método que revisa si el cliente está configurado para que se exporte como LEDES.
-	// * Parámetros:
-	// *	- $codigo_cliente: Código del cliente del cual se cargará y revisará su contrato.
-	// */
+	/**
+	 *
+	 * Método que revisa si el cliente está configurado para que se exporte como LEDES.
+	 * Parámetros:
+	 *	- $codigo_cliente: Código del cliente del cual se cargará y revisará su contrato.
+	 */
 
 	public function clienteSeExportaComoLedes($codigo_cliente) {
 
 		$criteria = new Criteria($this->Sesion);
 		$criteria->add_select('exportacion_ledes')
-				->add_from('contrato')
-				->add_left_join_with('cliente',CriteriaRestriction::equals('cliente.id_contrato', 'contrato.id_contrato'))
-		 		->add_restriction(
-		 				CriteriaRestriction::equals('cliente.codigo_cliente', "'{$codigo_cliente}'")
-		 		);
+			->add_from('contrato')
+			->add_left_join_with('cliente',CriteriaRestriction::equals('cliente.id_contrato', 'contrato.id_contrato'))
+			->add_restriction(
+				CriteriaRestriction::equals('cliente.codigo_cliente', "'{$codigo_cliente}'")
+			);
 
 		try{
 			$result = $criteria->run();

@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.26.5
+Monday 2015, November 9th
+* **Fix** [Modificar query para seleccionar actividades](https://github.com/LemontechSA/ttb/pull/1219)
+
 ## Hotfix 15.26.4
 Monday 2015, November 9th
 * **Fix** [html_entity_decode a nombre estudio](https://github.com/LemontechSA/ttb/pull/1218)

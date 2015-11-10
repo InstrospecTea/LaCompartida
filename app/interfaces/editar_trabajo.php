@@ -1481,13 +1481,17 @@ if ($opcion != 'nuevo') {
 					ledes: <?php echo Conf::GetConf($sesion, 'ExportacionLedes'); ?>,
 					actividades: <?php echo Conf::GetConf($sesion, 'UsoActividades'); ?>,
 					codigo_cliente: campo_asuntos.val().split('-').first(),
-<?php
-if ($t->fields['codigo_asunto']) {
-	echo 'codigo_asunto: \'' . $t->fields['codigo_asunto'] . '\'';
-} else {
-	echo 'codigo_asunto: jQuery(\'#campo_codigo_asunto\').val()';
-}
-?>
+					<?php
+					if ($t->fields['codigo_asunto']) {
+						echo 'codigo_asunto: \'' . $t->fields['codigo_asunto'] . '\'';
+					} else {
+						if (Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial')) {
+							echo 'codigo_asunto: jQuery(\'#codigo_asunto\').val()';
+						} else {
+							echo 'codigo_asunto: jQuery(\'#campo_codigo_asunto\').val()';
+						}
+					}
+					?>
 				}
 			}).done(function (response) {
 				jQuery('#actividades').html(response);
