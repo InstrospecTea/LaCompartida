@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.26.6
+Tuesday 2015, November 10th
+* **Fix** [Corrección PDF Revisar Horas](https://github.com/LemontechSA/ttb/pull/1220)
+
 ## Hotfix 15.26.5
 Monday 2015, November 9th
 * **Fix** [Modificar query para seleccionar actividades](https://github.com/LemontechSA/ttb/pull/1219)
