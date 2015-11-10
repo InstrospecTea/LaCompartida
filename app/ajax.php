@@ -539,71 +539,18 @@ switch ($accion) {
 		echo("ERROR");
 };
 
-function cargarActividades(Sesion $Sesion, $codigo_asunto, $activa = false) {
+function cargarActividades(Sesion $Sesion, $codigo_asunto, $activas = false) {
 	$retorno = '';
 
-	$Criteria = new Criteria($Sesion);
-	$asunto = $Criteria
-		->add_select('id_area_proyecto')
-		->add_select('id_tipo_asunto')
-		->add_from('asunto')
-		->add_restriction(CriteriaRestriction::equals('codigo_asunto', "'{$codigo_asunto}'"))
-		->run();
+	$Actividad = new Actividad($Sesion);
+	$actividades = $Actividad->obtenerActividadesSegunAsunto($codigo_asunto, $activas);
 
-	$and_area_tipo_proyecto = array();
-
-	if (!empty($asunto)) {
-		$or_area_tipo_proyecto = array();
-		if (!empty($asunto[0]['id_area_proyecto'])) {
-			$or_area_tipo_proyecto[] = CriteriaRestriction::equals('id_area_proyecto', "'{$asunto[0]['id_area_proyecto']}'");
-		} else {
-			$or_area_tipo_proyecto[] = CriteriaRestriction::is_null('id_area_proyecto');
-		}
-		if (!empty($asunto[0]['id_tipo_asunto'])) {
-			$or_area_tipo_proyecto[] = CriteriaRestriction::equals('id_tipo_proyecto', "'{$asunto[0]['id_tipo_asunto']}'");
-		} else {
-			$or_area_tipo_proyecto[] = CriteriaRestriction::is_null('id_tipo_proyecto');
-		}
-
-		$and_area_tipo_proyecto[] = CriteriaRestriction::or_clause($or_area_tipo_proyecto);
-		$and_area_tipo_proyecto[] = CriteriaRestriction::is_null('codigo_asunto');
-	}
-
-	$or_clauses = array(
-		CriteriaRestriction::equals('codigo_asunto', "'{$codigo_asunto}'"),
-		CriteriaRestriction::and_clause(
-			array(
-				CriteriaRestriction::is_null('id_area_proyecto'),
-				CriteriaRestriction::is_null('codigo_asunto'),
-				CriteriaRestriction::is_null('id_tipo_proyecto')
-			)
-		)
-	);
-
-	if (!empty($and_area_tipo_proyecto)) {
-		$or_clauses[] = CriteriaRestriction::and_clause($and_area_tipo_proyecto);
-	}
-
-	$and_clauses = array(CriteriaRestriction::or_clause($or_clauses));
-
-	if ($activa == true) {
-		$and_clauses[] = CriteriaRestriction::equals('activo', 1);
-	}
-
-	$Criteria = new Criteria($Sesion);
-	$actividad = $Criteria
-		->add_select('codigo_actividad')
-		->add_select('glosa_actividad')
-		->add_from('actividad')
-		->add_restriction(CriteriaRestriction::and_clause($and_clauses))
-		->run();
-
-	if (!empty($actividad)) {
-		for($i = 0; $i < count($actividad); $i++) {
+	if (!empty($actividades)) {
+		for($i = 0; $i < count($actividades); $i++) {
 			if ($i > 0) {
 				$retorno .= '~';
 			}
-			$retorno .= join('|', $actividad[$i]);
+			$retorno .= join('|', $actividades[$i]);
 		}
 	} else {
 		$retorno = 'VACIO|';
