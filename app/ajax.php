@@ -542,6 +542,14 @@ switch ($accion) {
 function cargarActividades(Sesion $Sesion, $codigo_asunto, $activas = false) {
 	$retorno = '';
 
+	if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
+		$Asunto = new Asunto($Sesion);
+		$Asunto->LoadByCodigoSecundario($codigo_asunto);
+		if ($Asunto->Loaded()) {
+			$codigo_asunto = $Asunto->fields['codigo_asunto'];
+		}
+	}
+
 	$Actividad = new Actividad($Sesion);
 	$actividades = $Actividad->obtenerActividadesSegunAsunto($codigo_asunto, $activas);
 
@@ -550,7 +558,7 @@ function cargarActividades(Sesion $Sesion, $codigo_asunto, $activas = false) {
 			if ($i > 0) {
 				$retorno .= '~';
 			}
-			$retorno .= $actividades[$i]['codigo_actividad'] . '|' . utf8_encode($actividades[$i]['glosa_actividad']);
+			$retorno .= join('|', $actividades[$i]);
 		}
 	} else {
 		$retorno = 'VACIO|';

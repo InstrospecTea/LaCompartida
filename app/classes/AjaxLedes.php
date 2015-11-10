@@ -36,6 +36,15 @@ class AjaxLedes {
 		$html .= $Form->input('campo_codigo_actividad', $codigo_actividad, $attrs);
 
 		$options = array();
+
+		if (Conf::GetConf($this->Sesion, 'CodigoSecundario')) {
+			$Asunto = new Asunto($this->Sesion);
+			$Asunto->LoadByCodigoSecundario($codigo_asunto);
+			if ($Asunto->Loaded()) {
+				$codigo_asunto = $Asunto->fields['codigo_asunto'];
+			}
+		}
+
 		$actividades = $Actividad->obtenerActividadesSegunAsunto($codigo_asunto, true);
 
 		foreach ($actividades as $actividad) {
