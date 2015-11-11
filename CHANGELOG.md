@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.26.7
+Wednesday 2015, November 11th
+* **Fix** [Agrupar Reporte Avanzado por Usuario Secundario](https://github.com/LemontechSA/ttb/pull/1221)
+
 ## Hotfix 15.26.6
 Tuesday 2015, November 10th
 * **Fix** [Corrección PDF Revisar Horas](https://github.com/LemontechSA/ttb/pull/1220)
