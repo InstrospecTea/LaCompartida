@@ -718,7 +718,7 @@ $duracion_cobrada = '';
 							<?php
 							$duracion_editable = $nuevo || $sesion->usuario->fields['id_usuario'] == $id_usuario;
 							if (!$duracion_editable) {
-								$duracion_editable = $usuario->LoadSecretario($id_usuario, $sesion->usuario->fields['id_usuario']);
+								$duracion_editable = $permiso_revisor || $permiso_revisor_usuario;
 							}
 
 							if ($tipo_ingreso == 'selector') {
