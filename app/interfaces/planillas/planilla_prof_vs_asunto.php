@@ -223,8 +223,8 @@ $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__
 	$ws1->write($fila_final, $columna_inicial, __(Total), $formato_texto_total);
 
 	$ws1->write($fila_inicial,$columna_final,'Total Cliente',$formato_titulo);
-	$ws1->write($fila_inicial,$columna_final+1,'Valor Tasas/HH según tarifa contrato',$formato_titulo);
-	$ws1->write($fila_inicial,$columna_final+2,'Valor Tasas/HH según tarifa por defecto',$formato_titulo);
+	$ws1->write($fila_inicial,$columna_final+1, __('Valor Tasas/HH según tarifa contrato'),$formato_titulo);
+	$ws1->write($fila_inicial,$columna_final+2, __('Valor Tasas/HH según tarifa por defecto'),$formato_titulo);
 
 	//For para ponerle los valores totales a los clientes
 	for($i = 0; $i < count($clientes); $i++)

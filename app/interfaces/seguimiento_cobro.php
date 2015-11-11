@@ -232,7 +232,7 @@ if ($opc == 'buscar') {
 	$b->AgregarEncabezado("glosa_cliente", __('Cliente'), "", "", "SplitDuracion");
 	$b->AgregarEncabezado("asuntos", __('Asunto'), "align=left");
 	$b->AgregarEncabezado("id_contrato", __('Acuerdo'), "align=left");
-	$b->AgregarFuncion("Opci&oacute;n", 'Opciones', "align=center nowrap width=8%");
+	$b->AgregarFuncion(__("Opción"), 'Opciones', "align=center nowrap width=8%");
 	$b->funcionTR = "funcionTR";
 
 	function funcionTR(&$cobro) {
@@ -302,15 +302,15 @@ if ($opc == 'buscar') {
 							</td>";
 
 			$ht .= "<td style='font-size:10px; ' align=left>
-								<b>&nbsp;&nbsp;&nbsp;Descripción " . __('del cobro') . "</b>
+								<b>&nbsp;&nbsp;&nbsp;" . __('Descripción'. " " . __('del cobro')) . "</b>
 							</td>";
 			if (Conf::GetConf($sesion, 'FacturaSeguimientoCobros')) {
 				$ht .= "<td align=center style='font-size:10px; width: 70px;'>
-								<b>Nº Factura</b>
+								<b>" . __('Nº Factura') . "</b>
 							</td>";
 			}
 			$ht .= "<td style='font-size:10px; width: 52px;' align=center>
-								<b>Opción</b>
+								<b>" . __('Opción') . "</b>
 							</td></tr>";
 			$ht .= "<tr bgcolor='#F2F2F2'><td align=center colspan=4><hr size=1px style='font-size:10px; border:1px dashed #CECECE'></td><tr>";
 
@@ -694,7 +694,7 @@ $pagina->PrintTop();
 				</td>
 				<td align="left" colspan="2">
 					<?php $GrupoCliente = new GrupoCliente($sesion); ?>
-					<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
+					<?php echo Html::SelectArrayDecente($GrupoCliente->Listar(), "id_grupo_cliente", $id_grupo_cliente, "", __("Ninguno"), '280px') ?>
 				</td>
 			</tr>
 
@@ -806,7 +806,7 @@ $pagina->PrintTop();
 
 			<tr>
 				<td align="right">
-					<b><?php echo __('Estado') . ' de ' . __('Cobro'); ?></b>
+					<b><?php echo __(__('Estado') . ' de ' . __('Cobro')); ?></b>
 				</td>
 				<td align="left" colspan="2">
 					<?php echo Html::SelectQuery($sesion, "SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden", "estado[]", $estado, 'multiple="multiple" size="7"', __('Vacio'), '150') ?>
@@ -815,10 +815,10 @@ $pagina->PrintTop();
 
 			<tr>
 				<div style="text-align: left;position: absolute;left: 600px;top: 300px;">
-					<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Honorarios'); ?>
-					<br/><input type="checkbox" name="tienegastos"   value="1" id="tienegastos"  <?php if (isset($_POST['tienegastos'])) echo 'checked="checked"'; ?>/> Tiene <?php echo __('Gastos'); ?>
-					<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> Tiene <?php echo __('Trámites'); ?>
-					<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> Hay <?php echo __('Adelantos'); ?>  disponibles
+					<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene ' . __('Honorarios')); ?>
+					<br/><input type="checkbox" name="tienegastos"   value="1" id="tienegastos"  <?php if (isset($_POST['tienegastos'])) echo 'checked="checked"'; ?>/> <?php echo __('Tiene ' . __('Gastos')); ?>
+					<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene ' . __('Trámites')); ?>
+					<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> <?php echo __('Hay ' . __('Adelantos') . ' disponibles'); ?> 
 				</div>
 			</tr>
 

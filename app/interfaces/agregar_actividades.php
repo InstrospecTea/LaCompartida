@@ -130,7 +130,7 @@ echo $Form->hidden('opcion', 'guardar', array('id' => 'opcion'));
 echo $Form->hidden('id_actividad', $Actividad->fields['id_actividad'], array('id' => 'id_actividad'));
 ?>
 	<fieldset class="border_plomo tb_base">
-		<legend><?php echo __('Ingreso de Actividades'); ?></legend>
+		<legend><?php echo __('Ingreso de') . ' ' . __('Actividades'); ?></legend>
 		<table style="border: 1px solid #BDBDBD;" class="" width="100%">
 			<tr>
 				<td align="right">

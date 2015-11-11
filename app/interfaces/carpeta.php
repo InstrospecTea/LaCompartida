@@ -248,7 +248,7 @@
 				"id_grupo_cliente",
 				$id_grupo_cliente ? $id_grupo_cliente : $carpeta->fields['id_grupo_cliente'],
 				'',
-				'Cualquiera'
+				__('Cualquiera')
 			); ?>
 		</td>
 	</tr>

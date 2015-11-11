@@ -755,9 +755,9 @@ $pagina->PrintTop();
 					<input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked' : '' ?> /><?php echo __('Desglosar monto por monedas') ?><br/>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mostrar
 					<select name="cobrable" id="cobrable" style="width:210px;">
-						<option value="-1" selected="selected"><?php echo __('Asuntos') . ' ' . __('Cobrables') . ' y No ' . __('Cobrables'); ?></option>
-						<option value="0">Sólo <?php echo __('Asuntos') . ' No  ' . __('Cobrables'); ?></option>
-						<option value="1">Sólo  <?php echo __('Asuntos') . ' ' . __('Cobrables'); ?></option>
+						<option value="-1" selected="selected"><?php echo __(__('Asuntos') . ' ' . __('Cobrables') . ' y No ' . __('Cobrables')); ?></option>
+						<option value="0"><?php echo __('Sólo ' . __('Asuntos') . ' No  ' . __('Cobrables')); ?></option>
+						<option value="1"><?php echo __('Sólo ' . __('Asuntos') . ' ' . __('Cobrables')); ?></option>
 					</select>
 				</div>
 			</td>
@@ -780,11 +780,11 @@ $pagina->PrintTop();
 				}
 				?>
 				&nbsp;&nbsp;&nbsp;<input type="checkbox" value=1 name="incluir_contratos_inactivos" <?php echo $incluir_contratos_inactivos ? 'checked="checked"' : '' ?> /><?php echo __('Incluir los acuerdos comerciales inactivos'); ?><br/>
-				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_encargado" <?php echo $ocultar_encargado ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('encargado') ?></label><br/>
-				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_ultimo_trabajo" <?php echo $ocultar_ultimo_trabajo ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo trabajo') ?></label><br/>
-				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_ultimo_cobro" <?php echo $ocultar_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('ultimo cobro') ?></label><br/>
-				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_estado_ultimo_cobro" <?php echo $ocultar_estado_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna estado') . ' ' . __('ultimo cobro') ?></label><br/>
-				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_fecha_corte" <?php echo $ocultar_fecha_corte ? 'checked="checked"' : '' ?> /><?php echo __('Ocultar columna') . ' ' . __('fecha de corte') ?></label><br/>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_encargado" <?php echo $ocultar_encargado ? 'checked="checked"' : '' ?> /><?php echo __(__('Ocultar columna') . ' ' . __('encargado')) ?></label><br/>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_ultimo_trabajo" <?php echo $ocultar_ultimo_trabajo ? 'checked="checked"' : '' ?> /><?php echo __(__('Ocultar columna') . ' ' . __('ultimo trabajo')) ?></label><br/>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_ultimo_cobro" <?php echo $ocultar_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __(__('Ocultar columna') . ' ' . __('ultimo cobro')) ?></label><br/>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_estado_ultimo_cobro" <?php echo $ocultar_estado_ultimo_cobro ? 'checked="checked"' : '' ?> /><?php echo __(__('Ocultar columna estado') . ' ' . __('ultimo cobro')) ?></label><br/>
+				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="ocultar_fecha_corte" <?php echo $ocultar_fecha_corte ? 'checked="checked"' : '' ?> /><?php echo __(__('Ocultar columna') . ' ' . __('fecha de corte')) ?></label><br/>
 				&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value=1 name="desglosar_moneda" <?php echo $desglosar_moneda ? 'checked="checked"' : '' ?> /><?php echo __('Desglosar monto por monedas') ?></label><br/>
 				<?php if ($sesion->usuario->Es('SADM')) { ?>
 					&nbsp;&nbsp;&nbsp;<label><input type="checkbox" value="1" name="llenar_olap" /><?php echo __('Ejecutar llenado inicial de datos'); ?></label><br/>

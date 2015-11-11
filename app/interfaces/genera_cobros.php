@@ -1011,7 +1011,7 @@ if ($proceso !== false) {
 		<tr>
 			<td>
 				<fieldset class="tb_base" style="width: 100%;border: 1px solid #BDBDBD;">
-					<legend><?php echo 'Filtros' ?></legend>
+					<legend><?php echo __('Filtros') ?></legend>
 					<table width='720px' style='border:0px dotted #999999'>
 						<tr>
 							<td align=right width='30%'>

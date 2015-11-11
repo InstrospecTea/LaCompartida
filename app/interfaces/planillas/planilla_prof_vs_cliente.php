@@ -246,8 +246,8 @@ $fila_final = $fila_inicial + $j + 1;
 $ws1->write($fila_final, $columna_inicial, __(Total), $formato_texto_total);
 
 $ws1->write($fila_inicial,$columna_final,'Total Cliente',$formato_titulo);
-$ws1->write($fila_inicial,$columna_final+1,'Valor según tarifa contrato',$formato_titulo);
-$ws1->write($fila_inicial,$columna_final+2,'Valor según tarifa por defecto',$formato_titulo);
+$ws1->write($fila_inicial,$columna_final+1, __('Valor según tarifa contrato'),$formato_titulo);
+$ws1->write($fila_inicial,$columna_final+2, __('Valor según tarifa por defecto'),$formato_titulo);
 
 //	For para ponerle los valores totales a los clientes
 for($i = 0; $i < count($clientes); $i++) {

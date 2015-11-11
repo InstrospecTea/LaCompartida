@@ -400,10 +400,10 @@ if ($opcion == "guardar") {
 
 // Título opcion
 if ($opcion == '' && $id_trabajo > 0) {
-	$txt_opcion = __('Modificación de Trabajo');
+	$txt_opcion = __('Modificación de') . ' ' . __('Trabajo');
 } else if ($id_trabajo == NULL) {
 	// si no tenemos id de trabajo es porque se está agregando uno nuevo.
-	$txt_opcion = __('Agregando nuevo Trabajo');
+	$txt_opcion = __('Agregando nuevo') . ' ' . __('Trabajo');
 } else if ($opcion == '') {
 	$txt_opcion = '';
 }
