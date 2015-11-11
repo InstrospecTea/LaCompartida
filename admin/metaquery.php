@@ -18,16 +18,13 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 			<label class="span3 al">Host de Base de Datos</label>
 			<?php
 			$servers = array(
-				'192.168.1.24',
-				'192.168.2.101',
-				'192.168.2.102',
 				'rdsdb1.thetimebilling.com',
 				'rdsdb2.thetimebilling.com',
 				'rdsdb3.thetimebilling.com',
 				'rdsdb4.thetimebilling.com',
 				'rdsdb5.thetimebilling.com',
 				'rdsdb6.thetimebilling.com',
-				'rdsvip1.thetimebilling.com',
+				'rdsvip1.thetimebilling.com'
 			);
 			echo Html::SelectArray($servers, 'dbhost', isset($_POST['dbhost'])? $_POST['dbhost']: Conf::dbHost(),' class="span5" ','','380px');
 			?>
@@ -45,12 +42,12 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 		<br/>
 		<div class="controls controls-row">
 			<label class="span5  al">Mostrar la query que estoy ejecutando</label>
-			<input type="checkbox" checked="checked" name="detalle" id="detalle" value="1" <?php echo !empty($_POST['detalle']) ? 'checked="checked"' : ''; ?> />
+			<input type="checkbox" name="detalle" id="detalle" value="1" <?php echo !empty($_POST['detalle']) ? 'checked="checked"' : ''; ?> />
 		</div>
 		<br/>
 		<div class="controls controls-row">
 			<label class="span5  al">Mostrar errores o excepciones que arroje mysql</label>
-			<input type="checkbox"  checked="checked" name="errores" id="errores" value="1" <?php echo !empty($_POST['errores']) ? 'checked="checked"' : ''; ?> />
+			<input type="checkbox" name="errores" id="errores" value="1" <?php echo !empty($_POST['errores']) ? 'checked="checked"' : ''; ?> />
 		</div>
 		<br/>
 		<div class="control-group">
@@ -65,72 +62,58 @@ if (isset($_POST['ejecutar']) && $_POST['ejecutar'] == 'ejecutar') {
 	try {
 		$dbhost = $_POST['dbhost'];
 		$cadenadb = 'mysql:dbname=phpmyadmin;host='.$dbhost;
-			switch ($dbhost) {
-				case '192.168.1.24':
-					$sesion->pdodbh2 = new PDO($cadenadb, 'root',	 'asdwsx');
-					break;
-				case '192.168.2.101':
-				case '192.168.2.102':
-					$sesion->pdodbh2 = new PDO($cadenadb, 'root',	 'admin.asdwsx');
-					break;
+		$sesion->pdodbh2 = new PDO($cadenadb, 'admin', 'admin1awdx');
+		$sesion->pdodbh2->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	} catch (PDOException $e) {
+		echo "Error Connection: " . $e->getMessage();
+	}
 
-				default:
-					$sesion->pdodbh2 = new PDO($cadenadb, 'admin',	 'admin1awdx');
-					break;
+	$bases = $sesion->pdodbh2->query("SHOW DATABASES like '{$_POST['schema']}'  ");
+	$arraybases = $bases->fetchAll(PDO::FETCH_COLUMN, 0);
+
+	foreach ($arraybases as $base) {
+		$query = trim($_POST['query']);
+
+		try {
+			$sesion->pdodbh2->exec("use $base;");
+			if ($_POST['detalle']) {
+				echo "<pre style='text-align:left;'>use $base;<br><b>$query</b><br></pre>";
 			}
-
-			$sesion->pdodbh2->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			if (stripos($query,'select') === false && stripos($query,'show') === false) {
+				$stmt = $sesion->pdodbh2->prepare($query);
+				$filas = $stmt->execute();
+				echo '<br>Filas afectadas: '. $filas.'</br>';
+				$stmt->closeCursor();
+			} else {
+				$filas = $sesion->pdodbh2->query($query);
+				$filasRS = $filas->fetchAll(PDO::FETCH_ASSOC);
+				$cuerpo = "";
+				foreach ($filasRS as $fila) {
+					$cabeceras=array_keys($fila);
+					$cuerpo .= '<tr>';
+					if (empty($_POST['detalle'])) {
+						$cuerpo .= '<td>'.$base.'</td>';
+					}
+					foreach($fila as $celda) {
+						$cuerpo .= '<td>'.str_replace(",",", ",$celda).'</td>';
+					}
+					$cuerpo.= '</tr>';
+				}
+				if (count($filasRS) > 0) {
+					echo '<table class="table-bordered" border="1">';
+					echo '<thead><tr><th>';
+					if (empty($_POST['detalle'])) {
+						echo 'Base de Datos</th><th>';
+					}
+					echo implode('</th><th>',$cabeceras).'</th></tr></thead>';
+					echo '<tbody>';
+					echo $cuerpo;
+					echo '</tbody>';
+					echo '</table><hr><br>';
+				}
+			}
 		} catch (PDOException $e) {
-			echo "Error Connection: " . $e->getMessage();
-			//file_put_contents("/var/www/error_logs/".DBHOST."_Connection-log.txt", DATE . PHP_EOL . $e->getMessage() . PHP_EOL . PHP_EOL, FILE_APPEND);
-		}
-
-		$bases = $sesion->pdodbh2->query("SHOW DATABASES like '{$_POST['schema']}'  ");
-		$arraybases = $bases->fetchAll(PDO::FETCH_COLUMN, 0);
-
-		foreach ($arraybases as $base) {
-			$query = trim($_POST['query']);
-
-			try {
-				$sesion->pdodbh2->exec("use $base;");
-				if ($_POST['detalle']) {
-					echo "<pre style='text-align:left;'>use $base;<br><b>$query</b><br></pre>";
-				}
-				if (stripos($query,'select') === false && stripos($query,'show') === false) {
-					$stmt = $sesion->pdodbh2->prepare($query);
-					$filas = $stmt->execute();
-					echo '<br>Filas afectadas: '. $filas.'</br>';
-					$stmt->closeCursor();
-				} else {
-					$filas = $sesion->pdodbh2->query($query);
-					$filasRS = $filas->fetchAll(PDO::FETCH_ASSOC);
-					$cuerpo = "";
-					foreach ($filasRS as $fila) {
-						$cabeceras=array_keys($fila);
-						$cuerpo .= '<tr>';
-						if (empty($_POST['detalle'])) {
-							$cuerpo .= '<td>'.$base.'</td>';
-						}
-						foreach($fila as $celda) {
-							$cuerpo .= '<td>'.str_replace(",",", ",$celda).'</td>';
-						}
-						$cuerpo.= '</tr>';
-					}
-					if (count($filasRS) > 0) {
-						echo '<table class="table-bordered" border="1">';
-						echo '<thead><tr><th>';
-						if (empty($_POST['detalle'])) {
-							echo 'Base de Datos</th><th>';
-						}
-						echo implode('</th><th>',$cabeceras).'</th></tr></thead>';
-						echo '<tbody>';
-						echo $cuerpo;
-						echo '</tbody>';
-						echo '</table><hr><br>';
-					}
-				}
-			} catch (PDOException $e) {
-				if ($_POST['detalle']) {
+			if ($_POST['detalle']) {
 				echo '<pre>Excepción en '.$base.':<br>';
 				echo $e->getMessage().'<br>';
 				echo '<hr>Traza:<br>';
