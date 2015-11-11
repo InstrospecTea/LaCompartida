@@ -1026,8 +1026,8 @@ UtilesApp::GetConfJS($sesion, 'PrellenarTrabajoConActividad');
 
 		// Si el usuario no tiene permiso de cobranza validamos la fecha del trabajo
 		<?php if (!$permiso_cobranza && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0) { ?>
-			temp = $('fecha').value.split("-");
-			fecha = new Date(temp[2] + '//' + temp[1] + '//' + temp[0]);
+			temp = jQuery('#fecha').val().split("-");
+			fecha = new Date(temp[2] + '/' + temp[1] + '/' + temp[0]);
 			hoy = new Date("<?php echo date('Y/m/d') ?>");
 			fecha_tope = new Date(hoy.getTime() - (<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo'] + 1) ?> * 24 * 60 * 60 * 1000));
 
@@ -1036,7 +1036,7 @@ UtilesApp::GetConfJS($sesion, 'PrellenarTrabajoConActividad');
 				var mes = fecha_tope.getMonth() + 1;
 				var anio = fecha_tope.getFullYear();
 				alert("No se pueden ingresar trabajos anteriores a " + dia + "-" + mes + "-" + anio);
-				$('fecha').focus;
+				jQuery('#fecha').focus();
 				return false;
 			}
 		<?php } ?>
