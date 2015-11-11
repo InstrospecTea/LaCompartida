@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.26.8
+Wednesday 2015, November 11th
+* **Fix** [Modificar permisos para editar horas trabajadas](https://github.com/LemontechSA/ttb/pull/1222)
+
 ## Hotfix 15.26.7
 Wednesday 2015, November 11th
 * **Fix** [Agrupar Reporte Avanzado por Usuario Secundario](https://github.com/LemontechSA/ttb/pull/1221)
