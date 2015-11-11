@@ -22,7 +22,7 @@ if (!function_exists('apache_setenv')) {
 
 if (!class_exists('Conf')) {
 	class Conf {
-		public static function AppName() { return APPNAME; }
+		public static function AppName() { return html_entity_decode(APPNAME); }
 		public static function ServerDir() { return dirname(__FILE__); }
 		public static function ASDBKey() { return 'avisos-ttbc'; }
 		public static function ImgDir() { return  '//static.thetimebilling.com/templates/default/img'; }

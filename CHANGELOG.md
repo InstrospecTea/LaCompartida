@@ -1,5 +1,29 @@
 # Changelog
 
+## Hotfix 15.26.8
+Wednesday 2015, November 11th
+* **Fix** [Modificar permisos para editar horas trabajadas](https://github.com/LemontechSA/ttb/pull/1222)
+
+## Hotfix 15.26.7
+Wednesday 2015, November 11th
+* **Fix** [Agrupar Reporte Avanzado por Usuario Secundario](https://github.com/LemontechSA/ttb/pull/1221)
+
+## Hotfix 15.26.6
+Tuesday 2015, November 10th
+* **Fix** [Corrección PDF Revisar Horas](https://github.com/LemontechSA/ttb/pull/1220)
+
+## Hotfix 15.26.5
+Monday 2015, November 9th
+* **Fix** [Modificar query para seleccionar actividades](https://github.com/LemontechSA/ttb/pull/1219)
+
+## Hotfix 15.26.4
+Monday 2015, November 9th
+* **Fix** [html_entity_decode a nombre estudio](https://github.com/LemontechSA/ttb/pull/1218)
+
+## Hotfix 15.26.3
+Friday 2015, November 6th
+* **Fix** [Mejora listado asuntos en cobros masivos](https://github.com/LemontechSA/ttb/pull/1217)
+
 ## Hotfix 15.26.2
 Thursday 2015, November 5th
 * **Fix** [Error SQL - Editar solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/1215)

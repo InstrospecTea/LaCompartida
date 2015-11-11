@@ -9,14 +9,14 @@ abstract class AbstractGrouperTranslator  implements IGrouperTranslator {
 
 	/**
 	 * Constructor
-	 * @param Sesion $Session La sessi贸n para acceso a datos y configuraci贸n
+	 * @param Sesion $Session La sessi髇 para acceso a datos y configuraci髇
 	 */
 	public function __construct(Sesion $Session) {
 		$this->Session = $Session;
 	}
 
 	/**
- * Obtiene la coluna correcta para c贸digo asunto
+ * Obtiene la coluna correcta para c骴igo asunto
  * @return String Campo Codigo de asunto
  */
 	function getProjectCodeField() {
@@ -44,8 +44,16 @@ abstract class AbstractGrouperTranslator  implements IGrouperTranslator {
 	}
 
 	/**
-	 * Dependiendo de la configuraci贸n UsaUsernameEnTodoElSistema devuelve
-	 * username o una concatenaci贸n del nombre y apellidos para agrupar
+	 * Obtiene el campo de la tabla de usuarios correspondiente para Usuario Secundario
+	 * @return String
+	 */
+	function getSecondUserAcountManagerField() {
+		return $this->getUserFieldBy('usuario_secundario');
+	}
+
+	/**
+	 * Dependiendo de la configuraci髇 UsaUsernameEnTodoElSistema devuelve
+	 * username o una concatenaci髇 del nombre y apellidos para agrupar
 	 * @return String
 	 */
 	function getUserFieldBy($table) {
