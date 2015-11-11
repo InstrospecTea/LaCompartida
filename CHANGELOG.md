@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 15.27.0](https://github.com/LemontechSA/ttb/pull/1213)
+Thursday 2015, November 5th
+* **Feature** [Traducción Brasil](https://github.com/LemontechSA/ttb/pull/1186)
+
 ## Hotfix 15.26.9
 Wednesday 2015, November 11th
 * **Fix** [Corrección validación fecha tope para editar/ingresar trabajos](https://github.com/LemontechSA/ttb/pull/1223)
