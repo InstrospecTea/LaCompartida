@@ -1395,12 +1395,6 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			elem.value = '';
 		});
 		$('fila_hito_1').setAttribute('bgcolor', $('fila_hito_1').getAttribute('bgcolor') == '<?php echo $color_par ?>' ? '<?php echo $color_impar ?>' : '<?php echo $color_par ?>');
-
-		Calendar.setup({
-			inputField	: 'hito_fecha_'+num,				// ID of the input field
-			ifFormat	: "%d-%m-%Y",			// the date format
-			button		: 'img_fecha_hito_'+num		// ID of the button
-		});
 	}
 
 	function validarHito(fila, permitirVacio){
@@ -2075,8 +2069,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 												<?php echo __('Fecha inicio') . $obligatorios('fecha_inicio_cap'); ?>
 											</td>
 											<td align="left">
-												<input type="text" name="fecha_inicio_cap" value="<?php echo Utiles::sql2date($contrato->fields['fecha_inicio_cap']) ?>" id="fecha_inicio_cap" size="11" maxlength="10" />
-												<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_inicio_cap" style="cursor:pointer" />
+												<?php echo $Html::PrintCalendar('fecha_inicio_cap', Utiles::sql2date($contrato->fields['fecha_inicio_cap'])); ?>
 											</td>
 										</tr>
 									</table>
@@ -2234,16 +2227,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									for ($i = 2; $i - 2 < $total_cobros_pendientes; $i++) {
 										$temp = $cobros_pendientes[$i - 2];
 										$disabled = empty($temp['id_cobro']) ? '' : ' disabled="disabled" ';
+										$claseFecha = empty($temp['id_cobro']) ? 'fechadiff' : 'fechadiff_disabled';
 										?>
 										<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_<?php echo $i ?>" >
 											<td align="center" nowrap>
 												<?php if ($disabled) { ?>
 													<input type="hidden" name="hito_disabled[<?php echo $i ?>]" value= "" />
 												<?php } ?>
-												<input type="text" name="hito_fecha[<?php echo $i ?>]" value='<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>' id="hito_fecha_<?php echo $i ?>" size="11" maxlength="10" <?php echo $disabled ?>/>
-													<?php if (!$disabled) { ?>
-														<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_hito_<?php echo $i ?>" style="cursor:pointer" />
-													<?php } ?>
+												<input type='text' class='<?php echo $claseFecha ?>' name="hito_fecha[<?php echo $i ?>]" id="hito_fecha_<?php echo $i ?>" value='<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>' size='12' />
 												<br/>
 												<span style="float:right">Observaciones:</span>
 											</td>
@@ -2265,8 +2256,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									<?php } ?>
 									<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_1">
 										<td align="center" nowrap>
-											<input type="text" name="hito_fecha[1]" value='' id="hito_fecha_1" size="11" maxlength="10" />
-											<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_hito_1" style="cursor:pointer" />
+											<input type='text' class='fechadiff' name='hito_fecha[1]' id='hito_fecha_1' value='' size='12' />
 											<br/>
 											<span style="float:right">Observaciones:</span>
 										</td>
@@ -3314,21 +3304,6 @@ echo $Form->script();
 		?>
 	}
 
-	if (jQuery('#fecha_inicio_cap').length != 0) {
-		Calendar.setup({
-			inputField	: "fecha_inicio_cap",				// ID of the input field
-			ifFormat		: "%d-%m-%Y",			// the date format
-			button			: "img_fecha_inicio_cap"		// ID of the button
-		});
-	}
-
-	$$('[id^="hito_fecha_"]').each(function(elem){
-		Calendar.setup({
-			inputField	: elem.id,				// ID of the input field
-			ifFormat		: "%d-%m-%Y",			// the date format
-			button			: elem.id.replace('hito_fecha_', 'img_fecha_hito_')
-		});
-	});
 	$$('tr.esconder').each(function(item) {
 		item.hide();
 	});
