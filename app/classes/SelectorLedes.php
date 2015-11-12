@@ -17,7 +17,7 @@ class SelectorLedes {
 	}
 
 	public function instanciar($proveedor) {
-		return new $proveedor($this->Sesion);
+		return new $this->proveedores[$proveedor]($this->Sesion);
 	}
 
 	public function getProveedores() {
