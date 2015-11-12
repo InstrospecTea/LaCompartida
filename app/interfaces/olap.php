@@ -21,7 +21,7 @@
 		$glosa_usuario = 'username_usuario';
     } else {
 		$glosa_usuario = 'nombre_usuario';
-    }   
+    }
 
     $dimensiones = array($glosa_usuario, 'glosa_actividad', 'glosa_cliente', 'glosa_asunto', 'forma_cobro', 'cobrable', 'glosa_moneda', 'glosa_tipo_proyecto');
     $glosa_dimensiones = array('Usuario', 'Actividad', 'Cliente', __('Asunto'), 'Forma de cobro', __('Asunto') . ' cobrable', 'Moneda', 'Tipo ' . __('asunto'));
@@ -173,8 +173,8 @@
     </tr>
     <tr>
         <td colspan=2 align=center>
-            <input type=submit class=btn onclick="this.form.excel.value=0;" value=<?php echo __('Desplegar'); ?>>
-            <input type=submit class=btn onclick="this.form.excel.value=1;" value=<?php echo __('Excel'); ?>>
+            <input type="submit" class="btn" onclick="this.form.excel.value=0;" value='<?php echo __('Desplegar'); ?>' >
+            <input type="submit" class="btn" onclick="this.form.excel.value=1;" value='<?php echo __('Excel'); ?>' >
         </td>
     </tr>
 </table>

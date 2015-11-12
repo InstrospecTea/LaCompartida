@@ -665,7 +665,7 @@ $Form->defaultLabel = false;
 		?>
 		<tr>
 			<td align="right"><?php echo __('Fecha') ?></td>
-			<td align="left" colspan=2>
+			<td align="left" colspan="2">
 				<?php echo $Html::PrintCalendar('fecha', Utiles::sql2date($factura->fields['fecha'])); ?>
 			</td>
 
