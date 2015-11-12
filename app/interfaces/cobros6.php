@@ -618,7 +618,13 @@ if ($cobro->fields['id_contrato'] != '') {
 }
 
 if (Conf::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['exportacion_ledes']) {
-	$Ledes = new Ledes($sesion);
+	$formato_ledes = $contrato->fields['formato_ledes'];
+	if ($formato_ledes == 'serengeti') {
+		$Ledes = new Serengeti($sesion);
+	}
+	if ($formato_ledes == 'tymetrix') {
+		$Ledes = new TyMetrix($sesion);
+	}
 	$errores_ledes = json_encode($Ledes->ValidarDatos($id_cobro));
 } else {
 	$errores_ledes = 'null';

@@ -10976,6 +10976,10 @@ QUERY;
 					ON DELETE SET NULL
 					ON UPDATE CASCADE;";
 			break;
+		case 8.22:
+			$queries[] = "ALTER TABLE `contrato` ADD COLUMN `formato_ledes` VARCHAR(50) NULL";
+			$queries[] = "UPDATE `contrato` SET `formato_ledes` = 'serengeti' WHERE `exportacion_ledes` = 1";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10988,7 +10992,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.21;
+$max_update = 8.22;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {

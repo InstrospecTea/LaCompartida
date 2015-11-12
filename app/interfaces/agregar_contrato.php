@@ -1634,6 +1634,13 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<input type="hidden" name="exportacion_ledes" value="0"/>	<input  class="span1" id="exportacion_ledes" type="checkbox" name="exportacion_ledes" value="1" <?php echo $exportacion_ledes == '1' ? 'checked="checked"' : '' ?>  />
 					</td>
 				</tr>
+				<tr class="controls controls-row ">
+					<td class="al"><?php echo __('Formato LEDES'); ?></td>
+					<td class="al"><select name="formato_ledes" id="formato_ledes" class="span3" style="width: 200px">
+							<option value="serengeti" <?php echo $contrato->fields['formato_ledes'] == 'serengeti' ? 'selected' : '' ?>>Serengeti</option>
+							<option value="tymetrix" <?php echo $contrato->fields['formato_ledes'] == 'tymetrix' ? 'selected' : '' ?>>TyMetrix</option>
+						</select></td>
+				</tr>
 			<?php } ?>
 		</table>
 		<!-- FIN RESPONSABLE -->
