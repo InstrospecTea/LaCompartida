@@ -4,6 +4,10 @@
 Thursday 2015, November 12th
 * **Feature** [Corregir formato LEDES para Flat Fee](https://github.com/LemontechSA/ttb/pull/1203)
 
+## Hotfix 15.27.2
+Thursday, November 12th
+* **Fix** [Deshabilitar edición de factura cuando el cobro no está emitido](https://github.com/LemontechSA/ttb/pull/1230)
+
 ## Hotfix 15.27.1
 Thursday, November 12th
 * **Fix** [Corrección JS en módulo usuarios](https://github.com/LemontechSA/ttb/pull/1226)
