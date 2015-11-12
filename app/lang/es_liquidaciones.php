@@ -31,8 +31,8 @@
 	$_LANG['Estado Cobro'] = "Estado Liquidación";
 	$_LANG['el &uacute;ltimo cobro'] = 'la &uacute;ltima liquidaci&oacute;n';
 	$_LANG['N° del Cobro'] = "N° de la Liquidación";
-	$_LANG['El Cobro asociado'] = "La Liquidación asociada";
-	$_LANG['El cobro asociado'] = "La liquidación asociada";
+	$_LANG['El Cobro %num asociado'] = "La Liquidación %num asociada";
+	$_LANG['El cobro %num asociado'] = "La liquidación %num asociada";
 	$_LANG['el Cobro antes indicado'] = "la Liquidación antes indicada";
 	$_LANG['el cobro antes indicado'] = "la liquidación antes indicada";
 
