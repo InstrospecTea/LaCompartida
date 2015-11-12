@@ -250,6 +250,68 @@ class Actividad extends Objeto {
 
 		return false;
 	}
+
+	function obtenerActividadesSegunAsunto($codigo_asunto, $activas = true) {
+		$actividades = array();
+
+		$Criteria = new Criteria($this->sesion);
+		$asunto = $Criteria
+			->add_select('id_area_proyecto')
+			->add_select('id_tipo_asunto')
+			->add_from('asunto')
+			->add_restriction(CriteriaRestriction::equals('codigo_asunto', "'{$codigo_asunto}'"))
+			->run();
+
+		$and_area_tipo_proyecto = array();
+
+		if (!empty($asunto)) {
+			$or_area_tipo_proyecto = array();
+			if (!empty($asunto[0]['id_area_proyecto'])) {
+				$or_area_tipo_proyecto[] = CriteriaRestriction::equals('id_area_proyecto', "'{$asunto[0]['id_area_proyecto']}'");
+			} else {
+				$or_area_tipo_proyecto[] = CriteriaRestriction::is_null('id_area_proyecto');
+			}
+			if (!empty($asunto[0]['id_tipo_asunto'])) {
+				$or_area_tipo_proyecto[] = CriteriaRestriction::equals('id_tipo_proyecto', "'{$asunto[0]['id_tipo_asunto']}'");
+			} else {
+				$or_area_tipo_proyecto[] = CriteriaRestriction::is_null('id_tipo_proyecto');
+			}
+
+			$and_area_tipo_proyecto[] = CriteriaRestriction::or_clause($or_area_tipo_proyecto);
+			$and_area_tipo_proyecto[] = CriteriaRestriction::is_null('codigo_asunto');
+		}
+
+		$or_clauses = array(
+			CriteriaRestriction::equals('codigo_asunto', "'{$codigo_asunto}'"),
+			CriteriaRestriction::and_clause(
+				array(
+					CriteriaRestriction::is_null('id_area_proyecto'),
+					CriteriaRestriction::is_null('codigo_asunto'),
+					CriteriaRestriction::is_null('id_tipo_proyecto')
+				)
+			)
+		);
+
+		if (!empty($and_area_tipo_proyecto)) {
+			$or_clauses[] = CriteriaRestriction::and_clause($and_area_tipo_proyecto);
+		}
+
+		$and_clauses = array(CriteriaRestriction::or_clause($or_clauses));
+
+		if ($activas == true) {
+			$and_clauses[] = CriteriaRestriction::equals('activo', 1);
+		}
+
+		$Criteria = new Criteria($this->sesion);
+		$actividades = $Criteria
+			->add_select('codigo_actividad')
+			->add_select('glosa_actividad')
+			->add_from('actividad')
+			->add_restriction(CriteriaRestriction::and_clause($and_clauses))
+			->run();
+
+		return $actividades;
+	}
 }
 
 class ListaActividades extends Lista {

@@ -1,5 +1,29 @@
 # Changelog
 
+## [Release 15.27.0](https://github.com/LemontechSA/ttb/pull/1213)
+Thursday 2015, November 5th
+* **Feature** [Traducción Brasil](https://github.com/LemontechSA/ttb/pull/1186)
+
+## Hotfix 15.26.9
+Wednesday 2015, November 11th
+* **Fix** [Corrección validación fecha tope para editar/ingresar trabajos](https://github.com/LemontechSA/ttb/pull/1223)
+
+## Hotfix 15.26.8
+Wednesday 2015, November 11th
+* **Fix** [Modificar permisos para editar horas trabajadas](https://github.com/LemontechSA/ttb/pull/1222)
+
+## Hotfix 15.26.7
+Wednesday 2015, November 11th
+* **Fix** [Agrupar Reporte Avanzado por Usuario Secundario](https://github.com/LemontechSA/ttb/pull/1221)
+
+## Hotfix 15.26.6
+Tuesday 2015, November 10th
+* **Fix** [Corrección PDF Revisar Horas](https://github.com/LemontechSA/ttb/pull/1220)
+
+## Hotfix 15.26.5
+Monday 2015, November 9th
+* **Fix** [Modificar query para seleccionar actividades](https://github.com/LemontechSA/ttb/pull/1219)
+
 ## Hotfix 15.26.4
 Monday 2015, November 9th
 * **Fix** [html_entity_decode a nombre estudio](https://github.com/LemontechSA/ttb/pull/1218)
