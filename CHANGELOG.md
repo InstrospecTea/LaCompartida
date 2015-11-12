@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.27.1
+Thursday, November 12th
+* **Fix** [Corrección JS en módulo usuarios](https://github.com/LemontechSA/ttb/pull/1226)
+
 ## [Release 15.27.0](https://github.com/LemontechSA/ttb/pull/1213)
 Thursday 2015, November 5th
 * **Feature** [Traducción Brasil](https://github.com/LemontechSA/ttb/pull/1186)
