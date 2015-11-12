@@ -2628,7 +2628,9 @@ class Factura extends Objeto {
 								, IF(factura.fecha < NOW(), DATEDIFF(NOW(), factura.fecha), '') as dias_vencimiento
 								, contrato.contacto as nombre_contacto
 								, contrato.fono_contacto as telefono_contacto
-								, contrato.email_contacto as email_contacto";
+								, contrato.email_contacto as email_contacto
+								, cobro.estado as estado_cobro
+								, prm_documento_legal.glosa as glosa_doc_legal";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (

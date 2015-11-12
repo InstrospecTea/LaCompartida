@@ -1,7 +1,7 @@
 <?php
  require_once dirname(__FILE__).'/../conf.php';
  require_once dirname(__FILE__).'/es_facturacion.php';
- 
+
  	$_LANG['Generación de Cobros'] = "Pre-Liquidaciones";
 	$_LANG['Seguimiento Cobros'] = "Seguimiento Liquidaciones";
 	$_LANG['Seguimiento de cobros'] = "Seguimiento de Liquidaciones";
@@ -22,23 +22,27 @@
 	$_LANG['Guardar cobro'] = "Guardar liquidación";
 	$_LANG['un cobro'] = "una liquidación";
 	$_LANG['Nota Cobro'] = "Nota Liquidación";
-        $_LANG['ultimo cobro'] = "ultima liquidación";
+  $_LANG['ultimo cobro'] = "ultima liquidación";
 	$_LANG['Total Cobro Original'] = "Total Liquidación Original";
 	$_LANG['al cobro'] = "a la liquidación";
 	$_LANG['un Cobro'] = "una Liquidación";
-	$_LANG['este cobro'] = "esta liquidación";	
+	$_LANG['este cobro'] = "esta liquidación";
 	$_LANG['N° Cobro'] = "N° Liquidación";
 	$_LANG['Estado Cobro'] = "Estado Liquidación";
 	$_LANG['el &uacute;ltimo cobro'] = 'la &uacute;ltima liquidaci&oacute;n';
 	$_LANG['N° del Cobro'] = "N° de la Liquidación";
-	
+	$_LANG['El Cobro %num asociado'] = "La Liquidación %num asociada";
+	$_LANG['El cobro %num asociado'] = "La liquidación %num asociada";
+	$_LANG['el Cobro antes indicado'] = "la Liquidación antes indicada";
+	$_LANG['el cobro antes indicado'] = "la liquidación antes indicada";
+
 	$_LANG['Cobro inválido'] = "Liquidación inválida";
-	
-	$_LANG['Hrs cobro/trab.'] = "Hrs liq./trab."; 
-	$_LANG['Hrs Trab./Cobro.'] = "Hrs Trab./Liq."; 
-	
+
+	$_LANG['Hrs cobro/trab.'] = "Hrs liq./trab.";
+	$_LANG['Hrs Trab./Cobro.'] = "Hrs Trab./Liq.";
+
 	$_LANG['Fecha Cobro'] = "Fecha Liquidación";  // revisar si está correcto
-	
+
 	$_LANG['Fecha último cobro emitido:']  = 'Fecha última liquidación emitida:';
 	$_LANG['Eliminar cobro'] = "Eliminar pre-liquidación";
 	$_LANG['Editar cobro'] = "Editar liquidación";
@@ -53,11 +57,11 @@
 	$_LANG['¿Desea imprimir los cobros del periodo?'] = "¿Desea imprimir las liquidaciones del periodo?";
 	$_LANG['Cobros generado con &eacute;xito'] = "Liquidaciones generado con &eacute;xito";
 	$_LANG['Cobros emitidos con &eacute;xito'] = "Liquidaciones emitidas con &eacute;xito";
-	
+
 	$_LANG['Generar cobro individual'] = "Generar liquidación individual";
 	$_LANG['Generar cobro individual para gastos'] = "Generar liquidación individual para gastos";
 	$_LANG['Generar cobro individual para honorarios'] = "Generar liquidación individual para honorarios";
-	
+
 	$_LANG['Detalle Cobro'] = "Detalle liquidación";
 	$_LANG['No hay gastos en este cobro'] = "No hay gastos en esta liquidación";
 	$_LANG['Cobro'] = "Liquidación";
@@ -65,7 +69,7 @@
 	$_LANG['NOTA DE COBRO'] = "NOTA DE LIQUIDACIÓN";
 	$_LANG['Nota de Cobro'] = "Nota de Liquidación";
 	$_LANG['Periodo Cobro'] = "Periodo Liquidación";
-	
+
 	$_LANG['%reference_no%'] = "Liquidación N°";
 	$_LANG['Debe especificar un cliente o cobro'] = "Debe especificar un cliente o liquidación";
 	$_LANG['Ud. ha seleccionado forma de cobro:'] = "Ud. a seleccionado forma de liquidación:";
@@ -179,18 +183,18 @@
 	$_LANG['No se puede eliminar este trámite.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.'] = "No se puede eliminar este trámite.\nLa Liquidación que lo incluye ya ha sido Emitido al Cliente.";
 	$_LANG['REPORTE COBROS POR AREA'] = "REPORTE LIQUIDACIONES POR AREA";
 	$_LANG['Reporte Cobros por Area'] = "Reporte Liquidaciones por Area";
-	
+
 	$_LANG['Horas Declaradas Corregidas por Forma de Cobro'] = "Horas Declaradas Corregidas por Forma de Liquidación";
 	$_LANG['Horas Liquidadas por Forma de Cobro'] = "Horas Liquidadas por Forma de Liquidación";
-	
+
 	$_LANG['Horas que ve el Cliente en nota de cobro (tras revisión)'] = "Horas que ve el Cliente en nota de liquidación (tras revisión)";
 	$_LANG['Horas Visibles en Cobros que ya fueron Emitidos'] = "Horas Visibles en Liquidaciones que ya fueron Emitidas";
-	
+
 	$_LANG['Sólo considera Trabajos en Cobros con fecha de corte en el Periodo'] = "Sólo considera Trabajos en Liquidaciones con fecha de corte en el Periodo";
 	$_LANG['Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo'] = "Sólo considera Trabajos en Liquidaciones con fecha de emisión en el Periodo";
 	$_LANG['Valor monetario que corresponde a cada Profesional, en un Cobro ya Emitido'] = "Valor monetario que corresponde a cada Profesional, en una Liquidación ya Emitida";
 	$_LANG['Considera todos los trabajos incluidos en cobros con fecha de corte en el rango.'] = "Considera todos los trabajos incluidos en liquidaciones con fecha de corte en el rango.";
-	
+
 	$_LANG['Desglose por forma de cobro'] = "Desglose por forma de liquidación";
 	$_LANG['Cobros con fecha de corte'] = "Liquidaciones con fecha de corte";
 	$_LANG['Cobros por Area'] = "Liquidaciones por Área";
