@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 15.27.1
+Thursday, November 12th
+* **Fix** [Corrección JS en módulo usuarios](https://github.com/LemontechSA/ttb/pull/1226)
+
+## [Release 15.27.0](https://github.com/LemontechSA/ttb/pull/1213)
+Thursday 2015, November 5th
+* **Feature** [Traducción Brasil](https://github.com/LemontechSA/ttb/pull/1186)
+
+## Hotfix 15.26.9
+Wednesday 2015, November 11th
+* **Fix** [Corrección validación fecha tope para editar/ingresar trabajos](https://github.com/LemontechSA/ttb/pull/1223)
+
 ## Hotfix 15.26.8
 Wednesday 2015, November 11th
 * **Fix** [Modificar permisos para editar horas trabajadas](https://github.com/LemontechSA/ttb/pull/1222)

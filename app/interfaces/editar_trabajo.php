@@ -1015,20 +1015,34 @@ UtilesApp::GetConfJS($sesion, 'PrellenarTrabajoConActividad');
 		} else {
 			if (form.duracion.value == '00:00:00') {
 				alert("<?php echo __('La duración debe ser mayor a 0') ?>");
-<?php
-if ($tipo_ingreso == 'selector') {
-	echo "document.getElementById('hora_duracion').focus();";
-} else {
-	echo "form.duracion.focus();";
-}
-?>
-
+				<?php if ($tipo_ingreso == 'selector') {
+					echo "document.getElementById('hora_duracion').focus();";
+				} else {
+					echo "form.duracion.focus();";
+				} ?>
 				return false;
 			}
 		}
 
+		// Si el usuario no tiene permiso de cobranza validamos la fecha del trabajo
+		<?php if (!$permiso_cobranza && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0) { ?>
+			temp = jQuery('#fecha').val().split("-");
+			fecha = new Date(temp[2] + '/' + temp[1] + '/' + temp[0]);
+			hoy = new Date("<?php echo date('Y/m/d') ?>");
+			fecha_tope = new Date(hoy.getTime() - (<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo'] + 1) ?> * 24 * 60 * 60 * 1000));
+
+			if (fecha_tope > fecha) {
+				var dia = fecha_tope.getDate();
+				var mes = fecha_tope.getMonth() + 1;
+				var anio = fecha_tope.getFullYear();
+				alert("No se pueden ingresar trabajos anteriores a " + dia + "-" + mes + "-" + anio);
+				jQuery('#fecha').focus();
+				return false;
+			}
+		<?php } ?>
+
 		//Revisa el Conf si esta permitido y la función existe
-<?php if ($tipo_ingreso == 'decimal') { ?>
+		<?php if ($tipo_ingreso == 'decimal') { ?>
 			var dur = form.duracion.value.replace(",", ".");
 			var dur_cob = form.duracion_cobrada.value.replace(",", ".");
 
@@ -1045,7 +1059,7 @@ if ($tipo_ingreso == 'selector') {
 				form.duracion.focus();
 				return false;
 			}
-<?php } ?>
+		<?php } ?>
 
 		if (!form.descripcion.value) {
 			alert("<?php echo __('Debe ingresar la descripción') ?>");
@@ -1061,11 +1075,11 @@ if ($tipo_ingreso == 'selector') {
 			}
 		}
 
-<?php
-// Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo que pasa
-if ($opcion != 'nuevo') {
-	// solo cuando la opción es distinto a 'nuevo' se crea el campo hidden 'id_trabajo'
-	?>
+		<?php
+		// Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo que pasa
+		if ($opcion != 'nuevo') {
+		// solo cuando la opción es distinto a 'nuevo' se crea el campo hidden 'id_trabajo'
+		?>
 			if (form.id_cobro.value != '' && $('id_trabajo').value != '') {
 				if (CodigoSecundario) {
 					if (!ActualizaCobro(form.codigo_asunto_secundario.value)) {
@@ -1079,9 +1093,7 @@ if ($opcion != 'nuevo') {
 					}
 				}
 			}
-	<?php
-}
-?>
+		<?php } ?>
 
 		if (OrdenadoPor == 1) {
 			if (form.solicitante.value == '') {
@@ -1099,25 +1111,8 @@ if ($opcion != 'nuevo') {
 			}
 		}
 
-		// Si el usuario no tiene permiso de cobranza validamos la fecha del trabajo
-<?php if (!$permiso_cobranza && $sesion->usuario->fields['dias_ingreso_trabajo'] > 0) { ?>
-			temp = $('fecha').value.split("-");
-			fecha = new Date(temp[2] + '//' + temp[1] + '//' + temp[0]);
-			hoy = new Date();
-			fecha_tope = new Date(hoy.getTime() - (<?php echo ($sesion->usuario->fields['dias_ingreso_trabajo'] + 1) ?> * 24 * 60 * 60 * 1000));
-
-			if (fecha_tope > fecha) {
-				var dia = fecha_tope.getDate();
-				var mes = fecha_tope.getMonth() + 1;
-				var anio = fecha_tope.getFullYear();
-				alert("No se pueden ingresar trabajos anteriores a " + dia + "-" + mes + "-" + anio);
-				$('fecha').focus;
-				return false;
-			}
-<?php } ?>
-
 		//Si esta editando desde la página de ingreso de trabajo le pide confirmación para realizar los cambios
-<?php if (isset($t) && $t->Loaded() && $opcion != 'nuevo') { ?>
+		<?php if (isset($t) && $t->Loaded() && $opcion != 'nuevo') { ?>
 			var string = new String(top.location);
 			//revisa que esté en la página de ingreso de trabajo
 			if (string.search('/trabajo.php') > 0) {
@@ -1125,7 +1120,7 @@ if ($opcion != 'nuevo') {
 					return false;
 				}
 			}
-<?php } ?>
+		<?php } ?>
 
 		top.window.jQuery('#semanactual').val(jQuery('#fecha').val());
 		form.submit();
