@@ -121,6 +121,13 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 		nuovaFinestra('Agregar_Factura', 730, 470, urlo, 'top=100, left=125');
 	}
 
+	function mensajeEditarFactura(estado) {
+		var mensaje = "<?php echo __('El cobro asociado'); ?> a esta factura está en estado "
+									+ estado + ", debe emitir <?php echo __('el cobro antes indicado'); ?> para poder editar esta factura";
+
+		alert(mensaje);
+	}
+
 <?php ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_facturas_js') : false; ?>
 </script>
 
@@ -386,7 +393,11 @@ HTML;
 function Opciones($fila) {
 	global $sesion;
 
-	$boton_editar = '<a class="fl ui-button editar" href="javascript:void(0);" style="margin: 3px 1px;width: 18px;height: 18px;" onclick="nuovaFinestra(\'Editar_Factura\',730,700,\'agregar_factura.php?' . 'id_factura=' . $fila->fields['id_factura'] . '&codigo_cliente=' . $fila->fields['codigo_cliente'] . '&popup=1\');" title="Editar Factura"></a>';
+	if ($fila->fields['estado_cobro'] == 'EN REVISION' || $fila->fields['estado_cobro'] == 'CREADO') {
+		$boton_editar = '<a class="fl ui-button editar_off" href="javascript:void(0);" style="margin: 3px 1px;width: 18px;height: 18px;" onclick="mensajeEditarFactura(\'' . $fila->fields['estado_cobro'] . '\');" title="Editar Factura" disabled></a>';
+	} else {
+		$boton_editar = '<a class="fl ui-button editar" href="javascript:void(0);" style="margin: 3px 1px;width: 18px;height: 18px;" onclick="nuovaFinestra(\'Editar_Factura\',730,700,\'agregar_factura.php?' . 'id_factura=' . $fila->fields['id_factura'] . '&codigo_cliente=' . $fila->fields['codigo_cliente'] . '&popup=1\');" title="Editar Factura"></a>';
+	}
 
 	if (Conf::GetConf($sesion, 'ImprimirFacturaDoc')) {
 		$boton_word = '<a class="fl ui-button doc" href="javascript:void(0);" style="margin: 3px 1px;width: 18px;height: 18px;" onclick="ImprimirDocumento(' . $fila->fields['id_factura'] . ');" title="Descargar Word"></a>';
