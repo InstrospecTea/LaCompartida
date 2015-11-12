@@ -221,7 +221,7 @@ class Ledes extends Objeto {
 				$codigo_asunto = $trabajo['codigo_asunto'];
 			}
 
-			$monto = $trabajo['cobrable'] == '1' && !empty($trabajo['monto_cobrado']) ? $trabajo['monto_cobrado'] : 1;
+			$monto = $trabajo['cobrable'] == '1' && !empty($trabajo['monto_cobrado']) ? $trabajo['monto_cobrado'] : 0;
 			$monto *= $cambios[$trabajo['id_moneda']];
 			$tarifa = $trabajo['tarifa_hh'] * $cambios[$trabajo['id_moneda']];
 
