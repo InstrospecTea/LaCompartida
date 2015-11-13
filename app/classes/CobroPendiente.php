@@ -167,11 +167,11 @@ class CobroPendiente extends Objeto {
 			->add_restriction(CriteriaRestriction::is_not_null('cobro_pendiente.fecha_cobro'))
 			->add_restriction(CriteriaRestriction::lower_or_equals_than('cobro_pendiente.fecha_cobro', 'NOW()'))
 			->add_restriction(CriteriaRestriction::is_null('cobro_pendiente.id_cobro'))
-			->add_restriction(CriteriaRestriction::and_clause(
+			->add_restriction(
 				CriteriaRestriction::or_clause(
 					CriteriaRestriction::is_not_null('contrato.id_usuario_responsable'), CriteriaRestriction::is_not_null('contrato.id_usuario_secundario')
 				)
-			))
+			)
 			->add_grouping('cobro_pendiente.id_cobro_pendiente')
 			->run();
 
