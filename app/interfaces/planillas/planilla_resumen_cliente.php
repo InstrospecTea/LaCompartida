@@ -208,7 +208,6 @@ $query = "SELECT
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 //echo $query.'<br><br>';
 $campo_monto = "monto_honorarios";
-$campo_monto = "monto";
 $campo_monto_thh = $tarifa;
 
 $glosa_comentario = array();
@@ -243,8 +242,6 @@ while ($row = mysql_fetch_array($resp)) {
 						$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $arr_idcobro_cliente[$o]);
 						$x_monto[$row['codigo_cliente']]['monto_' . $a . $m] += $x_resultados[$campo_monto][$id_moneda];
 						$x_monto[$row['codigo_cliente']]['monto_thh_' . $a . $m] += $x_resultados[$campo_monto_thh][$id_moneda];
-						$x_monto[$row['codigo_cliente']]['monto_' . $a . $m] +=$x_resultados[$campo_monto][$id_moneda];
-						$x_monto[$row['codigo_cliente']]['monto_thh_' . $a . $m] +=$x_resultados[$campo_monto_thh][$id_moneda];
 						$x_monto[$row['codigo_cliente']]['id_cobro_' . $a . $m] .= $arr_idcobro_cliente[$o] . " , ";
 
 						if ($arr_idcobro_cliente[$o] > 0) {
@@ -255,8 +252,6 @@ while ($row = mysql_fetch_array($resp)) {
 					$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $row['list_idcobro_' . $a . $m]);
 					$x_monto[$row['codigo_cliente']]['monto_' . $a . $m] += $x_resultados[$campo_monto][$id_moneda];
 					$x_monto[$row['codigo_cliente']]['monto_thh_' . $a . $m] += $x_resultados[$campo_monto_thh][$id_moneda];
-					$x_monto[$row['codigo_cliente']]['monto_' . $a . $m] +=$x_resultados[$campo_monto][$id_moneda];
-					$x_monto[$row['codigo_cliente']]['monto_thh_' . $a . $m] +=$x_resultados[$campo_monto_thh][$id_moneda];
 					$x_monto[$row['codigo_cliente']]['id_cobro_' . $a . $m] .= $row['list_idcobro_' . $a . $m] . " , ";
 
 					if ($row['list_idcobro_' . $a . $m] > 0) {
