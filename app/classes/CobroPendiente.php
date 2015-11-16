@@ -142,9 +142,15 @@ class CobroPendiente extends Objeto {
 		return empty($monto) ? 0 : $monto;
 	}
 
-	function ObtenerHitosCumplidosParaCorreos() {
+	/**
+	 * Obtiene los hitos cumplidos
+	 * @param bool|false $recordatorio indica si el hito es un recordatorio o es la primera vez que se notifica
+	 * @return array
+	 * @throws Exception
+	 */
+	function ObtenerHitosCumplidosParaCorreos($recordatorio = false) {
 		$Criteria = new Criteria($this->sesion);
-		$hitos = $Criteria->add_select('cobro_pendiente.id_cobro_pendiente')
+		$Criteria->add_select('cobro_pendiente.id_cobro_pendiente')
 			->add_select('cobro_pendiente.descripcion')
 			->add_select('cobro_pendiente.monto_estimado')
 			->add_select('cobro_pendiente.id_contrato')
@@ -163,17 +169,22 @@ class CobroPendiente extends Objeto {
 			->add_left_join_with('cliente', 'contrato.codigo_cliente = cliente.codigo_cliente')
 			->add_left_join_with('asunto', 'contrato.id_contrato = asunto.id_contrato')
 			->add_restriction(CriteriaRestriction::equals('cobro_pendiente.hito', 1))
-			->add_restriction(CriteriaRestriction::lower_than('cobro_pendiente.notificado', Conf::getConf($this->sesion, 'RepeticionesNotificacionHitos')))
 			->add_restriction(CriteriaRestriction::is_not_null('cobro_pendiente.fecha_cobro'))
-			->add_restriction(CriteriaRestriction::lower_or_equals_than('cobro_pendiente.fecha_cobro', 'NOW()'))
+			->add_restriction(CriteriaRestriction::lower_or_equals_than('cobro_pendiente.fecha_cobro', 'DATE_FORMAT(NOW(), \'%Y-%m-%d\')'))
 			->add_restriction(CriteriaRestriction::is_null('cobro_pendiente.id_cobro'))
 			->add_restriction(
 				CriteriaRestriction::or_clause(
 					CriteriaRestriction::is_not_null('contrato.id_usuario_responsable'), CriteriaRestriction::is_not_null('contrato.id_usuario_secundario')
 				)
-			)
-			->add_grouping('cobro_pendiente.id_cobro_pendiente')
-			->run();
+			);
+		if ($recordatorio) {
+			$days = Conf::getConf($this->sesion, 'DistanciaNotificacionesHitos');
+			$Criteria->add_restriction(CriteriaRestriction::equals("DATE_ADD(cobro_pendiente.fecha_notificacion, INTERVAL {$days} DAY)", 'DATE_FORMAT(NOW(), \'%Y-%m-%d\')'))
+				->add_restriction(CriteriaRestriction::lower_than('cobro_pendiente.notificado', Conf::getConf($this->sesion, 'RepeticionesNotificacionHitos')));
+		} else {
+			$Criteria->add_restriction(CriteriaRestriction::equals('cobro_pendiente.notificado', 0));
+		}
+		$hitos = $Criteria->add_grouping('cobro_pendiente.id_cobro_pendiente')->run();
 
 		$cliente_hitos = array(); //la estructura es usuario->cliente->contrato->(asunto,detalles,lista_hitos)
 		foreach ($hitos as $hito) {
@@ -213,7 +224,7 @@ class CobroPendiente extends Objeto {
 				);
 			}
 
-			$sql = "UPDATE cobro_pendiente SET notificado = notificado + 1 WHERE hito = 1 AND id_cobro_pendiente = " . $hito['id_cobro_pendiente'];
+			$sql = "UPDATE cobro_pendiente SET notificado = notificado + 1, fecha_notificacion = NOW() WHERE hito = 1 AND id_cobro_pendiente = " . $hito['id_cobro_pendiente'];
 			mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
 		}
 
