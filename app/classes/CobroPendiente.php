@@ -1,11 +1,7 @@
 <?php
-require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
-require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
-require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
+require_once dirname(__FILE__) . '/../conf.php';
 
-#Fechas de los cobros estimados de los contratos
+//Fechas de los cobros estimados de los contratos
 class CobroPendiente extends Objeto {
 	function CobroPendiente($sesion, $fields = "", $params = "") {
 		$this->tabla = "cobro_pendiente";
@@ -16,16 +12,16 @@ class CobroPendiente extends Objeto {
 	}
 
 	#asocia los cobros pendientes por fecha y contrato
-	function AsociarCobro($sesion,$id_cobro) {
-		$query = "UPDATE cobro_pendiente SET id_cobro='$id_cobro' WHERE id_cobro_pendiente='".$this->fields['id_cobro_pendiente']."'";
-		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+	function AsociarCobro($sesion, $id_cobro) {
+		$query = "UPDATE cobro_pendiente SET id_cobro='$id_cobro' WHERE id_cobro_pendiente='" . $this->fields['id_cobro_pendiente'] . "'";
+		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		return true;
 	}
 
 	#se borran todas las fechas del contrato
-	function EliminarPorContrato($sesion,$id_contrato) {
+	function EliminarPorContrato($sesion, $id_contrato) {
 		$query = "DELETE FROM cobro_pendiente WHERE id_contrato = '$id_contrato' AND id_cobro IS NULL";
-		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	}
 
 	/**
@@ -39,6 +35,7 @@ class CobroPendiente extends Objeto {
 	 * - No se consideran los cobros pendientes de HITOS
 	 *
 	 * @param $Sesion
+	 * @return bool
 	 */
 	function GenerarCobrosPeriodicos($Sesion) {
 
@@ -91,8 +88,9 @@ class CobroPendiente extends Objeto {
 			$months_diff = $interval_diff->m;
 
 			if ($pending_total < $max_pending_totals
-					&& $pending_unbilled < $MAX_PENDING_UNBILLED
-					&& $months_diff < $MAX_PENDING_MONTH_DIFF) {
+				&& $pending_unbilled < $MAX_PENDING_UNBILLED
+				&& $months_diff < $MAX_PENDING_MONTH_DIFF
+			) {
 
 				$next_date = date_format($next_date, 'Y-m-d');
 				$next_description = __('Cobro') . " N° " . ($pending_total + 1);
@@ -145,40 +143,40 @@ class CobroPendiente extends Objeto {
 	}
 
 	function ObtenerHitosCumplidosParaCorreos() {
-		$sql = "SELECT
-			cobro_pendiente.id_cobro_pendiente,
-			cobro_pendiente.descripcion,
-			cobro_pendiente.monto_estimado,
-			cobro_pendiente.id_contrato,
-			contrato.id_usuario_responsable,
-			contrato.id_usuario_secundario,
-			prm_moneda.simbolo,
-			prm_moneda.cifras_decimales,
-			cliente.glosa_cliente,
-			cliente.codigo_cliente,
-			cobro_pendiente.fecha_cobro,
-			GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ', ') as asuntos
-		FROM
-			cobro_pendiente
-			LEFT JOIN contrato ON cobro_pendiente.id_contrato = contrato.id_contrato
-			LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
-			LEFT JOIN prm_moneda ON contrato.id_moneda_monto = prm_moneda.id_moneda
-			LEFT JOIN cliente ON contrato.codigo_cliente = cliente.codigo_cliente
-			LEFT JOIN asunto ON contrato.id_contrato = asunto.id_contrato
-		WHERE
-			cobro_pendiente.hito = 1 AND
-			cobro_pendiente.notificado = 0 AND
-			cobro_pendiente.fecha_cobro IS NOT NULL AND
-			cobro_pendiente.fecha_cobro <= NOW() AND
-			cobro_pendiente.id_cobro IS NULL AND
-			(contrato.id_usuario_responsable IS NOT NULL OR contrato.id_usuario_secundario IS NOT NULL)
-		GROUP BY cobro_pendiente.id_cobro_pendiente
-		";
-
-		$query = mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
+		$Criteria = new Criteria($this->sesion);
+		$hitos = $Criteria->add_select('cobro_pendiente.id_cobro_pendiente')
+			->add_select('cobro_pendiente.descripcion')
+			->add_select('cobro_pendiente.monto_estimado')
+			->add_select('cobro_pendiente.id_contrato')
+			->add_select('contrato.id_usuario_responsable')
+			->add_select('contrato.id_usuario_secundario')
+			->add_select('prm_moneda.simbolo')
+			->add_select('prm_moneda.cifras_decimales')
+			->add_select('cliente.glosa_cliente')
+			->add_select('cliente.codigo_cliente')
+			->add_select('cobro_pendiente.fecha_cobro')
+			->add_select("GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ', ')", 'asuntos')
+			->add_from('cobro_pendiente')
+			->add_left_join_with('contrato', 'cobro_pendiente.id_contrato = contrato.id_contrato')
+			->add_left_join_with('usuario', 'contrato.id_usuario_responsable = usuario.id_usuario')
+			->add_left_join_with('prm_moneda', 'contrato.id_moneda_monto = prm_moneda.id_moneda')
+			->add_left_join_with('cliente', 'contrato.codigo_cliente = cliente.codigo_cliente')
+			->add_left_join_with('asunto', 'contrato.id_contrato = asunto.id_contrato')
+			->add_restriction(CriteriaRestriction::equals('cobro_pendiente.hito', 1))
+			->add_restriction(CriteriaRestriction::lower_than('cobro_pendiente.notificado', Conf::getConf($this->sesion, 'RepeticionesNotificacionHitos')))
+			->add_restriction(CriteriaRestriction::is_not_null('cobro_pendiente.fecha_cobro'))
+			->add_restriction(CriteriaRestriction::lower_or_equals_than('cobro_pendiente.fecha_cobro', 'NOW()'))
+			->add_restriction(CriteriaRestriction::is_null('cobro_pendiente.id_cobro'))
+			->add_restriction(
+				CriteriaRestriction::or_clause(
+					CriteriaRestriction::is_not_null('contrato.id_usuario_responsable'), CriteriaRestriction::is_not_null('contrato.id_usuario_secundario')
+				)
+			)
+			->add_grouping('cobro_pendiente.id_cobro_pendiente')
+			->run();
 
 		$cliente_hitos = array(); //la estructura es usuario->cliente->contrato->(asunto,detalles,lista_hitos)
-		while ($hito = mysql_fetch_array($query)) {
+		foreach ($hitos as $hito) {
 			//Monto con simbolo
 			$idioma = new Objeto($this->sesion, '', '', 'prm_idioma', 'codigo_idioma');
 			$idioma->Load(strtolower(UtilesApp::GetConf($this->sesion, 'Idioma')));
@@ -215,7 +213,7 @@ class CobroPendiente extends Objeto {
 				);
 			}
 
-			$sql = "UPDATE cobro_pendiente SET notificado = 1 WHERE hito = 1 AND id_cobro_pendiente = " . $hito['id_cobro_pendiente'];
+			$sql = "UPDATE cobro_pendiente SET notificado = notificado + 1 WHERE hito = 1 AND id_cobro_pendiente = " . $hito['id_cobro_pendiente'];
 			mysql_query($sql, $this->sesion->dbh) or Utiles::errorSQL($sql, __FILE__, __LINE__, $this->sesion->dbh);
 		}
 
