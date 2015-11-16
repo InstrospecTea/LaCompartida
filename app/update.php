@@ -10980,6 +10980,8 @@ QUERY;
 			$queries[] = "ALTER TABLE `contrato` ADD COLUMN `formato_ledes` VARCHAR(50) NULL";
 			$queries[] = "UPDATE `contrato` SET `formato_ledes` = 'serengeti' WHERE `exportacion_ledes` = 1";
 			break;
+		case 8.23:
+					$queries[] = "ALTER TABLE `cobro_pendiente` ADD COLUMN `fecha_notificacion` DATE NULL";
 	}
 
 	if (!empty($queries)) {
@@ -10992,7 +10994,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.22;
+$max_update = 8.23;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
