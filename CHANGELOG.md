@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.27.3
+Tuesday, November 17th
+* **Fix** [Agrupar por profesionales al desplegar gráfico en reporte general](https://github.com/LemontechSA/ttb/pull/1232)
+
 ## Hotfix 15.27.2
 Thursday, November 12th
 * **Fix** [Deshabilitar edición de factura cuando el cobro no está emitido](https://github.com/LemontechSA/ttb/pull/1230)
