@@ -1,18 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Moneda.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/Reporte.php';
 
 $sesion = new Sesion(array('REP'));
-
 $pagina = new Pagina($sesion);
 $Form = new Form($sesion);
 $usuario = new UsuarioExt($sesion);
@@ -92,27 +81,22 @@ $reporte = new ReporteCriteria($sesion);
 /* SELECTS MULTIPLES */
 
 // PROFESIONALES usuarios[]
-
 $usuarios = '';
 if (is_array($usuariosF)) {
 	$usuarios = implode(',', $usuariosF);
 }
 
-
 // CLIENTES clientes[]
-
 $clientes = '';
 if (is_array($clientesF)) {
 	$clientes = implode(',', $clientesF);
 }
 
 // AREA TRABAJO  areas_trabajo[]
-
 $areas_trabajo = '';
 if (is_array($areas_trabajoF)) {
 	$areas_trabajo = implode(',', $areas_trabajoF);
 }
-
 
 // CATEGORIA areas_usuario[]
 $areas_usuario = '';
@@ -121,7 +105,6 @@ if (is_array($areas_usuarioF)) {
 }
 
 $campo_fecha = "trabajo";
-
 $campos_porcentajes = array();
 
 if (isset($_POST['tipo'])) {
@@ -160,6 +143,8 @@ if (isset($_POST['tipo'])) {
 } else {
 	$vista = 'profesional-glosa_grupo_cliente-glosa_cliente-glosa_asunto';
 }
+
+$vista .= '-username';
 
 if (isset($_POST['horas_sql'])) {
 	if ($_POST['horas_sql'] == 'horas_trabajadas_cobrables') {
@@ -293,6 +278,7 @@ $agrupadores = explode('-', $vista);
 		});
 	});
 </script>
+
 <style type="text/css">
 	#tbl {
 		width: 700px;
@@ -577,7 +563,6 @@ $agrupadores = explode('-', $vista);
 	TD.principal { border-right: solid 1px #ccc;  border-bottom: solid 1px #ccc; padding-right: 4px; }
 	TD.secundario { border-right: solid 1px #ccc; border-bottom: solid 1px #ccc;  padding-right: 4px; }
 
-
 	a:link.indefinido { color: #660000; }
 	span.indefinido { color: #550000; }
 
@@ -587,8 +572,8 @@ $agrupadores = explode('-', $vista);
 			display: none;
 		}
 	}
-
 </style>
+
 <?php if (!$popup) { ?>
 	<form method="post" name="formulario" action="" id="formulario" autocomplete='off' />
 	<input type="hidden" name="opc" id="opc" value='print' />
@@ -842,7 +827,6 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 	}
 
 	/* AREAS TRABAJO */
-
 	$areas_trabajo = explode(',', $areas_trabajo);
 	foreach ($areas_trabajo as $area_trabajo) {
 		if ($area_trabajo) {
@@ -970,7 +954,7 @@ if ($opc == 'print' || $popup) {
 			</tr>
 		</tbody>
 	</table>
-	<table border="1" cellpadding="3" class="planilla" id="tabla_planilla_2" width="100%" >
+	<table border="1" cellpadding="3" class="planilla" id="tabla_planilla_2" width="100%">
 	</tbody>
 	<?php
 
@@ -1318,7 +1302,6 @@ if ($opc == 'grafico') {
 			break;
 	}
 
-
 	$contador = 0;
 
 	$tdatos = array();
@@ -1329,9 +1312,11 @@ if ($opc == 'grafico') {
 		}
 		$tdatos[$contador]['tiempo'] += round($row[$tipo_dato], 2);
 	}
+
 	function dort_desc($a, $b) {
 		return $a['tiempo'] < $b['tiempo'];
 	}
+
 	uasort($tdatos, 'dort_desc');
 
 	$tdatosC = array();
@@ -1392,7 +1377,7 @@ if ($opc == 'grafico') {
 		$datosC .= '&labels=' . urlencode(implode(',', $labels));
 	}
 
-	$html_info .= "<img src='graficos/{$grafico}.php?titulo=" . $titulo_reporte . '&datos=' . $datos . $datosC . "' alt='grafico' />";
+	$html_info .= "<img src='graficos/{$grafico}.php?titulo=" . $titulo_reporte . '&datos=' . $datos . $datosC . "' alt='grafico' width='100%' />";
 	echo $html_info;
 }
 ?>
