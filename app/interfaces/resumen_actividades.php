@@ -1377,7 +1377,7 @@ if ($opc == 'grafico') {
 		$datosC .= '&labels=' . urlencode(implode(',', $labels));
 	}
 
-	$html_info .= "<img src='graficos/{$grafico}.php?titulo=" . $titulo_reporte . '&datos=' . $datos . $datosC . "' alt='grafico' width='100%' />";
+	$html_info .= "<img src='graficos/{$grafico}.php?titulo=" . $titulo_reporte . '&datos=' . $datos . $datosC . "' alt='grafico' />";
 	echo $html_info;
 }
 ?>
