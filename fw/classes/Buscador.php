@@ -117,7 +117,7 @@ class Buscador
             $tooltip = "";
             $funcion = $this->tooltip;
             debug($this->tooltip);
-            $tooltip_text = $funcion(& $fila);
+            $tooltip_text = $funcion($fila);
             $tooltip_mover = " ddrivetip('$tooltip_text'); ";
             $tooltip_mout = " hideddrivetip(); ";
         }
@@ -145,7 +145,7 @@ class Buscador
             }
             else #Funcion
             {
-                $texto = call_user_func($this->funcion[$key],& $fila);
+                $texto = call_user_func($this->funcion[$key], $fila);
                 echo("<td class=buscador ".$this->opciones_td[$key].">".$texto."</td>");
 
             }
@@ -163,7 +163,7 @@ class Buscador
             if($this->funcionTR == "")
                 $html .= $this->PrintRow($obj);
             else
-                $html .= call_user_func($this->funcionTR,& $obj, $this->where);
+                $html .= call_user_func($this->funcionTR, $obj, $this->where);
         }
         return $html;
     }
