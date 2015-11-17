@@ -18,7 +18,7 @@
 	$pagina->PrintTop();
 ?>
 
-<form method="post" action="<?= $_SERVER[PHP_SELF] ?>">
+<form method="post" action="<?php $_SERVER[PHP_SELF]; ?>">
 <input type="hidden" name="opcion" value="desplegar" />
 
 <table class="border_plomo tb_base">

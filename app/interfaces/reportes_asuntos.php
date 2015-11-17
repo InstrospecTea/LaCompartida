@@ -65,7 +65,11 @@
 			<?php echo __('Solo activos'); ?>
 		</td>
 		<td>
-			<?php if ($solo_activos) $chk = "checked='checked'"; ?>
+			<?php
+				if ($solo_activos) {
+					$chk = "checked='checked'";
+				}
+			?>
 			<input type="checkbox" name="solo_activos" id="solo_activos" value="1" <?php echo $chk; ?> />
 		</td>
 	</tr>
