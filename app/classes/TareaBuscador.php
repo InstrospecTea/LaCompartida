@@ -6,8 +6,8 @@
     require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 
-//CASI IGUAL A BUSCADOR. 
-//CAMBIOS: 
+//CASI IGUAL A BUSCADOR.
+//CAMBIOS:
 //	funcion_nodo_tr : debe recibir la $fila, se escribe entre los argumentos del tr. Para poner estilo de cursor y onclick.
 //	funcion_tr_alterno : debe recibir la $fila, se invoca como otra fila oculta. Para expandir campos.
 //  form_buscador a formulario: para invocar refrescar() en javascript.
@@ -17,7 +17,7 @@ class TareaBuscador
 {
     // Sesion PHP
     var $sesion = null;
-    
+
     // String con el último error
     var $error = '';
 
@@ -52,7 +52,7 @@ class TareaBuscador
     var $mensaje_error_fecha = ""; #Despliega el "Sin resultados" por defecto de la fecha
 
 	//no_include_variables se refiere a variables que no queremos incorporar para generar la siguiente pagian
-    function TareaBuscador( $sesion, $query, $clase, $desde, $x_pag, $orden = "") 
+    function TareaBuscador( $sesion, $query, $clase, $desde, $x_pag, $orden = "")
     {
         $desde = $desde == "" ? 0 : $desde;
 		if($x_pag > 0)
@@ -72,15 +72,15 @@ class TareaBuscador
         $this->x_pag = $x_pag;
 		if($x_pag == 0)
 			$this->no_pages = true;
-			
+
         $this->orden = $orden;
-        
+
         if($orden != "")
             $query .= " ORDER BY $orden";
         if($x_pag > 0 && stristr($orden, "LIMIT") == false )
             $query .= " LIMIT ".$this->desde.", ".$this->x_pag;
 
-        $this->lista = new Lista($this->sesion, $clase, $params, $query); 
+        $this->lista = new Lista($this->sesion, $clase, $params, $query);
     }
 
     # $opciones_td es dentro del tag td para poner align, etc, $dentro_td es dentro del td para poner <strong> o algo asi.
@@ -151,23 +151,23 @@ class TareaBuscador
             {
                 $texto = call_user_func($this->funcion[$key],& $fila);
                 echo("<td class=buscador ".$this->opciones_td[$key].">".$texto."</td>");
-                
+
             }
         }
         echo("</tr>");
     }
 
     function PrintListRows( $lista)
-    {           
+    {
         for($i = 0; $i < $lista->num; $i++)
         {
             $obj = $lista->Get($i);
-            
+
 
             if($this->funcionTR == "")
                 $html .= $this->PrintRow($obj);
             else
-                $html .= call_user_func($this->funcionTR,& $obj);
+                $html .= call_user_func($this->funcionTR, $obj);
         }
         return $html;
     }
@@ -204,7 +204,7 @@ class TareaBuscador
 			  echo($form);
 			  echo("<input type=hidden name=orden value='".$this->orden."' />");
 		  }
-		  
+
 			  echo("<input type=hidden name=x_pag value='".$this->x_pag."' />");
 			  echo("<input type=hidden name=desde id=buscador_tarea_desde value='".$this->desde."' />");
 
@@ -250,7 +250,7 @@ class TareaBuscador
     {
         $num_pages = (int) ( $this->lista->mysql_total_rows / $this->x_pag + ( ($this->lista->mysql_total_rows % $this->x_pag)?1:0) );
         $actual_page = (int) ($this->desde / $this->x_pag)+1;
-        
+
         if($num_pages < 1)
             return false;
 
@@ -271,7 +271,7 @@ HTML;
         {
             $aumento = 4;
         }
-    
+
         $to = $actual_page + $aumento;
         if($to>$num_pages)
         {
@@ -317,7 +317,7 @@ HTML;
         return $html;
     }
     function Encabezado($obj)
-    {		
+    {
 		if(isset($this->encabezados))
 		{
 			if(!$obj)

@@ -157,7 +157,7 @@ class Buscador
     {
         for($i = 0; $i < $lista->num; $i++)
         {
-            $obj = $lista->Get($i);
+            $obj = &$lista->Get($i);
 
 
             if($this->funcionTR == "")
