@@ -1847,7 +1847,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		<!-- SOLICITANTE -->
 		<fieldset style="width: 97%; background-color: #FFFFFF;">
 			<legend <?php echo !$div_show ? 'onClick="MuestraOculta(\'datos_solicitante\')" style="cursor:pointer"' : '' ?> >
-				<?php if (!$div_show) {?>
+				<?php if (!$div_show) { ?>
 					<span id="datos_solicitante_img"><img src="<?php echo Conf::ImgDir(); ?>/mas.gif" border="0" id="datos_solicitante_img"></span>
 				<?php } ?>
 				&nbsp;<?php echo __('Solicitante') ?></legend>
@@ -3058,10 +3058,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		<!-- FIN CARTAS -->
 
 		<!-- DOCUMENTOS -->
-		<?php  if ($id_cliente || $id_asunto) {?>
+		<?php  if ($id_cliente || $id_asunto) { ?>
 			<fieldset style="width: 97%; background-color: #FFFFFF;">
 				<legend <?php echo !$div_show ? 'onClick="MuestraOculta(\'documentos\')" style="cursor:pointer"' : '' ?> >
-					<?php if (!$div_show) {?>
+					<?php if (!$div_show) { ?>
 						<span id="documentos_img"><img src="<?php echo Conf::ImgDir() ?>/mas.gif" border="0" id="documentos_img"></span>
 					<?php } ?>
 					&nbsp;<?php echo __('Documentos') ?></legend>
@@ -3272,7 +3272,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</table>
 			</fieldset>
 			<br>
-		<? } ?>
+		<?php } ?>
 
 		<!-- Fin modulo de generadores -->
 
