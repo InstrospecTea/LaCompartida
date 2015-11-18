@@ -187,7 +187,7 @@ HTML;
 		}
 		if ($Slim = Slim::getInstance('default', true)) {
 			$data = array('Factura' => $Factura);
-			$Slim->applyHook('hook_cobros7_botones_after', &$data);
+			$Slim->applyHook('hook_cobros7_botones_after', $data);
 		}
 		if (!($data && $data['content'])) {
 			if (Conf::GetConf($Factura->sesion, 'ImprimirFacturaPdf')) {

@@ -1008,7 +1008,7 @@ class Slim {
      * Hack: http://help.slimframework.com/discussions/questions/187-hooks-and-arguments
      *
      */
-    public function applyHook( $name, $hookArg = null ) {
+    public function applyHook( $name, &$hookArg = null ) {
         if ( !isset($this->hooks[$name]) ) {
             $this->hooks[$name] = array(array());
         }

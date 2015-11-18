@@ -52,7 +52,7 @@ if ($opc == 'buscar' || $opc == 'generar_factura') {
 
 		} else if ($archivo_contabilidad) {
 			$data = array('Resultados' => $results);
-			$Slim = Slim::getInstance() ? $Slim->applyHook('hook_facturas_genera_archivo_contabilidad', &$data) : false;
+			$Slim = Slim::getInstance() ? $Slim->applyHook('hook_facturas_genera_archivo_contabilidad', $data) : false;
 		}
 		exit;
 	}

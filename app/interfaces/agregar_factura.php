@@ -77,7 +77,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 
 	if ($opcion == "anular") {
 		$data = array('Factura' => $factura);
-		$Slim->applyHook('hook_anula_factura_electronica', &$data);
+		$Slim->applyHook('hook_anula_factura_electronica', $data);
 		$error = $data['Error'];
 		if (!is_null($error)) {
 			$pagina->AddError($error['Message'] ? $error['Message'] : __($error['Code']));
@@ -255,7 +255,7 @@ if ($opcion == "guardar") {
 		} else {
 			if ($mensaje_accion == 'anulado') {
 				$data_anular = array('Factura' => $factura);
-				($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_anula_factura_electronica', &$data_anular) : false;
+				($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_anula_factura_electronica', $data_anular) : false;
 				$error_message = $data_anular['Error'];
 				echo "<!-- {$error_message} -->";
 				if (!is_null($error_message)) {
@@ -306,18 +306,18 @@ if ($opcion == "guardar") {
 						$cobro->AgregarFactura($factura);
 
 						if ($usar_adelantos && empty($factura->fields['anulado']) && $codigo_tipo_doc != 'NC') {
-							
+
 							if (Conf::GetConf($sesion, 'AsociarAdelantosALiquidacion')) {
 								$factura->PagarUsandoAdelantos();
 							} else {
 								$documento = $cobro->DocumentoCobro();
 								$documento->GenerarPagosDesdeAdelantos(
-									$documento->fields['id_documento'], 
-									array($factura->fields['id_factura'] => $factura->fields['total']), 
-									$id_adelanto);		
-							}						
+									$documento->fields['id_documento'],
+									array($factura->fields['id_factura'] => $factura->fields['total']),
+									$id_adelanto);
+							}
 						}
-						
+
 						$cobro->CambiarEstadoSegunFacturas();
 					}
 				}
@@ -1518,14 +1518,14 @@ $Form->defaultLabel = false;
 					if (confirm('<?php echo __('Existen adelantos por ') . $simbolo . ' ' . number_format($saldo, $cifras_decimales) . ' ' .  __('asociados a esta liquidación. ¿Desea utilizarlos para saldar esta') . ' ' . $tipo_documento_legal . '?' ?>')) {
 						$('usar_adelantos').value = '1';
 					}
-			<?php 
+			<?php
 				}
 			} else {
 				$documento = new Documento($sesion);
 				$hh = $honorario;
 				$gg = $gastos_con_iva + $gastos_sin_iva;
 				$saldo = $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $hh>0, $gg>0, $cobro->fields['opc_moneda_total']);
-				
+
 				if ($saldo) {
 				?>
 					if (!jQuery('#id_adelanto').val() && confirm("<?php echo __('Existen adelantos') . ' ' . __('asociados a esta liquidación. ¿Desea utilizarlos para saldar esta') . " $tipo_documento_legal" . '?' ?>")) {
@@ -1543,8 +1543,8 @@ $Form->defaultLabel = false;
 						nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?' + decodeURIComponent(jQuery.param(params)), 'top=100, left=125, scrollbars=yes');
 						return false;
 					}
-				<?php 
-				} 
+				<?php
+				}
 			}
 		}
 		?>
