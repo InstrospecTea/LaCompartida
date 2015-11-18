@@ -214,11 +214,11 @@
 			$ws1->write($fila_inicial, $col_abogado, $trabajo->fields['username'], $tex);
 		else
 			$ws1->write($fila_inicial, $col_abogado, $trabajo->fields['nombre'].' '.$trabajo->fields['apellido1'], $tex);
-		list($duracion, $duracion_cobrada)= split('<br>', $trabajo->fields[duracion]);
-		list($h, $m)= split(':', $duracion);
+		list($duracion, $duracion_cobrada)= explode('<br>', $trabajo->fields[duracion]);
+		list($h, $m)= explode(':', $duracion);
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
 		$ws1->writeNumber($fila_inicial, $col_duracion_trabajada, $tiempo_excel, $time_format);
-		list($h, $m)= split(':', $duracion_cobrada);
+		list($h, $m)= explode(':', $duracion_cobrada);
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
 		$ws1->writeNumber($fila_inicial, $col_duracion_cobrable, $tiempo_excel, $time_format);
 

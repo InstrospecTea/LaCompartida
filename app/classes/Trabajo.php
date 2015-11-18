@@ -1244,12 +1244,12 @@ class Trabajo extends Objeto
 
 			if($tiempo_total_minutos_editado != $total_minutos_cobrables || $forzar_editado_divisor_cero)
 			{
-				list($h, $m, $s) = split(':', $t->fields['duracion_cobrada']);
+				list($h, $m, $s) = explode(':', $t->fields['duracion_cobrada']);
 				$minutos = ($h * 60) + $m;
 				//Si no tenia horas cobrables, se hace la proporcion de todo trabajo como si hubiese tenido 1 min.
 				if($forzar_editado_divisor_cero)
 				{
-					list($h, $m, $s) = split(':', $t->fields['duracion']);
+					list($h, $m, $s) = explode(':', $t->fields['duracion']);
 					$minutos = ($h * 60) + $m;
 				}
 				$tiempo_trabajo_minutos_contador += $minutos;

@@ -23,7 +23,7 @@
 	$meses[10]='Noviembre';
 	$meses[11]='Diciembre';
 
-	list($tmp,$mes_ini,$tmp) = split('-',$fechaini);
+	list($tmp,$mes_ini,$tmp) = explode('-',$fechaini);
 	for($i=0;$i<=$periodos;$i++)
    	{
             $hrs_secobra[$i] = 0;

@@ -239,7 +239,7 @@ if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro']
 	$col_duracion_retainer = $col++;
 	$col_tarificable_hh = $col++;
 }
-	
+
 	$col_tarifa_hh = $col++;
 	$col_valor_trabajo = $col++;
 	$col_valor_trabajo_flat_fee = $col++;
@@ -259,13 +259,13 @@ if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro']
 	$col_formula_tarifa_hh = Utiles::NumToColumnaExcel($col_tarifa_hh);
 	$col_formula_valor_trabajo = Utiles::NumToColumnaExcel($col_valor_trabajo);
 	$col_formula_valor_trabajo_flat_fee = Utiles::NumToColumnaExcel($col_valor_trabajo_flat_fee);
-	
+
 	//if($opc_ver_cobrable)
 	$col_formula_id_abogado = Utiles::NumToColumnaExcel($col_id_abogado);
 	$col_formula_abogado = Utiles::NumToColumnaExcel($col_abogado);
 	if($col_asunto)
 		$col_formula_asunto = Utiles::NumToColumnaExcel($col_asunto);
-	
+
 
 	// Esta variable se usa para que cada página tenga un nombre único.
 	$numero_pagina = 0;
@@ -479,7 +479,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	if (!$opc_ver_asuntos_separados){
 					$ws->setColumn($col_asunto, $col_asunto, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 	}
-	
+
 				$ws->setColumn($col_descripcion, $col_descripcion, Utiles::GlosaMult($sesion, 'descripcion', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
 				if($opc_ver_horas_trabajadas)
 					$ws->setColumn($col_duracion_trabajada, $col_duracion_trabajada, Utiles::GlosaMult($sesion, 'duracion_trabajada', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
@@ -517,7 +517,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$sumante = 5;
 	} else {
 		$sumante = 3;
-	} 
+	}
 	$ws->write($filas, $col_descripcion + $sumante, Utiles::GlosaMult($sesion, 'minuta', 'Encabezado', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo') . ' ' . $cobro->fields['id_cobro'], $formato_encabezado);
 	$filas++;
 	$ws->write($filas, $col_descripcion + $sumante, 'Código cliente: ' . $codigo_cliente, $formato_encabezado);
@@ -600,12 +600,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					}
 
 						$ws->write($filas, $col_fecha, __('Tarifario Base:'), $formato_encabezado);
-						
-						// Consulta glosa de tarifa 
+
+						// Consulta glosa de tarifa
 						$query = "SELECT glosa_tarifa FROM tarifa WHERE tarifa_defecto = 1 ";
 						$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__, $sesion->dbh);
 						list($glosa_tarifa) = mysql_fetch_array($resp);
-						
+
 						$ws->write($filas++, $col_descripcion, $glosa_tarifa, $formato_encabezado);
 						$ws->write($filas, $col_fecha, __('Pacto:'), $formato_encabezado);
 						//$ws->write($filas++, $col_abogado, __($cobro->fields['forma_cobro']), $formato_encabezado);
@@ -615,7 +615,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							$mje_detalle_forma_cobro = $simbolo_moneda_opc_moneda_monto." ".number_format($cobro->fields['monto_contrato'],$cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['cifras_decimales'],',','.');
 						}
 						$ws->write($filas++, $col_descripcion, __($cobro->fields['forma_cobro'])." ".$mje_detalle_forma_cobro, $formato_encabezado);
-					
+
 					if ($trabajo->fields['forma_cobro'] == 'PROPORCIONAL' || $trabajo->fields['forma_cobro'] == 'RETAINER') {
 						$ws->write($filas, $col_fecha, Utiles::GlosaMult($sesion, 'horas_retainer', 'Resumen', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_encabezado);
 						$ws->write($filas++, $col_descripcion, $cobro->fields['retainer_horas'], $formato_encabezado_derecha);
@@ -631,7 +631,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 							$ws->write($filas2, $col_valor_trabajo, __('Honorarios por horas:'), $formato_encabezado_derecha);
 							$ws->writeNumber($filas2++, $col_valor_trabajo_flat_fee, $cobro->fields['monto_thh_estandar'], $formato_moneda_encabezado);
-							
+
 							$ws->write($filas2, $col_valor_trabajo, __('Honorarios por pacto:'), $formato_encabezado_derecha);
 							$ws->writeNumber($filas2++, $col_valor_trabajo_flat_fee, $cobro->fields['monto_subtotal'], $formato_moneda_encabezado);
 
@@ -718,7 +718,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$cobro_tiene_trabajos = false;
 					$lineas_total_asunto = array();
 	while ($cobro->asuntos[$cont_asuntos]) {
-						
+
 						$asunto = new Asunto($sesion);
 						$asunto->LoadByCodigo($cobro->asuntos[$cont_asuntos]);
 						$codigo_asunto_secundario = $asunto->CodigoACodigoSecundario($cobro->asuntos[$cont_asuntos]);
@@ -768,15 +768,15 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 											$dato_tarifa_hh = "tarifa_hh_estandar";
 										}
 										// Buscar todos los trabajos de este asunto/cobro
-										$query_trabajos = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
+										$query_trabajos = "SELECT DISTINCT SQL_CALC_FOUND_ROWS
 																				trabajo.id_cobro,
 																				trabajo.id_trabajo,
 																				trabajo.codigo_asunto,
 																				trabajo.id_usuario,
 																				trabajo.cobrable,
-																				trabajo.monto_cobrado, 
+																				trabajo.monto_cobrado,
 																				trabajo.fecha,
-																				trabajo.descripcion, 
+																				trabajo.descripcion,
 																				trabajo.solicitante,
 																				prm_moneda.simbolo AS simbolo,
 																				asunto.codigo_cliente AS codigo_cliente,
@@ -810,14 +810,14 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									$lista_trabajos = $b1->lista;
 
 									// Encabezado de la tabla de trabajos
-									
+
 									$ws->write($filas, $col_fecha, Utiles::GlosaMult($sesion, 'fecha', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
-									
+
 									$ws->write($filas, $col_descripcion, Utiles::GlosaMult($sesion, 'descripcion', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 									if(!$opc_ver_asuntos_separados)
 										$ws->write($filas, $col_asunto, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 									$ws->write($filas, $col_abogado, Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
-				
+
 									if($opc_ver_horas_trabajadas)
 										$ws->write($filas, $col_duracion_trabajada, Utiles::GlosaMult($sesion, 'duracion_trabajada', 'Listado de trabajos', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'), $formato_titulo);
 									if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' ) {
@@ -838,8 +838,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										$ws->write($filas, $col_valor_trabajo_flat_fee, __('Valor Flat'), $formato_titulo_centrado);
 									} else {
 										$ws->write($filas, $col_valor_trabajo_flat_fee, __('Valor Estándar'), $formato_titulo_centrado);
-									} 
-									
+									}
+
 									$ws->write($filas, $col_id_abogado, __('NO MODIFICAR ESTA COLUMNA'));
 									if(!$primera_fila_primer_asunto)
 										$primera_fila_primer_asunto = $filas;
@@ -848,10 +848,10 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							 		$diferencia_proporcional = 0;
 							 		$suma_total_inexacto = 0;
 							 		$suma_total_exacto = 0;
-									
-									
-									
-										
+
+
+
+
 							 		// Contenido de la tabla de trabajos
 						    for ($i = 0; $i < $lista_trabajos->num; $i++) {
 										$trabajo = $lista_trabajos->Get($i);
@@ -868,19 +868,19 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 										// Se guarda el nombre en una variable porque se usa en el detalle profesional.
 										$nombre = $trabajo->fields['username'];
 										$ws->write($filas, $col_abogado, $nombre, $formato_normal);
-					
+
 										$duracion = $trabajo->fields['duracion'];
-										list($h, $m) = split(':', $duracion);
+										list($h, $m) = explode(':', $duracion);
 										$duracion = $h/24 + $m/(24*60);
 										if($opc_ver_horas_trabajadas)
 											$ws->writeNumber($filas, $col_duracion_trabajada, $duracion, $formato_tiempo);
 										$duracion_cobrada = $trabajo->fields['duracion_cobrada'];
-										list($h, $m) = split(':', $duracion_cobrada);
+										list($h, $m) = explode(':', $duracion_cobrada);
 										if($trabajo->fields['glosa_cobrable'] == 'SI')
 											$duracion_cobrada = $h/24 + $m/(24*60);
 										else
 											$duracion_cobrada = 0;
-										
+
 										$query_total_cobrable = "select if(sum(TIME_TO_SEC(duracion_cobrada)/3600)<=0,1,sum(TIME_TO_SEC(duracion_cobrada)/3600)) as duracion_total from trabajo where id_cobro = '".$cobro->fields['id_cobro']."' and cobrable = 1";
 										$resp_total_cobrable = mysql_query($query_total_cobrable,$sesion->dbh) or Utiles::errorSQL($query_total_cobrable,__FILE__,__LINE__,$sesion->dbh);
 										list($xtotal_hh_cobrable) = mysql_fetch_array($resp_total_cobrable);
@@ -894,14 +894,14 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									$duracion_retainer = $duracion_cobrada * $factor;
 								} else {
 											$duracion_retainer = $trabajo->fields['duracion_retainer'];
-											list($h,$m,$s) = split(':', $duracion_retainer);
+											list($h,$m,$s) = explode(':', $duracion_retainer);
 											$duracion_retainer = $h/24 + $m/(24*60) + $s/(24*60*60);
 								}
-								
+
 										if( $duracion_retainer > $duracion_cobrada || $cobro->fields['forma_cobro'] == 'FLAT FEE' )
 											$duracion_retainer = $duracion_cobrada;
 										$duracion_tarificable = max(($duracion_cobrada - $duracion_retainer),0);
-										
+
 										$ws->writeNumber($filas, $col_duracion_cobrable, $duracion_cobrada, $formato_tiempo);
 										if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' ) {
 											$ws->writeNumber($filas, $col_duracion_retainer, $duracion_retainer, $formato_tiempo);
@@ -910,15 +910,15 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 										if($opc_ver_cobrable)
 											$ws->write($filas, $col_es_cobrable, $trabajo->fields['cobrable']==1?__("Sí"):__("No"), $formato_normal);
-										
+
 										//if( UtilesApp::GetConf($sesion, 'DefinirTarifasConsiderandoCambiosdeCategoria') ) {
 										//	$tarifa_hh = Funciones::TarifaConsiderandoCategoria($sesion, $trabajo->fields['id_usuario'], $cobro->fields['id_moneda'], $trabajo->fields['codigo_asunto'], '', $trabajo->fields['id_categoria_usuario'], $trabajo->fields['id_categoria_usuario_antiguo']);
 										$tarifa_hh = $trabajo->fields['tarifa_hh'];
 										$tarifahhcliente=$trabajo->fields['tarifa_hh_cliente'];
 										$tarifahhestandar=$trabajo->fields['tarifa_hh_estandar'];
-										
-										
-											
+
+
+
                                                         if($cobro->fields['monto_thh_estandar'] > 0) {
                                                             $factor_valor_flat = number_format($cobro->fields['monto_trabajos'] / $cobro->fields['monto_thh_estandar'], 6, '.', '');
                                                         } else if ($cobro->fields['monto_thh'] > 0) {
@@ -936,23 +936,23 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									} else {
 										$factor_valor_hh = 1;
 									}
-										
-										
-										
-										
+
+
+
+
 										if( $cobro->fields['retainer_horas'] > 0 ) {
 											$factor_valor_retainer = number_format( ( $cobro->fields['monto_contrato'] * ( $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'] ) ) / (min($cobro->fields['total_minutos']/60,$cobro->fields['retainer_horas'])),6,'.','');
 										} else {
 											$factor_valor_retainer = 1;
 										}
-				
+
 										$ws->writeNumber($filas, $col_tarifa_hh, $tarifa_hh, $formato_moneda);
 										$ws->writeFormula($filas, $col_valor_trabajo, "=24*$col_formula_duracion_cobrable".($filas+1)."*$col_formula_tarifa_hh".($filas+1), $formato_moneda);
 										if( $cobro->fields['forma_cobro'] == 'RETAINER' || $cobro->fields['forma_cobro'] == 'PROPORCIONAL' ) {
 											$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, "=24*$factor_valor_retainer*$col_formula_duracion_retainer".($filas+1)."+24*$col_formula_tarificable_hh".($filas+1)."*$col_formula_tarifa_hh".($filas+1), $formato_moneda);
 										} else if( $cobro->fields['forma_cobro'] == 'FLAT FEE' ) {
 											if( $cobro->fields['monto_thh_estandar'] > 0 || $cobro->fields['monto_thh'] > 0) {
-												
+
 												$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, "=24*$factor_valor_flat*$col_formula_duracion_cobrable".($filas+1)."*$col_formula_tarifa_hh".($filas+1), $formato_moneda);
 											} elseif ($cobro->fields['monto_thh'] > 0 ) {
 												$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, "=24*$factor_valor_flat*$col_formula_duracion_cobrable".($filas+1)."*$col_formula_tarifa_hh".($filas+1), $formato_moneda);
@@ -979,7 +979,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 									// Guardar ultima linea para tener esta información por el resumen profesional
 									$ultima_fila_ultimo_asunto = $filas-1;
-									
+
 									//$lineas_total_asunto["'".($filas+1)."'"]  = $filas+1;
 									// Totales de la tabla de trámites
 									$ws->write($filas, $col_fecha, __('Total'), $formato_total);
@@ -987,7 +987,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									$ws->write($filas, $col_abogado, '', $formato_total);
 									if(!$opc_ver_asuntos_separados)
 										$ws->write($filas, $col_asunto, '', $formato_total);
-				
+
 									if($opc_ver_horas_trabajadas)
 										$ws->writeFormula($filas, $col_duracion_trabajada, "=SUM($col_formula_duracion_trabajada$primera_fila_asunto:$col_formula_duracion_trabajada$filas)", $formato_tiempo_total);
 									$ws->writeFormula($filas, $col_duracion_cobrable, "=SUM($col_formula_duracion_cobrable$primera_fila_asunto:$col_formula_duracion_cobrable$filas)", $formato_tiempo_total);
@@ -1050,7 +1050,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 												$ws->write($filas, $col_abogado, Utiles::GlosaMult($sesion, 'abogado', 'Listado de trámites', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'),$formato_titulo);
 												if(!$opc_ver_asuntos_separados)
 													$ws->write($filas, $col_abogado+1, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trámites', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'),$formato_titulo);
-			
+
 												$ws->write($filas, $col_descripcion, Utiles::GlosaMult($sesion, 'descripcion', 'Listado de trámites', "glosa_$lang", 'prm_excel_cobro', 'nombre_interno', 'grupo'),$formato_titulo);
 												if($opc_ver_horas_trabajadas)
 													$ws->write($filas, $col_duracion_trabajada, '', $formato_titulo);
@@ -1064,7 +1064,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 												// Contenido de la tabla de trámites
 				for ($i = 0; $i < $lista_tramites->num; $i++) {
 													$tramite = $lista_tramites->Get($i);
-													list($h,$m,$s) = split(':',$tramite->fields['duracion']);
+													list($h,$m,$s) = explode(':',$tramite->fields['duracion']);
 					if ($h + $m > 0) {
 														if( $h > 9 )
 															$duracion = $h.':'.$m;
@@ -1079,7 +1079,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 													if(!$opc_ver_asuntos_separados)
 														$ws->write($filas, $col_abogado+1, substr($tramite->fields['codigo_asunto'], -4), $formato_descripcion);
-					
+
 													$ws->write($filas, $col_descripcion, $tramite->fields['glosa_tramite'].' - '.$tramite->fields['descripcion'], $formato_descripcion);
 													if($opc_ver_horas_trabajadas)
 														$ws->write($filas, $col_duracion_trabajada, '', $formato_tiempo);
@@ -1099,7 +1099,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 									$ws->write($filas, $col_abogado, '', $formato_total);
 									if(!$opc_ver_asuntos_separados)
 										$ws->write($filas, $col_abogado+1, '', $formato_total);
-				
+
 									$ws->write($filas, $col_descripcion, '', $formato_total);
 									if($opc_ver_horas_trabajadas && $col_duracion_trabajada != $col_descripcion+1 )
 											$ws->write($filas, $col_duracion_trabajada, '', $formato_tiempo_total);
@@ -1118,11 +1118,11 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 						// Si se ven los asuntos por separado avanza al proximo
 						// Si no salga del while
 						if( $opc_ver_asuntos_separados ) {
-                                                   
+
 							$cont_asuntos++;
                                                         //FFF guardo la fila de los subtotales, la voy a necesitar al final de la planilla
                                                          $lineas_total_asunto[ $asunto->fields['glosa_asunto'] ] = array($filas-1,$cont_trabajos);
-                                                         	
+
                                                          $ws->write($$filas-1, 15, ' SUBTOTAL', $formato_resumen_rentabilidad);
                                                 } else {
 							break;
@@ -1131,27 +1131,27 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 	if (count($cobro->asuntos) == 0 || !$cobro_tiene_trabajos) {
 						$ws->write($filas++,$col_descripcion,'No existen trabajos asociados a este cobro.',$formato_instrucciones10);
-						
+
                                                 $filas += 2;
-                                                
+
 					} else {
 						// Construir formula para sumar totales de asuntos ...
-                                            $arraytemporal=array();      
+                                            $arraytemporal=array();
                                             $formula_total_hh=array();
                                              $formula_total_ff=array();
                                                 foreach($lineas_total_asunto as $label=>$numfila):
                                                    if($numfila[1]) $formula_total_hh[] = $col_formula_valor_trabajo.$numfila[0];
                                                    if($numfila[1]) $formula_total_ff[] = $col_formula_valor_trabajo_flat_fee.$numfila[0];
-                                                   
+
                                                 endforeach;
-                                                 
-                                                
+
+
 						if( $cobro->fields['forma_cobro'] == "TASA" ) {
 							$$arraytemporal = $formula_total_hh;
 							$formula_total_hh = $formula_total_ff;
 							$formula_total_ff = $$arraytemporal;
 						}
-						
+
 						$filas += 2;
 						$ws->mergeCells($filas, $col_tarifa_hh, $filas, $col_valor_trabajo);
 						$ws->write($filas, $col_tarifa_hh, __('TOTAL POR PACTO:'), $formato_resumen_rentabilidad);
@@ -1167,7 +1167,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 						$ws->write($filas, $col_tarifa_hh, __('Write off / Mark up:'), $formato_resumen_rentabilidad);
 						$ws->write($filas, $col_valor_trabajo, '', $formato_resumen_rentabilidad);
 						$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, "=100*($col_formula_valor_trabajo_flat_fee".($filas-1)."/$col_formula_valor_trabajo_flat_fee$filas)-100", $formato_porcentaje_rentabilidad);
-					
+
 						$filas += 2;
 					}
 
@@ -1493,7 +1493,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					}
 				// Si el cobro es RETAINER o PROPORCIONAL vuelve la definición de las columnas al
 				// estado normal para patir en cero en el siguiente cobro
-	
+
 }
 		// fin bucle cobros
 if (isset($ws)) {

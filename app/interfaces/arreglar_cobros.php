@@ -99,7 +99,7 @@
 		{
 			$trabajo = $lista_trabajos->Get($z);
 
-			list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
+			list($h,$m,$s) = explode(":",$trabajo->fields['duracion_cobrada']);
 			$duracion = $h + ($m > 0 ? ($m / 60) :'0');
 			$duracion_minutos = $h*60 + $m;
 

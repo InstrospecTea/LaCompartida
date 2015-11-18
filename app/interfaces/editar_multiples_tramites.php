@@ -385,7 +385,7 @@ function Lista(accion, div, codigo, div_post)
 function UpdateTramite(id_tramite, descripcion, duracion, fecha)
 {
 	var form = document.getElementById('form_editar_tramite');
-	
+
 	form.duracion.value = duracion;
 	form.descripcion.value = descripcion;
 	var fecha_arr = fecha.split('-',3);
@@ -693,7 +693,7 @@ if($txt_opcion)
 	$pagina->PrintBottom($popup);
 	function SplitDuracion($time)
 	{
-		list($h,$m,$s) = split(":",$time);
+		list($h,$m,$s) = explode(":",$time);
 		return $h.":".$m;
 	}
 	function Substring($string)

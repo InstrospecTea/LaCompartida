@@ -409,7 +409,7 @@ function Print_Prof(& $ws1, $td) {
 		$arr_col = array();
 
 		foreach ($r['labels_col'] as $id_col => $column) {
-			$mes_anyo = split('-', $column['nombre']);
+			$mes_anyo = explode('-', $column['nombre']);
 			$fecha = mktime(0, 0, 0, $mes_anyo[0], 1, $mes_anyo[1]);
 			$arr_col[$fecha] = array('id' => $id_col, 'fecha' => $fecha);
 		}

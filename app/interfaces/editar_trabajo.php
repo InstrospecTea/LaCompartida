@@ -373,7 +373,7 @@ if ($opcion == "guardar") {
 	// Actualizar tarifas en tabla trabajo_tarifa
 	$valores = array();
 	foreach ($_POST as $index => $valor) {
-		list( $key1, $key2, $id_moneda ) = split('_', $index);
+		list( $key1, $key2, $id_moneda ) = explode('_', $index);
 		if ($key1 == 'trabajo' && $key2 == 'tarifa' && $id_moneda > 0) {
 			if (empty($valor)) {
 				$valor = "0";
@@ -925,7 +925,7 @@ $duracion_cobrada = '';
 echo $Form->script();
 
 function SplitDuracion($time) {
-	list($h, $m, $s) = split(":", $time);
+	list($h, $m, $s) = explode(":", $time);
 	return $h . ":" . $m;
 }
 

@@ -567,7 +567,7 @@ $pagina->PrintTop($popup);
 										if (! $p_revisor) {
 											$where_usuario = "AND {$sesion->usuario->tabla}.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor={$sesion->usuario->fields['id_usuario']}) OR usuario.id_usuario={$sesion->usuario->fields['id_usuario']}";
 										}
-										
+
 										echo $Form->select('id_usuario', $sesion->usuario->ListarActivos($where_usuario, 'PRO'), $id_usuario, array('empty' => 'Todos', 'style' => 'width: 200px'));
 										?>
 									</td>
@@ -724,7 +724,7 @@ function Opciones(& $tramite) {
 }
 
 function SplitDuracion($time) {
-	list($h, $m, $s) = split(":", $time);
+	list($h, $m, $s) = explode(":", $time);
 	if ($h > 0 || $s > 0) {
 		return $h . ":" . $m;
 	}
@@ -759,7 +759,7 @@ function funcionTR(& $tramite) {
 		$tarifa = $tramite->fields['tarifa_tramite'];
 	}
 
-	list($h, $m, $s) = split(":", $tramite->fields['duracion_defecto']);
+	list($h, $m, $s) = explode(":", $tramite->fields['duracion_defecto']);
 
 	$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 	$total = round($tarifa, 2);

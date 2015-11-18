@@ -57,12 +57,12 @@
 		$asunto = new Asunto($sesion);
 		if($i == 0)
 			echo("<td style='width: 100px'>");
-		
+
 		$alto = $lista->Get($i)->fields[alto]."px";
 		$cod_asunto = $lista->Get($i)->fields[codigo_asunto];
 		$dia_semana = $lista->Get($i)->fields[dia_semana];
 		$duracion = $lista->Get($i)->fields[duracion];
-        list($hh,$mm,$ss) = split(":",$duracion);
+        list($hh,$mm,$ss) = explode(":",$duracion);
         $duracion = "$hh:$mm";
 		$fecha = $lista->Get($i)->fields[fecha];
 		$asunto->LoadByCodigo($cod_asunto);
@@ -78,11 +78,11 @@
 			for($q = $dia_anterior+1; $q <= $dia_semana; $q++)
 				echo("</td><td style='width: 100px'>");
 		}
-		echo("<div $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\" onclick=\"self.location='trabajo.php?opcion=editar&id_trab=$id_trabajo';\" style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
+		echo("<div $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\" onclick=\"self.location='trabajo.php?opcion=editar&id_trab=$id_trabajo';\" style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>");
 		echo("<strong>$cliente</strong> - $cod_asunto");
 		if($alto > 24)
 			echo("<br />$duracion");
-		echo("</div>"); 
+		echo("</div>");
 		$dia_anterior  = $dia_semana;
 	}
 	echo("</td>");
@@ -90,7 +90,7 @@
 	for($i = 2; $i <= 6; $i++)
 	{
 		#$total[$i] = number_format($total[$i],2);
-        $hora = floor($total[$i]); 
+        $hora = floor($total[$i]);
 		$minutos = number_format(($total[$i] - $hora)*60,0);
 		#$minutos = number_format($minutos,0);
         if($minutos < 10)
@@ -111,7 +111,7 @@
 	{
 		static $codigos = array();
 		$colores = array("#3366FF","#CC33FF","#FF3366","#FF6633","#FFCC33","#CCFF33","#66FF33","#33FF66","#33FFCC","#33CCFF","#003DF5","#002EB8","#F5B800","#B88A00","#FF33CC");
-		array_push($codigos, $cod);	
+		array_push($codigos, $cod);
 		$codigos = array_unique($codigos);
 
 		$i = 0;

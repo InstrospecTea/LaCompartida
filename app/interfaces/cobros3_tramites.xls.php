@@ -139,7 +139,7 @@
 			$moneda = $tramite->fields['id_moneda_tramite_individual'];
 		}
 		$moneda_total->Load($moneda);
-		
+
 		// Redefinimos el formato de la moneda, para que sea consistente con la cifra.
 		$simbolo_moneda = $moneda_total->fields['simbolo'];
 		$cifras_decimales = $moneda_total->fields['cifras_decimales'];
@@ -157,7 +157,7 @@
 								'Border' => 1,
 								'Color' => 'black',
 								'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
-		
+
 		$codigo_cliente = $tramite->fields['codigo_cliente'];
 		$cliente = new Cliente($sesion);
 		$cliente->LoadByCodigo($codigo_cliente);
@@ -165,7 +165,7 @@
 		$ws->write($fila_inicial + $i, $col_fecha, Utiles::sql2date($tramite->fields['fecha'], "%d-%m-%Y"), $tex);
 		$ws->write($fila_inicial + $i, $col_cliente, $cliente->fields['glosa_cliente'], $tex);
 		$ws->write($fila_inicial + $i, $col_asunto, $tramite->fields['glosa_asunto'], $tex);
-		
+
 		$text_descripcion = addslashes($tramite->fields['glosa_tramite'].'   '.$tramite->fields['descripcion']);
 
 		$ws->write($fila_inicial + $i, $col_descripcion, $text_descripcion, $tex);
@@ -173,13 +173,13 @@
 		$ws->write($fila_inicial + $i, $col_apellido, $tramite->fields['apellido1'], $tex);
 
 		$duracion= $tramite->fields['duracion'];
-		list($h, $m)= split(':', $duracion);
+		list($h, $m)= explode(':', $duracion);
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
 		$ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel, $time_format);
 
 		$params_array['codigo_permiso'] = 'REV';
 		$p_revisor = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
-		
+
 		if($p_cobranza->fields['permitido'])
 		{
 			$tarifa = $tramite->fields['tarifa_tramite_individual'];
@@ -192,7 +192,7 @@
 
 	$ws->writeFormula($fila_inicial+$i, $col_duracion, "=SUM($col_formula_duracion".($fila_inicial+1).":$col_formula_duracion".($fila_inicial+$i).")", $time_format);
 	// No tiene sentido sumar los totales porque pueden estar en monedas distintas.
-	
+
 	$wb->close();
 	exit;
 ?>

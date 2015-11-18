@@ -911,7 +911,7 @@ function LinkAlTrabajo(& $trabajo, $texto = '') {
 }
 
 function SplitDuracion($time) {
-	list($h, $m, $s) = split(":", $time);
+	list($h, $m, $s) = explode(":", $time);
 	if ($h > 0 || $s > 0) {
 		return $h . ":" . $m;
 	}
@@ -974,7 +974,7 @@ function funcionTR(& $trabajo) {
 	} else {
 		$tarifa = number_format(Funciones::TramiteTarifa($sesion, $trabajo->fields['id_tramite_tipo'], $trabajo->fields['id_moneda_cobro'], $trabajo->fields['codigo_asunto']), $moneda_cobro->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
 	}
-	list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
+	list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
 	$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 	$total = round($tarifa * $duracion, 2);
 	$total_horas += $duracion;
@@ -1018,7 +1018,7 @@ function funcionTR(& $trabajo) {
 		}
 	} else {
 		if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
-			list($duracion_trabajada, $duracion_cobrada) = split('<br>', $trabajo->fields['duracion']);
+			list($duracion_trabajada, $duracion_cobrada) = explode('<br>', $trabajo->fields['duracion']);
 			$duracion = UtilesApp::Time2Decimal($duracion_trabajada) . "<br>" . UtilesApp::Time2Decimal($duracion_cobrada);
 		}
 	}

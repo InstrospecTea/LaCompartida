@@ -386,7 +386,7 @@ class FacturaPago extends Objeto {
 		//EL voucher debe mostrar como encabezado el nombre de
 		//la razon social asociada a la 1era Factura que esta pagando
 		$lista_facturas_desde_pago = $this->GetListaFacturasSoyPago();
-		$arr_factura = split(',', $lista_facturas_desde_pago);
+		$arr_factura = explode(',', $lista_facturas_desde_pago);
 		$factura_encabezado->Load($arr_factura[0]);
 		$glosa_cliente_encabezado = $factura_encabezado->fields['cliente'];
 		$rut_cliente_encabezado = $factura_encabezado->fields['RUT_cliente'];

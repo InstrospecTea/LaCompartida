@@ -2873,9 +2873,9 @@ class NotaCobro extends Cobro {
 
 				for ($i = 0; $i < $lista_trabajos->num; $i++) {
 					$trabajo = $lista_trabajos->Get($i);
-					list($ht, $mt, $st) = split(":", $trabajo->fields['duracion']);
-					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
-					list($h_retainer, $m_retainer, $s_retainer) = split(":", $trabajo->fields['duracion_retainer']);
+					list($ht, $mt, $st) = explode(":", $trabajo->fields['duracion']);
+					list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
+					list($h_retainer, $m_retainer, $s_retainer) = explode(":", $trabajo->fields['duracion_retainer']);
 					$duracion_cobrada_decimal = $h + $m / 60 + $s / 3600;
 					$asunto->fields['trabajos_total_duracion'] += $h * 60 + $m + $s / 60;
 					$asunto->fields['trabajos_total_valor'] += $trabajo->fields['monto_cobrado'];
@@ -2992,7 +2992,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
 
 					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $trabajo->fields['nombre_usuario'], 4);
+					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $trabajo->fields['nombre_usuario'], 4);
 					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
@@ -3543,7 +3543,7 @@ class NotaCobro extends Cobro {
 							$row = str_replace('%td_tarifa_ajustada%', '', $row);
 						}
 						//muestra las iniciales de los profesionales
-						list($nombre, $apellido_paterno, $extra) = split(' ', $prof, 3);
+						list($nombre, $apellido_paterno, $extra) = explode(' ', $prof, 3);
 						$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0], $row);
 
 						$row = str_replace('%username%', $data['username'], $row);
@@ -5112,7 +5112,7 @@ class NotaCobro extends Cobro {
 						$minutes = (($duracion_cobrada / 60 ) % 60);
 						$seconds = ($duracion_cobrada % 60);
 
-						list($solo_codigo_cliente, $solo_codigo_asunto_secundario) = split("-", $codigo_asunto_secundario);
+						list($solo_codigo_cliente, $solo_codigo_asunto_secundario) = explode("-", $codigo_asunto_secundario);
 
 						$row = str_replace('%solo_codigo_asunto_secundario%', $solo_codigo_asunto_secundario, $row);
 
@@ -6044,9 +6044,9 @@ class NotaCobro extends Cobro {
 					$duracion = $trabajo->fields['duracion'];
 					$retainer_cobro = $this->fields['retainer_horas'];
 
-					list($h, $m, $s) = split(":", $duracion_cobrada);
-					list($h_retainer, $m_retainer, $s_retainer) = split(":", $duracion_retainer);
-					list($ht, $mt, $st) = split(":", $duracion);
+					list($h, $m, $s) = explode(":", $duracion_cobrada);
+					list($h_retainer, $m_retainer, $s_retainer) = explode(":", $duracion_retainer);
+					list($ht, $mt, $st) = explode(":", $duracion);
 
 					/* if ($this->fields['forma_cobro'] == 'RETAINER'){
 					  $horas = $h + $m / 60 + $s / 3600;
@@ -6055,7 +6055,7 @@ class NotaCobro extends Cobro {
 					  $horas_tarificadas_retainer = UtilesApp::Decimal2Time($horas_tarificadas);
 					  $horas_trabajadas = $ht + $mt /60 + $st / 3600;
 
-					  list($h, $m ,$s) = split(":",$horas_tarificadas_retainer);
+					  list($h, $m ,$s) = explode(":",$horas_tarificadas_retainer);
 					  $total_trabajo_importe = $tarifa_hh * $horas_tarificadas;
 					  } */
 
@@ -6153,7 +6153,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
 
 					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $trabajo->fields['nombre_usuario'], 4);
+					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $trabajo->fields['nombre_usuario'], 4);
 					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
@@ -6804,7 +6804,7 @@ class NotaCobro extends Cobro {
 						}
 
 						//muestra las iniciales de los profesionales
-						list($nombre, $apellido_paterno, $extra) = split(' ', $date['nombre_usuario'], 3);
+						list($nombre, $apellido_paterno, $extra) = explode(' ', $date['nombre_usuario'], 3);
 						$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0], $row);
 
 						if ($descontado || $retainer || $flatfee) {
@@ -8227,7 +8227,7 @@ class NotaCobro extends Cobro {
 
 				for ($i = 0; $i < $lista_tramites->num; $i++) {
 					$tramite = $lista_tramites->Get($i);
-					list($h, $m, $s) = split(":", $tramite->fields['duracion']);
+					list($h, $m, $s) = explode(":", $tramite->fields['duracion']);
 					$asunto->fields['tramites_total_duracion'] += $h * 60 + $m + $s / 60;
 					$asunto->fields['tramites_total_valor'] += $tramite->fields['tarifa'];
 					$categoria_duracion_horas+=round($h);
@@ -8657,9 +8657,9 @@ class NotaCobro extends Cobro {
 
 				for ($i = 0; $i < $lista_trabajos->num; $i++) {
 					$trabajo = $lista_trabajos->Get($i);
-					list($ht, $mt, $st) = split(":", $trabajo->fields['duracion']);
-					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
-					list($h_retainer, $m_retainer, $s_retainer) = split(":", $trabajo->fields['duracion_retainer']);
+					list($ht, $mt, $st) = explode(":", $trabajo->fields['duracion']);
+					list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
+					list($h_retainer, $m_retainer, $s_retainer) = explode(":", $trabajo->fields['duracion_retainer']);
 					$duracion_cobrada_decimal = $h + $m / 60 + $s / 3600;
 					$asunto->fields['trabajos_total_duracion'] += $h * 60 + $m + $s / 60;
 					$asunto->fields['trabajos_total_valor'] += $trabajo->fields['monto_cobrado'];
@@ -8773,7 +8773,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
 
 					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $trabajo->fields['nombre_usuario'], 4);
+					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $trabajo->fields['nombre_usuario'], 4);
 					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
@@ -9404,7 +9404,7 @@ class NotaCobro extends Cobro {
 						}
 
 						//muestra las iniciales de los profesionales
-						list($nombre, $apellido_paterno, $extra) = split(' ', $prof, 3);
+						list($nombre, $apellido_paterno, $extra) = explode(' ', $prof, 3);
 						$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0], $row);
 						$row = str_replace('%username%', $data['username'], $row);
 
@@ -10802,7 +10802,7 @@ class NotaCobro extends Cobro {
 						$html3 = str_replace('%td_importe_ajustado%', '', $html3);
 					}
 					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = split(' ', $data['nombre_usuario'], 4);
+					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $data['nombre_usuario'], 4);
 					$html3 = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $html3);
 					if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['opc_ver_horas_trabajadas'] || Conf::GetConf($this->sesion, 'NotaDeCobroVFC')) {
 						$html3 = str_replace('%hrs_trabajadas%', $data['glosa_duracion_cobrada'], $html3);

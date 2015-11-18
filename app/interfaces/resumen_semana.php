@@ -223,7 +223,7 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 		$duracion = $lista->Get($i)->fields['duracion_pedida'];
 		if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal' ) || ( method_exists('Conf', 'TipoIngresoHoras') && Conf::TipoIngresoHoras() == 'decimal' )) {
 			if (strpos($duracion, ':')) {
-				list($hh, $mm, $ss) = split(':', $duracion);
+				list($hh, $mm, $ss) = explode(':', $duracion);
 			} else {
 				$hh = floor($duracion / 3600);
 				$mm = floor(($duracion - $hh * 3600) / 60);
@@ -236,7 +236,7 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 			$duracion = UtilesApp::Time2Decimal($duracion);
 		} else {
 			if (strpos($duracion, ':')) {
-				list($hh, $mm, $ss) = split(':', $duracion);
+				list($hh, $mm, $ss) = explode(':', $duracion);
 			} else {
 				$hh = floor($duracion / 3600);
 				$mm = floor(($duracion - $hh * 3600) / 60);

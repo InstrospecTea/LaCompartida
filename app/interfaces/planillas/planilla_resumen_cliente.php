@@ -129,8 +129,8 @@ $ws1->mergeCells($filas, 1, $filas, 13);
 
 $filas += 3;
 
-list($x_anio_ini, $x_mes_ini, $x_dia_ini) = split('-', $fecha_ini);
-list($x_anio_fin, $x_mes_fin, $x_dia_fin) = split('-', $fecha_fin);
+list($x_anio_ini, $x_mes_ini, $x_dia_ini) = explode('-', $fecha_ini);
+list($x_anio_fin, $x_mes_fin, $x_dia_fin) = explode('-', $fecha_fin);
 
 // MESES
 for ($i = 0; $i <= ($periodo_final - $periodo_inicial); $i++) {

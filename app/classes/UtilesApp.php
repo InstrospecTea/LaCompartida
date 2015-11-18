@@ -1930,7 +1930,7 @@ HTML;
 	}
 
 	function glosaHora2Minuto($glosa_hora) {
-		list($xhh, $xmm) = split(":", $glosa_hora);
+		list($xhh, $xmm) = explode(":", $glosa_hora);
 		//validar  hora y min que senan positivos
 		$m = (int) $xmm;
 		$h = (int) $xhh;
@@ -1949,7 +1949,7 @@ HTML;
 	}
 
 	function PrintMenuDisenoNuevoPrototype($sesion, $url_actual) {
-		$actual = split('\?', $url_actual);
+		$actual = explode('\?', $url_actual);
 		$url_actual = $actual[0];
 		$bitmodfactura = Conf::GetConf($sesion, 'NuevoModuloFactura');
 		switch ($url_actual) {

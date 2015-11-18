@@ -1,4 +1,4 @@
-<?php 
+<?php
     require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -16,17 +16,17 @@
     $pagina = new Pagina($sesion);
     $pagina->titulo = __('Modificación de').' '.__('Trabajo');
     $pagina->PrintTop($popup);
-    
+
 	//Permisos
 	$params_array['codigo_permiso'] = 'PRO';
 	$p_profesional = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
-	
+
 	$params_array['codigo_permiso'] = 'REV';// permisos de consultor jefe
 	$p_revisor = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
-        
+
         $params_array['codigo_permiso'] = 'SEC';
 	$p_secretaria = $sesion->usuario->permisos->Find('FindPermiso',$params_array);
-	
+
 	if(!$id_usuario)
 	{
 		if($p_profesional->fields['permitido']) {
@@ -34,13 +34,13 @@
 		}
 		else if($p_secretaria->fields['permitido']) {
             $query = "SELECT usuario.id_usuario,
-						CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
+						CONCAT_WS(' ', apellido1, apellido2,',',nombre)
 						as nombre
 						FROM usuario
 			          JOIN usuario_permiso USING(id_usuario)
-                      JOIN usuario_secretario ON usuario_secretario.id_profesional = usuario.id_usuario 
-                      WHERE usuario.visible = 1 AND 
-                            usuario_permiso.codigo_permiso='PRO' AND 
+                      JOIN usuario_secretario ON usuario_secretario.id_profesional = usuario.id_usuario
+                      WHERE usuario.visible = 1 AND
+                            usuario_permiso.codigo_permiso='PRO' AND
                             usuario_secretario.id_secretario='".$sesion->usuario->fields['id_usuario']."'
                       GROUP BY usuario.id_usuario ORDER BY nombre LIMIT 1";
             $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
@@ -49,7 +49,7 @@
         }
 		if( !$id_usuario ) {
 			$query = "SELECT usuario.id_usuario,
-								CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
+								CONCAT_WS(' ', apellido1, apellido2,',',nombre)
 								as nombre
 								FROM usuario
 								JOIN usuario_permiso USING(id_usuario)
@@ -75,7 +75,7 @@
 	{
 		$semana2 = "'$semana'";
 		$sql_f = "SELECT DATE_ADD( '".$semana."', INTERVAL - WEEKDAY('".$semana."')  DAY ) AS semana_inicio";
-		
+
                 $resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f,__FILE__,__LINE__,$sesion->dbh);
 		list($semana_actual) = mysql_fetch_array($resp);
 		$semana_anterior = date("Y-m-d",strtotime("$semana_actual-7 days"));
@@ -94,21 +94,21 @@
 	$query = "SELECT $select_codigo asunto.glosa_asunto,trabajo.duracion,trabajo.fecha,trabajo.id_trabajo, trabajo.descripcion
 				,(SELECT c1.glosa_cliente FROM cliente AS c1 WHERE c1.codigo_cliente=asunto.codigo_cliente) as glosa_cliente
 				, TIME_TO_SEC(duracion)/90 as alto, DAYOFWEEK(fecha) AS dia_semana,trabajo.cobrable
-				 FROM trabajo 
+				 FROM trabajo
 				 JOIN asunto ON trabajo.codigo_asunto=asunto.codigo_asunto
 					WHERE
-					trabajo.id_usuario = '$id_usuario' 
+					trabajo.id_usuario = '$id_usuario'
 					AND YEARWEEK(fecha,1) = YEARWEEK($semana2,1)
 					ORDER BY fecha,id_trabajo";
-	
+
         $lista = new ListaTrabajos($sesion, "", $query);
 
 	$dias = array(__("Lunes"), __("Martes"), __("Miércoles"), __("Jueves"), __("Viernes"), __("Sábado"),__("Domingo"));
 	$tip_anterior = Html::Tooltip("<b>".__('Semana anterior').":</b><br>".Utiles::sql3fecha($semana_anterior,'%d de %B de %Y'));
 	$tip_siguiente = Html::Tooltip("<b>".__('Semana siguiente').":</b><br>".Utiles::sql3fecha($semana_siguiente,'%d de %B de %Y'));
-	?> 	<center> <?php 
+	?> 	<center> <?php
 	echo("<strong>".__('Haga clic en el botón derecho sobre algún trabajo para modificarlo')."</strong><br />");
-	
+
 #agregado para el nuevo select
 
 	if($p_revisor->fields['permitido'])
@@ -120,37 +120,37 @@
 
 
 ?>
-   
+
    <script type="text/css">
 			body {
 				background: #E0E0E0;
 			}
    </script>
-   
+
 <form method='post' name='form_semana' id='form_semana'>
 	<table width='90%'>
 		<tr>
-			<td align='left' width='3%'> <?php 
+			<td align='left' width='3%'> <?php
 				if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) ) { ?>
 				<img src='<?php echo Conf::ImgDir()."/izquierda_nuevo.gif"?>' <?php echo $tip_anterior?> class='mano_on' onclick="CambiaSemana('<?php echo $semana_anterior?>')">
 			<?php  } else { ?>
 				<img src='<?php echo Conf::ImgDir()."/izquierda.gif"?>' <?php echo $tip_anterior?> class='mano_on' onclick="CambiaSemana('<?php echo $semana_anterior?>')">
 			<?php  } ?>
 				</td>
-			 
-<?php 
+
+<?php
 if ($p_revisor->fields['permitido'])
 {
-?>	
+?>
 	<td align='center' width='45%'>
-<?php 
+<?php
 	echo ( __('Usuario') . "&nbsp;");
 	echo Html::SelectQuery($sesion,
-						"SELECT usuario.id_usuario, 
-							CONCAT_WS(' ', apellido1, apellido2,',',nombre) 
-							as nombre FROM usuario 
+						"SELECT usuario.id_usuario,
+							CONCAT_WS(' ', apellido1, apellido2,',',nombre)
+							as nombre FROM usuario
 							JOIN usuario_permiso USING(id_usuario)
-							LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional 
+							LEFT JOIN usuario_secretario ON usuario.id_usuario = usuario_secretario.id_profesional
 							WHERE $where GROUP BY id_usuario ORDER BY nombre"
 						,"id_usuario",$id_usuario,"onchange='Refrescar(this.value,form.semana.value);'",'',"170");
 ?>
@@ -161,8 +161,8 @@ if ($p_revisor->fields['permitido'])
 	<td align ='left' width='19%'>
 		<input type='button' class='btn' value="Ver semana" onclick="CambiaSemana(form.semana.value)">
 	</td>
-	
-<?php 
+
+<?php
 }
 else
 {
@@ -173,7 +173,7 @@ else
 	<td align ='left' width='47%'>
 		<input type='button' class='btn' value='Ver semana' onclick="CambiaSemana(form.semana.value)">
 	</td>
-<?php 
+<?php
 }
 ?>
 	<td align='right' width='3%'>
@@ -187,9 +187,9 @@ else
 </table>
 
 
-<?php 
+<?php
 	echo("<table style='width:600px'>");
-	
+
 	$horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 ?>
     <tr>
@@ -197,21 +197,21 @@ else
         	<?php echo __('Semana del');  ?>:
 					<b><?php echo $semana2 != '' ? Utiles::sql3fecha($semana_actual,'%d de %B de %Y') : Utiles::sql3fecha(date('Y-m-d'),'%d de %B de %Y') ?></b>
         </td>
-        
+
         <td align='right' colspan='2'>
         	<?php echo $horas_mes_consulta ? __('Total mes') : __('Total mes actual')?>:
         </td>
         <td style="vertical-align: middle">
-<?php 
+<?php
 $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'horas_trabajadas', $horas_mes_consulta ? $semana_actual : '');
 ?>
             <strong><?php echo $horas_trabajadas_mes?></strong>
 		</td>
     </tr>
-<?php 
+<?php
 	echo("<tr>");
 	$fecha_dia = Utiles::sql2date($semana_actual);
-	
+
         for($i = 0; $i < 7; $i++)
 	{
 		$dia_de_mes = date("j",strtotime(Utiles::add_date($semana_actual,$i)));
@@ -232,12 +232,12 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 	for($i = 0; $i < $lista->num; $i++)
 	{
 		$asunto = new Asunto($sesion);
-		if($i == 0) 
-			echo("<td width=14%>");  
+		if($i == 0)
+			echo("<td width=14%>");
 
-              
+
         $img_dir = Conf::ImgDir();
-		
+
 		$alto = max($lista->Get($i)->fields[alto],12)."px";
 		$cod_asunto = $lista->Get($i)->fields[codigo_asunto];
 		if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
@@ -246,7 +246,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 			$cod_asunto_color = $cod_asunto;
 		$cliente = $lista->Get($i)->fields[codigo_cliente];
 		$dia_semana = $lista->Get($i)->fields[dia_semana];
-		
+
 		$t = new Trabajo($sesion);
 		$t->Load($lista->Get($i)->fields[id_trabajo]);
 		if($t->Estado() == 'Cobrado')
@@ -255,21 +255,21 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 			$cobrado = false;
 
         if($dia_semana == 1)             $dia_semana = 8;
-           
+
 		$duracion = $lista->Get($i)->fields[duracion];
 		//echo $duracion;
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) ) 
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) )
 		{
-			list($hh,$mm,$ss) = split(":",$duracion);
+			list($hh,$mm,$ss) = explode(":",$duracion);
 			$duracion = UtilesApp::Time2Decimal( $duracion );
 		}
 		else
 		{
-			list($hh,$mm,$ss) = split(":",$duracion);
+			list($hh,$mm,$ss) = explode(":",$duracion);
 			$duracion = "$hh:$mm";
 		}
 		$fecha = $lista->Get($i)->fields[fecha];
-		
+
 		if($lista->Get($i)->fields[cobrable] == 0 || $lista->Get($i)->fields[cobrable] == 2)
 		{
 			$no_cobrable = __('No cobrable');
@@ -285,7 +285,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 				$color = '#E8E7D9';
 		}
 
-		$total[$dia_semana]  += $hh + $mm/60; 
+		$total[$dia_semana]  += $hh + $mm/60;
 #		$total[$dia_semana] += ($alto/40);
 
 		$descripcion = nl2br(str_replace("'","`",$lista->Get($i)->fields['descripcion']));
@@ -295,13 +295,13 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		{
 			for($q = $dia_anterior+1; $q <= $dia_semana; $q++)
 				echo("</td><td width=14%>");
-		}	
+		}
 		#onclick=\"relocate($id_trabajo,'".$semana."')\"
-		echo("<div id='".$id_trabajo."' $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  class=\"cajatrabajo $pintame\" rel=\"$cod_asunto\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>"); 
+		echo("<div id='".$id_trabajo."' $tooltip onmouseover=\"manoOn(this);\" onmouseout=\"manoOff(0)\"  class=\"cajatrabajo $pintame\" rel=\"$cod_asunto\"  style='background-color: $color; height: $alto; font-size: 10px; border: 1px solid black'>");
 		echo("<b id='".$id_trabajo."'>$cod_asunto</b>");
 		if($alto > 24)
 			echo("<br />Hr:$duracion");
-		echo("</div>"); 
+		echo("</div>");
 		$dia_anterior  = $dia_semana;
 	}
 	echo("</td>");
@@ -309,7 +309,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 	for($i = 2; $i <= 8; $i++)
 	{
 		#$total[$i] = number_format($total[$i],2);
-		$hora = floor($total[$i]); 
+		$hora = floor($total[$i]);
 		$minutos = number_format(($total[$i] - $hora)*60,0);
 		if($minutos==60)
 		{
@@ -319,7 +319,7 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
 		#$minutos = number_format($minutos,0);
         if($minutos < 10)
             $minutos = "0$minutos";
-		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) ) 
+		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) )
 		{
 				$dia_semana_decimal = UtilesApp::Time2Decimal( $hora.':'.$minutos.':00' );
 				echo("
@@ -344,15 +344,15 @@ $horas_trabajadas_mes = $sesion->usuario->HorasTrabajadasEsteMes($id_usuario, 'h
         		<?php echo __('Total semana')?>:
         </td>
         <td style="vertical-align: middle">
-<?php 
+<?php
 $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuario,$semana_actual);
 ?>
             <strong><?php echo $horas_trabajadas_semana?></strong>
 		</td>
 		</tr>
-		<?php 
+		<?php
 	echo("</table>");
-	
+
 	echo("</form>");
 #	echo(InputId::Javascript($sesion));
 ?>
@@ -363,17 +363,17 @@ $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuar
 	var myMenuItems = [
 	  {
 	  	name: 'Ingresar como nueva hora',
-	    className: 'new', 
+	    className: 'new',
 	    callback: function(e) {
 	      OpcionesTrabajo(e.target.id,'nuevo','');
 	    }
 	  },{
 	    name: 'Editar',
-	    className: 'edit', 
+	    className: 'edit',
 	    callback: function(e) {
 	    	OpcionesTrabajo(e.target.id,'','')
 	    }
-	  },{	    
+	  },{
 	    name: 'Eliminar',
 	    disabled: false,
 	    className: 'delete',
@@ -391,19 +391,19 @@ $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuar
 	    }
 	  }
 	]
-	
+
 	/* Array para todos los trabajos ingresador */
 	var arr_trabajos = new Array();
-<?php 
+<?php
 	for($i = 0; $i < $lista->num; $i++)
 	{
 ?>
 		arr_trabajos[<?php echo $i?>] = <?php echo $lista->Get($i)->fields[id_trabajo]?>;
-<?php 
+<?php
 	}
 ?>
-	/* 
-		Inicializando Menú 
+	/*
+		Inicializando Menú
 		creando cada menú según cantidad de trabajos hayan ingresados
 	*/
 	var list_div = parseInt(<?php echo $lista->num;?>);
@@ -423,7 +423,7 @@ $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuar
 		var MenuDias = [
 	  	{
 	  		name: 'Nueva hora',
-	    	className: 'new', 
+	    	className: 'new',
 	    	callback: function(e) {
 	    		var fecha = e.target.id.split('_',2);
 	    		var fecha_id = fecha[0]+''+fecha[1];
@@ -432,7 +432,7 @@ $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuar
 	    	}
 	  	}
 		]
-		
+
 		/*Menu para cada día de la semana*/
 		for(i=0;i<7;i++)
 		{
@@ -445,19 +445,19 @@ $horas_trabajadas_semana = $sesion->usuario->HorasTrabajadasEsteSemana($id_usuar
 	})
 	jQuery('.pintame').each(function() {
 				jQuery(this).css('background-color',window.top.s2c(jQuery(this).attr('rel')));
-			});	 
+			});
 </script>
 <script>
 function relocate(id_trabajo,semana)
 {
 	var string = new String(top.location);
-	if(string.search('trabajo.php') > 0)//Si la página está siendo llamada desde trabajo.php 
+	if(string.search('trabajo.php') > 0)//Si la página está siendo llamada desde trabajo.php
 		top.location='trabajo.php?opcion=editar&id_trab='+id_trabajo+'&semana='+semana;
 	else
 		self.location='trabajo.php?opcion=editar&id_trab='+id_trabajo+'&semana='+semana;
 }
-//La funcion Refrescar solo debe estar presente cuando el usuario sea revisor 
-<?php 
+//La funcion Refrescar solo debe estar presente cuando el usuario sea revisor
+<?php
 if ($p_revisor->fields['permitido'])
 {
 ?>
@@ -467,16 +467,16 @@ if ($p_revisor->fields['permitido'])
 		form.semana.value = semana;
 		//alert(semana);
 		//alert("semana.php?popup=1&id_usuario=" + id_usu + "&semana=");
-		self.location.href='semana.php?popup=1&id_usuario='+ id_usu+'&semana='+semana;	
+		self.location.href='semana.php?popup=1&id_usuario='+ id_usu+'&semana='+semana;
 
 
 	}
-<?php 
+<?php
 }
 ?>
 
-/* 
-	Opcion menu lateral 
+/*
+	Opcion menu lateral
 	opcion->elimina; nuevo o '' ('' editar)
 	f_dia->fecha para menu sobre dias semana
 */
@@ -497,7 +497,7 @@ function CambiaSemana( fecha )
 {
 	var form = $('form_semana');
 	form.semana.value = fecha;
-<?php 
+<?php
 if ($p_revisor->fields['permitido'])
 {
 ?>
@@ -511,24 +511,24 @@ if ($p_revisor->fields['permitido'])
 	form.action = accion;
 	form.target = '_self';
 	form.submit();*/
-<?php 
+<?php
 }
 else
 {
 ?>
 	var url="semana.php?popup=1&semana="+fecha+"&id_usuario="+<?php echo $id_usuario?>;
-<?php 
+<?php
 }
 ?>
 self.location.href = url;
 }
 </script>
-<?php 
+<?php
     $pagina->PrintBottom($popup);
 
     function SplitDuracion($time)
     {
-        list($h,$m,$s) = split(":",$time);
+        list($h,$m,$s) = explode(":",$time);
         return $h.":".$m;
     }
     function Substring($string)

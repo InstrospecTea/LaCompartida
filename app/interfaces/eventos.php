@@ -16,9 +16,9 @@ if( $to && $from )
 	$having = " HAVING fecha_inicial >= '".mysql_real_escape_string($from)."' AND fecha_inicial <= '".mysql_real_escape_string($to)."' ";
 
 
-$query = "SELECT id_datos_calendario, tabla_datos, glosa_datos, glosa_campo_id, glosa_descripcion, glosa_usuario, glosa_datos_cliente, glosa_fecha_ini, url_icon, fecha_con_hora, 
-								 glosa_duracion, glosa_fecha_fin   
-						FROM datos_calendario 
+$query = "SELECT id_datos_calendario, tabla_datos, glosa_datos, glosa_campo_id, glosa_descripcion, glosa_usuario, glosa_datos_cliente, glosa_fecha_ini, url_icon, fecha_con_hora,
+								 glosa_duracion, glosa_fecha_fin
+						FROM datos_calendario
 					 WHERE monstrar_datos=1";
 $resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
@@ -27,8 +27,8 @@ function arreglar_xml($campo)
 {
 	$campo = str_replace('&','&amp;',$campo);
 	$campo = str_replace('<','&lt;',$campo);
-	$campo = str_replace('>','&gt;',$campo);	
-	$campo = str_replace('>','&gt;',$campo);	
+	$campo = str_replace('>','&gt;',$campo);
+	$campo = str_replace('>','&gt;',$campo);
 	$campo = str_replace("'",'&quot;',$campo);
 	$campo = str_replace('"','&quot;',$campo);
 	$campo = urlencode($campo);
@@ -36,11 +36,11 @@ function arreglar_xml($campo)
 	$campo = urldecode($campo);
 	return $campo;
 }
- 
+
 while( list($id_datos_calendario, $tabla_datos, $glosa_datos, $glosa_campo_id, $glosa_descripcion, $glosa_usuario, $glosa_datos_cliente, $glosa_fecha_ini,$url_icon , $fecha_con_hora, $glosa_duracion, $glosa_fecha_fin) = mysql_fetch_array($resp) )
 	{
 		$select = $glosa_campo_id.", ".$glosa_fecha_ini." AS fecha_inicial ,".$glosa_fecha_ini;
-		
+
 		$join = "";
 		$where = "1";
 		$glosa_descripcion=split('//',$glosa_descripcion);
@@ -76,17 +76,17 @@ while( list($id_datos_calendario, $tabla_datos, $glosa_datos, $glosa_campo_id, $
 			else if( $glosa_duracion )
 				$select .= ", ".$glosa_duracion;
 			}
-			
-		
+
+
 			if($usuarios)
 			{
 				$in_usuarios = explode(',',$usuarios);
 				foreach($in_usuarios as $i => $u)
 					$in_usuarios[$i] = mysql_real_escape_string($u);
-					
+
 				$where .= " AND ".$tabla_datos.".".$glosa_usuario." IN ('".join("','",$in_usuarios)."') ";
 			}
-			
+
 			$otro_join_asunto  = '';
 			if($cliente)
 			{
@@ -98,28 +98,28 @@ while( list($id_datos_calendario, $tabla_datos, $glosa_datos, $glosa_campo_id, $
 				else
 					$where .= "	AND ".$tabla_datos.".codigo_cliente = '".$cliente."' ";
 			}
-			
+
 			if($grupo)
 			{
 				$in_grupo = explode(',',$grupo);
 				foreach($in_grupo as $i => $g)
 					$in_grupo[$i] = mysql_real_escape_string($g);
-				
+
 				$otro_join_asunto = " JOIN asunto AS a ON a.codigo_asunto=".$tabla_datos.".codigo_asunto";
 				$otro_join_cliente = " JOIN cliente AS c ON c.codigo_cliente= a.codigo_cliente";
 				$where .= " AND c.id_grupo_cliente IN ('".join("','",$in_grupo)."') ";
 			}
-			
-		
+
+
 		$query2 = "SELECT ".$select." FROM ".$tabla_datos." ".$join_usuario." ".$join_cliente." ".$join_asunto." ".$otro_join_asunto." ".$otro_join_cliente." ".$join." WHERE ".$where." ".$having;
 		$resp2 = mysql_query($query2,$sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
-		
+
 			while( $row = mysql_fetch_array($resp2) )
 				{
 					if( $row[$glosa_duracion] )
 						{
-							$fecha_ini = split(' ',$row[$glosa_fecha_ini]);
-							list($h,$m,$s) = split(":",$row[$glosa_duracion]);
+							$fecha_ini = explode(' ',$row[$glosa_fecha_ini]);
+							list($h,$m,$s) = explode(":",$row[$glosa_duracion]);
 							if( $fecha_ini[1] && $fecha_ini[1] != '00:00:00' )
 								{
 									list($hf,$mf,$sf)=split(':',$fecha_ini[1]);
@@ -131,33 +131,33 @@ while( list($id_datos_calendario, $tabla_datos, $glosa_datos, $glosa_campo_id, $
 									$hora_ini = '10:00:00';
 									$hora_fin = (10+$h).':'.$m.':'.$s;
 								}
-							
-							
+
+
 						$fecha_inicial = $fecha_ini[0].' '.$hora_ini;
 						$fecha_final = $fecha_ini[0].' '.$hora_fin;
 						}
 					else if( $row[$glosa_fecha_fin] )
 						{
-							$fecha_ini = split(' ',$row[$glosa_fecha_ini]);
+							$fecha_ini = explode(' ',$row[$glosa_fecha_ini]);
 							if( $fecha_ini[1] && $fecha_ini[1] != '00:00:00' )
 								$hora_ini = $fecha_ini[1];
 							else
 								$hora_ini = '09:00:00';
-									
-							$fecha_fin = split(' ',$row[$glosa_fecha_fin]);
+
+							$fecha_fin = explode(' ',$row[$glosa_fecha_fin]);
 							if( $fecha_fin[1] && $fecha_fin[1] != '00:00:00' )
 								$hora_fin = $fecha_fin[1];
-							else	
+							else
 								$hora_fin = '13:00:00';
-								
+
 							$fecha_inicial = $row[$glosa_fecha_ini];
 							$fecha_final = $row[$glosa_fecha_fin];
 						}
 					else
 						{
-							$fecha_ini = split(' ',$row[$glosa_fecha_ini]);
+							$fecha_ini = explode(' ',$row[$glosa_fecha_ini]);
 							if( $fecha_ini[1] && $fecha_ini[1] != '00:00:00' )
-								{ 
+								{
 									list($hf,$mf,$sf)=split(':',$fecha_ini[1]);
 									$hora_ini = $fecha_ini[1];
 									$hora_fin = ($hf+4).':'.$mf.':'.$sf;
@@ -170,7 +170,7 @@ while( list($id_datos_calendario, $tabla_datos, $glosa_datos, $glosa_campo_id, $
 							$fecha_inicial = $fecha_ini[0].' '.$hora_ini;
 							$fecha_final = $fecha_ini[0].' '.$hora_fin;
 						}
-					
+
 						$descripcion = $row[$glosa_descripcion[0]];
 						$cont=1;
 						while( $glosa_descripcion[$cont] ) {
@@ -186,7 +186,7 @@ while( list($id_datos_calendario, $tabla_datos, $glosa_datos, $glosa_campo_id, $
 							$cont++;
 							}
 						if( $row['nombre_encargado'] ) {
-							$descripcion .= ' -Encargado: '.$row['nombre_encargado']; 
+							$descripcion .= ' -Encargado: '.$row['nombre_encargado'];
 							if( $row['apellido1'] ) {
 								$descripcion .= ' '.$row['apellido1'];
 								if( $row['apellido2'] ) {
@@ -194,10 +194,10 @@ while( list($id_datos_calendario, $tabla_datos, $glosa_datos, $glosa_campo_id, $
 									}
 								}
 							}
-					
-						
+
+
 					//echo $i.' - '.$row[$glosa_campo_id].' - '.$fecha_inicial.' - '.$fecha_final.' - '.$descripcion.'<br>';
-					
+
 					echo "<event id=\"".$i."\">";
 					echo "<start_date>".$fecha_inicial."</start_date>";
 					echo "<end_date>".$fecha_final."</end_date>";
@@ -208,7 +208,7 @@ while( list($id_datos_calendario, $tabla_datos, $glosa_datos, $glosa_campo_id, $
 					echo "<titulo>".arreglar_xml($glosa_datos)."</titulo>";
 					echo "<event_pid>0</event_pid>";
 					echo "<event_length></event_length>";
-					echo "</event>"; 
+					echo "</event>";
 					$i++;
 				}
 	}

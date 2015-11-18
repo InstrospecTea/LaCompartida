@@ -336,7 +336,7 @@ if(Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador')
 	$pagina->PrintBottom($popup);
 	function SplitDuracion($time)
 	{
-		list($h,$m,$s) = split(":",$time);
+		list($h,$m,$s) = explode(":",$time);
 		return $h.":".$m;
 	}
 	function Substring($string)

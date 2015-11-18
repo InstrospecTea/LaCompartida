@@ -1217,7 +1217,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 echo(SelectorHoras::Javascript());
 
 function SplitDuracion($time) {
-	list($h, $m, $s) = split(':', $time);
+	list($h, $m, $s) = explode(':', $time);
 	return $h . ':' . $m;
 }
 

@@ -108,7 +108,7 @@
 	{
 		$moneda_total = new Objeto($sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda_total->Load($tramite->fields['id_moneda'] > 0 ? $tramite->fields['id_moneda'] : 1);
-   
+
 		$tramite = $lista->Get($i);
 		if($tramite->fields['id_contrato']!=$contrato )
 		{
@@ -167,7 +167,7 @@
 			$ws1->write($fila_inicial, $col_descripcion, __('Descripción'), $tit);
 			$ws1->write($fila_inicial, $col_abogado, __('Abogado'), $tit);
 			$ws1->write($fila_inicial, $col_duracion_trabajada, __('Duración Trabajada'), $tit);
-			
+
 			$ws1->write($fila_inicial, $col_valor_tramite, __('Valor tramite').'('.Utiles::glosa($sesion, $tramite->fields[id_moneda_asunto], 'simbolo', 'prm_moneda', 'id_moneda').')', $tit);
 			if($mostrar_ordenado_por)
 				$ws1->write($fila_inicial, $col_ordenado_por, __('Ordenado por'), $tit);
@@ -189,11 +189,11 @@
 		$ws1->write($fila_inicial, $col_descripcion, $text_descripcion, $tex);
 		$ws1->write($fila_inicial, $col_abogado, $tramite->fields[nombre].' '.$tramite->fields[apellido1], $tex);
 		$duracion=$tramite->fields[duracion];
-		list($h, $m)= split(':', $duracion);
+		list($h, $m)= explode(':', $duracion);
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
 		$ws1->writeNumber($fila_inicial, $col_duracion_trabajada, $tiempo_excel, $time_format);
-		
-		$tarifa = Funciones::TramiteTarifa($sesion, $tramite->fields['id_tramite_tipo'],$tramite->fields['id_moneda_asunto'],$tramite->fields['codigo_asunto']); 
+
+		$tarifa = Funciones::TramiteTarifa($sesion, $tramite->fields['id_tramite_tipo'],$tramite->fields['id_moneda_asunto'],$tramite->fields['codigo_asunto']);
 		$ws1->write($fila_inicial, $col_valor_tramite, $tarifa, $money_format);
 		if($mostrar_ordenado_por)
 			$ws1->write($fila_inicial, $col_ordenado_por, $tramite->fields[solicitante], $tex);

@@ -1,4 +1,4 @@
-<?php 
+<?php
 	require_once dirname(__FILE__).'/../classes/Utiles.php';
 	require_once dirname(__FILE__).'/../classes/Html.php';
 //	require_once dirname(__FILE__).'/../../conf.php';
@@ -7,7 +7,7 @@ class InputDiaMes
 {
 	function InputDiaMes( $nombre_input, $seleccionado)
 	{
-		list($y,$m,$d) = split("-",$seleccionado);
+		list($y,$m,$d) = explode("-",$seleccionado);
 		$this->nombre_input = $nombre_input;
         $this->seleccionado = $seleccionado;
 		$this->mes_seleccionado = $m;
@@ -24,7 +24,7 @@ class InputDiaMes
 		$id_campo = "campo_".$this->random_string;
 
 		$meses = array('','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic');
-		
+
         $select_mes = "<select onchange=\"Cambiar(this.value,'$id_oculto','mes');\">";
         for($x=1;$x <= 12;$x++)
         {
@@ -68,7 +68,7 @@ class InputDiaMes
 			else if(opc == 'ano')
                 ano_mes_dia =  valor +"-"+ arreglo[1] +"-"+ arreglo[2];
 			campo_fecha.value = ano_mes_dia;
-		}		
+		}
 		</script>
 HTML;
 	}

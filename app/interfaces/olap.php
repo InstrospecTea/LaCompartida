@@ -91,7 +91,7 @@
                     $tabla .= "<td>".$d1s[$i]."</td>";
                 if(stristr($result[$d1s[$i]][$d2s[$j]],":"))
                 {
-                    list($h,$m,$s) = split(":",$result[$d1s[$i]][$d2s[$j]]);
+                    list($h,$m,$s) = explode(":",$result[$d1s[$i]][$d2s[$j]]);
                     $res = "$h:$m";
                 }
                 else

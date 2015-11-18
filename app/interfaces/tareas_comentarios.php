@@ -563,7 +563,7 @@
 		$duracion = $fila->fields['duracion_avance'];
 		if($duracion)
 		{
-			$duracion = split(':',$duracion);
+			$duracion = explode(':',$duracion);
 			$h = $duracion[0].':'.$duracion[1];
 		}
 

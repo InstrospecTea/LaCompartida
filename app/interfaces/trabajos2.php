@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -34,14 +34,14 @@
 	{
 		$cobro = new Cobro($sesion);
 		$cobro->Load($id_cobro);
-		
+
 		if(!$cobro->Load($id_cobro))
 			$pagina->FatalError(__('Cobro inv·lido'));
-			
+
 		if($buscar != 1) {
 			if($fecha_ini=='' || $fecha_ini=='00-00-0000' || $fecha_ini == NULL )
 				$fecha_ini=Utiles::sql2date($cobro->fields['fecha_ini']);
-			
+
 				if($fecha_fin=='' || $fecha_fin=='00-00-0000' || $fecha_fin == NULL )
 					$fecha_fin=Utiles::sql2date($cobro->fields['fecha_fin']);
 				}
@@ -137,18 +137,18 @@
 			$where .= " AND ( trabajo.id_cobro is null OR cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' ) ";
 		if($cobrado == 'SI')
 			$where .= " AND trabajo.id_cobro is not null AND (cobro.estado != 'CREADO' AND cobro.estado != 'EN REVISION') ";
-	
+
 		if($from == 'reporte')
 		{
 			if($id_cobro)
 				$where .= " AND trabajo.id_cobro = $id_cobro ";
-	
+
 			if($mes)
 				$where .= " AND DATE_FORMAT(trabajo.fecha, '%m-%y') = '$mes' ";
-	
+
 			if($cobro_nulo)
 				$where .= " AND trabajo.id_cobro IS NULL ";
-	
+
 			if($estado)
 			if($estado != 'abiertos')
 			{
@@ -157,14 +157,14 @@
 				else
 					$where .= " AND cobro.estado = '$estado' ";
 			}
-	
+
 			if($lis_clientes)
 				$where .= " AND cliente.codigo_cliente IN (".$lis_clientes.") ";
 			if($lis_usuarios)
 				$where .= " AND usuario.id_usuario IN (".$lis_usuarios.") ";
-	
+
 		}
-	
+
 		//Estos filtros son tambien para la pag. mis horas
 		if($activo)
 		{
@@ -172,7 +172,7 @@
 				$activo = 1;
 			else
 				$activo = 0;
-	
+
 	    $where .= " AND a1.activo = $activo ";
 		}
 		if($codigo_cliente != "" || $codigo_cliente_secundario != "")
@@ -191,12 +191,12 @@
 			$where .= " AND trabajo.fecha >= '".$fecha_ini."' ";
                         $where_gastos .= " AND cta_corriente.fecha >= '".$fecha_ini."' ";
                 }
-	
+
 		if($fecha_fin != '' and $fecha_fin != 'NULL' and $fecha_fin != '0000-00-00') {
 			$where .= " AND trabajo.fecha <= '".$fecha_fin."' ";
                         $where_gastos .= " AND cta_corriente.fecha <= '".$fecha_fin."' ";
                 }
-                
+
 		if(isset($cobro)) // Es decir si es que estoy llamando a esta pantalla desde un cobro
 		{
 			$cobro->LoadAsuntos();
@@ -216,7 +216,7 @@
                     $where .= " AND trabajo.codigo_asunto IN ('$query_asuntos') ";
                         $where_gastos .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos') ";
 			//$where .= " AND trabajo.cobrable = 1";
-			
+
                         if($id_cobro) {
 				$where .= " AND (cobro.estado IS NULL OR trabajo.id_cobro = '$id_cobro')";
                                 $where_gastos.= " AND (cobro.estado IS NULL OR cta_corriente.id_cobro = '$id_cobro')";
@@ -225,17 +225,17 @@
 				$where .= " AND cobro.estado IS NULL";
                                 $where_gastos .= " AND cobro.estado IS NULL";
                         }
-                    
+
                 }
 		//para tema de los gastos que se preseleccionaran para cobro4.php
 		$codigo_cliente = $cobro->fields['codigo_cliente'];
 		$where_gasto .= " AND cta_corriente.codigo_asunto IN ('$query_asuntos') ";
-	
+
 		if($cobrable == 'SI')
 			$where .= " AND trabajo.cobrable = 1";
 		if($cobrable == 'NO')
 			$where .= " AND trabajo.cobrable <> 1";
-	
+
 		//Filtros que se mandan desde el reporte Periodico
 		if($id_grupo)
 		{
@@ -246,18 +246,18 @@
 		}
 		if($clientes)
 			$where .= "	AND cliente.codigo_cliente IN ('".base64_decode($clientes)."')";
-	
+
 		if($usuarios)
 			$where .= "	AND usuario.id_usuario IN (".base64_decode($usuarios).")";
-			
+
 			$where .= " AND trabajo.id_tramite = 0 ";
-		
+
 		if($id_encargado_comercial)
 			$where .= " AND contrato.id_usuario_responsable = '$id_encargado_comercial' ";
-		
-		
+
+
 		# Filtro para Actividades si est·n activos
-		
+
 		if( isset( $glosa_actividad ) && $glosa_actividad != '' ) {
 			if( isset($sin_actividad_definida) && $sin_actividad_definida ) {
 				$where .= " AND ( trabajo.codigo_actividad IS NULL OR trabajo.codigo_actividad = '' OR trabajo.codigo_actividad = 0 ) ";
@@ -265,10 +265,10 @@
 				$where .= " AND actividad.glosa_actividad = '$glosa_actividad'";
 			}
 		}
-	
+
 		#TOTAL HORAS
-		$query = "SELECT 
-								SUM(TIME_TO_SEC(if(trabajo.cobrable=1,duracion_cobrada,0)))/3600 AS total_duracion, 
+		$query = "SELECT
+								SUM(TIME_TO_SEC(if(trabajo.cobrable=1,duracion_cobrada,0)))/3600 AS total_duracion,
 								SUM(TIME_TO_SEC(duracion))/3600 AS total_duracion_trabajada
 							FROM trabajo
 							JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
@@ -276,62 +276,62 @@
 		          LEFT JOIN cliente ON cliente.codigo_cliente=asunto.codigo_cliente
 		          LEFT JOIN cobro ON cobro.id_cobro=trabajo.id_cobro
 		          LEFT JOIN contrato ON asunto.id_contrato =contrato.id_contrato
-	            LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario 
-		          LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda 
+	            LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
+		          LEFT JOIN prm_moneda ON contrato.id_moneda=prm_moneda.id_moneda
 		          WHERE $where ";
                 // echo $query;
 	  $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	  list($total_duracion,$total_duracion_trabajada) = mysql_fetch_array($resp);
-	
+
 	  $select_glosa_actividad = "";
 	  if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		  $select_glosa_actividad = ', actividad.glosa_actividad as glosa_actividad ';
 	  }
 		#BUSCAR
-		$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS 
+		$query = "SELECT DISTINCT SQL_CALC_FOUND_ROWS
                                         trabajo.id_trabajo,
 												trabajo.id_cobro,
-												trabajo.revisado, 
-												trabajo.id_trabajo, 
+												trabajo.revisado,
+												trabajo.id_trabajo,
 												trabajo.codigo_asunto,
 												trabajo.cobrable,
 												prm_moneda.simbolo as simbolo,
                                         prm_moneda.id_moneda as id_moneda,
-												asunto.codigo_cliente as codigo_cliente, 
-												contrato.id_moneda as id_moneda_asunto, 
+												asunto.codigo_cliente as codigo_cliente,
+												contrato.id_moneda as id_moneda_asunto,
 												asunto.id_asunto AS id,
 												cliente.glosa_cliente,
-												trabajo.fecha_cobro as fecha_cobro_orden, 
-												trabajo.descripcion, 
-												IF( trabajo.cobrable = 1, 'SI', 'NO') as glosa_cobrable, 
-												trabajo.visible, 
-												cobro.estado as estado_cobro, 
+												trabajo.fecha_cobro as fecha_cobro_orden,
+												trabajo.descripcion,
+												IF( trabajo.cobrable = 1, 'SI', 'NO') as glosa_cobrable,
+												trabajo.visible,
+												cobro.estado as estado_cobro,
 												cobro.id_moneda as id_moneda_cobro,
 												contrato.id_moneda as id_moneda_contrato,
-												CONCAT_WS(' ',usuario.nombre,usuario.apellido1) as usr_nombre, 
-												usuario.username, 
-												usuario.id_usuario, 
-												CONCAT_WS('<br>',DATE_FORMAT(trabajo.duracion,'%H:%i'), 
+												CONCAT_WS(' ',usuario.nombre,usuario.apellido1) as usr_nombre,
+												usuario.username,
+												usuario.id_usuario,
+												CONCAT_WS('<br>',DATE_FORMAT(trabajo.duracion,'%H:%i'),
 												DATE_FORMAT(duracion_cobrada,'%H:%i')) as duracion,
-												TIME_TO_SEC(trabajo.duracion)/3600 as duracion_horas, 
-												trabajo.tarifa_hh, 
+												TIME_TO_SEC(trabajo.duracion)/3600 as duracion_horas,
+												trabajo.tarifa_hh,
 												tramite_tipo.id_tramite_tipo,
-												DATE_FORMAT(trabajo.fecha_cobro,'%e-%c-%x') AS fecha_cobro, 
-												cobro.estado, 
-                                        cliente.glosa_cliente, 
-												asunto.forma_cobro, 
-                                        asunto.codigo_asunto_secundario, 
-												asunto.monto, 
+												DATE_FORMAT(trabajo.fecha_cobro,'%e-%c-%x') AS fecha_cobro,
+												cobro.estado,
+                                        cliente.glosa_cliente,
+												asunto.forma_cobro,
+                                        asunto.codigo_asunto_secundario,
+												asunto.monto,
 												asunto.glosa_asunto,
-												contrato.descuento, 
-												tramite_tipo.glosa_tramite, 
-												trabajo.fecha, 
+												contrato.descuento,
+												tramite_tipo.glosa_tramite,
+												trabajo.fecha,
 		              			prm_idioma.codigo_idioma as codigo_idioma,
-		              			contrato.id_tarifa  
+		              			contrato.id_tarifa
 								$select_glosa_actividad
 		              FROM trabajo
 		              JOIN asunto ON trabajo.codigo_asunto = asunto.codigo_asunto
-		              LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma 
+		              LEFT JOIN prm_idioma ON asunto.id_idioma = prm_idioma.id_idioma
 		              LEFT JOIN actividad ON trabajo.codigo_actividad=actividad.codigo_actividad
 		              LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 		              LEFT JOIN cobro ON trabajo.id_cobro = cobro.id_cobro
@@ -354,7 +354,7 @@
 				$emitir_trabajo->Edit('id_cobro',$id_cobro);
 				$emitir_trabajo->Write();
 			}
-                        
+
                         if( $cobro->fields['incluye_gastos'] ) {
                             $query3 = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro='$id_cobro'";
                             $resp = mysql_query($query3, $sesion->dbh) or Utiles::errorSQL($query3,__FILE__,__LINE__,$sesion->dbh);
@@ -376,14 +376,14 @@
 		//de esta manera no se sobrecarga esta p·gina
 		//Esta comentado hasta encontrar una buena manera de encriptarlo
 		//$query_listado_completo=mcrypt_encrypt(MCRYPT_CRYPT,Conf::Hash(),$where,MCRYPT_ENCRYPT);
-		
-		
-		
+
+
+
 		if($orden == "")
 			$orden = " trabajo.fecha ASC, trabajo.descripcion";
 		if(stristr($orden,".") === FALSE)
 			$orden = str_replace("codigo_asunto","a1.codigo_asunto",$orden);
-	
+
 		$x_pag = 15;
 		$b = new Buscador($sesion, $query, "Trabajo", $desde, $x_pag, $orden);
 		$b->mensaje_error_fecha = "N/A";
@@ -473,7 +473,7 @@ function GrabarCampo(accion,id_trabajo,cobro,valor)
 function Refrescar()
 {
 //todo if $motivo=="cobros",$motivo=="horas"
-<?php 
+<?php
 	if($desde)
 		echo "var pagina_desde = '&desde=".$desde."';";
 	else
@@ -489,14 +489,14 @@ function Refrescar()
 ?>
 				var cliente = 'codigo_cliente_secundario='+$('codigo_cliente_secundario').value;
 				var asunto = 'codigo_asunto_secundario='+$('codigo_asunto_secundario').value;
-<?php 
+<?php
 			}
 		else
 			{
 ?>
 				var cliente = 'codigo_cliente='+$('codigo_cliente').value;
 				var asunto = 'codigo_asunto='+$('codigo_asunto').value;
-<?php 
+<?php
 			}
 ?>
 
@@ -507,7 +507,7 @@ function Refrescar()
 	var fecha_ini = $('fecha_ini').value;
 	var fecha_fin = $('fecha_fin').value;
 	var url = "trabajos2.php?from=horas&id_usuario="+usuario+"&cobrable="+cobrable+"&motivo=horas&revisado="+revisado+"&cobrado="+cobrado+"&"+asunto+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&popup=1&opc=buscar"+pagina_desde+orden+"&"+cliente;
-<?php 
+<?php
 	}
 	elseif ($motivo == "cobros")
 	{
@@ -663,7 +663,7 @@ function EditarTodosLosArchivos()
 <input type='hidden' name='popup' id='popup' value='<?php echo $popup?>'>
 <input type='hidden' name='motivo' id='motivo' value='<?php echo $motivo?>'>
 <input type='hidden' name='id_usuario' id='id_usuario' value='<?php echo $id_usuario?>'>
-<?php 
+<?php
 if($query_asuntos) echo '<input type="hidden" name="query_asuntos" id="query_asuntos" value="'.$query_asuntos.'"/>';
 if($id_cobro) echo '<input type="hidden" name="id_cobro" id="id_cobro" value="'.$id_cobro.'"/>';
 ?>
@@ -678,7 +678,7 @@ if($id_cobro) echo '<input type="hidden" name="id_cobro" id="id_cobro" value="'.
 <fieldset class="tb_base" width="100%" style="border: 1px solid #BDBDBD;">
 <legend><?php echo __('Filtros')?></legend>
 <table   style="border: 0px solid black;" >
-<?php 
+<?php
 
 	if($motivo != "cobros")
 	{
@@ -689,30 +689,30 @@ if($id_cobro) echo '<input type="hidden" name="id_cobro" id="id_cobro" value="'.
 		<td align=right>
 			<?php echo __('Cobrado')?>
 		</td>
-		 
+
                    <td align='left'>
 			<?php echo Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","cobrado",$cobrado,'','Todos','60')?>
 			<?php echo __('Cobrable')?> <?php echo Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","cobrable",$cobrable,'','Todos','60')?>
 			<?php echo __('Revisado')?> <?php echo Html::SelectQuery($sesion,"SELECT codigo_si_no, codigo_si_no FROM prm_si_no","revisado",$revisado,'','Todos','60')?>
-		
+
                        </td>
                        <td style="text-align:right;">
                 <?php
-                
-           
-                 
+
+
+
                 if($motivo=='horas'):
                     echo '&nbsp;<div style="float:left;text-align:left;width:60px;">'.__('Cobro')." &nbsp;&nbsp;</div><input id='id_cobro' type='text' style='float:left;width:80px;' name='id_cobro' id='id_cobro' value='$id_cobro'/>";
                 else:
                     echo "<input type='hidden' name='id_cobro' id='id_cobro' value='$id_cobro'/>";
-                
+
                 endif;
-                
+
                 ?>
 
                 </td>
 	</tr>
-<?php 
+<?php
 		}
 ?>
    	<tr>
@@ -720,12 +720,12 @@ if($id_cobro) echo '<input type="hidden" name="id_cobro" id="id_cobro" value="'.
             <?php echo __('Nombre Cliente')?>
         </td>
         <td nowrap align='left' colspan="2">
-<?php 
+<?php
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 			echo Autocompletador::ImprimirSelector($sesion, '',$codigo_cliente_secundario);
-		else	
+		else
 			echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
 	}
 	else
@@ -743,7 +743,7 @@ if($id_cobro) echo '<input type="hidden" name="id_cobro" id="id_cobro" value="'.
 			<?php echo __('Asunto')?>
 		</td>
 		<td nowrap align='left' colspan="2">
-			<?php 
+			<?php
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
@@ -765,7 +765,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		<td nowrap align='left' colspan="2">
 			<?php echo Html::SelectQuery($sesion,"SELECT IF( glosa_actividad != '', glosa_actividad, 'Indefinido' ) as glosa_actividad,'' FROM actividad GROUP BY glosa_actividad","glosa_actividad",$glosa_actividad,'','Cualquiera','200'); ?>
 		</td>
-	</tr>	
+	</tr>
 <?php
 }
 ?>
@@ -777,7 +777,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 			<?php echo Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='SOC' ORDER BY nombre ASC","id_encargado_comercial",$id_encargado_comercial,'','Todos','200'); ?>
 		<td>
 	</tr>
-<?php  
+<?php
 		// Explicacion adicional: Esa condiciÛn "strlen($select_usuario) > 164" esta validando si hay mas usuarios
 		// que solamente Admin Lemontech
 		if(strlen($select_usuario) > 164) // Depende de que no cambie la funci√≥n Html::SelectQuery(...)
@@ -791,12 +791,12 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 			<?php echo $select_usuario?>
 		</td>
 	</tr>
-<?php 
+<?php
 		}
 	}
   	### Validando fecha
   	$hoy = date('Y-m-d');
-  	
+
   	if( $fecha_ini != '0000-00-00' )
   		{
   			if( Utiles::es_fecha_sql($fecha_ini) )
@@ -836,7 +836,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 </center>
 </form>
 
-<?php 
+<?php
 	if(isset($cobro) || $opc == 'buscar')
 	{
 		echo "<center>";
@@ -855,7 +855,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		<br />
 	</center>
 		<!--<input type=button class=btn value="<?php echo __('Descargar Archivo a Word')?>" onclick="window.open('trabajos2.php?id_cobro=<?php echo $id_cobro?>&word=1&motivo=<?php echo $motivo?>&where=<?php echo urlencode(base64_encode($where))?>')">-->
-<?php 
+<?php
 
 	}
 	function Cobrable(& $fila)
@@ -930,8 +930,8 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 			}
 		}
 		else
-		$opc_html .= "<span title='".__('Usted no tiene permiso de Revisor')."'>".($texto=='') ? "<img src=$img_dir/candado_16.gif border=0 />" : $texto."</span>";	
-                    
+		$opc_html .= "<span title='".__('Usted no tiene permiso de Revisor')."'>".($texto=='') ? "<img src=$img_dir/candado_16.gif border=0 />" : $texto."</span>";
+
 
 		return $opc_html;
 	}
@@ -947,7 +947,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		$cobro = new Cobro($sesion);
 		$cobro->Load($id_cobro);
 
-		 
+
 		if($p_revisor->fields['permitido'])
 		{
 			if($cobro->fields['estado'] == 'CREADO' || $cobro->fields['estado'] == 'EN REVISION' || empty($trabajo->fields['id_cobro']))
@@ -969,14 +969,14 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 			}
 		}
 		else
-		$opc_html .= "<span title='".__('Usted no tiene permiso de Revisor')."'>".($texto=='') ? "<img src=$img_dir/candado_16.gif border=0 />" : $texto."</span>";	
-                    
+		$opc_html .= "<span title='".__('Usted no tiene permiso de Revisor')."'>".($texto=='') ? "<img src=$img_dir/candado_16.gif border=0 />" : $texto."</span>";
+
 
 		return $opc_html;
 	}
 	function SplitDuracion($time)
 	{
-		list($h,$m,$s) = split(":",$time);
+		list($h,$m,$s) = explode(":",$time);
 		if($h > 0 || $s > 0)
 			return $h.":".$m;
 	}
@@ -987,9 +987,9 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		global $p_cobranza;
 		global $select_usuario;
 		static $i = 0;
-		
+
 		$t = new Trabajo($sesion);
-		
+
 		$moneda_cobro = new Moneda($sesion);
 		if( $trabajo->fields['id_cobro'] > 0 ) {
 			$moneda_cobro->Load($trabajo->fields['id_moneda_cobro']);
@@ -999,13 +999,13 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		}
 		if($trabajo->fields['id_tramite'] > 0)
 		{
-			$query = "SELECT glosa_tramite FROM tramite_tipo 
-								JOIN tramite USING(id_tramite_tipo) 
+			$query = "SELECT glosa_tramite FROM tramite_tipo
+								JOIN tramite USING(id_tramite_tipo)
 								WHERE tramite.id_tramite=".$trabajo->fields['id_tramite'];
 			$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			list($glosa_tramite)=mysql_fetch_array($resp);
 		}
-		
+
 		$idioma = new Objeto($sesion,'','','prm_idioma','codigo_idioma');
 		if( $trabajo->fields['codigo_idioma'] != '' ) {
 			$idioma->Load($trabajo->fields['codigo_idioma']);
@@ -1013,18 +1013,18 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		else {
 			$idioma->Load(strtolower(UtilesApp::GetConf($sesion,'Idioma')));
 		}
-		
+
 		if($i % 2 == 0)
 			$color = "#dddddd";
 		else
 			$color = "#ffffff";
-		
+
 		if( UtilesApp::GetConf($sesion,'GuardarTarifaAlIngresoDeHora') ) {
 			if( $trabajo->fields['id_moneda_cobro'] > 0 )
 				$id_moneda_trabajo = $trabajo->fields['id_moneda_cobro'];
 			else
 				$id_moneda_trabajo = $trabajo->fields['id_moneda_contrato'];
-			
+
 			$tarifa = number_format($t->GetTrabajoTarifa( $id_moneda_trabajo, $trabajo->fields['id_trabajo'] ),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		}
 		else if( $trabajo->fields['tarifa_hh'] > 0 && $trabajo->fields['id_cobro'] > 0 )
@@ -1032,8 +1032,8 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		else if($trabajo->fields['id_tramite_tipo'] == 0)
 			$tarifa = number_format(Funciones::Tarifa($sesion,$trabajo->fields['id_usuario'],$trabajo->fields['id_moneda_contrato'],$trabajo->fields['codigo_asunto']),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
 		else
-			$tarifa = number_format(Funciones::TramiteTarifa($sesion, $trabajo->fields['id_tramite_tipo'],$trabajo->fields['id_moneda_cobro'],$trabajo->fields['codigo_asunto']),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']); 
-		list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
+			$tarifa = number_format(Funciones::TramiteTarifa($sesion, $trabajo->fields['id_tramite_tipo'],$trabajo->fields['id_moneda_cobro'],$trabajo->fields['codigo_asunto']),$moneda_cobro->fields['cifras_decimales'],$idioma->fields['separador_decimales'],$idioma->fields['separador_miles']);
+		list($h,$m,$s) = explode(":",$trabajo->fields['duracion_cobrada']);
 		$duracion = $h + ($m > 0 ? ($m / 60) :'0');
 		$total = round($tarifa * $duracion, 2);
 		$total_horas += $duracion;
@@ -1041,7 +1041,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		#		$h=substr($h,1);
 		$dur_cob = "$h:$m";
 		$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
-		
+
 		$fecha = Utiles::sql2fecha($trabajo->fields[fecha],$formato_fecha);
 		if( $trabajo->fields['id_tramite_tipo'] > 0 ) {
 		$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";
@@ -1069,7 +1069,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		//echo $duracion;
 		if(!$p_revisor->fields['permitido'])
 		{
-			list($duracion_trabajada, $duracion_cobrada) = split('<br>',$trabajo->fields['duracion']);
+			list($duracion_trabajada, $duracion_cobrada) = explode('<br>',$trabajo->fields['duracion']);
 			$duracion = $duracion_trabajada;
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) )
 			{
@@ -1080,7 +1080,7 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 		{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) )
 			{
-					list($duracion_trabajada, $duracion_cobrada) = split('<br>',$trabajo->fields['duracion']);
+					list($duracion_trabajada, $duracion_cobrada) = explode('<br>',$trabajo->fields['duracion']);
 					$duracion = UtilesApp::Time2Decimal($duracion_trabajada) . "<br>" . UtilesApp::Time2Decimal($duracion_cobrada);
 			}
 		}
@@ -1128,9 +1128,9 @@ if (UtilesApp::GetConf($sesion, 'UsoActividades')) {
 	}
 ?>
 <script type="text/javascript">
-   
 
-jQuery(document).ready(function() { 
+
+jQuery(document).ready(function() {
    /* jQuery('#uicss').load(function() {
         jQuery('#cobrado').buttonset();
         jQuery('#cobrable').buttonset();
@@ -1152,7 +1152,7 @@ Calendar.setup(
 	}
 );
 </script>
-<?php 
+<?php
 
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{

@@ -1,4 +1,4 @@
-<?php 
+<?php
 	#@todo falta que checkee el largo de los varchar y que solo deje ingresar numeros en los int
 	require_once "../../app/conf.php";
 	require_once "./funciones_mantencion_tablas.php";
@@ -44,7 +44,7 @@
 
 	if($opcion == "guardar")
 	{
-');	
+');
 	$query = "DESC $tabla";
 	$resp = mysql_query($query) or Utiles::errorSQL($query,__FILE__,__LINE__,$dbh);
 	for($i = 0; $arreglo = mysql_fetch_assoc($resp); $i++)
@@ -112,7 +112,7 @@
 		$input = $largo = $numero = $enum = "";
 
 		if($arreglo['Key'] != "PRI")
-		{	
+		{
 			$nombre_campo = $arreglo['Field'];
 
 			$obj = "$"."obj->fields[";
@@ -137,7 +137,7 @@
 				$lista = str_replace("enum","",$lista);
 				$lista = str_replace("(","",$lista);
 				$lista = str_replace(")","",$lista);
-				$arreglo = split(',',$lista);
+				$arreglo = explode(',',$lista);
 				foreach($arreglo as $key => $value)
 				{
 					$value = str_replace("'","",$value);
@@ -145,7 +145,7 @@
 				}
 				$input = "<select id=\"$nombre_campo\" name=\"$nombre_campo\">$enum</select>";
 			}
-			
+
 			if($input == "")
 				$input = "<input id=\"$nombre_campo\" $largo $numero name=$nombre_campo value=\"<?php echo  $obj$nombre_campo] ?>\" />";
 
@@ -173,7 +173,7 @@
 ");
 		}
 	}
-	fwrite($handle,"</table>		
+	fwrite($handle,"</table>
 					<input type=submit value=Guardar />
 					</form>
 					<?php ");

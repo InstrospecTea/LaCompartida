@@ -319,7 +319,7 @@ for ($i = 0; $i < $lista->num; ++$i) {
 	// Aumentamos los totales del asunto actual.
 	$nombre_asunto = $trabajo->fields['glosa_asunto'];
 	$duracion_cobrada = $trabajo->fields['duracion_cobrada'];
-	list($h, $m) = split(':', $duracion_cobrada);
+	list($h, $m) = explode(':', $duracion_cobrada);
 	$duracion_cobrada = $h / 24 + $m / (24 * 60);
 	$horas_abogado[$trabajo->fields['id_usuario']] += $duracion_cobrada;
 

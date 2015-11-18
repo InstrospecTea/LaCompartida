@@ -841,7 +841,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$ws->writeNumber($filas, $columna_tarifa, $tarifa_abogado, $formato_moneda2_centrado);
 
 				$duracion = $trabajo->fields['duracion_cobrada'];
-				list($h, $m) = split(':', $duracion);
+				list($h, $m) = explode(':', $duracion);
 				$duracion = $h / 24 + $m / (24 * 60);
 				$ws->writeNumber($filas, $columna_hora, $duracion, $formato_tiempo2_centrado);
 
@@ -849,7 +849,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				if ($Cobro->fields['opc_ver_valor_hh_flat_fee'] == 0 &&
 								($Cobro->fields['forma_cobro'] == 'RETAINER' || $Cobro->fields['forma_cobro'] == 'PROPORCIONAL')) {
 					$duracion_tarificada = $trabajo->fields['duracion_tarificada'];
-					list($ht, $mt) = split(':', $duracion_tarificada);
+					list($ht, $mt) = explode(':', $duracion_tarificada);
 					$duracion_tarificada = $ht / 24 + $m / (24 * 60);
 					$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2_centrado);
 				}
@@ -1096,7 +1096,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 
 				$duracion = $trabajo->fields['duracion_cobrada'];
-				list($h, $m) = split(':', $duracion);
+				list($h, $m) = explode(':', $duracion);
 				$duracion = $h / 24 + $m / (24 * 60);
 				$ws->writeNumber($filas, $columna_hora, $duracion, $formato_tiempo2_centrado);
 
@@ -1104,7 +1104,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				if ($Cobro->fields['opc_ver_valor_hh_flat_fee'] == 0 &&
 								($Cobro->fields['forma_cobro'] == 'RETAINER' || $Cobro->fields['forma_cobro'] == 'PROPORCIONAL')) {
 					$duracion_tarificada = $trabajo->fields['duracion_tarificada'];
-					list($ht, $mt) = split(':', $duracion_tarificada);
+					list($ht, $mt) = explode(':', $duracion_tarificada);
 					$duracion_tarificada = $ht / 24 + $mt / (24 * 60);
 					$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2_centrado);
 				}

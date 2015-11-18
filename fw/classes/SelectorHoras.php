@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once dirname(__FILE__).'/../../app/conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
@@ -10,9 +10,9 @@ class SelectorHoras
     {
     	if( method_exists('Conf','GetConf') )
     		$intervalo = Conf::GetConf($sesion,'Intervalo');
-    	else if( method_exists('Conf','Intervalo') ) 
+    	else if( method_exists('Conf','Intervalo') )
     		$intervalo = Conf::Intervalo();
-			$hora_separado = split(':',$value);
+			$hora_separado = explode(':',$value);
 			if( $hora_separado[1]%$intervalo != 0 )
 					$hora_separado[1]=Utiles::EnIntervalo( $sesion, $hora_separado[1] );
 			if( $max_horas == '' )
@@ -25,29 +25,29 @@ class SelectorHoras
 			else
 				{
 					if( $editable )
-						$html = "<select id=\"hora_".$input_name."\" onchange=\"CambiaHora(this.value,'".$input_name."','".$max_horas."');".$oncambio."\" value=\"".$hora_separado[0]."\">"; 
+						$html = "<select id=\"hora_".$input_name."\" onchange=\"CambiaHora(this.value,'".$input_name."','".$max_horas."');".$oncambio."\" value=\"".$hora_separado[0]."\">";
 					else
-						$html = "<select id=\"hora_".$input_name."\" onfocus=\"this.defaultIndex=this.selectedIndex;\" onchange=\"this.selectedIndex=this.defaultIndex;\" value=\"".$hora_separado[0]."\">"; 
-						 for($i=0;$i<$max_horas+1;$i++) 
-									{ 
+						$html = "<select id=\"hora_".$input_name."\" onfocus=\"this.defaultIndex=this.selectedIndex;\" onchange=\"this.selectedIndex=this.defaultIndex;\" value=\"".$hora_separado[0]."\">";
+						 for($i=0;$i<$max_horas+1;$i++)
+									{
 										if( $hora_separado[0]==Utiles::PongaCero($i) )
-												$html .= "<option value=\"".$i."\" selected>".Utiles::PongaCero($i)."</option>"; 
-										else 
-												$html .= "<option value=\"".$i."\">".Utiles::PongaCero($i)."</option>"; 
-									}	
+												$html .= "<option value=\"".$i."\" selected>".Utiles::PongaCero($i)."</option>";
+										else
+												$html .= "<option value=\"".$i."\">".Utiles::PongaCero($i)."</option>";
+									}
 				$html .= "</select>";
 				}
 					if($editable)
-						$html .= "<select id=\"minuto_".$input_name."\" onchange=\"CambiaMinuto(this.value,'".$input_name."','".$max_horas."');".$oncambio."\" value='".$hora_separado[1]."'>"; 
+						$html .= "<select id=\"minuto_".$input_name."\" onchange=\"CambiaMinuto(this.value,'".$input_name."','".$max_horas."');".$oncambio."\" value='".$hora_separado[1]."'>";
 					else
 						$html .= "<select id=\"minuto_".$input_name."\" onfocus=\"this.defaultIndex=this.selectedIndex;\" onchange=\"this.selectedIndex=this.defaultIndex;\" value='".$hora_separado[1]."'>";
-							 for($j=0;$j<60;$j+=$intervalo) 
-									{ 
+							 for($j=0;$j<60;$j+=$intervalo)
+									{
 										if( $hora_separado[1]==Utiles::PongaCero($j) )
-												$html .= "<option value=\"".$j."\" selected>".Utiles::PongaCero($j)."</option>"; 
+												$html .= "<option value=\"".$j."\" selected>".Utiles::PongaCero($j)."</option>";
 										else
-												$html .= "<option value=\"".$j."\">".Utiles::PongaCero($j)."</option>"; 
-									}	
+												$html .= "<option value=\"".$j."\">".Utiles::PongaCero($j)."</option>";
+									}
 				 if($editable)
           {
                $html .= "</select><img id=\"subir_hora\" onmousedown=\"setMouseDown('".$input_name."','subir',".$intervalo.");\" onmouseup=\"setMouseUp();\" onmouseout=\"setMouseUp();\" src=\"".Conf::ImgDir()."/mas.gif\" />
@@ -60,9 +60,9 @@ class SelectorHoras
    	                     <img id=\"bajar_hora\" src=\"".Conf::ImgDir()."/menos.gif\" />
                          <input type=\"hidden\" name=\"".$input_name."\" id=\"".$input_name."\" value=\"".$value."\" />";
           }
-		return $html; 
-    } 
-    
+		return $html;
+    }
+
   function Javascript()
   {
     $output = "
@@ -72,7 +72,7 @@ class SelectorHoras
 			var tiempo = $(campo).value;
 			tiempo = tiempo.split(':');
 			$(campo).value = PongaCero(horas)+':'+tiempo[1]+':00';
-			if(campo=='duracion') 
+			if(campo=='duracion')
 				{
 					$('duracion_cobrada').value = PongaCero(horas)+':'+tiempo[1]+':00';
 					$('hora_duracion_cobrada').value = horas;
@@ -81,7 +81,7 @@ class SelectorHoras
 			if( horas == max_horas )
 				CambiaMinuto( '0', campo, 'limit' );
 		}
-		
+
 		function CambiaMinuto( minutos, campo, max_horas)
 		{
 			var tiempo = $(campo).value;
@@ -92,30 +92,30 @@ class SelectorHoras
 				$('minuto_'+campo).value = minutos;
 				}
 			$(campo).value = tiempo[0]+':'+PongaCero(minutos)+':00';
-			if(campo=='duracion') 
+			if(campo=='duracion')
 				{
 					$('duracion_cobrada').value = tiempo[0]+':'+PongaCero(minutos)+':00';
 					$('minuto_duracion_cobrada').value = minutos;
 					$('hora_duracion_cobrada').value = $('hora_duracion').value;
 				}
 		}
-		
+
 		function PongaCero( numero )
 		{
 		 		if( numero < 10 )
 				numero = '0'+numero;
 		 		return numero;
 		}
-		
-		
+
+
 		function SubeTiempo( campo, direccion, intervalo, cont )
 		{
 			var gRepeatTimeInMS = $('gRepeatTimeInMS').value;
 			var gIsMouseDown = $('gIsMouseDown').value;
-			
+
 			if( !cont )
 				var cont=0;
-			
+
 			if( gIsMouseDown=='true' )
 			{
 				cont++;
@@ -198,15 +198,15 @@ class SelectorHoras
 			else
 				$('gRepeatTimeInMS').value = 200;
 		}
-		
-		
-		
+
+
+
 		function setMouseDown( campo, direccion, intervalo )
 		{
 		$('gIsMouseDown').value = true;
 		SubeTiempo( campo, direccion, intervalo );
 		}
-		
+
 		function setMouseUp()
 		{
 		$('gIsMouseDown').value = false;

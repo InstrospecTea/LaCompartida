@@ -287,8 +287,8 @@ HTML;
 	function es_fecha_sql($string) {
 		if ($string == '')
 			return;
-		list($date, $time) = split(" ", $string);
-		list($ano, $mes, $dia) = split("-", $date);
+		list($date, $time) = explode(" ", $string);
+		list($ano, $mes, $dia) = explode("-", $date);
 		return checkdate($mes, $dia, $ano);
 	}
 

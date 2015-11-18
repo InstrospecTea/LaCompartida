@@ -1215,7 +1215,7 @@ if (!class_exists('Cobro')) {
 			} else {
 				for ($z = 0; $z < $lista_trabajos->num; $z++) {
 					$trabajo = $lista_trabajos->Get($z);
-					list($h, $m, $s) = split(':', $trabajo->fields['duracion_cobrada']);
+					list($h, $m, $s) = explode(':', $trabajo->fields['duracion_cobrada']);
 					$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 					$duracion_minutos = $h * 60 + $m;
 					$id_usuario = $trabajo->fields['id_usuario'];
@@ -1378,7 +1378,7 @@ if (!class_exists('Cobro')) {
 			if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
 				for ($z = 0; $z < $lista_trabajos->num; ++$z) {
 					$trabajo = $lista_trabajos->Get($z);
-					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
+					list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
 					$duracion = $h + ($m > 0 ? ($m / 60) : '0') + ($s > 0 ? ($s / 3600) : '0');
 					$duracion_minutos = $h * 60 + $m + $s / 60;
 
@@ -1455,7 +1455,7 @@ if (!class_exists('Cobro')) {
 
 					$trabajo->ActualizarTrabajoTarifa($trabajo->fields['id_moneda'], number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''), '', $valor_estandar);
 					$trabajo->Edit('tarifa_hh', number_format($trabajo->fields['tarifa_hh'] * $factor, 6, '.', ''));
-					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
+					list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
 					$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 					$monto_cobrado = number_format($trabajo->fields['tarifa_hh'] * $duracion, 6, '.', '');
 					$trabajo->Edit('monto_cobrado', $monto_cobrado);

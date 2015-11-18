@@ -1476,7 +1476,7 @@ foreach ($chargeResults as $charge) {
 					$ws->write($filas, $col_abogado, $nombre, $formato_normal);
 					$ws->write($filas, $col_solicitante, $trabajo->fields['solicitante'], $formato_normal);
 					$duracion = $trabajo->fields['duracion'];
-					list($h, $m) = split(':', $duracion);
+					list($h, $m) = explode(':', $duracion);
 
 					if ($ingreso_via_decimales) {
 						$duracion = $h + $m / 60;
@@ -1486,7 +1486,7 @@ foreach ($chargeResults as $charge) {
 					if ($opc_ver_horas_trabajadas)
 						$ws->writeNumber($filas, $col_duracion_trabajada, $duracion, $formato_tiempo);
 					$duracion_cobrada = $trabajo->fields['duracion_cobrada'];
-					list($h, $m) = split(':', $duracion_cobrada);
+					list($h, $m) = explode(':', $duracion_cobrada);
 					if ($trabajo->fields['glosa_cobrable'] == 'SI') {
 						if ($ingreso_via_decimales) {
 							$duracion_cobrada = $h + $m / 60;
@@ -1521,7 +1521,7 @@ foreach ($chargeResults as $charge) {
 						$duracion_retainer = $duracion_cobrada * $factor;
 					} else {
 						$duracion_retainer = $trabajo->fields['duracion_retainer'];
-						list($h, $m, $s) = split(':', $duracion_retainer);
+						list($h, $m, $s) = explode(':', $duracion_retainer);
 						if ($ingreso_via_decimales) {
 							$duracion_retainer = $h + $m / 60 + $s / 3600;
 						} else {
@@ -1741,7 +1741,7 @@ foreach ($chargeResults as $charge) {
 
 				for ($i = 0; $i < $lista_tramites->num; $i++) {
 					$tramite = $lista_tramites->Get($i);
-					list($h, $m, $s) = split(':', $tramite->fields['duracion']);
+					list($h, $m, $s) = explode(':', $tramite->fields['duracion']);
 					if ($h + $m > 0) {
 						if ($ingreso_via_decimales) {
 							$duracion = $h + $m / 60 + $s / 3600;

@@ -452,7 +452,7 @@ function Opciones(& $fila) {
 }
 
 function SplitDuracion($time) {
-	list($h, $m, $s) = split(":", $time);
+	list($h, $m, $s) = explode(":", $time);
 	if ($h > 0 || $s > 0 || $m > 0) {
 		return $h . ":" . $m;
 	}
