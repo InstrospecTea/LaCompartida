@@ -60,7 +60,7 @@ class Sesion {
 				header("Cache-control: private");
 			}
 		}
-		compact($_REQUEST);
+		extract($_REQUEST);
 
 		$this->error_msg = isset($_SESSION['ERROR']) ? $_SESSION['ERROR'] : '';
 		$this->ultimo_ingreso = isset($_SESSION['ULTIMO_INGRESO']) ? $_SESSION['ULTIMO_INGRESO'] : '';

@@ -6,7 +6,7 @@ require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 
 $sesion = new Sesion(null, true);
-
+extract($_REQUEST);
 // usar Windows login en Active Directory con ldap-Autentificacion
 if (isset($ldap_user)){
 	$query = "SELECT DISTINCT rut, dv_rut FROM usuario WHERE ldap_user = '" . $ldap_user . "'";
