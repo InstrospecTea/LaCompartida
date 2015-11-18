@@ -191,4 +191,15 @@ class Utiles extends \Utiles {
 		return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
 	}
 
+	/**
+	 * Sanitiza las variables globales.
+	 * TODO: Este método es provisorio. Debe ser eliminado cuando se exporten las SQL a PDO o se hayan Criterizado.
+	 * @param type $array arreglo con las variables (get_defined_vars()).
+	 */
+	public static function sanitizeGlobals($array) {
+		foreach (array_merge($array['_POST'], $array['_GET']) as $nombre => $elemento) {
+			global $$nombre;
+			$$nombre = mysql_real_escape_string($elemento);
+		}
+	}
 }
