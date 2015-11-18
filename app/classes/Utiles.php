@@ -197,7 +197,9 @@ class Utiles extends \Utiles {
 	 * @param type $array arreglo con las variables (get_defined_vars()).
 	 */
 	public static function sanitizeGlobals($array) {
-		foreach (array_merge($array['_POST'], $array['_GET']) as $nombre => $elemento) {
+		$array_merged = array_merge($array['_POST'], $array['_GET']);
+
+		foreach ($array_merged as $nombre => $elemento) {
 			global $$nombre;
 			$$nombre = mysql_real_escape_string($elemento);
 		}
