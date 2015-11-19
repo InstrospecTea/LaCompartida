@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.28.2
+Thursday, November 19th
+* **Fix** [Corregir sanitizado global de filtros](https://github.com/LemontechSA/ttb/pull/1236)
+
 ## Hotfix 15.28.1
 Thursday, November 19th
 * **Fix** [Agregar tarifas a los trabajos agregados por shell para demo](https://github.com/LemontechSA/ttb/pull/1235)
