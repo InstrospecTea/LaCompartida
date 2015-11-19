@@ -618,7 +618,9 @@ if ($cobro->fields['id_contrato'] != '') {
 }
 
 if (Conf::GetConf($sesion, 'ExportacionLedes') && $contrato->fields['exportacion_ledes']) {
-	$Ledes = new Ledes($sesion);
+	$SelectorLedes = new SelectorLedes($sesion);
+	$Ledes = $SelectorLedes->instanciar($contrato->fields['formato_ledes']);
+
 	$errores_ledes = json_encode($Ledes->ValidarDatos($id_cobro));
 } else {
 	$errores_ledes = 'null';

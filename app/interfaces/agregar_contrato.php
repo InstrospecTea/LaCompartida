@@ -1634,6 +1634,15 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<input type="hidden" name="exportacion_ledes" value="0"/>	<input  class="span1" id="exportacion_ledes" type="checkbox" name="exportacion_ledes" value="1" <?php echo $exportacion_ledes == '1' ? 'checked="checked"' : '' ?>  />
 					</td>
 				</tr>
+				<tr class="controls controls-row ">
+					<td class="al"><?php echo __('Formato LEDES'); ?></td>
+					<td class="al">
+						<?php
+							$SelectorLedes = new SelectorLedes($Sesion);
+							echo $Form->select('formato_ledes', $SelectorLedes->getProveedores(), $contrato->fields['formato_ledes'], array('empty' => false, 'style' => 'width: 200px', 'class' => 'span3'));
+						?>
+					</td>
+				</tr>
 			<?php } ?>
 		</table>
 		<!-- FIN RESPONSABLE -->
