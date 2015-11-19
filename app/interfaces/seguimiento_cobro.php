@@ -9,6 +9,8 @@ $Form = new Form;
 global $contratofields;
 $series_documento = new DocumentoLegalNumero($sesion);
 
+\TTB\Utiles::sanitizeGlobals(get_defined_vars());
+
 $query_cliente = "SELECT codigo_cliente, glosa_cliente FROM cliente WHERE activo = 1 ORDER BY glosa_cliente ASC";
 
 $query_proceso = "SELECT id_proceso FROM cobro_proceso ORDER BY id_proceso ASC";
@@ -818,7 +820,7 @@ $pagina->PrintTop();
 					<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene ' . __('Honorarios')); ?>
 					<br/><input type="checkbox" name="tienegastos"   value="1" id="tienegastos"  <?php if (isset($_POST['tienegastos'])) echo 'checked="checked"'; ?>/> <?php echo __('Tiene ' . __('Gastos')); ?>
 					<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene ' . __('Trámites')); ?>
-					<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> <?php echo __('Hay ' . __('Adelantos') . ' disponibles'); ?> 
+					<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> <?php echo __('Hay ' . __('Adelantos') . ' disponibles'); ?>
 				</div>
 			</tr>
 

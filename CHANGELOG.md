@@ -4,6 +4,10 @@
 Thursday 2015, November 12th
 * **Feature** [Corregir formato LEDES para Flat Fee](https://github.com/LemontechSA/ttb/pull/1203)
 
+## Hotfix 15.27.4
+Wednesday, November 18th
+* **Fix** [Error SQL - Buscar cobro](https://github.com/LemontechSA/ttb/pull/1234)
+
 ## Hotfix 15.27.3
 Tuesday, November 17th
 * **Fix** [Agrupar por profesionales al desplegar gráfico en reporte general](https://github.com/LemontechSA/ttb/pull/1232)
