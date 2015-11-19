@@ -331,14 +331,16 @@ if (Conf::EsAmbientePrueba()) {
 		if (count($values) > 0) {
 			Debug::pr('Insertando ' . count($values) . ' trabajos para el día ' . date('d-m-Y', $fecha));
 
-			$query = "INSERT INTO trabajo(id_moneda, fecha,codigo_asunto, descripcion, duracion, duracion_cobrada, id_usuario, tarifa_hh, costo_hh) VALUES ";
-			$resp = mysql_query($query . implode(',', $values)) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			foreach ($values as $value) {
+				$query = "INSERT INTO trabajo(id_moneda, fecha,codigo_asunto, descripcion, duracion, duracion_cobrada, id_usuario, tarifa_hh, costo_hh) VALUES {$value}";
+				mysql_query($query) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
-			// incluir tarifas por trabajo
-			$id_trabajo = mysql_insert_id($sesion->dbh);
-			$Trabajo = new Trabajo($sesion);
-			$Trabajo->Load($id_trabajo);
-			$Trabajo->InsertarTrabajoTarifa();
+				// incluir tarifas por trabajo
+				$id_trabajo = mysql_insert_id($sesion->dbh);
+				$Trabajo = new Trabajo($sesion);
+				$Trabajo->Load($id_trabajo);
+				$Trabajo->InsertarTrabajoTarifa();
+			}
 		}
 
 		list($anio, $mes, $dia) = explode('-', $fecha_trabajo);
