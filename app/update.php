@@ -10977,7 +10977,9 @@ QUERY;
 					ON UPDATE CASCADE;";
 			break;
 		case 8.22:
-			$queries[] = "ALTER TABLE `contrato` ADD COLUMN `formato_ledes` VARCHAR(50) NULL";
+			if (!ExisteCampo('formato_ledes', 'contrato', $dbh)) {
+				$queries[] = "ALTER TABLE `contrato` ADD COLUMN `formato_ledes` VARCHAR(50) NULL";
+			}
 			$queries[] = "UPDATE `contrato` SET `formato_ledes` = 'serengeti' WHERE `exportacion_ledes` = 1";
 			break;
 	}

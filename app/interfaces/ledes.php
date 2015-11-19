@@ -7,13 +7,8 @@ $contrato = new Contrato($sesion);
 $cobro->Load($id_cobro);
 $contrato->Load($cobro->fields['id_contrato']);
 
-if ($contrato->fields['formato_ledes'] == 'serengeti') {
-	$Ledes = new Serengeti($sesion);
-}
-
-if ($contrato->fields['formato_ledes'] == 'tymetrix') {
-	$Ledes = new TyMetrix($sesion);
-}
+$SelectorLedes = new SelectorLedes($sesion);
+$Ledes = $SelectorLedes->instanciar($contrato->fields['formato_ledes']);
 
 $data =  $Ledes->ExportarCobrosLedes($id_cobro);
 

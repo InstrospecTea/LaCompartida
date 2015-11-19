@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 15.28.0](https://github.com/LemontechSA/ttb/pull/1228)
+Thursday 2015, November 12th
+* **Feature** [Corregir formato LEDES para Flat Fee](https://github.com/LemontechSA/ttb/pull/1203)
+
 ## Hotfix 15.27.4
 Wednesday, November 18th
 * **Fix** [Error SQL - Buscar cobro](https://github.com/LemontechSA/ttb/pull/1234)
