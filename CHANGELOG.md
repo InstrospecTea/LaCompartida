@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.28.1
+Thursday, November 19th
+* **Fix** [Agregar tarifas a los trabajos agregados por shell para demo](https://github.com/LemontechSA/ttb/pull/1235)
+
 ## [Release 15.28.0](https://github.com/LemontechSA/ttb/pull/1228)
 Thursday 2015, November 12th
 * **Feature** [Corregir formato LEDES para Flat Fee](https://github.com/LemontechSA/ttb/pull/1203)
