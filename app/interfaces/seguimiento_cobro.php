@@ -9,7 +9,7 @@ $Form = new Form;
 global $contratofields;
 $series_documento = new DocumentoLegalNumero($sesion);
 
-\TTB\Utiles::sanitizeGlobals(get_defined_vars());
+\TTB\Utiles::sanitizeGlobalsRequest($_REQUEST);
 
 $query_cliente = "SELECT codigo_cliente, glosa_cliente FROM cliente WHERE activo = 1 ORDER BY glosa_cliente ASC";
 

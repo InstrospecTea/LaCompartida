@@ -192,16 +192,17 @@ class Utiles extends \Utiles {
 	}
 
 	/**
-	 * Sanitiza las variables globales.
+	 * Sanitiza las variables que llegan desde el request.
 	 * TODO: Este método es provisorio. Debe ser eliminado cuando se exporten las SQL a PDO o se hayan Criterizado.
-	 * @param type $array arreglo con las variables (get_defined_vars()).
+	 * @param Array $array arreglo con las variables ($_REQUEST).
 	 */
-	public static function sanitizeGlobals($array) {
-		$array_merged = array_merge($array['_POST'], $array['_GET']);
+	public static function sanitizeGlobalsRequest($array) {
+		$Utiles = new Utiles();
+		array_walk_recursive($array, array($Utiles, 'escape_variable'));
+	}
 
-		foreach ($array_merged as $nombre => $elemento) {
-			global $$nombre;
-			$$nombre = mysql_real_escape_string($elemento);
-		}
+	public function escape_variable($value, $name) {
+		global $$name;
+		$$name = mysql_real_escape_string($value);
 	}
 }
