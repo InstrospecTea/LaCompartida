@@ -340,8 +340,8 @@ class Notificacion {
 					"<tr>
 						<td>&nbsp;</td>
 						<td colspan='7'>
-							<fieldset style='background-color: #ffcd99'>
-								<legend>" . __('Hitos') . " vencidos por gestionar </legend>
+							<fieldset>
+								<legend><b>" . __('Hitos') . " vencidos por gestionar </b></legend>
 								<table width='100%' style='border-collapse:collapse;'>
 									<tr style='background-color:#B3E58C;'>
 										<th width='200px'>Cliente</th>
@@ -369,7 +369,7 @@ class Notificacion {
 						</td>
 					</tr>";
 
-				$mail['lista_hitos'] = "<p>" . __('Hito') . ": %DESCRIPCION por un monto de %MONTO (%FECHA)</p>";
+				$mail['lista_hitos'] = "<p><b>" . __('Hito') . "</b>: %DESCRIPCION por un monto de %MONTO (%FECHA)</p>";
 
 				$mail['bottom'] = "</table>";
 				break;
