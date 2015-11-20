@@ -78,15 +78,17 @@ class Utiles extends \Utiles {
 
 	/**
 	 * Funcion que inserta correos en la cola de idem.
-	 * @param object  $sesion     la sesión con que se conecta a la DB para hacer las consultas
-	 * @param string  $subject    subject del mail
-	 * @param string  $mensaje    contenido del mail
-	 * @param string  $email      email del destinatario
-	 * @param string  $nombre     nombre del destinatario
-	 * @param boolean $es_diario  cuando es true, evita repetir el mismo tipo, al mismo destinatario, en el mismo día
-	 * @param int  $id_usuario  el id_usuario del destinatario
-	 * @param string  $tipo       Tipo de correo: alerta diaria, semanal, etc
-	 * @param boolean $simular    Cuando es true, marca el correo como si ya lo hubiera enviado
+	 * @param object $sesion la sesión con que se conecta a la DB para hacer las consultas
+	 * @param string $subject subject del mail
+	 * @param string $mensaje contenido del mail
+	 * @param string $email email del destinatario
+	 * @param string $nombre nombre del destinatario
+	 * @param boolean $es_diario cuando es true, evita repetir el mismo tipo, al mismo destinatario, en el mismo día
+	 * @param int $id_usuario el id_usuario del destinatario
+	 * @param string $tipo Tipo de correo: alerta diaria, semanal, etc
+	 * @param boolean $simular Cuando es true, marca el correo como si ya lo hubiera enviado
+	 * @return string
+	 * @throws \Exception
 	 */
 	public static function InsertarPlus($sesion, $subject, $mensaje, $email, $nombre, $es_diario = true, $id_usuario = null, $tipo = null, $simular = false) {
 		$clean_patt = '/[\r\n\t]+/';
