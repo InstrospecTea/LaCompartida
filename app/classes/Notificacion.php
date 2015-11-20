@@ -337,10 +337,10 @@ class Notificacion {
 					</tr>";
 
 				$mail['tr_recordatorio_hitos_cumplidos'] =
-					"<tr style='background-color: #ffcd99'>
+					"<tr>
 						<td>&nbsp;</td>
 						<td colspan='7'>
-							<fieldset>
+							<fieldset style='background-color: #ffcd99'>
 								<legend>" . __('Hitos') . " vencidos por gestionar </legend>
 								<table width='100%' style='border-collapse:collapse;'>
 									<tr style='background-color:#B3E58C;'>
