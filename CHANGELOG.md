@@ -1,5 +1,25 @@
 # Changelog
 
+## Hotfix 15.28.2
+Thursday, November 19th
+* **Fix** [Corregir sanitizado global de filtros](https://github.com/LemontechSA/ttb/pull/1236)
+
+## Hotfix 15.28.1
+Thursday, November 19th
+* **Fix** [Agregar tarifas a los trabajos agregados por shell para demo](https://github.com/LemontechSA/ttb/pull/1235)
+
+## [Release 15.28.0](https://github.com/LemontechSA/ttb/pull/1228)
+Thursday 2015, November 12th
+* **Feature** [Corregir formato LEDES para Flat Fee](https://github.com/LemontechSA/ttb/pull/1203)
+
+## Hotfix 15.27.4
+Wednesday, November 18th
+* **Fix** [Error SQL - Buscar cobro](https://github.com/LemontechSA/ttb/pull/1234)
+
+## Hotfix 15.27.3
+Tuesday, November 17th
+* **Fix** [Agrupar por profesionales al desplegar gráfico en reporte general](https://github.com/LemontechSA/ttb/pull/1232)
+
 ## Hotfix 15.27.2
 Thursday, November 12th
 * **Fix** [Deshabilitar edición de factura cuando el cobro no está emitido](https://github.com/LemontechSA/ttb/pull/1230)
