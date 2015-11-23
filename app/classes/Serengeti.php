@@ -134,7 +134,7 @@ class Serengeti  extends Ledes{
 			JOIN usuario u ON t.id_usuario = u.id_usuario
 			JOIN prm_categoria_usuario c ON u.id_categoria_usuario = c.id_categoria_usuario
 			JOIN asunto a ON t.codigo_asunto = a.codigo_asunto
-			WHERE t.id_cobro = $id_cobro AND t.id_tramite = 0";
+			WHERE t.id_cobro = $id_cobro AND t.id_tramite = 0 AND t.duracion_cobrada > 0";
 
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
