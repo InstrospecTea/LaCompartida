@@ -134,11 +134,14 @@ class Serengeti  extends Ledes{
 			JOIN usuario u ON t.id_usuario = u.id_usuario
 			JOIN prm_categoria_usuario c ON u.id_categoria_usuario = c.id_categoria_usuario
 			JOIN asunto a ON t.codigo_asunto = a.codigo_asunto
-			WHERE t.id_cobro = $id_cobro AND t.id_tramite = 0 AND t.duracion_cobrada > 0";
+			WHERE t.id_cobro = $id_cobro AND t.id_tramite = 0";
 
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while ($trabajo = mysql_fetch_assoc($resp)) {
+			if ($Cobro->fields['forma_cobro'] != 'FLAT FEE' && $this->round($trabajo['horas']) == 0) {
+				continue;
+			}
 			if ($fecha_min > $trabajo['fecha']) {
 				$fecha_min = $trabajo['fecha'];
 			}
@@ -153,7 +156,7 @@ class Serengeti  extends Ledes{
 			/**
 			 * redondeo decimales ahora para que calcen los ajustes
 			 */
-			$horas =$this->round($trabajo['horas']);
+			$horas = $this->round($trabajo['horas']);
 			$monto = $this->round($monto);
 			$tarifa = $this->round($tarifa);
 
