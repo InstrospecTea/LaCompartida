@@ -1685,12 +1685,12 @@ class Contrato extends Objeto {
 	public function MattersByContract($id_contrato) {
 		$criteria = new Criteria($this->sesion);
 
-		$mostrar_codigo_asuntos = "NULL";
+		$mostrar_codigo_asuntos = 'NULL';
 
 		if (Conf::GetConf($this->sesion, 'MostrarCodigoAsuntoEnListados')) {
-			$mostrar_codigo_asuntos = "asunto.codigo_asunto";
+			$mostrar_codigo_asuntos = 'codigo_asunto';
 			if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
-				$mostrar_codigo_asuntos .= "_secundario";
+				$mostrar_codigo_asuntos .= '_secundario';
 			}
 		}
 
