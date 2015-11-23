@@ -1684,7 +1684,18 @@ class Contrato extends Objeto {
 	 */
 	public function MattersByContract($id_contrato) {
 		$criteria = new Criteria($this->sesion);
-		$criteria->add_select('glosa_asunto')
+
+		$mostrar_codigo_asuntos = "NULL";
+
+		if (Conf::GetConf($this->sesion, 'MostrarCodigoAsuntoEnListados')) {
+			$mostrar_codigo_asuntos = "asunto.codigo_asunto";
+			if (Conf::GetConf($this->sesion, 'CodigoSecundario')) {
+				$mostrar_codigo_asuntos .= "_secundario";
+			}
+		}
+
+		$criteria->add_select($mostrar_codigo_asuntos, 'codigo_asunto')
+				->add_select('glosa_asunto')
 				->add_from('asunto')
 				->add_restriction(CriteriaRestriction::equals('id_contrato', $id_contrato))
 		 		->add_ordering('glosa_asunto');
@@ -1696,7 +1707,7 @@ class Contrato extends Objeto {
 			$rows = array();
 
 			foreach ($result as $asunto) {
-				$rows[] = $asunto['glosa_asunto'];
+				$rows[] = $asunto['codigo_asunto'] . ' ' . $asunto['glosa_asunto'];
 			}
 
 			$Form = new Form();
