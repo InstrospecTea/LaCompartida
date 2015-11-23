@@ -151,7 +151,7 @@ class Actividad extends Objeto {
 	}
 
 	public function tieneTrabajoAsociado() {
-		$tiene_trabajo_asociado = true;
+		$tiene_trabajo_asociado = false;
 
 		if (!empty($this->fields['codigo_actividad'])) {
 			$Criteria = new Criteria($this->sesion);
