@@ -151,7 +151,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 	foreach (array_keys($hito_fecha) as $i) {
 		if (!empty($hito_fecha[$i]) || !empty($hito_descripcion[$i]) || !empty($hito_monto_estimado[$i])) {
 			if (empty($hito_fecha[$i])) {
-				$Pagina->AddError(__('Debe ingresar una fecha válida para el ') . __('hito') . (empty($hito_descripcion[$i]) ? ' con monto ' . $hito_monto_estimado[$i] : ' ' . $hito_descripcion[$i]));
+				$Pagina->AddError(__('Debe ingresar una fecha de recordatorio para el ') . __('hito') . (empty($hito_descripcion[$i]) ? ' con monto ' . $hito_monto_estimado[$i] : ' ' . $hito_descripcion[$i]));
 			}
 			if (empty($hito_descripcion[$i])) {
 				$Pagina->AddError(__('Debe ingresar una descripción válida para el ') . __('hito') . (empty($hito_fecha[$i]) ? ' con monto ' . $hito_monto_estimado[$i] : ' con fecha ' . $hito_fecha[$i]));
