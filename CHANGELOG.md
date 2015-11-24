@@ -2,7 +2,7 @@
 
 ## Hotfix 15.28.5
 Tuesday, November 24rd
-* **Fix** [Ordenamiento reporte Hitos y validación al agregar hitos](https://github.com/LemontechSA/ttb/pull/)
+* **Fix** [Ordenamiento reporte Hitos y validación al agregar hitos](https://github.com/LemontechSA/ttb/pull/1240)
 
 ## Hotfix 15.28.4
 Monday, November 23rd
