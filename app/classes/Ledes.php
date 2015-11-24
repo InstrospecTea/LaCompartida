@@ -136,7 +136,6 @@ class Ledes extends Objeto {
 			$datos_cobro['BILLING_START_DATE'] = $fecha_min;
 		}
 		$monto_total = $datos_cobro['INVOICE_TOTAL'] * 1;
-		$ajuste = 0;
 		$filas = array();
 		if (abs($suma - $monto_total) > $monto_total / 100) {
 			$monto = $monto_total - $suma;
@@ -154,7 +153,7 @@ class Ledes extends Objeto {
 				'LINE_ITEM_ACTIVITY_CODE' => '',
 				'TIMEKEEPER_ID' => '',
 				'LINE_ITEM_DESCRIPTION' => 'Ajuste',
-				'LINE_ITEM_UNIT_COST' => $ajuste,
+				'LINE_ITEM_UNIT_COST' => 0,
 				'TIMEKEEPER_NAME' => '',
 				'TIMEKEEPER_CLASSIFICATION' => '',
 				'CLIENT_MATTER_ID' => $last_client_matter_id
