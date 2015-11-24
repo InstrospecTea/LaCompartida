@@ -318,22 +318,37 @@ if ($opcion == 'guardar') {
 				$Pagina->AddError($contrato->error);
 			}
 		} else {
-			if ($Asunto->fields['id_contrato'] > 0) {
+			if (($Asunto->fields['id_contrato'] > 0) && ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato'])) {
 				$criteria = new Criteria($Sesion);
 				$criteria->add_select('COUNT(*)', 'total')
 					->add_from('cobro_pendiente')
+					->add_restriction(CriteriaRestriction::not_equal('hito', 1))
 					->add_restriction(CriteriaRestriction::equals('id_contrato', $Asunto->fields['id_contrato']));
 
 				$result = $criteria->run();
-				$cobro_pendiente = ($result[0]['total'] > 0) ? true : false;
+				$cobro_programado = ($result[0]['total'] > 0) ? true : false;
+
+				$criteria = new Criteria($Sesion);
+				$criteria->add_select('COUNT(*)', 'total')
+					->add_from('cobro_pendiente')
+					->add_restriction(CriteriaRestriction::equals('hito', 1))
+					->add_restriction(CriteriaRestriction::equals('id_contrato', $Asunto->fields['id_contrato']));
+
+				$result = $criteria->run();
+				$hito = ($result[0]['total'] > 0) ? true : false;
+
+				$cobro_pendiente = true;
 			}
 
-			if ($cobro_pendiente) {
+			if ($cobro_programado) {
 				$Pagina->AddError(__('El') . ' ' . __('contrato') . ' ' . __('tiene cobros programados configurados, no se puede desvincular del') . ' ' . __('asunto') . ' ' . __('hasta que quite los cobros programados.'));
+			} else if ($hito) {
+				$Pagina->AddError(__('El') . ' ' . __('contrato') . ' ' . __('tiene hitos configurados, no se puede desvincular del') . ' ' . __('asunto') . ' ' . __('hasta que quite los hitos.'));
 			} else {
 				$Contrato_indep = $Asunto->fields['id_contrato_indep'];
 				$Asunto->Edit("id_contrato", $Cliente->fields['id_contrato']);
 				$Asunto->Edit("id_contrato_indep", null);
+				$cobro_pendiente = false;
 			}
 		}
 
