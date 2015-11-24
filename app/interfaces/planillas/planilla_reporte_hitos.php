@@ -83,7 +83,9 @@ if ($xls) {
 		->add_left_join_with('asunto AS asu', CriteriaRestriction::equals('con.id_contrato', 'asu.id_contrato'))
 		->add_left_join_with('cliente AS cli', CriteriaRestriction::equals('con.codigo_cliente', 'cli.codigo_cliente'))
 		->add_grouping('cp.id_cobro')
-		->add_restriction(CriteriaRestriction::equals('cp.hito', '1'));
+		->add_restriction(CriteriaRestriction::equals('cp.hito', '1'))
+		->add_ordering('glosa_cliente')
+		->add_ordering('glosa_asunto');
 
 	$resultado = $criteria->run();
 
