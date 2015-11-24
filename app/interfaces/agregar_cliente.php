@@ -69,6 +69,7 @@ if ($opcion == "guardar") {
 				}
 			}
 		}
+
 		$loadasuntos = false;
 	} else {
 		$loadasuntos = true;
@@ -108,6 +109,20 @@ if ($opcion == "guardar") {
 		}
 		if (Conf::GetConf($Sesion, 'ClienteReferencia') && empty($id_cliente_referencia)) {
 			$Pagina->AddError(__("Por favor ingrese la referencia"));
+		}
+	}
+
+	foreach (array_keys($hito_fecha) as $i) {
+		if (!empty($hito_fecha[$i]) || !empty($hito_descripcion[$i]) || !empty($hito_monto_estimado[$i])) {
+			if (empty($hito_fecha[$i])) {
+				$Pagina->AddError(__('Debe ingresar una fecha de recordatorio para el ') . __('hito') . (empty($hito_descripcion[$i]) ? ' ' . __('con monto') . ' ' . $hito_monto_estimado[$i] : ' ' . $hito_descripcion[$i]));
+			}
+			if (empty($hito_descripcion[$i])) {
+				$Pagina->AddError(__('Debe ingresar una descripción válida para el ') . __('hito') . (empty($hito_fecha[$i]) ? ' ' . __('con monto') . ' ' . $hito_monto_estimado[$i] : ' ' . __('con fecha') . ' ' . $hito_fecha[$i]));
+			}
+			if ($hito_monto_estimado[$i] <= 0) {
+				$Pagina->AddError(__('Debe ingresar un monto válido para el ') . __('hito') . (empty($hito_descripcion[$i]) ? ' ' . __('con fecha') . ' ' . $hito_fecha[$i] : ' ' . $hito_descripcion[$i]));
+			}
 		}
 	}
 
