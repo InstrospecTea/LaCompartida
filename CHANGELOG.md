@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 15.28.4
+Monday, November 23rd
+* **Fix** [Validar que al eliminar una actividad no este asociado a un trabajo o tramite](https://github.com/LemontechSA/ttb/pull/1238)
+
+## Hotfix 15.28.3
+Monday, November 23rd
+* **Fix** [Se añade conf a la query que lista liquidaciones](https://github.com/LemontechSA/ttb/pull/1237)
+
 ## Hotfix 15.28.2
 Thursday, November 19th
 * **Fix** [Corregir sanitizado global de filtros](https://github.com/LemontechSA/ttb/pull/1236)

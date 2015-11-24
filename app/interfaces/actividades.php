@@ -1,41 +1,43 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
+// var_dump($_POST); exit;
+
 $Sesion = new Sesion(array('DAT'));
 $Pagina = new Pagina($Sesion);
-
-$id_usuario = $Sesion->usuario->fields['id_usuario'];
-
 $Actividad = new Actividad($Sesion);
-$Actividad->Fill($_REQUEST);
+$Form = new Form();
 
 switch ($opc) {
 	case 'eliminar':
-		if ($Actividad->Delete()) {
-			$Pagina->AddInfo(__('Actividad') . ' ' . __('eliminada con éxito'));
+		if ($Actividad->Load($_REQUEST['id_actividad'])) {
+			if ($Actividad->Delete()) {
+				$Pagina->AddInfo(__('Actividad') . ' ' . __('eliminada con éxito'));
+			} else {
+				$Pagina->AddError($Actividad->error);
+				$Actividad = new Actividad($Sesion);
+			}
 		} else {
-			$Pagina->AddError($Actividad->error);
+			$Pagina->AddError(__('Actividad') . ' ' . __('no existe'));
 		}
 		break;
 	case 'xls':
+		$Actividad->Fill($_REQUEST);
 		$Actividad->DownloadExcel();
+		break;
+	case 'buscar':
+		$Actividad->Fill($_REQUEST);
 		break;
 }
 
 $Pagina->titulo = __('Actividades');
 $Pagina->PrintTop();
-$Form = new Form();
 
-$codigo_actividad = $Actividad->fields['codigo_actividad'];
-$codigo_cliente = $Actividad->extra_fields['codigo_cliente'];
-$codigo_asunto = $Actividad->fields['codigo_asunto'];
+echo $Form->create('form_actividades', array('action' => 'actividades.php'));
+echo $Form->hidden('opc', 'buscar');
+echo $Form->hidden('desde');
+echo $Form->hidden('id_actividad');
 ?>
-
-<form method="POST" action="actividades.php" name="form_actividades" id="form_actividades">
-	<input type="hidden" name="xdesde" id="xdesde" value="">
-	<input type="hidden" name="opc" id="opc" value="buscar">
-	<input type="hidden" name="id_actividad" id="id_actividad" value="">
-
 	<div style="width: 95%; margin-bottom: 5px;" align="right">
 		<?php echo $Form->icon_button(__('Agregar') . ' ' . __('Actividad'), 'agregar', array('id' => 'agregar_actividad')); ?>
 	</div>
@@ -49,23 +51,23 @@ $codigo_asunto = $Actividad->fields['codigo_asunto'];
 			<td align="right">
 				<?php echo __('Código'); ?>
 			</td>
-			<td align=left>
-				<input name="codigo_actividad" size="5" maxlength="5" value="<?php echo $codigo_actividad; ?>" id="codigo_actividad" />
+			<td align="left">
+				<?php echo $Form->input('codigo_actividad', $codigo_actividad, array('label' => false, 'size' => 5, 'maxlength' => 5)); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">
 				<?php echo __('Título'); ?>
 			</td>
-			<td align=left>
-				<input <?php echo $tooltip ?> name='glosa_actividad' id='glosa_actividad' size='35' value="<?php echo $Actividad->fields['glosa_actividad']; ?>" />
+			<td align="left">
+				<?php echo $Form->input('glosa_actividad', $glosa_actividad, array('label' => false, 'size' => 35)); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">
 				<?php echo __('Cliente'); ?>
 			</td>
-			<td align=left nowrap>
+			<td align="left" nowrap>
 				<?php UtilesApp::CampoCliente($Sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
 			</td>
 		</tr>
@@ -96,7 +98,8 @@ $codigo_asunto = $Actividad->fields['codigo_asunto'];
 			<td>&nbsp;</td>
 		</tr>
 	</table>
-</form>
+<?php echo $Form->end(); ?>
+
 <br/><br/>
 
 <?php
@@ -117,18 +120,17 @@ if ($opc == 'buscar' || $opc == 'eliminar') {
 
 	$x_pag = 25;
 	$b = new Buscador($Sesion, $Actividad->SearchQuery(), 'Actividad', $desde, $x_pag, $orden);
-	$b->AgregarEncabezado('glosa_actividad', __('Nombre Actividad'), 'align=left');
-	$b->AgregarEncabezado('glosa_asunto', __('Asunto'), 'align=left');
-	$b->AgregarEncabezado('glosa_cliente', __('Cliente'), 'align=left');
-	$b->AgregarEncabezado('codigo_actividad', __('Código'), 'align=left');
-	$b->AgregarFuncion('', 'acciones', 'align=center');
+	$b->AgregarEncabezado('codigo_actividad', __('Código Actividad'), 'align="left"');
+	$b->AgregarEncabezado('glosa_actividad', __('Nombre Actividad'), 'align="left"');
+	$b->AgregarEncabezado('glosa_asunto', __('Asunto'), 'align="left"');
+	$b->AgregarEncabezado('glosa_cliente', __('Cliente'), 'align="left"');
+	$b->AgregarEncabezado('codigo_actividad', __('Código'), 'align="left"');
+	$b->AgregarFuncion('', 'acciones', 'align="center"');
 	$b->color_mouse_over = '#bcff5c';
 	$b->Imprimir();
 }
 
-function acciones(& $fila) {
-	global $Sesion;
-
+function acciones(&$fila) {
 	$boton_editar = '<a href="javascript:void(0);" onclick="EditarActividad(' . $fila->fields['id_actividad'] . ');" title="Editar Actividad">'
 			. '<img src="' . Conf::ImgDir() . '/editar_on.gif" border="0" alt="Editar Actividad" /></a>';
 
@@ -152,37 +154,13 @@ function acciones(& $fila) {
 	}
 
 	function EliminarActividad(id) {
-		if (parseInt(id) > 0 && confirm('¿Desea eliminar la actividad seleccionada?') == true) {
-			var form = document.forms.namedItem('form_actividades');
-			form.action = 'actividades.php?desde=<?php echo ($desde) ? $desde : 0 ?>';
-			form.id_actividad.value = id;
-			form.opc.value = 'eliminar';
-			form.submit();
+		if (parseInt(id) > 0 && confirm("<?php echo __('¿Desea eliminar la actividad seleccionada?'); ?>")) {
+			jQuery('#form_actividades').attr('action', 'actividades.php');
+			jQuery('#id_actividad').val(id);
+			jQuery('#opc').val('eliminar');
+			jQuery('#desde').val('<?php echo !empty($desde) ? $desde : 0; ?>');
+			jQuery('#form_actividades').submit();
 		}
-	}
-
-	function Refrescar() {
-		jQuery('#boton_buscar').click();
-	}
-
-	function BuscarFacturas(form, from) {
-		if (!form) {
-			var form = $('form_actividades');
-		}
-
-		switch (from) {
-			case 'buscar':
-				form.action = 'actividades.php';
-				break;
-			case 'exportar_excel':
-				form.action = 'actividades_xls.php';
-				break;
-			default:
-				return false;
-		}
-
-		form.submit();
-		return true;
 	}
 </script>
 
