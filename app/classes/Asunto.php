@@ -585,6 +585,7 @@ class Asunto extends Objeto {
 			$criteria->add_select('COUNT(*)', 'total')
 					->add_from('cobro_pendiente')
 					->add_restriction(CriteriaRestriction::equals('hito', 1))
+					->add_restriction(CriteriaRestriction::is_null('id_cobro'))
 					->add_restriction(CriteriaRestriction::equals('id_contrato', $id_contrato_indep));
 
 			$result = $criteria->run();
