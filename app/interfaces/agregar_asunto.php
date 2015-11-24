@@ -114,6 +114,20 @@ if ($opcion == 'guardar') {
 		}
 	}
 
+	foreach (array_keys($hito_fecha) as $i) {
+		if (!empty($hito_fecha[$i]) || !empty($hito_descripcion[$i]) || !empty($hito_monto_estimado[$i])) {
+			if (empty($hito_fecha[$i])) {
+				$Pagina->AddError(__('Debe ingresar una fecha válida para el ') . __('hito'));
+			}
+			if (empty($hito_descripcion[$i])) {
+				$Pagina->AddError(__('Debe ingresar una descripción válida para el ') . __('hito'));
+			}
+			if ($hito_monto_estimado[$i] <= 0) {
+				$Pagina->AddError(__('Debe ingresar un monto válido para el ') . __('hito'));
+			}
+		}
+	}
+
 	$contractValidation->validate();
 
 	$errores = $Pagina->GetErrors();
