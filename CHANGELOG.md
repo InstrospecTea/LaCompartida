@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.28.5
+Tuesday, November 24rd
+* **Fix** [Ordenamiento reporte Hitos y validación al agregar hitos](https://github.com/LemontechSA/ttb/pull/)
+
 ## Hotfix 15.28.4
 Monday, November 23rd
 * **Fix** [Validar que al eliminar una actividad no este asociado a un trabajo o tramite](https://github.com/LemontechSA/ttb/pull/1238)
