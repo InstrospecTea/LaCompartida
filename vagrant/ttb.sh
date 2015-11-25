@@ -34,7 +34,7 @@ echo "AddCharset ISO-8859-1 .iso8859-1 .latin1" >> /etc/apache2/conf-available/c
 # Todas las siguentes configuraciones son necesarias
 sed -i "s/html_errors = Off/html_errors = On/" /etc/php5/apache2/php.ini
 sed -i "s/short_open_tag = Off/short_open_tag = On/g" /etc/php5/apache2/php.ini
-sed -i 's/;default_charset = "iso-8859-1"/default_charset = "iso-8859-1"/g' /etc/php5/apache2/php.ini
+sed -i 's/default_charset = "UTF-8"/default_charset = "iso-8859-1"/g' /etc/php5/apache2/php.ini
 sed -i "s/error_reporting = E_ALL & ~E_DEPRECATED/error_reporting = E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR/g" /etc/php5/apache2/php.ini
 
 # Configuracion local de la conexion a la base de datos
