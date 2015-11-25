@@ -4,34 +4,34 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 function autocargattb($class_name) {
-		$class_name = explode('\\', $class_name);
-		$class_name = str_replace('_', DIRECTORY_SEPARATOR,  end($class_name));
+	$class_name = explode('\\', $class_name);
+	$class_name = str_replace('_', DIRECTORY_SEPARATOR,  end($class_name));
 
-    if (is_readable(dirname(__FILE__) . '/app/layers/dao/' . $class_name . '.php')) {
+	if (is_readable(dirname(__FILE__) . '/app/layers/dao/' . $class_name . '.php')) {
 
-        require_once dirname(__FILE__) . '/app/layers/dao/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/dao/' . $class_name . '.php';
 
-    } if (is_readable(dirname(__FILE__) . '/app/layers/dao/exceptions/' . $class_name . '.php')) {
+	} if (is_readable(dirname(__FILE__) . '/app/layers/dao/exceptions/' . $class_name . '.php')) {
 
 		require_once dirname(__FILE__) . '/app/layers/dao/exceptions/' . $class_name . '.php';
 
 	} elseif (is_readable(dirname(__FILE__) . '/app/layers/dao.framework/' . $class_name . '.php')){
 
-        require_once dirname(__FILE__) . '/app/layers/dao.framework/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/dao.framework/' . $class_name . '.php';
 
-    } elseif (is_readable(dirname(__FILE__) . '/app/layers/dto/' . $class_name . '.php')) {
+	} elseif (is_readable(dirname(__FILE__) . '/app/layers/dto/' . $class_name . '.php')) {
 
-        require_once dirname(__FILE__) . '/app/layers/dto/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/dto/' . $class_name . '.php';
 
-    } elseif (is_readable(dirname(__FILE__) . '/app/layers/service/' . $class_name . '.php')) {
+	} elseif (is_readable(dirname(__FILE__) . '/app/layers/service/' . $class_name . '.php')) {
 
-        require_once dirname(__FILE__) . '/app/layers/service/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/service/' . $class_name . '.php';
 
-    } elseif (is_readable(dirname(__FILE__) . '/app/layers/service.support/' . $class_name . '.php')) {
+	} elseif (is_readable(dirname(__FILE__) . '/app/layers/service.support/' . $class_name . '.php')) {
 
-        require_once dirname(__FILE__) . '/app/layers/service.support/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/service.support/' . $class_name . '.php';
 
-    } elseif (is_readable(dirname(__FILE__) . '/app/classes/' . $class_name . '.php')) {
+	} elseif (is_readable(dirname(__FILE__) . '/app/classes/' . $class_name . '.php')) {
 
 		require_once dirname(__FILE__) . '/app/classes/' . $class_name . '.php';
 
@@ -41,29 +41,29 @@ function autocargattb($class_name) {
 
 	} else if (is_readable(dirname(__FILE__) . '/app/layers/utilities/' . $class_name . '.php')) {
 
-	    require_once dirname(__FILE__) . '/app/layers/utilities/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/utilities/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/utilities/twig/' . $class_name . '.php')) {
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/utilities/twig/' . $class_name . '.php')) {
 
-        require_once dirname(__FILE__) . '/app/layers/utilities/twig/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/utilities/twig/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/business/' . $class_name . '.php')){
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/business/' . $class_name . '.php')){
 
-	    require_once dirname(__FILE__) . '/app/layers/business/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/business/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/business.support/' . $class_name . '.php')){
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/business.support/' . $class_name . '.php')){
 
-        require_once dirname(__FILE__) . '/app/layers/business.support/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/business.support/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/scope.support/' . $class_name . '.php')){
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/scope.support/' . $class_name . '.php')){
 
-	    require_once dirname(__FILE__) . '/app/layers/scope.support/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/scope.support/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/scope/' . $class_name . '.php')){
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/scope/' . $class_name . '.php')){
 
-	    require_once dirname(__FILE__) . '/app/layers/scope/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/scope/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/report/' . $class_name . '.php')){
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/report/' . $class_name . '.php')){
 
 		require_once dirname(__FILE__) . '/app/layers/report/' . $class_name . '.php';
 
@@ -79,35 +79,35 @@ function autocargattb($class_name) {
 
 		require_once dirname(__FILE__) . '/app/layers/report.support/engine/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/report/calculators/' . $class_name . '.php')){
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/report/calculators/' . $class_name . '.php')){
 
-        require_once dirname(__FILE__) . '/app/layers/report/calculators/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/report/calculators/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/report.support/calculators/' . $class_name . '.php')){
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/report.support/calculators/' . $class_name . '.php')){
 
-        require_once dirname(__FILE__) . '/app/layers/report.support/calculators/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/report.support/calculators/' . $class_name . '.php';
 
 	} else if (is_readable(dirname(__FILE__) . '/app/layers/view/helpers/' . $class_name . '.php')){
 
-        require_once dirname(__FILE__) . '/app/layers/view/helpers/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/view/helpers/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/report.support/filters/' . $class_name . '.php')) {
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/report.support/filters/' . $class_name . '.php')) {
 
-        require_once dirname(__FILE__) . '/app/layers/report.support/filters/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/report.support/filters/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/report/filters/' . $class_name . '.php')) {
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/report/filters/' . $class_name . '.php')) {
 
-        require_once dirname(__FILE__) . '/app/layers/report/filters/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/report/filters/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/report.support/groupers/' . $class_name . '.php')) {
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/report.support/groupers/' . $class_name . '.php')) {
 
-        require_once dirname(__FILE__) . '/app/layers/report.support/groupers/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/report.support/groupers/' . $class_name . '.php';
 
-    } else if (is_readable(dirname(__FILE__) . '/app/layers/report/groupers/' . $class_name . '.php')) {
+	} else if (is_readable(dirname(__FILE__) . '/app/layers/report/groupers/' . $class_name . '.php')) {
 
-        require_once dirname(__FILE__) . '/app/layers/report/groupers/' . $class_name . '.php';
+		require_once dirname(__FILE__) . '/app/layers/report/groupers/' . $class_name . '.php';
 
-    } else {
+	} else {
 
 		return false;
 
