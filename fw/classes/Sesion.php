@@ -365,9 +365,9 @@ class Sesion {
 			  Seteando cookie
 			 */
 			if (isset($recordar)) {
-				setcookie("lmjuiciosrut", $rut, time() + 60 * 60 * 24 * 100, "/");
-				setcookie("lmjuiciosdv", $dvrut, time() + 60 * 60 * 24 * 100, "/");
-				setcookie("lmjuiciospass", $this->encrypt($password), time() + 60 * 60 * 24 * 100, "/");
+				setcookie("ttbrut", $rut, time() + 60 * 60 * 24 * 100, "/");
+				setcookie("ttbdv", $dvrut, time() + 60 * 60 * 24 * 100, "/");
+				setcookie("ttbpass", $this->encrypt($password), time() + 60 * 60 * 24 * 100, "/");
 			}
 
 			$this->logged = true;
@@ -384,9 +384,9 @@ class Sesion {
 
 	function Logout($salir = false) {
 		if ($salir) {
-			setcookie("lmjuiciosrut", '', time() + 60 * 60 * 24 * 100, "/");
-			setcookie("lmjuiciosdv", '', time() + 60 * 60 * 24 * 100, "/");
-			setcookie("lmjuiciospass", '', time() + 60 * 60 * 24 * 100, "/");
+			setcookie("ttbrut", '', time() + 60 * 60 * 24 * 100, "/");
+			setcookie("ttbdv", '', time() + 60 * 60 * 24 * 100, "/");
+			setcookie("ttbpass", '', time() + 60 * 60 * 24 * 100, "/");
 		}
 
 		$_SESSION = array();
@@ -406,10 +406,10 @@ class Sesion {
 	 */
 
 	function CheckLogin() {
-		if ($this->logged || isset($_COOKIE['lmjuiciosrut']) && isset($_COOKIE['lmjuiciospass'])) {
-			$rut = $_COOKIE['lmjuiciosrut'];
-			$dvrut = $_COOKIE['lmjuiciosdv'];
-			$password = $this->decrypt($_COOKIE['lmjuiciospass']);
+		if ($this->logged || isset($_COOKIE['ttbrut']) && isset($_COOKIE['ttbpass'])) {
+			$rut = $_COOKIE['ttbrut'];
+			$dvrut = $_COOKIE['ttbdv'];
+			$password = $this->decrypt($_COOKIE['ttbpass']);
 			if ($this->logged || $this->Login($rut, $dvrut, $password, true)) {
 				if (file_exists(Conf::ServerDir() . '/usuarios/index.php')) {
 					$pagina_inicio = Conf::RootDir() . "/app/usuarios/index.php";
@@ -509,7 +509,9 @@ class Sesion {
 	 */
 	public function encrypt($text) {
 		$crypt = $this->getCryptData();
-		$encrypted = mcrypt_cbc($crypt['cipher'], $crypt['key'], $text, MCRYPT_ENCRYPT, $crypt['iv']);
+		mcrypt_generic_init($crypt['cipher'], $crypt['key'], $crypt['iv']);
+		$encrypted = mcrypt_generic($crypt['cipher'], $text);
+		mcrypt_generic_deinit($crypt['cipher']);
 		return base64_encode($encrypted);
 	}
 
@@ -520,7 +522,9 @@ class Sesion {
 	 */
 	public function decrypt($text) {
 		$crypt = $this->getCryptData();
-		$decrypted = mcrypt_cbc($crypt['cipher'], $crypt['key'], base64_decode($text), MCRYPT_DECRYPT, $crypt['iv']);
+		mcrypt_generic_init($crypt['cipher'], $crypt['key'], $crypt['iv']);
+		$decrypted = mdecrypt_generic($crypt['cipher'], base64_decode($text));
+		mcrypt_generic_deinit($crypt['cipher']);
 		return trim($decrypted);
 	}
 
@@ -528,7 +532,7 @@ class Sesion {
 	 * Obtiene los parámatros de encrttación y desencriptación
 	 */
 	protected function getCryptData() {
-		$cipher = MCRYPT_BLOWFISH;
+		$cipher = mcrypt_module_open(MCRYPT_BLOWFISH, '', MCRYPT_MODE_CBC, '');
 		$key = md5('lemontech-99511620');
 		$iv_size = mcrypt_get_block_size($cipher, MCRYPT_MODE_CBC);
 		$iv = substr($key, 0, $iv_size);
