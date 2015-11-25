@@ -1,9 +1,9 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-	config.vm.box = "hashicorp/precise32"
+	config.vm.box = "debian/jessie64"
 
-	config.vm.network "forwarded_port", guest: 80, host: 8080 
+	config.vm.network "forwarded_port", guest: 80, host: 8080
 	config.vm.synced_folder "../../", "/vagrant"
 
 	# Provision Main
@@ -16,7 +16,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.provision "shell", path: "mysql.sh"
 
 	# Provision PHP
-	config.vm.provision "shell", path: "php.sh"	
+	config.vm.provision "shell", path: "php.sh"
 
 	# Provision phpmyadmin
 	config.vm.provision "shell", path: "phpmyadmin.sh"

@@ -1,15 +1,15 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 
-apt-get install apache2 apache2-utils -y
+apt-get -y install apache2 apache2-utils
 
 if [ ! -L /var/www/vagrant ]; then
-    sed -i "s/\/var\/www/\/var\/www\/vagrant/" /etc/apache2/sites-available/default
-    sed -i "s/AllowOverride None/AllowOverride All/g" /etc/apache2/sites-available/default
+    sed -i "s/\/var\/www\/html/\/var\/www\/vagrant/" /etc/apache2/sites-available/000-default.conf
+    sed -i "s/AllowOverride None/AllowOverride All/g" /etc/apache2/sites-available/000-default.conf
     ln -s /vagrant /var/www/vagrant
 fi
 
-echo "ServerName localhost" > /etc/apache2/conf.d/name
+echo "ServerName localhost"
 
 
 # Restart

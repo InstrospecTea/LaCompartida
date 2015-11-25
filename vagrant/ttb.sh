@@ -26,8 +26,8 @@ mysql -u root -p$MYSQL_ROOT_PASS timetracking < /vagrant/ttb/vagrant/database.ex
 # Apache
 
 # TTB Clasic tiene su codigo con encodign ISO-8859-1
-echo "AddDefaultCharset ISO-8859-1" >> /etc/apache2/conf.d/charset
-echo "AddCharset ISO-8859-1 .iso8859-1 .latin1" >> /etc/apache2/conf.d/charset
+echo "AddDefaultCharset ISO-8859-1" >> /etc/apache2/conf-available/charset.conf
+echo "AddCharset ISO-8859-1 .iso8859-1 .latin1" >> /etc/apache2/conf-available/charset.conf
 
 # PHP
 
