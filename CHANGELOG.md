@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 15.29.0](https://github.com/LemontechSA/ttb/pull/1243)
+Wednesday 2015, November 25th
+* **Feature** [Recordatorio hitos pendientes](https://github.com/LemontechSA/ttb/pull/1231)
+
 ## Hotfix 15.28.5
 Tuesday, November 24th
 * **Fix** [Ordenamiento reporte Hitos y validación al agregar hitos](https://github.com/LemontechSA/ttb/pull/1240)
