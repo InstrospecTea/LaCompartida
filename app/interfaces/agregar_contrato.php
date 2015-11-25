@@ -187,7 +187,10 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 		if ($contrato->fields['forma_cobro'] !== 'FLAT FEE') {
 			$valor_fecha = array();
 		}
-		for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
+		foreach (array_keys($valor_fecha) as $i) {
+			if (empty($valor_monto_estimado[$i])) {
+				continue;
+			}
 			$cobro_pendiente = new CobroPendiente($Sesion);
 			$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 			$cobro_pendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
@@ -2577,25 +2580,28 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 															<?php
 															$color_par = "#f0f0f0";
 															$color_impar = "#ffffff";
-															$query = "SELECT cp.fecha_cobro, cp.descripcion, cp.monto_estimado FROM cobro_pendiente cp WHERE cp.id_contrato = '{$contrato->fields['id_contrato']}' AND cp.id_cobro IS NULL AND cp.hito = '0' ORDER BY fecha_cobro";
+															$query = "SELECT cp.id_cobro, cp.fecha_cobro, cp.descripcion, cp.monto_estimado FROM cobro_pendiente cp WHERE cp.id_contrato = '{$contrato->fields['id_contrato']}' AND cp.hito = '0' ORDER BY fecha_cobro";
 															$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
 															for ($i = 2; $temp = mysql_fetch_array($resp); $i++) {
+																$disabled = empty($temp['id_cobro']) ? '' : 'disabled="disabled"';
 																?>
 																<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_fecha_<?php echo $i ?>" class="<?php echo $i > 6 ? 'esconder' : 'mostrar' ?>">
 																	<td align="center" style="vertical-align:middle">
-																		<input type="hidden" class="fecha" value="<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>" id="valor_fecha_<?php echo $i ?>" name="valor_fecha[<?php echo $i ?>]"><?php echo Utiles::sql2date($temp['fecha_cobro']) ?>
+																		<input type="hidden" class="fecha" value="<?php echo Utiles::sql2date($temp['fecha_cobro']) ?>" id="valor_fecha_<?php echo $i ?>" name="valor_fecha[<?php echo $i ?>]" <?php echo $disabled ?>><?php echo Utiles::sql2date($temp['fecha_cobro']) ?>
 																	</td>
 																	<td align="left">
-																		<input size="40" type="text" class="descripcion" value="<?php echo $temp['descripcion'] ?>" id="valor_descripcion_<?php echo $i ?>" name="valor_descripcion[<?php echo $i ?>]">
+																		<input size="40" type="text" class="descripcion" value="<?php echo $temp['descripcion'] ?>" id="valor_descripcion_<?php echo $i ?>" name="valor_descripcion[<?php echo $i ?>]" <?php echo $disabled ?>>
 																	</td>
 																	<td align="right">
 																		<div class="input-prepend input">
 																			<span class="moneda_tabla" align="center"></span>
-																			<input class="monto_estimado" size="10" type="text" align="right" value="<?php echo empty($temp['monto_estimado']) ? '' : $temp['monto_estimado'] ?>" id="valor_monto_estimado_<?php echo $i ?>" name="valor_monto_estimado[<?php echo $i ?>]">
+																			<input class="monto_estimado" size="10" type="text" align="right" value="<?php echo empty($temp['monto_estimado']) ? '' : $temp['monto_estimado'] ?>" id="valor_monto_estimado_<?php echo $i ?>" name="valor_monto_estimado[<?php echo $i ?>]" <?php echo $disabled ?>>
 																		</div>
 																	</td>
 																	<td align="center">
-																		<img src="<?php echo Conf::ImgDir() ?>/eliminar.gif" style="cursor:pointer" onclick="eliminarFila(this.parentNode.parentNode.rowIndex);" />
+																		<?php if(empty($disabled)): ?>
+																			<img src="<?php echo Conf::ImgDir() ?>/eliminar.gif" style="cursor:pointer" onclick="eliminarFila(this.parentNode.parentNode.rowIndex);" />
+																		<?php endif; ?>
 																	</td>
 																</tr>
 																<?php
