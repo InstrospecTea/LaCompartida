@@ -341,7 +341,7 @@ class Notificacion {
 						<td>&nbsp;</td>
 						<td colspan='7'>
 							<fieldset>
-								<legend><b>" . __('Hitos') . " vencidos por gestionar </b></legend>
+								<legend><b style='color: red'>" . __('Hitos') . " vencidos por gestionar </b></legend>
 								<table width='100%' style='border-collapse:collapse;'>
 									<tr style='background-color:#B3E58C;'>
 										<th width='200px'>Cliente</th>
