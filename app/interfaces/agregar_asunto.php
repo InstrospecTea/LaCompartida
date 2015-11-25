@@ -339,6 +339,7 @@ if ($opcion == 'guardar') {
 				$criteria->add_select('COUNT(*)', 'total')
 					->add_from('cobro_pendiente')
 					->add_restriction(CriteriaRestriction::not_equal('hito', 1))
+					->add_restriction(CriteriaRestriction::is_null('id_cobro'))
 					->add_restriction(CriteriaRestriction::equals('id_contrato', $Asunto->fields['id_contrato']));
 
 				$result = $criteria->run();
