@@ -10983,7 +10983,8 @@ QUERY;
 			$queries[] = "UPDATE `contrato` SET `formato_ledes` = 'serengeti' WHERE `exportacion_ledes` = 1";
 			break;
 		case 8.23:
-					$queries[] = "ALTER TABLE `cobro_pendiente` ADD COLUMN `fecha_notificacion` DATE NULL";
+			$queries[] = "ALTER TABLE `cobro_pendiente` ADD COLUMN `fecha_notificacion` DATE NULL";
+			break;
 	}
 
 	if (!empty($queries)) {
