@@ -924,8 +924,9 @@ function funcionTR(& $trabajo) {
 	global $p_profesional;
 	global $select_usuario;
 	static $i = 0;
+	$html = '';
+	$total_horas = 0;
 
-	$t = new Trabajo($sesion);
 
 	$moneda_cobro = new Moneda($sesion);
 	if ($trabajo->fields['id_cobro'] > 0) {

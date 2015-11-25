@@ -134,8 +134,60 @@ class Actividad extends Objeto {
 	}
 
 	function CheckDelete() {
+		$delete = true;
+
 		// Buscar que no tenga trabajos o tramites asociados
-		return true;
+		if ($this->tieneTrabajoAsociado()) {
+			$delete = false;
+			$this->error = "La actividad '{$this->fields['glosa_actividad']}' tiene trabajos asociados";
+		}
+
+		if ($this->tieneTramiteAsociado()) {
+			$delete = false;
+			$this->error = "La actividad '{$this->fields['glosa_actividad']}' tiene tramites asociados";
+		}
+
+		return $delete;
+	}
+
+	public function tieneTrabajoAsociado() {
+		$tiene_trabajo_asociado = false;
+
+		if (!empty($this->fields['codigo_actividad'])) {
+			$Criteria = new Criteria($this->sesion);
+			$trabajos = $Criteria
+				->add_select('COUNT(*)', 'total')
+				->add_from('trabajo')
+				->add_restriction(CriteriaRestriction::equals('codigo_actividad', "'{$this->fields['codigo_actividad']}'"))
+				->run();
+			$total_trabajos = isset($trabajos[0]['total']) ? (int) $trabajos[0]['total'] : 0;
+
+			if ($total_trabajos > 0) {
+				$tiene_trabajo_asociado = true;
+			}
+		}
+
+		return $tiene_trabajo_asociado;
+	}
+
+	public function tieneTramiteAsociado() {
+		$tiene_tramite_asociado = false;
+
+		if (!empty($this->fields['codigo_actividad'])) {
+			$Criteria = new Criteria($this->sesion);
+			$tramites = $Criteria
+				->add_select('COUNT(*)', 'total')
+				->add_from('tramite')
+				->add_restriction(CriteriaRestriction::equals('codigo_actividad', "'{$this->fields['codigo_actividad']}'"))
+				->run();
+			$total_tramites = isset($tramites[0]['total']) ? (int) $tramites[0]['total'] : 0;
+
+			if ($total_tramites > 0) {
+				$tiene_tramite_asociado = true;
+			}
+		}
+
+		return $tiene_tramite_asociado;
 	}
 
 	/**

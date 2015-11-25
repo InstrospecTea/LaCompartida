@@ -148,6 +148,20 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 		$_REQUEST['contacto'] = trim($_REQUEST['nombre_contacto']);
 	}
 
+	foreach (array_keys($hito_fecha) as $i) {
+		if (!empty($hito_fecha[$i]) || !empty($hito_descripcion[$i]) || !empty($hito_monto_estimado[$i])) {
+			if (empty($hito_fecha[$i])) {
+				$Pagina->AddError(__('Debe ingresar una fecha de recordatorio para el ') . __('hito') . (empty($hito_descripcion[$i]) ? ' ' . __('con monto') . ' ' . $hito_monto_estimado[$i] : ' ' . $hito_descripcion[$i]));
+			}
+			if (empty($hito_descripcion[$i])) {
+				$Pagina->AddError(__('Debe ingresar una descripción válida para el ') . __('hito') . (empty($hito_fecha[$i]) ? ' ' . __('con monto') . ' ' . $hito_monto_estimado[$i] : ' ' . __('con fecha') . ' ' . $hito_fecha[$i]));
+			}
+			if ($hito_monto_estimado[$i] <= 0) {
+				$Pagina->AddError(__('Debe ingresar un monto válido para el ') . __('hito') . (empty($hito_descripcion[$i]) ? ' ' . __('con fecha') . ' ' . $hito_fecha[$i] : ' ' . $hito_descripcion[$i]));
+			}
+		}
+	}
+
 	$activo_antes = $contrato->fields['activo'];
 	$contrato->Fill($_REQUEST, true);
 
@@ -1636,10 +1650,12 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</tr>
 				<tr class="controls controls-row ">
 					<td class="al"><?php echo __('Formato LEDES'); ?></td>
-					<td class="al"><select name="formato_ledes" id="formato_ledes" class="span3" style="width: 200px">
-							<option value="serengeti" <?php echo $contrato->fields['formato_ledes'] == 'serengeti' ? 'selected' : '' ?>>Serengeti</option>
-							<option value="tymetrix" <?php echo $contrato->fields['formato_ledes'] == 'tymetrix' ? 'selected' : '' ?>>TyMetrix</option>
-						</select></td>
+					<td class="al">
+						<?php
+							$SelectorLedes = new SelectorLedes($Sesion);
+							echo $Form->select('formato_ledes', $SelectorLedes->getProveedores(), $contrato->fields['formato_ledes'], array('empty' => false, 'style' => 'width: 200px', 'class' => 'span3'));
+						?>
+					</td>
 				</tr>
 			<?php } ?>
 		</table>

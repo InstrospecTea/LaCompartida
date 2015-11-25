@@ -191,4 +191,18 @@ class Utiles extends \Utiles {
 		return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
 	}
 
+	/**
+	 * Sanitiza las variables que llegan desde el request.
+	 * TODO: Este método es provisorio. Debe ser eliminado cuando se exporten las SQL a PDO o se hayan Criterizado.
+	 * @param Array $array arreglo con las variables ($_REQUEST).
+	 */
+	public static function sanitizeGlobalsRequest($array) {
+		$Utiles = new Utiles();
+		array_walk_recursive($array, array($Utiles, 'escape_variable'));
+	}
+
+	public function escape_variable($value, $name) {
+		global $$name;
+		$$name = mysql_real_escape_string($value);
+	}
 }
