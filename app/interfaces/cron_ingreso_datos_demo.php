@@ -179,11 +179,11 @@ if (Conf::EsAmbientePrueba()) {
 
 	$duracion_subtract = array('00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:10:00', '00:20:00', '00:30:00', '00:40:00', '00:50:00', '01:00:00');
 
-	list($anio, $mes, $dia) = split('-', $fecha_ini);
+	list($anio, $mes, $dia) = explode('-', $fecha_ini);
 	$fecha_mk_ini = mktime(0, 0, 0, $mes, $dia, $anio);
 	$fecha = $fecha_mk_ini;
 
-	list($anio_fin, $mes_fin, $dia_fin) = split('-', $fecha_fin);
+	list($anio_fin, $mes_fin, $dia_fin) = explode('-', $fecha_fin);
 	$fecha_mk_fin = mktime(0, 0, 0, $mes_fin, $dia_fin, $anio_fin);
 
 	$query = "SELECT codigo_asunto FROM asunto WHERE activo = 1";
@@ -202,7 +202,7 @@ if (Conf::EsAmbientePrueba()) {
 		exit;
 	}
 
-	$query = "SELECT id_usuario FROM usuario WHERE activo = 1";
+	$query = "SELECT id_usuario FROM usuario WHERE activo = 1 AND rut != 99511620";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 	$j = 0;
@@ -223,6 +223,9 @@ if (Conf::EsAmbientePrueba()) {
 	}
 
 	$i = 0;
+	$usuario_tarifa_hh = array();
+	$usuario_costo_hh = array();
+	$id_moneda = 2; //dolar
 
 	while ($fecha <= $fecha_mk_fin) {
 		$fecha_trabajo = date('Y-m-d', $fecha);
@@ -238,11 +241,23 @@ if (Conf::EsAmbientePrueba()) {
 				$horas_maximas = rand(6, 10);
 
 				while (Utiles::time2decimal($duracion_en_este_dia) < $horas_maximas && $cont_trabajos_total < ( $max_dia + 4 )) {
-					if (rand(1, 100) < 66 && $cont_trabajos < $max_dia) {
-						$usuario = $usuarios[$cont_usu];
-						$asunto_index = array_rand($usuario_asunto[$usuario], 1);
-						$asunto = $usuario_asunto[$usuario][$asunto_index];
+					$usuario = $usuarios[$cont_usu];
+					$asunto_index = array_rand($usuario_asunto[$usuario], 1);
+					$asunto = $usuario_asunto[$usuario][$asunto_index];
 
+					// Agregar valores de tarifa
+					if (!isset($usuario_tarifa_hh[$usuario])) {
+						$usuario_tarifa_hh[$usuario] = Funciones::Tarifa($sesion, $usuario, $id_moneda, $asunto);
+					}
+
+					if (!isset($usuario_costo_hh[$usuario])) {
+						$usuario_costo_hh[$usuario] = Funciones::TarifaDefecto($sesion, $usuario, $id_moneda);
+					}
+
+					$tarifa_hh = $usuario_tarifa_hh[$usuario];
+					$costo_hh = $usuario_costo_hh[$usuario];
+
+					if (rand(1, 100) < 66 && $cont_trabajos < $max_dia) {
 						$accion_index = array_rand($acciones, 1);
 
 						if ($accion_index == 3) {
@@ -286,17 +301,13 @@ if (Conf::EsAmbientePrueba()) {
 						}
 
 						if (Utiles::time2decimal(Utiles::add_hora($duracion_en_este_dia, $duracion)) < $horas_maximas) {
-							$values[] = "(2, '{$fecha_trabajo}', '{$asunto}', '{$descripcion_trabajo}', '{$duracion}', '{$duracion_cobrada}', {$usuario})";
+							$values[] = "({$id_moneda}, '{$fecha_trabajo}', '{$asunto}', '{$descripcion_trabajo}', '{$duracion}', '{$duracion_cobrada}', {$usuario}, {$tarifa_hh}, {$costo_hh})";
 							$duracion_en_este_dia = Utiles::add_hora($duracion_en_este_dia, $duracion);
 						}
 
 						$cont_trabajos++;
 						$cont_trabajos_total++;
 					} else {
-						$usuario = $usuarios[$cont_usu];
-						$asunto_index = array_rand($usuario_asunto[$usuario], 1);
-						$asunto = $usuario_asunto[$usuario][$asunto_index];
-
 						$descripcion_index = array_rand($descripcion_trabajos_grandes, 1);
 						$descripcion = $descripcion_trabajos_grandes[$descripcion_index];
 
@@ -307,7 +318,7 @@ if (Conf::EsAmbientePrueba()) {
 						$duracion_cobrada = Utiles::subtract_hora($duracion, $duracion_subtract[$duracion_subtract_index]);
 
 						if (Utiles::time2decimal(Utiles::add_hora($duracion_en_este_dia, $duracion)) < $horas_maximas) {
-							$values[] = "(2, '{$fecha_trabajo}', '{$asunto}', '{$descripcion_trabajo}', '{$duracion}', '{$duracion_cobrada}', {$usuario})";
+							$values[] = "({$id_moneda}, '{$fecha_trabajo}', '{$asunto}', '{$descripcion_trabajo}', '{$duracion}', '{$duracion_cobrada}', {$usuario}, {$tarifa_hh}, {$costo_hh})";
 							$duracion_en_este_dia = Utiles::add_hora($duracion_en_este_dia, $duracion);
 						}
 
@@ -320,11 +331,19 @@ if (Conf::EsAmbientePrueba()) {
 		if (count($values) > 0) {
 			Debug::pr('Insertando ' . count($values) . ' trabajos para el día ' . date('d-m-Y', $fecha));
 
-			$query = "INSERT INTO trabajo(id_moneda, fecha,codigo_asunto, descripcion, duracion, duracion_cobrada, id_usuario) VALUES ";
-			$resp = mysql_query($query . implode(',', $values)) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			foreach ($values as $value) {
+				$query = "INSERT INTO trabajo(id_moneda, fecha,codigo_asunto, descripcion, duracion, duracion_cobrada, id_usuario, tarifa_hh, costo_hh) VALUES {$value}";
+				mysql_query($query) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+
+				// incluir tarifas por trabajo
+				$id_trabajo = mysql_insert_id($sesion->dbh);
+				$Trabajo = new Trabajo($sesion);
+				$Trabajo->Load($id_trabajo);
+				$Trabajo->InsertarTrabajoTarifa();
+			}
 		}
 
-		list($anio, $mes, $dia) = split('-', $fecha_trabajo);
+		list($anio, $mes, $dia) = explode('-', $fecha_trabajo);
 		$fecha = mktime(0, 0, 0, $mes, $dia + 1, $anio);
 	}
 
@@ -367,14 +386,11 @@ if (Conf::EsAmbientePrueba()) {
 		__('Transporte Aéreo')
 	);
 
-
-
-
-	list($anio, $mes, $dia) = split('-', $fecha_ini);
+	list($anio, $mes, $dia) = explode('-', $fecha_ini);
 	$fecha_mk_ini = mktime(0, 0, 0, $mes, $dia, $anio);
 	$fecha = $fecha_mk_ini;
 
-	list($anio_fin, $mes_fin, $dia_fin) = split('-', $fecha_fin);
+	list($anio_fin, $mes_fin, $dia_fin) = explode('-', $fecha_fin);
 	$fecha_mk_fin = mktime(0, 0, 0, $mes_fin, $dia_fin, $anio_fin);
 
 	$query = "SELECT codigo_asunto FROM asunto WHERE activo = 1";
@@ -430,7 +446,7 @@ if (Conf::EsAmbientePrueba()) {
 			$resp = mysql_query($query . implode(',', $values), $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		}
 
-		list($anio, $mes, $dia) = split('-', $fecha_para_pasar);
+		list($anio, $mes, $dia) = explode('-', $fecha_para_pasar);
 		$fecha = mktime(0, 0, 0, $mes + 1, $dia, $anio);
 	}
 
@@ -451,10 +467,10 @@ if (Conf::EsAmbientePrueba()) {
 		$resp_usuario = mysql_query($query_usuario, $sesion->dbh) or Utiles::errorSQL($query_usuario, __FILE__, __LINE__, $sesion->dbh);
 		list($id_usuario_cobro) = mysql_fetch_array($resp_usuario);
 
-		list($anio_ini, $mes_ini, $dia_ini) = split('-', $fecha_ini);
+		list($anio_ini, $mes_ini, $dia_ini) = explode('-', $fecha_ini);
 		$fecha_mk_ini = mktime(0, 0, 0, $mes_ini, $dia_ini, $anio_ini);
 
-		list($anio_fin, $mes_fin, $dia_fin) = split('-', $fecha_fin);
+		list($anio_fin, $mes_fin, $dia_fin) = explode('-', $fecha_fin);
 		$fecha_mk_fin = mktime(0, 0, 0, $mes_fin, $dia_fin, $anio_fin);
 		$fecha_fin_restriccion = mktime(0, 0, 0, $mes_fin - 1, $dia_fin, $anio_fin);
 

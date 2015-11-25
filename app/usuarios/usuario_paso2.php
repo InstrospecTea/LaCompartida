@@ -519,7 +519,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					}
 					?>
 					<br/>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-size: 9px;">(<?php echo __('(sólo los usuarios activos pueden ingresar al sistema)'); ?>)</span>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-size: 9px;"><?php echo __('(sólo los usuarios activos pueden ingresar al sistema)'); ?></span>
 					<div id="activo_status" class="alert alert-error" style="display:none;width:300px;margin-top:20px;padding:5px;"></div>
 				</td>
 			</tr>
@@ -589,7 +589,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			</tr>
 			<tr>
 				<td colspan="3">
-					El perfil por defecto es secretario de todos los profesionales, en caso que desee que sea sólo de algunos debe seleccionarlos.
+					<b><?php echo __('El perfil por defecto es secretario de todos los profesionales, en caso que desee que sea sólo de algunos debe seleccionarlos') ?>.</b>
 				</td>
 			</tr>
 		</table>
@@ -629,7 +629,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			</tr>
 			<tr>
 				<td colspan="3">
-					<?php echo __('El perfil por defecto es revisor de todos los profesionales, en caso que desee que sea sólo de algunos debe seleccionarlos.'); ?>
+					<b><?php echo __('El perfil por defecto es revisor de todos los profesionales, en caso que desee que sea sólo de algunos debe seleccionarlos'); ?>.</b>
 				</td>
 			</tr>
 		</table>
@@ -1144,7 +1144,7 @@ function CargarPermisos() {
 	$$('.cls_eliminar_vacacion').each(function(elemento){
 		elemento.observe('click', function(evento){
 			evento.stop();
-			if (confirm(<?php echo __('¿Está seguro que quiere borrar las vacaciones de este usuario?'); ?>)) {
+			if (confirm("<?php echo __('¿Está seguro que quiere borrar las vacaciones de este usuario?'); ?>")) {
 				var ide = elemento.id;
 				var tmp = ide.split('_');
 				$('opc').value = 'elimina_vacacion';

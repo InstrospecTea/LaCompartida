@@ -61,6 +61,16 @@ class CriteriaRestriction {
 	}
 
 	/**
+	 * Sentencia like entre dos argumentos.
+	 * @param $left
+	 * @param $right
+	 * @return CriteriaRestriction
+	 */
+	public static function like($left, $right) {
+		return new CriteriaRestriction("{$left} LIKE {$right}");
+	}
+
+	/**
 	 * Genera una sentencia AND entre los argumentos pasados.
 	 * @return CriteriaRestriction
 	 */
