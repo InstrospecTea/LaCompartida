@@ -981,8 +981,8 @@ class CronNotificacion extends Cron {
 	 * Revisa los hitos cumplidos segun fecha de cobro
 	 */
 	public function hitos_cumplidos() {
-		$cobro_pendiete = new CobroPendiente($this->Sesion);
-		$hitos_cumplidos = $cobro_pendiete->ObtenerHitosCumplidosParaCorreos();
+		$cobro_pendiente = new CobroPendiente($this->Sesion);
+		$hitos_cumplidos = $cobro_pendiente->ObtenerHitosCumplidosParaCorreos();
 
 		if (!empty($hitos_cumplidos)) {
 			foreach ($hitos_cumplidos as $usuario_responsable => $hito_cumplido) {
@@ -992,8 +992,8 @@ class CronNotificacion extends Cron {
 	}
 
 	public function recordatorio_hitos_cumplidos() {
-		$cobro_pendiete = new CobroPendiente($this->Sesion);
-		$recordatorio_hitos_cumplidos = $cobro_pendiete->ObtenerHitosCumplidosParaCorreos(true);
+		$cobro_pendiente = new CobroPendiente($this->Sesion);
+		$recordatorio_hitos_cumplidos = $cobro_pendiente->ObtenerHitosCumplidosParaCorreos(true);
 		if (!empty($recordatorio_hitos_cumplidos)) {
 			foreach ($recordatorio_hitos_cumplidos as $usuario_responsable => $hito_cumplido) {
 				$this->datoDiario[$usuario_responsable]['recordatorio_hitos_cumplidos'][] = $hito_cumplido;
