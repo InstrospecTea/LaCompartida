@@ -10985,6 +10985,12 @@ QUERY;
 		case 8.23:
 			$queries[] = "ALTER TABLE `cobro_pendiente` ADD COLUMN `fecha_notificacion` DATE NULL";
 			break;
+		case 8.24:
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+					VALUES ('RepeticionesNotificacionHitos', '5', 'Cantidad de veces que se volverá a notificar un Hito', 'select;1;2;3;4;5', '3', '-1')";
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+					VALUES ('DistanciaNotificacionesHitos', '3', 'Cantidad de días entre repeticiones de notificación de un hito', 'select;1;2;3;4;5', '3', '-1')";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -10997,7 +11003,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.23;
+$max_update = 8.24;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
