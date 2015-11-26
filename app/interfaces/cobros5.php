@@ -18,7 +18,7 @@ $enpdf = ( $opc == 'guardar_cobro_pdf' ? true : false );
 $cliente = new Cliente($sesion);
 $cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 $nombre_cliente = $cliente->fields['glosa_cliente'];
-$pagina->titulo = __('Emitir') . ' ' . __('Cobro') . __(' :: Detalle #') . $id_cobro . __(' ') . $nombre_cliente;
+$pagina->titulo = __('Emitir') . ' ' . __('Cobro') . __(' :: Detalle #') . $cobro->fields['id_cobro'] . __(' ') . $nombre_cliente;
 
 //Contrato
 $contrato = new Contrato($sesion);
@@ -36,7 +36,7 @@ $moneda_base->Load($cobro->fields['id_moneda_base']);
 $retainer = "";
 
 if ($cobro->fields['estado'] != 'CREADO' && $cobro->fields['estado'] != 'EN REVISION' && $opc != 'anular_emision') {
-	$pagina->Redirect("cobros6.php?id_cobro=" . $id_cobro . "&popup=1&contitulo=true&opc=guardar");
+	$pagina->Redirect("cobros6.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1&contitulo=true&opc=guardar");
 }
 
 if ($opc == 'anular_emision') {
@@ -172,12 +172,12 @@ if ($opc == 'anular_emision') {
 
 	$cobro->Edit('tipo_descuento', $tipo_descuento);
 	$cobro_moneda_cambio = new CobroMoneda($sesion);
-	$cobro_moneda_cambio->UpdateTipoCambioCobro($cobro_id_moneda, $cobro_tipo_cambio, $id_cobro);
+	$cobro_moneda_cambio->UpdateTipoCambioCobro($cobro_id_moneda, $cobro_tipo_cambio, $cobro->fields['id_cobro']);
 	$observacion = new Observacion($sesion);
 	$moneda = new Moneda($sesion);
 	$moneda->Load($cobro_id_moneda);
 	$tipo_cambio_original = $moneda->fields['tipo_cambio'];
-	$ultimaObservacion = $observacion->UltimaObservacion($id_cobro);
+	$ultimaObservacion = $observacion->UltimaObservacion($cobro->fields['id_cobro']);
 
 	$comentario = __('Moneda') . ' seleccionada ' . $moneda->fields['codigo'] . '';
 
@@ -189,7 +189,7 @@ if ($opc == 'anular_emision') {
 			$observacion->Edit('fecha', date('Y-m-d H:i:s'));
 			$observacion->Edit('comentario', $comentario);
 			$observacion->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
-			$observacion->Edit('id_cobro', $id_cobro);
+			$observacion->Edit('id_cobro', $cobro->fields['id_cobro']);
 			$observacion->Write();
 	}
 
@@ -241,7 +241,7 @@ if ($opc == 'anular_emision') {
 		if ($cobro->Write()) {
 			if (!empty($usar_adelantos)) {
 				$documento = new Documento($sesion);
-				$documento->LoadByCobro($id_cobro);
+				$documento->LoadByCobro($cobro->fields['id_cobro']);
 				$documento->GenerarPagosDesdeAdelantos($documento->fields['id_documento'], null, $id_adelanto);
 			}
 			if (empty($cobro->fields['estado_anterior']) || in_array($cobro->fields['estado_anterior'], array('CREADO', 'EN REVISION'))) {
@@ -251,7 +251,7 @@ if ($opc == 'anular_emision') {
 				$cobro->Write();
 			}
 			$refrescar = "<script language='javascript' type='text/javascript'>if(window.opener.Refrescar) window.opener.Refrescar(" . $id_foco . ");</script>";
-			$pagina->Redirect("cobros6.php?id_cobro=" . $id_cobro . "&popup=1&contitulo=true&refrescar=1&opc=guardar");
+			$pagina->Redirect("cobros6.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1&contitulo=true&refrescar=1&opc=guardar");
 		}
 
 	#################### IMPRESION #####################
@@ -272,9 +272,9 @@ if ($opc == 'anular_emision') {
 	################## ANTERIOR PASO ###################
 	} else if ($accion == 'anterior') {
 		if (!empty($cobro->fields['incluye_gastos'])) {
-			$pagina->Redirect("cobros4.php?id_cobro=" . $id_cobro . "&popup=1&contitulo=true");
+			$pagina->Redirect("cobros4.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1&contitulo=true");
 		} else {
-			$pagina->Redirect("cobros_tramites.php?id_cobro=" . $id_cobro . "&popup=1&contitulo=true");
+			$pagina->Redirect("cobros_tramites.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1&contitulo=true");
 		}
 	}
 
@@ -332,7 +332,7 @@ if ($popup) {
 	<table width="100%" border="0" cellspacing="0" cellpadding="2">
 		<tr>
 			<td valign="top" align="left" class="titulo" bgcolor="<?php echo Conf::GetConf($sesion, 'ColorTituloPagina') ?>">
-	<?php echo __('Emitir') . " " . __('Cobro') . __(' :: Detalle #') . $id_cobro . __(' ') . $nombre_cliente; ?>
+	<?php echo __('Emitir') . " " . __('Cobro') . __(' :: Detalle #') . $cobro->fields['id_cobro'] . __(' ') . $nombre_cliente; ?>
 			</td>
 		</tr>
 	</table>
@@ -340,7 +340,7 @@ if ($popup) {
 	<?php
 }
 
-$pagina->PrintPasos($sesion, 4, '', $id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
+$pagina->PrintPasos($sesion, 4, '', $cobro->fields['id_cobro'], $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']);
 
 #Tooltips para las modalidades de cobro.
 $tip_tasa = __("En esta modalidad se cobra hora a hora. Cada profesional tiene asignada su propia tarifa para cada asunto.");
@@ -594,7 +594,7 @@ echo $refrescar;
 	function seleccionarAdelanto() {
 		var params = {
 			popup: 1,
-			id_cobro: '<?php echo $id_cobro ?>',
+			id_cobro: '<?php echo $cobro->fields['id_cobro'] ?>',
 			codigo_cliente: '<?php echo $cobro->fields['codigo_cliente'] ?>',
 			elegir_para_pago: 1,
 			id_contrato: '<?php echo $cobro->fields['id_contrato'] ?>',
@@ -1204,7 +1204,7 @@ else
 
 <form method="post" id="form_cobro5" name="form_cobro5" >
 	<input type="hidden" name="existe_factura" id="existe_factura" value="<?php echo $existe_factura ?>" />
-	<input type="hidden" name="id_cobro" id="id_cobro" value="<?php echo $id_cobro ?>">
+	<input type="hidden" name="id_cobro" id="id_cobro" value="<?php echo $cobro->fields['id_cobro'] ?>">
 	<input type="hidden" name="ajustar_monto_hide" id="ajustar_monto_hide" value="<?php echo $cobro->fields['monto_ajustado'] > 0 ? true : false ?>" />
 	<input type="hidden" name="opc" value="guardar_cobro">
 	<input type="hidden" name="id_contrato" value="<?php echo $cobro->fields['id_contrato'] ?>" id="id_contrato">
@@ -1217,7 +1217,7 @@ else
 		$documento = new Documento($sesion);
 		$pago_honorarios = (float) ($cobro->fields['monto_subtotal']) ? 1 : 0;
 		$pago_gastos = (float) ($cobro->fields['subtotal_gastos']) ? 1 : 0;
-		$cobro_moneda = new ListaMonedas($sesion, '', 'SELECT * FROM cobro_moneda WHERE id_cobro = ' . $id_cobro);
+		$cobro_moneda = new ListaMonedas($sesion, '', 'SELECT * FROM cobro_moneda WHERE id_cobro = ' . $cobro->fields['id_cobro']);
 		$tipo_cambio_cobro = Array();
 
 		for ($i = 0; $i < $monedas->num; $i++) {
@@ -1306,7 +1306,7 @@ else
 
 						<?php
 						/* Lista de moneda del cobro */
-						$cobro_moneda = new ListaMonedas($sesion, '', 'SELECT * FROM cobro_moneda WHERE id_cobro = ' . $id_cobro);
+						$cobro_moneda = new ListaMonedas($sesion, '', 'SELECT * FROM cobro_moneda WHERE id_cobro = ' . $cobro->fields['id_cobro']);
 						$tipo_cambio_cobro = Array();
 
 						for ($i = 0; $i < $monedas->num; $i++) {
@@ -1748,7 +1748,7 @@ else
 				$moneda_total = new Moneda($sesion);
 				$moneda_total->Load($cobro->fields['opc_moneda_total']);
 				$cobro_moneda_tipo_cambio = new CobroMoneda($sesion);
-				$cobro_moneda_tipo_cambio->Load($id_cobro);
+				$cobro_moneda_tipo_cambio->Load($cobro->fields['id_cobro']);
 				$tipo_cambio_moneda_cobro = $cobro_moneda_tipo_cambio->moneda[$cobro->fields['id_moneda']]['tipo_cambio'];
 				$tipo_cambio_moneda_total = $cobro_moneda_tipo_cambio->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
 				$cifras_decimales_moneda_cobro = $cobro_moneda_tipo_cambio->moneda[$cobro->fields['id_moneda']]['cifras_decimales'];
@@ -2201,7 +2201,7 @@ else
 
 <br>
 
-<iframe src="historial_cobro.php?id_cobro=<?php echo $id_cobro?>" width=600px height=450px style="border: none;" frameborder=0></iframe>
+<iframe src="historial_cobro.php?id_cobro=<?php echo $cobro->fields['id_cobro']?>" width=600px height=450px style="border: none;" frameborder=0></iframe>
 
 <div id="confirmacionEmitir" style="display:none">
 	<div style="font-size:11px; color:#000; ">
@@ -2227,7 +2227,7 @@ else
 					<br/>
 					<span>
 						Puede revisar las tarifas de todos los trabajos
-						<a href="cobros3.php?id_cobro=<?php echo $id_cobro; ?>&popup=1&contitulo=true" style="color:blue;">aquí</a></span>
+						<a href="cobros3.php?id_cobro=<?php echo $cobro->fields['id_cobro']; ?>&popup=1&contitulo=true" style="color:blue;">aquí</a></span>
 				</span>
 			<?php } else { ?>
 				<span>
