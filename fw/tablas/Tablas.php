@@ -57,7 +57,7 @@ class Tablas {
         if (count($elements) > 0) {
             $foreignKeyArr = array();
             foreach ($elements as $element) {
-                if (ereg('CONSTRAINT', $element)) {
+                if (preg_match('CONSTRAINT', $element)) {
                     array_push($constraints, $element);
                 }
             }
