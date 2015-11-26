@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.29.1
+Thursday, November 25th
+* **Fix** [Error SQL Cobro](https://github.com/LemontechSA/ttb/pull/1245)
+
 ## [Release 15.29.0](https://github.com/LemontechSA/ttb/pull/1243)
 Wednesday 2015, November 25th
 * **Feature** [Recordatorio hitos pendientes](https://github.com/LemontechSA/ttb/pull/1231)
