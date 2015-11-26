@@ -1,6 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once('Numbers/Words.php');
 
 class FacturaPdfDatos extends Objeto {
 	function FacturaPdfDatos($sesion, $fields = '', $params = '') {
@@ -101,13 +100,15 @@ class FacturaPdfDatos extends Objeto {
 			$fix_decimal = '10';
 		}
 
+		$NumbersWords = new Numbers_Words();
+
 		if (empty($monto_parte_decimal)) {
-			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, $codigo));
+			$monto_palabra_parte_entera = strtoupper($NumbersWords->toWords($monto_parte_entera, $codigo));
 			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
 			$monto_en_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' 00/100 ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
 		} else {
-			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, $codigo));
-			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal * $fix_decimal, $codigo));
+			$monto_palabra_parte_entera = strtoupper($NumbersWords->toWords($monto_parte_entera, $codigo));
+			$monto_palabra_parte_decimal = strtoupper($NumbersWords->toWords($monto_parte_decimal * $fix_decimal, $codigo));
 			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1') . ' ' . __('CON') . ' ' . $monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
 			$monto_en_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' ' . ($monto_parte_decimal * $fix_decimal) . '/100 ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
 		}
