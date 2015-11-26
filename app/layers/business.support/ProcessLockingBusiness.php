@@ -126,7 +126,7 @@ class ProcessLockingBusiness extends AbstractBusiness implements IProcessLocking
 	}
 
 	public function getNotificationHtml($entity) {
-		$proceso = \TTB\Utiles::humanize(\TTB\Utiles::underscoreize($entity->get('proceso')));
+		$proceso = Utiles::humanize(Utiles::underscoreize($entity->get('proceso')));
 		$fecha = Utiles::sql3fecha($entity->get('fecha_modificacion'), '%d-%m-%Y a las %H:%M hrs.');
 		$form_link = $this->getFormLink($entity->get('proceso'), $entity->get('datos_post'), $entity->get('id'));
 		$html = "<b>{$proceso}</b><br/>{$fecha}<br/>{$entity->get('estado')}<br/>{$form_link}";

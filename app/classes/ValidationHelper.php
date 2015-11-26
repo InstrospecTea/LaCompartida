@@ -4,50 +4,48 @@ require_once dirname(__FILE__) . '/../../app/conf.php';
 
  /**
   * Helper para correr validaciones en el front Legacy
-  * 
-  * Permite definir validaciones de servidor y cliente de manera 
+  *
+  * Permite definir validaciones de servidor y cliente de manera
   * que se puedan unificar y reutilizar sobre todo en interfaces
   * que sirven como partials para otras.
-  * 
+  *
   */
 class ValidationHelper {
 
-  public $Utiles;
   public $Html;
   protected $scripts = array();
   protected $validations = array();
 
   /**
    * Constructor
-   * @param object $Sesion Sesi贸n activa
-   * @param array $options opciones de configuraci贸n:
+   * @param object $Sesion Sesi髇 activa
+   * @param array $options opciones de configuraci髇:
    *                       * skipped: array con la lista de atributos que no se validan
-   *                       * disableServer: boolean establece si se deshabilitan las 
+   *                       * disableServer: boolean establece si se deshabilitan las
    *                                         validaciones del lado del servidor
-   *                       * disableClient: boolean establece si se deshabilitan las 
+   *                       * disableClient: boolean establece si se deshabilitan las
    *                                         validaciones del lado del servidor
-   *                       * validateClient: string c贸digo js que se ejecuta antes de cada validaci贸n
+   *                       * validateClient: string c骴igo js que se ejecuta antes de cada validaci髇
    */
   public function __construct($Sesion, $options) {
-    $this->Utiles = new \TTB\Utiles();
     $this->Html = new \TTB\Html();
     $this->validations = array();
     $this->options = $options;
   }
 
   /**
-   * Registra una nueva validaci贸n
+   * Registra una nueva validaci髇
    * @param  string $field      nombre del campo a validar, debe coincidir con el elemento del form
-   * @param  array $validation  establece las reglas de valicaci贸n
-   *                            * server: function Lamda con la validaci贸n del lado del servidor
+   * @param  array $validation  establece las reglas de valicaci髇
+   *                            * server: function Lamda con la validaci髇 del lado del servidor
    *                            * value: object Valor o variable que contiene el valor en el servidor
-   *                            * client: string C贸digo JS validaci贸n del lado del cliente
+   *                            * client: string C骴igo JS validaci髇 del lado del cliente
    * <code>
    *  $options = array(
-   *    
+   *
    *  )
    * </code>
-   * 
+   *
    * @return void
    */
   public function registerValidation($field, $validation) {
@@ -55,8 +53,8 @@ class ValidationHelper {
   }
 
   /**
-   * verifica si una validaci贸n debe ser saltada
-   * 
+   * verifica si una validaci髇 debe ser saltada
+   *
    * @param  string $key [description]
    * @return [type]      [description]
    */
@@ -83,7 +81,7 @@ class ValidationHelper {
     }
     return false;
   }
-  
+
   public function getClientValidationsScripts() {
     if ($this->options && $this->options['disableClient'] == true) {
       return;

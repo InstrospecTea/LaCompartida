@@ -372,8 +372,7 @@ La solicitud de adelanto N° {$this->fields['id_solicitud_adelanto']},
 se encuentra disponible para su retiro.
 BODY;
 
-			$utiles = new Utiles;
-			return $utiles->EnviarMail($this->sesion, $correo_solicitante, $subject, $body);
+			return Utiles::EnviarMail($this->sesion, $correo_solicitante, $subject, $body);
 		}
 
 		return false;

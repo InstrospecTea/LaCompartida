@@ -81,7 +81,7 @@ class GeneracionMasivaCobros extends AppShell {
 //						" {$usuario['nombre']}:\n\n" .
 //						__('El proceso a finalizado con el siguiente resultado') .
 //						":\n\n{$this->statusText()}\n\n--\nThe Time Billing";
-//			\TTB\Utiles::InsertarPlus($this->Session, $subject, $messaje, $usuario['email'], $usuario['nombre'], false, $this->data['user_id'], 'proceso');
+//			Utiles::InsertarPlus($this->Session, $subject, $messaje, $usuario['email'], $usuario['nombre'], false, $this->data['user_id'], 'proceso');
 //		} catch (Exception $e) {
 //			$this->log('ERROR al generar correo: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
 //		}
@@ -124,7 +124,7 @@ class GeneracionMasivaCobros extends AppShell {
 			} catch (Exception $e) {
 				$this->log('Error contracts: ' . $e->getMessage());
 			}
-			$this->log(' |- Uso de memoria ' . \TTB\Utiles::_h(memory_get_usage()) . ', sistema ' . \TTB\Utiles::_h(memory_get_usage(1)));
+			$this->log(' |- Uso de memoria ' . Utiles::_h(memory_get_usage()) . ', sistema ' . Utiles::_h(memory_get_usage(1)));
 		}
 		$msg_procesando = $this->sp($processing, __('Se ha procesado 1 contrato de') . " {$total_contratos}", __('Se han procesado') . " {$processing} " . __('contratos de') . " {$total_contratos}");
 		$this->status('proceso', "{$msg_procesando}.");
@@ -162,7 +162,7 @@ class GeneracionMasivaCobros extends AppShell {
 					} else {
 						$this->generaMIXTAS($contrato['id_contrato']);
 					}
-					$this->log(' |- Uso de memoria ' . \TTB\Utiles::_h(memory_get_usage()) . ', sistema ' . \TTB\Utiles::_h(memory_get_usage(1)));
+					$this->log(' |- Uso de memoria ' . Utiles::_h(memory_get_usage()) . ', sistema ' . Utiles::_h(memory_get_usage(1)));
 				}
 			} catch (Exception $e) {
 				$this->log('Error clients: ' . $e->getMessage());

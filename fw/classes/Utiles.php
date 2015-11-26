@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../../app/conf.php';
 
 class Utiles {
 
-	static function errorSQL($query, $error_file = '', $error_line = '', $dbh = NULL, $mensaje_adicional = '', $e = null) {
+	public static function errorSQL($query, $error_file = '', $error_line = '', $dbh = NULL, $mensaje_adicional = '', $e = null) {
 		global $ROOT_PATH, $IMAGES_PATH, $save_log, $sesion, $Sesion;
 
 		if ($e == null) {
@@ -124,7 +124,7 @@ class Utiles {
 		exit;
 	}
 
-	function errorFatal($mensaje, $error_file, $error_line) {
+	public static function errorFatal($mensaje, $error_file, $error_line) {
 		global $ROOT_PATH, $IMAGES_PATH;
 
 		echo<<<HTML
@@ -146,7 +146,7 @@ HTML;
 		exit;
 	}
 
-	function ValorUF($sesion) {
+	public static function ValorUF($sesion) {
 		// Seleccionamos el valor de la UF mas cercano a hoy.
 		$query = "SELECT valor_uf FROM uf WHERE fecha <= CURDATE() ORDER BY fecha DESC LIMIT 0,1";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -165,19 +165,19 @@ HTML;
 		return $moneda;
 	}
 
-	function SacarPuntos($monto) {
+	public static function SacarPuntos($monto) {
 		$monto = str_replace(".", "", $monto);
 		$monto = str_replace(",", "", $monto);
 		return $monto;
 	}
 
-	function PongaCero($numero) {
+	public static function PongaCero($numero) {
 		if ($numero < 10)
 			$numero = '0' . $numero;
 		return $numero;
 	}
 
-	function EnIntervalo($sesion, $numero) {
+	public static function EnIntervalo($sesion, $numero) {
 		if ($numero % Conf::GetConf($sesion, 'Intervalo') > Conf::GetConf($sesion, 'Intervalo') / 2) {
 			return (floor($numero / Conf::GetConf($sesion, 'Intervalo')) + 1) * Conf::GetConf($sesion, 'Intervalo');
 		} else {
@@ -194,7 +194,7 @@ HTML;
 		return $rut;
 	}
 
-	function ValidarRut($rut, $dvrut) {
+	public static function ValidarRut($rut, $dvrut) {
 		$rut = '' . $rut; // pa transformar a string
 		$largo = strlen($rut);
 		$suma = 0;
@@ -220,7 +220,7 @@ HTML;
 		return ($dvrut == $digito);
 	}
 
-	function Comuna($sesion, $id_comuna) {
+	public static function Comuna($sesion, $id_comuna) {
 		$query = "SELECT glosa_comuna FROM prm_comuna WHERE id_comuna='$id_comuna'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($valor) = mysql_fetch_array($resp);
@@ -231,7 +231,7 @@ HTML;
 			return "No existe información";
 	}
 
-	function LoadDocumento($sesion, $id_documento) {
+	public static function LoadDocumento($sesion, $id_documento) {
 		$query = "SELECT contenido FROM documentos WHERE id_documento='$id_documento'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($valor) = mysql_fetch_array($resp);
@@ -242,12 +242,12 @@ HTML;
 			return "No existe información";
 	}
 
-	function NewPassword() {
+	public static function NewPassword() {
 		return Utiles::RandomString();
 	}
 
 	//Retorna un string aleatorio de 8 caracteres.
-	function RandomString() {
+	public static function RandomString() {
 		$new_password = '';
 
 		while (strlen($new_password) < 8)
@@ -256,7 +256,7 @@ HTML;
 		return $new_password;
 	}
 
-	static function sql2fecha($string, $format = '%A %d de %B de %Y', $mensaje_error = "") {
+	public static function sql2fecha($string, $format = '%A %d de %B de %Y', $mensaje_error = "") {
 		if (strpos($string, "0000-00-00") === 0 || $string == "")
 			if ($mensaje_error == "")
 				return "No existe fecha";
@@ -284,7 +284,7 @@ HTML;
 		return(strtolower(strftime($format, $time)));
 	}
 
-	function es_fecha_sql($string) {
+	public static function es_fecha_sql($string) {
 		if ($string == '')
 			return;
 		list($date, $time) = explode(" ", $string);
@@ -292,7 +292,7 @@ HTML;
 		return checkdate($mes, $dia, $ano);
 	}
 
-	function sql2date($string, $format = '%d-%m-%Y') {
+	public static function sql2date($string, $format = '%d-%m-%Y') {
 		if ($string == '')
 			return null;
 		$arr = preg_split('//', $format);
@@ -320,12 +320,12 @@ HTML;
 			return null;
 	}
 
-	function sql3fecha($string, $format = '%A %d de %B de %Y a las %H:%M hrs.') {
+	public static function sql3fecha($string, $format = '%A %d de %B de %Y a las %H:%M hrs.') {
 		$format = self::FormatoStrfTime($format);
 		return( Utiles::sql2fecha($string, $format) );
 	}
 
-	function fecha2sql($fecha, $default = "actual") {
+	public static function fecha2sql($fecha, $default = "actual") {
 		list($d, $m, $a) = explode("-", $fecha);
 		if ($a > 0)
 			return "$a-$m-$d";
@@ -335,7 +335,7 @@ HTML;
 			return $default;
 	}
 
-	function fechahora2sql($fecha, $default = "actual") {
+	public static function fechahora2sql($fecha, $default = "actual") {
 		list($fecha, $hora) = explode(" ", $fecha);
 		list($d, $m, $a) = explode("-", $fecha);
 
@@ -347,7 +347,7 @@ HTML;
 			return $default;
 	}
 
-	function CantidadMeses($fecha1, $fecha2) {
+	public static function CantidadMeses($fecha1, $fecha2) {
 		$mes1 = date("n", strtotime($fecha1));
 		$mes2 = date("n", strtotime($fecha2));
 		$anio1 = date("Y", strtotime($fecha1));
@@ -356,19 +356,19 @@ HTML;
 		return $cantidad_meses;
 	}
 
-	function add_date($givendate, $day = 0, $mth = 0, $yr = 0) {
+	public static function add_date($givendate, $day = 0, $mth = 0, $yr = 0) {
 		$cd = strtotime($givendate);
 		$newdate = date('Y-m-d h:i:s', mktime(date('h', $cd), date('i', $cd), date('s', $cd), date('m', $cd) + $mth, date('d', $cd) + $day, date('Y', $cd) + $yr));
 		return $newdate;
 	}
 
-	function add_date_con_hora($givendate, $day = 0, $mth = 0, $yr = 0, $hr = 0, $min = 0, $sec = 0) {
+	public static function add_date_con_hora($givendate, $day = 0, $mth = 0, $yr = 0, $hr = 0, $min = 0, $sec = 0) {
 		$cd = strtotime($givendate);
 		$newdate = date('Y-m-d h:i:s', mktime(date('h', $cd) + $hr, date('i', $cd) + $min, date('s', $cd) + $sec, date('m', $cd) + $mth, date('d', $cd) + $day, date('Y', $cd) + $yr));
 		return $newdate;
 	}
 
-	function add_hora($hora1, $hora2) {
+	public static function add_hora($hora1, $hora2) {
 		list($h1, $m1, $s1) = explode(":", $hora1);
 		list($h2, $m2, $s2) = explode(":", $hora2);
 
@@ -393,7 +393,7 @@ HTML;
 		return $suma;
 	}
 
-	function subtract_hora($hora1, $hora2) {
+	public static function subtract_hora($hora1, $hora2) {
 		list($h1, $m1, $s1) = explode(":", $hora1);
 		list($h2, $m2, $s2) = explode(":", $hora2);
 
@@ -418,7 +418,7 @@ HTML;
 		return $diferencia;
 	}
 
-	function Dias_Trabajo_Este_Anio() {
+	public static function Dias_Trabajo_Este_Anio() {
 		$DiasTrabajoEsteAnio = 0;
 		$fecha = mktime(0, 0, 0, 1, 1, date("Y", time()));
 		while ($fecha <= time()) {
@@ -430,7 +430,7 @@ HTML;
 		return $DiasTrabajoEsteAnio;
 	}
 
-	function Dias_Trabajo_Ultimo_Mes() {
+	public static function Dias_Trabajo_Ultimo_Mes() {
 		$DiasTrabajoUltimoMes = 0;
 		$fecha = mktime(0, 0, 0, date('m', time()) - 1, 1, date("Y", time()));
 		//echo date("d-m-Y",$fecha);
@@ -443,7 +443,7 @@ HTML;
 		return $DiasTrabajoUltimoMes;
 	}
 
-	function Dias_Trabajo_Ultima_Semana() {
+	public static function Dias_Trabajo_Ultima_Semana() {
 		$DiasTrabajoUltimaSemana = 0;
 		$dia_actual = date("w", time());
 		$fecha = mktime(0, 0, 0, date('m', time()), date('d', time()) - (6 + $dia_actual), date('Y', time()));
@@ -456,7 +456,7 @@ HTML;
 		return $DiasTrabajoUltimaSemana;
 	}
 
-	function feriado($fecha) {
+	public static function feriado($fecha) {
 		if (date("d", $fecha) == 1 && date("m", $fecha) == 1)
 			return false;
 		else if (date("d", $fecha) == 1 && date("m", $fecha) == 5)
@@ -494,7 +494,7 @@ HTML;
 			return true;
 	}
 
-	function dia_de_pascua($fecha) {
+	public static function dia_de_pascua($fecha) {
 		if ($fecha == '') {
 			$a = date("Y", time()) % 19;
 			$b = date("Y", time()) % 4;
@@ -515,7 +515,7 @@ HTML;
 		return 22 + $d + $e;
 	}
 
-	function FechaValida($fecha) {
+	public static function FechaValida($fecha) {
 		list($fecha, $hora) = explode(' ', $fecha);
 		list($a, $m, $d) = explode('-', $fecha);
 
@@ -527,7 +527,7 @@ HTML;
 		return $fecha;
 	}
 
-	function ValidarFecha($dia, $mes, $ano, $hora = 0, $min = 0) {
+	public static function ValidarFecha($dia, $mes, $ano, $hora = 0, $min = 0) {
 		if (!checkdate($mes, $dia, $ano))
 			return false;
 
@@ -537,7 +537,7 @@ HTML;
 		return true;
 	}
 
-	function SelectDias($sesion, $name, $selected = null, $id = 0, $onchange = "") {
+	public static function SelectDias($sesion, $name, $selected = null, $id = 0, $onchange = "") {
 		$select = "<select name='$name' id='$id' onchange=\"$onchange\">";
 
 
@@ -553,7 +553,7 @@ HTML;
 		return $select;
 	}
 
-	function Formato($num, $format = '%d', $idioma = null, $numero_decimales = 0) {
+	public static function Formato($num, $format = '%d', $idioma = null, $numero_decimales = 0) {
 		$ret = '';
 
 		if ($idioma != null) {
@@ -594,7 +594,7 @@ HTML;
 		return $ret;
 	}
 
-	function Direccion($sesion, $dir_calle, $dir_numero, $dir_depto, $dir_comuna) {
+	public static function Direccion($sesion, $dir_calle, $dir_numero, $dir_depto, $dir_comuna) {
 		$direccion = $dir_calle . ' ' . $dir_numero;
 
 		if ($dir_depto)
@@ -606,7 +606,7 @@ HTML;
 	}
 
 	//Esta funcion en muy util al tener el id y querer desplegar la glosa.
-	function Glosa($sesion, $id, $campo, $tabla, $llave = "") {
+	public static function Glosa($sesion, $id, $campo, $tabla, $llave = "") {
 		$llave = $llave == "" ? "id_" . $tabla : $llave;
 
 		$query = "SELECT $campo FROM $tabla WHERE $llave='$id'";
@@ -619,7 +619,7 @@ HTML;
 			return "No existe información";
 	}
 
-	function GlosaMult($sesion, $id1, $id2, $campo, $tabla, $llave1, $llave2) {
+	public static function GlosaMult($sesion, $id1, $id2, $campo, $tabla, $llave1, $llave2) {
 		$query = "SELECT $campo FROM $tabla WHERE $llave1='$id1' AND $llave2='$id2'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($valor) = mysql_fetch_array($resp);
@@ -642,7 +642,7 @@ HTML;
 		return $arraylang;
 	}
 
-	function CrearLog($sesion, $tabla, $id, $accion, $detalle = "", $consulta = "") {
+	public static function CrearLog($sesion, $tabla, $id, $accion, $detalle = "", $consulta = "") {
 		$consulta = addslashes($consulta);
 		$rut = $sesion->usuario->fields['rut'];
 		$query = "INSERT INTO log SET
@@ -658,7 +658,7 @@ HTML;
 	}
 
 	//Pasa de numero de columna (0,1, etc) a fila Excel (A,B...,AA,AB..) para hacer formulas es increible!
-	function NumToColumnaExcel($num) {
+	public static function NumToColumnaExcel($num) {
 		if ($num >= 26)
 			return Utiles::NumToColumnaExcel(floor($num / 26) - 1) . Utiles::NumToColumnaExcel($num % 26);
 		else
@@ -676,7 +676,7 @@ HTML;
 	 * @param csv string $days e.g. 'Su,M,T,W,TH,F,S';
 	 * @return array
 	 */
-	function getDaysBetween($startDate, $endDate, $days) {
+	public static function getDaysBetween($startDate, $endDate, $days) {
 		$endDate = strtotime($endDate);
 		$days = explode(',', 'M,W');
 		$dates = array();
@@ -715,7 +715,7 @@ HTML;
 		return $dates;
 	}
 
-	function send_mail($emailaddress, $fromname, $fromaddress, $emailsubject, $body, $attachments = false, $type_content = 'txt') {
+	public static function send_mail($emailaddress, $fromname, $fromaddress, $emailsubject, $body, $attachments = false, $type_content = 'txt') {
 		$eol = "\r\n";
 		$mime_boundary = md5(time());
 
@@ -785,7 +785,7 @@ HTML;
 	  Esto esta hecho para las tareas que pueden tener muchas modificaciones y no se deben repetir los correos.
 	 */
 
-	function Insertar($sesion, $subject, $mensaje, $email, $nombre, $es_diario = true) {
+	public static function Insertar($sesion, $subject, $mensaje, $email, $nombre, $es_diario = true) {
 		$where_dia = "";
 		if ($es_diario) {
 			$where_dia = " AND YEAR(fecha)=YEAR(NOW()) AND MONTH(fecha)=MONTH(NOW()) AND DAY(fecha)=DAY(NOW())";
@@ -800,13 +800,13 @@ HTML;
 		}
 	}
 
-	function horaDecimal2HoraMinuto($horaDecimal) {
+	public static function horaDecimal2HoraMinuto($horaDecimal) {
 		$h = (int) ($horaDecimal);
 		$m = round($horaDecimal * 60) % 60;
 		return $h . ':' . sprintf('%02d', $m);
 	}
 
-	function Decimal2GlosaHora($horaDecimal) {
+	public static function Decimal2GlosaHora($horaDecimal) {
 
 		$horaDecimalAbsoluto = abs($horaDecimal);
 		$h = (int) ($horaDecimalAbsoluto);
@@ -824,7 +824,7 @@ HTML;
 		}
 	}
 
-	static function GlosaHora2Multiplicador($glosaHora) {
+	public static function GlosaHora2Multiplicador($glosaHora) {
 
 		if (substr($glosaHora, 0, 1) == '-') {
 			$multiplicador = -1;
@@ -838,13 +838,13 @@ HTML;
 		return $factor;
 	}
 
-	function time2decimal($hora) {
+	public static function time2decimal($hora) {
 		list($h, $m, $s) = explode(":", $hora);
 		$hora_decimal = ( $h - 0 ) + ( $m - 0 ) / 60 + ( $s - 0 ) / 3600;
 		return $hora_decimal;
 	}
 
-	function es_bisiesto($a) {
+	public static function es_bisiesto($a) {
 		return $a % 400 == 0 || ($a % 100 != 0 && $a % 4 == 0);
 	}
 
@@ -991,6 +991,137 @@ HTML;
 
 		return $formato;
 	}
+
+	/**
+	 * Funcion que inserta correos en la cola de idem.
+	 * @param object  $sesion     la sesión con que se conecta a la DB para hacer las consultas
+	 * @param string  $subject    subject del mail
+	 * @param string  $mensaje    contenido del mail
+	 * @param string  $email      email del destinatario
+	 * @param string  $nombre     nombre del destinatario
+	 * @param boolean $es_diario  cuando es true, evita repetir el mismo tipo, al mismo destinatario, en el mismo día
+	 * @param int  $id_usuario  el id_usuario del destinatario
+	 * @param string  $tipo       Tipo de correo: alerta diaria, semanal, etc
+	 * @param boolean $simular    Cuando es true, marca el correo como si ya lo hubiera enviado
+	 */
+	public static function InsertarPlus($sesion, $subject, $mensaje, $email, $nombre, $es_diario = true, $id_usuario = null, $tipo = null, $simular = false) {
+		$clean_patt = '/[\r\n\t]+/';
+		$id_tipo_correo = null;
+		if (!empty($tipo)) {
+			$TipoCorreo = new TipoCorreo($sesion);
+			$id_tipo_correo = $TipoCorreo->obtenerId($tipo);
+		}
+		$where_dia = 'AND fecha = CURDATE()';
+		if ($es_diario) {
+			$where_dia = 'AND fecha > CURDATE()';
+		}
+		$mensaje = mysql_real_escape_string(preg_replace($clean_patt, '', $mensaje));
+		$query = "SELECT COUNT(id_log_correo) total
+					FROM log_correo
+					WHERE subject = :subject
+						AND mail = :email
+						AND id_tipo_correo = :id_tipo_correo
+						AND mensaje= :mensaje
+						{$where_dia} ";
+		$resp = $sesion->pdodbh->prepare($query);
+
+		$resp->bindParam(':subject', $subject, \PDO::PARAM_STR);
+		$resp->bindParam(':email', $email, \PDO::PARAM_STR);
+		$resp->bindParam(':mensaje', $mensaje, \PDO::PARAM_STR);
+		$resp->bindParam(':id_tipo_correo', $id_tipo_correo, \PDO::PARAM_INT);
+		$resp->execute();
+		if (!$resp) {
+			throw new \Exception(preg_replace($clean_patt, ' ', $query));
+		}
+
+		$count = $resp->fetch(\PDO::FETCH_ASSOC);
+		if ($count['total'] == 0) {
+			$query2 = "INSERT INTO log_correo SET
+				subject = :subject,
+				mensaje = :mensaje,
+				mail = :email,
+				nombre = :nombre,
+				fecha = NOW()
+			";
+			if (!empty($id_usuario)) {
+				$query2 .= ", id_usuario = :id_usuario, fecha_modificacion = NOW()";
+			}
+			if (!empty($id_tipo_correo)) {
+				$query2 .= ", id_tipo_correo = :id_tipo_correo";
+			}
+			if ($simular) {
+				$query2 .= ', enviado = 1, fecha_envio = NOW()';
+			}
+
+			$sth = $sesion->pdodbh->prepare($query2);
+			$sth->bindParam(':subject', $subject, \PDO::PARAM_STR);
+			$sth->bindParam(':email', $email, \PDO::PARAM_STR);
+			$sth->bindParam(':mensaje', $mensaje, \PDO::PARAM_STR);
+			$sth->bindParam(':nombre', $nombre, \PDO::PARAM_STR);
+			$id_usuario ? $sth->bindParam(':id_usuario', $id_usuario, \PDO::PARAM_INT) : false;
+			$id_tipo_correo ? $sth->bindParam(':id_tipo_correo', $id_tipo_correo, \PDO::PARAM_INT) : false;
+
+			if (!$sth->execute()) {
+				throw new \Exception(preg_replace($clean_patt, ' ', $query2));
+			}
+
+			if ($simular) {
+				echo "Nuevo Correo<pre>\n{$subject}\n{$tipo}\n{$email}\n{$nombre}</pre><hr>";
+			}
+			return 'Agrega Correo: ' . preg_replace($clean_patt, ' ', $query2);
+		}
+		if ($simular) {
+			echo "Omitiendo Correo Repetido<pre>\n{$subject}\n{$tipo}\n{$email}\n{$nombre}</pre><hr>";
+		}
+		return json_encode(compact('query', 'count'));
+	}
+
+	public static function camelize($word) {
+		return preg_replace('/(_)([a-z])/e', 'strtoupper("\\2")', $word);
+	}
+
+	public static function pascalize($word) {
+		return preg_replace('/(^|_)([a-z])/e', 'strtoupper("\\2")', $word);
+	}
+
+	/**
+	 * Convierte PascalCase en underscore_case
+	 * @param type $word
+	 * @return type
+	 */
+	public static function underscoreize($word) {
+		return str_replace(' ', '_', strtolower(trim(preg_replace('/([A-Z])/', ' $1', $word))));
+	}
+
+	public static function humanize($word) {
+		return ucfirst(str_replace('_', ' ', strtolower($word)));
+	}
+
+	/**
+	 * Devuelve un tamaño de bytes en lectura humana (b, kb, mb, gb, tb o pb)
+	 * @param type $size tamaño en bytes
+	 * @return string
+	 */
+	public static function _h($size) {
+		$unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+		return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
+	}
+
+	/**
+	 * Sanitiza las variables que llegan desde el request.
+	 * TODO: Este método es provisorio. Debe ser eliminado cuando se exporten las SQL a PDO o se hayan Criterizado.
+	 * @param Array $array arreglo con las variables ($_REQUEST).
+	 */
+	public static function sanitizeGlobalsRequest($array) {
+		$Utiles = new Utiles();
+		array_walk_recursive($array, array($Utiles, 'escape_variable'));
+	}
+
+	public static function escape_variable($value, $name) {
+		global $$name;
+		$$name = mysql_real_escape_string($value);
+	}
+
 }
 
 

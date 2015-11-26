@@ -8,12 +8,10 @@ require_once dirname(__FILE__) . '/../../app/conf.php';
  */
 class FormSelectHelper {
 
-	public $Utiles;
 	public $Html;
 
 	public function __construct() {
 		$this->Form = new Form;
-		$this->Utiles = new \TTB\Utiles();
 		$this->Html = new \TTB\Html();
 	}
 
