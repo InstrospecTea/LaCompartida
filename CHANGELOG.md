@@ -1,6 +1,10 @@
 # Changelog
 
 ## Hotfix 15.29.1
+Friday, November 27th
+* **Fix** [Problema LEDES](https://github.com/LemontechSA/ttb/pull/1246)
+
+## Hotfix 15.29.1
 Thursday, November 25th
 * **Fix** [Error SQL Cobro](https://github.com/LemontechSA/ttb/pull/1245)
 
