@@ -140,7 +140,6 @@ class AlertaCron {
 		$prof = new Usuario($this->sesion);
 		$prof->LoadId($id_persona);
 
-		$mensaje_restriccion_minimo = "El usuario NO ha ingresado el MINIMO de horas durante los últimos 7 días";
 		$mensaje_restriccion_minimo = Conf::GetConf($sesion, 'MensajeRestriccionSemanal');
 
 		if ($opc_mail == 'mail_hrs_semanales') {

@@ -1,5 +1,21 @@
 # Changelog
 
+## Hotfix 15.29.1
+Thursday, November 25th
+* **Fix** [Error SQL Cobro](https://github.com/LemontechSA/ttb/pull/1245)
+
+## [Release 15.29.0](https://github.com/LemontechSA/ttb/pull/1243)
+Wednesday 2015, November 25th
+* **Feature** [Recordatorio hitos pendientes](https://github.com/LemontechSA/ttb/pull/1231)
+
+## Hotfix 15.28.6
+Tuesday, November 24th
+* **Fix** [Edición de Asuntos](https://github.com/LemontechSA/ttb/pull/1242)
+
+## Hotfix 15.28.5
+Tuesday, November 24th
+* **Fix** [Ordenamiento reporte Hitos y validación al agregar hitos](https://github.com/LemontechSA/ttb/pull/1240)
+
 ## Hotfix 15.28.4
 Monday, November 23rd
 * **Fix** [Validar que al eliminar una actividad no este asociado a un trabajo o tramite](https://github.com/LemontechSA/ttb/pull/1238)
