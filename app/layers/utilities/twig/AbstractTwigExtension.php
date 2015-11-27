@@ -22,7 +22,8 @@ abstract class AbstractTwigExtension extends Twig_Extension {
 
 		foreach ($classMethods as $method) {
 			if (preg_match('/^ext[A-Z].+$/', $method->name)) {
-				$name = preg_replace('/^ext([A-Z].+)$/e', 'strtolower(\\1)', $method->name);
+				$name = preg_replace_callback('/^ext([A-Z].+)$/',
+       					create_function ('$matches', 'return strtolower($matches[1]);'), $method->name);
 
 				// new \Twig_SimpleFunction('lipsum', array($this, 'extLipsum'))
 				$filters[] = new \Twig_SimpleFilter($name, array($this, $method->name));
