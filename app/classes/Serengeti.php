@@ -157,7 +157,7 @@ class Serengeti  extends Ledes{
 			$horas = $this->round($trabajo['horas']);
 			$monto = $this->round($monto);
 			$tarifa = $this->round($tarifa);
-
+			$ajuste = 0;
 			if ($Cobro->fields['forma_cobro'] == 'FLAT FEE') {
 				$monto = $tarifa * $horas;
 			} else {
