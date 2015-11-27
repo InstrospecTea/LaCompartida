@@ -49,10 +49,5 @@ fi
 # Instalar vendors
 cd /vagrant/ttb && /usr/local/bin/composer install
 
-# Bibliotecas pear para TTB Clasic
-pear install Numbers_Words-0.16.4
-pear install Spreadsheet_Excel_Writer-beta
-pear install OLE-0.5
-
 # Actualizar la base de datos de ejemplo
 curl -I "http://localhost/ttb/app/update.php?hash=c85ef9997e6a30032a765a20ee69630b"
