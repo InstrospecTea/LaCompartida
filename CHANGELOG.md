@@ -1,6 +1,6 @@
 # Changelog
 
-## Hotfix 15.29.1
+## Hotfix 15.29.2
 Friday, November 27th
 * **Fix** [Problema LEDES](https://github.com/LemontechSA/ttb/pull/1246)
 
