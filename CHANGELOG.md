@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.29.3
+Monday, November 30th
+* **Fix** [Desagrupacíon de hitos sin cobros](https://github.com/LemontechSA/ttb/pull/)
+
 ## Hotfix 15.29.2
 Friday, November 27th
 * **Fix** [Problema LEDES](https://github.com/LemontechSA/ttb/pull/1246)
