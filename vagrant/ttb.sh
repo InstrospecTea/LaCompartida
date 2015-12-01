@@ -51,3 +51,9 @@ cd /vagrant/ttb && /usr/local/bin/composer install
 
 # Actualizar la base de datos de ejemplo
 curl -I "http://localhost/ttb/app/update.php?hash=c85ef9997e6a30032a765a20ee69630b"
+
+# Instalar wkhtmltopdf
+apt-get update
+apt-get install wkhtmltopdf -y
+ln -s /usr/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
+
