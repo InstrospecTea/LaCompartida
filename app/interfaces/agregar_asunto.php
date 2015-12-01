@@ -275,13 +275,15 @@ if ($opcion == 'guardar') {
 				// Cobro pendiente
 				CobroPendiente::EliminarPorContrato($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 				if ($contrato->fields['forma_cobro'] == 'FLAT FEE') {
-					for ($i = 2; $i <= sizeof($valor_fecha); $i++) {
-						$CobroPendiente = new CobroPendiente($Sesion);
-						$CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-						$CobroPendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
-						$CobroPendiente->Edit("descripcion", $valor_descripcion[$i]);
-						$CobroPendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
-						$CobroPendiente->Write();
+					foreach (array_keys($valor_fecha) as $i) {
+						if (!empty($valor_monto_estimado[$i])) {
+							$CobroPendiente = new CobroPendiente($Sesion);
+							$CobroPendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+							$CobroPendiente->Edit("fecha_cobro", Utiles::fecha2sql($valor_fecha[$i]));
+							$CobroPendiente->Edit("descripcion", $valor_descripcion[$i]);
+							$CobroPendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
+							$CobroPendiente->Write();
+						}
 					}
 				}
 
@@ -332,22 +334,39 @@ if ($opcion == 'guardar') {
 				$Pagina->AddError($contrato->error);
 			}
 		} else {
-			if ($Asunto->fields['id_contrato'] > 0) {
+			if (($Asunto->fields['id_contrato'] > 0) && ($Asunto->fields['id_contrato'] != $Cliente->fields['id_contrato'])) {
 				$criteria = new Criteria($Sesion);
 				$criteria->add_select('COUNT(*)', 'total')
 					->add_from('cobro_pendiente')
+					->add_restriction(CriteriaRestriction::not_equal('hito', 1))
+					->add_restriction(CriteriaRestriction::is_null('id_cobro'))
 					->add_restriction(CriteriaRestriction::equals('id_contrato', $Asunto->fields['id_contrato']));
 
 				$result = $criteria->run();
-				$cobro_pendiente = ($result[0]['total'] > 0) ? true : false;
+				$cobro_programado = ($result[0]['total'] > 0) ? true : false;
+
+				$criteria = new Criteria($Sesion);
+				$criteria->add_select('COUNT(*)', 'total')
+					->add_from('cobro_pendiente')
+					->add_restriction(CriteriaRestriction::equals('hito', 1))
+					->add_restriction(CriteriaRestriction::is_null('id_cobro'))
+					->add_restriction(CriteriaRestriction::equals('id_contrato', $Asunto->fields['id_contrato']));
+
+				$result = $criteria->run();
+				$hito = ($result[0]['total'] > 0) ? true : false;
+
+				$cobro_pendiente = true;
 			}
 
-			if ($cobro_pendiente) {
+			if ($cobro_programado) {
 				$Pagina->AddError(__('El') . ' ' . __('contrato') . ' ' . __('tiene cobros programados configurados, no se puede desvincular del') . ' ' . __('asunto') . ' ' . __('hasta que quite los cobros programados.'));
+			} else if ($hito) {
+				$Pagina->AddError(__('El') . ' ' . __('contrato') . ' ' . __('tiene hitos configurados, no se puede desvincular del') . ' ' . __('asunto') . ' ' . __('hasta que quite los hitos.'));
 			} else {
 				$Contrato_indep = $Asunto->fields['id_contrato_indep'];
 				$Asunto->Edit("id_contrato", $Cliente->fields['id_contrato']);
 				$Asunto->Edit("id_contrato_indep", null);
+				$cobro_pendiente = false;
 			}
 		}
 
