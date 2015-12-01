@@ -28,22 +28,7 @@ The Time Billing - Time Tracking
         character-set-server = latin1
         character-set-client = latin1
 
-###Librerías
-* [Pear Fix on OS X](https://github.com/LemontechSA/ttb/wiki/Fix-pear-OS-X)
-* [Numbers_Words][3]:
-
-        $ sudo pear install Numbers_Words-0.16.4
-
- * OLE (0.5)
-
-      $ sudo pear install OLE-0.5
-
-* Spreadsheet Excel writer (unestable version)
-
-        $ sudo pear install Spreadsheet_Excel_Writer-beta
-
-> Recuerda reiniciar Apache cada vez que hagas cambios en la configuración o instalción de nuevos paquetes
-
+###Bibliotecas
 
 * [WKHTMLTOPDF](http://wkhtmltopdf.org/)
 
@@ -61,8 +46,8 @@ The Time Billing - Time Tracking
 * CURL		 sudo apt-get install CURL
 * PEAR		 sudo apt-get install php-user
 
-###Incluir el framework de lemontech en FW y amazon WSDDKforPHP en backups/AWSSDKforPHP
-* https://github.com/LemontechSA/framework, https://github.com/amazonwebservices/aws-sdk-for-php usando:
+###Incluir amazon WSDDKforPHP en backups/AWSSDKforPHP
+* https://github.com/amazonwebservices/aws-sdk-for-php usando:
     git submodule init
     git submodule update
 
@@ -137,6 +122,10 @@ The Time Billing - Time Tracking
 
         $ cp config/cap_servers.rb.default config/cap_servers.rb
         (Es necesario modificar este archivo. Dejar solo el servidor al que se realizará el deployeo)
+        
+  * Instalar bibliotecas con [Composer][12]:
+
+        $ composer install
 
 ###Deploy in local machinne
 
@@ -195,7 +184,6 @@ SET @@global.sql_mode= '';
 
 [1]: https://gist.github.com/3867988
 [2]: https://gist.github.com/3868074
-[3]: http://pear.php.net/package/Numbers_Words
 [4]: http://www.mattvsworld.com/blog/2010/02/install-the-latest-autoconf-and-automake-on-mac-os-10-6
 [5]: http://xdebug.org/wizard.php
 [6]: http://localhost/time_tracking
@@ -204,3 +192,4 @@ SET @@global.sql_mode= '';
 [9]: https://github.com/nvie/gitflow/wiki/Windows
 [10]: http://www.sublimetext.com/
 [11]: https://github.com/LemontechSA/ttb/wiki/Correr-Capybara-con-Chrome
+[12]: https://getcomposer.org/
