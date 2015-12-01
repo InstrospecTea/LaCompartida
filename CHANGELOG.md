@@ -2,7 +2,7 @@
 
 ## Hotfix 15.29.4
 Tuesday, December 1st
-* **Fix** [Problema con colores en el calendario](https://github.com/LemontechSA/ttb/pull/1248)
+* **Fix** [Problema con colores en el calendario](https://github.com/LemontechSA/ttb/pull/1249)
 
 ## Hotfix 15.29.3
 Monday, November 30th
