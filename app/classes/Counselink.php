@@ -199,6 +199,10 @@ class Counselink extends Ledes{
 			$filas[] = $fila;
 
 			$last_client_matter_id = $trabajo['codigo_homologacion'];
+
+			if ($Cobro->fields['forma_cobro'] == 'FLAT FEE') {
+				break;
+			}
 		}
 		return array('filas' => $filas, 'trabajo' => $trabajo);
 	}
