@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix 15.29.5
+Wednesday, December 2st
+* **Fix** [Lang Brasil](https://github.com/LemontechSA/ttb/pull/1251)
+* **Fix** [Problema con colores en el calendario](https://github.com/LemontechSA/ttb/pull/1251)
+
 ## Hotfix 15.29.4
 Tuesday, December 1st
 * **Fix** [Problema con colores en el calendario](https://github.com/LemontechSA/ttb/pull/1249)
