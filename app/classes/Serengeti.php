@@ -59,13 +59,11 @@ class Serengeti  extends Ledes{
 			$datos_cobro['BILLING_START_DATE'] = $fecha_min;
 		}
 		$monto_total = $datos_cobro['INVOICE_TOTAL'] * 1;
-		$ajuste = 0;
+
 		$filas = array();
-		if (abs($suma - $monto_total) > $monto_total / 100) {
+		if (abs($suma - $monto_total) > $monto_total / 100 or $Cobro->fields['forma_cobro'] == 'FLAT FEE') {
 			$monto = $monto_total - $suma;
-			if ($Cobro->fields['forma_cobro'] == 'FLAT FEE') {
-				$ajuste = $monto_total - $suma_unit;
-			}
+
 			$fila = array(
 				'LAW_FIRM_MATTER_ID' => $codigo_asunto,
 				'LINE_ITEM_NUMBER' => 'IF1',
@@ -79,7 +77,7 @@ class Serengeti  extends Ledes{
 				'LINE_ITEM_ACTIVITY_CODE' => '',
 				'TIMEKEEPER_ID' => '',
 				'LINE_ITEM_DESCRIPTION' => 'Ajuste',
-				'LINE_ITEM_UNIT_COST' => $ajuste,
+				'LINE_ITEM_UNIT_COST' => 0,
 				'TIMEKEEPER_NAME' => '',
 				'TIMEKEEPER_CLASSIFICATION' => '',
 				'CLIENT_MATTER_ID' => $last_client_matter_id
@@ -139,6 +137,9 @@ class Serengeti  extends Ledes{
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while ($trabajo = mysql_fetch_assoc($resp)) {
+			if ($Cobro->fields['forma_cobro'] != 'FLAT FEE' && $this->round($trabajo['horas']) == 0) {
+				continue;
+			}
 			if ($fecha_min > $trabajo['fecha']) {
 				$fecha_min = $trabajo['fecha'];
 			}
@@ -153,13 +154,12 @@ class Serengeti  extends Ledes{
 			/**
 			 * redondeo decimales ahora para que calcen los ajustes
 			 */
-			$horas =$this->round($trabajo['horas']);
+			$horas = $this->round($trabajo['horas']);
 			$monto = $this->round($monto);
 			$tarifa = $this->round($tarifa);
-
+			$ajuste = 0;
 			if ($Cobro->fields['forma_cobro'] == 'FLAT FEE') {
-				$ajuste = 0;
-				$tarifa = $monto;
+				$monto = $tarifa * $horas;
 			} else {
 				$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
 			}

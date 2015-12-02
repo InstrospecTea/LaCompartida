@@ -1,5 +1,29 @@
 # Changelog
 
+## Hotfix 15.29.4
+Tuesday, December 1st
+* **Fix** [Problema con colores en el calendario](https://github.com/LemontechSA/ttb/pull/1249)
+
+## Hotfix 15.29.3
+Monday, November 30th
+* **Fix** [Desagrupacíon de hitos sin cobros](https://github.com/LemontechSA/ttb/pull/1247)
+
+## Hotfix 15.29.2
+Friday, November 27th
+* **Fix** [Problema LEDES](https://github.com/LemontechSA/ttb/pull/1246)
+
+## Hotfix 15.29.1
+Thursday, November 25th
+* **Fix** [Error SQL Cobro](https://github.com/LemontechSA/ttb/pull/1245)
+
+## [Release 15.29.0](https://github.com/LemontechSA/ttb/pull/1243)
+Wednesday 2015, November 25th
+* **Feature** [Recordatorio hitos pendientes](https://github.com/LemontechSA/ttb/pull/1231)
+
+## Hotfix 15.28.6
+Tuesday, November 24th
+* **Fix** [Edición de Asuntos](https://github.com/LemontechSA/ttb/pull/1242)
+
 ## Hotfix 15.28.5
 Tuesday, November 24th
 * **Fix** [Ordenamiento reporte Hitos y validación al agregar hitos](https://github.com/LemontechSA/ttb/pull/1240)

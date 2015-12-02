@@ -1,7 +1,7 @@
 
 <div id="footer" style="clear:both;display:block;">
 	&nbsp;
-		<script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.20151111052208.js"></script>
+		<script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.20151201033117.js"></script>
 		<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/chosen.min.css" />
 		<script type="text/javascript" src="//static.thetimebilling.com/js/chosen.jquery.min.js"></script>
 </div>
