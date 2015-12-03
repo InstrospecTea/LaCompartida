@@ -8,5 +8,8 @@
 		"pear/numbers_words": "dev-master",
 		"pear/ole": "dev-master",
 		"pear/spreadsheet_excel_writer": "dev-master"
-	}
+	},
+	"autoload": {
+        "psr-4": {"TTB\\Graficos\\": "app/classes/Graficos"}
+    }
 }
