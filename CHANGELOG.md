@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.29.6
+Thursday, December 3rd
+* **Fix** [Modificaciones counsellink](https://github.com/LemontechSA/ttb/pull/1252)
+
 ## Hotfix 15.29.5
 Wednesday, December 2st
 * **Fix** [Lang Brasil](https://github.com/LemontechSA/ttb/pull/1251)
