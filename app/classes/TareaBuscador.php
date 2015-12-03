@@ -116,14 +116,14 @@ class TareaBuscador
         {
             $tooltip = "";
             $funcion = $this->tooltip;
-            $tooltip_text = $funcion(& $fila);
+            $tooltip_text = $funcion($fila);
             $tooltip_mover = " ddrivetip('$tooltip_text'); ";
             $tooltip_mout = " hideddrivetip(); ";
         }
 
 		if($this->funcion_argumento_tr)
 		{
-			$f_tr = call_user_func($this->funcion_argumento_tr,& $fila);
+			$f_tr = call_user_func($this->funcion_argumento_tr, $fila);
 		}
 
         echo("<tr $f_tr bgcolor=\"$color\" onMouseOver=\"javascript:style.backgroundColor='".$this->color_mouse_over."'; $tooltip_mover \" onMouseOut=\"javascript:style.backgroundColor='$color'; $tooltip_mout \">");
@@ -149,7 +149,7 @@ class TareaBuscador
             }
             else #Funcion
             {
-                $texto = call_user_func($this->funcion[$key],& $fila);
+                $texto = call_user_func($this->funcion[$key], $fila);
                 echo("<td class=buscador ".$this->opciones_td[$key].">".$texto."</td>");
 
             }
