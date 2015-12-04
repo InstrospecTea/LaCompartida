@@ -69,4 +69,3 @@
 		->addLabels($asunto);
 
 	echo $grafico->getJson();
-?>

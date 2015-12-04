@@ -76,4 +76,3 @@
 		->addLabels($cliente);
 
 	echo $grafico->getJson();
-?>

@@ -75,5 +75,3 @@
 		->addLabels($empleado);
 
 	echo $grafico->getJson();
-
-?>
