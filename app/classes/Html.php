@@ -191,14 +191,16 @@ class Html extends \Html {
 	 * @return string
 	 */
 	public static function PrintCalendar($input_name, $value, $size = 12, $clase = 'fechadiff', $blank = false) {
+		$Form = new \Form;
+
 		if ($value == '') {
 			if ($blank) {
-				return "<input type='text' id='" . $input_name . "' name='" . $input_name . "' class='" . $clase . "' value='' size='" . $size . "' />";
+				$value = '';
 			} else {
-				return "<input type='text' id='" . $input_name . "' name='" . $input_name . "' class='" . $clase . "' value='" . date('d-m-Y') . "' size='" . $size . "' />";
+				$value = date('d-m-Y');
 			}
-		} else {
-			return "<input type='text' id='" . $input_name . "' name='" . $input_name . "' class='" . $clase . "' value='" . $value . "' size='" . $size . "' />";
 		}
+
+		return $Form->input('', $value, array('name' => $input_name, 'id' => $input_name, 'class' => $clase, 'size' => $size));
 	}
 }
