@@ -1836,7 +1836,7 @@ class CartaCobro extends NotaCobro {
 				$glosa_moneda_plural_lang = __($cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural']);
 				$cobro_id_moneda = $this->fields['opc_moneda_total'];
 
-				$NumbersWords = new Numbers_Words();
+				$Numbers_Words = new Numbers_Words();
 
 				$total_mta = number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], '.', '');
 				$decimales_monto = number_format(($total_mta - (int) $total_mta), 2);
