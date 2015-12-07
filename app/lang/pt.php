@@ -35,11 +35,9 @@ $_LANG['Administración'] = 'Administracao';
 $_LANG['Enero'] = 'Janeiro';
 $_LANG['Febrero'] = 'Fevereiro';
 $_LANG['Marzo'] = 'Março';
-//$_LANG['Abril'] = 'Abril';
 $_LANG['Mayo'] = 'Maio';
 $_LANG['Junio'] = 'Junho';
 $_LANG['Julio'] = 'Julho';
-//$_LANG['Agosto'] = 'Agosto';
 $_LANG['Septiembre'] = 'Setembro';
 $_LANG['Octubre'] = 'Outubro';
 $_LANG['Noviembre'] = 'Novembro';
@@ -57,7 +55,6 @@ $_LANG['adelantos'] = 'adiantamentos';
 
 // Clientes
 $_LANG['Nombre Cliente'] = 'Nome do Cliente';
-$_LANG['Grupo'] = 'Nenhum';
 $_LANG['Solo Activos'] = 'Somente ativos';
 $_LANG['Código de homologación'] = 'Código de Homologação';
 $_LANG['Usuario encargado'] = 'Usuário responsável';
@@ -246,11 +243,12 @@ $_LANG['Duración Ingresada'] = 'Duração inserida';
 $_LANG['Proceso masivo de emisión de cobros'] = 'Processo massivo de planilha e pré-liquidações';
 $_LANG['Encargado comercial'] = 'Responsável comercial';
 $_LANG['Tipo de Liquidación'] = 'Tipo de liquidação';
-$_LANG['Asuntos por cobrar'] = 'Assuntos por cobrar';
-$_LANG['Generar borradores cobrar'] = 'Gerar rascunhos';
+$_LANG['Asuntos por'] = 'Assuntos a';
+$_LANG['Generar borradores'] = 'Gerar rascunhos';
 $_LANG['Excel borradores'] = 'Rascunho em Excel';
 $_LANG['Descargar borradores'] = 'Baixar rascunhos';
-$_LANG['Emitir cobros masivamente'] = 'Emissão de cobrança';
+$_LANG['Emitir cobros'] = 'Emitir faturas';
+$_LANG['Pasar cobros a estado EN REVISIÓN'] = 'Passar faturas a estado EM REVISÃO';
 $_LANG['Último Cobro'] = 'Última cobrança';
 $_LANG['Acuerdo'] = 'Acordo';
 $_LANG['Opción'] = 'Opção';
@@ -366,8 +364,6 @@ $_LANG['Decimales'] = 'Casas Decimais';
 $_LANG['Ingreso de Tarifas de Trámites'] = 'Inserção de Tarifas de trâmite';
 $_LANG['Nueva Tarifa'] = 'Nova Tarifa';
 $_LANG['Tramite'] = 'Trâmite';
-$_LANG[''] = '';
-$_LANG[''] = '';
 
 // Solicitudes de Adelanto
 $_LANG['Solicitudes de Adelanto'] = 'Solicitações de Adiantamento';
@@ -444,9 +440,6 @@ $_LANG['Solo activos'] = 'Apenas Ativos';
 $_LANG['Tipo de reporte'] = 'Tipo de relatório';
 $_LANG['Generar reporte'] = 'Gerar relatório';
 $_LANG['Planilla'] = 'Planilha';
-//$_LANG['Horas trabajadas por empleado'] = '';
-//$_LANG['Horas trabajadas por asunto'] = '';
-//$_LANG['Horas trabajadas por cliente'] = '';
 
 // Reporte Ventas
 $_LANG['Grupos Clientes'] = 'Grupo de clientes';
@@ -610,7 +603,6 @@ $_LANG['Fecha Envío al Cliente'] = 'Data de Envio ao Cliente';
 $_LANG['Honorarios pagados'] = 'Honorários pagos';
 $_LANG['Gastos pagados'] = 'Gastos pagos';
 $_LANG['Cliente Asuntos'] = 'Cliente Assuntos';
-//$_LANG['Nota Cobro'] = '';
 
 // Reportes Consolidados
 $_LANG['Reportes año '] = 'Relatórios ano ';
@@ -625,7 +617,6 @@ $_LANG['Año'] = 'Ano';
 $_LANG['año'] = 'ano';
 $_LANG['Horas Declaradas Corregidas por Forma de Cobro'] = 'Horas Declaradas Corrigidas por Forma de Pagamento';
 $_LANG['FECHA REPORTE'] = 'Data de Relatório';
-//$_LANG['desagregadas por mes'] = '';
 $_LANG['SUMA FIJA'] = 'Soma Fixa';
 $_LANG['Porcentaje'] = 'Porcentagem';
 $_LANG['RETAINER PRORRATEO'] = 'RETAINER Pró-Rateio';
@@ -656,7 +647,6 @@ $_LANG['Proyecto'] = 'Projeto';
 $_LANG['Demora ingreso de horas'] = 'Demora Ingresso de Horas';
 $_LANG['Demora Ingreso Horas'] = 'Demora Ingresso de Horas';
 $_LANG['Mayor'] = 'Maior';
-//$_LANG['Menor'] = 'Menor';
 $_LANG['Promedio'] = 'Média';
 $_LANG['N° Trabajos'] = 'N° Trabalhos';
 $_LANG['Reporte sobre la demora en el ingreso de horas'] = 'Relatório sobre a demora no ingresso de horas';
@@ -750,8 +740,6 @@ $_LANG['Sólo Gastos'] = 'Apenas gastos';
 $_LANG['Sólo Mixtas (Honorarios y Gastos)'] = 'Apenas mistas (Honorários e gastos)';
 $_LANG['días'] = 'dias';
 
-
-
 // Biblioteca
 $_LANG['Archivo'] = 'Arquivo';
 $_LANG['Nº Carpeta'] = 'Número da Pasta';
@@ -761,7 +749,6 @@ $_LANG['Agregar carpeta'] = 'Adicionar Pasta';
 
 // Actividades
 $_LANG['Actividad'] = 'Atividade';
-$_LANG['Actividades'] = 'Atividades';
 $_LANG['Actividades'] = 'Atividades';
 
 // Usuarios
@@ -824,6 +811,7 @@ $_LANG['Contraseña'] = 'Senha';
 $_LANG['Cambio de contraseña'] = 'Alteração de senha';
 $_LANG['Cambiar contraseña'] = 'Alterar senha';
 $_LANG['Solicitar un cambio de contraseña al próximo inicio de sesión'] = 'Solicitar troca de senha no próximo início de sessão';
+$_LANG['Retraso max.'] = 'Atraso Máx.';
 
 // Costos
 $_LANG['Costo por profesional'] = 'Custo por profissional';
@@ -843,15 +831,10 @@ $_LANG['Agregando nuevo'] = 'Adicionando novo';
 $_LANG['Duración'] = 'Duração';
 $_LANG['Duración Cobrable'] = 'Horas a faturar';
 $_LANG['Ver semana'] = 'Ver Semana';
-$_LANG['Haga click con el botón derecho sobre algún trabajo para modificarlo'] = 'Clique com o botão direito sobre
-algum trabalho o alterar';
+$_LANG['Haga click con el botón derecho sobre algún trabajo para modificarlo'] = 'Clique com o botão direito sobre algum trabalho o alterar';
 $_LANG['Semana del'] = 'Semana do';
 $_LANG['Total mes'] = 'Total mês';
 $_LANG['Total mes actual'] = 'Total mês atual';
-
-
-
-
 
 /* DATOS DEMO */
 /* TRABAJOS */
@@ -982,9 +965,9 @@ $_LANG['Revisión de contratos de trabajo.'] = 'Revisão de contratos de trabalho.
 $_LANG['Revisión de documentos legales y modificación de l...'] = 'Revisão de documentos legais e modificação de contrato social';
 $_LANG['Revisión de escrituras de propiedad anterior.'] = 'Revisão dos contratos imobiliários do ano 2014';
 $_LANG['Revisión del contrato de trabajo y redacción de lo...'] = 'Elaboração de regulamento interno com base na legislação vigente';
-$_LANG['Salida a terreno con F.D. Análisis derechos.'] = 'Rescisão de Contrato de Trabalho – Elaboração de Documento';
+$_LANG['Salida a terreno con F.D. Análisis derechos.'] = 'Rescisão de Contrato de Trabalho - Elaboração de Documento';
 $_LANG['Se preparan los documentos legales para la compra ...'] = 'Preparação de documentos para aquisição de terreno';
-$_LANG['Seguimiento de caso LA.'] = 'Seguimento do Caso “João Vs. Prefeitura de São Paulo';
+$_LANG['Seguimiento de caso LA.'] = 'Seguimento do Caso João Vs. Prefeitura de São Paulo';
 $_LANG['Soporte telefónico alcance contratos'] = 'Suporte telefónico ao cliente Elizeu Drummond';
 $_LANG['Timbres de Registro. Re: Timbres y derechos de reg...'] = 'Revisión de contrato 2011';
 $_LANG['Trámites notaria contrato 2011'] = 'Revisión de contrato 2011';
@@ -1117,3 +1100,5 @@ $_LANG['y anterior a'] = 'E anterior a';
 $_LANG['Agregar Cobro'] = 'Adicionar Liquidação';
 $_LANG['Facturas_Pagos'] = 'Facturas_Pagamento';
 $_LANG['Nombre Banco'] = 'Nome Banco';
+
+$_LANG['Bienvenido a '] = 'Bem-vindo ao ';
