@@ -136,7 +136,7 @@
 
 		$query_fecha = '';
 		if ($fecha1 != '' and $fecha2 != '') {
-			$query_fecha = " AND cobro.fecha_creacion >= '" . $fecha1 . "' AND cobro.fecha_creacion <= '" . $fecha2 . " 23:59:59'";
+			$query_fecha = " AND cobro.fecha_creacion >= '" . Utiles::fecha2sql($fecha1) . "' AND cobro.fecha_creacion <= '" . Utiles::fecha2sql($fecha2) . " 23:59:59'";
 			$filas += 1;
 			$ws1->write($filas, $col_fecha_creacion, __('FECHA CONSULTA:'), $formato_texto);
 			$ws1->write($filas, $col_cliente, $fecha1 . ' - ' . $fecha2, $formato_texto);
@@ -351,7 +351,7 @@
 			$ws1->writeFormula($filas, $col_duracion_trabajada, "=SUM($col_formula_duracion_trabajada$fila_inicial:$col_formula_duracion_trabajada$filas)", $formato_tiempo);
 			$ws1->writeFormula($filas, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada$fila_inicial:$col_formula_duracion_cobrada$filas)", $formato_tiempo);
 			$ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingreso_en_moneda_base$fila_inicial:$col_formula_ingreso_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
-			$ws1->writeFormula($filas, $col_gastos_en_moneda_base, "=SUM($col_formula_gastos_en_moneda_base$fila_inicial:$col_formula_gastos_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);		
+			$ws1->writeFormula($filas, $col_gastos_en_moneda_base, "=SUM($col_formula_gastos_en_moneda_base$fila_inicial:$col_formula_gastos_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
 		} else {
 			$ws1->mergeCells($filas, 1, $filas, 3);
 			$ws1->write($filas, $col_numero_factura, __('No se encontraron resultados'), $formato_encabezado);
