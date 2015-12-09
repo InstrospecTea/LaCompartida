@@ -8,6 +8,21 @@ class GraficoBarra {
 	 * Constructor de la clase.
 	 */
 	function __construct() {
+		$this->name_chart = "Grafico bonito";
+	}
+
+	/**
+	 * Añade el nombre del Gráfico.
+	 * @param string $name_chart
+	 * @return GraficoBarra
+	 */
+	function addNameChart($name_chart) {
+		if (!empty($name_chart)) {
+			$this->name_chart = mb_detect_encoding($name_chart, 'UTF-8', true) ? $name_chart : utf8_encode($name_chart);
+			return $this;
+		} else {
+			error_log('Debe enviar un String no vacío');
+		}
 	}
 
 	/**
@@ -64,7 +79,8 @@ class GraficoBarra {
 			if ($this->labels) {
 				$json = [
 					'labels' => $this->labels,
-					'datasets' => $this->datasets
+					'datasets' => $this->datasets,
+					'name_chart' => $this->name_chart
 				];
 				return json_encode($json);
 			} else {

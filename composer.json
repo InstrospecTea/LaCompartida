@@ -10,6 +10,6 @@
 		"pear/spreadsheet_excel_writer": "dev-master"
 	},
 	"autoload": {
-        "psr-4": {"TTB\\Graficos\\": "app/classes/Graficos"}
-    }
+		"psr-4": {"TTB\\Graficos\\": "app/classes/Graficos"}
+	}
 }
