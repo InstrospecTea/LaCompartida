@@ -127,16 +127,31 @@ $Slim->get('/clients/:code/matters', function ($code) use ($Session) {
 
 $Slim->get('/matters', function () use ($Session, $Slim) {
 	validateAuthTokenSendByHeaders();
-
-	$timestamp = $Slim->request()->params('timestamp');
-	$include = $Slim->request()->params('include');
-	$include_all = (!is_null($include) && $include == 'all');
-	if (!is_null($timestamp) && !isValidTimeStamp($timestamp)) {
-		halt(__('The date format is incorrect'), 'InvalidDate');
-	}
-
 	$Matter = new Asunto($Session);
-	$matters = $Matter->findAllActive($timestamp, $include_all);
+
+	$client_code = $Slim->request()->params('client_code');
+	if (!empty($client_code)) {
+		if (Conf::GetConf($Session, 'CodigoSecundario') == '1') {
+			$client = $Client->LoadByCodigoSecundario($code);
+		} else {
+			$client = $Client->LoadByCodigo($code);
+		}
+
+		if ($client === false) {
+			halt(__("The client doesn't exist"), 'ClientDoesntExists');
+		}
+
+		$matters = $Matter->findAllByClientCode($code);
+	} else {
+		$timestamp = $Slim->request()->params('timestamp');
+		$include = $Slim->request()->params('include');
+		$include_all = (!is_null($include) && $include == 'all');
+		if (!is_null($timestamp) && !isValidTimeStamp($timestamp)) {
+			halt(__('The date format is incorrect'), 'InvalidDate');
+		}
+
+		$matters = $Matter->findAllActive($timestamp, $include_all);
+	}
 
 	outputJson($matters);
 });
@@ -309,7 +324,7 @@ $Slim->get('/users/:id/works', function ($id) use ($Session, $Slim) {
 	outputJson($works);
 });
 
-$Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
+$Slim->post('/users/:id/works', function ($id) use ($Session, $Slim) {
 	if (is_null($id) || empty($id)) {
 		halt(__('Invalid user ID'), 'InvalidUserID');
 	}
@@ -381,7 +396,7 @@ $Slim->put('/users/:id/works', function ($id) use ($Session, $Slim) {
 	outputJson($work);
 });
 
-$Slim->post('/users/:user_id/works/:id', function ($user_id, $id) use ($Session, $Slim) {
+$Slim->put('/users/:user_id/works/:id', function ($user_id, $id) use ($Session, $Slim) {
 	if (is_null($user_id) || empty($user_id)) {
 		halt(__('Invalid user ID'), 'InvalidUserID');
 	}
