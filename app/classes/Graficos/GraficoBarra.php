@@ -8,7 +8,6 @@ class GraficoBarra {
 	 * Constructor de la clase.
 	 */
 	function __construct() {
-		$this->name_chart = "Grafico bonito";
 	}
 
 	/**
