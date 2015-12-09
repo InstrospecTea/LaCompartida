@@ -111,32 +111,34 @@ class Serengeti  extends Ledes{
 		/**
 		 * Obtener los trabajos
 		 */
-		$query = "SELECT
-				t.id_trabajo,
-				t.codigo_asunto,
-				t.monto_cobrado,
-				TIME_TO_SEC(t.duracion_cobrada)/3600 as horas,
-				t.tarifa_hh,
-				t.fecha,
-				t.id_usuario,
-				t.descripcion,
-				t.cobrable,
-				t.id_moneda,
-				CONCAT(u.apellido1, ', ', u.nombre) as nombre_usuario,
-				u.username,
-				c.codigo_categoria,
-				t.codigo_actividad,
-				t.codigo_tarea,
-				a.codigo_homologacion
-			FROM trabajo t
-			JOIN usuario u ON t.id_usuario = u.id_usuario
-			JOIN prm_categoria_usuario c ON u.id_categoria_usuario = c.id_categoria_usuario
-			JOIN asunto a ON t.codigo_asunto = a.codigo_asunto
-			WHERE t.id_cobro = $id_cobro AND t.id_tramite = 0";
 
+		$Criteria = new Criteria($this->sesion);
+		$trabajos = $Criteria->add_select('trabajo.id_trabajo')
+			->add_select('trabajo.codigo_asunto')
+			->add_select('trabajo.monto_cobrado')
+			->add_select('TIME_TO_SEC(trabajo.duracion_cobrada)/3600', 'horas')
+			->add_select('trabajo.tarifa_hh')
+			->add_select('trabajo.fecha')
+			->add_select('trabajo.id_usuario')
+			->add_select('trabajo.descripcion')
+			->add_select('trabajo.cobrable')
+			->add_select('trabajo.id_moneda')
+			->add_select("CONCAT(usuario.apellido1, ', ', usuario.nombre)", 'nombre_usuario')
+			->add_select('usuario.username')
+			->add_select('prm_categoria_usuario.codigo_categoria')
+			->add_select('trabajo.codigo_actividad')
+			->add_select('trabajo.codigo_tarea')
+			->add_select('asunto.codigo_homologacion')
+			->add_from('trabajo')
+			->add_left_join_with('usuario', 'trabajo.id_usuario = usuario.id_usuario')
+			->add_left_join_with('prm_categoria_usuario', 'usuario.id_categoria_usuario = prm_categoria_usuario.id_categoria_usuario')
+			->add_left_join_with('asunto', 'trabajo.codigo_asunto = asunto.codigo_asunto')
+			->add_restriction(CriteriaRestriction::equals('trabajo.id_cobro', $id_cobro))
+			->add_restriction(CriteriaRestriction::equals('trabajo.id_tramite', 0))
+			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
+			->run();
 
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		while ($trabajo = mysql_fetch_assoc($resp)) {
+		foreach ($trabajos as $trabajo) {
 			if ($Cobro->fields['forma_cobro'] != 'FLAT FEE' && $this->round($trabajo['horas']) == 0) {
 				continue;
 			}
