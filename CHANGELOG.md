@@ -2,7 +2,7 @@
 
 ## Hotfix 15.29.7
 Wednesday, December 9th
-* **Fix** [No mostrar trabajos no cobrables serengeti](https://github.com/LemontechSA/ttb/pull/1256)
+* **Fix** [No mostrar trabajos no cobrables serengeti](https://github.com/LemontechSA/ttb/pull/1257)
 
 ## Hotfix 15.29.6
 Thursday, December 3rd
