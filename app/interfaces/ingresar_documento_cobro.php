@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 
 	$sesion = new Sesion(array('COB'));
@@ -201,7 +201,7 @@ function CheckEliminaIngreso(chk)
 	</tr>
 </table>
 
-<?
+<?php
 	if(isset($b))
 	{
 		$b->Imprimir("",array(''),false);
@@ -211,7 +211,7 @@ function CheckEliminaIngreso(chk)
 
 </form>
 
-<?
+<?php
 	echo InputId::Javascript($sesion);
 	$pagina->PrintBottom($popup);
 ?>
