@@ -27,7 +27,8 @@ define(MAX_TIMESTAMP, 4182191999);
 // header('Access-Control-Allow-Methods: GET, POST, PUT');
 
 $Slim->map(':x+', function($x) {
-	http_response_code(200);
+	$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
+	header($protocol . ' 200 Ok');
 })->via('OPTIONS');
 
 $Slim->post('/login', function () use ($Session, $Slim) {
@@ -357,7 +358,7 @@ $Slim->post('/users/:id/works', function ($id) use ($Session, $Slim) {
 		$params['billable'] = (int) $Slim->request()->params('billable');
 		$params['visible'] = (int) $Slim->request()->params('visible');
 	} else {
-		$params = json_decode($Slim->request()->getBody());
+		$params = json_decode($Slim->request()->getBody(), 1);
 	}
 
 	$work['date'] = $params['date'];
