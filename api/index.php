@@ -129,8 +129,8 @@ $Slim->get('/matters', function () use ($Session, $Slim) {
 	validateAuthTokenSendByHeaders();
 	$Matter = new Asunto($Session);
 
-	$client_code = $Slim->request()->params('client_code');
-	if (!empty($client_code)) {
+	$code = $Slim->request()->params('client_code');
+	if (!empty($code)) {
 		if (Conf::GetConf($Session, 'CodigoSecundario') == '1') {
 			$client = $Client->LoadByCodigoSecundario($code);
 		} else {
@@ -206,45 +206,50 @@ $Slim->get('/settings', function () use ($Session) {
 	$settings = array();
 
 	if (is_array($Session->arrayconf) && !empty($Session->arrayconf)) {
-		if ($Session->arrayconf['Intervalo']) {
+		if (array_key_exists('Intervalo', $Session->arrayconf)) {
 			array_push($settings, array('code' => 'IncrementalStep', 'value' => $Session->arrayconf['Intervalo']));
 		}
 
-		if ($Session->arrayconf['CantidadHorasDia']) {
+		if (array_key_exists('CantidadHorasDia', $Session->arrayconf)) {
 			array_push($settings, array('code' => 'TotalDailyTime', 'value' => $Session->arrayconf['CantidadHorasDia']));
 		}
 
-		if ($Session->arrayconf['UsarAreaTrabajos']) {
+		if (array_key_exists('UsarAreaTrabajos', $Session->arrayconf)) {
 			array_push($settings, array('code' => 'UseWorkingAreas', 'value' => $Session->arrayconf['UsarAreaTrabajos']));
 		}
 
-		if ($Session->arrayconf['UsoActividades']) {
+		if (array_key_exists('UsoActividades', $Session->arrayconf)) {
 			array_push($settings, array('code' => 'UseActivities', 'value' => $Session->arrayconf['UsoActividades']));
 		}
 
-		if ($Session->arrayconf['GuardarTarifaAlIngresoDeHora']) {
+		if (array_key_exists('UsarAreaTrabajos', $Session->arrayconf)) {
+			array_push($settings, array('code' => 'UseAreas', 'value' => $Session->arrayconf['UsarAreaTrabajos']));
+		}
+
+		if (array_key_exists('GuardarTarifaAlIngresoDeHora', $Session->arrayconf)) {
 			array_push($settings, array('code' => 'UseWorkRate', 'value' => $Session->arrayconf['GuardarTarifaAlIngresoDeHora']));
 		}
 
-		if ($Session->arrayconf['OrdenadoPor']) {
+		if (array_key_exists('OrdenadoPor', $Session->arrayconf)) {
 			array_push($settings, array('code' => 'UseRequester', 'value' => $Session->arrayconf['OrdenadoPor']));
 		}
 
-		if ($Session->arrayconf['TodoMayuscula']) {
+		if (array_key_exists('TodoMayuscula', $Session->arrayconf)) {
 			array_push($settings, array('code' => 'UseUppercase', 'value' => $Session->arrayconf['TodoMayuscula']));
 		}
 
-		if ($Session->arrayconf['PermitirCampoCobrableAProfesional']) {
+		if (array_key_exists('PermitirCampoCobrableAProfesional', $Session->arrayconf)) {
 			array_push($settings, array('code' => 'AllowBillable', 'value' => $Session->arrayconf['PermitirCampoCobrableAProfesional']));
 		} else {
 			array_push($settings, array('code' => 'AllowBillable', 'value' => 0));
 		}
 
-		if ($Session->arrayconf['MaxDuracionTrabajo']) {
+		if (array_key_exists('MaxDuracionTrabajo', $Session->arrayconf)) {
 			array_push($settings, array('code' => 'MaxWorkDuration', 'value' => $Session->arrayconf['MaxDuracionTrabajo']));
 		}
 	}
 
+	// outputJson(array_key_exists('UsoActividades', $Session->arrayconf));
 	outputJson($settings);
 });
 
@@ -336,19 +341,38 @@ $Slim->post('/users/:id/works', function ($id) use ($Session, $Slim) {
 
 	$work = array();
 
-	$work['date'] = $Slim->request()->params('date');
-	$work['created_date'] = $Slim->request()->params('created_date');
-	$work['duration'] = (float) $Slim->request()->params('duration');
-	$work['notes'] = $Slim->request()->params('notes');
-	$work['rate'] = (float) $Slim->request()->params('rate');
-	$work['requester'] = $Slim->request()->params('requester');
-	$work['activity_code'] = $Slim->request()->params('activity_code');
-	$work['area_code'] = $Slim->request()->params('area_code');
-	$work['matter_code'] = $Slim->request()->params('matter_code');
-	$work['task_code'] = $Slim->request()->params('task_code');
-	$work['user_id'] = (int) $Slim->request()->params('user_id');
-	$work['billable'] = (int) $Slim->request()->params('billable');
-	$work['visible'] = (int) $Slim->request()->params('visible');
+	$params = array();
+	if ($Slim->request()->params('date')) {
+		$params['date'] = $Slim->request()->params('date');
+		$params['created_date'] = $Slim->request()->params('created_date');
+		$params['duration'] = (float) $Slim->request()->params('duration');
+		$params['notes'] = $Slim->request()->params('notes');
+		$params['rate'] = (float) $Slim->request()->params('rate');
+		$params['requester'] = $Slim->request()->params('requester');
+		$params['activity_code'] = $Slim->request()->params('activity_code');
+		$params['area_code'] = $Slim->request()->params('area_code');
+		$params['matter_code'] = $Slim->request()->params('matter_code');
+		$params['task_code'] = $Slim->request()->params('task_code');
+		$params['user_id'] = (int) $Slim->request()->params('user_id');
+		$params['billable'] = (int) $Slim->request()->params('billable');
+		$params['visible'] = (int) $Slim->request()->params('visible');
+	} else {
+		$params = json_decode($Slim->request()->getBody());
+	}
+
+	$work['date'] = $params['date'];
+	$work['created_date'] = $params['created_date'];
+	$work['duration'] = (float) $params['duration'];
+	$work['notes'] = $params['notes'];
+	$work['rate'] = (float) $params['rate'];
+	$work['requester'] = $params['requester'];
+	$work['activity_code'] = $params['activity_code'];
+	$work['area_code'] = $params['area_code'];
+	$work['matter_code'] = $params['matter_code'];
+	$work['task_code'] = $params['task_code'];
+	$work['user_id'] = (int) $params['user_id'];
+	$work['billable'] = (int) $params['billable'];
+	$work['visible'] = (int) $params['visible'];
 
 	if (!is_null($work['date']) && isValidTimeStamp($work['date'])) {
 		$work['date'] = date('Y-m-d H:i:s', $work['date']);
