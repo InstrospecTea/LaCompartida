@@ -11,13 +11,21 @@ if ($_POST['opcion'] == 'guardar') {
 	$SolicitudAdelanto->Fill($_REQUEST, true);
 	$SolicitudAdelanto->Edit('id_usuario_ingreso', $Sesion->usuario->fields['id_usuario']);
 
+	if (Conf::GetConf($Sesion, 'CodigoSecundario') && (isset($_REQUEST['codigo_cliente_secundario']) && !empty($_REQUEST['codigo_cliente_secundario']))) {
+		$Cliente = new Cliente($Sesion);
+		$Cliente->LoadByCodigoSecundario($_REQUEST['codigo_cliente_secundario']);
+		if ($Cliente->Loaded()) {
+			$SolicitudAdelanto->Edit('codigo_cliente', $Cliente->fields['codigo_cliente']);
+		}
+	}
+
 	if ($SolicitudAdelanto->fields['codigo_asunto'] == '') {
 		$SolicitudAdelanto->fields['codigo_asunto'] = NULL;
 	}
-	
+
 	if ($SolicitudAdelanto->Write()) {
 		$Pagina->AddInfo(__('Solicitud de Adelanto guardada con éxito'));
-		
+
 		if ($_REQUEST['notificar_solicitante']) {
 			$SolicitudAdelanto->NotificarSolicitante();
 		}
@@ -29,7 +37,7 @@ if ($_POST['opcion'] == 'guardar') {
 		$SolicitudAdelanto->Load($_REQUEST['id_solicitud_adelanto']);
 		unset($_REQUEST['id_solicitud_adelanto']);
 	}
-	
+
 	$SolicitudAdelanto->Fill($_REQUEST);
 }
 
@@ -39,7 +47,7 @@ $Pagina->titulo = __('Solicitud de Adelanto');
 
 if ($SolicitudAdelanto->Loaded()) {
 	$Pagina->titulo = __('Edición') . ' de ' . $Pagina->titulo . ' N° ' . $SolicitudAdelanto->fields['id_solicitud_adelanto'];
-	
+
 	if (!empty($SolicitudAdelanto->fields['id_contrato'])) {
 		$codigo_asunto = $SolicitudAdelanto->fields['codigo_asunto'];
 		if(empty($codigo_asunto)){
@@ -162,7 +170,7 @@ $Pagina->PrintTop($popup);
 			$('monto').focus();
 			return false;
 		}
-			
+
 <?php
 if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 	if (UtilesApp::GetConf($Sesion, 'TipoSelectCliente') == 'autocompletador') {
@@ -182,21 +190,21 @@ if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 				var cod_cli = document.getElementById('codigo_cliente');
 	<?php } else { ?>
 				var cod_cli = document.getElementById('campo_codigo_cliente');
-	<?php } ?>	
+	<?php } ?>
 			if (cod_cli == '-1' || cod_cli == "") {
 				alert('<?php echo __('Debe ingresar un cliente') ?>');
 				return false;
 			}
-<?php } ?> 
-        
+<?php } ?>
+
 		if (form.descripcion.value == "") {
 			alert('<?php echo __('Debe ingresar una descripción'); ?>');
 			form.descripcion.focus();
 			return false;
 		}
-		
+
 		var estado_anterior = '<?php echo $SolicitudAdelanto->fields['estado']; ?>';
-		
+
 		if (form.estado.value == "DEPOSITADO" && estado_anterior != form.estado.value) {
 			if (confirm('¿Desea notificar al solicitante la disponibilidad del adelanto?')) {
 				form.notificar_solicitante.value = true;
@@ -215,7 +223,7 @@ if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 					jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
 				});
 			});
-				
+
 			jQuery('.printlinkpage').live('click',function() {
 				multi = jQuery("input[name=x_pag]").val();
 				//alert(multi);
