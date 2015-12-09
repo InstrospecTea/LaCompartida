@@ -1,17 +1,5 @@
 <?
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/classes/Funciones.php';
-	require_once Conf::ServerDir().'/classes/Documento.php';
-	require_once Conf::ServerDir().'/classes/Moneda.php';
-	require_once Conf::ServerDir().'/classes/Observacion.php';
 
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
@@ -85,69 +73,9 @@
 ?>
 
 <script type="text/javascript">
-//Extend the scal library to add draggable calendar support.
-//This script block can be added to the scal.js file.
-Object.extend(scal.prototype,
-{
-    toggleCalendar: function()
-    {
-        var element = $(this.options.wrapper) || this.element;
-        this.options[element.visible() ? 'onclose' : 'onopen'](element);
-        this.options[element.visible() ? 'closeeffect' : 'openeffect'](element, {duration: 0.5});
-    },
-
-    isOpen: function()
-    {
-        return ( $(this.options.wrapper) || this.element).visible();
-    }
-});
-
-//this is a global variable to have only one instance of the calendar
-var calendar = null;
-
-//@element   => is the <div> where the calender will be rendered by Scal.
-//@input     => is the <input> where the date will be updated.
-//@container => is the <div> for dragging.
-//@source    => is the img/button which raises up the calender, the script will locate the calenar over this control.
-function showCalendar(element, input, container, source)
-{
-    if (!calendar)
-    {
-        container = $(container);
-        //the Draggable handle is hard coded to "rtop" to avoid other parameter.
-        new Draggable(container, {handle: "rtop", starteffect: Prototype.emptyFunction, endeffect: Prototype.emptyFunction});
-
-        //The singleton calendar is created.
-        calendar = new scal(element, $(input),
-        {
-            updateformat: 'dd-mm-yyyy',
-            closebutton: '&nbsp;',
-            wrapper: container
-        });
-    }
-    else
-    {
-        calendar.updateelement = $(input);
-    }
-
-    var date = new Date($F(input));
-    calendar.setCurrentDate(isNaN(date) ? new Date() : date);
-
-    //Locates the calendar over the calling control  (in this example the "img").
-    if (source = $(source))
-    {
-        Position.clone($(source), container, {setWidth: false, setHeight: false, offsetLeft: source.getWidth() + 2});
-    }
-
-    //finally show the calendar =)
-    calendar.openCalendar();
-};
-
 
 document.observe('dom:loaded', function() {
 });
-
-
 
 function Validar(form)
 {
@@ -187,9 +115,6 @@ function CheckEliminaIngreso(chk)
 	return true;
 }
 
-
-window.opener.Refrescar();
-
 </script>
 <form method="post" action="<?php echo $SERVER[PHP_SELF]; ?>" onsubmit="return Validar(this);" id="form_documentos" autocomplete='off'>
 <input type="hidden" name="opcion" value="guardar" />
@@ -222,23 +147,10 @@ window.opener.Refrescar();
 			<?php echo __('Fecha'); ?>
 		</td>
 		<td align="left">
-			<?php echo $Html::PrintCalendar('fecha', $documento->fields[fecha]); ?>
+			<?php echo $Html::PrintCalendar('fecha', Utiles::sql2date($documento->fields[fecha])); ?>
 		</td>
 	</tr>
 	<tr>
-<?/*		<td align=right>
-			<?=__('Cliente')?>
-		</td>
-		<td align=left>
-			<input maxlength=10 readonly=readonly name="codigo_cliente" id="campo_codigo_cliente" size=10 value= <? echo $codigo_cliente; ?> />
-				<input name="nombre_cliente" id='nombre' style='width: 280px;' value = "<?
-																								$cliente = new Cliente($sesion);
-																								$cliente->LoadByCodigo($codigo_cliente);
-																								echo $cliente->fields['glosa_cliente'];
-																							   ?>" readonly=readonly />
-			<span style="color:#FF0000; font-size:10px">*</span>
-		</td>
-*/?>
 		<td align="right" width='30%'><?php echo  __('Cliente '); ?></td>
 		<td colspan="3" align=left><?php echo InputId::ImprimirSinCualquiera($sesion,"cliente","codigo_cliente","glosa_cliente", "codigo_cliente", $codigo_cliente," ","", 280); ?></td>
 		</td>
