@@ -60,7 +60,7 @@ class Funciones {
 
 	#retorna la tarifa para un cierto usuario, una cierta moneda y un cierto cliente. Si el cliente = "", es la tarifa por defecto para todos los clientes
 
-	function Tarifa($sesion, $id_usuario, $id_moneda, $codigo_asunto = "", $id_tarifa = "") {
+	public static function Tarifa($sesion, $id_usuario, $id_moneda, $codigo_asunto = "", $id_tarifa = "") {
 		if ($id_tarifa == "") {
 			$query = "SELECT
 						contrato.id_tarifa
@@ -84,7 +84,7 @@ class Funciones {
 		return empty($arreglo['tarifa']) ? 0 : $arreglo['tarifa'];
 	}
 
-	function TramiteTarifa($sesion, $id_tramite_tipo, $id_moneda, $codigo_asunto, $id_tramite_tarifa = "") {
+	public static function TramiteTarifa($sesion, $id_tramite_tipo, $id_moneda, $codigo_asunto, $id_tramite_tarifa = "") {
 		if ($id_tramite_tarifa == "") {
 			$query = "SELECT contrato.id_tramite_tarifa FROM asunto JOIN contrato ON asunto.id_contrato=contrato.id_contrato WHERE asunto.codigo_asunto = '$codigo_asunto' ";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
