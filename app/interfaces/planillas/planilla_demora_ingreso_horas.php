@@ -145,8 +145,8 @@
 								AVG(DATEDIFF( t.fecha_creacion, t.fecha )) as AvgDemoraIngreso
 							FROM trabajo t
 							WHERE t.id_usuario = '".$id_usuario."'
-								AND t.fecha >= '".$fecha1."'
-								AND t.fecha <= '".$fecha2."'
+								AND t.fecha >= '".Utiles::fecha2sql($fecha1)."'
+								AND t.fecha <= '".Utiles::fecha2sql($fecha2)."'
 							GROUP BY MONTH( t.fecha ),YEAR( t.fecha )
 							ORDER BY YEAR( t.fecha ) ASC, MONTH( t.fecha ) ASC ";
 			$resp_datos = mysql_query($query_datos,$sesion->dbh) or Utiles::errorSQL($query_datos,__FILE__,__LINE__,$sesion->dbh);
