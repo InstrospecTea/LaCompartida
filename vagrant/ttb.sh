@@ -50,6 +50,7 @@ fi
 
 # Instalar vendors
 cd /vagrant/ttb && /usr/local/bin/composer install
+composer dump-autoload --optimize
 
 # Actualizar la base de datos de ejemplo
 curl -I "http://localhost/ttb/app/update.php?hash=c85ef9997e6a30032a765a20ee69630b"
@@ -58,3 +59,6 @@ curl -I "http://localhost/ttb/app/update.php?hash=c85ef9997e6a30032a765a20ee6963
 apt-get update
 apt-get install wkhtmltopdf -y
 ln -s /usr/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
+
+# Corrige config de AWS
+mv /vagrant/ttb/backups/AWSSDKforPHP/config-sample.inc.php /vagrant/ttb/backups/AWSSDKforPHP/config.inc.php`
