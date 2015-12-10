@@ -643,13 +643,15 @@ $Slim->get('/reports/:report_code', function ($report_code) use ($Session, $Slim
 	}
 
 	$reportObject = new $reportClass($Session, $report_code);
-	$query = ($simpleReport->fields['query']);
-	if (!isset($query)) {
-		$query = $reportObject->QueryReporte();
-	}
 	$params = $Slim->request()->params();
 	$format = isset($params['format']) ? $params['format'] : 'Json';
 	unset($params['format']);
+
+	$query = ($simpleReport->fields['query']);
+	if (!isset($query)) {
+		$query = $reportObject->QueryReporte($params);
+	}
+
 	$results = $reportObject->ReportData($query, $params);
 	$results = $reportObject->ProcessReport($results, $params);
 	if ($format == 'Html') {

@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 15.30.0](https://github.com/LemontechSA/ttb/pull/1258)
+Thursday 2015, December 10th
+* **Feature** [Reporte MTA](https://github.com/LemontechSA/ttb/pull/1254)
+
 ## Hotfix 15.29.7
 Wednesday, December 9th
 * **Fix** [No mostrar trabajos no cobrables serengeti](https://github.com/LemontechSA/ttb/pull/1257)
