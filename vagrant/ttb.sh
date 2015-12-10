@@ -61,4 +61,4 @@ apt-get install wkhtmltopdf -y
 ln -s /usr/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
 
 # Corrige config de AWS
-mv /vagrant/ttb/backups/AWSSDKforPHP/config-sample.inc.php /vagrant/ttb/backups/AWSSDKforPHP/config.inc.php`
+cp /vagrant/ttb/backups/AWSSDKforPHP/config-sample.inc.php /vagrant/ttb/backups/AWSSDKforPHP/config.inc.php`
