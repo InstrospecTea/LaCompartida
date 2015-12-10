@@ -91,7 +91,7 @@
 </table>
 </form>
 
-<canvas id="grafico_hito" width="600" height="400"></canvas>
+<div id="contenedor_grafico_hito"></div>
 
 <script type="text/javascript">
 <!-- //
@@ -117,20 +117,33 @@ jQuery(function() {
 			dataType: 'json',
 			type: 'POST',
 			success: function(respuesta) {
-				var canvas = jQuery("#grafico_hito")[0];
-				var context = canvas.getContext('2d');
+				if (respuesta != null) {
+					agregarCanvas('hito', jQuery('#contenedor_grafico_hito'));
+					var canvas = jQuery("#grafico_hito")[0];
+					var context = canvas.getContext('2d');
 
-				if (graficoBarraHito) {
-					graficoBarraHito.destroy();
+					if (graficoBarraHito) {
+						graficoBarraHito.destroy();
+					}
+
+					graficoBarraHito = new Chart(context).Bar(respuesta);
 				}
-
-				graficoBarraHito = new Chart(context).Bar(respuesta);
 			},
 			error: function(e) {
 				console.log(e);
 			}
 		});
 	});
+
+	function agregarCanvas(id, contenedor) {
+		var canvas = document.createElement('canvas');
+		canvas.width = 600;
+		canvas.height = 400;
+		canvas.id = 'grafico_' + id;
+
+		contenedor.empty();
+		contenedor.append(canvas);
+	}
 });
 
 function Planilla(form) {
