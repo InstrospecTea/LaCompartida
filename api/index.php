@@ -346,17 +346,17 @@ $Slim->post('/users/:id/works', function ($id) use ($Session, $Slim) {
 	if ($Slim->request()->params('date')) {
 		$params['date'] = $Slim->request()->params('date');
 		$params['created_date'] = $Slim->request()->params('created_date');
-		$params['duration'] = (float) $Slim->request()->params('duration');
+		$params['duration'] = $Slim->request()->params('duration');
 		$params['notes'] = $Slim->request()->params('notes');
-		$params['rate'] = (float) $Slim->request()->params('rate');
+		$params['rate'] = $Slim->request()->params('rate');
 		$params['requester'] = $Slim->request()->params('requester');
 		$params['activity_code'] = $Slim->request()->params('activity_code');
 		$params['area_code'] = $Slim->request()->params('area_code');
 		$params['matter_code'] = $Slim->request()->params('matter_code');
 		$params['task_code'] = $Slim->request()->params('task_code');
-		$params['user_id'] = (int) $Slim->request()->params('user_id');
-		$params['billable'] = (int) $Slim->request()->params('billable');
-		$params['visible'] = (int) $Slim->request()->params('visible');
+		$params['user_id'] = $Slim->request()->params('user_id');
+		$params['billable'] = $Slim->request()->params('billable');
+		$params['visible'] = $Slim->request()->params('visible');
 	} else {
 		$params = json_decode($Slim->request()->getBody(), 1);
 	}
@@ -435,21 +435,39 @@ $Slim->put('/users/:user_id/works/:id', function ($user_id, $id) use ($Session, 
 	$User = new Usuario($Session);
 	$Work = new Trabajo($Session);
 
-	$work = array();
+	$params = array();
+	if ($Slim->request()->params('date')) {
+		$params['date'] = $Slim->request()->params('date');
+		$params['created_date'] = $Slim->request()->params('created_date');
+		$params['duration'] = $Slim->request()->params('duration');
+		$params['notes'] = $Slim->request()->params('notes');
+		$params['rate'] = $Slim->request()->params('rate');
+		$params['requester'] = $Slim->request()->params('requester');
+		$params['activity_code'] = $Slim->request()->params('activity_code');
+		$params['area_code'] = $Slim->request()->params('area_code');
+		$params['matter_code'] = $Slim->request()->params('matter_code');
+		$params['task_code'] = $Slim->request()->params('task_code');
+		$params['user_id'] = $Slim->request()->params('user_id');
+		$params['billable'] = $Slim->request()->params('billable');
+		$params['visible'] = $Slim->request()->params('visible');
+	} else {
+		$params = json_decode($Slim->request()->getBody(), 1);
+	}
 
+	$work = array();
 	$work['id'] = $id;
-	$work['date'] = $Slim->request()->params('date');
-	$work['duration'] = (float) $Slim->request()->params('duration');
-	$work['notes'] = $Slim->request()->params('notes');
-	$work['rate'] = (float) $Slim->request()->params('rate');
-	$work['requester'] = $Slim->request()->params('requester');
-	$work['activity_code'] = $Slim->request()->params('activity_code');
-	$work['area_code'] = $Slim->request()->params('area_code');
-	$work['matter_code'] = $Slim->request()->params('matter_code');
-	$work['task_code'] = $Slim->request()->params('task_code');
-	$work['user_id'] = (int) $user_id;
-	$work['billable'] = (int) $Slim->request()->params('billable');
-	$work['visible'] = (int) $Slim->request()->params('visible');
+	$work['date'] = $params['date'];
+	$work['duration'] = (float) $params['duration'];
+	$work['notes'] = $params['notes'];
+	$work['rate'] = (float) $params['rate'];
+	$work['requester'] = $params['requester'];
+	$work['activity_code'] = $params['activity_code'];
+	$work['area_code'] = $params['area_code'];
+	$work['matter_code'] = $params['matter_code'];
+	$work['task_code'] = $params['task_code'];
+	$work['user_id'] = (int) $params['user_id'];
+	$work['billable'] = (int) $params['billable'];
+	$work['visible'] = (int) $params['visible'];
 
 	if (!is_null($work['date']) && isValidTimeStamp($work['date'])) {
 		$work['date'] = date('Y-m-d H:i:s', $work['date']);
