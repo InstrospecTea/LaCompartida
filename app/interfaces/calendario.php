@@ -1,44 +1,44 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';	
+	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
 	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
-  
-  
+
+
 	$sesion = new Sesion(array('ADM','PRO'));
 	$pagina = new Pagina($sesion);
 
 	$pagina->titulo = __('Calendario');
 	$pagina->PrintTop($popup);
-	
+
 	$params = array();
-	
+
 	if(!$opcion)
 		$usuarios = array($sesion->usuario->fields['id_usuario']);
-	
+
 	if(is_array($usuarios))
 		$params[] = 'usuarios='.join(',',$usuarios);
-		
+
 	if(is_array($grupo_cliente))
 		$params[] = 'grupo='.join(',',$grupo_cliente);
-		
+
 	if( $codigo_cliente_secundario != '' && $codigo_cliente == '' )
 	{
 		$cliente = new Cliente($sesion);
 		$codigo_cliente = $cliente->CodigoSecundarioACodigo( $codigo_cliente_secundario );
-	} 
+	}
 	if($codigo_cliente)
 		$params[] = 'cliente='.$codigo_cliente;
-	
+
 	$argumentos = '';
 	if(!empty($params))
 		$argumentos = '?'.join('&',$params);
-	
+
 	require Conf::ServerDir().'/templates/'.Conf::Templates().'/headers_calendario.php';
 ?>
 
@@ -48,7 +48,7 @@
 	form.submit();
 	/*scheduler.load("<?=Conf::RootDir()?>/app/interfaces/eventos.php");*/
 	}
-	
+
 function Refrescar()
 {
 	var url = "calendario.php";
@@ -56,12 +56,12 @@ function Refrescar()
 }
 
 </script>
-<? echo Autocompletador::CSS(); ?>
+<?php echo Autocompletador::CSS(); ?>
 
-<?
+<?php
 if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 		$width = "90%";
-	else 
+	else
 		$width = "100%";
 ?>
 
@@ -74,19 +74,19 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 			<tr>
 				<td align=right><b><?=__('Usuario')?></b>:</td>
 				<td align=left colspan=3>
-					<? if(!$usuario) $usuario = $sesion->usuario->fields['id_usuario']; ?>
-					<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"class=\"selectMultiple\" multiple size=4 ","","200"); ?>	
+					<?php if(!$usuario) $usuario = $sesion->usuario->fields['id_usuario']; ?>
+					<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"class=\"selectMultiple\" multiple size=4 ","","200"); ?>
 				</td>
 			</tr>
 			<tr>
 				<td align=right width='30%'><b><?=__('Cliente')?></b></td>
 				<td colspan=3 align=left>
-					<? 
+					<?php
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 						{
 							if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 								echo Autocompletador::ImprimirSelector($sesion, '', $codigo_cliente_secundario);
-							else	
+							else
 								echo Autocompletador::ImprimirSelector($sesion, $codigo_cliente);
 						}
 					else
@@ -101,7 +101,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 			<tr>
 				<td align=right><b><?=__('Grupo Cliente')?></b>:</td>
 				<td align=left colspan=3>
-					<?=Html::SelectQuery($sesion,"SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente ORDER BY glosa_grupo_cliente ASC","grupo_cliente[]",$grupo_cliente,"class=\"selectMultiple\" multiple size=4 ","","200");?>	
+					<?=Html::SelectQuery($sesion,"SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente ORDER BY glosa_grupo_cliente ASC","grupo_cliente[]",$grupo_cliente,"class=\"selectMultiple\" multiple size=4 ","","200");?>
 				</td>
 			</tr>
 			<tr>
@@ -113,13 +113,13 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 </fieldset>
 </td></tr></table>
 
-</form> 
+</form>
 
 <br>
 
-	<div id="scheduler_here" class="dhx_cal_container" style='width:<?=width ?>; height:820px; overflow: visible;'> 
+	<div id="scheduler_here" class="dhx_cal_container" style='width:<?=width ?>; height:820px; overflow: visible;'>
 		<div class="dhx_cal_navline" >
-     
+
 			<div class="dhx_cal_prev_button">&nbsp;</div>
 			<div class="dhx_cal_next_button">&nbsp;</div>
 			<div class="dhx_cal_today_button"></div>
@@ -134,7 +134,7 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 		<div class="dhx_cal_header">
 		</div>
 		<div class="dhx_cal_data">
-		</div>		
+		</div>
 	</div>
 
 <script type="text/javascript">
@@ -143,7 +143,7 @@ Event.observe(window, "load", function(e)
 init();
 });
 </script>
-<?
+<?php
 if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		echo(Autocompletador::Javascript($sesion,false));

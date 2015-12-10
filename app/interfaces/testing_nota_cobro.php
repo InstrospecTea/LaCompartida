@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../app/classes/PaginaCobro.php';
@@ -58,13 +58,13 @@ return $innerHTML;
 	</tr>
 </table>
 </form>
-	<?
+	<?php
 	if($id_cobro)
 	{
 		$cobro = new Cobro($sesion);
 		$cobro->Load($id_cobro);
 		$cobro->LoadAsuntos();
-		
+
 		if( $formatos )
 			{
 				$lista_formatos = implode(', ',$formatos);
@@ -72,10 +72,10 @@ return $innerHTML;
 			}
 		else
 			$where = "";
-		
+
 		$query = " SELECT id_formato, descripcion FROM cobro_rtf $where";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		
+
 		while( list($id_formato,$descripcion) = mysql_fetch_array($resp) )
 		{
 			echo '<br><br><h2>'.$descripcion.'</h2><br><br>';
@@ -90,7 +90,7 @@ return $innerHTML;
 			$dom->loadHTML($doc->output());
 			/* Parseo pagina_5 para obtener Fixed Incomes y Variable Incomes */
 			$xpath = new DOMXPath($dom);
-	
+
 			$query = "//table[@class='tabla_normal']//td//table | //table[@class='tabla_normal' and not(.//table) and not(.='')]";
 			$elementos = $xpath->query($query);
 			foreach ($elementos as $elemento)
@@ -100,9 +100,9 @@ return $innerHTML;
 				echo "</table>";
 			}
 		}
-	}	
+	}
 	?>
 
-<?
+<?php
 	$pagina->PrintBottom();
-?> 
+?>

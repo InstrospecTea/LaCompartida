@@ -1,4 +1,4 @@
-<? 
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../app/implementacion/0_instrucciones_y_configuraciones.php';
@@ -6,33 +6,33 @@
 	require_once Conf::ServerDir().'/../app/classes/Cliente.php';
 	require_once Conf::ServerDir().'/../app/classes/Documento.php';
 	$sesion = new Sesion();
-	
+
 	ini_set("memory_limit","128M");
-	
+
 	$query = "SELECT id_documento_legal, codigo FROM prm_documento_legal";
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	
+
 	$array_codigo_a_id = array();
 	while( list($id,$codigo)=mysql_query($resp) )
 	{
 		$array_codigo_a_id[$codigo]=$id;
 	}
-	
+
 	$query = "SELECT id_cobro FROM cobro";
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,$sesion->dbh);
-	
+
 	while( list($id_cobro) = mysql_fetch_array($resp) )
 	{
 		$cobro = new Cobro($sesion);
 		$cobro->Load($id_cobro);
-		
+
 			$cliente = new Cliente($sesion);
 			$cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
-			
+
 			$query2 = "SELECT id_documento_legal FROM prm_documento_legal WHERE codigo = '".$cobro->fields['tipo_documento_legal']."'";
 			$resp2 = mysql_query($query2,$sesion->dbh) or Utiles::errorSQL($query2,__FILE__,__LINE__,$sesion->dbh);
 			list($id_documento_legal) = mysql_fetch_array($resp2);
-			
+
 				$factura = new Factura($sesion);
 				$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $id_cobro);
 				$x_gastos 		= UtilesApp::ProcesaGastosCobro($sesion, $id_cobro);
@@ -62,7 +62,7 @@
 					$documento = new Documento($sesion);
 					if( $documento->LoadByCobro($id_cobro) )
 					{
-						$valores = array( 
+						$valores = array(
 							$factura->fields['id_factura'],
 							$id_cobro,
 							$documento->fields['id_documento'],
@@ -71,23 +71,23 @@
 							$documento->fields['id_moneda'],
 							$documento->fields['id_moneda']
 						);
-						
+
 						$query = "DELETE FROM factura_cobro WHERE id_factura = '".$factura->fields['id_factura']."' AND id_cobro = '".$id_cobro."' ";
 						mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-						
+
 						$query = "INSERT INTO factura_cobro (id_factura, id_cobro, id_documento, monto_factura, impuesto_factura, id_moneda_factura, id_moneda_documento)
 											VALUES ('".implode("','",$valores)."')";
 						mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 					}
 				}
 	}
-	
+
 	$query = "ALTER TABLE `cobro`
 									  DROP `descripcion_factura`,
 									  DROP `tipo_documento_legal`,
 									  DROP `ind_pagado`;";
 	mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-	
+
 	$queries = array();
 	$queries[] = "UPDATE factura SET estado = 'ANULADO' WHERE estado = 'A'";
 	$queries[] = "UPDATE factura SET estado = 'DADA DE BAJA' WHERE estado = 'B'";
@@ -98,10 +98,10 @@
 	$queries[] = "UPDATE factura SET estado = 'OBSEQUIOS' WHERE estado = 'O'";
 	$queries[] = "UPDATE factura SET estado = 'PENDIENTE' WHERE estado = 'P'";
 	$queries[] = "UPDATE factura SET estado = 'REGULARIZAR' WHERE estado = 'R'";
-	
+
 	foreach($queries as $query)
 		{
 			mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		}
-	
+
 ?>

@@ -52,18 +52,18 @@ $pagina->PrintTop();
 				<table cellpadding="0" cellspacing="0"><tbody><tr>
 					<td valign="middle">
 						<select id="fecha1_m" name="fecha1_m">
-							<option value="0" <? if($fecha_m==1) echo 'selected="selected"';?>><?=__("Ene")?></option>
-							<option value="1" <? if($fecha_m==2) echo 'selected="selected"';?>><?=__("Feb")?></option>
-							<option value="2" <? if($fecha_m==3) echo 'selected="selected"';?>><?=__("Mar")?></option>
-							<option value="3" <? if($fecha_m==4) echo 'selected="selected"';?>><?=__("Abr")?></option>
-							<option value="4" <? if($fecha_m==5) echo 'selected="selected"';?>><?=__("May")?></option>
-							<option value="5" <? if($fecha_m==6) echo 'selected="selected"';?>><?=__("Jun")?></option>
-							<option value="6" <? if($fecha_m==7) echo 'selected="selected"';?>><?=__("Jul")?></option>
-							<option value="7" <? if($fecha_m==8) echo 'selected="selected"';?>><?=__("Ago")?></option>
-							<option value="8" <? if($fecha_m==9) echo 'selected="selected"';?>><?=__("Sep")?></option>
-							<option value="9" <? if($fecha_m==10) echo 'selected="selected"';?>><?=__("Oct")?></option>
-							<option value="10" <? if($fecha_m==11) echo 'selected="selected"';?>><?=__("Nov")?></option>
-							<option value="11" <? if($fecha_m==12) echo 'selected="selected"';?>><?=__("Dic")?></option>
+							<option value="0" <?php if($fecha_m==1) echo 'selected="selected"';?>><?=__("Ene")?></option>
+							<option value="1" <?php if($fecha_m==2) echo 'selected="selected"';?>><?=__("Feb")?></option>
+							<option value="2" <?php if($fecha_m==3) echo 'selected="selected"';?>><?=__("Mar")?></option>
+							<option value="3" <?php if($fecha_m==4) echo 'selected="selected"';?>><?=__("Abr")?></option>
+							<option value="4" <?php if($fecha_m==5) echo 'selected="selected"';?>><?=__("May")?></option>
+							<option value="5" <?php if($fecha_m==6) echo 'selected="selected"';?>><?=__("Jun")?></option>
+							<option value="6" <?php if($fecha_m==7) echo 'selected="selected"';?>><?=__("Jul")?></option>
+							<option value="7" <?php if($fecha_m==8) echo 'selected="selected"';?>><?=__("Ago")?></option>
+							<option value="8" <?php if($fecha_m==9) echo 'selected="selected"';?>><?=__("Sep")?></option>
+							<option value="9" <?php if($fecha_m==10) echo 'selected="selected"';?>><?=__("Oct")?></option>
+							<option value="10" <?php if($fecha_m==11) echo 'selected="selected"';?>><?=__("Nov")?></option>
+							<option value="11" <?php if($fecha_m==12) echo 'selected="selected"';?>><?=__("Dic")?></option>
 						</select>
 					</td>
 					<td valign="middle">
@@ -80,18 +80,18 @@ $pagina->PrintTop();
 				<table cellpadding="0" cellspacing="0"><tbody><tr>
 					<td valign="middle">
 						<select id="fecha2_m" name="fecha2_m">
-							<option value="0" <? if($fecha_m==1) echo 'selected="selected"';?>><?=__("Ene")?></option>
-							<option value="1" <? if($fecha_m==2) echo 'selected="selected"';?>><?=__("Feb")?></option>
-							<option value="2" <? if($fecha_m==3) echo 'selected="selected"';?>><?=__("Mar")?></option>
-							<option value="3" <? if($fecha_m==4) echo 'selected="selected"';?>><?=__("Abr")?></option>
-							<option value="4" <? if($fecha_m==5) echo 'selected="selected"';?>><?=__("May")?></option>
-							<option value="5" <? if($fecha_m==6) echo 'selected="selected"';?>><?=__("Jun")?></option>
-							<option value="6" <? if($fecha_m==7) echo 'selected="selected"';?>><?=__("Jul")?></option>
-							<option value="7" <? if($fecha_m==8) echo 'selected="selected"';?>><?=__("Ago")?></option>
-							<option value="8" <? if($fecha_m==9) echo 'selected="selected"';?>><?=__("Sep")?></option>
-							<option value="9" <? if($fecha_m==10) echo 'selected="selected"';?>><?=__("Oct")?></option>
-							<option value="10" <? if($fecha_m==11) echo 'selected="selected"';?>><?=__("Nov")?></option>
-							<option value="11" <? if($fecha_m==12) echo 'selected="selected"';?>><?=__("Dic")?></option>
+							<option value="0" <?php if($fecha_m==1) echo 'selected="selected"';?>><?=__("Ene")?></option>
+							<option value="1" <?php if($fecha_m==2) echo 'selected="selected"';?>><?=__("Feb")?></option>
+							<option value="2" <?php if($fecha_m==3) echo 'selected="selected"';?>><?=__("Mar")?></option>
+							<option value="3" <?php if($fecha_m==4) echo 'selected="selected"';?>><?=__("Abr")?></option>
+							<option value="4" <?php if($fecha_m==5) echo 'selected="selected"';?>><?=__("May")?></option>
+							<option value="5" <?php if($fecha_m==6) echo 'selected="selected"';?>><?=__("Jun")?></option>
+							<option value="6" <?php if($fecha_m==7) echo 'selected="selected"';?>><?=__("Jul")?></option>
+							<option value="7" <?php if($fecha_m==8) echo 'selected="selected"';?>><?=__("Ago")?></option>
+							<option value="8" <?php if($fecha_m==9) echo 'selected="selected"';?>><?=__("Sep")?></option>
+							<option value="9" <?php if($fecha_m==10) echo 'selected="selected"';?>><?=__("Oct")?></option>
+							<option value="10" <?php if($fecha_m==11) echo 'selected="selected"';?>><?=__("Nov")?></option>
+							<option value="11" <?php if($fecha_m==12) echo 'selected="selected"';?>><?=__("Dic")?></option>
 						</select>
 					</td>
 					<td valign="middle">
@@ -120,7 +120,7 @@ $pagina->PrintTop();
 	<input type=submit value='<?=__('Descargar excel anual') ?>' class=btn >
 </form>
 <br />
-<?
+<?php
 	$pagina->PrintBottom($popup);
 ?>
 

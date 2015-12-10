@@ -1,5 +1,5 @@
-<?
-  require_once dirname(__FILE__).'/../conf.php';
+<?php
+ require_once dirname(__FILE__).'/../conf.php';
   require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
   require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 
@@ -24,7 +24,7 @@
 
 <table width="90%">
 
-<?
+<?php
 	$query = "SELECT * FROM cobro WHERE id_contrato IS NULL AND fecha_creacion<=NOW()";
 	$cobros = new ListaCobros($sesion,'',$query);
 
@@ -37,7 +37,7 @@
 			<hr size="1">
 			<b><?php echo __('Cobro'); ?> <?=$cobro->fields['id_cobro']?>, por un monto de <?=$cobro->fields['monto']?></b><br>
 
-<?
+<?php
 		$cobro->LoadAsuntos();
 		$asuntos_por_coma = implode("','", $cobro->asuntos);
 
@@ -171,7 +171,7 @@
 		</td>
 	</tr>
 
-<?
+<?php
 	}
 ?>
 
@@ -182,6 +182,6 @@
 | <a href="?fix=1">Arreglar problemas</a>
 <br><br>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

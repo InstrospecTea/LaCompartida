@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Encuesta.php';
 
@@ -13,7 +13,7 @@
 
 	$sesion = new Sesion( '' );
 	$pagina = new Pagina($sesion);
-    	    
+
 	$pagina->titulo = "Ver Encuestas";
 
 	$pagina->PrintHeaders();
@@ -40,7 +40,7 @@
 					$pagina->AddInfo("Encuesta eliminada");
 				else
 					$pagina->AddError($enc->error);
-		
+
 		}
 		else
 			$pagina->FatalError(" No tiene permisos de Administrador");
@@ -48,12 +48,12 @@
 
 	if($from == 'USER')
 	{
-		$lista_encuestas = new ListaEncuestas($sesion,'',"SELECT * FROM encuesta WHERE id_empresa = $id_empresa AND estado = 'EMITIDA' 
+		$lista_encuestas = new ListaEncuestas($sesion,'',"SELECT * FROM encuesta WHERE id_empresa = $id_empresa AND estado = 'EMITIDA'
 																			 ORDER BY fecha_creacion DESC");
 	}
 	else
 	{
-        $lista_encuestas = new ListaEncuestas($sesion,'',"SELECT * FROM encuesta WHERE id_empresa = $id_empresa 
+        $lista_encuestas = new ListaEncuestas($sesion,'',"SELECT * FROM encuesta WHERE id_empresa = $id_empresa
                                                                              ORDER BY fecha_creacion DESC");
 	}
 	if($id_empresa == '')
@@ -79,18 +79,18 @@
 <table width="100%" align="left">
     <tr>
         <td valign="top" class="subtitulo" align="left" colspan="3">
-              <img border=0 src="<?=Conf::ImgDir()?>/ver_encuesta16.gif"> Lista de encuestas empresa: <?=$empresa->fields['glosa_empresa']?> 
+              <img border=0 src="<?=Conf::ImgDir()?>/ver_encuesta16.gif"> Lista de encuestas empresa: <?=$empresa->fields['glosa_empresa']?>
    </td>
 	<td width=10% align=center>
-<?
-       $params_array['codigo_permiso'] = 'ADM';
+<?php
+      $params_array['codigo_permiso'] = 'ADM';
         $p = $sesion->usuario->permisos->Find('FindPermiso',$params_array) or $pagina->FatalError("No se encontro el permiso ADM",__FILE__,__LINE__);
 
         if( $p->fields['permitido'] )
         {
 ?>
         <a href="encuesta_paso1.php?id_empresa=<?=$id_empresa?>"><img src=<?=Conf::ImgDir()?>/agregar_encuesta16.gif title="Agregar Encuesta" border=0></a>
-<?
+<?php
 		}
 ?>
 	</td>
@@ -102,7 +102,7 @@
 		<td class="texto_suave">Nombre</td>
 		<td class="texto_suave" align ="center" width=20%><?=$from == 'USER' ? 'Estado':'Opciones'?></td>
 	</tr>
-<?
+<?php
 	    $rut = $sesion->usuario->fields['rut'];
 
 		for($x=0; $x<$lista_encuestas->num; $x++)
@@ -114,8 +114,8 @@
 			<?=$encuesta->fields['titulo']?><br>
 		</td>
 		<td align="center">
-<?
-        if($from == 'ADMIN')
+<?php
+       if($from == 'ADMIN')
 		{
             echo "<a href='desplegar_encuesta.php?id_encuesta=".$encuesta->fields['id_encuesta']."' ><img border=0 src='".Conf::ImgDir()."/ver_16.gif' title='Ver Encuesta'></a>&nbsp;<a href=ver_encuestas.php?id_empresa=".$id_empresa."&id_encuesta=".$encuesta->fields['id_encuesta']."&opc=borrar><img border=0 src='".Conf::ImgDir()."/encuesta_borrar.gif' title='Borrar Encuesta'></a>";
 
@@ -145,7 +145,7 @@
 		<hr size=1>
 		</td>
 	</tr>
-<?
+<?php
 		}
 ?>
 	</table>
@@ -155,7 +155,7 @@
         </td>
     </tr>
 </table>
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>
 

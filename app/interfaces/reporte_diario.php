@@ -292,7 +292,7 @@ function TipoDato(valor)
 	}
 
 		td_col.className = 'boton_presionado';
-		<?
+		<?php
 		foreach($tipos_de_dato as $key => $t_d)
 		{
 			echo " if(valor == '".$t_d."' ){ ";
@@ -304,13 +304,13 @@ function TipoDato(valor)
 }
 
 </script>
-<?
+<?php
 }
 ?>
 <form method=post name=formulario action="" id=formulario autocomplete='off'>
 <input type=hidden name=opc id=opc value='print'>
 <input type=hidden name=debug id=debug value='<?=$debug?>'>
-<?
+<?php
 if(!$popup)
 {
 ?>
@@ -344,23 +344,23 @@ if(!$popup)
 			<br>
 		</td>
 		<td>
-			<?
+			<?php
 				$explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
 				$explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
 				$explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
 			?>
 			<span title="<?=__($explica_periodo_trabajo)?>">
 			<input type="radio" name="campo_fecha" id="campo_fecha_trabajo" value="trabajo"
-																					 <? if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?>
+																					 <?php if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?>
 																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_trabajo"><?=__("Trabajo")?></label>
 			</span>
 			<span title="<?=__($explica_periodo_cobro)?>"><input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
-																					<? if($campo_fecha=='cobro' ) echo 'checked="checked"';
+																					<?php if($campo_fecha=='cobro' ) echo 'checked="checked"';
 																					 ?>
 																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_cobro"><?=__("Corte")?></label>
 			</span>
 			<span title="<?=__($explica_periodo_emision)?>"><input type="radio" name="campo_fecha" id="campo_fecha_emision" value="emision"
-																					<? if($campo_fecha=='emision' ) echo 'checked="checked"';
+																					<?php if($campo_fecha=='emision' ) echo 'checked="checked"';
 																					 ?>
 																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_emision"><?=__("Emisión")?></label>
 			</span>
@@ -392,9 +392,9 @@ if(!$popup)
 					<option value='12' <?=$fecha_mes==12 ? 'selected':'' ?>><?=__('Diciembre') ?></option>
 				</select>
 				<select name="fecha_anio" style='width:55px'>
-					<? for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
+					<?php for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
 					<option value='<?=$i?>' <?=$fecha_anio == $i ? 'selected' : '' ?>><?=$i ?></option>
-					<? } ?>
+					<?php } ?>
 				</select>
 			</div>
 		</td>
@@ -415,25 +415,25 @@ if(!$popup)
 		<td>
 			<span title="<?=__($explica_periodo_trabajo)?>">
 			<input type="radio" name="campo_fecha_F" value="trabajo" id = "campo_fecha_F"
-																					<? if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?> onclick ="SincronizarCampoFecha()" />
+																					<?php if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?> onclick ="SincronizarCampoFecha()" />
 			<?=__("Trabajo")?>
 			</span>
 			<span title="<?=__($explica_periodo_cobro)?>">
 			<input type="radio" name="campo_fecha_F" value="cobro" id = "campo_fecha_F"
-																					<? if($campo_fecha=='cobro') echo 'checked="checked"';
+																					<?php if($campo_fecha=='cobro') echo 'checked="checked"';
 																					 ?> onclick ="SincronizarCampoFecha()" />
 			<?=__("Corte")?>
 			</span>
 			<span title="<?=__($explica_periodo_emision)?>">
 			<input type="radio" name="campo_fecha_F" value="emision" id = "campo_fecha_F"
-																					<? if($campo_fecha=='emision') echo 'checked="checked"';
+																					<?php if($campo_fecha=='emision') echo 'checked="checked"';
 																					 ?> onclick ="SincronizarCampoFecha()" />
 			<?=__("Emisión")?>
 			</span>
 		</td>
 	</tr>
 
-	<?
+	<?php
 		$largo_select = 6;
 		if( method_exists('Conf','GetConf') )
 		{
@@ -473,7 +473,7 @@ if(!$popup)
 		</td>
 	</tr>
 	<!-- TIPO DE ASUNTO Y AREA (CONFIGURABLE) !-->
-	<?
+	<?php
 	if($filtros_extra)
 	{?>
 	<tr>
@@ -561,7 +561,7 @@ if(!$popup)
 	<tr>
 		<td id = 'td_dato' class='<?=$comparar? 'borde_rojo':'borde_blanco'?>' >
 			<select name='tipo_dato' id='tipo_dato' style='width:180px; ' onchange="TipoDato(this.value)" >
-			<?
+			<?php
 				foreach($tipos_de_dato as $tipo)
 				{
 					echo "<option value='".$tipo."'";
@@ -580,7 +580,7 @@ if(!$popup)
 		<td id = 'td_dato_comparado' class='borde_azul' style='<?=$comparar? '':'display: none;'?>' >
 
 			<select name='tipo_dato_comparado' id='tipo_dato_comparado' style='width:180px; ' >
-			<?
+			<?php
 				foreach($tipos_de_dato as $tipo)
 				{
 					echo "<option value='".$tipo."'";
@@ -598,7 +598,7 @@ if(!$popup)
 <table id="full_tipo_dato" style="border: 0px solid black; width:730px; display: none;" cellpadding="0" cellspacing="0">
 	<tr>
 		<td align="center">
-		<?
+		<?php
 			function celda($nombre)
 			{
 				global $tipo_dato;
@@ -808,7 +808,7 @@ if(!$popup)
 		<input type=hidden name=numero_agrupadores id=numero_agrupadores value=<?=$numero_agrupadores?> />
 		<input type=hidden name=vista id=vista value='' />
 		<?=__('Agrupar por')?>:&nbsp;
-		<?
+		<?php
 				$ya_elegidos = array();
 				for($i=0;$i<6;$i++)
 				{
@@ -857,7 +857,7 @@ if(!$popup)
 <script> RevisarMoneda();</script>
 
 		<!-- RESULTADO -->
-<?
+<?php
 }
 
 ?>
@@ -879,6 +879,6 @@ Calendar.setup(
 	}
 );
 </script>
-<?
+<?php
 	$pagina->PrintBottom($popup);
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
 
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
@@ -82,7 +82,7 @@
         	if($archivo->DbRemove())
             {
             	$pagina->AddInfo("Archivo Eliminado");
-            }   
+            }
             else
             	$pagina->AddError($archivo->error);
 	     }
@@ -133,7 +133,7 @@ function Confirmar()
  <input type="hidden" name="desde" value="">
 	<tr>
 		<td valign="top" class="subtitulo" align="left" colspan="4">
-		     <img border=0 src="<?=Conf::ImgDir()?>/proyectos_16.gif"> <?=$accion == 'agregar'? 'Agregar Grupo':'Editar Grupo'?>	
+		     <img border=0 src="<?=Conf::ImgDir()?>/proyectos_16.gif"> <?=$accion == 'agregar'? 'Agregar Grupo':'Editar Grupo'?>
 			<hr class="subtitulo"/>
 		</td>
 	</tr>
@@ -163,7 +163,7 @@ function Confirmar()
         </td>
     </tr>
 
-<?
+<?php
 	if($accion == 'agregar')
 	{
 ?>
@@ -179,7 +179,7 @@ function Confirmar()
         </td>
   </tr>
 </form>
-<?
+<?php
 	}
 	else
 	{
@@ -189,8 +189,8 @@ function Confirmar()
             <input type="submit" value="Grabar" onclick="this.form.opc.value='editPro';">
         </td>
   </tr>
-<?
-        $params_array['codigo_permiso'] = 'ADM';
+<?php
+       $params_array['codigo_permiso'] = 'ADM';
         $p = $Sesion->usuario->permisos->Find('FindPermiso',$params_array); //tiene permiso de administrador
         if( $p->fields['permitido'] )
         {
@@ -200,7 +200,7 @@ function Confirmar()
 			<img border=0 src="<?=Conf::ImgDir()?>/usuarios2_16.gif"> <a href="agregar_consultor.php?id_proyecto=<?=$id_proyecto?>"><strong>Manejar Consultores</strong></a>
 		<td>
 </tr>
-<?
+<?php
 		}
 ?>
   <tr>
@@ -226,7 +226,7 @@ function Confirmar()
         </td>
   </tr>
 
-<?
+<?php
 	}
 		if(!is_numeric($desde))
 			$desde=0;
@@ -236,7 +236,7 @@ function Confirmar()
 		$proyecto->archivos = new ListaArchivosProyectos ( $Sesion,'', "SELECT SQL_CALC_FOUND_ROWS * FROM archivos_proyectos WHERE id_proyecto='$id_proyecto' LIMIT $desde, $x_pag");
 		echo Html::PrintListRows($Sesion, $proyecto->archivos, 'PrintRow');
 		echo Html::PrintListPages($proyecto->archivos, $desde, $x_pag, 'PrintLinkPage');
-	
+
 		if($id_proyecto && $accion=='editar')
 		{
 ?>
@@ -261,7 +261,7 @@ function Confirmar()
   </tr>
 </form>
 </table>
-<?
+<?php
 		}
     	function PrintRow (& $archivo)
 	    {
@@ -278,7 +278,7 @@ function Confirmar()
             ${fields['descripcion']}
         </td>
         <td valign="top" align="center">
-			<a href="ver_archivo_proyecto.php?id_proyecto=$id_proyecto&id_archivo=${fields['id_archivo']}" ><img border=0 src="$img_dir/iconos/16/ver_16.gif" title='Ver'></a>            
+			<a href="ver_archivo_proyecto.php?id_proyecto=$id_proyecto&id_archivo=${fields['id_archivo']}" ><img border=0 src="$img_dir/iconos/16/ver_16.gif" title='Ver'></a>
             <a href="?opc=delFile&id_proyecto=$id_proyecto&id_archivo=${fields['id_archivo']}&accion=editar" onclick="return Confirmar();"><img border=0 src="$img_dir/iconos/16/eliminar.gif" title='Eliminar'></a>
         </td>
   </tr>
@@ -296,8 +296,8 @@ HTML;
 </tr>
 </td>
 </table>
-<script language="javascript">	
-<!-- //
+<script language="javascript">
+
 
 function PrintLinkPage( page )
 {
@@ -305,9 +305,9 @@ function PrintLinkPage( page )
 	document.formArchivos.submit();
 }
 
-// ->
+
 </script>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

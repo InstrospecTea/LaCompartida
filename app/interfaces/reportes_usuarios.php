@@ -60,13 +60,13 @@
 
 </form>
 
-<?
+<?php
 	if($opcion == "desplegar")
 	{
 ?>
 		<br />
 		<img src=graficos/grafico_<?=$tipo_reporte?>.php?id_usuario=<?=$id_usuario?>&fecha1=<?=$fecha1?>&fecha2=<?=$fecha2?> alt='' />
-<?
+<?php
 	}
 
 
@@ -94,7 +94,7 @@ setDateDefecto();
 // ->
 </script>
 
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -134,7 +134,7 @@
 				<script>
 					window.opener.Refrescar();
 				</script>
-			<?
+			<?php
 		}
 		elseif($contadorModificados > 0)
 		{
@@ -143,7 +143,7 @@
 				<script>
 					window.opener.Refrescar();
 				</script>
-			<?
+			<?php
 		}
 		#refresca el listado de horas.php cuando se graba la informacion desde el popup
 	}
@@ -162,7 +162,7 @@
 		<script>
 			window.opener.Refrescar();
 		</script>
-<?
+<?php
 	}
 
 	/* Título opcion */
@@ -182,7 +182,7 @@
 <script type=text/javascript>
 function Validar(form)
 {
-<?
+<?php
 			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 			{
 				echo "if(!form.codigo_asunto_secundario.value){";
@@ -193,7 +193,7 @@ function Validar(form)
 			}
 ?>
 			alert("<?=__('Debe seleccionar un').' '.__('asunto')?>");
-<?
+<?php
 			if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 			{
 				echo "form.codigo_asunto_secundario.focus();";
@@ -210,7 +210,7 @@ function Validar(form)
 	var cambiaCobrable = 0;
 	var cobrableOriginal = new Array();
 	var n;
-<?
+<?php
 	for($i=0; $i<count($id); ++$i)
 		if($tramite[$i]->fields['cobrable'] == 0)
 			echo("cobrableOriginal[".$i."] = 0;");
@@ -340,7 +340,7 @@ function Lista(accion, div, codigo, div_post)
 	{
 		form.campo_codigo_cliente.value = codigo;
 		SetSelectInputId('campo_codigo_cliente','codigo_cliente');
-<?
+<?php
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
 		{
 			echo "CargarSelect('codigo_cliente_secundario','codigo_asunto_secundario','cargar_asuntos');";
@@ -355,10 +355,10 @@ function Lista(accion, div, codigo, div_post)
 	{
 		form.campo_codigo_asunto.value = codigo;
 		SetSelectInputId('campo_codigo_asunto','codigo_asunto');
-<? if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
+<?php if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsoActividades') ) || ( method_exists('Conf','UsoActividades') && Conf::UsoActividades() ) )
 	 { ?>
 		CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
-<? }?>
+<?php }?>
 	}
 
 	var http = getXMLHTTP();
@@ -432,7 +432,7 @@ function ActualizaCobro(valor)
 	var id_cobro = new Array();
 	var id_tramite = new Array();
 	var fecha_tramite = new Array();
-<?
+<?php
 	for($i=0; $i<count($id); ++$i)
 	{
 		echo('codigosOriginales['.$i.'] = "'.$tramite[$i]->fields['codigo_asunto'] . '";');
@@ -496,13 +496,13 @@ function ActualizarCobroAsunto(valor, codigo_asunto_hide, id_cobro, id_tramite, 
 	return true;
 }
 </script>
-<? echo(Autocompletador::CSS()); ?>
+<?php echo(Autocompletador::CSS()); ?>
 <style>
 A:link,A:visited {font-size:9px;text-decoration: none}
 A:hover {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 A:active {font-size:9px;text-decoration:none; color:#990000; background-color:#D9F5D3}
 </style>
-<?
+<?php
 if($opcion == "eliminar")
 {
 	echo '<button onclick="window.close();">'.__('Cerrar ventana').'</button>';
@@ -512,18 +512,18 @@ else
 ?>
 <form id="form_editar_tramite" name=form_editar_tramite method="post" action="<?=$_SERVER[PHP_SELF]?>">
 <input type=hidden name=opcion value="guardar" />
-<?
+<?php
 	if( $opcion != 'nuevo' )
 	{
 ?>
 <input type=hidden name='edit' value="<?= $opcion == 'edit' ? 1 : '' ?>" id='edit' />
-<?
+<?php
 	}
 	else
 	{
 ?>
 <input type=hidden name='nuevo' value="<?= $opcion == 'nuevo' ? 1 : '' ?>" id='nuevo' />
-<?
+<?php
 	}
 ?>
 <input type=hidden name=popup value='<?=$popup?>' id="popup">
@@ -606,7 +606,7 @@ else
 		<td colspan="6" class="td_transparente" style="height:190px">&nbsp;</td>
 	</tr>
 </table>
-<?
+<?php
 if($txt_opcion)
 {
 ?>
@@ -616,7 +616,7 @@ if($txt_opcion)
 	</tr>
 </table>
 <br>
-<?
+<?php
 }
 ?>
 <table style='border:1px solid black' id="tbl_tramite" width=90%>
@@ -625,7 +625,7 @@ if($txt_opcion)
 			<?=__('Cliente')?>
 		</td>
 		<td align=left>
-<?
+<?php
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -652,7 +652,7 @@ if($txt_opcion)
 			 <?=__('Asunto')?>
 		</td>
 		<td align=left>
-			<?
+			<?php
 					if (( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) ))
 					{
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto_secundario","glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario,"","CargaIdioma(this.value);CargarSelectCliente(this.value);", 320,$codigo_cliente_secundario);
@@ -665,7 +665,7 @@ if($txt_opcion)
 	   </td>
 	</tr>
 
-<?
+<?php
 	if(isset($tramite[0]) && $tramite[0]->Loaded() && $opcion != 'nuevo')
 	{
 		echo("<tr><td></td><td colspan=3 align=left>");
@@ -676,14 +676,14 @@ if($txt_opcion)
 	<tr>
 		<td colspan='2' align='right'>
 			<input type="hidden" name="opcion" value="guardar" />
-			<input type="hidden" name="ids" value="<? echo(''.$ids); ?>" />
+			<input type="hidden" name="ids" value="<?php echo(''.$ids); ?>" />
 			<input type="submit" class="btn" value="<?=__('Guardar')?>" onclick="return Validar(this.form);" />
 		</td>
 	</tr>
 </table>
 </form>
 
-<?
+<?php
 }
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{

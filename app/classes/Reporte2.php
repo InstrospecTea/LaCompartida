@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
@@ -38,7 +38,7 @@ class Reporte
 	var $campo_fecha = 'trabajo.fecha';
 	var $campo_fecha_2 = '';
 	var $campo_fecha_3 = '';
-	
+
 	//Cuanto se repite la fila para cada agrupador
 	var $filas = array();
 
@@ -175,7 +175,7 @@ class Reporte
 		}
 		//Para ORDER BY - Query principal por trabajos
 				$this->orden_agrupador[] = $s;
-		
+
 		//Para GROUP BY - Query secundaria por Cobros
 		switch($s)
 		{
@@ -263,7 +263,7 @@ class Reporte
 			// TIPO DE DATO
 			switch($this->tipo_dato)
 			{
-				case 'valor_cobrado': 
+				case 'valor_cobrado':
 				case 'valor_por_cobrar':
 				{
 					$s .=
@@ -314,7 +314,7 @@ class Reporte
 			}
 			 $s .= ' as '.$this->tipo_dato;
 			 $s .= ' FROM cobro
-			 			LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario 
+			 			LEFT JOIN usuario ON cobro.id_usuario=usuario.id_usuario
 						LEFT JOIN cliente ON cobro.codigo_cliente = cliente.codigo_cliente
 						LEFT JOIN grupo_cliente ON grupo_cliente.id_grupo_cliente = cliente.id_grupo_cliente
 						'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato':'').'
@@ -328,7 +328,7 @@ class Reporte
 				}
 				else
 				{
-					$s .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";					
+					$s .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";
 					$tabla = 'documento';
 				}
 				//moneda buscada
@@ -337,8 +337,8 @@ class Reporte
 				$s .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_cobro on (cobro_moneda_cobro.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_cobro.id_moneda = cobro.id_moneda )";
 				//moneda_base
 				$s .= " LEFT JOIN ".$tabla."_moneda as cobro_moneda_base on (cobro_moneda_base.id_".$tabla." = ".$tabla.".id_".$tabla." AND cobro_moneda_base.id_moneda = moneda_base.id_moneda )";
-		
-			
+
+
 
 			/*WHERE SIN USUARIOS NI TRABAJOS*/
 			unset($this->filtros['trabajo.cobrable']);
@@ -364,7 +364,7 @@ class Reporte
 			$dato_usuario = 'usuario.username';
 		else
 			$dato_usuario = 'CONCAT_WS(\' \',usuario.nombre, usuario.apellido1, LEFT(usuario.apellido2,1))';
-			
+
 		$s = 'SELECT	'.$dato_usuario.' as profesional,
 						usuario.id_usuario,
 						cliente.id_cliente,
@@ -414,7 +414,7 @@ class Reporte
 			}
 			case 'valor_por_cobrar':
 			{
-				//Si el trabajo está en cobro CREADO, se usa la formula de ese cobro. Si no está, se usa la tarifa de la moneda del contrato, y se convierte según el tipo de cambio actual de la moneda que se está mostrando. 
+				//Si el trabajo está en cobro CREADO, se usa la formula de ese cobro. Si no está, se usa la tarifa de la moneda del contrato, y se convierte según el tipo de cambio actual de la moneda que se está mostrando.
 				$s .= "
 					IF
 					(
@@ -429,8 +429,8 @@ class Reporte
 									*	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 									/	cobro_moneda.tipo_cambio
 								),
-									SUM( 
-											
+									SUM(
+
 												usuario_tarifa.tarifa * TIME_TO_SEC( duracion_cobrada ) * moneda_por_cobrar.tipo_cambio / (moneda_display.tipo_cambio * 3600)
 										)
 					)";
@@ -475,7 +475,7 @@ class Reporte
 				/*Se necesita resultado extra: lo que se habría cobrado*/
 				$s .= "SUM(trabajo.tarifa_hh_estandar * (TIME_TO_SEC( duracion_cobrada)/3600) * (cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 						/	cobro_moneda.tipo_cambio) AS valor_divisor, ";
-				$s .= "SUM((".$s_tarifa."*TIME_TO_SEC(duracion_cobrada)/3600) 
+				$s .= "SUM((".$s_tarifa."*TIME_TO_SEC(duracion_cobrada)/3600)
 						* (cobro.monto_trabajos/".$s_monto_thh.") *	(cobro_moneda_cobro.tipo_cambio/cobro_moneda_base.tipo_cambio)
 						/	cobro_moneda.tipo_cambio
 						)";
@@ -506,7 +506,7 @@ class Reporte
 	function sFrom()
 	{
 		//Calculo de valor por cobrar requiere Tarifa, Tipo de Cambio
-		$join_por_cobrar  = 
+		$join_por_cobrar  =
 		"
 			LEFT JOIN usuario_tarifa ON usuario_tarifa.id_tarifa = contrato.id_tarifa AND usuario_tarifa.id_usuario = trabajo.id_usuario AND usuario_tarifa.id_moneda = contrato.id_moneda
 			LEFT JOIN prm_moneda AS moneda_por_cobrar ON moneda_por_cobrar.id_moneda = contrato.id_moneda
@@ -528,7 +528,7 @@ class Reporte
 				'.(in_array('categoria_usuario',$this->agrupador)?'LEFT JOIN prm_categoria_usuario ON prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario':'').'
 				'.(in_array('id_usuario_responsable',$this->agrupador)?'LEFT JOIN usuario AS usuario_responsable ON usuario_responsable.id_usuario = contrato.id_usuario_responsable':'').'
 				';
-		//Se requiere: Moneda Buscada (en el reporte), Moneda Original (del cobro), Moneda Base. 
+		//Se requiere: Moneda Buscada (en el reporte), Moneda Original (del cobro), Moneda Base.
 		//Se usa CobroMoneda (cobros por cobrar) o DocumentoMoneda (cobros cobrados).
 		if($this->requiereMoneda($this->tipo_dato))
 		{
@@ -538,8 +538,8 @@ class Reporte
 				$tabla = 'cobro';
 			}
 			else
-			{ 
-				$s .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";					
+			{
+				$s .= " LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N' ";
 				$tabla = 'documento';
 			}
 			//moneda buscada
@@ -653,7 +653,7 @@ class Reporte
 	function Query()
 	{
 		$resp = mysql_query($this->sQuery(), $this->sesion->dbh) or Utiles::errorSQL($this->sQuery(),__FILE__,__LINE__,$this->sesion->dbh);
-		
+
 		$this->row = array();
 		while($row = mysql_fetch_array($resp))
 			$this->row[] = $row;
@@ -665,9 +665,9 @@ class Reporte
 			(
 				$this->tipo_dato,
 				array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_incobrable','rentabilidad','diferencia_valor_estandar')
-			) 
-			&& $this->cobroQuery() 
-			&& !$this->filtros['usuario.id_area_usuario']['positivo'][0] 
+			)
+			&& $this->cobroQuery()
+			&& !$this->filtros['usuario.id_area_usuario']['positivo'][0]
 			&& !$this->filtros['usuario.id_categoria_usuario']['positivo'][0]
 		)
 		{
@@ -943,7 +943,7 @@ class Reporte
 			{
 				$r[$row[$a]][$row[$b]][$row[$c]][$row[$d]][$row[$e]][$row[$f]]['valor_divisor'] = 0.0;
 			}
-			
+
 
 			//Rentabilidad y Valor/Hora necesitan dividirse por otro total.
 			if($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'valor_hora')
@@ -1007,7 +1007,7 @@ class Reporte
 
 		}
 
-		
+
 
 		/* En el caso de la Rentabilidad y el Valor por Hora, debo dividir por el 'valor divisor', en cada una de las 6 profundidades (y luego en el Total)*/
 		if($this->tipo_dato == 'rentabilidad' || $this->tipo_dato == 'valor_hora')
@@ -1087,7 +1087,7 @@ class Reporte
 				{
 					if(!isset($data[$ag1][$ag2]))
 						Reporte::rellenar($data[$ag1][$ag2],$data2[$ag1][$ag2]);
-				
+
 					foreach($b as $ag3 => $c)
 					{
 
@@ -1095,7 +1095,7 @@ class Reporte
 						{
 							if(!isset($data[$ag1][$ag2][$ag3]))
 								Reporte::rellenar($data[$ag1][$ag2][$ag3],$data2[$ag1][$ag2][$ag3]);
-							
+
 							foreach($c as $ag4 => $d)
 							{
 								if(is_array($d))
@@ -1109,7 +1109,7 @@ class Reporte
 										{
 											if(!isset($data[$ag1][$ag2][$ag3][$ag4][$ag5]))
 												Reporte::rellenar($data[$ag1][$ag2][$ag3][$ag4][$ag5],$data2[$ag1][$ag2][$ag3][$ag4][$ag5]);
-											
+
 											foreach($e as $ag6 => $f)
 											if(is_array($f))
 											if(!isset($data[$ag1][$ag2][$ag3][$ag4][$ag5][$ag6]))

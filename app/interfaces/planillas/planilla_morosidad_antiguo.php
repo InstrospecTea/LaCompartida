@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -9,9 +9,9 @@
 	require_once Conf::ServerDir().'/classes/Cobro.php';
 
 	$sesion = new Sesion(array('REP'));
-	
+
 	set_time_limit(300);
-	
+
 	$pagina = new Pagina($sesion);
 	if($xls)
 	{
@@ -143,10 +143,10 @@
 			$lista_monedas = join("','", $monedas);
 			$where .= " AND cobro.id_moneda IN ('$lista_monedas')";
 		}
-		
+
 		if($periodo && $fecha_ini)
 				$where .= " AND cobro.fecha_emision >=  '".Utiles::fecha2sql($fecha_ini)."' ";
-		
+
 		if( ( ( method_exists('Conf','ReporteMorosidadEnviados') && Conf::GetConf($sesion,'ReporteMorosidadEnviado') ) || ( method_exists('Conf','ReporteMorosidadEnviados') && Conf::ReporteMorosidadEnviados() ) ) )
 			$where .= " AND cobro.estado = 'ENVIADO AL CLIENTE' ";
 		else
@@ -196,13 +196,13 @@
 								prm_moneda.glosa_moneda,
 								documento.id_moneda
 							FROM cobro
-								LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro $where_documento 
+								LEFT JOIN documento ON documento.id_cobro = cobro.id_cobro $where_documento
 								LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
 								LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 								LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
 								LEFT JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
 								LEFT JOIN cobro_moneda ON cobro_moneda.id_cobro = cobro.id_cobro AND cobro_moneda.id_moneda = documento.id_moneda
-							WHERE $where 
+							WHERE $where
 							ORDER BY $orderby;";
 		// Obtener los asuntos de cada cobro
 		$query_asuntos = "SELECT cobro.id_cobro,
@@ -570,7 +570,7 @@
 	</tr>
 	<tr>
 		<td align=left>
-			<input type="checkbox" name="periodo" value="1" <?=$periodo ? 'checked' : '' ?> onclick='' title='<?=__('Periodo del Cobro')?>' />&nbsp;	
+			<input type="checkbox" name="periodo" value="1" <?=$periodo ? 'checked' : '' ?> onclick='' title='<?=__('Periodo del Cobro')?>' />&nbsp;
 			<b><?=__('Periodo') ?>:</b>
 			<div id=periodo_rango style='align:center'>
 				&nbsp;&nbsp;&nbsp;
@@ -603,7 +603,7 @@ Calendar.setup(
 );
 </script>
 
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>

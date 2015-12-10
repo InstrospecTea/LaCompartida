@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -177,7 +177,7 @@ function getDNETVersion(reportError)
 		else result = null;
 		res['conpuntonet'] = false;
 	}
-	
+
 	res['texto'] = result;
 
 	return res;
@@ -209,8 +209,8 @@ function writeDNetReport(doc)
 		<div class="explorer explorer6" align="left">
 			Usted está utilizando Internet Explorer 6. Por su seguridad, Lemontech recomienda actualizar a la última versión de <a target="_blank" href="http://www.microsoft.com/windows/ie/">Internet Explorer</a>
 			<hr style="color:black;" size=1 />
-		</div>		
-		
+		</div>
+
 		<div align=left>
 			<ul>
 			<li>A continuación usted podrá instalar la aplicación que le permitirá utilizar el sistema cuando no cuente con una conexión a Internet.</li>
@@ -220,7 +220,7 @@ function writeDNetReport(doc)
 			<br /><br />
 			<center>
 			<SPAN style="border: 1px solid black; padding: 3px; background-color:#A7DF60">
-<?
+<?php
 		if (method_exists('Conf','GetConf'))
 		{
 			$PdfLinea1 = Conf::GetConf($sesion, 'PdfLinea1');
@@ -238,6 +238,6 @@ function writeDNetReport(doc)
 <script type="text/javascript">
 MostrarDivs();
 </script>
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

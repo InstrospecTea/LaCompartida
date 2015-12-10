@@ -1,4 +1,4 @@
-<?
+<?php
 
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
@@ -14,7 +14,7 @@ class Bodega extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
-	
+
 	#Carga a través de ID
 	function LoadById($id_bodega)
 	{
@@ -23,14 +23,14 @@ class Bodega extends Objeto
 		list($id) = mysql_fetch_array($resp);
 		return $this->Load($id);
 	}
-	
-	
+
+
 	# Elimina Bodegas
 	function Eliminar()
 	{
 		$id_bodega = $this->fields[id_bodega];
 		if($id_bodega)
-		{			
+		{
 			$query = "DELETE FROM bodega WHERE id_bodega = $id_bodega";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 			return true;

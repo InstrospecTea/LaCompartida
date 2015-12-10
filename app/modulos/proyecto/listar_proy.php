@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
     require_once Conf::ServerDir().'/fw/modulos/proyecto/classes/Proyecto.php';
     require_once Conf::ServerDir().'/fw/modulos/proyecto/classes/ListaProyecto.php';
@@ -11,9 +11,9 @@
 	require_once Conf::ServerDir().'/fw/classes/Html.php';
 
     $Sesion = new Sesion( array('ADM') );
-	
+
 	$pagina = new Pagina($Sesion);
-	
+
 	$pagina->titulo = "Listado de Grupos";
 
 	$pagina->PrintHeaders();
@@ -111,7 +111,7 @@ function OrdenarLista( tipo )
         </td>
     </tr>
 
-<?
+<?php
 //	if($opc == 'buscar')
 //	{
 ?>
@@ -129,7 +129,7 @@ function OrdenarLista( tipo )
             Opciones
         </td>
 	</tr>
-<?
+<?php
 
         $where2= '';
 
@@ -173,7 +173,7 @@ function OrdenarLista( tipo )
         $p = $Sesion->usuario->permisos->Find('FindPermiso',$params_array); //tiene permiso de Emprendedor
         if( $p->fields['permitido'] )
 		{
-			$rut=$Sesion->usuario->fields['rut'];	
+			$rut=$Sesion->usuario->fields['rut'];
             $where.=" OR id_proyecto in (SELECT id_proyecto FROM usuario_proyecto WHERE rut='$rut')";
 		}
 #echo "desde $desde--x_pag=$x_pag--where $where2";
@@ -184,15 +184,15 @@ function OrdenarLista( tipo )
                                 ORDER BY $orden ASC
                                 LIMIT $desde, $x_pag";
 
-	
-	$proyectos = new ListaProyectos ( $Sesion,'', $query); 
-			
+
+	$proyectos = new ListaProyectos ( $Sesion,'', $query);
+
 	echo Html::PrintListRows($Sesion, $proyectos, 'PrintRow');
 	echo Html::PrintListPages($proyectos, $desde, $x_pag, 'PrintLinkPage');
 
 ?>
  </form>
-<?
+<?php
 
     	function PrintRow (& $fila)
    	 	{
@@ -216,7 +216,7 @@ function OrdenarLista( tipo )
         </td>
         <td valign="top" align="center">
             $opciones
-            
+
         </td>
   </tr>
   <tr>
@@ -235,7 +235,7 @@ HTML;
 </td>
 </tr>
 </table>
-<script language="javascript">	
+<script language="javascript">
 <!-- //
 
 function PrintLinkPage( page )
@@ -247,6 +247,6 @@ function PrintLinkPage( page )
 // ->
 </script>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

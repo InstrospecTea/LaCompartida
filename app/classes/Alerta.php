@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
@@ -26,8 +26,8 @@ class Alerta
 		while(list($id_persona) = mysql_fetch_array($resp))
 			$this->AlertaProfesional($id_persona);
 	}
-	
-	
+
+
 
 	function AlertaPersona($id_persona)
 	{
@@ -84,9 +84,9 @@ class Alerta
 		$query = "SELECT email FROM usuario WHERE usuario.activo=1 AND id_usuario IN (SELECT id_encargado FROM trabajo LEFT JOIN asunto USING (codigo_asunto) WHERE trabajo.fecha > DATE_SUB(NOW(), INTERVAL 10 DAY) AND trabajo.id_usuario=$id_persona)";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
 		while(list($email) = mysql_fetch_array($resp))
-			
+
 		Utiles::Insertar( $sesion, __("Alerta")." ".Conf::AppName(), $mensaje, $email, '');
-		
+
 	}
 	function AlertaProfesional($id_persona,$opc,$sesion)
 	{
@@ -110,7 +110,7 @@ class Alerta
 				//$this->EnviarAlertaProfesional($id_persona,"El usuario ha superado el tiempo máximo sin ingresar horas.",$sesion);
 				echo __("ha superado el tiempo sin ingresar horas");
 		}
-		
+
 	}
 
 	function HorasUltimaSemana($id_usuario)

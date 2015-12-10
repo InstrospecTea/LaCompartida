@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -22,13 +22,13 @@
 	if($orden == "")
 		$orden = "fecha";
 
-	$query = "SELECT SQL_CALC_FOUND_ROWS gasto.*, usuario.*, prm_moneda.*, asunto.glosa_asunto, gasto.descripcion 
-				FROM gasto 
+	$query = "SELECT SQL_CALC_FOUND_ROWS gasto.*, usuario.*, prm_moneda.*, asunto.glosa_asunto, gasto.descripcion
+				FROM gasto
 				LEFT JOIN asunto USING(codigo_asunto)
 				LEFT JOIN usuario ON usuario.id_usuario=gasto.id_usuario
 				LEFT JOIN prm_moneda ON gasto.id_moneda=prm_moneda.id_moneda
                 LEFT JOIN usuario_tarifa ON usuario_tarifa.id_usuario = usuario.id_usuario AND gasto.id_moneda = usuario_tarifa.id_moneda
-				WHERE asunto.codigo_asunto IN ('$comma_separated') 	
+				WHERE asunto.codigo_asunto IN ('$comma_separated')
 					AND gasto.id_cobro IS NULL AND gasto.cobrable = 1
 				";
 
@@ -55,7 +55,7 @@
 	</td>
 </tr>
 </table>
-<?
+<?php
 
     function Nombre(& $fila)
     {

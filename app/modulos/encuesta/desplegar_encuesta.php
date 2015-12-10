@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../../../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../../../conf.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Encuesta.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Pregunta.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Alternativa.php';
@@ -34,7 +34,7 @@
     <tr>
     <td></td>
     <td>
-<?
+<?php
 	$lista_preguntas = new ListaPreguntas($sesion,'',"SELECT * FROM encuesta_pregunta WHERE id_encuesta = $id_encuesta");
 
 ?>
@@ -45,8 +45,8 @@
             <hr class="subtitulo">
         </td>
     </tr>
-<?
-    for($x=0;$x<$lista_preguntas->num;$x++)// Busca las preguntas de la encuesta
+<?php
+   for($x=0;$x<$lista_preguntas->num;$x++)// Busca las preguntas de la encuesta
     {
         $pregunta = $lista_preguntas->Get($x);
         $id_encuesta_pregunta = $pregunta->fields['id_encuesta_pregunta'];
@@ -56,8 +56,8 @@
             <td>
         <br><strong><?=$x+1?> - <?=$pregunta->fields['glosa_pregunta']?></strong>&nbsp;&nbsp;&nbsp;<br><br>
 
-<?
-        if($pregunta->fields['tipo'] == 'ALTERNATIVA') // si es alternativa busca las alternativas
+<?php
+       if($pregunta->fields['tipo'] == 'ALTERNATIVA') // si es alternativa busca las alternativas
         {
             $lista_alternativas = new ListaPreguntasAlternativas($sesion,'',"SELECT * FROM encuesta_pregunta_alternativa
                                                                     WHERE id_encuesta_pregunta = $id_encuesta_pregunta");
@@ -68,7 +68,7 @@
 ?>
                 <?=$y+1?>) <input type="radio" name="respuesta[<?=$id_encuesta_pregunta?>]" value="<?=$id_alternativa?>" disabled>
                 <?=$alternativas->fields['glosa_alternativa']?><br>
-<?
+<?php
 
                 }
         }
@@ -76,8 +76,8 @@
         {
 ?>
 Pregunta Abierta
-<?
-        }
+<?php
+       }
 ?>
         </td>
     </tr>
@@ -87,15 +87,15 @@ Pregunta Abierta
         </td>
     </tr>
 
-<?
-    }
+<?php
+   }
 ?>
 </table>
 </td>
 </tr>
 </table>
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>
 
 

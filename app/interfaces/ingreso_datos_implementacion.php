@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -49,7 +49,7 @@
 	</table>
 	</form>
 
-<?
+<?php
 	if( $opc == 'subir_excel' )
 		{
 		if(!$archivo_data["tmp_name"])

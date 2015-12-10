@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -7,7 +7,7 @@
     require_once Conf::ServerDir().'/../app/classes/Debug.php';
     require_once Conf::ServerDir().'/../app/classes/Moneda.php';
     require_once Conf::ServerDir().'/../app/classes/Gasto.php';
-    require_once Conf::ServerDir().'/classes/Funciones.php'; 
+    require_once Conf::ServerDir().'/classes/Funciones.php';
     require_once Conf::ServerDir().'/classes/UtilesApp.php';
     require_once 'Spreadsheet/Excel/Writer.php';
 
@@ -97,7 +97,7 @@
                                 'Border' => 1,
                                 'Color' => 'black'));
     $time_format->setNumFormat('[h]:mm');
-	
+
 	$total =& $wb->addFormat(array('Size' => 10,
                                 'Align' => 'right',
                                 'Bold' => '1',
@@ -112,7 +112,7 @@
 		$ws1->fitToPages(1,0);
 		$ws1->setZoom(75);
 
-		// se setea las columnas para facilitar orden 
+		// se setea las columnas para facilitar orden
 		$col = 0;
 		$col_fecha = $col++;
 		$ws1->write($fila_inicial, $col_fecha, __('Fecha'), $tit);
@@ -120,7 +120,7 @@
 			$col_cliente = $col++;
 		}
 		if (!$codigo_asunto){
-			$col_codigo = $col++;		
+			$col_codigo = $col++;
 			$col_asunto = $col++;
 		}
 		if ( UtilesApp::GetConf($sesion,'TipoGasto') ){
@@ -158,9 +158,9 @@
 		$col_nombre_proveedor = $col++;
 		$col_ingresado_por = $col++;
 		$col_ordenado_por = $col++;
-		
-		
-		// se setea el ancho de las columnas		
+
+
+		// se setea el ancho de las columnas
 		$ws1->setColumn( $col_fecha, $col_fecha, 18.00); #fecha
 		$ws1->setColumn( $col_cliente, $col_cliente, 30.00); #cliente
 		$ws1->setColumn( $col_codigo, $col_codigo, 15.00); #código
@@ -176,7 +176,7 @@
 			$ws1->setColumn( $col_tipo_doc, $col_tipo_doc, 25.00); #tipo documento
 			$ws1->setColumn( $col_fecha_factura, $col_fecha_factura, 25.00); #fecha documnento
 		}
-		
+
 		if ( UtilesApp::GetConf($sesion,'TipoGasto') ){
 			$ws1->setColumn( $col_tipo, $col_tipo, 25.00); #tipo gasto
 		}
@@ -199,8 +199,8 @@
 		$ws1->setColumn( $col_nombre_proveedor, $col_nombre_proveedor, 15.00); #nombre proveedor
 		$ws1->setColumn( $col_ingresado_por, $col_ingresado_por, 15.00); #código
 		$ws1->setColumn( $col_ordenadopor, $col_ordenado_por, 15.00); #código
-		
-		
+
+
 		$ws1->write(1, 0, __('Resumen de gastos'), $encabezado);
 		$ws1->mergeCells (1, 0, 1, 8);
 
@@ -217,7 +217,7 @@
 			$ws1->write(3, 0, __('Antes de ').$fecha2, $encabezado);
 		}
 		$ws1->mergeCells (3, 0, 3, 8);
-		
+
 		if($codigo_cliente)
 		{
 			$info_usr1 = str_replace('<br>',' - ', 'Cliente: '.Utiles::Glosa( $sesion, $codigo_cliente, 'glosa_cliente', 'cliente', 'codigo_cliente'));
@@ -246,7 +246,7 @@
 			$cliente = new Cliente($sesion);
 			$cliente->LoadByCodigo($codigo_cliente);
 			$total_cta = number_format($cliente->TotalCuentaCorriente(),0,",",".");
-		}		
+		}
 		if($codigo_asunto){
 			$where .= " AND cta_corriente.codigo_asunto = '$codigo_asunto'";
 		}
@@ -277,12 +277,12 @@
 		else if(!empty($id_cobro)){
 			$where .= " AND cta_corriente.id_cobro = '$id_cobro' ";
 		}
-		
+
 		// Filtrar por moneda del gasto
 		if ($moneda_gasto != ''){
 			$where .= " AND cta_corriente.id_moneda=$moneda_gasto ";
 		}
-		
+
 		$col_select ="";
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
 		{
@@ -294,26 +294,26 @@
 		if ( UtilesApp::GetConf( $sesion, 'PrmGastos') && !(UtilesApp::GetConf($sesion, 'PrmGastosActualizarDescripcion'))){
 			$col_select .= ", IF( cta_corriente.id_glosa_gasto IS NOT NULL, prm_glosa_gasto.glosa_gasto, '-') as concepto";
 		}
-		
-		
+
+
 		$moneda_base = Utiles::MonedaBase($sesion);
 		$moneda = new Moneda($sesion);
 		$total_balance_egreso = 0;
 		$total_balance_ingreso = 0;
 
-		$query = "SELECT SQL_BIG_RESULT SQL_NO_CACHE  cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.monto_cobrable, cta_corriente.codigo_cliente, cliente.glosa_cliente, 
+		$query = "SELECT SQL_BIG_RESULT SQL_NO_CACHE  cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.monto_cobrable, cta_corriente.codigo_cliente, cliente.glosa_cliente,
 					cta_corriente.id_cobro, cta_corriente.id_moneda, prm_moneda.simbolo, cta_corriente.fecha, asunto.codigo_asunto, asunto.glosa_asunto,
 					cta_corriente.descripcion, prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento,
-					cta_corriente.numero_ot, cta_corriente.codigo_factura_gasto, cta_corriente.fecha_factura, prm_tipo_documento_asociado.glosa as tipo_doc_asoc, 
+					cta_corriente.numero_ot, cta_corriente.codigo_factura_gasto, cta_corriente.fecha_factura, prm_tipo_documento_asociado.glosa as tipo_doc_asoc,
 					prm_moneda.cifras_decimales, cobro.estado
 					$col_select,
 					prm_proveedor.rut as rut_proveedor, prm_proveedor.glosa as nombre_proveedor,
 					CONCAT(usuario.apellido1 , ', ' , usuario.nombre) as usuario_ingresa,
 					CONCAT(usuario2.apellido1 , ', ' , usuario2.nombre) as usuario_ordena
-					FROM cta_corriente 
+					FROM cta_corriente
 					LEFT JOIN asunto USING(codigo_asunto)
-					LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
-					LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro 
+					LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
+					LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
 					LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 					LEFT JOIN usuario as usuario2 ON usuario2.id_usuario=cta_corriente.id_usuario_orden
 					LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
@@ -323,14 +323,14 @@
 					LEFT JOIN prm_proveedor ON ( cta_corriente.id_proveedor = prm_proveedor.id_proveedor )
 					LEFT JOIN prm_glosa_gasto ON ( cta_corriente.id_glosa_gasto = prm_glosa_gasto.id_glosa_gasto )
 					WHERE $where";
-		
+
 		$lista_gastos = new ListaGastos($sesion,'',$query);
 		$moneda_unica = true; #para verificar en el ciclo si es la moneda única
 		$id_moneda_check = 0; #igual que el de arriba
 		for( $v=0; $v < $lista_gastos->num; $v++ )
 		{
 			$gasto = $lista_gastos->Get($v);
-			
+
 			$tipo_cambio = Moneda::GetTipoCambioMoneda($sesion, $gasto->fields['id_moneda']);
 			if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 			{
@@ -340,16 +340,16 @@
 					if($gasto->fields['ingreso'] > 0)
 						$total_balance_ingreso += ($gasto->fields['monto_cobrable'] * $tipo_cambio)/$moneda_base['tipo_cambio'];
 				}
-	
+
 			}
 			else
-			{	
+			{
 				if($gasto->fields['egreso'] > 0 )
 					$total_balance_egreso += ($gasto->fields['monto_cobrable'] * $tipo_cambio)/$moneda_base['tipo_cambio'];
 				if($gasto->fields['ingreso'] > 0)
 					$total_balance_ingreso += ($gasto->fields['monto_cobrable'] * $tipo_cambio)/$moneda_base['tipo_cambio'];
 			}
-			
+
 			if( $v > 0 ) #la primera vez que entra al ciclo nos saltamos este paso por que no hay con que comparar la moneda
 			{
 				if( $id_moneda_check != $gasto->fields['id_moneda'])
@@ -365,12 +365,12 @@
 		elseif($total_balance_egreso > 0)
 			$total_balance = -$total_balance_egreso;
 		elseif($total_balance_ingreso > 0)
-			$total_balance = $total_balance_ingreso;			
-			
-		
+			$total_balance = $total_balance_ingreso;
+
+
 		$ws1->write(5, 0, __("Total balance").': '.$moneda_base['simbolo'].' '.number_format($total_balance,$moneda_base['cifras_decimales'],',','.'), $encabezado);
 		$ws1->mergeCells (5, 0, 5, 8);
-    
+
     $fila_inicial = 7;
 	# titulos de columnas
     $ws1->write($fila_inicial, $col_fecha, __('Fecha'), $tit);
@@ -420,14 +420,14 @@ if( UtilesApp::GetConf($sesion,'UsaAfectoImpuesto') ) {
 	$ws1->write($fila_inicial, $col_nombre_proveedor, __('Nombre Proveedor'), $tit);
 	$ws1->write($fila_inicial, $col_ingresado_por, __('Creado por'), $tit);
 	$ws1->write($fila_inicial, $col_ordenado_por, __('Ordenado por'), $tit);
-	
-	
-    $fila_inicial++;    
+
+
+    $fila_inicial++;
     if($orden == "")
 	{
-			$orden = "fecha DESC";		
+			$orden = "fecha DESC";
 	}
-	
+
 	#si es moneda unica creamos el formato de la moneda unida
 	if( $moneda_unica ){
 		$obj_moneda_unica = new Moneda($sesion);
@@ -454,13 +454,13 @@ if( UtilesApp::GetConf($sesion,'UsaAfectoImpuesto') ) {
 						'Color' => 'black',
 						'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 	}
-	
+
 	#valores de columnas
 	$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 	while($row = mysql_fetch_array($resp2))
 	{
-		  
+
     	$columna_actual=0;
 	    $ws1->write($fila_inicial, $col_fecha, Utiles::sql2date($row['fecha'], $formato_fecha), $f4);
 	    if(!$codigo_cliente){
@@ -494,15 +494,15 @@ if( UtilesApp::GetConf($sesion,'UsaAfectoImpuesto') ) {
 	    $ws1->write($fila_inicial, $col_descripcion, $row['descripcion'], $f4);
 	    if( $moneda_gasto > 0 || $moneda_unica )
 	    {
-	    	$ws1->write($fila_inicial, $col_egreso, $row['egreso'], $formato_moneda);            
+	    	$ws1->write($fila_inicial, $col_egreso, $row['egreso'], $formato_moneda);
 	    	$ws1->write($fila_inicial, $col_ingreso, $row['ingreso'], $formato_moneda);
 	    }
 	    else
-	    {      
+	    {
 	    	$ws1->write($fila_inicial, $col_egreso, $row['ingreso'] ? '' : $row['simbolo'] . " " . number_format($row['egreso'],$row['cifras_decimales'],",","."), $f4);
 			$ws1->write($fila_inicial, $col_ingreso, $row['egreso'] ? '' : $row['simbolo'] . " " . number_format($row['ingreso'],$row['cifras_decimales'],",","."), $f4);
 	    }
-	    
+
 		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 		{
 			if($row['esCobrable'] == 'No') {
@@ -510,40 +510,40 @@ if( UtilesApp::GetConf($sesion,'UsaAfectoImpuesto') ) {
 					$ws1->write($fila_inicial, $col_monto_cobrable, 0, $formato_moneda);
 				}
 			}
-			else 
+			else
 			{
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
 				{
 					if( $moneda_gasto > 0 || $moneda_unica ){
-						$ws1->write($fila_inicial, $col_monto_cobrable, $row['monto_cobrable'], $formato_moneda); 
+						$ws1->write($fila_inicial, $col_monto_cobrable, $row['monto_cobrable'], $formato_moneda);
 					}
 					else
 					{
-						$ws1->write($fila_inicial, $col_monto_cobrable, $row['simbolo'] . " " . number_format($row['monto_cobrable'],$row['cifras_decimales'],",","."), $f4); 
+						$ws1->write($fila_inicial, $col_monto_cobrable, $row['simbolo'] . " " . number_format($row['monto_cobrable'],$row['cifras_decimales'],",","."), $f4);
 					}
 				}
-			}	
+			}
 		}
 		else
 		{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaMontoCobrable') ) || ( method_exists('Conf','UsaMontoCobrable') && Conf::UsaMontoCobrable() ) )
 			{
 				if( $moneda_gasto > 0 || $moneda_unica ){
-					$ws1->write($fila_inicial, $col_monto_cobrable, $row['monto_cobrable'], $formato_moneda); 
+					$ws1->write($fila_inicial, $col_monto_cobrable, $row['monto_cobrable'], $formato_moneda);
 				}
 				else
 				{
 					$ws1->write($fila_inicial, $col_monto_cobrable, $row['simbolo'] . " " . number_format($row['monto_cobrable'],$row['cifras_decimales'],",","."), $f4);
-				} 
+				}
 			}
-		}	
-	    
+		}
+
 	    if( UtilesApp::GetConf($sesion,'UsaAfectoImpuesto') ) {
 		$ws1->write($fila_inicial, $col_afecto_impuesto, $row['afecto_impuesto'], $f4);
 	}
 	    $ws1->write($fila_inicial, $col_liquidacion, $row['id_cobro'], $f4);
 		$ws1->write($fila_inicial, $col_estado, $row['estado'], $f4);
-		
+
 		if ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarGastosCobrable') ) || ( method_exists('Conf','UsarGastosCobrable') && Conf::UsarGastosCobrable() ) )
 		{
 			$ws1->write($fila_inicial, $col_facturable, $row['esCobrable'], $f4);
@@ -559,7 +559,7 @@ if( UtilesApp::GetConf($sesion,'UsaAfectoImpuesto') ) {
 
 	$ws1->write($fila_inicial,$columna_balance_glosa, __("Total balance: "), $encabezado);
 	$ws1->write($fila_inicial,$columna_balance_valor, $moneda_base['simbolo'].' '.number_format($total_balance,$moneda_base['cifras_decimales'],',','.'), $encabezado);
-		
+
     $wb->close();
     exit;
 ?>

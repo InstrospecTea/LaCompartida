@@ -1,4 +1,4 @@
-<?
+<?php
 require_once("../../libs/chart_director/phpchartdir.php");
 
 require_once dirname(__FILE__).'/../../../conf.php';
@@ -30,7 +30,7 @@ require_once Conf::ServerDir().'/fw/classes/Html.php';
 	$data[1] = $cant['no_respondidas'];
 
 	$c = new PieChart(500, 210);
-	
+
 	$c->setPieSize(250, 110, 80);
 
 	$c->addTitle('Total: '. $cant['total']);
@@ -38,7 +38,7 @@ require_once Conf::ServerDir().'/fw/classes/Html.php';
 	$c->set3D();
 
 	$c->setData($data, $labels);
-	
+
 	header("Content-type: image/png");
 	print($c->makeChart2(PNG));
 ?>

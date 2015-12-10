@@ -827,7 +827,7 @@
 	<div class="floating" id="calendar"></div>
 </div>
 <!-- Fin calendario DIV -->
-<?
+<?php
 $hoy = date("Y-m-d");
 ?>
 <table class="border_plomo tb_base" width="650px" cellpadding="0" cellspacing="3" align="center">
@@ -857,7 +857,7 @@ $hoy = date("Y-m-d");
 		</td>
 	</tr>
 	<tr><td colspan="3">&nbsp;</td></tr>
-<?
+<?php
 	if(!$tipo)
 		$tipo = 'Profesional';
 ?>
@@ -881,7 +881,7 @@ $hoy = date("Y-m-d");
 			<label for="rango" style="font-size:9px"><?=__('Otro rango') ?></label>
 		</td>
 		<td align=left>
-<?
+<?php
 		if(!$fecha_mes)
 			$fecha_mes = date('m');
 ?>
@@ -900,14 +900,14 @@ $hoy = date("Y-m-d");
 					<option value='11' <?=$fecha_mes==11 ? 'selected':'' ?>><?=__('Noviembre') ?></option>
 					<option value='12' <?=$fecha_mes==12 ? 'selected':'' ?>><?=__('Diciembre') ?></option>
 				</select>
-<?
+<?php
 			if(!$fecha_anio)
 				$fecha_anio = date('Y');
 ?>
 				<select name="fecha_anio" style='width:55px'>
-					<? for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
+					<?php for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
 					<option value='<?=$i?>' <?=$fecha_anio == $i ? 'selected' : '' ?>><?=$i ?></option>
-					<? } ?>
+					<?php } ?>
 				</select>
 			</div>
 			<div id=periodo_rango style='display:<?=$rango ? 'inline' : 'none' ?>;'>
@@ -960,7 +960,7 @@ Calendar.setup(
 );
 // ->
 </script>
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>

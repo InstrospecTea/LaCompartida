@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -102,7 +102,7 @@
 
 		function Honorarios(& $fila)
 		{
-			
+
 			$checked = '';
 			if($fila->fields['honorarios_pagados']=='SI')
 				$checked = 'checked="checked"';
@@ -133,7 +133,7 @@
 		$txt_pagina = $id_documento ? __('Edición de Documento de') . ' ' . __('Cobro') : __('Documento de') . ' ' . __('Cobro');
 		$txt_tipo = __('Documento de') . ' ' . __('Cobro');
 	}
-	
+
 	$pagina->titulo = $txt_pagina;
 	$pagina->PrintTop($popup);
 ?>
@@ -151,7 +151,7 @@ Object.extend(scal.prototype,
     },
 
     isOpen: function()
-    { 
+    {
         return ( $(this.options.wrapper) || this.element).visible();
     }
 });
@@ -163,21 +163,21 @@ var calendar = null;
 //@input     => is the <input> where the date will be updated.
 //@container => is the <div> for dragging.
 //@source    => is the img/button which raises up the calender, the script will locate the calenar over this control.
-function showCalendar(element, input, container, source)            
+function showCalendar(element, input, container, source)
 {
     if (!calendar)
     {
         container = $(container);
         //the Draggable handle is hard coded to "rtop" to avoid other parameter.
         new Draggable(container, {handle: "rtop", starteffect: Prototype.emptyFunction, endeffect: Prototype.emptyFunction});
-        
+
         //The singleton calendar is created.
-        calendar = new scal(element, $(input), 
+        calendar = new scal(element, $(input),
         {
             updateformat: 'dd-mm-yyyy',
-            closebutton: '&nbsp;', 
+            closebutton: '&nbsp;',
             wrapper: container
-        }); 
+        });
     }
     else
     {
@@ -186,13 +186,13 @@ function showCalendar(element, input, container, source)
 
     var date = new Date($F(input));
     calendar.setCurrentDate(isNaN(date) ? new Date() : date);
-    
+
     //Locates the calendar over the calling control  (in this example the "img").
     if (source = $(source))
     {
         Position.clone($(source), container, {setWidth: false, setHeight: false, offsetLeft: source.getWidth() + 2});
     }
-    
+
     //finally show the calendar =)
     calendar.openCalendar();
 };
@@ -207,8 +207,8 @@ function Validar(form)
 {
 
 	monto = parseFloat(form.monto.value);
-	
-	
+
+
 	if(monto <= 0 || isNaN(monto))
 	{
 		alert('<?=__('Debe ingresar un monto para el pago')?>');
@@ -243,7 +243,7 @@ window.opener.Refrescar();
 <input type=hidden name=id_documento value="<?= $documento->fields['id_documento'] ?>" />
 <input type=hidden name='pago' value='<?=$pago?>'>
 <input type=hidden name=elimina_ingreso id=elimina_ingreso value=''>
-<!-- Calendario DIV -->	
+<!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
 </div>
@@ -278,12 +278,12 @@ window.opener.Refrescar();
 			<?=__('Cliente')?>
 		</td>
 		<td align=left>
-			<input maxlength=10 readonly=readonly name="codigo_cliente" id="campo_codigo_cliente" size=10 value= <? echo $codigo_cliente; ?> />
-				<input name="nombre_cliente" id='nombre' style='width: 280px;' value = "<?
+			<input maxlength=10 readonly=readonly name="codigo_cliente" id="campo_codigo_cliente" size=10 value= <?php echo $codigo_cliente; ?> />
+				<input name="nombre_cliente" id='nombre' style='width: 280px;' value = "<?php
 																								$cliente = new Cliente($sesion);
 																								$cliente->LoadByCodigo($codigo_cliente);
-																								echo $cliente->fields['glosa_cliente']; 
-																							   ?>" readonly=readonly />	
+																								echo $cliente->fields['glosa_cliente'];
+																							   ?>" readonly=readonly />
 			<span style="color:#FF0000; font-size:10px">*</span>
 		</td>
 	</tr>
@@ -295,7 +295,7 @@ window.opener.Refrescar();
 				<?=__('Monto')?>
 			</td>
 			<td align=left>
-				<input name=monto size=10 value="<? echo str_replace("-","",$documento->fields['monto']);  ?>" />
+				<input name=monto size=10 value="<?php echo str_replace("-","",$documento->fields['monto']);  ?>" />
 				<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<?=__('Moneda')?>&nbsp;
 				<?= Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda FROM prm_moneda ORDER BY id_moneda","id_moneda", $documento->fields['id_moneda'] ? $documento->fields['id_moneda'] : '', '','',"80"); ?>
@@ -307,14 +307,14 @@ window.opener.Refrescar();
 				<?=__('Número Documento:')?>
 			</td>
 			<td align=left>
-				<input name=numero_doc size=20 value="<? echo str_replace("-","",$documento->fields['numero_doc']);  ?>" />
+				<input name=numero_doc size=20 value="<?php echo str_replace("-","",$documento->fields['numero_doc']);  ?>" />
 						<?=__('Tipo:')?>&nbsp;
 				<select name='tipo_doc' id='tipo_doc'  style='width: 80px;' selected='<?=$documento->fields['tipo_doc']?$documento->fields['tipo_doc']:'E' ?>'>
 					<option value='E'>Efectivo</option>
 					<option value='C'>Cheque</option>
 					<option value='T'>Transferencia</option>
 					<option value='O'>Otro</option>
-					</select>	
+					</select>
 			</td>
 		</tr>
 	<?} else {?>
@@ -323,7 +323,7 @@ window.opener.Refrescar();
 				<?=__('Monto Honorarios')?>
 			</td>
 			<td align=left>
-				<input name=monto_honorarios size=10 value="<? echo str_replace("-","",$documento->fields['monto']);  ?>" />
+				<input name=monto_honorarios size=10 value="<?php echo str_replace("-","",$documento->fields['monto']);  ?>" />
 				<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 				<?=__('Moneda')?>&nbsp;
@@ -336,7 +336,7 @@ window.opener.Refrescar();
 				<?=__('Monto Gastos')?>
 			</td>
 			<td align=left>
-				<input name=monto_gastos size=10 value="<? echo str_replace("-","",$documento->fields['monto']);  ?>" />
+				<input name=monto_gastos size=10 value="<?php echo str_replace("-","",$documento->fields['monto']);  ?>" />
 				<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 		</tr>
@@ -363,7 +363,7 @@ window.opener.Refrescar();
 	</tr>
 </table>
 
-<?
+<?php
 	if(isset($b))
 	{
 		$b->Imprimir("",array(''),false);
@@ -389,7 +389,7 @@ Calendar.setup(
 	}
 );
 </script>
-<?
+<?php
 	echo InputId::Javascript($sesion);
 	$pagina->PrintBottom($popup);
 ?>

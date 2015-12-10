@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -10,7 +10,7 @@
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
-	
+
 	$moneda_base = Utiles::MonedaBase($sesion);
 	#ARMANDO XLS
 	$wb = new Spreadsheet_Excel_Writer();
@@ -129,12 +129,12 @@
 								'Border' => 1,
 								'Locked' => 1,
 								'Color' => 'black'));
-									
+
 	#$ws1->setColumn( 1, 9, 19.00);
 	$hoy = date("d-m-Y");
 	$filas += 1;
 	#$ws1 =& $wb->addWorksheet($profesional);
-	if(is_array($usuarios))	
+	if(is_array($usuarios))
 		$lista_usuarios = join(',',$usuarios);
 	else
 		die(__('Usted no ha seleccionado a ningún usuario para generar el informe'));
@@ -143,7 +143,7 @@
 		$lista_usuarios = 'NULL';
 
 	$where= "";
-	
+
 	if(is_array($forma_cobro))
 	{
 		$where = $where . " AND ( ( cobro.forma_cobro IS NULL AND (contrato.forma_cobro IS NULL OR contrato.forma_cobro IN ('".join("','",$forma_cobro)."'))) OR cobro.forma_cobro IN ('".join("','",$forma_cobro)."') )";
@@ -174,7 +174,7 @@
 					LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 					LEFT JOIN usuario AS ec ON ec.id_usuario=contrato.id_usuario_responsable
 					WHERE fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
-					AND trabajo.id_usuario IN ($lista_usuarios) 
+					AND trabajo.id_usuario IN ($lista_usuarios)
 					$where
 					GROUP BY trabajo.id_usuario,trabajo.codigo_asunto, YEAR(fecha), MONTH(fecha), IF((cobro.estado = 'CREADO' OR cobro.estado = 'EN REVISION' OR cobro.estado IS NULL),'NO','SI'),trabajo.cobrable
 					ORDER BY usuario.apellido1,usuario.nombre,cliente_asunto, periodo_ano ASC, periodo_mes ASC";
@@ -221,7 +221,7 @@
 			{
 				$formato->setNumFormat("[hh]:mm");
 			}
-			
+
 			#Parto dejando la lìnea de un solo color y formato
 			for($i=2;$i<=($periodo_final-$periodo_inicial+1)*5+1;$i++)
 				$ws1->write($fila,$i,'',$formato);
@@ -265,7 +265,7 @@
 				$monto_thh_valor_cobrado = $arr_monto[$a]/$arr_monto_thh[$a];
 			}
 			else {
-				$monto_thh_valor_cobrado = $arr_monto[$a];				
+				$monto_thh_valor_cobrado = $arr_monto[$a];
 			}
 			$valor_cobrado += $valor_tarifa_hh * $monto_thh_valor_cobrado;
 			$arr_result[$row['cliente_asunto']][$a]['id_cobro']=$arr_id_cobro[$a];
@@ -300,14 +300,14 @@
 		else
 			$ws1->writeNumber($fila,$columna_relativa+1,Reporte::FormatoValor($sesion,number_format($row['dur'],2,'.',''),"horas_","excel"),$formato);
 
-		
-			
+
+
 	}
 	if($profesional == '') //Si no encontró ninguna tupla
  		die(__('El informe generado no encontró ningún dato'));
 	Print_Resumen_Prof($ws1);//Se llena la tabla resumen para poder pasar a nueva hoja
 /*
-*/	
+*/
 
 function Print_Resumen_Prof(& $ws1)
 {
@@ -328,20 +328,20 @@ function Print_Resumen_Prof(& $ws1)
 	global $formato_totales_cobro;
 	global $fila, $hoy;
 	$fila_titulos = 13;
-	
+
 	$time_periodo = strtotime($fecha_ini);
 	$ws1->write($fila+1,1,__('TOTAL'),$formato_totales);
 	$ws1->write($fila+1,2,'',$formato_totales);
 	$ws1->mergeCells( $fila+1, 1, $fila+1, 2 );
-	
+
 	$ws1->setColumn( 3+$i*5, 3+$i*5+3, 6);
 	for($i=0;$i <= ($periodo_final-$periodo_inicial);$i++)
 	{
 		$ws1->write($fila_titulos-1, 3+$i*5,date('M Y',$time_periodo), $formato_periodo); //Se imprime el titulo del periodo
 		$ws1->write($fila_titulos-1, 3+$i*5+1,'', $formato_periodo); //Esto es solo para que quede con formato
-		$ws1->write($fila_titulos-1, 3+$i*5+2,'', $formato_periodo); 
-		$ws1->write($fila_titulos-1, 3+$i*5+3,'', $formato_periodo); 
-		$ws1->write($fila_titulos-1, 3+$i*5+4,'', $formato_periodo); 
+		$ws1->write($fila_titulos-1, 3+$i*5+2,'', $formato_periodo);
+		$ws1->write($fila_titulos-1, 3+$i*5+3,'', $formato_periodo);
+		$ws1->write($fila_titulos-1, 3+$i*5+4,'', $formato_periodo);
 		$ws1->mergeCells( $fila_titulos-1, 3+$i*5, $fila_titulos -1, 3+$i*5+4 );
 		$time_periodo = strtotime('+1 month',$time_periodo);
 		$ws1->setColumn( 3+$i*5, 3+$i*5+3, 6);
@@ -351,17 +351,17 @@ function Print_Resumen_Prof(& $ws1)
 		#Horas Trabajadas
 		$ws1->WriteFormula($fila_titulos,3+$i*5,'=SUM('.excel_column(3+$i*5).($fila+2).":".excel_column(3+$i*5+3).($fila+2).")",$formato_duracion_totales);
 		$ws1->write($fila_titulos, 3+$i*5+1,'', $formato_totales); //Esto es solo para que quede con formato
-		$ws1->write($fila_titulos, 3+$i*5+2,'', $formato_totales); 
-		$ws1->write($fila_titulos, 3+$i*5+3,'', $formato_totales); 
-		$ws1->write($fila_titulos, 3+$i*5+4,'', $formato_totales); 
-		$ws1->mergeCells( $fila_titulos, 3+$i*5, $fila_titulos , 3+$i*5+4 );		
-		
+		$ws1->write($fila_titulos, 3+$i*5+2,'', $formato_totales);
+		$ws1->write($fila_titulos, 3+$i*5+3,'', $formato_totales);
+		$ws1->write($fila_titulos, 3+$i*5+4,'', $formato_totales);
+		$ws1->mergeCells( $fila_titulos, 3+$i*5, $fila_titulos , 3+$i*5+4 );
+
 		#Ingresos Estimados
 		$ws1->WriteFormula($fila_titulos+6,3+$i*5,'='.excel_column(3+$i*5+4).($fila+2)."/IF(".excel_column(3+$i*5).($fila+2).">0;".excel_column(2+$i*5).($fila+2).";1)*(".excel_column(2+$i*5).($fila+2)."+".excel_column(2+$i*5+3).($fila+2).")",$formato_totales_cobro);
 		$ws1->write($fila_titulos+6, 3+$i*5+1,'', $formato_totales_cobro); //Esto es solo para que quede con formato
-		$ws1->write($fila_titulos+6, 3+$i*5+2,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+6, 3+$i*5+3,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+6, 3+$i*5+4,'', $formato_totales_cobro); 
+		$ws1->write($fila_titulos+6, 3+$i*5+2,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+6, 3+$i*5+3,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+6, 3+$i*5+4,'', $formato_totales_cobro);
 		$ws1->mergeCells( $fila_titulos+6, 3+$i*5, $fila_titulos+6 , 3+$i*5+4 );
 
 		#Títulos columnas verticales
@@ -375,58 +375,58 @@ function Print_Resumen_Prof(& $ws1)
 		$fila_suma_desde= $fila_titulos + 9;
 		$ws1->WriteFormula($fila+1,3+$i*5,'=SUM('.excel_column(3+$i*5)."$fila_suma_desde:".excel_column(3+$i*5).($fila+1).')',$formato_duracion_totales);
 		$total_hr_cobradas= excel_column(3+$i*5).($fila+2).'+'.$total_hr_cobradas;
-		
+
 		$ws1->WriteFormula($fila+1,3+$i*5+1,'=SUM('.excel_column(3+$i*5+1)."$fila_suma_desde:".excel_column(3+$i*5+1).($fila+1).')',$formato_duracion_totales);
 		$total_hr_no_cobrable= excel_column(3+$i*5+1).($fila+2).'+'.$total_hr_no_cobrable;
-		
+
 		$ws1->WriteFormula($fila+1,3+$i*5+2,'=SUM('.excel_column(3+$i*5+2)."$fila_suma_desde:".excel_column(3+$i*5+2).($fila+1).')',$formato_duracion_totales);
 		$total_hr_castigada= excel_column(3+$i*5+2).($fila+2).'+'.$total_hr_castigada;
-		
+
 		$ws1->WriteFormula($fila+1,3+$i*5+3,'=SUM('.excel_column(3+$i*5+3)."$fila_suma_desde:".excel_column(3+$i*5+3).($fila+1).')',$formato_duracion_totales);
 		$total_hr_por_cobrar= excel_column(3+$i*5+3).($fila+2).'+'.$total_hr_por_cobrar;
-		
+
 		$ws1->WriteFormula($fila+1,3+$i*5+4,'=SUM('.excel_column(3+$i*5+4)."$fila_suma_desde:".excel_column(3+$i*5+4).($fila+1).')',$formato_totales_cobro);
 		$total_cobrado= excel_column(3+$i*5+4).($fila+2).'+'.$total_cobrado;
-		
+
 		##############################################################################
 		#Horas cobradas
 		$ws1->WriteFormula($fila_titulos+1,3+$i*5,'=SUM('.excel_column(3+$i*5)."$fila_suma_desde:".excel_column(3+$i*5).($fila+1).')',$formato_duracion_totales);
 		$ws1->write($fila_titulos+1, 3+$i*5+1,'', $formato_totales_cobro); //Esto es solo para que quede con formato
-		$ws1->write($fila_titulos+1, 3+$i*5+2,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+1, 3+$i*5+3,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+1, 3+$i*5+4,'', $formato_totales_cobro); 
+		$ws1->write($fila_titulos+1, 3+$i*5+2,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+1, 3+$i*5+3,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+1, 3+$i*5+4,'', $formato_totales_cobro);
 		$ws1->mergeCells( $fila_titulos+1, 3+$i*5, $fila_titulos +1 , 3+$i*5+4 );
-		
+
 		#Horas no cobradas
 		$ws1->WriteFormula($fila_titulos+2,3+$i*5,'=SUM('.excel_column(3+$i*5+1)."$fila_suma_desde:".excel_column(3+$i*5+1).($fila+1).')',$formato_duracion_totales);
 		$ws1->write($fila_titulos+2, 3+$i*5+1,'', $formato_totales_cobro); //Esto es solo para que quede con formato
-		$ws1->write($fila_titulos+2, 3+$i*5+2,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+2, 3+$i*5+3,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+2, 3+$i*5+4,'', $formato_totales_cobro); 
-		$ws1->mergeCells( $fila_titulos+2, 3+$i*5, $fila_titulos +2 , 3+$i*5+4 );		
-		
+		$ws1->write($fila_titulos+2, 3+$i*5+2,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+2, 3+$i*5+3,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+2, 3+$i*5+4,'', $formato_totales_cobro);
+		$ws1->mergeCells( $fila_titulos+2, 3+$i*5, $fila_titulos +2 , 3+$i*5+4 );
+
 		#Horas castigadas
 		$ws1->WriteFormula($fila_titulos+3,3+$i*5,'=SUM('.excel_column(3+$i*5+2)."$fila_suma_desde:".excel_column(3+$i*5+2).($fila+1).')',$formato_duracion_totales);
 		$ws1->write($fila_titulos+3, 3+$i*5+1,'', $formato_totales_cobro); //Esto es solo para que quede con formato
-		$ws1->write($fila_titulos+3, 3+$i*5+2,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+3, 3+$i*5+3,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+3, 3+$i*5+4,'', $formato_totales_cobro); 
-		$ws1->mergeCells( $fila_titulos+3, 3+$i*5, $fila_titulos +3 , 3+$i*5+4 );		
-		
+		$ws1->write($fila_titulos+3, 3+$i*5+2,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+3, 3+$i*5+3,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+3, 3+$i*5+4,'', $formato_totales_cobro);
+		$ws1->mergeCells( $fila_titulos+3, 3+$i*5, $fila_titulos +3 , 3+$i*5+4 );
+
 		#Horas por cobrar
 		$ws1->WriteFormula($fila_titulos+4,3+$i*5,'=SUM('.excel_column(3+$i*5+3)."$fila_suma_desde:".excel_column(3+$i*5+3).($fila+1).')',$formato_duracion_totales);
 		$ws1->write($fila_titulos+4, 3+$i*5+1,'', $formato_totales_cobro); //Esto es solo para que quede con formato
-		$ws1->write($fila_titulos+4, 3+$i*5+2,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+4, 3+$i*5+3,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+4, 3+$i*5+4,'', $formato_totales_cobro); 
-		$ws1->mergeCells( $fila_titulos+4, 3+$i*5, $fila_titulos +4 , 3+$i*5+4 );		
-		
+		$ws1->write($fila_titulos+4, 3+$i*5+2,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+4, 3+$i*5+3,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+4, 3+$i*5+4,'', $formato_totales_cobro);
+		$ws1->mergeCells( $fila_titulos+4, 3+$i*5, $fila_titulos +4 , 3+$i*5+4 );
+
 		#Ingresos devenegados
 		$ws1->WriteFormula($fila_titulos+5,3+$i*5,'=SUM('.excel_column(3+$i*5+4)."$fila_suma_desde:".excel_column(3+$i*5+4).($fila+1).')',$formato_totales_cobro);
 		$ws1->write($fila_titulos+5, 3+$i*5+1,'', $formato_totales_cobro); //Esto es solo para que quede con formato
-		$ws1->write($fila_titulos+5, 3+$i*5+2,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+5, 3+$i*5+3,'', $formato_totales_cobro); 
-		$ws1->write($fila_titulos+5, 3+$i*5+4,'', $formato_totales_cobro); 
+		$ws1->write($fila_titulos+5, 3+$i*5+2,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+5, 3+$i*5+3,'', $formato_totales_cobro);
+		$ws1->write($fila_titulos+5, 3+$i*5+4,'', $formato_totales_cobro);
 		$ws1->mergeCells( $fila_titulos+5, 3+$i*5, $fila_titulos +5 , 3+$i*5+4 );
 		##############################################################################
 	}
@@ -458,7 +458,7 @@ function Print_Resumen_Prof(& $ws1)
 
 	#$ws1->mergeCells( $filas, 1, $filas, 3 );
 	$ws1->write($filas, 1, __('REPORTE RENDIMIENTO PROFESIONALES'), $formato_morado);
-	$ws1->mergeCells( $filas,1, $filas, 2+4 );	
+	$ws1->mergeCells( $filas,1, $filas, 2+4 );
 
 	$ws1->write(++$filas, 1, strtoupper(__('Profesional')), $formato_morado);
 	$ws1->write($filas, 2, $profesional, $formato_morado);
@@ -492,10 +492,10 @@ function Print_Resumen_Prof(& $ws1)
 	$ws1->writeFormula($filas, 2, "=$total_hr_por_cobrar 0", $formato_duracion_morado);
 	$ws1->mergeCells( $filas, 2, $filas, 2+4 );
 }
-function excel_column($col_number) 
+function excel_column($col_number)
 {
 	if( ($col_number < 0) || ($col_number > 701)) die('Column must be between 0(A) and 701(ZZ)');
-	if($col_number < 26) 
+	if($col_number < 26)
 	{
 		return(chr(ord('A') + $col_number));
 	}

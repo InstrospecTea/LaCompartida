@@ -1,11 +1,11 @@
-<?
-    require_once dirname(__FILE__).'/../../../../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../../../../conf.php';
 
 class Respuesta
 {
 	// Sesion PHP
 	var $sesion = null;
-	
+
 	// Arreglo con los valores de los campos
 	var $fields = null;
 
@@ -19,7 +19,7 @@ class Respuesta
 
 	var $id_respuesta = null;
 
-	function Respuesta($sesion, $fields=array(), $params) 
+	function Respuesta($sesion, $fields=array(), $params)
 	{
 		$this->sesion = $sesion;
 

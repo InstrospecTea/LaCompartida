@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -230,8 +230,8 @@ window.opener.Refrescar();
 			<?=__('Cliente')?>
 		</td>
 		<td align=left>
-			<input maxlength=10 readonly=readonly name="codigo_cliente" id="campo_codigo_cliente" size=10 value= <? echo $codigo_cliente; ?> />
-				<input name="nombre_cliente" id='nombre' style='width: 280px;' value = "<?
+			<input maxlength=10 readonly=readonly name="codigo_cliente" id="campo_codigo_cliente" size=10 value= <?php echo $codigo_cliente; ?> />
+				<input name="nombre_cliente" id='nombre' style='width: 280px;' value = "<?php
 																								$cliente = new Cliente($sesion);
 																								$cliente->LoadByCodigo($codigo_cliente);
 																								echo $cliente->fields['glosa_cliente'];
@@ -249,7 +249,7 @@ window.opener.Refrescar();
 			<?=__('Monto Honorarios')?>
 		</td>
 		<td align=left>
-			<input name=monto_honorarios size=10 value="<? echo str_replace("-","",$documento->fields['honorarios']);  ?>" />
+			<input name=monto_honorarios size=10 value="<?php echo str_replace("-","",$documento->fields['honorarios']);  ?>" />
 			<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 			<?=__('Moneda')?>&nbsp;
@@ -262,7 +262,7 @@ window.opener.Refrescar();
 			<?=__('Monto Gastos')?>
 		</td>
 		<td align=left>
-			<input name=monto_gastos size=10 value="<? echo str_replace("-","",$documento->fields['gastos']);  ?>" />
+			<input name=monto_gastos size=10 value="<?php echo str_replace("-","",$documento->fields['gastos']);  ?>" />
 			<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		</td>
 	</tr>
@@ -289,7 +289,7 @@ window.opener.Refrescar();
 	</tr>
 </table>
 
-<?
+<?php
 	if(isset($b))
 	{
 		$b->Imprimir("",array(''),false);
@@ -315,7 +315,7 @@ Calendar.setup(
 	}
 );
 </script>
-<?
+<?php
 	echo InputId::Javascript($sesion);
 	$pagina->PrintBottom($popup);
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -50,42 +50,42 @@ td
 	text-align:center;
 	border-right: 1px solid #CCCCCC;
 }
-.td_h1	{		<? if( sizeof($agrupadores) < 6  ) echo "display:none;"   ?>	}
-.td_h2	{		<? if( sizeof($agrupadores) < 5  ) echo "display:none;"   ?>	}
-.td_h3	{		<? if( sizeof($agrupadores) < 4  ) echo "display:none;"   ?>	}
-.td_h4	{		<? if( sizeof($agrupadores) < 3  ) echo "display:none;"   ?>	}
-.td_h5	{		<? if( sizeof($agrupadores) < 2  ) echo "display:none;"   ?>	}
+.td_h1	{		<?php if( sizeof($agrupadores) < 6  ) echo "display:none;"   ?>	}
+.td_h2	{		<?php if( sizeof($agrupadores) < 5  ) echo "display:none;"   ?>	}
+.td_h3	{		<?php if( sizeof($agrupadores) < 4  ) echo "display:none;"   ?>	}
+.td_h4	{		<?php if( sizeof($agrupadores) < 3  ) echo "display:none;"   ?>	}
+.td_h5	{		<?php if( sizeof($agrupadores) < 2  ) echo "display:none;"   ?>	}
 
 td.primer
 {
 	background-color:#c4c4dd;
 	font-size:95%;
-	<? if( sizeof($agrupadores)<6 ) echo "display:none;"   ?>
+	<?php if( sizeof($agrupadores)<6 ) echo "display:none;"   ?>
 }
 td.segundo
 {
 	background-color:#d2d2ee;
 	font-size:90%;
-	 <? if( sizeof($agrupadores) <5 ) echo "display:none;"   ?>
+	 <?php if( sizeof($agrupadores) <5 ) echo "display:none;"   ?>
 }
 td.tercer
 {
 	font-size:84%;
 	background-color:#d9d9f2;
-	 <? if( sizeof($agrupadores) <4 ) echo "display:none;"   ?>
+	 <?php if( sizeof($agrupadores) <4 ) echo "display:none;"   ?>
 }
 td.cuarto
 {
 	font-size:80%;
 	background-color:#e5e5f5;
-	 <? if( sizeof($agrupadores) <3 ) echo "display:none;"   ?>
+	 <?php if( sizeof($agrupadores) <3 ) echo "display:none;"   ?>
 
 }
 td.quinto
 {
 	font-size:76%;
 	background-color:#f1f1f9;
-	 <? if( sizeof($agrupadores) <2 ) echo "display:none;"   ?>
+	 <?php if( sizeof($agrupadores) <2 ) echo "display:none;"   ?>
 
 }
 td.sexto
@@ -133,7 +133,7 @@ span.indefinido { color: #550000; }
 
 </style>
 
-<?
+<?php
 	/*Se crea el reporte según el Input del usuario*/
 	$reporte = new ReporteCriteria($sesion);
 
@@ -278,7 +278,7 @@ span.indefinido { color: #550000; }
 						<?=(Reporte::requiereMoneda($tipo_dato))? __(Reporte::simboloTipoDato($tipo_dato,$sesion,$id_moneda)):"&nbsp;" ?>
 					</td>
 				</tr>
-				<? if($tipo_dato_comparado)
+				<?php if($tipo_dato_comparado)
 				{?>
 				<tr>
 					<td align=right>
@@ -299,7 +299,7 @@ span.indefinido { color: #550000; }
 </table>
 <table border=1 cellpadding="3" class="planilla" id="tabla_planilla_2" >
 </tbody>
-		<?
+		<?php
 		//Imprime un valor en forma de Link. Añade los filtros correpondientes para ver los trabajos.
 		function url($valor,$filtros = array())
 		{
@@ -447,6 +447,6 @@ Event.observe(window, "load", function(e)
 	Resize();
 });
 </script>
-<?
+<?php
 	$pagina->PrintBottom($popup);
 ?>

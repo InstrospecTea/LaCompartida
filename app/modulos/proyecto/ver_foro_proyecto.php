@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../../../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../../../conf.php';
     require_once Conf::ServerDir().'/fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/app/classes/PaginaProyecto.php';
     require_once Conf::ServerDir().'/fw/classes/Utiles.php';
@@ -61,7 +61,7 @@
     <td width="10%" class="texto_suave">Mensajes</td>
   </tr>
         <td valign="top" align="center" colspan="3">
-<?
+<?php
 
 	$foro->Imprimir($desde,$x_pag);
 ?>
@@ -111,8 +111,8 @@
 </tr>
 </table>
 
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>
 
 

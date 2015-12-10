@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
 
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
@@ -12,7 +12,7 @@
 	$Sesion = new Sesion( array('CON') );
 	$pagina = new Pagina($Sesion);
     $proyecto = new Proyecto($Sesion);
-		
+
     Proyecto::PermisoEditar($id_proyecto, $Sesion) or $pagina->FatalError("No tiene permiso de consultor en este proyecto",__FILE__,__LINE__);
 
 	if($id_proyecto != "")
@@ -210,8 +210,8 @@ function EliminarUsuario( form )
 }
 var usuarios = new Lista();
 
-<?
-	$query = "SELECT rut AS ru, CONCAT( apellido1, ' ', apellido2, ', ', nombre ) AS nombre_usuario, 
+<?php
+	$query = "SELECT rut AS ru, CONCAT( apellido1, ' ', apellido2, ', ', nombre ) AS nombre_usuario,
 				(
 					SELECT id_proyecto AS pro
 						FROM proyecto_usuario
@@ -242,6 +242,6 @@ var form = document.getElementById("form");
 ActualizarSeleccion( form );
 </script>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../../../../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../../../../conf.php';
     require_once Conf::ServerDir().'/fw/classes/Utiles.php';
     require_once Conf::ServerDir().'/fw/classes/Usuario.php';
     require_once Conf::ServerDir().'/fw/classes/Sesion.php';

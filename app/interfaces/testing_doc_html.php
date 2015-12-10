@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../app/classes/PaginaCobro.php';
@@ -24,7 +24,7 @@
 	$sesion = new Sesion(array());
 	$pagina = new Pagina($sesion);
 
-	
+
 	if($numero)
 	{
 		$factura = new Factura($sesion);
@@ -39,20 +39,20 @@
 				}
 			else
 				$where = "";
-			
+
 			$query = " SELECT id_factura_formato, descripcion FROM factura_rtf $where";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 			$doc = 'No se encontro formaato RTF';
 			while( list($id_factura_formato,$descripcion) = mysql_fetch_array($resp) )
 			{
 				$imprimir = "<a href='javascript:void(0)' onclick=\"ImprimirDocumento(".$factura->fields['id_factura'].");\" ><img src='".Conf::ImgDir()."/pdf.gif' border=0 title=Imprimir></a>";
-			
+
 				$doc = $factura->GeneraHTMLFactura($id_factura_formato);
 			}
 			$ruta_cuadricula = Conf::Server().Conf::ImgDir().'/cuadricula_transp.png';
 		}
-	}	
-	
+	}
+
 	if($opc == 'generar_factura')
 	{
 		// POR HACER
@@ -63,8 +63,8 @@
 			echo "Error";
 		exit;
 	}
-	
-	
+
+
 	$pagina->PrintTop();
 ?>
 <form name="form1" action="<?php echo $_server['php_self'];?>" method="post">
@@ -94,17 +94,17 @@
 					echo "<style>".$doc['css']."</style>";
 					echo $doc['html'];
 		echo "</div>";
-	}	
-	?>	
+	}
+	?>
 <script type="text/javascript">
-$('hoja_carta_cuadriculada').style.background="url('<?=$ruta_cuadricula;?>')";	
+$('hoja_carta_cuadriculada').style.background="url('<?=$ruta_cuadricula;?>')";
 function ImprimirDocumento( id_factura )
 {
 	var vurl = 'testing_doc_html.php?opc=generar_factura&id_factura_grabada=' + id_factura;
-	
+
 	self.location.href=vurl;
-}	
+}
 </script>
-<?
+<?php
 	$pagina->PrintBottom();
-?> 
+?>

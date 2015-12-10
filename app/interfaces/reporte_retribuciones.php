@@ -353,7 +353,7 @@ if (!empty($_POST)) {
 				<td class='number-cell' colspan=1><?php echo $simbolo_moneda . ' ' . number_format($valores['retribucion_socios'], $numero_decimales); ?></td>
 				<td class='number-cell' colspan=1><?php echo $simbolo_moneda . ' ' . number_format($valores['retribucion_abogado'], $numero_decimales); ?></td>
 			<tr>
-				<?
+				<?php
 			}
 
 			$cliente_actual = '';
@@ -367,7 +367,7 @@ if (!empty($_POST)) {
 					$cliente_actual = $encabezado['glosa_cliente'];
 					?>
 				<tr class="item-group"><th colspan="12"><?php echo $cliente_actual; ?></th></tr>
-				<?
+				<?php
 			}
 			$responsable = !empty($encabezado['nombre_usuario_responsable']) && !empty($encabezado['retribucion_usuario_responsable']);
 			$secundario = !empty($encabezado['nombre_usuario_secundario']) && !empty($encabezado['retribucion_usuario_secundario']);

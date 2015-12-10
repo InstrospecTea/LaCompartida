@@ -419,7 +419,7 @@ if (!empty($_POST)) {
 			<td class='number-cell' colspan=1><?php echo empty($valores['retribucion_responsable']) ? '' : monto($valores['retribucion_responsable']); ?></td>
 			<td class='number-cell' colspan=1><?php echo empty($valores['retribucion_secundario']) ? '' : monto($valores['retribucion_secundario']); ?></td>
 		<tr>
-		<?
+		<?php
 	}
 
 	//acumula detalle

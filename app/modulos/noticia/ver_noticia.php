@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
 
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
@@ -22,7 +22,7 @@
 
 	$id_noticia_agrupador = $noticia->fields['id_noticia_agrupador'];
 
-    $lista_noticia_relacionadas = new ListaNoticias($sesion,'',"SELECT * FROM noticia WHERE id_noticia_agrupador = '$id_noticia_agrupador' 
+    $lista_noticia_relacionadas = new ListaNoticias($sesion,'',"SELECT * FROM noticia WHERE id_noticia_agrupador = '$id_noticia_agrupador'
 																				AND id_noticia <>'$id_noticia' ORDER BY fecha_creacion LIMIT 0,10 ");
     $pagina->PrintTop();
 ?>
@@ -40,7 +40,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td valign="top"><span class=texto_chico><?=utiles::sql2fecha($noticia->fields['fecha_creacion'],'%A, %d de %B de %Y');?></a></td>
+					<td valign="top"><span class=texto_chico><?=utiles::sql2fecha($noticia->fields['fecha_creacion'],'%A, %d de %B de %Y');?></a></span></td>
 				</tr>
 			</table>
 		</td>
@@ -64,8 +64,8 @@
 <div style="text-align: left; padding-left: 30px;"><strong>Noticias Relacionadas<strong></div>
 <hr size=1 width=90% color="#000000">
 
-<?
-    for($x=0;$x<$lista_noticia_relacionadas->num; $x++)
+<?php
+   for($x=0;$x<$lista_noticia_relacionadas->num; $x++)
     {
         $noticia = $lista_noticia_relacionadas->Get($x)
 ?>
@@ -75,8 +75,8 @@
     <td valign="top"><b> <a href="ver_noticia.php?id_noticia=<?=$noticia->fields['id_noticia']?>&id_noticia_agrupador=<?=$noticia->fields['id_noticia_agrupador']?>"><?= $noticia->fields['titulo'] ?></a></b> </td>
   </tr>
 </table>
-<?
-     }
+<?php
+    }
 
 $pagina->PrintBottom();
 ?>

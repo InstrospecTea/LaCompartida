@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
     require_once Conf::ServerDir().'/fw/modulos/noticia/classes/Noticia.php';
     require_once Conf::ServerDir().'/fw/modulos/proyecto/classes/Proyecto.php';
@@ -14,14 +14,14 @@
 	$pagina = new Pagina($sesion);
 	$proyecto = new Proyecto($sesion);
 
-    Proyecto::PermisoEditar($id_proyecto,$sesion) or $pagina->FatalError("Usted no tiene permiso para editar este proyecto",__FILE__,__LINE__);	
-    	    
+    Proyecto::PermisoEditar($id_proyecto,$sesion) or $pagina->FatalError("Usted no tiene permiso para editar este proyecto",__FILE__,__LINE__);
+
 	if($opc == 'agregar_not')
     {
         if($titulo== '' or $resumen== '' or $detalle== '')
             $pagina->AddError("Debe ingresar todos los datos de la noticia");
         else
-        
+
         {
             $noticia=new Noticia($sesion);
             $noticia->Edit('titulo',$titulo);
@@ -29,7 +29,7 @@
 
             $noticia->Edit( 'detalle',$detalle);
             $noticia->Edit('id_noticia_agrupador',$id_noticia_agrupador);
-            
+
 		if( $noticia->Write() )
             {
                  $pagina->AddInfo( 'Noticia ingresada con exito...' );
@@ -37,7 +37,7 @@
         }
 	}
 
-	
+
 	$proyecto->Load($id_proyecto);
     $titulo_proyecto= $proyecto->fields['titulo'];
 
@@ -81,7 +81,7 @@
 </table>
 </form>
 
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>
 

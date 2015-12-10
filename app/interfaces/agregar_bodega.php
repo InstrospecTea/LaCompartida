@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -9,19 +9,19 @@
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 	require_once Conf::ServerDir().'/../app/classes/InputId.php';
 	require_once Conf::ServerDir().'/../app/classes/Funciones.php';
-	
+
 	$sesion = new Sesion(array('PRO','REV','ADM','COB'));
-	
+
 	$pagina = new Pagina($sesion);
-	
+
 	$bodega = new Bodega($sesion);
-	
+
 	$bodega->loadById($id_bodega_edicion);
-	
+
 	if($opc == 'guardar')
 	{
 		$bodega->Edit('glosa_bodega',$glosa_bodega);
-		
+
 		if($bodega->Write())
 		{
 		  $id_bodega_edicion = $bodega->fields['id_bodega'];
@@ -31,20 +31,20 @@
 	$pagina->titulo = __('Ingreso de Bodegas');
 
 	$pagina->PrintTop($popup);
-	
+
 	$active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 ?>
 <script>
-function foco(elemento) 
-{ 
+function foco(elemento)
+{
 	elemento.style.border = "2px solid #000000";
-} 
-
-function no_foco(elemento) 
-{ 
-	elemento.style.border = "1px solid #CCCCCC"; 
 }
-function cambia_bodega(valor) 
+
+function no_foco(elemento)
+{
+	elemento.style.border = "1px solid #CCCCCC";
+}
+function cambia_bodega(valor)
 {
 	var popup = $('popup').value;
 	if( confirm('<?=__('confirma cambio bodega?')?>') )
@@ -73,7 +73,7 @@ function cambia_bodega(valor)
 
 	<table width='100%' border="0" cellpadding="0" cellspacing="0">
 		<tr>
-<?
+<?php
 	$colspan=2;
 	if($id_bodega_edicion || $bodega->fields['id_bodega'])
 	{
@@ -81,7 +81,7 @@ function cambia_bodega(valor)
 ?>
 			<td align=right><?=__('Bodega')?>&nbsp;</td>
 			<td align=left><?= Html::SelectQuery($sesion, "SELECT * FROM bodega ORDER BY glosa_bodega","id_bodega", $id_bodega_edicion ? $id_bodega_edicion : $bodega->fields['id_bodega'],"onchange='cambia_bodega(this.value)'","","120"); ?></td>
-<?
+<?php
 	}
 ?>
 			<td> <?=__('Nombre')?>: <input type=text name=glosa_bodega value='<?=$bodega->fields['glosa_bodega']?>' <?=$active?>> </td>

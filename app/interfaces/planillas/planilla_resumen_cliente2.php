@@ -1,5 +1,5 @@
-<?
-    require_once 'Spreadsheet/Excel/Writer.php';
+<?php
+   require_once 'Spreadsheet/Excel/Writer.php';
     require_once dirname(__FILE__).'/../../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -118,34 +118,34 @@
 
 
 	#CLIENTE
-	if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PermitirFactura') ) || ( method_exists('Conf','PermitirFactura') && Conf::PermitirFactura() ) )  ) 
+	if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'PermitirFactura') ) || ( method_exists('Conf','PermitirFactura') && Conf::PermitirFactura() ) )  )
 		{
-			$query = "SELECT cobro.codigo_cliente, 
-									cl.glosa_cliente, 
-									SUM((cobro.monto+cobro.monto_gastos)*cmmt.tipo_cambio/cmmb.tipo_cambio) AS monto_cobrado_monedabase, 
-									SUM((cobro.monto_thh+cobro.monto_gastos)*cmmt.tipo_cambio/cmmb.tipo_cambio) AS monto_thh_monedabase, 
-									YEAR(cobro.fecha_emision) AS periodo_ano, 
-									MONTH(cobro.fecha_emision) AS periodo_mes 
-								FROM cobro 
-									JOIN cobro_moneda AS cmmb ON ( cobro.id_cobro=cmmb.id_cobro AND cobro.id_moneda_base=cmmb.id_moneda ) 
-									JOIN cobro_moneda AS cmmt ON ( cobro.id_cobro=cmmt.id_cobro AND cobro.opc_moneda_total=cmmt.id_moneda ) 
-									LEFT JOIN cliente AS cl ON cobro.codigo_cliente=cl.codigo_cliente 
-								WHERE cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION' 
-									AND cobro.fecha_emision BETWEEN '$fecha_ini' AND '$fecha_fin 23:59:59' $where 
-								GROUP BY cobro.codigo_cliente, year(cobro.fecha_emision), month(cobro.fecha_emision) 
+			$query = "SELECT cobro.codigo_cliente,
+									cl.glosa_cliente,
+									SUM((cobro.monto+cobro.monto_gastos)*cmmt.tipo_cambio/cmmb.tipo_cambio) AS monto_cobrado_monedabase,
+									SUM((cobro.monto_thh+cobro.monto_gastos)*cmmt.tipo_cambio/cmmb.tipo_cambio) AS monto_thh_monedabase,
+									YEAR(cobro.fecha_emision) AS periodo_ano,
+									MONTH(cobro.fecha_emision) AS periodo_mes
+								FROM cobro
+									JOIN cobro_moneda AS cmmb ON ( cobro.id_cobro=cmmb.id_cobro AND cobro.id_moneda_base=cmmb.id_moneda )
+									JOIN cobro_moneda AS cmmt ON ( cobro.id_cobro=cmmt.id_cobro AND cobro.opc_moneda_total=cmmt.id_moneda )
+									LEFT JOIN cliente AS cl ON cobro.codigo_cliente=cl.codigo_cliente
+								WHERE cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION'
+									AND cobro.fecha_emision BETWEEN '$fecha_ini' AND '$fecha_fin 23:59:59' $where
+								GROUP BY cobro.codigo_cliente, year(cobro.fecha_emision), month(cobro.fecha_emision)
 								ORDER BY cl.glosa_cliente";
 		}
 	else
 		{
-			$query = "SELECT cliente.codigo_cliente, 
-								cliente.glosa_cliente, 
-								SUM(cobro.monto*cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) AS monto_cobrado_monedabase, 
-								SUM(cobro.monto_thh*cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) AS monto_thh_monedabase, 
-								YEAR(cobro.`fecha_emision`) AS periodo_ano, 
-								MONTH(cobro.`fecha_emision`) AS periodo_mes 
-							FROM cobro 
+			$query = "SELECT cliente.codigo_cliente,
+								cliente.glosa_cliente,
+								SUM(cobro.monto*cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) AS monto_cobrado_monedabase,
+								SUM(cobro.monto_thh*cobro.tipo_cambio_moneda/cobro.tipo_cambio_moneda_base) AS monto_thh_monedabase,
+								YEAR(cobro.`fecha_emision`) AS periodo_ano,
+								MONTH(cobro.`fecha_emision`) AS periodo_mes
+							FROM cobro
 								LEFT JOIN cliente ON cobro.`codigo_cliente` = cliente.`codigo_cliente`
-							WHERE cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION' 
+							WHERE cobro.estado <> 'CREADO' AND cobro.estado <> 'EN REVISION'
 								AND fecha_emision BETWEEN '$fecha_ini' AND '$fecha_fin 23:59:59'
 							$where
 							GROUP BY cobro.codigo_cliente, year(cobro.`fecha_emision`), month(cobro.`fecha_emision`)

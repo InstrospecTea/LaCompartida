@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once dirname(__FILE__).'/classes/lista.php';
 
@@ -30,7 +30,7 @@
 			$pagina->AddError("Debe ingresar el titulo");
 		else
 		{
-			
+
 	        $proyecto->Edit('titulo', $titulo);
 	        $proyecto->Edit('resumen', $resumen);
 			$proyecto->Edit('visible_inversionista', $inv);
@@ -40,7 +40,7 @@
 				$id_proyecto=$proyecto->fields['id_proyecto'];
     	    }
 		}
-	}      
+	}
 
 	$pagina->titulo = "Editar Proyecto";
 
@@ -78,7 +78,7 @@ function Confirmar()
  <input type="hidden" name="desde" value="">
 	<tr>
 		<td valign="top" class="subtitulo" align="left" colspan="4">
-		    Proyecto	
+		    Proyecto
 			<hr class="subtitulo"/>
 		</td>
 	</tr>
@@ -144,8 +144,8 @@ function Confirmar()
         </td>
 
   </tr>
-<?
-        $where="0 ";
+<?php
+       $where="0 ";
         $params_array['codigo_permiso'] = 'ADM';
         $p = $Sesion->usuario->permisos->Find('FindPermiso',$params_array); //tiene permiso de administrador
         if( $p->fields['permitido'] )
@@ -161,7 +161,7 @@ function Confirmar()
 ?>
  </form>
 </table>
-<?
+<?php
 
         function PrintRow (& $fila)
         {
@@ -206,7 +206,7 @@ HTML;
 
  </form>
 
-<script language="javascript">	
+<script language="javascript">
 <!-- //
 
 function PrintLinkPage( page )

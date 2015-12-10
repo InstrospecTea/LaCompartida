@@ -215,7 +215,7 @@ if ($orden_click) {
 		}
 	});
 </script>
-<? echo(Autocompletador::CSS()); ?>
+<?php echo(Autocompletador::CSS()); ?>
 <form name='formulario' id='formulario' method='post' action='tareas.php' autocomplete='off'>
     <input type='hidden' name='conf_codigo_primario' id="conf_codigo_primario" value="<?php echo  (Conf::GetConf($Sesion,'CodigoSecundario') ? 'false' : 'true'); ?>"/>
     <input type='hidden' name='opc' id='opc' value='buscar' />

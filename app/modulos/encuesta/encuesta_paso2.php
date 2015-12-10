@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Encuesta.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Pregunta.php';
@@ -14,7 +14,7 @@
 	$sesion = new Sesion( array('ADM') );
 
 	$pagina = new Pagina($sesion);
-	
+
     $enc = new Encuesta($sesion);
     if(!$enc->Load($id_encuesta))
 		$pagina->FatalError("Encuesta Inválida");
@@ -48,7 +48,7 @@
 		$pre = new Pregunta($sesion);
 		if($pre->Load($id_encuesta_pregunta))
 		{
-			if($pre->Delete())	
+			if($pre->Delete())
 				$pagina->AddInfo("Pregunta Eliminada");
 			else
 				$pagina->AddError($pre->error);
@@ -106,7 +106,7 @@ function OcultarAlt()
 }
 
 var textNumber = 1;
-function addTextBox(form, afterElement) 
+function addTextBox(form, afterElement)
 {
 	var div = document.getElementById("alternativas");
 	var label = document.createElement("label");
@@ -184,10 +184,10 @@ function Guardar_P(form)
 		 <form id="form" name="Pregunta" method="post">
 		 <input type="hidden" name="opc" value="<?=$opc?>">
 		 <input type="hidden" name="id_encuesta" value="<?=$id_encuesta?>">
-			<strong>Ingrese el texto de la pregunta:</strong><br>	
+			<strong>Ingrese el texto de la pregunta:</strong><br>
 			<textarea name=glosa_pregunta cols=60 rows=2></textarea><br><br>
             <strong>Seleccione el tipo de pregunta:</strong> <br>
-			<input type="radio" value="abierta" checked name="tipo" onclick="OcultarAlt();">Abierta 
+			<input type="radio" value="abierta" checked name="tipo" onclick="OcultarAlt();">Abierta
 			<input type="radio" name="tipo"  value="alternativa" onclick="MostrarAlt();"> Alternativas<br>
 			<div id=alternativas style="display:none;" align=left>
 			<p id="parrafo"><input type="button" value="Agregar Alternativa" onclick="addTextBox(this.form,this.parentNode)" /></p>
@@ -209,8 +209,8 @@ function Guardar_P(form)
 	<tr>
 	<td></td>
 	<td>
-<?
-    $lista_preguntas = new ListaPreguntas($sesion,'',"SELECT * FROM encuesta_pregunta WHERE id_encuesta = $id_encuesta");
+<?php
+   $lista_preguntas = new ListaPreguntas($sesion,'',"SELECT * FROM encuesta_pregunta WHERE id_encuesta = $id_encuesta");
 
 ?>
 <table width="100%" align="left">
@@ -220,8 +220,8 @@ function Guardar_P(form)
             <hr class="subtitulo">
         </td>
     </tr>
-<?
-    for($x=0;$x<$lista_preguntas->num;$x++)// Busca las preguntas de la encuesta
+<?php
+   for($x=0;$x<$lista_preguntas->num;$x++)// Busca las preguntas de la encuesta
     {
         $pregunta = $lista_preguntas->Get($x);
         $id_encuesta_pregunta = $pregunta->fields['id_encuesta_pregunta'];
@@ -231,8 +231,8 @@ function Guardar_P(form)
             <td width=80%>
         <br><strong><?=$x+1?> - <?=$pregunta->fields['glosa_pregunta']?></strong>&nbsp;&nbsp;&nbsp;<br><br>
 
-<?
-        if($pregunta->fields['tipo'] == 'ALTERNATIVA') // si es alternativa busca las alternativas
+<?php
+       if($pregunta->fields['tipo'] == 'ALTERNATIVA') // si es alternativa busca las alternativas
         {
             $lista_alternativas = new ListaPreguntasAlternativas($sesion,'',"SELECT * FROM encuesta_pregunta_alternativa
                                                                     WHERE id_encuesta_pregunta = $id_encuesta_pregunta");
@@ -243,7 +243,7 @@ function Guardar_P(form)
 ?>
                 <?=$y+1?>) <input type="radio" name="respuesta[<?=$id_encuesta_pregunta?>]" value="<?=$id_alternativa?>" disabled>
                 <?=$alternativas->fields['glosa_alternativa']?><br>
-<?
+<?php
 
                 }
         }
@@ -251,8 +251,8 @@ function Guardar_P(form)
         {
 ?>
 Pregunta Abierta
-<?
-        }
+<?php
+       }
 ?>
         </td>
 		<td align=center>
@@ -265,15 +265,15 @@ Pregunta Abierta
         </td>
     </tr>
 
-<?
-    }
+<?php
+   }
 ?>
 </table>
 </td>
 </tr>
 </table>
 
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>
 
