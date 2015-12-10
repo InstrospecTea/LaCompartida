@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -20,9 +20,9 @@
 	}
 
 	if($vs=='cliente')
-		$query = "SELECT 
-								trabajo.id_usuario, 
-								cliente.codigo_cliente, 
+		$query = "SELECT
+								trabajo.id_usuario,
+								cliente.codigo_cliente,
 								SUM(TIME_TO_SEC( $horas )) AS duracion,
 								usuario_tarifa_contrato.tarifa * (SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600) AS valor_hh,
 								usuario_tarifa_standard.tarifa * (SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600) AS valor_standard,
@@ -46,9 +46,9 @@
 							GROUP BY trabajo.id_usuario, asunto.codigo_cliente
 							ORDER BY grupo_cliente.glosa_grupo_cliente,usuario.id_categoria_usuario";
 	elseif($vs=='asunto')
-		$query = "SELECT 
-								trabajo.id_usuario, 
-								trabajo.codigo_asunto, 
+		$query = "SELECT
+								trabajo.id_usuario,
+								trabajo.codigo_asunto,
 								SUM( TIME_TO_SEC( $horas )) AS duracion,
 								usuario_tarifa_contrato.tarifa * (SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600) AS valor_hh,
 								usuario_tarifa_standard.tarifa * (SUM(TIME_TO_SEC( trabajo.duracion_cobrada ))/3600) AS valor_standard
@@ -66,7 +66,7 @@
 								usuario_tarifa_standard.id_tarifa=tarifa_defecto.id_tarifa
 							WHERE fecha >= '$fecha1' AND fecha <= '$fecha2'
 							GROUP BY trabajo.id_usuario, trabajo.codigo_asunto";
-							
+
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	for($i = 0; list($id_usuario, $cliente, $duracion, $valor_hh, $valor_standard, $glosa_grupo_cliente) = mysql_fetch_array($resp); $i++)
 	{
@@ -194,7 +194,7 @@
 		{
 			if($j == 0) #usuarios
 					$ws1->write($fila_inicial, $columna_inicial + 1 + $i, Utiles::Glosa($sesion, $usuarios[$i], $dato_usuario, "usuario"), $formato_titulo);
-	
+
 			if($i == 0)
 			{
 				if($vs=='cliente') #clientes
@@ -219,14 +219,14 @@
 				$ws1->write($fila_inicial + 1 + $j, $columna_inicial + 1 + $i, '', $formato_tiempo);
 		}
 	}
-	
+
 	$ws1->setColumn(0, 1, 20);
 	$ws1->setColumn(2, 2 + count($usuarios), 12);
-	
+
 	$columna_final = $columna_inicial + $i + 1;
 	$ws1->setColumn($columna_final, $columna_final+2, 18);
 	$fila_final = $fila_inicial + $j + 1;
-	
+
 	$ws1->write($fila_final, $columna_inicial, __(Total), $formato_texto_total);
 
 	$ws1->write($fila_inicial,$columna_final,'Total Cliente',$formato_titulo);

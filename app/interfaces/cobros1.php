@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
   require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -65,7 +65,7 @@ function Validar(form)
     return true;
 }
 </script>
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 
 	if($opcion == "buscar")

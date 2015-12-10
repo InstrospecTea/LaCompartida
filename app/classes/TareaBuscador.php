@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../../fw/classes/Utiles.php';
+<?php
+   require_once dirname(__FILE__).'/../../fw/classes/Utiles.php';
     require_once dirname(__FILE__).'/../../fw/classes/Html.php';
     require_once dirname(__FILE__).'/../../fw/classes/Lista.php';
     require_once dirname(__FILE__).'/../../fw/funciones/funciones.php';

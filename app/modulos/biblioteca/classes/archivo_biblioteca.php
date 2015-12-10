@@ -1,13 +1,13 @@
-<?
+<?php
 require_once Conf::ServerDir().'/fw/modulos/archivo/classes/Archivo.php';
 
 
 class ArchivoBiblio extends Archivo
 {
    function ArchivoBiblio($sesion, $fields=array(), $params)
-	{ 
+	{
 		$this->tabla = 'archivos_biblioteca';
-      	parent::Archivo($sesion,$fields, $params); 
+      	parent::Archivo($sesion,$fields, $params);
 	}
 
 	function Load()

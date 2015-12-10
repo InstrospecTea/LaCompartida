@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -46,7 +46,7 @@
                                 'Color' => 'black'));
     $f4->setNumFormat("0");
 
-    
+
     if($id_tarifa_edicion==0):
     	$querytarifas = "SELECT distinct id_tarifa, glosa_tarifa FROM tarifa";
     else:
@@ -55,13 +55,13 @@
    // mail('ffigueroa@lemontech.cl','Querytarifa',$querytarifas);
     if($resptarifas = mysql_query($querytarifas, $sesion->dbh) or Utiles::errorSQL($query_tarifas,__FILE__,__LINE__,$sesion->dbh)) {
     while($hojas=mysql_fetch_array( $resptarifas )):
-	
-	
-	
+
+
+
 	$id_tarifa=$hojas['id_tarifa'];
     $ws1 =& $wb->addWorksheet(__('Tarifa').' '.$id_tarifa.' '.substr($hojas['glosa_tarifa'],0,20));
 
-   
+
 	$ws1->setInputEncoding('utf-8');
 	$ws1->fitToPages(1,0);
 	$ws1->setZoom(75);
@@ -71,10 +71,10 @@
 	$ws1->setColumn( 0, 0,  45.00);
 	$ws1->setColumn( 1, 10, 15.00);
 
-	
+
 		$PdfLinea1 = UtilesApp::GetConf($sesion, 'PdfLinea1');
 		$PdfLinea2 = UtilesApp::GetConf($sesion, 'PdfLinea2');
-	
+
 	$ws1->write(0, 0, 'Detalle de tarifa '.$hojas['glosa_tarifa'], $encabezado);
 	$ws1->mergeCells (0, 0, 0, 8);
 	$info_usr1 = str_replace(array('<br>','<br/>','<br />'),' - ',$PdfLinea1);

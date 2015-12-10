@@ -112,7 +112,7 @@ setDateDefecto();
 // ->
 </script>
 
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>

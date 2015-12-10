@@ -1,4 +1,4 @@
-<?
+<?php
 
 $_LANG['asunto'] =  "encargo";
 $_LANG['Asunto'] =  "Encargo";

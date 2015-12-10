@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once dirname(__FILE__).'/classes/archivo_biblioteca.php';
 	require_once dirname(__FILE__).'/classes/categoria_biblioteca.php';
@@ -13,9 +13,9 @@
 
 #	$sesion = new Sesion( array('ADM','EMP','INV') ); Como todos los perfiles pueden mejor pregunto por perfil vacío ya que es más barato
 	$sesion = new Sesion('');
-	
+
 	$pagina = new Pagina($sesion);
-	
+
 	$pagina->titulo = "Biblioteca de Documentos";
 
 	$pagina->PrintHeaders();
@@ -31,7 +31,7 @@
 				$pagina->AddInfo("Categoría ingresada");
 			else
 				$pagina->AddError($new_cat->error);
-		}	
+		}
 		else
 			$pagina->AddError("Debe ingresar un nombre para la categoria");
 	}
@@ -41,7 +41,7 @@
         if ($_FILES['file']['tmp_name'] ==  '')
             $pagina->AddError("Debe especificar un archivo");
 		else if($categoria == 0)
-			$pagina->AddError("Debe seleccionar una categoria");	
+			$pagina->AddError("Debe seleccionar una categoria");
 		else
 		{
 	        $archivo = new ArchivoBiblio($sesion,'','');
@@ -135,7 +135,7 @@ function MostrarNewCat()
  <input type="hidden" name="orden" value="">
 	<tr>
 		<td valign="top" class="subtitulo" align="left" colspan="5">
-		     <img border=0 src="<?=Conf::ImgDir()?>/iconos/16/ver_16.gif"> Ingrese los filtros para la búsqueda de documentos	
+		     <img border=0 src="<?=Conf::ImgDir()?>/iconos/16/ver_16.gif"> Ingrese los filtros para la búsqueda de documentos
 			<hr class="subtitulo">
 		</td>
 	</tr>
@@ -217,7 +217,7 @@ function MostrarNewCat()
             Opciones
         </td>
 	</tr>
-<?
+<?php
 
         $where2= '';
 
@@ -269,11 +269,11 @@ function MostrarNewCat()
         $p = $sesion->usuario->permisos->Find('FindPermiso',$params_array); //tiene permiso de Emprendedor
         if( $p->fields['permitido'] )
             $where.=" OR visible_emprendedor=1";
-	
-	  $archivos = new ListaArchivosBiblio ( $sesion,'', "SELECT id_archivo, nombre, descripcion, archivos_biblioteca.fecha_mod, glosa_categoria FROM archivos_biblioteca 
-																LEFT JOIN categoria ON categoria.id_categoria = archivos_biblioteca.id_categoria 
-																WHERE ($where) AND ($where2) 
-																ORDER BY $orden ASC 
+
+	  $archivos = new ListaArchivosBiblio ( $sesion,'', "SELECT id_archivo, nombre, descripcion, archivos_biblioteca.fecha_mod, glosa_categoria FROM archivos_biblioteca
+																LEFT JOIN categoria ON categoria.id_categoria = archivos_biblioteca.id_categoria
+																WHERE ($where) AND ($where2)
+																ORDER BY $orden ASC
 																LIMIT $desde, $x_pag");
 
 	echo Html::PrintListRows($sesion, $archivos, 'PrintRow');
@@ -281,8 +281,8 @@ function MostrarNewCat()
 
 ?>
  </form>
-<?
-        $params_array['codigo_permiso'] = 'ADM';
+<?php
+       $params_array['codigo_permiso'] = 'ADM';
         $p = $sesion->usuario->permisos->Find('FindPermiso',$params_array); //tiene permiso de administrador
         if( $p->fields['permitido'] )
         {
@@ -313,7 +313,7 @@ function MostrarNewCat()
 	<tr>
 		<td></td><td>
 			<table id="new_categoria" style="display : none" width="100%">
-			<tr>	
+			<tr>
 				<td bgcolor="#f0f0f0" style="border: 1px dashed #bbbbbb;">
 				<br>
 				<strong>&nbsp;Nombre:&nbsp;</strong><input type="cat_name" name="cat_name">&nbsp;<input type=submit value="Agregar" onclick="this.form.opc.value = 'addCat';">
@@ -337,14 +337,14 @@ function MostrarNewCat()
 </form>
 </table>
 </td></tr>
-<?
-    }
+<?php
+   }
 ?>
 
 </table>
 
-<?
-    	function PrintRow (& $fila)
+<?php
+   	function PrintRow (& $fila)
    	 	{
 		$fields=&$fila->fields;
 		global $sesion;
@@ -380,7 +380,7 @@ function MostrarNewCat()
         </td>
         <td valign="top" align="center">
             $opciones
-            
+
         </td>
   </tr>
   <tr>
@@ -394,7 +394,7 @@ HTML;
    		}
 ?>
 
-<script language="javascript">	
+<script language="javascript">
 <!-- //
 function PrintLinkPage( page )
 {

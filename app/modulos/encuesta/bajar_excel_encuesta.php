@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../../../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../../../conf.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Encuesta.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Reportes.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Pregunta.php';
@@ -172,7 +172,7 @@
 
         $id_empresa = $encuesta->fields['id_empresa'];
         $lista_usuarios = new ListaEncuestas($sesion,'',"SELECT * FROM usuario INNER JOIN
-																usuario_empresa ON usuario_empresa.rut_usuario = usuario.rut 
+																usuario_empresa ON usuario_empresa.rut_usuario = usuario.rut
 																				WHERE usuario_empresa.id_empresa = '$id_empresa' ");
 
         for($i=0;$i < $lista_usuarios->num; $i++)
@@ -180,7 +180,7 @@
             $usuario_rut = $lista_usuarios->Get($i);
 
 			// DATOS DEL USUARIO
-			
+
             $ws1->write(16 + $i, 1, $usuario_rut->fields['rut'].'-'.$usuario_rut->fields['dv_rut'], $f7);
             $ws1->write(16 + $i, 2, $usuario_rut->fields['nombre'].' '.$usuario_rut->fields['apellido1'].' '.$usuario_rut->fields['apellido2'], $f7);
             $ws1->write(16 + $i, 3, $usuario_rut->fields['email'], $f7);
@@ -189,7 +189,7 @@
 			{
     	    	$ws1->write(16 + $i, 4, 'Respondida', $f7);
 	           	for($x=0;$x<$lista_preguntas->num;$x++)// Busca las preguntas de la encuesta
-	          	{	
+	          	{
         	        $pregunta = $lista_preguntas->Get($x);
     	        	$id_encuesta_pregunta = $pregunta->fields['id_encuesta_pregunta'];
 
@@ -219,7 +219,7 @@
 
 			}
 
-			
+
 		}
 		for($j=0; $j<100; $j++)
 		{
@@ -249,6 +249,6 @@
 
 	<a href="javascript:history.go(-1);">volver</a>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

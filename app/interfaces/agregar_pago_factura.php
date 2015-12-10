@@ -687,7 +687,7 @@ $Form->defaultLabel = false;
 				return false;
 			}
 
-<? } else { ?>
+<?php } else { ?>
 
 			if ($('codigo_cliente').value == '') {
 				alert('Debe ingresar un cliente.');

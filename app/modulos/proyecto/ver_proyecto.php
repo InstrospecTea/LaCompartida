@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
 
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
@@ -68,7 +68,7 @@
             <strong>Opciones</strong>
         </td>
   </tr>
-<?
+<?php
 	if(!is_numeric($desde))
 		$desde=0;
     if(!is_numeric($x_pag))
@@ -81,7 +81,7 @@
 ?>
  </form>
 </table>
-<?
+<?php
 
     function PrintRow (& $archivo)
     {
@@ -102,7 +102,7 @@
         </td>
 
 		    <td valign="top" align="center">
-            <a href="ver_archivo_proyecto.php?id_archivo=${fields['id_archivo']}&id_proyecto=$id_proyecto" ><img border=0 src="$img/iconos/16/ver_16.gif" title='Ver'></a>        
+            <a href="ver_archivo_proyecto.php?id_archivo=${fields['id_archivo']}&id_proyecto=$id_proyecto" ><img border=0 src="$img/iconos/16/ver_16.gif" title='Ver'></a>
         </td>
 
   </tr>
@@ -119,7 +119,7 @@ HTML;
 
 ?>
 
-<script language="javascript">	
+<script language="javascript">
 <!-- //
 
 function PrintLinkPage( page )

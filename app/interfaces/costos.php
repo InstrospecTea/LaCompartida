@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__) . '/../conf.php';
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
@@ -143,7 +143,7 @@ $pagina->PrintTop();
 <?php
 $idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 $idioma->Load('es');
-$query = "SELECT 
+$query = "SELECT
 		usuario.id_usuario,
 		CONCAT(usuario.apellido1,' ',usuario.apellido2,' ',usuario.nombre) AS nombre_usuario,
 		usuario.username

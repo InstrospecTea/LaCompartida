@@ -1,4 +1,4 @@
-<? 
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -10,7 +10,7 @@
 	require_once Conf::ServerDir().'/../app/classes/CobroMoneda.php';
 	require_once Conf::ServerDir().'/../app/classes/Documento.php';
 	require_once Conf::ServerDir().'/../app/classes/Testing.php';
-	
+
 	$sesion = new Sesion(array());
 	if( method_exists('Conf','GetConf') )
 	{
@@ -29,23 +29,23 @@
 	else
 		header("location: ".Conf::ServerDir()."/../fw/usuarios/index.php");
 	$pagina = new Pagina($sesion);
-	
+
 	$pagina->titulo = __(' Testing automatico');
 	$pagina->PrintTop();
-	
+
 	set_time_limit(200);
 	?>
-	
+
 	<script type="text/javascript">
 		function Validar( opcion )
 		{
 			var form = document.getElementById('form_testing');
 			var hidden_opc = document.getElementById( 'opc' );
-			
+
 			if( opcion == 'generar' )
 				{
 					hidden_opc.value = 'generar_datos';
-					form.submit();	
+					form.submit();
 					return true;
 				}
 			else if( opcion == 'eliminar' )
@@ -58,7 +58,7 @@
 				return;
 		}
 	</script>
-	
+
 	<fieldset width="97%">
 		<legend>Filtros</legend>
 			<form name="form_testing" action="" method="POST">
@@ -119,26 +119,26 @@
 						</tr>
 						<tr>
 							<td colspan="2" align="center">
-						<? 
+						<?php
 							if( $opc == "generar_datos" )
 								{	?>
 									<input type="submit" value="Eliminar datos testing" onclick="Validar( 'eliminar' );" />
-						<?  } 
+						<?php  }
 							else
 								{ ?>
-									<input type="submit" value="Generar datos testing" onclick="Validar( 'generar' );" /> 
-						<?  } ?>
+									<input type="submit" value="Generar datos testing" onclick="Validar( 'generar' );" />
+						<?php  } ?>
 							</td>
 						</tr>
 					</table>
 			</form>
 	</fieldset>
-	
-	<?
+
+	<?php
 	if( $opc == "generar_datos" )
 		{
-			// Generar los cobros del cliente TESTING 
-			// Imprimir una tabla con todas las informaciones 
+			// Generar los cobros del cliente TESTING
+			// Imprimir una tabla con todas las informaciones
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'EsAmbientePrueba') ) || ( method_exists('Conf','EsAmbientePrueba') && Conf::EsAmbientePrueba() ) )
 			{
 					if( $id_moneda )
@@ -148,7 +148,7 @@
 					if( $id_moneda_monto )
 						{
 							CambiarCampoContrato( '', $codigo_cliente, 'id_moneda_monto', $id_moneda_monto );
-							
+
 							$query_contrato = "SELECT id_contrato, id_moneda_monto, monto FROM contrato WHERE codigo_cliente='$codigo_cliente'";
 							$resp_contrato = mysql_query($query_contrato,$sesion->dbh) or Utiles::errorSQL($query_contrato,__FILE__,__LINE__,$sesion->dbh);
 							while( list($id,$id_moneda_monto_antes,$monto) = mysql_fetch_array($resp_contrato) )
@@ -163,27 +163,27 @@
 						}
 					if( $id_moneda_tramite )
 						CambiarCampoContrato( '', $codigo_cliente, 'id_moneda_tramite', $id_moneda_tramite );
-				
+
 					if( method_exists('Conf','GetConf') )
 						{
 							$valor_usar_impuesto = Conf::GetConf($sesion,'UsarImpuestoSeparado');
 							$valor_usar_impuesto_gastos = Conf::GetConf($sesion,'UsarImpuestoPorGastos');
 						}
-						
+
 				if( $config == 'todo' )
 					{
 						ModificarConfig( 'UsarImpuestoPorGastos', '1' );
 						ModificarConfig( 'UsarImpuestoSeparado', '1' );
 						CambiarCampoContrato( '', $codigo_cliente, 'usa_impuesto_separado', '1');
 						CambiarCampoContrato( '', $codigo_cliente, 'usa_impuesto_gastos', '1');
-							
+
 							Testing::BorrarDatos($sesion, $codigo_cliente);
 						echo '<h3> Cobros con impuestos a honorarios y gastos.</h3>';
 							$cobros = GenerarDatos( $codigo_cliente, $opc_moneda_total );
 							ImprimirCobros( $cobros );
 							ImprimirDocumentos( $cobros );
 							Testing::BorrarDatos($sesion, $codigo_cliente);
-							
+
 						echo '<h3> Cobros con impuestos a honorarios. </h3>';
 							ModificarConfig( 'UsarImpuestoPorGastos', '0' );
 							CambiarCampoContrato( '', $codigo_cliente, 'usa_impuesto_gastos', '0');
@@ -191,23 +191,23 @@
 							ImprimirCobros( $cobros );
 							ImprimirDocumentos( $cobros );
 							Testing::BorrarDatos($sesion, $codigo_cliente);
-							
+
 						echo '<h3> Cobros sin impuestos. </h3>';
 							ModificarConfig( 'UsarImpuestoSeparado', '0' );
 							CambiarCampoContrato( '', $codigo_cliente, 'usa_impuesto_separado', '0');
 							$cobros = GenerarDatos( $codigo_cliente, $opc_moneda_total );
 							ImprimirCobros( $cobros );
 							ImprimirDocumentos( $cobros );
-							
+
 					}
 				else if( $config == 'con_impuesto' )
 					{
-						
+
 						ModificarConfig( 'UsarImpuestoPorGastos', '1' );
 						ModificarConfig( 'UsarImpuestoSeparado', '1' );
 						CambiarCampoContrato( '', $codigo_cliente, 'usa_impuesto_gastos', '1');
 						CambiarCampoContrato( '', $codigo_cliente, 'usa_impuesto_separado', '1');
-						
+
 						Testing::BorrarDatos($sesion, $codigo_cliente);
 						echo '<h3> Cobros con impuestos a honorarios y gastos.</h3>';
 							$cobros = GenerarDatos( $codigo_cliente, $opc_moneda_total );
@@ -221,7 +221,7 @@
 						ModificarConfig( 'UsarImpuestoSeparado', '0' );
 						CambiarCampoContrato( '', $codigo_cliente, 'usa_impuesto_gastos', '0');
 						CambiarCampoContrato( '', $codigo_cliente, 'usa_impuesto_separado', '0');
-						
+
 						Testing::BorrarDatos($sesion, $codigo_cliente);
 						echo '<h3> Cobros sin impuestos. </h3>';
 							$cobros = GenerarDatos( $codigo_cliente, $opc_moneda_total );
@@ -235,7 +235,7 @@
 						ModificarConfig( 'UsarImpuestoSeparado', '1' );
 						CambiarCampoContrato( '', $codigo_cliente, 'usa_impuesto_gastos', '0');
 						CambiarCampoContrato( '', $codigo_cliente, 'usa_impuesto_separado', '1');
-						
+
 						Testing::BorrarDatos($sesion, $codigo_cliente);
 						echo '<h3> Cobros con impuestos a honorarios. </h3>';
 							$cobros = GenerarDatos( $codigo_cliente, $opc_moneda_total );
@@ -243,7 +243,7 @@
 							ImprimirDocumentos( $cobros );
 							ImprimirOpcionesReportes( $sesion, $codigo_cliente );
 					}
-					
+
 					ModificarConfig( 'UsarImpuestoPorGastos', $valor_usar_impuesto_gastos );
 					ModificarConfig( 'UsarImpuestoSeparado', $valor_usar_impuesto );
 					if( method_exists('Conf','GetConf') )
@@ -253,7 +253,7 @@
 						}
 			}
 		}
-	
+
 	if( $opc == 'eliminar_datos' )
 		{
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'EsAmbientePrueba') ) || ( method_exists('Conf','EsAmbientePrueba') && Conf::EsAmbientePrueba() ) )
@@ -261,7 +261,7 @@
 				Testing::BorrarDatos( $sesion, $codigo_cliente);
 			}
 		}
-	
+
 	function GenerarDatos( $codigo_cliente, $opc_moneda_total )
 	{
 		global $sesion;
@@ -273,52 +273,52 @@
 		$max_gastos = 10;
 		$min_tramites = 4;
 		$max_tramites = 8;
-			
+
 		Testing::BorrarDatos( $sesion, $codigo_cliente );
 		Testing::GenerarTrabajos( $sesion, $fecha_ini, $fecha_fin, $max_dia, $max_usuarios, $codigo_cliente );
 		Testing::GenerarTramites( $sesion, $fecha_ini, $fecha_fin, $codigo_cliente, $min_tramites, $max_tramites, $max_usuarios);
 		Testing::GenerarGastos( $sesion, $fecha_ini, $fecha_fin, $codigo_cliente, $min_gastos, $max_gastos, $opc_moneda_total);
 		$cobros = Testing::GenerarCobros( $sesion, $fecha_ini, $fecha_fin, $codigo_cliente );
-				
+
 		return $cobros;
 	}
 
 	function CambiarCampoContrato( $id_contrato='', $codigo_cliente='', $campo, $valor )
 	{
 		global $sesion;
-		if( $id_contrato != '' ) 
+		if( $id_contrato != '' )
 			$query = " UPDATE contrato SET ".$campo."='".$valor."' WHERE id_contrato='$id_contrato' ";
 		else if( $codigo_cliente != '' )
 			$query = " UPDATE contrato SET ".$campo."='".$valor."' WHERE codigo_cliente='$codigo_cliente' ";
 		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	}
-	
-	function ModificarConfig( $glosa_opcion, $valor_opcion ) 
+
+	function ModificarConfig( $glosa_opcion, $valor_opcion )
 	{
 		global $sesion;
 		$query = " UPDATE configuracion SET valor_opcion='".$valor_opcion."' WHERE glosa_opcion='".$glosa_opcion."' ";
 		mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	}
-	
+
 	function ImprimirCobros( $cobros, $opciones=false )
 	{
 		global $sesion;
 					$lista_cobros = implode( '\' ,\'', $cobros );
-					$query = "SELECT SQL_CALC_FOUND_ROWS id_cobro, 
-														forma_cobro, 
-														id_moneda, 
-														opc_moneda_total, 
-														id_moneda_monto, 
-														monto_subtotal, 
-														monto_trabajos, 
-														monto_tramites, 
-														descuento, 
-														impuesto, 
-														monto, 
-														subtotal_gastos, 
-														impuesto_gastos, 
-														monto_gastos 
-											FROM cobro 
+					$query = "SELECT SQL_CALC_FOUND_ROWS id_cobro,
+														forma_cobro,
+														id_moneda,
+														opc_moneda_total,
+														id_moneda_monto,
+														monto_subtotal,
+														monto_trabajos,
+														monto_tramites,
+														descuento,
+														impuesto,
+														monto,
+														subtotal_gastos,
+														impuesto_gastos,
+														monto_gastos
+											FROM cobro
 										 WHERE id_cobro IN ('".$lista_cobros."') ";
 					$x_pag = 15;
 					$b = new Buscador($sesion,$query,'Cobro',$desde,$x_pag,$orden);
@@ -343,34 +343,34 @@
 					$b->color_mouse_over = "#bcff5c";
 					$b->Imprimir();
 	}
-	
+
 	function Opciones(& $fila)
 	{
 		$opc_html = "<a href='javascript:void(0)' onclick=\"nuevaVentana('Generar Cobro',750,660,'cobros5.php?popup=1&id_cobro=".$fila->fields['id_cobro']."');\"'><img src=".Conf::ImgDir()."/editar_on.gif border=0></a>";
 		return $opc_html;
 	}
-	
-	function ImprimirDocumentos( $cobros ) 
+
+	function ImprimirDocumentos( $cobros )
 	{
 		global $sesion;
 					$lista_cobros = implode( '\' ,\'', $cobros );
-					$query_doc = "SELECT SQL_CALC_FOUND_ROWS documento.id_cobro, 
-																		cobro.forma_cobro, 
-																		documento.id_moneda, 
-																		documento.subtotal_honorarios, 
-																		documento.monto_trabajos, 
-																		documento.monto_tramites, 		
-																		documento.subtotal_sin_descuento, 
-																		documento.descuento_honorarios, 
-																		documento.honorarios, 
-																		documento.subtotal_gastos, 
+					$query_doc = "SELECT SQL_CALC_FOUND_ROWS documento.id_cobro,
+																		cobro.forma_cobro,
+																		documento.id_moneda,
+																		documento.subtotal_honorarios,
+																		documento.monto_trabajos,
+																		documento.monto_tramites,
+																		documento.subtotal_sin_descuento,
+																		documento.descuento_honorarios,
+																		documento.honorarios,
+																		documento.subtotal_gastos,
 																		documento.subtotal_gastos_sin_impuesto,
-																		documento.gastos, 
-																		documento.impuesto, 
-																		documento.monto, 
-																		documento.tipo_doc 
-													FROM documento 
-													JOIN cobro USING( id_cobro ) 
+																		documento.gastos,
+																		documento.impuesto,
+																		documento.monto,
+																		documento.tipo_doc
+													FROM documento
+													JOIN cobro USING( id_cobro )
 												 WHERE documento.id_cobro IN ('".$lista_cobros."') ";
 					$x_pag = 15;
 					$b = new Buscador($sesion,$query_doc,'Documento',$desde,$x_pag,$orden);
@@ -394,13 +394,13 @@
 					$b->color_mouse_over = "#bcff5c";
 					$b->Imprimir();
 	}
-	
+
 	function ImprimirOpcionesReportes( $sesion, $codigo_cliente )
 	{
 		$fecha_fin = date("Y-m-d", time());
 		$fecha_ini = date("Y-m-d", mktime(0,0,0,date("m",time())-1,1,date("Y",time())));
 		$clientes = array();
-		array_push($clientes,$codigo_cliente); 
+		array_push($clientes,$codigo_cliente);
 		echo "<table>
 					<tr><td align=center>
 					<form action=\"planillas/planilla_resumen_cobranza2.php\" method=\"POST\">
@@ -430,7 +430,7 @@
 					</form>
 					</td></tr>
 					</table>";
-	} 
-	 
+	}
+
 	$pagina->PrintBottom();
 	?>

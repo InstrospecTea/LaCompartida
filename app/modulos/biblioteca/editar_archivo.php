@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once dirname(__FILE__).'/classes/archivo_biblioteca.php';
 	require_once dirname(__FILE__).'/classes/categoria_biblioteca.php';
@@ -11,13 +11,13 @@
 
 #	$sesion = new Sesion( array('ADM','EMP','INV') ); Como todos los perfiles pueden mejor pregunto por perfil vacío ya que es más barato
 	$sesion = new Sesion('');
-	
+
 	$pagina = new Pagina($sesion);
-	
+
 	$pagina->titulo = "Editar Documento";
 
 	$pagina->PrintHeaders();
-	
+
 	$id['id_archivo'] = $id_archivo;
     $arch = new ArchivoBiblio($sesion,'',$id);
 
@@ -25,7 +25,7 @@
     if($opc == "upload")
     {
 		 if($categoria == 0)
-			$pagina->AddError("Debe seleccionar una categoria");	
+			$pagina->AddError("Debe seleccionar una categoria");
 		else
 		{
 	        $arch->Edit('descripcion',$file_desc);
@@ -36,7 +36,7 @@
     	    {
         	    $pagina->AddInfo( 'Documento Editado.' );
             	$id_archivo=$arch->fields['id_archivo'];
-	        }	
+	        }
 		}
     }
 	if($desde=="")
@@ -110,7 +110,7 @@ function MostrarNewCat()
 	<tr>
 		<td></td><td>
 			<table id="new_categoria" width="100%" style="display:none;">
-			<tr>	
+			<tr>
 				<td bgcolor="#f0f0f0" style="border: 1px dashed #bbbbbb;">
 				<br>
 				<strong>&nbsp;Nombre:&nbsp;</strong><input type="cat_name" name="cat_name">&nbsp;<input type=submit value="Agregar" onclick="this.form.opc.value = 'AddCat';">
@@ -140,7 +140,7 @@ function MostrarNewCat()
 </td>
 </tr>
 </table>
-<script language="javascript">	
+<script language="javascript">
 <!-- //
 function PrintLinkPage( page )
 {
@@ -155,21 +155,21 @@ function PrintLinkPage( page )
         if( form.categoria.options[i].value == '<?=$arch->fields['id_categoria']?>' )
             form.categoria.options[i].selected = true;
     }
-<?
+<?php
 	if($arch->fields['visible_emprendedor']==1)
 	{
-?>	
+?>
 		form.emp.checked=true;
-<?
+<?php
 	}
 ?>
-<?
-    if($arch->fields['visible_inversionista']==1)
+<?php
+   if($arch->fields['visible_inversionista']==1)
     {
 ?>
         form.inv.checked=true;
-<?
-    }
+<?php
+   }
 ?>
 // ->
 </script>

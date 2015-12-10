@@ -1,4 +1,4 @@
-<?
+<?php
 
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
@@ -143,9 +143,9 @@ $query = "SELECT cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.codi
 					cliente.glosa_cliente, cta_corriente.id_cobro, cta_corriente.id_moneda, prm_moneda.simbolo,
 					cta_corriente.fecha, asunto.glosa_asunto, cta_corriente.descripcion, prm_moneda.cifras_decimales,
 					prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento
-					FROM cta_corriente 
+					FROM cta_corriente
 					LEFT JOIN asunto USING(codigo_asunto)
-					LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato 
+					LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
 					LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 					LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda
 					JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
@@ -284,7 +284,7 @@ $query = "SELECT cta_corriente.egreso, cta_corriente.ingreso, cta_corriente.codi
 					cliente.glosa_cliente, cta_corriente.id_cobro, cta_corriente.id_moneda, prm_moneda.simbolo,
 					cta_corriente.fecha, asunto.glosa_asunto, cta_corriente.descripcion, prm_moneda.cifras_decimales,
 					prm_cta_corriente_tipo.glosa as glosa_tipo, cta_corriente.numero_documento
-					FROM cta_corriente 
+					FROM cta_corriente
 					LEFT JOIN asunto USING(codigo_asunto)
 					LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 					LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda

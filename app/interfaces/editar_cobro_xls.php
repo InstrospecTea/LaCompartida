@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -40,7 +40,7 @@
 	<form method="post" action="">
 		<input type="hidden" name="opc" value="guardar">
 		<table width='100%' border="1" style='border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545; border-bottom:none' cellpadding="3" cellspacing="3">
-<?
+<?php
 	$grupo_anterior = 'Este valor debe no válido.';
 	for($i=0; $i<$lista_parametros->num; $i++)
 	{
@@ -61,7 +61,7 @@
 				<td style="font-weight:bold"><?=__('Valor actual')?></td>
 				<td style="font-weight:bold"><?=__('Nuevo valor')?></td>
 			</tr>
-<?
+<?php
 			$grupo_anterior = $parametro->fields['grupo'];
 		}
 ?>
@@ -71,7 +71,7 @@
 				<td><?=$parametro->fields['glosa_en']?></td>
 				<td><input name="nuevo_valor_en[<?=$parametro->fields['id_prm_excel_cobro']?>]" value="" tabindex="<?=$i+2*$lista_parametros->num?>"/></td>
 			</tr>
-<?
+<?php
 	}
 ?>
 			<tr>
@@ -80,6 +80,6 @@
 		</table>
 
 	</form>
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

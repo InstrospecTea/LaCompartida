@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Encuesta.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Pregunta.php';
@@ -15,7 +15,7 @@
 
 	$sesion = new Sesion( '' );
 	$pagina = new Pagina($sesion);
-    	    
+
 	$pagina->titulo = "Responder Encuesta";
 
 	$encuesta = new Encuesta($sesion);
@@ -29,7 +29,7 @@
 
 
 	if($id_empresa_enc != $id_empresa_user)  // Valida que la emcuesta sea de la empresa a la cual pertenece el usuario
-		$pagina->FatalError("No puede contestar encuestas de otra empresa"); 
+		$pagina->FatalError("No puede contestar encuestas de otra empresa");
 
 
 	$id_encuesta = $encuesta->fields['id_encuesta'];
@@ -60,7 +60,7 @@
 		if($detec==true)
 		{
 		    for($x=0;$x<$lista_preguntas->num;$x++)// Busca las preguntas de la encuesta
-    		{	
+    		{
 	        	$pregunta = $lista_preguntas->Get($x);
 		        $id_pregunta = $pregunta->fields['id_encuesta_pregunta'];
 
@@ -87,7 +87,7 @@
 		if($detec==true)
 		{
 			$pagina->AddInfo("Encuesta guardada con éxito");
-		    $pagina->Redirect( 'ver_encuestas.php?guardada=yes');	
+		    $pagina->Redirect( 'ver_encuestas.php?guardada=yes');
 		}
 		else
 			$pagina->AddError("Debe responder todas las preguntas para continuar");
@@ -115,7 +115,7 @@
 	</tr>
  <form id="form" name="Encuesta" method="post">
  <input type="hidden" name="opc" value="guardar">
-<?
+<?php
 	for($x=0;$x<$lista_preguntas->num;$x++)// Busca las preguntas de la encuesta
 	{
 		$pregunta = $lista_preguntas->Get($x);
@@ -125,21 +125,21 @@
 		<tr>
 			<td>
 		<br><strong><?=$x+1?> - <?=$pregunta->fields['glosa_pregunta']?></strong>&nbsp;&nbsp;&nbsp;<br><br>
-	
-<?
+
+<?php
 		if($pregunta->fields['tipo'] == 'ALTERNATIVA') // si es alternativa busca las alternativas
 		{
-			$lista_alternativas = new ListaPreguntasAlternativas($sesion,'',"SELECT * FROM encuesta_pregunta_alternativa 
+			$lista_alternativas = new ListaPreguntasAlternativas($sesion,'',"SELECT * FROM encuesta_pregunta_alternativa
 																	WHERE id_encuesta_pregunta = $id_encuesta_pregunta");
 				for($y=0;$y<$lista_alternativas->num;$y++)
 				{
 					$alternativas = $lista_alternativas->Get($y);
 					$id_alternativa = $alternativas->fields['id_encuesta_pregunta_alternativa'];
 ?>
-				<?=$y+1?>) <input type="radio" name="respuesta[<?=$id_encuesta_pregunta?>]" value="<?=$id_alternativa?>" 
+				<?=$y+1?>) <input type="radio" name="respuesta[<?=$id_encuesta_pregunta?>]" value="<?=$id_alternativa?>"
 							<?=$respuesta[$id_encuesta_pregunta] == $id_alternativa ? 'checked':''?>>
-				<?=$alternativas->fields['glosa_alternativa']?><br>	
-<?
+				<?=$alternativas->fields['glosa_alternativa']?><br>
+<?php
 
 				}
 		}
@@ -147,17 +147,17 @@
 		{
 ?>
 		<textarea name="respuesta[<?=$id_encuesta_pregunta?>]" rows=3 cols=60><?=$respuesta[$id_encuesta_pregunta]?></textarea><br>
-<?
+<?php
 		}
 ?>
 		</td>
 	</tr>
-<?
+<?php
 	}
 ?>
 	<tr>
 		<td align=right>
-<br><br><input type="submit" value="Terminar Encuesta">	
+<br><br><input type="submit" value="Terminar Encuesta">
 	</form>
 		</td>
 	</tr>
@@ -165,7 +165,7 @@
 	</td>
 	</tr>
 	</table>
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>
 

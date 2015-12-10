@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 
@@ -12,8 +12,8 @@
 	$sesion = new Sesion(array('ADM'));
     $pagina = new Pagina($sesion);
 	$pagina->PrintTop();
-	
-	
+
+
 ?>
 
 <style>
@@ -63,22 +63,22 @@ table.main td,th
 	<th> Monto Impuesto</th>
 </tr>
 
-<?
+<?php
 	if($id_cobro_buscar)
-		$where .= " AND cobro.id_cobro = $id_cobro_buscar ";  
+		$where .= " AND cobro.id_cobro = $id_cobro_buscar ";
 	if(!$limit_ini)
 		$limit_ini = 0;
 	if(!$limit_fin)
 		$limit_fin = 30;
 	$limit = " LIMIT $limit_ini , $limit_fin ";
-	
+
 	$sel = " SELECT cobro.id_cobro, cobro.estado, documento.id_documento FROM cobro
 LEFT JOIN documento ON (documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N')  WHERE 1 $where $limit";
 
 	$resp = mysql_query($sel,$sesion->dbh) or Utiles::errorSQL($sel,__FILE__,__LINE__,$sesion->dbh);
 	while( list($id_cobro,$estado_cobro,$id_documento) = mysql_fetch_array($resp))
 	{
-		
+
 		$cobro = new Cobro($sesion);
 		$cobro->Load($id_cobro);
 		$estado_cobro = $cobro->fields['estado'];
@@ -119,7 +119,7 @@ LEFT JOIN documento ON (documento.id_cobro = cobro.id_cobro AND documento.tipo_d
 		<td align=center rowspan=<?=$num?> >
 				<?=$lista['mostrar_impuesto_gasto']?>
 		</td>
-		<?
+		<?php
 		if($num == 0 ) echo '<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
 		$i=0;
 		foreach($lista['gasto_detalle'] as $id_gasto => $detalle)
@@ -145,12 +145,12 @@ LEFT JOIN documento ON (documento.id_cobro = cobro.id_cobro AND documento.tipo_d
 			<td>
 				<?=$detalle['monto_total_impuesto']?>
 			</td>
-		<?
+		<?php
 			$i++;
 		}
 		?>
 	</tr>
-<?
+<?php
 	}
 ?>
 </table>
@@ -164,6 +164,6 @@ LEFT JOIN documento ON (documento.id_cobro = cobro.id_cobro AND documento.tipo_d
 </form>
 </fieldset>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

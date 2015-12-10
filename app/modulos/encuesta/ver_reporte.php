@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../../../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../../../conf.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Encuesta.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Pregunta.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Alternativa.php';
@@ -25,7 +25,7 @@
 
 	if($enc->fields['estado']=='CREADA')
 		$pagina->FatalError("No puede ver los reportes de esta encuesta por aún no es EMITIDA");
-	
+
     $pagina->PrintHeaders();
 
     $pagina->PrintTop();
@@ -50,7 +50,7 @@
     <tr>
     <td></td>
     <td>
-<?
+<?php
 	$lista_preguntas = new ListaPreguntas($sesion,'',"SELECT * FROM encuesta_pregunta WHERE id_encuesta = $id_encuesta");
 
 ?>
@@ -61,8 +61,8 @@
             <hr class="subtitulo">
         </td>
     </tr>
-<?
-    for($x=0;$x<$lista_preguntas->num;$x++)// Busca las preguntas de la encuesta
+<?php
+   for($x=0;$x<$lista_preguntas->num;$x++)// Busca las preguntas de la encuesta
     {
         $pregunta = $lista_preguntas->Get($x);
         $id_encuesta_pregunta = $pregunta->fields['id_encuesta_pregunta'];
@@ -72,24 +72,24 @@
             <td>
         <br><strong><?=$x+1?> - <?=$pregunta->fields['glosa_pregunta']?></strong>&nbsp;&nbsp;&nbsp;<br><br>
 
-<?
-        if($pregunta->fields['tipo'] == 'ALTERNATIVA') // si es alternativa busca las alternativas
+<?php
+       if($pregunta->fields['tipo'] == 'ALTERNATIVA') // si es alternativa busca las alternativas
         {
             $lista_alternativas = new ListaPreguntasAlternativas($sesion,'',"SELECT * FROM encuesta_pregunta_alternativa
                                                                     WHERE id_encuesta_pregunta = $id_encuesta_pregunta");
-			
+
                 for($y=0;$y<$lista_alternativas->num;$y++)
                 {
                     $alternativas = $lista_alternativas->Get($y);
                     $id_alternativa = $alternativas->fields['id_encuesta_pregunta_alternativa'];
 					$cant = Reportes::Alternativa($sesion, $id_encuesta_pregunta,$id_alternativa);
-			
+
 ?>
 
 
                 <?=$y+1?>) <input type="radio" name="respuesta[<?=$id_encuesta_pregunta?>]" value="<?=$id_alternativa?>" disabled>
                 <?=$alternativas->fields['glosa_alternativa']?> (<?=$cant['num']?>)<br>
-<?
+<?php
 
                 }
 ?>
@@ -97,14 +97,14 @@
 		<tr>
 			<td align=center>
 			   <br><img src=grafico_pregunta.php?id_encuesta_pregunta=<?=$id_encuesta_pregunta?>>
-<?
-        }
+<?php
+       }
         else // si es abierta, despliega un text area
         {
 ?>
 Pregunta Abierta
-<?
-        }
+<?php
+       }
 ?>
         </td>
     </tr>
@@ -113,15 +113,15 @@ Pregunta Abierta
             <hr size=1>
         </td>
     </tr>
-<?
-    }
+<?php
+   }
 ?>
 </table>
 </td>
 </tr>
 </table>
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>
 
 

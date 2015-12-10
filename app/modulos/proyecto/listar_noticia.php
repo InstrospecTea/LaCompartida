@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../conf.php';
     require_once Conf::ServerDir().'/fw/classes/noticia.php';
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
@@ -13,7 +13,7 @@
 	$pagina->titulo = "Noticias";
 	$pagina->PrintHeaders();
 
-	$lista_noticia = new ListaNoticias($Sesion,'',"SELECT * FROM noticia 	
+	$lista_noticia = new ListaNoticias($Sesion,'',"SELECT * FROM noticia
 														WHERE id_noticia_agrupador = '$id_noticia_agrupador'
 														ORDER BY fecha_creacion LIMIT 0,10");
 
@@ -28,8 +28,8 @@
 </style>
 
 
-<?
-    for($x=0;$x<$lista_noticia->num; $x++)
+<?php
+   for($x=0;$x<$lista_noticia->num; $x++)
     {
         $noticia = $lista_noticia->Get($x)
 ?>
@@ -80,7 +80,7 @@
     <td></td>
   </tr>
 </table>
-<?
-     }
+<?php
+    }
 ?>
 

@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/fw/classes/Pagina.php';
@@ -9,7 +9,7 @@
 
 
 	$sesion = new Sesion( array('ADM') );
-	
+
 	$pagina = new Pagina($sesion);
 
 	$pagina->titulo = "Administración - Empresas";
@@ -23,7 +23,7 @@
     if($orden == '')
         $orden= 'glosa_empresa';
 
-	
+
 
 	if($opc=='agregar')
 	{
@@ -35,7 +35,7 @@
 		else
 		{
 			$empresa = new Empresa($sesion);
-		
+
 	 	if($foto['tmp_name'] != "")
            	$empresa->Edit('data_foto',$foto);
 
@@ -44,16 +44,16 @@
 		if($empresa->Write())
 			$pagina->AddInfo("Empresa agregada");
 		else
-			$pagina->AddError($empresa->error);		
-		
+			$pagina->AddError($empresa->error);
+
 
 
 		}
-	
+
 
 	}
 
-    
+
 
 
 	$pagina->PrintTop();
@@ -93,7 +93,7 @@ function OrdenarLista( tipo )
         <td valign="top" class="subtitulo" align="left" colspan="2">
 	    <input type="file" name="foto" size="20"></td>
 	</tr>
-	
+
 	<tr>
 	<td></td>
 	<td>
@@ -167,8 +167,8 @@ function OrdenarLista( tipo )
 </tr>
 <tr><td colspan=4>
 <table width=100%>
-<?
-       $where2= '';
+<?php
+      $where2= '';
 
         if( $nombre != '' )
         {
@@ -195,8 +195,8 @@ function OrdenarLista( tipo )
 
 ?>
 </table>
-<?
-    function PrintRow(& $fila)
+<?php
+   function PrintRow(& $fila)
     {
        $fields = &$fila->fields;
 	   $empresa = $fields['id_empresa'];
@@ -237,6 +237,6 @@ HTML;
 	</tr>
 </table>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

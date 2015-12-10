@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -205,8 +205,8 @@
 							LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
 							LEFT JOIN prm_area_proyecto AS area ON area.id_area_proyecto = asunto.id_area_proyecto
 							LEFT JOIN prm_moneda ON prm_moneda.id_moneda = cobro.id_moneda
-							WHERE 1 $query_fecha $query_estado $query_usuarios 
-							GROUP BY cobro.id_cobro, asunto.id_area_proyecto 
+							WHERE 1 $query_fecha $query_estado $query_usuarios
+							GROUP BY cobro.id_cobro, asunto.id_area_proyecto
 							ORDER BY asunto.id_area_proyecto, cliente.glosa_cliente, cobro.id_cobro;";
 
 		#Clientes
@@ -220,12 +220,12 @@
 		{
 			$cobro_moneda = new CobroMoneda($sesion);
 			$cobro_moneda->Load( $cobro['id_cobro'] );
-			$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente 
+			$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente
 								 WHERE id_cobro=".$cobro['id_cobro']." AND ( ingreso > 0 OR egreso > 0 ) AND cta_corriente.incluir_en_cobro='SI'
 								 ORDER BY fecha ASC";
 			$lista_gastos = new ListaGastos($sesion,'',$query);
 			$saldo_gastos=0;
-			
+
 			$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro['id_cobro']);
 			$saldo_monto=$x_resultados['monto'][$cobro['opc_moneda_total']];
 			$saldo_honorarios=$x_resultados['monto_honorarios'][$cobro['opc_moneda_total']];
@@ -446,6 +446,6 @@ $ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingre
 		}
 	);
 	</script>
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

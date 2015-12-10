@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../../../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
@@ -67,23 +67,23 @@ xmlns="http://www.w3.org/TR/REC-html40">
 
 <div style='mso-element:header' id=h1>
 
-<? 
-// Busca html de header y pie de pagina 
+<?php
+// Busca html de header y pie de pagina
 if( $id_formato != '' )
 	$where = " WHERE id_formato = '$id_formato' ";
 else
 	$where = " WHERE 1=2";
-$query = "SELECT html_header, html_pie FROM cobro_rtf $where"; 
-$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
-list($html_header, $html_pie) = mysql_fetch_array($resp); 
+$query = "SELECT html_header, html_pie FROM cobro_rtf $where";
+$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+list($html_header, $html_pie) = mysql_fetch_array($resp);
 
-// reemplacar anchores 
-$html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header); 
-?> 
+// reemplacar anchores
+$html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header);
+?>
 
 <p class=MsoHeader align=center style='text-align:center'><span
 style='font-size:22.0pt'>Borrador<o:p></o:p></span><br>
-	<? echo $html_header; ?>
+	<?php echo $html_header; ?>
 </p>
 
 </div>
@@ -99,14 +99,14 @@ style='font-size:22.0pt'>Borrador<o:p></o:p></span><br>
 <p class=MsoFooter align=right style='text-align:right'><span style='mso-field-code:
 " PAGE   \\* MERGEFORMAT "'><span style='mso-no-proof:yes'>1</span></span></p>
 
-<?
+<?php
 $html_pie = str_replace('%img_dir%', Conf::ImgDir(), $html_pie);
 ?>
 <p class=MsoFooter align=center style='text-align:center'>
 	<span style='mso-no-proof:yes;'>
-		<? echo $html_pie; ?>
+		<?php echo $html_pie; ?>
 	</span>
-<?php if( !UtilesApp::GetConf($sesion,'EliminarLetraBorradorEnPieDePagina') ) { ?>	
+<?php if( !UtilesApp::GetConf($sesion,'EliminarLetraBorradorEnPieDePagina') ) { ?>
 	<br><span lang=ES
 style='font-size:22.0pt;mso-ansi-language:ES'>Borrador<o:p></o:p></span>
 <?php } ?>
@@ -129,5 +129,5 @@ style='font-size:22.0pt;mso-ansi-language:ES'>Borrador<o:p></o:p></span>
 </body>
 
 </html>
-<?
+<?php
 ?>

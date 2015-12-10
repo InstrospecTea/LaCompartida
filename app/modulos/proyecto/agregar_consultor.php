@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
 
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
@@ -12,9 +12,9 @@
 	$Sesion = new Sesion( array('ADM') );
 	$pagina = new Pagina($Sesion);
     $proyecto = new Proyecto($Sesion);
-	
+
 	#@TODO checkear permisos
-	# Proyecto::CheckPermisosConsultor($id_proyecto,$Sesion->usuario->fields['rut']);	
+	# Proyecto::CheckPermisosConsultor($id_proyecto,$Sesion->usuario->fields['rut']);
 
 	if($id_proyecto != "")
 	{
@@ -211,8 +211,8 @@ function EliminarUsuario( form )
 }
 var usuarios = new Lista();
 
-<?
-	$query = "SELECT usuario.rut AS ru, CONCAT( apellido1, ' ', apellido2, ', ', nombre ) AS nombre_usuario, 
+<?php
+	$query = "SELECT usuario.rut AS ru, CONCAT( apellido1, ' ', apellido2, ', ', nombre ) AS nombre_usuario,
 				(
 					SELECT id_proyecto AS pro
 						FROM proyecto_consultor
@@ -239,6 +239,6 @@ var form = document.getElementById("form");
 ActualizarSeleccion( form );
 </script>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

@@ -12,8 +12,7 @@ class WKPDFReportEngine extends AbstractReportEngine implements IWKPDFReportEngi
 
   protected function buildReport($data) {
     $options = array(
-      'encoding' => 'ISO-8859-1',
-      'binary' => '/usr/local/bin/wkhtmltopdf'
+      'encoding' => 'ISO-8859-1'
     );
     $this->engine->setOptions($options);
     $this->engine->addPage($this->configuration['html']);

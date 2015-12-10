@@ -66,7 +66,7 @@ Calendar.setup(
 
 // ->
 </script>
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>

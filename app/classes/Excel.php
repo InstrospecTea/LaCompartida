@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 
 require_once Conf::ServerDir().'/../app/classes/Cliente.php';
@@ -108,7 +108,7 @@ class Excel
 	{
 		if(!$this->C(1))
 			return 0;
-		
+
 		foreach($this->encabezado as $index => $data) {
 			$this->datos[$this->fila][$data] = $this->C($index);
 		}

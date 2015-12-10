@@ -1,9 +1,9 @@
-<?
+<?php
 class CategoriaBiblio
 {
 	// Sesion PHP
 	var $sesion = null;
-	
+
 	// Arreglo con los valores de los campos
 	var $fields = null;
 
@@ -23,7 +23,7 @@ class CategoriaBiblio
 		$this->tabla='categoria';
         if($this->tabla == "")
         {
-            Utiles::errorFatal("No se pudo cargar el archivo",__FILE__,__LINE__); 
+            Utiles::errorFatal("No se pudo cargar el archivo",__FILE__,__LINE__);
         }
 
 		if(is_numeric($params['id_categoria']))
@@ -119,7 +119,7 @@ class CategoriaBiblio
             $this->error = "Falta nombre de tabla en archivo.php";
             return false;
         }
-		
+
         $params_array['codigo_permiso'] = 'ADM';
         $p = $this->sesion->usuario->permisos->Find('FindPermiso',$params_array); //tiene permiso de administrador
         if( $p->fields['permitido'] )

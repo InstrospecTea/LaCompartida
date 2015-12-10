@@ -1,11 +1,11 @@
-<?
-    require_once dirname(__FILE__).'/../../../../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../../../../conf.php';
 
 class Alternativa
 {
 	// Sesion PHP
 	var $sesion = null;
-	
+
 	// Arreglo con los valores de los campos
 	var $fields = null;
 
@@ -74,7 +74,7 @@ class Alternativa
 
             $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
             $this->fields['id_encuesta_pregunta_alternativa'] = mysql_insert_id($this->sesion->dbh);
-					
+
         }
 
         return true;

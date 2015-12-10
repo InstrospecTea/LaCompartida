@@ -7,9 +7,14 @@
 		"nesbot/carbon": "1.14",
 		"pear/numbers_words": "dev-master",
 		"pear/ole": "dev-master",
-		"pear/spreadsheet_excel_writer": "dev-master"
+		"pear/spreadsheet_excel_writer": "dev-master",
+		"dompdf/dompdf": "^0.6.1"
 	},
 	"autoload": {
-		"psr-4": {"TTB\\Graficos\\": "app/classes/Graficos"}
+		"classmap": [
+			"app/classes",
+			"app/layers",
+			"fw/classes"
+		]
 	}
 }

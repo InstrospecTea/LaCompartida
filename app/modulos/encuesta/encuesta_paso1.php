@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
     require_once Conf::ServerDir().'/app/modulos/encuesta/classes/Encuesta.php';
 	require_once Conf::ServerDir().'/fw/classes/Pagina.php';
@@ -32,7 +32,7 @@
             $pagina->AddError("no se pudo guardar la encuesta");
     }
 
-    	    
+
 	$pagina->titulo ="Nueva Encuesta";
 
 	$pagina->PrintHeaders();
@@ -57,7 +57,7 @@
 			<tr>
 				<td align=center>
 				<textarea name="titulo" cols=50></textarea><br><br>
-				 <input type="submit" value="Siguiente">	
+				 <input type="submit" value="Siguiente">
 				</td>
 			</tr>
 		</form>
@@ -65,7 +65,7 @@
         </td>
     </tr>
 </table>
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>
 

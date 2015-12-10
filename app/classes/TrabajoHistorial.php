@@ -1,10 +1,10 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 require_once Conf::ServerDir().'/../fw/classes/Objeto.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
-class TrabajoHistorial extends Objeto 
+class TrabajoHistorial extends Objeto
 {
 	function TrabajoHistorial($sesion, $fields = "", $params = "")
 	{

@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
     require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -23,7 +23,7 @@
 		top.location.href = self.location; // relocate the page to the container frame, use the absolute path
 		// for example: top.location.href = '/folder/page1.html';
 	}
-	
+
 	function resizeCaller()
 	{
 		document.getElementById('Iframe').style.height='372px';
@@ -44,6 +44,6 @@
 		</td>
 	</tr>
 </table>
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 
 require_once dirname(__FILE__) . '/../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
@@ -181,42 +181,42 @@ $moneda = new Moneda($sesion);
 $total_balance_egreso = 0;
 $total_balance_ingreso = 0;
 
-$query = "SELECT 
-								cta_corriente.egreso, 
-								cta_corriente.ingreso, 
-								cta_corriente.monto_cobrable, 
-								IF( cta_corriente.id_cobro > 0, cta_corriente.monto_cobrable * cm_gasto.tipo_cambio / cm_monedabase.tipo_cambio, cta_corriente.monto_cobrable * m_gasto.tipo_cambio / m_monedabase.tipo_cambio ) as monto_monedabase, 
-								cta_corriente.codigo_cliente, 
-								cliente.glosa_cliente, 
-								cta_corriente.id_cobro, 
-								cta_corriente.id_moneda, 
-								m_gasto.tipo_cambio as tc1, 
-								m_monedabase.tipo_cambio as tc2, 
-								m_gasto.simbolo, 
-								cta_corriente.fecha, 
-								cliente.glosa_cliente, 
-								CONCAT_WS(' ',usuario_encargado.apellido1,usuario_encargado.apellido2, usuario_encargado.nombre) as encargado_comercial, 
-								asunto.glosa_asunto, 
-								cta_corriente.descripcion, 
-								prm_cta_corriente_tipo.glosa as glosa_tipo, 
-								cta_corriente.numero_documento, 
-								cta_corriente.numero_ot, 
-								m_gasto.cifras_decimales, 
-								cobro.estado 
-								$col_select 
-							FROM cta_corriente 
+$query = "SELECT
+								cta_corriente.egreso,
+								cta_corriente.ingreso,
+								cta_corriente.monto_cobrable,
+								IF( cta_corriente.id_cobro > 0, cta_corriente.monto_cobrable * cm_gasto.tipo_cambio / cm_monedabase.tipo_cambio, cta_corriente.monto_cobrable * m_gasto.tipo_cambio / m_monedabase.tipo_cambio ) as monto_monedabase,
+								cta_corriente.codigo_cliente,
+								cliente.glosa_cliente,
+								cta_corriente.id_cobro,
+								cta_corriente.id_moneda,
+								m_gasto.tipo_cambio as tc1,
+								m_monedabase.tipo_cambio as tc2,
+								m_gasto.simbolo,
+								cta_corriente.fecha,
+								cliente.glosa_cliente,
+								CONCAT_WS(' ',usuario_encargado.apellido1,usuario_encargado.apellido2, usuario_encargado.nombre) as encargado_comercial,
+								asunto.glosa_asunto,
+								cta_corriente.descripcion,
+								prm_cta_corriente_tipo.glosa as glosa_tipo,
+								cta_corriente.numero_documento,
+								cta_corriente.numero_ot,
+								m_gasto.cifras_decimales,
+								cobro.estado
+								$col_select
+							FROM cta_corriente
 							LEFT JOIN asunto USING(codigo_asunto)
 							LEFT JOIN contrato ON asunto.id_contrato = contrato.id_contrato
-							LEFT JOIN usuario as usuario_encargado ON usuario_encargado.id_usuario = contrato.id_usuario_responsable  
+							LEFT JOIN usuario as usuario_encargado ON usuario_encargado.id_usuario = contrato.id_usuario_responsable
 							LEFT JOIN cobro ON cobro.id_cobro=cta_corriente.id_cobro
 							LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
-							LEFT JOIN prm_moneda   as m_gasto       ON m_gasto.id_moneda      = cta_corriente.id_moneda 
-							LEFT JOIN prm_moneda   as m_monedabase  ON m_monedabase.id_moneda = '$id_moneda_base' 
-							LEFT JOIN cobro_moneda as cm_gasto      ON cta_corriente.id_cobro = cm_gasto.id_cobro      AND cta_corriente.id_moneda = cm_gasto.id_moneda 
-							LEFT JOIN cobro_moneda as cm_monedabase ON cta_corriente.id_cobro = cm_monedabase.id_cobro AND cm_monedabase.id_moneda = '$id_moneda_base' 
+							LEFT JOIN prm_moneda   as m_gasto       ON m_gasto.id_moneda      = cta_corriente.id_moneda
+							LEFT JOIN prm_moneda   as m_monedabase  ON m_monedabase.id_moneda = '$id_moneda_base'
+							LEFT JOIN cobro_moneda as cm_gasto      ON cta_corriente.id_cobro = cm_gasto.id_cobro      AND cta_corriente.id_moneda = cm_gasto.id_moneda
+							LEFT JOIN cobro_moneda as cm_monedabase ON cta_corriente.id_cobro = cm_monedabase.id_cobro AND cm_monedabase.id_moneda = '$id_moneda_base'
 							JOIN cliente ON cta_corriente.codigo_cliente = cliente.codigo_cliente
 							LEFT JOIN prm_cta_corriente_tipo ON (prm_cta_corriente_tipo.id_cta_corriente_tipo = cta_corriente.id_cta_corriente_tipo)
-							WHERE $where 
+							WHERE $where
 							ORDER BY usuario_encargado.apellido1, cliente.glosa_cliente, asunto.glosa_asunto";
 $lista_gastos = new ListaGastos($sesion, '', $query);
 
