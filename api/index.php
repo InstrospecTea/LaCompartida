@@ -34,9 +34,18 @@ $Slim->map(':x+', function($x) {
 $Slim->post('/login', function () use ($Session, $Slim) {
 	$UserToken = new UserToken($Session);
 
-	$user = $Slim->request()->params('user');
-	$password = $Slim->request()->params('password');
-	$app_key = $Slim->request()->params('app_key');
+	$params = array();
+	if ($Slim->request()->params('user')) {
+		$params['user'] = $Slim->request()->params('user');
+		$params['password'] = $Slim->request()->params('password');
+		$params['app_key'] = $Slim->request()->params('app_key');
+	} else {
+		$params = json_decode($Slim->request()->getBody(), true);
+	}
+
+	$user = $params['user'];
+	$password = $params['password'];
+	$app_key = $params['app_key'];
 	$auth_token = $UserToken->makeAuthToken($user);
 	$dv = null;
 	if (is_null($user) || $user == '') {
@@ -358,7 +367,7 @@ $Slim->post('/users/:id/works', function ($id) use ($Session, $Slim) {
 		$params['billable'] = $Slim->request()->params('billable');
 		$params['visible'] = $Slim->request()->params('visible');
 	} else {
-		$params = json_decode($Slim->request()->getBody(), 1);
+		$params = json_decode($Slim->request()->getBody(), true);
 	}
 
 	$work['date'] = $params['date'];
@@ -451,7 +460,7 @@ $Slim->put('/users/:user_id/works/:id', function ($user_id, $id) use ($Session, 
 		$params['billable'] = $Slim->request()->params('billable');
 		$params['visible'] = $Slim->request()->params('visible');
 	} else {
-		$params = json_decode($Slim->request()->getBody(), 1);
+		$params = json_decode($Slim->request()->getBody(), true);
 	}
 
 	$work = array();
