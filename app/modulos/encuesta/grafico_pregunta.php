@@ -1,4 +1,4 @@
-<?
+<?php
 require_once("../../libs/chart_director/phpchartdir.php");
 
 require_once dirname(__FILE__).'/../../../conf.php';
@@ -33,7 +33,7 @@ require_once Conf::ServerDir().'/fw/classes/Html.php';
 		$labels[$y] = $glosa_alternativa;
 		$data[$y] = $cant['num'];
 	}
-	
+
 	$c = new PieChart(500, 210);
 
 	$c->setPieSize(250, 110, 80);

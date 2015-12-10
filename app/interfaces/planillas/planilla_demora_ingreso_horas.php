@@ -230,6 +230,6 @@
 	</table>
 </form>
 
-<?
+<?php
 $pagina->PrintBottom();
 ?>

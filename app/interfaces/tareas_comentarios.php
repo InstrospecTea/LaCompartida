@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 
 	$sesion = new Sesion();
@@ -265,7 +265,7 @@
 						$('display_archivo').hide();
 					}
 
-					<?  // Por cada estado, 'estado_comentario' puede cambiar a ese estado.
+					<?php  // Por cada estado, 'estado_comentario' puede cambiar a ese estado.
 						$elector = array();
 						foreach($arreglo_estados as $i => $e)
 							$elector[] = "if(campos[9] == '".$e."') $('estado_comentario').selectedIndex = ".$i.";";
@@ -322,7 +322,7 @@
 				form.descripcion_avance.focus();
 				return false;
 			}
-			<?  //Revisa el Conf si el TipoIngresoHoras es 'decimal': se agrega esta revisión de Duracion a ValidarAvance().
+			<?php  //Revisa el Conf si el TipoIngresoHoras es 'decimal': se agrega esta revisión de Duracion a ValidarAvance().
 				if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoIngresoHoras')=='decimal' ) || ( method_exists('Conf','TipoIngresoHoras') && Conf::TipoIngresoHoras()=='decimal' ) )
 				{
 						?>
@@ -344,7 +344,7 @@
 								return false;
 							}
 						}
-						<?
+						<?php
 				}
 			?>
 			return true;
@@ -355,13 +355,13 @@
 
 	<div id='contenido_bitacora'>
 
-	<? /* INFO */
+	<?php /* INFO */
 		if(!empty($infos))
 		{
 			?>
 				<table class="info" width="100%">
 					<tbody>
-						<? foreach($infos as $info)
+						<?php foreach($infos as $info)
 							{
 								echo '<tr>  <td style="font-size: 12px;" valign="top" align="left">';
 									echo $info;
@@ -370,23 +370,23 @@
 						?>
 					</tbody>
 				</table>
-			<?
+			<?php
 		}
 	?>
-	<? /* ERRORES */
+	<?php /* ERRORES */
 		if(!empty($errors))
 		{
 			?>
 				<table class="error" width="100%">
 					<tbody>
-						<? foreach($errors as $error)
+						<?php foreach($errors as $error)
 							echo '<tr>  <td style="font-size: 12px;" valign="top" align="left">';
 								echo $error;
 							echo '</td> </tr>';
 						?>
 					</tbody>
 				</table>
-			<?
+			<?php
 		}
 		if(!empty($errors)||!empty($infos))
 		echo "<br />";
@@ -409,7 +409,7 @@
 
 
 	<!--Input duración -->
-	<?
+	<?php
 				$oc = "$('ingresa_trabajo').disabled = false;";
 				$input_duracion = Html::PrintTime("duracion_avance",'','onchange="'.$oc.'"',true);
 
@@ -484,7 +484,7 @@
 									<td align=left>
 										<label for='ingresa_cobrable'><?=__('Estado de Tarea')?>:&nbsp;</label>
 										<select name=estado_comentario id=estado_comentario>
-											<?
+											<?php
 												foreach($arreglo_estados as $e)
 												{
 													$selected = '';
@@ -528,7 +528,7 @@
 		</div>
 
 
-<?
+<?php
 	if($orden == "")
 		$orden = " tarea_comentario.fecha_creacion DESC";
 
@@ -653,7 +653,7 @@
 ?>
 </div>
 
-<? echo SelectorHoras::Javascript(); ?>
+<?php echo SelectorHoras::Javascript(); ?>
 <script type="text/javascript">
 	window.onload=function(){Resize()}
 

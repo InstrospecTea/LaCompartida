@@ -1,4 +1,4 @@
-<?
+<?php
 
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
@@ -7,7 +7,7 @@ require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 class Ayuda extends Objeto
 {
-	
+
 	function Ayuda($sesion, $fields = "", $params = "")
 	{
 		$this->tabla = "prm_ayuda";
@@ -15,7 +15,7 @@ class Ayuda extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
-  
+
   function LoadByPagina($pagina)
   {
     $query = "SELECT id_ayuda FROM prm_ayuda WHERE pagina='$pagina'";

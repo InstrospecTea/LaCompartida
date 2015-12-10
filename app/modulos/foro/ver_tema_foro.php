@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/fw/classes/Pagina.php';
@@ -126,7 +126,7 @@
     <td width="70%" class="texto_suave">Mensaje</td>
   </tr>
         <td valign="top" align="center" colspan="2">
-<?
+<?php
 	$tema_foro->Imprimir($desde,$x_pag);
 ?>
 </td>
@@ -174,8 +174,8 @@
 </td>
 </tr>
 </table>
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>
 
 

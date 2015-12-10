@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -39,7 +39,7 @@
 <script type="text/javascript">
 function MostrarTarifa(id_usuario,radio_moneda)
 {
-	for(var i = 0; i < radio_moneda.length; i++) 
+	for(var i = 0; i < radio_moneda.length; i++)
 	{
 		if(radio_moneda[i].checked)
 			id_moneda = radio_moneda[i].value;
@@ -70,7 +70,7 @@ function GuardarTarifa(id_usuario,radio_moneda,tarifa)
 	}
 
 	var id_moneda = 0;
-	for(var i = 0; i < radio_moneda.length; i++) 
+	for(var i = 0; i < radio_moneda.length; i++)
 	{
 		if(radio_moneda[i].checked)
 			id_moneda = radio_moneda[i].value;
@@ -102,7 +102,7 @@ function GuardarTarifa(id_usuario,radio_moneda,tarifa)
 			<table>
 				<tr>
 					<td>
-						<?= Html::SelectQuery($sesion, "SELECT id_usuario,CONCAT_WS(', ',apellido1, nombre) 
+						<?= Html::SelectQuery($sesion, "SELECT id_usuario,CONCAT_WS(', ',apellido1, nombre)
 										FROM usuario WHERE visible=1 ORDER BY apellido1","id_usuario_tarifa", "",
 							"onchange=\"MostrarTarifa(this.value,this.form.id_moneda_tarifa)\""); ?>
 					</td>
@@ -122,14 +122,14 @@ function GuardarTarifa(id_usuario,radio_moneda,tarifa)
 </form>
 <br /><br />
 <?= InputId::Javascript($sesion) ?>
-<?
+<?php
 	$codigo_cliente = $cliente->fields[codigo_cliente];
 	if($orden == "")
 		$orden = "nombre, glosa_moneda";
 
 	$query = "SELECT SQL_CALC_FOUND_ROWS *, CONCAT_WS(', ', apellido1, nombre) as nombre
-				FROM 
-				usuario_tarifa_cliente LEFT JOIN usuario USING (id_usuario) 
+				FROM
+				usuario_tarifa_cliente LEFT JOIN usuario USING (id_usuario)
 				LEFT JOIN prm_moneda ON prm_moneda.id_moneda=usuario_tarifa_cliente.id_moneda
 				WHERE codigo_cliente='$codigo_cliente'";
 

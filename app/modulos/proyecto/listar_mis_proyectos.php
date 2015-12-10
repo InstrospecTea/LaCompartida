@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
 
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
@@ -8,9 +8,9 @@
 	require_once Conf::ServerDir().'/fw/classes/Html.php';
 
 	$Sesion = new Sesion('');
-	
+
 	$pagina = new Pagina($Sesion);
-	
+
 	$pagina->titulo = "Listado de mis grupos";
 
 	$pagina->PrintHeaders();
@@ -67,22 +67,22 @@ function OrdenarLista( tipo )
             Opciones
         </td>
 	</tr>
-<?
+<?php
 
-	$query = "SELECT SQL_CALC_FOUND_ROWS proyecto.* FROM proyecto, proyecto_usuario WHERE 
+	$query = "SELECT SQL_CALC_FOUND_ROWS proyecto.* FROM proyecto, proyecto_usuario WHERE
 							proyecto.id_proyecto = proyecto_usuario.id_proyecto AND
 							proyecto_usuario.rut_usuario = '".$Sesion->usuario->fields['rut']."'
-						ORDER BY $orden ASC 
+						ORDER BY $orden ASC
 						LIMIT $desde, $x_pag";
 	$proyectos = new ListaProyectos ( $Sesion,'', $query );
-			
+
 	echo Html::PrintListRows($Sesion, $proyectos, 'PrintRow');
 	echo Html::PrintListPages($proyectos, $desde, $x_pag, 'PrintLinkPage');
 
 ?>
  </form>
 </table>
-<?
+<?php
 
     	function PrintRow (& $fila)
    	 	{
@@ -124,7 +124,7 @@ HTML;
 </table>
 
 
-<script language="javascript">	
+<script language="javascript">
 <!-- //
 
 function PrintLinkPage( page )
@@ -136,7 +136,7 @@ function PrintLinkPage( page )
 // ->
 </script>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>
 

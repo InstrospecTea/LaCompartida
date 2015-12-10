@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -226,7 +226,7 @@ function CambiarAgrupador(num)
 			if(selector_siguiente.options[j].text == selector.options[selector.selectedIndex].text)
 			{
 				selector_siguiente.options[j]=null;
-				CambiarAgrupador(i);	
+				CambiarAgrupador(i);
 			}
 		}
 		//y se dispone lo viejo, SOLO si no resultó elegido en uno anterior
@@ -250,12 +250,12 @@ function CambiarAgrupador(num)
 	valor = selector.value;
 	txt = selector.options[selector.selectedIndex].text;
 	opc = new Option(txt,valor);
-	selector_previo.options[0] = opc;	
+	selector_previo.options[0] = opc;
 }
 
 function ResizeIframe(width, height)
 {
-	currentfr = document.getElementById('planilla'); 
+	currentfr = document.getElementById('planilla');
 	currentfr.height = height+'px'; // currentfr.Document.body.scrollHeight;
 	currentfr.width = width+'px'; // currentfr.Document.body.scrollHeight;
 
@@ -531,7 +531,7 @@ function TipoDato(valor)
 	{
 		td_col.className = 'boton_presionado';
 
-		<?
+		<?php
 		foreach($tipos_de_dato as $key => $t_d)
 		{
 			echo " if(valor == '".$t_d."' ){ ";
@@ -543,7 +543,7 @@ function TipoDato(valor)
 	else if(valor != tipo_de_dato.value)
 	{
 			td_col.className = 'boton_comparar';
-			<?
+			<?php
 			foreach($tipos_de_dato as $key => $t_d)
 			{
 				echo " if(valor == '".$t_d."' ){ ";
@@ -557,12 +557,12 @@ function TipoDato(valor)
 }
 
 </script>
-<?
+<?php
 }
 ?>
 <form method=post name=formulario action="" id=formulario autocomplete='off'>
 <input type=hidden name=opc id=opc value='print'>
-<?
+<?php
 if(!$popup)
 {
 ?>
@@ -595,17 +595,17 @@ if(!$popup)
 			<br>
 		</td>
 		<td>
-			<?
+			<?php
 				$explica_periodo_trabajo = 'Considera todos los trabajos realizados en el rango de fecha.';
 				$explica_periodo_cobro = 'Considera todos los trabajos incluidos en cobros con fecha de corte en el rango.';
 			?>
 			<span title="<?=__($explica_periodo_trabajo)?>">
 			<input type="radio" name="campo_fecha" id="campo_fecha_trabajo" value="trabajo"
-																					 <? if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?>
+																					 <?php if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?>
 																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_trabajo"><?=__("Trabajo")?></label>
 			</span>
 			<span title="<?=__($explica_periodo_cobro)?>"><input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
-																					<? if($campo_fecha=='cobro' ) echo 'checked="checked"';
+																					<?php if($campo_fecha=='cobro' ) echo 'checked="checked"';
 																					 ?>
 																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_cobro"><?=__("Cobro")?></label>
 			</span>
@@ -635,9 +635,9 @@ if(!$popup)
 					<option value='12' <?=$fecha_mes==12 ? 'selected':'' ?>><?=__('Diciembre') ?></option>
 				</select>
 				<select name="fecha_anio" style='width:55px'>
-					<? for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
+					<?php for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
 					<option value='<?=$i?>' <?=$fecha_anio == $i ? 'selected' : '' ?>><?=$i ?></option>
-					<? } ?>
+					<?php } ?>
 				</select>
 			</div>
 		</td>
@@ -658,19 +658,19 @@ if(!$popup)
 		<td>
 			<span title="<?=__($explica_periodo_trabajo)?>">
 			<input type="radio" name="campo_fecha_F" value="trabajo" id = "campo_fecha_F"
-																					<? if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?> onclick ="SincronizarCampoFecha()" />
+																					<?php if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?> onclick ="SincronizarCampoFecha()" />
 			<?=__("Trabajo")?>
 			</span>
 			<span title="<?=__($explica_periodo_cobro)?>">
 			<input type="radio" name="campo_fecha_F" value="cobro" id = "campo_fecha_F"
-																					<? if($campo_fecha=='cobro') echo 'checked="checked"';
+																					<?php if($campo_fecha=='cobro') echo 'checked="checked"';
 																					 ?> onclick ="SincronizarCampoFecha()" />
 			<?=__("Cobro")?>
 			</span>
 		</td>
 	</tr>
 
-	<?
+	<?php
 		$largo_select = 6;
 		if( method_exists('Conf','GetConf') )
 		{
@@ -710,7 +710,7 @@ if(!$popup)
 		</td>
 	</tr>
 	<!-- TIPO DE ASUNTO Y AREA (CONFIGURABLE) !-->
-	<?
+	<?php
 	if($filtros_extra)
 	{?>
 	<tr>
@@ -798,7 +798,7 @@ if(!$popup)
 	<tr>
 		<td id = 'td_dato' class='<?=$comparar? 'borde_rojo':'borde_blanco'?>' >
 			<select name='tipo_dato' id='tipo_dato' style='width:180px; ' onchange="TipoDato(this.value)" >
-			<?
+			<?php
 				foreach($tipos_de_dato as $tipo)
 				{
 					echo "<option value='".$tipo."'";
@@ -817,7 +817,7 @@ if(!$popup)
 		<td id = 'td_dato_comparado' class='borde_azul' style='<?=$comparar? '':'display: none;'?>' >
 
 			<select name='tipo_dato_comparado' id='tipo_dato_comparado' style='width:180px; ' >
-			<?
+			<?php
 				foreach($tipos_de_dato as $tipo)
 				{
 					echo "<option value='".$tipo."'";
@@ -835,7 +835,7 @@ if(!$popup)
 <table id="full_tipo_dato" style="border: 0px solid black; width:730px; display: none;" cellpadding="0" cellspacing="0">
 	<tr>
 		<td align="center">
-		<?
+		<?php
 			function celda($nombre)
 			{
 				global $tipo_dato;
@@ -1049,7 +1049,7 @@ if(!$popup)
 		<img src="<?=Conf::ImgDir()?>/menos.gif" onclick="Agrupadores(-1)"; id='menos_agrupadores'
 		 style=' <?=$numero_agrupadores==1?'display:none;':''?> cursor:pointer;' />
 		<select name="vista" id="vista" onchange="RevisarTabla();">
-		<?
+		<?php
 				foreach($vistas as $key => $v)
 				{
 					$s = implode('-',$v);
@@ -1068,16 +1068,16 @@ if(!$popup)
 <tr>
 	<td colspan=6 align=left>
 	<div style="float:left">
-		<img src="<?=Conf::ImgDir()?>/menos.gif" onclick="Agrupadores(-1)"; 
+		<img src="<?=Conf::ImgDir()?>/menos.gif" onclick="Agrupadores(-1)";
 		 style='cursor:pointer;' />
-		 <img src="<?=Conf::ImgDir()?>/mas.gif" onclick="Agrupadores(1)"; 
+		 <img src="<?=Conf::ImgDir()?>/mas.gif" onclick="Agrupadores(1)";
 		 style='cursor:pointer;' />
 		 <?=__('Agrupar por')?>:&nbsp;
 		<input type=hidden name=numero_agrupadores id=numero_agrupadores value=<?=$numero_agrupadores?> />
 		<input type=hidden name=vista id=vista value='' />
 	</div>
 	<div style="float:left">
-		<?
+		<?php
 				$ya_elegidos = array();
 				for($i=0;$i<6;$i++)
 				{
@@ -1098,7 +1098,7 @@ if(!$popup)
 								{
 									if($agrupador[$i] == $v)
 									{
-										echo 'selected';	
+										echo 'selected';
 										$valor_previo = '<select style="display:none;" id="agrupador_valor_previo_'.$i.'"><option value = "'.$v.'">'.__($v).'</option></select>';
 										$ya_elegidos[] = $v;
 									}
@@ -1140,7 +1140,7 @@ if(!$popup)
 			<tr>
 				<td>
 					<input type="checkbox" name="orden_barras_max2min" id="orden_barras_max2min" value="1"
-					<?
+					<?php
 						if(isset($orden_barras_max2min) || !isset($tipo_dato))
 							echo 'checked="checked"';
 					?>
@@ -1148,7 +1148,7 @@ if(!$popup)
 					<label for="orden_barras_max2min"><?=__("Gráficar de Mayor a Menor")?></label>
 				</td>
 				<td>
-					<span id = "limite_check" <? if(!isset($orden_barras_max2min) && isset($tipo_dato) ) echo 'style= "display: none; "'; ?>>
+					<span id = "limite_check" <?php if(!isset($orden_barras_max2min) && isset($tipo_dato) ) echo 'style= "display: none; "'; ?>>
 						<input type="checkbox" name="limitar" id="limite_checkbox" value="1" <?=$limitar?'checked="checked"':''?> />
 						<label for="limite_checkbox"><?=__("y mostrar sólo") ?></label> &nbsp;
 						<input type="text" name="limite" value="<?=$limite ? $limite : '5' ?>" id="limite" size="2" maxlength="2" /> &nbsp;
@@ -1172,7 +1172,7 @@ if(!$popup)
 <script> RevisarMoneda(); RevisarCircular(); RevisarTabla();</script>
 
 		<!-- RESULTADO -->
-<?
+<?php
 }
 
 	$alto = 800;
@@ -1259,11 +1259,11 @@ if(!$popup)
 ?>
 </form>
 
-	<?
+	<?php
 	if($opc):
 	?>
 		 <iframe name=planilla id=planilla src='<?=$url_iframe ?>' frameborder=0 width=700px height=<?=$alto?>px></iframe>
-	<? endif; ?>
+	<?php endif; ?>
 
 <script>
 Calendar.setup(
@@ -1281,6 +1281,6 @@ Calendar.setup(
 	}
 );
 </script>
-<?
+<?php
 	$pagina->PrintBottom($popup);
 ?>

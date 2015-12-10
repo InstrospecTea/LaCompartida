@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
   require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -33,7 +33,7 @@
 	{
 		$pagina->AddError(__('Carpeta inválida'));
 	}
-		
+
 	if($opcion == 'guardar')
 	{
 		$carpeta->Edit('id_tipo_movimiento_carpeta',$id_tipo_movimiento_carpeta);
@@ -77,9 +77,9 @@ return true;
 <br>
 
 <table style="border: 1px solid black;" width='90%'>
-		<? if($carpeta->Loaded()){ ?>
+		<?php if($carpeta->Loaded()){ ?>
 	<tr><td colspan=2 align='center'>
-		<?
+		<?php
 			if($carpeta->fields['id_tipo_movimiento_carpeta'] > 0)
 			{
 				$query = "SELECT CONCAT_WS(' ',usuario.nombre,usuario.apellido1,usuario.apellido2) as nombre_abogado,
@@ -107,7 +107,7 @@ return true;
 			<?=__('Nuevo movimiento:')?>&nbsp;
 		</td>
 		<td align=left >
-			<? if (!empty($carpeta->fields['id_tipo_movimiento_carpeta'])) $where_tipo_carpeta= " AND id_tipo_movimiento_carpeta<> ".$carpeta->fields['id_tipo_movimiento_carpeta'];
+			<?php if (!empty($carpeta->fields['id_tipo_movimiento_carpeta'])) $where_tipo_carpeta= " AND id_tipo_movimiento_carpeta<> ".$carpeta->fields['id_tipo_movimiento_carpeta'];
 				 else if ($id_tipo_movimiento_carpeta) $where_tipo_carpeta= " AND id_tipo_movimiento_carpeta<> ".$id_tipo_movimiento_carpeta;
 				 else $where_tipo_carpeta = " AND id_tipo_movimiento_carpeta=1"; ?>
 			<?= Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_movimiento_carpeta WHERE 1 $where_tipo_carpeta ORDER BY glosa_tipo_movimiento_carpeta","id_tipo_movimiento_carpeta", $id_tipo_movimiento_carpeta ? $id_tipo_movimiento_carpeta : $carpeta->fields['id_tipo_movimiento_carpeta'],"","","120"); ?>
@@ -123,10 +123,10 @@ return true;
 	</tr>
 <?}?>
 </table>
-	
+
 </form>
 <br/><br/>
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom($popup);
 ?>

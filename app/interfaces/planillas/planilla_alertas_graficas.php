@@ -508,7 +508,7 @@
 	</tr>
 </table>
 </form>
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>

@@ -1,6 +1,6 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
-    require_once Conf::ServerDir().'/fw/modulos/noticia/classes/Noticia.php';
+  require_once Conf::ServerDir().'/fw/modulos/noticia/classes/Noticia.php';
 	require_once Conf::ServerDir().'/fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/fw/classes/Lista.php';
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
@@ -8,17 +8,17 @@
 	require_once Conf::ServerDir().'/fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/fw/classes/Html.php';
 	require_once Conf::ServerDir().'/fw/classes/Empresa.php';
-    
+
 	$sesion = new Sesion( array('ADM') );
 	$emp = new Empresa($sesion);
 	$pagina = new Pagina($sesion);
-    	    
+
 	if($opc == 'agregar_not')
     {
         if($titulo== '' or $resumen== '' or $detalle== '')
             $pagina->AddError("Debe ingresar todos los datos de la noticia");
         else
-        
+
         {
             $noticia=new Noticia($sesion);
             $noticia->Edit('titulo',$titulo);
@@ -26,18 +26,18 @@
 
             $noticia->Edit( 'detalle',$detalle);
             $noticia->Edit('id_noticia_agrupador',$id_noticia_agrupador);
-            
+
 		if( $noticia->Write() )
             {
                  $pagina->AddInfo( 'Noticia ingresada con exito...' );
             }
         }
 	}
-	
+
 	$emp->Load($id_empresa);
 	$glosa_empresa=	$emp->fields['glosa_empresa'];
 	$pagina->titulo = "Noticias Empresa - $glosa_empresa";
-	
+
 	$pagina->PrintHeaders();
 
 	$pagina->PrintTop();
@@ -50,7 +50,7 @@
     <input name="opc" type="hidden" value="agregar_not">
 <table width="100%" height="44" border="0">
   <tr>
-	<td height="40" class= "subtitulo"><img src="<?=Conf::ImgDir()?>/noticia16.png"> Agregar Noticia 
+	<td height="40" class= "subtitulo"><img src="<?=Conf::ImgDir()?>/noticia16.png"> Agregar Noticia
       <hr class ="subtitulo" width="100%"></td>
   </tr>
 </table>
@@ -73,12 +73,12 @@
   <tr>
     <td width="341">
         <div align="right">
-          <input type="submit" name="Submit" value="Agregar">  
+          <input type="submit" name="Submit" value="Agregar">
       </div></td>
   </tr>
 </table>
 </form>
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 ?>
 

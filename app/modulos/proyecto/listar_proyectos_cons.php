@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../../../conf.php';
 	require_once Conf::ServerDir().'/fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/fw/classes/Pagina.php';
@@ -6,10 +6,10 @@
 	require_once Conf::ServerDir().'/fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/fw/classes/Html.php';
 	require_once Conf::ServerDir().'/fw/classes/Empresa.php';
-	
+
 
 	$Sesion = new Sesion( array('CON') );
-	
+
 	$pagina = new Pagina($Sesion);
 	$pagina->titulo = "Listado de mis grupos";
 
@@ -72,8 +72,8 @@ function OrdenarLista( tipo )
             Opciones
         </td>
 	</tr>
-<?
-		
+<?php
+
 		$query = "SELECT DISTINCT empresa.glosa_empresa, proyecto.*,proyecto_noticia_agrupador.id_noticia_agrupador
                                   	FROM empresa,proyecto_empresa,proyecto, proyecto_consultor, proyecto_noticia_agrupador
                                 	WHERE empresa.id_empresa=proyecto_empresa.id_empresa
@@ -82,10 +82,10 @@ function OrdenarLista( tipo )
                                 	AND proyecto_noticia_agrupador.id_proyecto = proyecto.id_proyecto
                                 	AND proyecto_consultor.rut_consultor = '".$Sesion->usuario->fields['rut']."'
                                 	ORDER BY $orden ASC
-                                	LIMIT $desde, $x_pag";	
-	
+                                	LIMIT $desde, $x_pag";
+
 	$proyectos = new ListaProyectos ( $Sesion,'', $query );
-	
+
 	echo Html::PrintListRows($Sesion, $proyectos, 'PrintRow');
 	echo Html::PrintListPages($proyectos, $desde, $x_pag, 'PrintLinkPage');
 
@@ -94,13 +94,13 @@ function OrdenarLista( tipo )
 ?>
  </form>
 </table>
-<?
+<?php
 
     	function PrintRow (& $fila)
    	 	{
 			$fields = &$fila->fields;
 			$id_proyecto = $fields['id_proyecto'];
-		//	$empresa->load($id_proyecto);	    
+		//	$empresa->load($id_proyecto);
 			$glosa_empresa = $fields['glosa_empresa'];
 			global $Sesion;
 
@@ -140,7 +140,7 @@ HTML;
 </tr>
 </table>
 
-<script language="javascript">	
+<script language="javascript">
 <!-- //
 
 function PrintLinkPage( page )
@@ -152,6 +152,6 @@ function PrintLinkPage( page )
 // ->
 </script>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

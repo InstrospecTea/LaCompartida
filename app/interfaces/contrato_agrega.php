@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../app/classes/Contrato.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -143,7 +143,7 @@
 						//window.close();
 					}*/
 			</script>
-<?		}
+<?php		}
 		else
 			$pagina->AddError($contrato->error);
 	}
@@ -338,12 +338,12 @@ function InactivaContrato(alerta, opcion)
 		return false;
 }
 </script>
-<? if($popup && !$motivo){?>
+<?php if($popup && !$motivo){?>
 <form name='formulario' id='formulario' method=post>
 <input type=hidden name=codigo_cliente value="<?=$cliente->fields['codigo_cliente'] ? $cliente->fields['codigo_cliente'] : $codigo_cliente ?>" />
 <input type=hidden name=opcion_contrato value="guardar_contrato" />
 <input type=hidden name='id_contrato' value="<?=$contrato->fields['id_contrato'] ?>" />
-<? } ?>
+<?php } ?>
 <br>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
@@ -360,7 +360,7 @@ function InactivaContrato(alerta, opcion)
 		<td align=left width='30%'>
 			<?=__('Activo')?>
 		</td>
-<?
+<?php
 		if(!$contrato->loaded())
 			$chk = 'checked';
 		else
@@ -370,7 +370,7 @@ function InactivaContrato(alerta, opcion)
 			<input type=checkbox name=activo_contrato id=activo_contrato value=1 <?=$contrato->fields['activo'] == 'SI' ? 'checked' : ''?> <?=$chk ?> onclick=InactivaContrato(this.checked)>
 		</td>
 	</tr>
-<?
+<?php
 	$query = "SELECT usuario.id_usuario,CONCAT_WS(' ',apellido1,apellido2,',',nombre)
 				FROM usuario JOIN usuario_permiso USING(id_usuario)
 				WHERE codigo_permiso='SOC' ORDER BY apellido1";
@@ -495,7 +495,7 @@ function InactivaContrato(alerta, opcion)
 <!-- FIN SOLICITANTE -->
 
 <br>
-<?
+<?php
 	$fecha_ini = date('d-m-Y');
 
 	if($popup && !$motivo)
@@ -532,7 +532,7 @@ function InactivaContrato(alerta, opcion)
 				</td>
 			</tr>
 		</table>
-<?
+<?php
 	$display = $contrato->fields['es_periodico'] == 'SI' ? "inline" : "none";
 ?>
 		<table id='div_cobro_periodos' style="display:'<?=$display ?>" width="100%">
@@ -609,7 +609,7 @@ function InactivaContrato(alerta, opcion)
 				<td align=right>
 					<?=__('Forma de Tarificación')?>
 				</td>
-	<?
+	<?php
 				if(!$contrato->fields['forma_cobro'])
 					$contrato_forma_cobro = 'TASA';
 				else
@@ -637,11 +637,11 @@ function InactivaContrato(alerta, opcion)
 						</div>
 						<div id=div_fecha_cap align=left style="display:none; background-color:#C6DEAD;padding-left:2px;">
 							<table style='border: 0px solid' bgcolor='#C6DEAD'>
-							<? if($cobro){ ?>
+							<?php if($cobro){ ?>
 							<tr>
 								<td><?=__('Monto utilizado')?>:</td><td align=left>&nbsp;<label style='background-color:#FFFFFF'> <?=$cobro->TotalCobrosCap($contrato->fields['id_contrato']) > 0 ? $cobro->TotalCobrosCap($contrato->fields['id_contrato']) : 0;?> </label></td>
 							</tr>
-							<? }?>
+							<?php }?>
 							<tr>
 								<td><?=__('Fecha inicio')?>:</td><td align=left valign='top'><input type="text" name="fecha_inicio_cap" value="<?=Utiles::sql2date($contrato->fields['fecha_inicio_cap'])?>" id="fecha_inicio_cap" size="11" maxlength="10" />
 					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_inicio_cap" style="cursor:pointer" /></td>
@@ -664,22 +664,22 @@ function InactivaContrato(alerta, opcion)
 
 	<!--Samuel-->
 		<table width="100%">
-<?
+<?php
 		if($id_cliente||$id_asunto)
 		{
 ?>
 			<tr>
 				<td colspan=2 align=center>
-<?
+<?php
 					$id_contrato_ifr = $contrato->fields['id_contrato'];
 ?>
 					<iframe name=iframe_documentos id=iframe_documentos src='documentos.php?id_cliente=<?=$cliente->fields['id_cliente']?>&id_contrato=<?=$id_contrato_ifr ?>' frameborder=0 width=650px height=370px></iframe>
 				</td>
 			</tr>
-<?
+<?php
 		} #fin id_cliente OR id_asunto
 ?>
-<?
+<?php
 		//Samuel: no sé para que se usa esto.
 		/*if(!$motivo)
 		{
@@ -689,7 +689,7 @@ function InactivaContrato(alerta, opcion)
 					<?=__('Asuntos')?>
 				</td>
 				<td align=left>
-<?
+<?php
 					if($contrato->fields['codigo_cliente'] == "")
 						echo __('Debes guardar primero el contrato para seleccionar los asuntos')."<br>";
 			 		$lista_asuntos = new ListaObjetos($sesion,'',"SELECT codigo_asunto, glosa_asunto, id_contrato FROM asunto
@@ -701,13 +701,13 @@ function InactivaContrato(alerta, opcion)
 						$asunto = $lista_asuntos->Get($x);
 		?>
 						<option value='<?=$asunto->fields['codigo_asunto']?>' <?= ($contrato->fields['id_contrato'] == $asunto->fields['id_contrato']  ? "selected" : "") ?>><?=$asunto->fields['glosa_asunto']." (".$asunto->fields['id_contrato'].")"?></option>
-		<?
+		<?php
 					}
 					echo "</select>";
 ?>
 				</td>
 			</tr>
-<?
+<?php
 		}*/ #Fin if Motivo
 ?>
 	 	</table>
@@ -760,7 +760,7 @@ if ($contrato->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPo
 				<?=Html::SelectQuery( $sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", 'opc_moneda_total',$contrato->fields['opc_moneda_total'],'onchange="ActualizarTipoCambioOpcion(this.form, this.value);"','','60')?>
 			</td>
 		</tr>
-		<?
+		<?php
 		if(!$contrato->loaded())
 			$checked = 'checked';
 		else
@@ -796,7 +796,7 @@ if ($contrato->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPo
 <!-- FIN CARTAS -->
 
 <!-- GUARDAR -->
-<? if($popup && !$motivo){ ?>
+<?php if($popup && !$motivo){ ?>
 <fieldset style="width: 98%">
 	<legend><?=__('Guardar datos')?></legend>
 	<table>
@@ -807,17 +807,17 @@ if ($contrato->fields['opc_papel'] == '' && UtilesApp::GetConf($sesion, 'PapelPo
 		</tr>
 	</table>
 </fieldset>
-<? } ?>
+<?php } ?>
 <!-- FIN GUARDAR -->
 
 </fieldset>
 <!-- FIN INFORMACION COMERCIAL GENERAL -->
-<? if($popup && !$motivo){?>
+<?php if($popup && !$motivo){?>
 </form>
-<? } ?>
+<?php } ?>
 <br>
 <?= InputId::Javascript($sesion) ?>
-<? #if($popup && !$motivo){
+<?php #if($popup && !$motivo){
 ?>
 <script type="text/javascript">
 ActualizarFormaCobro();
@@ -844,5 +844,5 @@ Calendar.setup(
 	}
 );
 </script>
-<? #}
+<?php #}
 ?>

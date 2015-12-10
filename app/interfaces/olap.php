@@ -162,8 +162,8 @@
 <br />
 
 <?= $tabla ?>
-<?
-    $pagina->PrintBottom();
+<?php
+   $pagina->PrintBottom();
 
     function SelectDimension( $array_valores, $array_glosas, $name, $selected='', $opciones='', $titulo='')
     {

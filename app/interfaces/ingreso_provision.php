@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -38,7 +38,7 @@
 
 	if($ingreso->fields[id_usuario_orden] == "")
 		$ingreso->fields[id_usuario_orden] = $sesion->usuario->fields[id_usuario];
-	
+
 
 	$pagina->titulo = __('Ingreso de provisión');
 	$pagina->PrintTop();
@@ -96,7 +96,7 @@
 	</tr>
 
 </table>
-	
+
 </form>
 
 <script type="text/javascript">
@@ -119,7 +119,7 @@ function Validar(form)
 	for (counter = 0; counter < form.id_moneda.length; counter++)
 	{
 		if (form.id_moneda[counter].checked)
-			radio_choice = true; 
+			radio_choice = true;
 	}
 	if (!radio_choice)
 	{
@@ -129,7 +129,7 @@ function Validar(form)
 	return true;
 }
 </script>
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 
 	$pagina->PrintBottom();

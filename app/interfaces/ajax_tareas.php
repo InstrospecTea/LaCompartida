@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -6,19 +6,19 @@
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	
+
 	require_once Conf::ServerDir().'/classes/Tarea.php';
 	require_once Conf::ServerDir().'/classes/TareaComentario.php';
 	require_once Conf::ServerDir().'/classes/Asunto.php';
 	require_once Conf::ServerDir().'/classes/Trabajo.php';
 	require_once Conf::ServerDir().'/classes/Archivo.php';
-	
-	
+
+
     $sesion = new Sesion('');
 	$pagina = new Pagina ($sesion);
 
 	$html = 'EXITO';
-	
+
 	if($accion == 'cargar_comentario')
 	{
 		$h = array();
@@ -36,7 +36,7 @@
 			{
 				$duracion = UtilesApp::Time2Decimal($duracion);
 			}
-			
+
 			$nombre_archivo = '';
 			if( $row['id_archivo'] )
 			{
@@ -56,12 +56,12 @@
 			$h[] = $row['id_archivo'];
 			$h[] = $nombre_archivo;
 			$h[] = $row['estado'];
-			
+
 			echo implode('|',$h);
 		}
 		else
 			echo 'FAIL';
-		
+
 	}
 	if($accion == 'refrescar_tiempo_ingresado')
 	{

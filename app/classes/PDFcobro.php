@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once Conf::RutaPDF();
 
 class PDFcobro extends FPDF

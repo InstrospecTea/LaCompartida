@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -26,10 +26,10 @@
 	/*TOTALES en moneda opc_moneda_total*/
 	$moneda_total = new Objeto($sesion,'','','prm_moneda','id_moneda');
 	$moneda_total->Load($cobro->fields['opc_moneda_total']);
-			
+
 	$cobro_moneda = new CobroMoneda($sesion);
 	$cobro_moneda->Load($cobro->fields['id_cobro']);
-		
+
 	$tipo_cambio_moneda_total = $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio'];
 	if($tipo_cambio_moneda_total == 0)
 		$tipo_cambio_moneda_total = 1;
@@ -56,7 +56,7 @@
 
 		/* Total para Honorarios */
 		$aproximacion_monto = number_format($cobro->fields['monto'],$cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'],'.','');
-				
+
 		$total_honorarios = ((double)$aproximacion_monto*(double)$cobro->fields['tipo_cambio_moneda'])/($tipo_cambio_moneda_total > 0 ? $tipo_cambio_moneda_total : $moneda_total->fields['tipo_cambio']);
 
 		$total_honorarios = number_format($total_honorarios,$moneda_total->fields['cifras_decimales'],'.','');
@@ -113,17 +113,17 @@
 
 		//PAGO DE COBRO
 		if( $cobro->SetPagos(isset($_POST['pago_honorarios']),isset($_POST['pago_gastos']),$id_documento) )
-				$pagina->AddInfo(__('Historial de Pago de Cobro ingresado'));	
+				$pagina->AddInfo(__('Historial de Pago de Cobro ingresado'));
 
 	}
 
 
 	 	$txt_pagina = $id_documento ? __('Edición de Pago') : __('Ingreso');
 	 	$txt_tipo = __('Pago');
-	
+
 	$pagina->titulo = $txt_pagina;
 	$pagina->PrintTop($popup);
-	
+
 ?>
 
 <script type="text/javascript">
@@ -139,7 +139,7 @@ Object.extend(scal.prototype,
     },
 
     isOpen: function()
-    { 
+    {
         return ( $(this.options.wrapper) || this.element).visible();
     }
 });
@@ -151,21 +151,21 @@ var calendar = null;
 //@input     => is the <input> where the date will be updated.
 //@container => is the <div> for dragging.
 //@source    => is the img/button which raises up the calender, the script will locate the calenar over this control.
-function showCalendar(element, input, container, source)            
+function showCalendar(element, input, container, source)
 {
     if (!calendar)
     {
         container = $(container);
         //the Draggable handle is hard coded to "rtop" to avoid other parameter.
         new Draggable(container, {handle: "rtop", starteffect: Prototype.emptyFunction, endeffect: Prototype.emptyFunction});
-        
+
         //The singleton calendar is created.
-        calendar = new scal(element, $(input), 
+        calendar = new scal(element, $(input),
         {
             updateformat: 'dd-mm-yyyy',
-            closebutton: '&nbsp;', 
+            closebutton: '&nbsp;',
             wrapper: container
-        }); 
+        });
     }
     else
     {
@@ -174,13 +174,13 @@ function showCalendar(element, input, container, source)
 
     var date = new Date($F(input));
     calendar.setCurrentDate(isNaN(date) ? new Date() : date);
-    
+
     //Locates the calendar over the calling control  (in this example the "img").
     if (source = $(source))
     {
         Position.clone($(source), container, {setWidth: false, setHeight: false, offsetLeft: source.getWidth() + 2});
     }
-    
+
     //finally show the calendar =)
     calendar.openCalendar();
 };
@@ -195,8 +195,8 @@ function Validar(form)
 {
 
 	monto = parseFloat(form.monto.value);
-	
-	
+
+
 	if(monto <= 0 || isNaN(monto))
 	{
 		alert('<?=__('Debe ingresar un monto para el pago')?>');
@@ -209,7 +209,7 @@ function Validar(form)
 		form.glosa_documento.focus();
 		return false;
 	}
-	
+
 	//window.opener.Refrescar(true);
 }
 
@@ -225,9 +225,9 @@ function CheckEliminaIngreso(chk)
 }
 
 
-<?  if($opcion=='guardar'): ?>
+<?php  if($opcion=='guardar'): ?>
 window.opener.Refrescar(true);
-<? endif; ?>
+<?php endif; ?>
 
 </script>
 <form method=post action="<?= $SERVER[PHP_SELF] ?>" onsubmit="return Validar(this);" id="form_documentos" autocomplete='off'>
@@ -236,7 +236,7 @@ window.opener.Refrescar(true);
 <input type=hidden name=id_cobro value="<?= $id_cobro ?>" />
 <input type=hidden name='pago' value='<?=$pago?>'>
 <input type=hidden name=elimina_ingreso id=elimina_ingreso value=''>
-<!-- Calendario DIV -->	
+<!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
 </div>
@@ -272,12 +272,12 @@ window.opener.Refrescar(true);
 			<?=__('Cliente')?>
 		</td>
 		<td align=left>
-			<input maxlength=10 readonly=readonly name="codigo_cliente" id="campo_codigo_cliente" size=10 value=<? echo $codigo_cliente; ?> />
-				<input name="nombre_cliente" id='nombre' style='width: 280px;' value = "<?
+			<input maxlength=10 readonly=readonly name="codigo_cliente" id="campo_codigo_cliente" size=10 value=<?php echo $codigo_cliente; ?> />
+				<input name="nombre_cliente" id='nombre' style='width: 280px;' value = "<?php
 																								$cliente = new Cliente($sesion);
 																								$cliente->LoadByCodigo($codigo_cliente);
-																								echo $cliente->fields['glosa_cliente']; 
-																							   ?>" readonly=readonly />	
+																								echo $cliente->fields['glosa_cliente'];
+																							   ?>" readonly=readonly />
 			<span style="color:#FF0000; font-size:10px">*</span>
 		</td>
 	</tr>
@@ -286,7 +286,7 @@ window.opener.Refrescar(true);
 			<?=__('Monto')?>
 		</td>
 		<td align=left>
-			<input name=monto size=10 value="<? if($id_documento)
+			<input name=monto size=10 value="<?php if($id_documento)
 													echo str_replace("-","",$documento->fields['monto']);
 												else
 													echo $total;
@@ -310,9 +310,9 @@ window.opener.Refrescar(true);
 				<option value='T'>Transferencia</option>
 				<option value='O'>Otro</option>
 				</select>&nbsp;&nbsp;
-				
+
 			<?=__('Número:')?>&nbsp;
-			<input name=numero_doc size=20 value="<? echo str_replace("-","",$documento->fields['numero_doc']);  ?>" />	
+			<input name=numero_doc size=20 value="<?php echo str_replace("-","",$documento->fields['numero_doc']);  ?>" />
 		</td>
 	</tr>
 	<tr>
@@ -320,7 +320,7 @@ window.opener.Refrescar(true);
 			<?=__('Descripción')?>
 		</td>
 		<td align=left>
-			<textarea name=glosa_documento cols="45" rows="3"><?
+			<textarea name=glosa_documento cols="45" rows="3"><?php
 																if($opc=='guardar')
 																	echo $documento->fields['glosa_documento'];
 																else
@@ -333,7 +333,7 @@ window.opener.Refrescar(true);
 	</tr>
 	<tr>
 		<td align=right>
-			<?
+			<?php
 			$checked = '';
 			$honorarios = 'Este documento completa el Pago de Honorarios ( ';
 			if($cobro->fields['honorarios_pagados']=='SI')
@@ -341,12 +341,12 @@ window.opener.Refrescar(true);
 				$honorarios = 'Pago de Honorarios completo ( ';
 			}
 			$checked = 'checked=checked';
-			
+
 			?>
 			<input type=checkbox name="pago_honorarios" <?=$checked?> >
 		</td>
 		<td align=left>
-			<?
+			<?php
 			$moneda_cobro = new Moneda($sesion);
 			$moneda_cobro->Load($cobro->fields['id_moneda']);
 			$simbolo_cobro = $moneda_total->fields['simbolo'];
@@ -356,7 +356,7 @@ window.opener.Refrescar(true);
 	</tr>
 	<tr>
 		<td align=right>
-			<?
+			<?php
 			$checked = '';
 			$gastos = 'Este documento completa el Pago de Gastos ( ';
 			if($cobro->fields['gastos_pagados']=='SI')
@@ -404,7 +404,7 @@ Calendar.setup(
 	}
 );
 </script>
-<?
+<?php
 	echo InputId::Javascript($sesion);
 	$pagina->PrintBottom($popup);
 ?>

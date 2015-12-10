@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -31,7 +31,7 @@
 			$cliente = new Cliente($sesion);
 			$codigo_cliente_secundario = $cliente->CodigoACodigoSecundario( $codigo_cliente );
 		}
-	
+
 	if($id_documento)
 	{
 		$documento->Load($id_documento);
@@ -46,25 +46,25 @@
 				$query="UPDATE cobro SET fecha_cobro='".Utiles::fecha2sql($fecha)." 00:00:00' WHERE id_cobro=".$id_cobro;
 				$resp=mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 				}
-				
+
 		$query = "SELECT activo FROM cliente WHERE codigo_cliente=".$codigo_cliente;
 		$resp=mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		list($activo)=mysql_fetch_array($resp);
-		
-		if($activo==1) 
+
+		if($activo==1)
 			{
 			$monto=str_replace(',','.',$monto);
-	
+
 			/*Es pago, asi que monto es negativo*/
 			$multiplicador = -1.0;
 			$documento->Edit("id_tipo_documento",2);
-	
+
 			$moneda = new Moneda($sesion);
 			$moneda->Load($id_moneda);
 			$moneda_base = Utiles::MonedaBase($sesion);
-	
+
 			$monto_base = $monto * $moneda->fields['tipo_cambio'] / $moneda_base['tipo_cambio'];
-	
+
 			$documento->Edit("monto",number_format($monto*$multiplicador,$moneda->fields['cifras_decimales'],".",""));
 			$documento->Edit("monto_base",number_format($monto_base*$multiplicador,$moneda_base['cifras_decimales'],".",""));
 			$documento->Edit("saldo_pago",number_format($monto*$multiplicador,$moneda->fields['cifras_decimales'],".",""));
@@ -75,35 +75,35 @@
 			$documento->Edit("fecha",Utiles::fecha2sql($fecha));
 			$documento->Edit("glosa_documento",$glosa_documento);
 			$documento->Edit("codigo_cliente",$codigo_cliente);
-	
+
 			$out_neteos = "";
-	
+
 			if($documento->Write())
 				{
 					$id_documento = $documento->fields['id_documento'];
 					$pagina->addInfo(__('Pago ingresado con éxito'));
-		
+
 							//Si se ingresa el documento, se ingresan los pagos
 							foreach($_POST as $key => $post)
 							{
 								if(strpos($key,'documento_pendiente_') !== false && $post > 0)
 								{
 									$id_documento_cobro = $post;
-		
+
 									$pago_honorarios = str_replace(',','.',$_POST['pago_honorarios_'.$post]);
 									$pago_gastos = str_replace(',','.',$_POST['pago_gastos_'.$post]);
-		
+
 									$cambio_cobro = $_POST['cambio_cobro_'.$post];
 									$cambio_pago = $_POST['cambio_pago_'.$post];
-		
+
 									$decimales_cobro = $_POST['decimales_cobro_'.$post];
 									$decimales_pago = $_POST['decimales_pago_'.$post];
-		
+
 									$id_cobro_neteado = $_POST['id_cobro_'.$post];
-		
+
 									if(!$pago_gastos) $pago_gastos = 0;
 									if(!$pago_honorarios) $pago_honorarios = 0;
-		
+
 									/*Guardo los saldos, para indicar cuales fueron actualizados*/
 									$documento_cobro_aux = new Documento($sesion);
 									if($documento_cobro_aux->Load($id_documento_cobro))
@@ -111,19 +111,19 @@
 										$saldo_honorarios_anterior = $documento_cobro_aux->fields['saldo_honorarios'];
 										$saldo_gastos_anterior = $documento_cobro_aux->fields['saldo_gastos'];
 									}
-		
+
 									$neteo_documento = new NeteoDocumento($sesion);
-		
+
 									//Si el neteo existía, está siendo modificado y se debe partir de 0:
-									if( $neteo_documento->Ids($id_documento,$id_documento_cobro)) 
-									$out_neteos .= $neteo_documento->Reestablecer($decimales_cobro); 
+									if( $neteo_documento->Ids($id_documento,$id_documento_cobro))
+									$out_neteos .= $neteo_documento->Reestablecer($decimales_cobro);
 									else
 									$out_neteos .= "<tr><td>No</td><td>0</td><td>0</td>";
-		
+
 									//Luego se modifica
 									if($pago_honorarios != 0 || $pago_gastos != 0)
 										$out_neteos .= $neteo_documento->Escribir($pago_honorarios,$pago_gastos,$cambio_pago,$cambio_cobro,$decimales_pago,$decimales_cobro,$id_cobro_neteado);
-		
+
 									/*Compruebo cambios en saldos para mostrar mensajes de actualizacion*/
 									$documento_cobro_aux = new Documento($sesion);
 									if($documento_cobro_aux->Load($id_documento_cobro))
@@ -135,15 +135,15 @@
 									}
 								}
 						}
-		
+
 						$documento->Load($id_documento);
 						$monto_neteos =  $documento->fields['saldo_pago']-$documento->fields['monto'];
 						$monto_pago = -1*$documento->fields['monto'];
-						
+
 						?>
 						<script type="text/javascript">
 						window.opener.Refrescar();
-						</script> <?
+						</script> <?php
 				}
 				else
 					$pagina->AddError($documento->error);
@@ -151,8 +151,8 @@
 		else
 		{ ?>
 			<script type="text/javascript">alert('�No se puede modificar un pago de un cliente inactivo!');</script>
-<?	}
-		
+<?php	}
+
 		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>".$out_neteos."</table>";
 		//echo $out_neteos;
 	}
@@ -289,35 +289,35 @@ function CargarTabla(mostrar_actualizado)
 	var id_documento = document.getElementById('id_documento');
 
 	var http = getXMLHTTP();
-<? 
+<?php
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
-	{ 
+	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 		{ ?>
 			var codigo_cliente_secundario = document.getElementById('codigo_cliente_secundario');
-<?  } 
+<?php  }
 		else
 		{ ?>
 			var codigo_cliente_secundario = document.getElementById('campo_codigo_cliente_secundario');
-<?	}	?>
-		var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda.value + '&codigo_cliente_secundario=' + codigo_cliente_secundario.value<? if($id_cobro) echo "+'&id_cobro=".$id_cobro."'"; else echo "+'&id_cobro=0'"; ?>;
-<?}
+<?php	}	?>
+		var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda.value + '&codigo_cliente_secundario=' + codigo_cliente_secundario.value<?php if($id_cobro) echo "+'&id_cobro=".$id_cobro."'"; else echo "+'&id_cobro=0'"; ?>;
+<?php }
 	else
-	{ 
+	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 		{ ?>
 			var codigo_cliente = document.getElementById('codigo_cliente');
-<?  } 
+<?php  }
 		else
 		{ ?>
 			var codigo_cliente = document.getElementById('campo_codigo_cliente');
-<?	}	?>
-		var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda.value + '&codigo_cliente=' + codigo_cliente.value<? if($id_cobro) echo "+'&id_cobro=".$id_cobro."'"; else echo "+'&id_cobro=0'"; ?>;
-<?} ?>
-	
+<?php	}	?>
+		var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda.value + '&codigo_cliente=' + codigo_cliente.value<?php if($id_cobro) echo "+'&id_cobro=".$id_cobro."'"; else echo "+'&id_cobro=0'"; ?>;
+<?php } ?>
+
 
 	if(mostrar_actualizado)
-		url += ''<? if(!empty($cambios_en_saldo_honorarios)) echo "+'&c_hon=".implode(',',$cambios_en_saldo_honorarios)."'"; if(!empty($cambios_en_saldo_gastos)) echo "+'&c_gas=".implode(',',$cambios_en_saldo_gastos)."'";?>;
+		url += ''<?php if(!empty($cambios_en_saldo_honorarios)) echo "+'&c_hon=".implode(',',$cambios_en_saldo_honorarios)."'"; if(!empty($cambios_en_saldo_gastos)) echo "+'&c_gas=".implode(',',$cambios_en_saldo_gastos)."'";?>;
 
 	if(id_documento.value)
 		url += '&id_documento='+id_documento.value;
@@ -352,24 +352,24 @@ function  Actualizar_Monto_Pagos(tipo,id)
 
 function SetMontoPagos()
 {
-	<? if(!$documento->Loaded()){?>
+	<?php if(!$documento->Loaded()){ ?>
 		var monto_pagos = document.getElementById('monto_pagos');
 		var monto = document.getElementById('monto');
 		if(monto_pagos)
 		{
 			monto.value = Math.round(monto_pagos.value * 100) / 100;
 		}
-	<?}?>
-	<?if($opcion != "guardar"){?>
+	<?php }?>
+	<?php if($opcion != "guardar"){ ?>
 	window.setTimeout($('form_documentos').submit(),100);
-	<?}else{?>
+	<?php } else { ?>
 	window.close();
-	<?}?>
+	<?php } ?>
 }
 
 
 </script>
-<? echo Autocompletador::CSS(); ?>
+<?php echo Autocompletador::CSS(); ?>
 <form method=post action="<?= $SERVER[PHP_SELF] ?>" id="form_documentos" autocomplete='off'>
 <input type=hidden name=opcion value="guardar" />
 <input type=hidden name='id_documento' id ='id_documento' value="<?= $documento->fields['id_documento']? $documento->fields['id_documento']:''  ?>" />
@@ -409,7 +409,7 @@ function SetMontoPagos()
 	<tr>
 		<td align="right" width="30%"><?=__('Cliente ')?></td>
 		<td colspan="3" align="left">
-			<?
+			<?php
 			if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{
 					if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists('Conf','CodigoSecundario') && Conf::CodigoSecundario() ) )
@@ -435,11 +435,11 @@ function SetMontoPagos()
 			<td align=right>
 				<?=__('Monto')?>
 			</td>
-			<td align=left> 
-				<input name=monto id=monto size=10 value="<? echo str_replace("-","",$documento->fields['monto']);  ?>" />
+			<td align=left>
+				<input name=monto id=monto size=10 value="<?php echo str_replace("-","",$documento->fields['monto']);  ?>" />
 				<span style="color:#FF0000; font-size:10px">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<?=__('Moneda')?>&nbsp;
-				<?
+				<?php
 					if($id_documento)
 						$moneda_usada = $documento->fields['id_moneda'];
 					else if($id_cobro)
@@ -456,30 +456,30 @@ function SetMontoPagos()
 				<?=__('Número Documento:')?>
 			</td>
 			<td align=left>
-				<input name=numero_doc size=20 value="<? echo str_replace("-","",$documento->fields['numero_doc']);  ?>" />
+				<input name=numero_doc size=20 value="<?php echo str_replace("-","",$documento->fields['numero_doc']);  ?>" />
 						<?=__('Tipo:')?>&nbsp;
 				<select name='tipo_doc' id='tipo_doc'  style='width: 80px;'>
-				<? if($documento->fields['tipo_doc']=='E' || $documento->fields['tipo_doc']=='' || $documento->fields['tipo_doc']=='N' ) { ?>
+				<?php if($documento->fields['tipo_doc']=='E' || $documento->fields['tipo_doc']=='' || $documento->fields['tipo_doc']=='N' ) { ?>
 					<option value='E' selected>Efectivo</option>
 					<option value='C'>Cheque</option>
 					<option value='T'>Transferencia</option>
 					<option value='O'>Otro</option>
-				<? } if($documento->fields['tipo_doc']=='C') { ?>
+				<?php } if($documento->fields['tipo_doc']=='C') { ?>
 					<option value='E'>Efectivo</option>
 					<option value='C' selected>Cheque</option>
 					<option value='T'>Transferencia</option>
 					<option value='O'>Otro</option>
-				<? } if($documento->fields['tipo_doc']=='T') { ?>
+				<?php } if($documento->fields['tipo_doc']=='T') { ?>
 					<option value='E'>Efectivo</option>
 					<option value='C'>Cheque</option>
 					<option value='T' selected>Transferencia</option>
 					<option value='O'>Otro</option>
-				<? } if($documento->fields['tipo_doc']=='O') { ?>
+				<?php } if($documento->fields['tipo_doc']=='O') { ?>
 					<option value='E'>Efectivo</option>
 					<option value='C'>Cheque</option>
 					<option value='T'>Transferencia</option>
 					<option value='O' selected>Otro</option>
-				<? } ?>
+				<?php } ?>
 					</select>
 			</td>
 		</tr>
@@ -489,7 +489,7 @@ function SetMontoPagos()
 			<?=__('Descripción')?>
 		</td>
 		<td align=left>
-			<textarea name=glosa_documento cols="45" rows="3"><?
+			<textarea name=glosa_documento cols="45" rows="3"><?php
 				if($documento->fields['glosa_documento'])
 					echo $documento->fields['glosa_documento'];
 				else if($id_cobro)
@@ -536,7 +536,7 @@ Calendar.setup(
 
 
 </script>
-<?
+<?php
 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 	{
 		echo Autocompletador::Javascript($sesion,false);

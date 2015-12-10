@@ -66,7 +66,7 @@
 			<?=__('Solo activos')?>
 		</td>
 		<td>
-			<? if( $solo_activos ) $chk = "checked='checked'"; ?>
+			<?php if( $solo_activos ) $chk = "checked='checked'"; ?>
 			<input type="checkbox" name="solo_activos" id="solo_activos" value=1 <?=$chk ?> />
 		</td>
 	</tr>
@@ -96,7 +96,7 @@
 </form>
 <script>
 </script>
-<?
+<?php
 	if($opcion == "desplegar")
 	{
 		$url_clientes = "&clientes=";
@@ -121,11 +121,11 @@
 		<img src="graficos/grafico_<?=$tipo_reporte?>.php?popup=1<?=$url_clientes?><?=$url_activos?><?=$url_usuarios?>&fecha_ini=<?=Utiles::fecha2sql($fecha_ini)?>&fecha_fin=<?=Utiles::fecha2sql($fecha_fin)?>" alt='' />
 
 		<!--
-		<?
+		<?php
 		echo "graficos/grafico_".$tipo_reporte.".php?clientes=".implode(',',$clientes)."&usuarios=".implode(',',$usuarios)."&fecha_ini=".Utiles::fecha2sql($fecha_ini)."&fecha_fin=".Utiles::fecha2sql($fecha_fin); ?>
 		-->
 
-<?
+<?php
 	}
 ?>
 
@@ -158,6 +158,6 @@ Calendar.setup(
 
 // ->
 </script>
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

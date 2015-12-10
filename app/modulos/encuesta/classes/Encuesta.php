@@ -1,11 +1,11 @@
-<?
-    require_once dirname(__FILE__).'/../../../../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../../../../conf.php';
 
 class Encuesta
 {
 	// Sesion PHP
 	var $sesion = null;
-	
+
 	// Arreglo con los valores de los campos
 	var $fields = null;
 
@@ -43,10 +43,10 @@ class Encuesta
     }
     function IsRespondida($id_encuesta,$rut)
     {
-        $query = "SELECT encuesta.id_encuesta FROM encuesta_respuesta_alternativa 
+        $query = "SELECT encuesta.id_encuesta FROM encuesta_respuesta_alternativa
 								INNER JOIN encuesta_pregunta ON encuesta_pregunta.id_encuesta_pregunta = encuesta_respuesta_alternativa.id_encuesta_pregunta
 								INNER JOIN encuesta ON encuesta_pregunta.id_encuesta = encuesta.id_encuesta
-							    WHERE encuesta_respuesta_alternativa.rut_usuario='$rut' 
+							    WHERE encuesta_respuesta_alternativa.rut_usuario='$rut'
 									AND encuesta.id_encuesta = '$id_encuesta' LIMIT 0,1" ;
 
         $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
@@ -98,7 +98,7 @@ class Encuesta
 
             $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
             $this->fields['id_encuesta'] = mysql_insert_id($this->sesion->dbh);
-					
+
         }
 
         return true;

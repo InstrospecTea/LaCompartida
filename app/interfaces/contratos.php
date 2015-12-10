@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -33,7 +33,7 @@
 function Refrescar()
 {
 //todo if $motivo=="cobros",$motivo=="horas"
-<?
+<?php
 	if($desde)
 		echo "var pagina_desde = '&desde=".$desde."';";
 	else

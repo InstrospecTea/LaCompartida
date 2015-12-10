@@ -1,4 +1,4 @@
-<?
+<?php
 $dir = preg_replace('/\s/', '', $dir);
 
 if($dir == "")
