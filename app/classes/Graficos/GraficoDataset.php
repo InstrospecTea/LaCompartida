@@ -122,7 +122,9 @@ class GraficoDataset {
 	 * @return boolean
 	 */
 	private function validarRGBA($r, $g, $b, $a) {
-		if (is_int($r) AND is_int($g) AND is_int($b) AND is_numeric($a)) {
+		if ((is_int($r) AND $r <= 255) AND
+				(is_int($g) AND $g <= 255) AND
+				(is_int($b) AND $b <= 255) AND is_numeric($a)) {
 			return true;
 		} else {
 			return false;
