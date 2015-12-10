@@ -27,7 +27,7 @@ class GraficoDataset {
 			$this->label = $label;
 			return $this;
 		} else {
-			//TODO: implementar errores
+			error_log('Debe ingresar un String no vacío');
 		}
 	}
 
@@ -44,7 +44,7 @@ class GraficoDataset {
 			$this->fillColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $a . ')';
 			return $this;
 		} else {
-			//TODO: implementar errores
+			error_log('Debe ingresar un color válido');
 		}
 	}
 
@@ -61,7 +61,7 @@ class GraficoDataset {
 			$this->strokeColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $a . ')';
 			return $this;
 		} else {
-			//TODO: implementar errores
+			error_log('Debe ingresar un color válido');
 		}
 	}
 
@@ -78,7 +78,7 @@ class GraficoDataset {
 			$this->highlightFill = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $a . ')';
 			return $this;
 		} else {
-			//TODO: implementar errores
+			error_log('Debe ingresar un color válido');
 		}
 	}
 
@@ -95,7 +95,7 @@ class GraficoDataset {
 			$this->highlightStroke = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $a . ')';
 			return $this;
 		} else {
-			//TODO: implementar errores
+			error_log('Debe ingresar un color válido');
 		}
 	}
 
@@ -109,7 +109,7 @@ class GraficoDataset {
 			$this->data = $data;
 			return $this;
 		} else {
-			//TODO: implementar errores
+			error_log('Debe ingresar un la data como array');
 		}
 	}
 
