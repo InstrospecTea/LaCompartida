@@ -174,7 +174,7 @@
 							{ ?>
 								var url = '<?=$url?>null&fecha='+ fecha;
 								text_window += '<tr><td width="25%"></td><td width="80%" align="left"><input type="radio" name="tipo" id="tipo" value="'+url+'" /><?=$glosa?></td></tr>';
-					<?	} ?>
+					<?php	} ?>
 							text_window += '</table></form>';
 							Dialog.alert(text_window,
 							{
@@ -209,7 +209,7 @@
 							while( list( $id, $url, $glosa ) = mysql_fetch_array($resp) )
 							{ ?>
 								text_window += '<tr><td width="20%"></td><td width="80%" align="left"><input type="radio" name="tipo" id="tipo" value="<?=$url?>" /><?=$glosa?></td></tr>';
-					<?	} ?>
+					<?php	} ?>
 							text_window += '</table>';
 							Dialog.alert(text_window,
 							{

@@ -151,7 +151,7 @@
 		else
 		{ ?>
 			<script type="text/javascript">alert('�No se puede modificar un pago de un cliente inactivo!');</script>
-<?	}
+<?php	}
 
 		$out_neteos = "<table border=1><tr> <td>Id Cobro</td><td>Faltaba</td> <td>Aportaba y Devolví</td> <td>Pasó a Faltar</td> <td>Ahora aporto</td> <td>Ahora falta </td> </tr>".$out_neteos."</table>";
 		//echo $out_neteos;
@@ -299,9 +299,9 @@ function CargarTabla(mostrar_actualizado)
 		else
 		{ ?>
 			var codigo_cliente_secundario = document.getElementById('campo_codigo_cliente_secundario');
-<?	}	?>
+<?php	}	?>
 		var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda.value + '&codigo_cliente_secundario=' + codigo_cliente_secundario.value<?php if($id_cobro) echo "+'&id_cobro=".$id_cobro."'"; else echo "+'&id_cobro=0'"; ?>;
-<?}
+<?php }
 	else
 	{
 		if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
@@ -311,9 +311,9 @@ function CargarTabla(mostrar_actualizado)
 		else
 		{ ?>
 			var codigo_cliente = document.getElementById('campo_codigo_cliente');
-<?	}	?>
+<?php	}	?>
 		var url = root_dir + '/app/interfaces/ajax_pago_documentos.php?id_moneda=' + select_moneda.value + '&codigo_cliente=' + codigo_cliente.value<?php if($id_cobro) echo "+'&id_cobro=".$id_cobro."'"; else echo "+'&id_cobro=0'"; ?>;
-<?} ?>
+<?php } ?>
 
 
 	if(mostrar_actualizado)
@@ -352,19 +352,19 @@ function  Actualizar_Monto_Pagos(tipo,id)
 
 function SetMontoPagos()
 {
-	<?php if(!$documento->Loaded()){?>
+	<?php if(!$documento->Loaded()){ ?>
 		var monto_pagos = document.getElementById('monto_pagos');
 		var monto = document.getElementById('monto');
 		if(monto_pagos)
 		{
 			monto.value = Math.round(monto_pagos.value * 100) / 100;
 		}
-	<?}?>
-	<?if($opcion != "guardar"){?>
+	<?php }?>
+	<?php if($opcion != "guardar"){ ?>
 	window.setTimeout($('form_documentos').submit(),100);
-	<?}else{?>
+	<?php } else { ?>
 	window.close();
-	<?}?>
+	<?php } ?>
 }
 
 

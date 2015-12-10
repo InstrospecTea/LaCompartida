@@ -143,7 +143,7 @@
 						//window.close();
 					}*/
 			</script>
-<?		}
+<?php		}
 		else
 			$pagina->AddError($contrato->error);
 	}

@@ -287,7 +287,7 @@ window.opener.Refrescar();
 			<span style="color:#FF0000; font-size:10px">*</span>
 		</td>
 	</tr>
-	<?	if($pago == 'true')
+	<?php	if($pago == 'true')
 		{
 	?>
 		<tr>
