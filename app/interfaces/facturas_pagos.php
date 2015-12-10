@@ -217,9 +217,9 @@ function funcionTR(& $fila) {
 	$html .= "<tr id=\"t" . $fila->fields['id_factura'] . "\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B;\">";
 	$html .= "<td align=left>" . Utiles::sql2fecha($fila->fields['fecha'], $formato_fechas, '-') . "</td>";
 	$html .= "<td align=left>" . $fila->fields['tipo'] . "</td>";
-	$html .= "<td align=right>#" . NumeroFactura(& $fila, $Sesion) . "&nbsp;</td>";
-	$html .= "<td align=left>" . GlosaCliente(& $fila) . "</td>";
-	$html .= "<td align=right>" . Glosa_asuntos(& $fila, $Sesion) . "</td>";
+	$html .= "<td align=right>#" . NumeroFactura($fila, $Sesion) . "&nbsp;</td>";
+	$html .= "<td align=left>" . GlosaCliente($fila) . "</td>";
+	$html .= "<td align=right>" . Glosa_asuntos($fila, $Sesion) . "</td>";
 	$html .= "<td align=left>" . $fila->fields['encargado_comercial'] . "</td>";
 	//$html .= "<td align=left>".$fila->fields['descripcion']."</td>";
 	if (method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'NuevoModuloFactura'))
@@ -228,20 +228,20 @@ function funcionTR(& $fila) {
 		$html .= "<td align=center>" . $fila->fields['anulado'] . "</td>";
 	$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_" . __("Cobro") . "',1024,660,'cobros6.php?id_cobro=" . $fila->fields['id_cobro'] . "&popup=1');\">" . $fila->fields['id_cobro'] . "</a></td>";
 
-	$html .= "<td align=right >" . RetencionImpuestoPago(& $fila, $Sesion) . "</td>";
-	$html .= "<td align=right >" . ConceptoPago(& $fila, $Sesion) . "</td>";
-	$html .= "<td align=right >" . DescripcionPago(& $fila, $Sesion) . "</td>";
-	$html .= "<td align=right >" . BancoPago(& $fila, $Sesion) . "</td>";
-	$html .= "<td align=right nowrap>" . CuentaPago(& $fila, $Sesion) . "</td>";
+	$html .= "<td align=right >" . RetencionImpuestoPago($fila, $Sesion) . "</td>";
+	$html .= "<td align=right >" . ConceptoPago($fila, $Sesion) . "</td>";
+	$html .= "<td align=right >" . DescripcionPago($fila, $Sesion) . "</td>";
+	$html .= "<td align=right >" . BancoPago($fila, $Sesion) . "</td>";
+	$html .= "<td align=right nowrap>" . CuentaPago($fila, $Sesion) . "</td>";
 	$html .= "<td align=right nowrap>" . Utiles::sql2fecha($fila->fields['fecha_pago'], $formato_fechas, '-') . "</td>";
-	//$html .= "<td align=right nowrap>".SubTotal(& $fila)."</td>";
-	//$html .= "<td align=right nowrap>".Iva(& $fila)."</td>";
-	$html .= "<td align=right nowrap>" . MontoTotal(& $fila) . "</td>";
-	//$html .= "<td align=right nowrap>".Pago(& $fila, $Sesion)."</td>";
-	$html .= "<td align=right nowrap>" . MontoPago(& $fila) . "</td>";
-	$html .= "<td align=right nowrap>" . SaldoPago(& $fila) . "</td>";
-	$html .= "<td align=right nowrap>" . Saldo(& $fila) . "</td>";
-	$html .= "<td align=center nowrap>" . Opciones(& $fila, $Sesion) . "</td>";
+	//$html .= "<td align=right nowrap>".SubTotal($fila)."</td>";
+	//$html .= "<td align=right nowrap>".Iva($fila)."</td>";
+	$html .= "<td align=right nowrap>" . MontoTotal($fila) . "</td>";
+	//$html .= "<td align=right nowrap>".Pago($fila, $Sesion)."</td>";
+	$html .= "<td align=right nowrap>" . MontoPago($fila) . "</td>";
+	$html .= "<td align=right nowrap>" . SaldoPago($fila) . "</td>";
+	$html .= "<td align=right nowrap>" . Saldo($fila) . "</td>";
+	$html .= "<td align=center nowrap>" . Opciones($fila, $Sesion) . "</td>";
 	$html .= "</tr>";
 
 	$i++;
