@@ -169,6 +169,8 @@ else{
 
 $agrupadores = explode('-', $vista);
 ?>
+
+<script src="../../public/vendors/Chart.js/Chart.js" ></script>
 <script type="text/javascript">
 	function Generar(form, valor) {
 		if (form.tipo.value == 'Profesional') {
@@ -709,11 +711,11 @@ $agrupadores = explode('-', $vista);
 					</tr>
 					<tr>
 						<td align="left"><input type="checkbox" name="area_y_categoria" id="area_y_categoria" value="1" <?php echo $area_y_categoria ? 'checked="checked"' : '' ?> onclick="Categorias(this, this.form);" title="Seleccionar área y categoría" />&nbsp;<span style="font-size:9px"><label for="area_y_categoria"><?php echo __('Seleccionar área y categoría') ?></label</span></td>
-						<td align=right>&nbsp;</td>
-						<td align=left colspan=2>
-							<input type=button class=btn value="<?php echo __('Generar planilla') ?>" onclick="Generar(this.form, 'print')" />
-							<input type=button class=btn value="<?php echo __('Imprimir') ?>" onclick="Generar(this.form, 'op');">
-							<input type=button class=btn value="<?php echo __('Generar Gráfico') ?>" onclick="Generar(this.form, 'grafico');">
+						<td align="right">&nbsp;</td>
+						<td align="left" colspan="2">
+							<input type="button" class="btn" value="<?php echo __('Generar planilla') ?>" onclick="Generar(this.form, 'print')" />
+							<input type="button" class="btn" value="<?php echo __('Imprimir') ?>" onclick="Generar(this.form, 'op');">
+							<input type="button" class="btn" value="<?php echo __('Generar Gráfico') ?>" onclick="Generar(this.form, 'grafico');">
 						</td>
 					</tr>
 					<tr>
@@ -954,6 +956,7 @@ if ($opc == 'print' || $popup) {
 			</tr>
 		</tbody>
 	</table>
+
 	<table border="1" cellpadding="3" class="planilla" id="tabla_planilla_2" width="100%">
 	</tbody>
 	<?php
@@ -1368,16 +1371,68 @@ if ($opc == 'grafico') {
 	$datos_grafico['nombres'] = UtilesApp::utf8izar($datos_grafico['nombres']);
 	$datos_grafico_compara['nombres'] = UtilesApp::utf8izar($datos_grafico_compara['nombres']);
 
-	$datos = urlencode(base64_encode(json_encode($datos_grafico)));
+	$datos = base64_encode(json_encode($datos_grafico));
 	$datosC = '';
 	$grafico = 'grafico_resumen_actividades';
 	if ($tipo_dato_comparado) {
 		$grafico = 'grafico_barras_resumen_actividades';
-		$datosC = '&datos_compara=' . urlencode(base64_encode(json_encode($datos_grafico_compara)));
-		$datosC .= '&labels=' . urlencode(implode(',', $labels));
+		$datosC = '&datos_compara=' . base64_encode(json_encode($datos_grafico_compara));
+		$datosC .= '&labels=' . implode(',', $labels);
 	}
 
-	$html_info .= "<img src='graficos/{$grafico}.php?titulo=" . $titulo_reporte . '&datos=' . $datos . $datosC . "' alt='grafico' />";
+	$html_info .= "<div id='contenedor_grafico_resumen_actividad'></div>";
+?>
+<script type="text/javascript">
+	var graficoResumenActividades;
+
+	var titulo = '<?php echo $titulo_reporte; ?>';
+	var datos = '<?php echo $datos . $datosC; ?>';
+
+	jQuery.ajax({
+		url: "graficos/<?php echo $grafico; ?>.php",
+		data: {
+			'datos': datos
+		},
+		dataType: 'json',
+		type: 'POST',
+		success: function(respuesta) {
+			if (respuesta != null) {
+				agregarCanvas('resumen_actividad',
+						jQuery('#contenedor_grafico_resumen_actividad'),
+						titulo);
+
+				var canvas = jQuery("#grafico_resumen_actividad")[0];
+				var context = canvas.getContext('2d');
+
+				if (graficoResumenActividades) {
+					graficoResumenActividades.destroy();
+				}
+
+				graficoResumenActividades = new Chart(context).Pie(respuesta, {
+					tooltipTemplate:  "<%= label %>: <%= value %>hrs. (<%= Math.round(circumference / 6.283 * 100) %>%)"
+				});
+			}
+		},
+		error: function(e) {
+			console.log(e);
+		}
+	});
+
+	function agregarCanvas(id, contenedor, titulo) {
+		var canvas = document.createElement('canvas');
+		var h3 = document.createElement('h3');
+		canvas.width = 600;
+		canvas.height = 400;
+		canvas.id = 'grafico_' + id;
+		h3.innerHTML = titulo;
+
+		contenedor.empty();
+		contenedor.append(h3);
+		contenedor.append(canvas);
+	}
+</script>
+
+<?php
 	echo $html_info;
 }
 ?>
