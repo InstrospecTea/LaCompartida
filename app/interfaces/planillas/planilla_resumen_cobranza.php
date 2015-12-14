@@ -1,5 +1,4 @@
 <?php
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
 
 $sesion = new Sesion(array('REP'));
@@ -875,7 +874,7 @@ if ($xls) {
 		}
 		$ws1->writeFormula($filas, $col_honorarios, "=SUM($col_formula_honorarios$fila_inicial:$col_formula_honorarios$filas)", $formatos_moneda[$moneda]);
 		$ws1->writeFormula($filas, $col_gastos, "=SUM($col_formula_gastos$fila_inicial:$col_formula_gastos$filas)", $formatos_moneda[$moneda]);
-		
+
 		if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 			$ws1->writeFormula($filas, $col_iva, "=SUM($col_formula_iva$fila_inicial:$col_formula_iva$filas)", $formatos_moneda[$moneda]);
 		}
