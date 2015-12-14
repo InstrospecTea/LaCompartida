@@ -122,10 +122,14 @@ The Time Billing - Time Tracking
 
         $ cp config/cap_servers.rb.default config/cap_servers.rb
         (Es necesario modificar este archivo. Dejar solo el servidor al que se realizará el deployeo)
-        
+
   * Instalar bibliotecas con [Composer][12]:
 
         $ composer install
+  * Actualizar autoloader
+
+        $ composer dump-autoload --optimize
+
 
 ###Deploy in local machinne
 
