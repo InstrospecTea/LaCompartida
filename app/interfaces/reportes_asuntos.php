@@ -134,7 +134,6 @@
 
 
 <script type="text/javascript">
-<!-- //
 
 function Verificar(form,opc)
 {
@@ -144,7 +143,7 @@ function Verificar(form,opc)
 		form.action = "reportes_asuntos.php";
 	form.submit();
 }
-// ->
+
 </script>
 <?
 	$pagina->PrintBottom();

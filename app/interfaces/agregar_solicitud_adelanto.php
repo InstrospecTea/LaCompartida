@@ -11,7 +11,7 @@ if ($_POST['opcion'] == 'guardar') {
 	$SolicitudAdelanto->Fill($_REQUEST, true);
 	$SolicitudAdelanto->Edit('id_usuario_ingreso', $Sesion->usuario->fields['id_usuario']);
 
-	if (Conf::GetConf($Sesion, 'CodigoSecundario') && (isset($_REQUEST['codigo_cliente_secundario']) && !empty($_REQUEST['codigo_cliente_secundario']))) {
+	if (Conf::GetConf($Sesion, 'CodigoSecundario') && !empty($_REQUEST['codigo_cliente_secundario'])) {
 		$Cliente = new Cliente($Sesion);
 		$Cliente->LoadByCodigoSecundario($_REQUEST['codigo_cliente_secundario']);
 		if ($Cliente->Loaded()) {
