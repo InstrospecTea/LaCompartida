@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
+$Html = new \TTB\Html;
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 set_time_limit(300);
@@ -74,50 +75,45 @@ if ($xls) {
 	$ws1->setZoom(75);
 
 	$filas += 1;
-	$ws1->mergeCells($filas, 1, $filas, 3);
 	$ws1->write($filas, 1, __('Reporte ciclo de cobranza').' '.UtilesApp::GetConf($sesion,'PdfLinea1'), $formato_encabezado);
-	$ws1->write($filas, 2, '', $formato_encabezado);
-        $ws1->write($filas, 3, '', $formato_encabezado);
 
 	$filas +=2;
-	$ws1->mergeCells($filas, 1, $filas, 4);
 
-	if (isset($_POST['fecha1']) && isset($_POST['fecha2'])) {
-		$ft = explode("-", $_POST['fecha1']);
+	if ($fecha1 != '' AND !DateTime::createFromFormat('Y-m-d', $fecha1)) {
+		$fecha1 = date('Y-m-d', strtotime($fecha1));
+	}
+	if ($fecha2 != '' AND !DateTime::createFromFormat('Y-m-d', $fecha2)) {
+		$fecha2 = date('Y-m-d', strtotime($fecha2));
+	}
+
+	$ws1->mergeCells($filas, 2, $filas, 3);
+
+	if ($fecha1 != '' && $fecha2 != '') {
+		$ft = explode("-", $fecha1);
 		$fecha_desde = $ft[2] . "/" . $ft[1] . "/" . $ft[0];
 
-		$ft = explode("-", $_POST['fecha2']);
+		$ft = explode("-", $fecha2);
 		$fecha_hasta = $ft[2] . "/" . $ft[1] . "/" . $ft[0];
 
-		$ws1->write($filas, 1, __('Periodo desde:'), $formato_encabezado2);
+		$ws1->write($filas, 1, __('Periodo desde: '), $formato_encabezado2);
 		$ws1->write($filas, 2, $fecha_desde . __(" Hasta ") . $fecha_hasta, $formato_encabezado2);
-                $ws1->write($filas, 3, '', $formato_encabezado2);
-                $ws1->write($filas, 4, '', $formato_encabezado2);
-	} elseif (isset($_POST['fecha1'])) {
-		$where .= " AND f.fecha >= '{$_POST['fecha1']}' ";
+	} elseif ($fecha1 != '') {
+		$where .= " AND f.fecha >= '{$fecha1}' ";
 
-		$ft = explode("-", $_POST['fecha1']);
+		$ft = explode("-", $fecha1);
 		$fecha_desde = $ft[2] . "/" . $ft[1] . "/" . $ft[0];
 
 		$ws1->write($filas, 1, __('Periodo desde:'), $formato_encabezado2);
 		$ws1->write($filas, 2, $fecha_desde, $formato_encabezado2);
-                $ws1->write($filas, 3, '', $formato_encabezado2);
-                $ws1->write($filas, 4, '', $formato_encabezado2);
-	} elseif (isset($_POST['fecha2'])) {
+	} elseif ($fecha2 != '') {
+		$where .= " AND f.fecha <= '{$fecha2}' ";
 
-		$where .= " AND f.fecha <= '{$_POST['fecha2']}' ";
-
-		$ft = explode("-", $_POST['fecha2']);
+		$ft = explode("-", $fecha2);
 		$fecha_hasta = $ft[2] . "/" . $ft[1] . "/" . $ft[0];
 
 		$ws1->write($filas, 1, __('Periodo hasta:'), $formato_encabezado2);
 		$ws1->write($filas, 2, $fecha_hasta, $formato_encabezado2);
-                $ws1->write($filas, 3, '', $formato_encabezado2);
-                $ws1->write($filas, 4, '', $formato_encabezado2);
 	}
-
-
-	$ws1->write($filas, 2, date("d-m-Y H:i:s"), $formato_texto);
 
 	$filas +=4;
 	$col = 0;
@@ -152,14 +148,13 @@ if ($xls) {
 
 
 	if (UtilesApp::GetConf($sesion, 'NuevoModuloFactura')) {
-
 		$where = " pef.codigo != 'A' ";
-		if (isset($_POST['fecha1']) && isset($_POST['fecha2'])) {
-			$where .= " AND f.fecha >= '{$_POST['fecha1']}' AND f.fecha <= '{$_POST['fecha2']}' ";
-		} elseif (isset($_POST['fecha1'])) {
-			$where .= " AND f.fecha >= '{$_POST['fecha1']}' ";
-		} elseif (isset($_POST['fecha2'])) {
-			$where .= " AND f.fecha <= '{$_POST['fecha2']}' ";
+		if ($fecha1 != '' && $fecha2 != '') {
+			$where .= " AND f.fecha >= '{$fecha1}' AND f.fecha <= '{$fecha2}' ";
+		} elseif ($fecha1 != '') {
+			$where .= " AND f.fecha >= '{$fecha1}' ";
+		} elseif ($fecha2 != '') {
+			$where .= " AND f.fecha <= '{$fecha2}' ";
 		}
 
 		if (isset($_POST['id_documento_legal']) && $_POST['id_documento_legal'] > 0) {
@@ -249,12 +244,12 @@ if ($xls) {
 	} else {
 		$where = " d.tipo_doc = 'N'
 				AND ( cob.estado != 'CREADO' AND cob.estado!='EN REVISION' AND cob.estado != 'INCOBRABLE') ";
-		if (isset($_POST['fecha1']) && isset($_POST['fecha2'])) {
-			$where .= " AND d.fecha >= '{$_POST['fecha1']}' AND d.fecha <= '{$_POST['fecha2']}' ";
-		} elseif (isset($_POST['fecha1'])) {
-			$where .= " AND d.fecha >= '{$_POST['fecha1']}' ";
-		} elseif (isset($_POST['fecha2'])) {
-			$where .= " AND d.fecha <= '{$_POST['fecha2']}' ";
+		if ($fecha1 != '' && $fecha2 != '') {
+			$where .= " AND d.fecha >= '{$fecha1}' AND d.fecha <= '{$fecha2}' ";
+		} elseif ($fecha1 != '') {
+			$where .= " AND d.fecha >= '{$fecha1}' ";
+		} elseif ($fecha2 != '') {
+			$where .= " AND d.fecha <= '{$fecha2}' ";
 		}
 
 
@@ -346,7 +341,7 @@ $pagina->PrintTop();
 				<?php echo __('Fecha desde'); ?>
 			</td>
 			<td align=left>
-				<?php echo Html::PrintCalendar("fecha1", "$fecha1"); ?>
+				<?php echo $Html::PrintCalendar('fecha1', $fecha1); ?>
 			</td>
 		</tr>
 		<tr>
@@ -354,7 +349,7 @@ $pagina->PrintTop();
 				<?php echo __('Fecha hasta'); ?>
 			</td>
 			<td align=left>
-				<?php echo Html::PrintCalendar("fecha2", "$fecha2"); ?>
+				<?php echo $Html::PrintCalendar('fecha2', $fecha2); ?>
 			</td>
 		</tr>
 		<!--<tr>
@@ -387,6 +382,6 @@ $pagina->PrintTop();
 	</table>
 </form>
 <?php
-echo(InputId::Javascript($sesion));
-$pagina->PrintBottom();
+	echo(InputId::Javascript($sesion));
+	$pagina->PrintBottom();
 ?>

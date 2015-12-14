@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 
 $sesion = new sesion(array('REP'));
+$Html = new \TTB\Html;
 
 if (in_array($opcion, array('buscar', 'xls', 'json'))) {
 
@@ -50,13 +51,11 @@ $Pagina->PrintTop();
 						<tr>
 							<td align="right"><?php echo __('Fecha Desde') ?></td>
 							<td nowrap align="left">
-								<input type="text" name="fecha_desde" value="<?php echo $fecha_desde ?>" id="fecha_desde" size="11" maxlength="10" />
-								<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_desde" style="cursor:pointer" />
+								<?php echo $Html::PrintCalendar("fecha_desde", $fecha_desde); ?>
 							</td>
 							<td align="right"><?php echo __('Fecha Hasta') ?></td>
 							<td nowrap align="left">
-								<input type="text" name="fecha_hasta" value="<?php echo $fecha_hasta ?>" id="fecha_hasta" size="11" maxlength="10" />
-								<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_hasta" style="cursor:pointer" />
+								<?php echo $Html::PrintCalendar("fecha_hasta", $fecha_hasta); ?>
 							</td>
 						</tr>
 						<tr>
@@ -87,9 +86,6 @@ $Pagina->PrintTop();
 		jQuery('#boton_buscar').click(function() {
 			jQuery('#opcion').val('buscar');
 		});
-
-		Calendar.setup({inputField: "fecha_desde", ifFormat: "%d-%m-%Y", button: "img_fecha_desde"});
-		Calendar.setup({inputField: "fecha_hasta", ifFormat: "%d-%m-%Y", button: "img_fecha_hasta"});
 	});
 </script>
 

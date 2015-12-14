@@ -3,6 +3,7 @@
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
+	$Html = new \TTB\Html;
 
 	$pagina->titulo = __('Reporte Histórico Tipo de Cambio');
 	$pagina->PrintTop();
@@ -13,25 +14,23 @@
 <table class="border_plomo tb_base">
 	<tr>
 		<td align=right>
-			<?=__('Fecha desde')?>
+			<?php echo __('Fecha desde'); ?>
 		</td>
 		<td align=left>
-		  <input type="text" name="fecha_ini" value="<?=$fecha_ini ?>" id="fecha_ini" size="11" maxlength="10" />
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+			<?php echo $Html::PrintCalendar('fecha_ini', $fecha_ini, 12, 'fechadiff', true); ?>
 		</td>
 	</tr>
 	<tr>
 		<td align=right>
-			<?=__('Fecha hasta')?>
+			<?php echo __('Fecha hasta'); ?>
 		</td>
 		<td align=left>
-			<input type="text" name="fecha_fin" value="<?=$fecha_fin ?>" id="fecha_fin" size="11" maxlength="10" />
-			<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+			<?php echo $Html::PrintCalendar('fecha_fin', $fecha_fin, 12, 'fechadiff', true); ?>
 		</td>
 	</tr>
 	<tr>
 		<td colspan=4 align=center>
-			<input type=submit class=btn value="<?=__('Descargar Reporte')?>">
+			<input type=submit class=btn value="<?php echo __('Descargar Reporte'); ?>">
 		</td>
 	</tr>
 
@@ -39,26 +38,7 @@
 
 </form>
 
-<script type="text/javascript">
-<!-- //
-Calendar.setup(
-	{
-		inputField	: "fecha_ini",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_ini"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha_fin",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_fin"		// ID of the button
-	}
-);
-
-// ->
-</script>
-<?
+<?php
 	//echo(InputId::Javascript($sesion));
-	$pagina->PrintBottom();e
+	$pagina->PrintBottom();
 ?>
