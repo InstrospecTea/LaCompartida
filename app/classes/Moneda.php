@@ -64,7 +64,7 @@ class Moneda extends Objeto {
 		}
 	}
 
-	function GetMonedaBase(&$sesion) {
+	public static function GetMonedaBase(&$sesion) {
 		$query = "SELECT id_moneda FROM prm_moneda WHERE moneda_base = 1";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($id_moneda) = mysql_fetch_array($resp)) {
@@ -122,7 +122,7 @@ class Moneda extends Objeto {
 		}
 	}
 
-	function GetMonedaTramitePorDefecto(&$sesion) {
+	public static function GetMonedaTramitePorDefecto(&$sesion) {
 		if (method_exists('Conf', 'GetConf')) {
 			$query = "SELECT id_moneda FROM prm_moneda WHERE glosa_moneda = '" . Conf::GetConf($sesion, 'MonedaTramitePorDefecto') . "'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -136,7 +136,7 @@ class Moneda extends Objeto {
 		}
 	}
 
-	function GetMonedaReportesAvanzados(&$sesion) {
+	public static function GetMonedaReportesAvanzados(&$sesion) {
 		$query = " SELECT id_moneda FROM prm_moneda WHERE glosa_moneda LIKE '%" . Conf::GetConf($sesion, 'MonedaTarifaPorDefecto') . "%' ";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($id_moneda) = mysql_fetch_array($resp);
