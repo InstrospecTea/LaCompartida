@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 15.31.0](https://github.com/LemontechSA/ttb/pull/1260)
+Monday 2015, December 14th
+* **Feature** [Unificar calendarios](https://github.com/LemontechSA/ttb/pull/1225)
+
 ## [Release 15.30.0](https://github.com/LemontechSA/ttb/pull/1258)
 Thursday 2015, December 10th
 * **Feature** [Reporte MTA](https://github.com/LemontechSA/ttb/pull/1254)
