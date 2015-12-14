@@ -27,7 +27,7 @@ HTML;
 		return $html;
 	}
 
-	public static  function PrintCheckboxList($sesion, $lista, $function_rows = "PrintCheckRow") {
+	public static function PrintCheckboxList($sesion, $lista, $function_rows = "PrintCheckRow") {
 		$html = "";
 		for ($i = 0; $i < $lista->num; $i++) {
 			$obj = $lista->Get($i);
@@ -46,7 +46,7 @@ HTML;
 	 * @param type $width
 	 * @return string
 	 */
-	public static  function SelectArrayDecente($array, $name, $selected = '', $opciones = '', $titulo = '', $width = "150px") {
+	public static function SelectArrayDecente($array, $name, $selected = '', $opciones = '', $titulo = '', $width = "150px") {
 		$select = "<select name='$name' id='$name' $opciones style='width: $width;'>";
 		if ($titulo == 'Vacio') {
 			$select .= "<option value='-1'>&nbsp;</option>\n";
@@ -66,7 +66,7 @@ HTML;
 		return $select;
 	}
 
-	public static  function SelectArray($array, $name, $selected = '', $opciones = '', $titulo = '', $width = "150px") {
+	public static function SelectArray($array, $name, $selected = '', $opciones = '', $titulo = '', $width = "150px") {
 		//sort($array);
 		$is_assoc = is_array($array[0]);
 
@@ -114,7 +114,7 @@ HTML;
 		return $html;
 	}
 
-	public static  function SelectResultado($sesion, $resp, $name, $selected = '', $opciones = '', $titulo = '', $width = '150') {
+	public static function SelectResultado($sesion, $resp, $name, $selected = '', $opciones = '', $titulo = '', $width = '150') {
 		if (is_array($selected)) {
 			$cont_selected = 0;
 			$seleccionado = $selected[0];
@@ -186,7 +186,7 @@ HTML;
 	 * @param type $width
 	 * @return type
 	 */
-	function SelectQuery($sesion, $query, $name, $selected = '', $opciones = '', $titulo = '', $width = '150') {
+	public static function SelectQuery($sesion, $query, $name, $selected = '', $opciones = '', $titulo = '', $width = '150') {
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 		return self::SelectResultado($sesion, $resp, $name, $selected, $opciones, $titulo, $width);
@@ -223,7 +223,7 @@ HTML;
 	}
 
 	//Funci�n que imprime un calendario
-	public static  function PrintCalendar($input_name, $value, $requerido = true) {
+	public static function PrintCalendar($input_name, $value, $requerido = true) {
 		if ($value == "0000-00-00")
 			echo("<script type='text/javascript'>DateInput('$input_name', false, 'YYYY-MM-DD' )</script>");#No muestra los selects, no manda nada al form
 		else if ($value == "")
@@ -237,7 +237,7 @@ HTML;
 	}
 
 	//Imprime un reloj
-	public static  function PrintTime($input_name, $value, $opciones = "", $editable = true) {
+	public static function PrintTime($input_name, $value, $opciones = "", $editable = true) {
 		static $i = 0;
 		echo '<script type="text/javascript" src="//static.thetimebilling.com/js/fs_pat.js"></script>';
 
@@ -301,7 +301,7 @@ HTML;
 		return $lista_menu_permiso;
 	}
 
-	public static  function PrintMenu($sesion) {
+	public static function PrintMenu($sesion) {
 		$lista_menu_permiso = Html::ListaMenuPermiso($sesion);
 
 		$menu_html = "<!-- Menu Section--> \n";
@@ -336,7 +336,7 @@ HTML;
 		return $menu_html;
 	}
 
-	public static  function PrintMenuTheme($sesion) {
+	public static function PrintMenuTheme($sesion) {
 		$lista_menu_permiso = Html::ListaMenuPermiso($sesion);
 
 		$menu_html = "<!-- Menu Section--> \n";
@@ -371,7 +371,7 @@ HTML;
 		return $menu_html;
 	}
 
-	public static  function PrintMenuJuiciosjQuery($sesion, $url_actual, $argv) {
+	public static function PrintMenuJuiciosjQuery($sesion, $url_actual, $argv) {
 		$argv = explode('&', $argv[0]);
 		switch ($url_actual) {
 			case '/app/interfaces/lista_causas.php':
@@ -483,7 +483,7 @@ HTML;
 		return $menu_html;
 	}
 
-	public static  function SelectAnos(&$sesion, $name, $selected = '', $opciones = '') {
+	public static function SelectAnos(&$sesion, $name, $selected = '', $opciones = '') {
 		$select = "<select name='$name' id='$name' $opciones>";
 		$ano_actual = date('Y');
 		$hasta = $ano_actual - 101;
@@ -500,7 +500,7 @@ HTML;
 	}
 
 	//genera codigo de tooltip listo para poner dentro de un tag
-	public static  function Tooltip($html) {
+	public static function Tooltip($html) {
 		$html = str_replace(array("\r\n", "\r", "\n"), "<br>", $html);
 		$html = str_replace("'", "\'", $html);
 		$html = htmlspecialchars($html, ENT_QUOTES);
@@ -508,4 +508,3 @@ HTML;
 	}
 
 }
-

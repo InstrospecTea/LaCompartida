@@ -248,7 +248,7 @@ if ($opcion == 'guardar') {
 			}
 			$documento->LoadByCobro($id_cobro);
 			$id_factura_pago = $pago->fields['id_factura_pago'];
-			$cta_cte_fact->IngresarPago($pago, $neteos, $id_cobro, &$pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago);
+			$cta_cte_fact->IngresarPago($pago, $neteos, $id_cobro, $pagina, $ids_monedas_factura_pago, $tipo_cambios_factura_pago);
 			$monto_pago -= $monto;
 
 			$cobro->CambiarEstadoSegunFacturas();
