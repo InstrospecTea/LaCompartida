@@ -181,4 +181,26 @@ class Html extends \Html {
 		return $this->{"{$type}Path"} . $filename;
 	}
 
+	/**
+	 * Devuelve un calendario. Si la fecha está en blanco se desplegara la fecha actual.
+	 * @param string $input_name
+	 * @param string $value
+	 * @param int $size
+	 * @param string $clase
+	 * @param boolean $blank
+	 * @return string
+	 */
+	public static function PrintCalendar($input_name, $value, $size = 12, $clase = 'fechadiff', $blank = false) {
+		$Form = new \Form;
+
+		if ($value == '') {
+			if ($blank) {
+				$value = '';
+			} else {
+				$value = date('d-m-Y');
+			}
+		}
+
+		return $Form->input('', $value, array('name' => $input_name, 'id' => $input_name, 'class' => $clase, 'size' => $size));
+	}
 }

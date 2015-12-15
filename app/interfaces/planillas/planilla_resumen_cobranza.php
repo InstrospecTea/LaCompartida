@@ -10,6 +10,7 @@ set_time_limit(300);
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 $Form = new Form($sesion);
+$Html = new \TTB\Html;
 
 if ($xls) {
 	$moneda_base = Utiles::MonedaBase($sesion);
@@ -875,7 +876,7 @@ if ($xls) {
 		}
 		$ws1->writeFormula($filas, $col_honorarios, "=SUM($col_formula_honorarios$fila_inicial:$col_formula_honorarios$filas)", $formatos_moneda[$moneda]);
 		$ws1->writeFormula($filas, $col_gastos, "=SUM($col_formula_gastos$fila_inicial:$col_formula_gastos$filas)", $formatos_moneda[$moneda]);
-		
+
 		if (Conf::GetConf($sesion, 'UsarImpuestoSeparado')) {
 			$ws1->writeFormula($filas, $col_iva, "=SUM($col_formula_iva$fila_inicial:$col_formula_iva$filas)", $formatos_moneda[$moneda]);
 		}
@@ -907,8 +908,8 @@ $pagina->PrintTop();
 
 </script>
 
-<form method=post name=formulario action="<?php echo $_server['php_self']; ?>?xls=1">
-	<input type=hidden name=horas_sql id=horas_sql value='<?php echo $horas_sql ? $horas_sql : 'hr_trabajadas' ?>'/>
+<form method="post" name="formulario" action="<?php echo $_server['php_self']; ?>?xls=1">
+	<input type="hidden" name="horas_sql" id="horas_sql" value='<?php echo $horas_sql ? $horas_sql : 'hr_trabajadas' ?>'/>
 	<!-- Calendario DIV -->
 	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
 		<div class="floating" id="calendar"></div>
@@ -921,31 +922,31 @@ $pagina->PrintTop();
 		   <tr>
 			<td align="center">
 				<table style="border: 0px solid black;" width="99%" cellpadding="0" cellspacing="3" >
-					<tr valign=top>
-						<td align=left width='25%' >
+					<tr valign="top">
+						<td align="left" width='25%' >
 							<b><?php echo __('Clientes') ?>:</b>
 						</td>
-						<td align=left width='25%'>
+						<td align="left" width='25%'>
 							<b><?php echo __('Encargados Comerciales') ?>:</b>
 						</td>
-						<td align=left width='25%'>
+						<td align="left" width='25%'>
 							<b><?php echo __('Grupos Clientes') ?>:</b>
 						</td>
-						<td align=left width='25%'>
+						<td align="left" width='25%'>
 							<b><?php echo __('Estado') ?>:</b>
 						</td>
 					</tr>
-					<tr valign=top>
-						<td rowspan="2" align=left>
+					<tr valign="top">
+						<td rowspan="2" align="left">
 							<?php echo Html::SelectQuery($sesion, "SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes, "class=\"selectMultiple\" multiple size=6 ", "", "170"); ?>
 						</td>
-						<td rowspan="2" align=left><!-- Nuevo Select -->
+						<td rowspan="2" align="left"><!-- Nuevo Select -->
 							<?php echo $Form->select('socios[]', UsuarioExt::QueryComerciales($sesion), $socios, array('empty' => FALSE, 'style' => 'width: 170px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6')); ?>
 						</td>
-						<td rowspan="2" align=left>
+						<td rowspan="2" align="left">
 							<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "grupos[]", $grupos, "class=\"selectMultiple\" multiple size=6 ", "", "170"); ?>
 						</td>
-						<td rowspan="2" align=left>
+						<td rowspan="2" align="left">
 							<?php echo Html::SelectQuery($sesion, "SELECT codigo_estado_cobro AS estado FROM prm_estado_cobro ORDER BY orden ASC", "estados[]", $estados, "class=\"selectMultiple\" multiple size=6 ", "", "170"); ?>
 						</td>
 					</tr>
@@ -960,7 +961,7 @@ $pagina->PrintTop();
 							<b><?php echo __('Facturado en:') ?></b><br>
 							<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda ASC", "monedas[]", $monedas, "class=\"selectMultiple\" multiple size=3 ", "", "160"); ?>
 						</td>
-						<td align=right><b><?php echo __('Fecha de') ?>:&nbsp;</b></td><td align=left>
+						<td align="right"><b><?php echo __('Fecha de') ?>:&nbsp;</b></td><td align="left">
 							<select name='estado' id='estado' style='width: 148px;'>
 								<option value='CORTE'>CORTE</option>
 								<option value='CREADO'>CREADO</option>
@@ -975,16 +976,16 @@ $pagina->PrintTop();
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td align=right>
+						<td align="right">
 							<b><?php echo __('Periodo') ?>:</b>&nbsp;&nbsp;
 
 						</td>
-						<td align=left colspan="1">
+						<td align="left" colspan="1">
 							<?php
 							if (!$fecha_mes)
 								$fecha_mes = date('m');
 							?>
-							<div id=periodo style='display:<?php echo!$rango ? 'inline' : 'none' ?>;'>
+							<div id="periodo" style='display:<?php echo!$rango ? 'inline' : 'none' ?>;'>
 								<select name="fecha_mes" style='width:89px'>
 									<option value='1' <?php echo $fecha_mes == 1 ? 'selected' : '' ?>><?php echo __('Enero') ?></option>
 									<option value='2' <?php echo $fecha_mes == 2 ? 'selected' : '' ?>><?php echo __('Febrero') ?></option>
@@ -1009,20 +1010,18 @@ $pagina->PrintTop();
 									<?php } ?>
 								</select>
 							</div>
-							<div id=periodo_rango style='display:<?php echo $rango ? 'inline' : 'none' ?>;'>
+							<div id="periodo_rango" style='display:<?php echo $rango ? 'inline' : 'none' ?>;'>
 								<table>
 									<tr>
 										<td nowrap>
 											<?php echo __('Fecha desde') ?>:
-											<input type="text" name="fecha_ini" value="<?php echo $fecha_ini ? $fecha_ini : date("d-m-Y", strtotime("$hoy")) ?>" id="fecha_ini" size="8" maxlength="10" />
-											<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+											<?php echo $Html::PrintCalendar('fecha_ini', $fecha_ini); ?>
 										</td>
 									</tr>
 									<tr>
 										<td nowrap>
 											<?php echo __('Fecha hasta') ?>:&nbsp;
-											<input type="text" name="fecha_fin" value="<?php echo $fecha_fin ? $fecha_fin : date("d-m-Y", strtotime("$hoy")) ?>" id="fecha_fin" size="8" maxlength="10" />
-											<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+											<?php echo $Html::PrintCalendar('fecha_fin', $fecha_fin); ?>
 										</td>
 									</tr>
 								</table>
@@ -1036,16 +1035,16 @@ $pagina->PrintTop();
 
 					</tr>
 					<tr>
-						<td align=right>
+						<td align="right">
 							<b><?php echo __('Mostrar valores en: ') ?></b>&nbsp;
 						</td>
-						<td colspan="3" align=left>
+						<td colspan="3" align="left">
 							<?php echo Html::SelectQuery($sesion, "SELECT id_moneda,glosa_moneda AS nombre FROM prm_moneda ORDER BY id_moneda ASC", "moneda", $moneda, "", "", "80"); ?>&nbsp;
 						</td>
 					</tr>
 					<tr>
-						<td align=right colspan="4">
-							<input type=submit class=btn value="<?php echo __('Generar planilla') ?>" />
+						<td align="right" colspan="4">
+							<input type="submit" class="btn" value="<?php echo __('Generar planilla') ?>" />
 						</td>
 					</tr>
 				</table>
@@ -1054,7 +1053,7 @@ $pagina->PrintTop();
 	</table>
 </form>
 <script type="text/javascript">
-<!-- //
+
 	function Rangos(obj, form) {
 		if (obj.checked) {
 			jQuery('#periodo').hide();
@@ -1064,23 +1063,9 @@ $pagina->PrintTop();
 			jQuery('#periodo_rango').hide();
 		}
 	}
-	Calendar.setup(
-			{
-				inputField: "fecha_ini", // ID of the input field
-				ifFormat: "%d-%m-%Y", // the date format
-				button: "img_fecha_ini"	// ID of the button
-			}
-	);
-	Calendar.setup(
-			{
-				inputField: "fecha_fin", // ID of the input field
-				ifFormat: "%d-%m-%Y", // the date format
-				button: "img_fecha_fin"	// ID of the button
-			}
-	);
-// ->
+
 </script>
 <?php
-echo(InputId::Javascript($sesion));
-$pagina->PrintBottom();
+	echo(InputId::Javascript($sesion));
+	$pagina->PrintBottom();
 ?>

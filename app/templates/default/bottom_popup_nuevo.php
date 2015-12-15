@@ -1,13 +1,13 @@
 </div>
-<div id="dialogomodal" style="display:none;" ></div>  
-<div id="dialog-confirm" style="display:none;" ></div>  
+<div id="dialogomodal" style="display:none;" ></div>
+<div id="dialog-confirm" style="display:none;" ></div>
 <div id="lttooltip"></div>
-<script type="text/javascript" src="//static.thetimebilling.com/js/bottom.20150914032122.js"></script>
+<script type="text/javascript" src="//static.thetimebilling.com/js/bottom.20151207051018.js"></script>
 <script type="text/javascript">
 /* <![CDATA[   */
 <?php ($Slim=Slim::getInstance('default',true)) ? $Slim->applyHook('hook_footer_popup') : false; ?>
-   
- 
+
+
 
 
 
@@ -16,7 +16,7 @@
  function downloadJSAtOnload() {
 
 
- 
+
 if (_sf_async_config.pathseguro!==undefined) {
          if (jQuery('#DigiCertClickID_iIR9fwBQ').length>0) {
                 jQuery('#ultimocontenedor').css({'width':'330px'});
@@ -34,7 +34,7 @@ if (_sf_async_config.pathseguro!==undefined) {
  else if (window.attachEvent)
  window.attachEvent("onload", downloadJSAtOnload);
  else window.onload = downloadJSAtOnload;
- 
+
 
 /* ]]> */
 </script>

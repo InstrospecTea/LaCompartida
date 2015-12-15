@@ -9,6 +9,7 @@
 	$pagina = new Pagina($sesion);
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 	$Form = new Form($sesion);
+	$Html = new \TTB\Html;
 
 	if($xls)
 	{
@@ -820,50 +821,51 @@
 	$pagina->titulo = __('Reporte Participación Abogados');
 	$pagina->PrintTop();
 ?>
-<form method=post name=formulario action="planilla_participacion_abogado.php?xls=1">
-<input type=hidden name=horas_sql id=horas_sql value='<?=$horas_sql ? $horas_sql : 'hr_trabajadas' ?>'/>
+<form method="post" name="formulario" action="planilla_participacion_abogado.php?xls=1">
+<input type="hidden" name="horas_sql" id="horas_sql" value='<?php echo $horas_sql ? $horas_sql : 'hr_trabajadas'; ?>'/>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
 	<div class="floating" id="calendar"></div>
 </div>
 <!-- Fin calendario DIV -->
-<?
-$hoy = date("Y-m-d");
+<?php
+	$hoy = date("Y-m-d");
 ?>
 <table class="border_plomo tb_base" width="650px" cellpadding="0" cellspacing="3" align="center">
 	<tr>
 		<td align="center">
 <table style="border: 0px solid black;" width="99%" cellpadding="0" cellspacing="3">
-	<tr valign=top>
-		<td align=left colspan="2" width='33%' >
-			<b><?=__('Clientes')?>:</b>
+	<tr valign="top">
+		<td align="left" colspan="2" width='33%' >
+			<b><?php echo __('Clientes'); ?>:</b>
 		</td>
-		<td align=left width='33%'>
-			<b><?=__('Encargados Comerciales')?>:</b>
+		<td align="left" width='33%'>
+			<b><?php echo __('Encargados Comerciales'); ?>:</b>
 		</td>
-		<td align=left width='33%'>
-			<b><?=__('Estado')?>:</b>
+		<td align="left" width='33%'>
+			<b><?php echo __('Estado'); ?>:</b>
 		</td>
 	</tr>
-	<tr valign=top>
-		<td rowspan="2" colspan="2" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
+	<tr valign="top">
+		<td rowspan="2" colspan="2" align="left">
+			<?php echo Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]", $clientes,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>
 		</td>
-		<td rowspan="2" align=left><!-- Nuevo Select -->
+		<td rowspan="2" align="left"><!-- Nuevo Select -->
             <?php echo $Form->select('socios[]', UsuarioExt::QueryComerciales($sesion), $socios, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple', 'size' => '6')); ?>
 		</td>
-		<td rowspan="2" align=left>
-			<?=Html::SelectQuery($sesion,"SELECT codigo_estado_cobro AS estado FROM prm_estado_cobro ORDER BY orden ASC", "estados[]", $estados,"class=\"selectMultiple\" multiple size=6 ","","200"); ?></td>
+		<td rowspan="2" align="left">
+			<?php echo Html::SelectQuery($sesion,"SELECT codigo_estado_cobro AS estado FROM prm_estado_cobro ORDER BY orden ASC", "estados[]", $estados,"class=\"selectMultiple\" multiple size=6 ","","200"); ?></td>
 		</td>
 	</tr>
 	<tr><td colspan="3">&nbsp;</td></tr>
-<?
-	if(!$tipo)
+<?php
+	if (!$tipo) {
 		$tipo = 'Profesional';
+	}
 ?>
 <!-- PERIODOS -->
 	<tr>
-		<td align=right><b><?=__('Fecha de') ?>:&nbsp;</b></td><td align=left>
+		<td align="right"><b><?php echo __('Fecha de'); ?>:&nbsp;</b></td><td align=left>
 		<select name='estado' id='estado' style='width: 120px;'>
 			<option value='CORTE'>CORTE</option>
 			<option value='CREADO'>CREADO</option>
@@ -875,57 +877,57 @@ $hoy = date("Y-m-d");
 			<option value='PAGADO'>PAGADO</option>
 			<option value='INCOBRABLE'>INCOBRABLE</option>
 		</select></td>
-		<td align=right>
-			<b><?=__('Periodo') ?>:</b>&nbsp;&nbsp;
-			<input type="checkbox" id="rango" name="rango" value="1" <?=$rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;
-			<label for="rango" style="font-size:9px"><?=__('Otro rango') ?></label>
+		<td align="right">
+			<b><?php echo __('Periodo'); ?>:</b>&nbsp;&nbsp;
+			<input type="checkbox" id="rango" name="rango" value="1" <?php echo $rango ? 'checked' : ''; ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;
+			<label for="rango" style="font-size:9px"><?php echo __('Otro rango'); ?></label>
 		</td>
-		<td align=left>
-<?
-		if(!$fecha_mes)
+		<td align="left">
+<?php
+		if (!$fecha_mes) {
 			$fecha_mes = date('m');
+		}
 ?>
-			<div id=periodo style='display:<?=!$rango ? 'inline' : 'none' ?>;'>
+			<div id="periodo" style="display:<?php echo !$rango ? 'inline' : 'none'; ?>;">
 				<select name="fecha_mes" style='width:60px'>
-					<option value='1' <?=$fecha_mes==1 ? 'selected':'' ?>><?=__('Enero') ?></option>
-					<option value='2' <?=$fecha_mes==2 ? 'selected':'' ?>><?=__('Febrero') ?></option>
-					<option value='3' <?=$fecha_mes==3 ? 'selected':'' ?>><?=__('Marzo') ?></option>
-					<option value='4' <?=$fecha_mes==4 ? 'selected':'' ?>><?=__('Abril') ?></option>
-					<option value='5' <?=$fecha_mes==5 ? 'selected':'' ?>><?=__('Mayo') ?></option>
-					<option value='6' <?=$fecha_mes==6 ? 'selected':'' ?>><?=__('Junio') ?></option>
-					<option value='7' <?=$fecha_mes==7 ? 'selected':'' ?>><?=__('Julio') ?></option>
-					<option value='8' <?=$fecha_mes==8 ? 'selected':'' ?>><?=__('Agosto') ?></option>
-					<option value='9' <?=$fecha_mes==9 ? 'selected':'' ?>><?=__('Septiembre') ?></option>
-					<option value='10' <?=$fecha_mes==10 ? 'selected':'' ?>><?=__('Octubre') ?></option>
-					<option value='11' <?=$fecha_mes==11 ? 'selected':'' ?>><?=__('Noviembre') ?></option>
-					<option value='12' <?=$fecha_mes==12 ? 'selected':'' ?>><?=__('Diciembre') ?></option>
+					<option value='1' <?php echo $fecha_mes==1 ? 'selected':''; ?>><?php echo __('Enero'); ?></option>
+					<option value='2' <?php echo $fecha_mes==2 ? 'selected':''; ?>><?php echo __('Febrero'); ?></option>
+					<option value='3' <?php echo $fecha_mes==3 ? 'selected':''; ?>><?php echo __('Marzo'); ?></option>
+					<option value='4' <?php echo $fecha_mes==4 ? 'selected':''; ?>><?php echo __('Abril'); ?></option>
+					<option value='5' <?php echo $fecha_mes==5 ? 'selected':''; ?>><?php echo __('Mayo'); ?></option>
+					<option value='6' <?php echo $fecha_mes==6 ? 'selected':''; ?>><?php echo __('Junio'); ?></option>
+					<option value='7' <?php echo $fecha_mes==7 ? 'selected':''; ?>><?php echo __('Julio'); ?></option>
+					<option value='8' <?php echo $fecha_mes==8 ? 'selected':''; ?>><?php echo __('Agosto'); ?></option>
+					<option value='9' <?php echo $fecha_mes==9 ? 'selected':''; ?>><?php echo __('Septiembre'); ?></option>
+					<option value='10' <?php echo $fecha_mes==10 ? 'selected':''; ?>><?php echo __('Octubre'); ?></option>
+					<option value='11' <?php echo $fecha_mes==11 ? 'selected':''; ?>><?php echo __('Noviembre'); ?></option>
+					<option value='12' <?php echo $fecha_mes==12 ? 'selected':''; ?>><?php echo __('Diciembre'); ?></option>
 				</select>
-<?
-			if(!$fecha_anio)
+<?php
+			if (!$fecha_anio) {
 				$fecha_anio = date('Y');
+			}
 ?>
 				<select name="fecha_anio" style='width:55px'>
-					<? for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
-					<option value='<?=$i?>' <?=$fecha_anio == $i ? 'selected' : '' ?>><?=$i ?></option>
-					<? } ?>
+					<?php for ($i=(date('Y')-5);$i < (date('Y')+5);$i++) { ?>
+						<option value='<?php echo $i; ?>' <?php echo $fecha_anio == $i ? 'selected' : ''; ?>><?php echo $i; ?></option>
+					<?php } ?>
 				</select>
 			</div>
-			<div id=periodo_rango style='display:<?=$rango ? 'inline' : 'none' ?>;'>
-				<?=__('Fecha desde')?>:
-					<input type="text" name="fecha_ini" value="<?=$fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_ini" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+			<div id="periodo_rango" style="display:<?php echo $rango ? 'inline' : 'none'; ?>;">
+				<?php echo __('Fecha desde'); ?>:
+					<?php echo $Html::PrintCalendar('fecha_ini', $fecha_ini); ?>
 				<br />
-				<?=__('Fecha hasta')?>:&nbsp;
-					<input type="text" name="fecha_fin" value="<?=$fecha_fin ? $fecha_fin : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_fin" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+				<?php echo __('Fecha hasta'); ?>:&nbsp;
+					<?php echo $Html::PrintCalendar('fecha_fin', $fecha_fin); ?>
 			</div>
 	</tr>
 	<tr>
-		<td align=right><b><?=__('Moneda') ?>:</b>&nbsp;</td><td colspan="3" align=left><?=Html::SelectQuery($sesion,"SELECT id_moneda,glosa_moneda AS nombre FROM prm_moneda ORDER BY id_moneda ASC", "moneda", $moneda,"","","50"); ?>&nbsp;</td>
+		<td align="right"><b><?php echo __('Moneda'); ?>:</b>&nbsp;</td><td colspan="3" align=left><?php echo Html::SelectQuery($sesion,"SELECT id_moneda,glosa_moneda AS nombre FROM prm_moneda ORDER BY id_moneda ASC", "moneda", $moneda,"","","50"); ?>&nbsp;</td>
 	</tr>
 	<tr>
-			<td align=right colspan="4">
-				<input type=submit class=btn value="<?=__('Generar planilla')?>" />
+			<td align="right" colspan="4">
+				<input type="submit" class="btn" value="<?php echo __('Generar planilla'); ?>" />
 			</td>
 	</tr>
 </table>
@@ -944,20 +946,6 @@ $hoy = date("Y-m-d");
 			jQuery('#periodo_rango').hide();
 		}
 	}
-Calendar.setup(
-	{
-		inputField	: "fecha_ini",		// ID of the input field
-		ifFormat	: "%d-%m-%Y",		// the date format
-		button		: "img_fecha_ini"	// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha_fin",		// ID of the input field
-		ifFormat	: "%d-%m-%Y",		// the date format
-		button		: "img_fecha_fin"	// ID of the button
-	}
-);
 // ->
 </script>
 <?

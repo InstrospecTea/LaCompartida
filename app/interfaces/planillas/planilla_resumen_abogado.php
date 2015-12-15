@@ -223,7 +223,7 @@ foreach ($usuarios as $usuario) {
 		$reporte->id_moneda = CTEMONEDA;
 		$reporte->ignorar_cobros_sin_horas = true;
 		$reporte->setVista('glosa_cliente_asunto-mes_reporte');
-		$reporte->addRangoFecha(Utiles::fecha2sql($fecha_ini), Utiles::fecha2sql($fecha_fin));
+		$reporte->addRangoFecha($fecha_ini, $fecha_fin);
 		$reporte->setTipoDato($td);
 		if ($td == 'valor_cobrado') {
 			$reporte->Query();
@@ -333,7 +333,7 @@ function Print_Prof(& $ws1, $td) {
 	$ws1->mergeCells($filas, 2, $filas, 2 + 4);
 
 	$ws1->write( ++$filas, 1, __('PERIODO'), $formato_morado);
-	$ws1->write($filas, 2, Utiles::sql2date($fecha_ini) . ' a ' . Utiles::sql2date($fecha_fin), $formato_morado);
+	$ws1->write($filas, 2, $fecha_ini . ' a ' . $fecha_fin, $formato_morado);
 	$ws1->mergeCells($filas, 2, $filas, 2 + 4);
 
 	$ws1->setColumn(1, 2, 28);

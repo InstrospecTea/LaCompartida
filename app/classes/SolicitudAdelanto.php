@@ -334,11 +334,6 @@ class SolicitudAdelanto extends Objeto {
 			$errores[] = __('Debe seleccionar una fecha válida');
 		}
 
-		// template
-		//		if ($this->fields['id_template'] == '' || $this->fields['id_template'] == 0) {
-		//			$errores[] = __('Se produjo un error al asociar un template');
-		//		}
-
 		$this->error = $errores;
 
 		return empty($this->error);

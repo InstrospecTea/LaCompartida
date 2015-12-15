@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('COB','PRO'));
 $Pagina = new Pagina($Sesion);
+$Html = new \TTB\Html;
 
 $SolicitudAdelanto = new SolicitudAdelanto($Sesion);
 $SolicitudAdelanto->Fill($_REQUEST);
@@ -62,14 +63,12 @@ $Pagina->PrintTop();
 							<td align="right">
 								<label for="fecha_desde"><?php echo __('Fecha Desde') ?></label>
 							</td>
-							<td align="left">
-								<input type="text" name="fecha_desde" value="<?php echo $SolicitudAdelanto->extra_fields['fecha_desde']; ?>" id="fecha_desde" size="11" maxlength="10" />
-								<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_desde" style="cursor:pointer" />
+							<td align="left" colspan="2">
+								<?php echo $Html::PrintCalendar("fecha_desde", $SolicitudAdelanto->extra_fields['fecha_desde'], 12, "fechadiff", true); ?>
 							</td>
 							<td align="left" colspan="2">
 								<label for="fecha_hasta"><?php echo __('Fecha Hasta') ?></label>
-								<input type="text" name="fecha_hasta" value="<?php echo $SolicitudAdelanto->extra_fields['fecha_hasta']; ?>" id="fecha_hasta" size="11" maxlength="10" />
-								<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha_hasta" style="cursor:pointer" />
+								<?php echo $Html::PrintCalendar("fecha_hasta", $SolicitudAdelanto->extra_fields['fecha_hasta'], 12, "fechadiff", true); ?>
 							</td>
 						</tr>
 						<tr>
@@ -100,22 +99,22 @@ $Pagina->PrintTop();
 <?php
 if ($_REQUEST['accion'] == 'buscar') {
 
-	if ($orden == "") {
-		$orden = "glosa_cliente";
+	if ($orden == '') {
+		$orden = 'glosa_cliente';
 	}
 
 	$x_pag = 25;
 
-	$b = new Buscador($Sesion, $SolicitudAdelanto->SearchQuery(), "SolicitudAdelanto", $desde, $x_pag, $orden);
-	$b->AgregarEncabezado("id_solicitud_adelanto", __('N°'), "align=center");
-	$b->AgregarEncabezado("fecha", __('Fecha Solicitud'), "align=center");
-	$b->AgregarEncabezado("glosa_cliente", __('Cliente'), "align=left");
-	$b->AgregarEncabezado("descripcion", __('Descripción'), "align=left");
-	$b->AgregarFuncion(__('Monto'), 'FormatoMonto', "align=right");
-	$b->AgregarEncabezado("estado", __('Estado'), "align=left");
-	$b->AgregarEncabezado("username", __('Solicitante'), "align=left");
-	$b->AgregarFuncion(__('Opciones'), 'Opciones', "align=right");
-	$b->color_mouse_over = "#bcff5c";
+	$b = new Buscador($Sesion, $SolicitudAdelanto->SearchQuery(), 'SolicitudAdelanto', $desde, $x_pag, $orden);
+	$b->AgregarEncabezado('id_solicitud_adelanto', __('N°'), 'align=center');
+	$b->AgregarEncabezado('fecha', __('Fecha Solicitud'), 'align=center');
+	$b->AgregarEncabezado('glosa_cliente', __('Cliente'), 'align=left');
+	$b->AgregarEncabezado('descripcion', __('Descripción'), 'align=left');
+	$b->AgregarFuncion(__('Monto'), 'FormatoMonto', 'align=right');
+	$b->AgregarEncabezado('estado', __('Estado'), 'align=left');
+	$b->AgregarEncabezado('username', __('Solicitante'), 'align=left');
+	$b->AgregarFuncion(__('Opciones'), 'Opciones', 'align=right');
+	$b->color_mouse_over = '#bcff5c';
 	$b->Imprimir();
 }
 
@@ -128,9 +127,9 @@ function FormatoMonto(&$fila) {
 
 	if ($cantidad_adelantos > 0) {
 		$s = ($cantidad_adelantos > 1) ? 's' : '';
-		$title = "$cantidad_adelantos adelanto$s por $monto_adelantos (saldo: $saldo_adelantos)";
+		$title = '$cantidad_adelantos adelanto$s por $monto_adelantos (saldo: $saldo_adelantos)';
 	} else {
-		$title = "Sin adelantos";
+		$title = 'Sin adelantos';
 	}
 
 	return "<span title=\"$title\">$monto_solicitado</span>";
@@ -152,8 +151,7 @@ function Opciones(& $fila) {
 }
 ?>
 <script type="text/javascript">
-	function AgregarNuevo(tipo, id)
-	{
+	function AgregarNuevo(tipo, id) {
 		var url_extension = '';
 		if (!isNaN(id)) {
 			url_extension = '&id_solicitud_adelanto=' + id;
@@ -175,15 +173,10 @@ function Opciones(& $fila) {
 		}
 	}
 
-	function EliminaSolicitudAdelanto(id_solicitud)
-	{
+	function EliminaSolicitudAdelanto(id_solicitud) {
 		self.location.href = "solicitudes_adelanto.php?id_solicitud_adelanto="+id_solicitud+"&accion=eliminar&buscar=1&desde=<?php echo ($desde) ? $desde : '0'?>";
 		return true;
 	}
-
-	Calendar.setup({ inputField	: "fecha_desde", ifFormat : "%d-%m-%Y", button : "img_fecha_desde" });
-	Calendar.setup({ inputField	: "fecha_hasta", ifFormat : "%d-%m-%Y", button : "img_fecha_hasta" });
-
 </script>
 <?php
 

@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
+$Html = new \TTB\Html;
 //La funcionalidad contenida en esta pagina puede invocarse desde integracion_contabilidad3.php (SOLO GUARDAR).
 //(desde_webservice será true). Esa pagina emula el POST, es importante revisar que los cambios realizados en la FORM
 //se repliquen en el ingreso de datos via webservice.
@@ -306,18 +307,18 @@ if ($opcion == "guardar") {
 						$cobro->AgregarFactura($factura);
 
 						if ($usar_adelantos && empty($factura->fields['anulado']) && $codigo_tipo_doc != 'NC') {
-							
+
 							if (Conf::GetConf($sesion, 'AsociarAdelantosALiquidacion')) {
 								$factura->PagarUsandoAdelantos();
 							} else {
 								$documento = $cobro->DocumentoCobro();
 								$documento->GenerarPagosDesdeAdelantos(
-									$documento->fields['id_documento'], 
-									array($factura->fields['id_factura'] => $factura->fields['total']), 
-									$id_adelanto);		
-							}						
+									$documento->fields['id_documento'],
+									array($factura->fields['id_factura'] => $factura->fields['total']),
+									$id_adelanto);
+							}
 						}
-						
+
 						$cobro->CambiarEstadoSegunFacturas();
 					}
 				}
@@ -664,7 +665,9 @@ $Form->defaultLabel = false;
 		?>
 		<tr>
 			<td align="right"><?php echo __('Fecha') ?></td>
-			<td align="left" colspan=2><input type="text" name="fecha" clase="fechadiff" value="<?php echo $factura->fields['fecha'] ? Utiles::sql2date($factura->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" /></td>
+			<td align="left" colspan="2">
+				<?php echo $Html::PrintCalendar('fecha', Utiles::sql2date($factura->fields['fecha'])); ?>
+			</td>
 
 			<td><span style='display:none' id=letra_inicial>&nbsp;&nbsp;
 		<?php echo __('Letra') ?>
@@ -780,7 +783,9 @@ $Form->defaultLabel = false;
 		</tr>
 		<tr class="fecha_vencimiento_pago" style="visibility: visible;">
 			<td align="right" ><?php echo __('Fecha Vencimiento')?></td>
-			<td align="left" colspan="3" ><input type="text" name="fecha_vencimiento_pago_input" id="fecha_vencimiento_pago_input" value="<?php echo $factura->fields['fecha_vencimiento'] ? Utiles::sql2date($factura->fields['fecha_vencimiento']) : date('d-m-Y') ?>" size="11" maxlength="10" /></td>
+			<td align="left" colspan="3" >
+				<?php echo $Html::PrintCalendar('fecha_vencimiento_pago_input', Utiles::sql2date($factura->fields['fecha_vencimiento'])); ?>
+			</td>
 		</tr>
 
 
@@ -1518,14 +1523,14 @@ $Form->defaultLabel = false;
 					if (confirm('<?php echo __('Existen adelantos por ') . $simbolo . ' ' . number_format($saldo, $cifras_decimales) . ' ' .  __('asociados a esta liquidación. ¿Desea utilizarlos para saldar esta') . ' ' . $tipo_documento_legal . '?' ?>')) {
 						$('usar_adelantos').value = '1';
 					}
-			<?php 
+			<?php
 				}
 			} else {
 				$documento = new Documento($sesion);
 				$hh = $honorario;
 				$gg = $gastos_con_iva + $gastos_sin_iva;
 				$saldo = $documento->SaldoAdelantosDisponibles($codigo_cliente, $id_contrato, $hh>0, $gg>0, $cobro->fields['opc_moneda_total']);
-				
+
 				if ($saldo) {
 				?>
 					if (!jQuery('#id_adelanto').val() && confirm("<?php echo __('Existen adelantos') . ' ' . __('asociados a esta liquidación. ¿Desea utilizarlos para saldar esta') . " $tipo_documento_legal" . '?' ?>")) {
@@ -1543,8 +1548,8 @@ $Form->defaultLabel = false;
 						nuovaFinestra('Adelantos', 730, 470, root_dir + '/app/Advances/get_list?' + decodeURIComponent(jQuery.param(params)), 'top=100, left=125, scrollbars=yes');
 						return false;
 					}
-				<?php 
-				} 
+				<?php
+				}
 			}
 		}
 		?>
