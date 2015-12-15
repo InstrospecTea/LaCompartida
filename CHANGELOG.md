@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.30.1
+Tuesday, December 15th
+* **Fix** [Excel revisión de Horas](https://github.com/LemontechSA/ttb/pull/1261)
+
 ## [Release 15.30.0](https://github.com/LemontechSA/ttb/pull/1258)
 Thursday 2015, December 10th
 * **Feature** [Reporte MTA](https://github.com/LemontechSA/ttb/pull/1254)
