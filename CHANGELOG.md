@@ -2,7 +2,7 @@
 
 ## Hotfix 15.30.3
 Tuesday, December 15th
-* **Fix** [Error Documentos legales por defecto](https://github.com/LemontechSA/ttb/pull/1262)
+* **Fix** [Error Documentos legales por defecto](https://github.com/LemontechSA/ttb/pull/1263)
 
 ## Hotfix 15.30.2
 Tuesday, December 15th
