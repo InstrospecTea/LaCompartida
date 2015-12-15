@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 15.31.0](https://github.com/LemontechSA/ttb/pull/1260)
+Monday 2015, December 14th
+* **Feature** [Unificar calendarios](https://github.com/LemontechSA/ttb/pull/1225)
+
 ## Hotfix 15.30.3
 Tuesday, December 15th
 * **Fix** [Error Documentos legales por defecto](https://github.com/LemontechSA/ttb/pull/1263)
