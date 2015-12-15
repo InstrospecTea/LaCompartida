@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.30.2
+Tuesday, December 15th
+* **Fix** [Error Documentos legales por defecto](https://github.com/LemontechSA/ttb/pull/1262)
+
 ## Hotfix 15.30.1
 Tuesday, December 15th
 * **Fix** [Excel revisión de Horas](https://github.com/LemontechSA/ttb/pull/1261)

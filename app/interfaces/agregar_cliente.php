@@ -229,7 +229,7 @@ if ($opcion == "guardar") {
 				}
 
 				ContratoDocumentoLegal::EliminarDocumentosLegales($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-				if (is_array($doc_legales)) {
+				if (is_array($docs_legales)) {
 					foreach ($docs_legales as $doc_legal) {
 						if (empty($doc_legal['documento_legal']) or ( empty($doc_legal['honorario']) and empty($doc_legal['gastos_con_iva']) and empty($doc_legal['gastos_sin_iva']) )) {
 							continue;
