@@ -146,6 +146,11 @@ if ($opc == 'anular_emision') {
 	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
 
 	#################### OPCIONES Vial Olivares #######################
+	if (empty($lang)) {
+		$PrmIdioma = new Idioma($sesion);
+		$primer_idioma = $PrmIdioma->obtenerPrimero();
+		$lang = $primer_idioma['codigo_idioma'];
+	}
 	$cobro->Edit("opc_restar_retainer", $opc_restar_retainer);
 	$cobro->Edit("opc_ver_detalle_retainer", $opc_ver_detalle_retainer);
 	$cobro->Edit("opc_ver_valor_hh_flat_fee", $opc_ver_valor_hh_flat_fee);
