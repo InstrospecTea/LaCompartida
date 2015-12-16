@@ -207,6 +207,11 @@ Vagrantfile
 
 # Bower
 bower_components
-public/vendors/
+
+# Node
+node_modules
+
+# Grunt
+/public/js/vendors*
 
 tags
