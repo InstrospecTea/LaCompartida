@@ -391,7 +391,9 @@ class Ledes extends Objeto {
 		 */
 
 		$Criteria = new Criteria($this->sesion);
-		$gastos_result = $Criteria->add_select('cta_corriente.id_usuario')
+		$gastos_result = $Criteria
+			->add_select('cta_corriente.id_movimiento')
+			->add_select('cta_corriente.id_usuario')
 			->add_select('CONCAT(usuario.apellido1, \', \', usuario.nombre)', 'nombre_usuario')
 			->add_select('usuario.username')
 			->add_select('prm_categoria_usuario.codigo_categoria')

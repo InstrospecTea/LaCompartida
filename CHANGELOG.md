@@ -1,7 +1,11 @@
 # Changelog
 
+## Hotfix 15.31.1
+Wednesday, December 16th
+* **Fix** [Problemas LEDES Gastos](https://github.com/LemontechSA/ttb/pull/1264)
+
 ## [Release 15.31.0](https://github.com/LemontechSA/ttb/pull/1260)
-Monday 2015, December 14th
+Tuesday, December 15th
 * **Feature** [Unificar calendarios](https://github.com/LemontechSA/ttb/pull/1225)
 
 ## Hotfix 15.30.3
