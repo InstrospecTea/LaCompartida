@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.31.2
+Wednesday, December 16th
+* **Fix** [Mejoras Reporte Producción por Periodo](https://github.com/LemontechSA/ttb/pull/1265)
+
 ## Hotfix 15.31.1
 Wednesday, December 16th
 * **Fix** [Problemas LEDES Gastos](https://github.com/LemontechSA/ttb/pull/1264)
