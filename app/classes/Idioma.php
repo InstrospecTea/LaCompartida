@@ -16,7 +16,7 @@ class Idioma extends Objeto {
 	}
 
 	public function Listar($query_extra = '') {
-		
+
 		if (preg_match('/[\(\.]/', $this->campo_glosa)) { //verifica si es funcion o parte de table.field
 			$glosa = $this->campo_glosa;
 		} else {
@@ -35,6 +35,13 @@ class Idioma extends Objeto {
 			$respuesta[$usuarios[$x]['id']] = $usuarios[$x]['glosa'];
 		}
 		return $respuesta;
+	}
+
+	public function obtenerPrimero() {
+		$query = "SELECT * FROM {$this->tabla} LIMIT 1";
+		$qr = $this->sesion->pdodbh->query($query);
+		$idioma = $qr->fetchAll(PDO::FETCH_ASSOC);
+		return $idioma[0];
 	}
 }
 

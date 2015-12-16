@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 //La funcionalidad contenida en esta pagina puede invocarse desde integracion_contabilidad3.php (SOLO GUARDAR).
 //(desde_webservice será true). Esa pagina emula el POST, es importante revisar que los cambios realizados en la FORM
 //se repliquen en el ingreso de datos via webservice.
+$Html = new \TTB\Html;
 if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $password)) {
 	$sesion = new Sesion();
 	$factura = new Factura($sesion);
@@ -848,8 +849,7 @@ $Form->defaultLabel = false;
 				<?php echo __('Fecha') ?>
 			</td>
 			<td class="al" colspan="3">
-				<input type="text" name="fecha" value="<?php echo $pago->fields['fecha'] ? Utiles::sql2date($pago->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
-				<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
+				<?php echo $Html::PrintCalendar('fecha', Utiles::sql2date($pago->fields['fecha'])); ?>
 			</td>
 		</tr>
 		<tr>
@@ -1164,24 +1164,6 @@ $Form->defaultLabel = false;
 		<?php }
 	}
 	?>
-
-	Calendar.setup(
-			{
-				inputField: "fecha", // ID of the input field
-				ifFormat: "%d-%m-%Y", // the date format
-				button: "img_fecha"		// ID of the button
-			}
-	);
-
-	if (jQuery('#fecha_pago').length > 0) {
-		Calendar.setup(
-			{
-				inputField: "fecha_pago", // ID of the input field
-				ifFormat: "%d-%m-%Y", // the date format
-				button: "img_fecha_pago"		// ID of the button
-			}
-		);
-	}
 </script>
 <?php
 echo $Form->script();

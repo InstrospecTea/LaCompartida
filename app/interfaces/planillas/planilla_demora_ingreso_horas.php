@@ -3,9 +3,10 @@
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
+	$Html = new \TTB\Html;
 
 
-	if( $opc == "generar_reporte" )
+	if( $opc == 'generar_reporte' )
 	{
 		#ARMANDO XLS
 		$wb = new Spreadsheet_Excel_Writer();
@@ -73,20 +74,19 @@
 		$ws1->fitToPages(1,0);
 		$ws1->setZoom(75);
 
-		if( is_array($usuarios) )
-			{
-				$lista_usuarios = implode(',',$usuarios);
-				$where .= " AND u.id_usuario IN ( ".$lista_usuarios." ) ";
-			}
+		if (is_array($usuarios)) {
+			$lista_usuarios = implode(',',$usuarios);
+			$where .= " AND u.id_usuario IN ( ".$lista_usuarios." ) ";
+		}
 
 		$query_usuarios = "SELECT
-												u.id_usuario,
-												CONCAT_WS(' ', nombre, apellido1, apellido2 ) as NombreUsuario
-											FROM usuario AS u
-											JOIN usuario_permiso AS up ON u.id_usuario = up.id_usuario
-											WHERE u.activo = 1
-												AND up.codigo_permiso = 'PRO'
-												$where ";
+								u.id_usuario,
+								CONCAT_WS(' ', nombre, apellido1, apellido2 ) as NombreUsuario
+							FROM usuario AS u
+								JOIN usuario_permiso AS up ON u.id_usuario = up.id_usuario
+							WHERE u.activo = 1
+								AND up.codigo_permiso = 'PRO'
+							$where ";
 		$resp_usuarios = mysql_query($query_usuarios,$sesion->dbh) or Utiles::errorSQL($query_usuarios,__FILE__,__LINE__,$sesion->dbh);
 
 		$filas = 1;
@@ -104,61 +104,58 @@
 		// Setear Columnas:
 		$col = 1;
 		$ws1->setColumn($col,$col,40);$col++;
-		while( $col < 4 * $cantidad_meses + 2 )
-		{
+		while ($col < 4 * $cantidad_meses + 2) {
 			$ws1->setColumn($col,$col,15);$col++;
 		}
+
 		$col = 2;
 		$meses = UtilesApp::ArregloMeses();
 		$x_mes  = date("n",strtotime($fecha1));
 		$x_anio = date("Y",strtotime($fecha1));
 		$ws1->write($filas+1, $col-1, 'Nombre', $formato_titulo);
-		while( $col < 4 * $cantidad_meses + 2 )
-		{
+
+		while ($col < 4 * $cantidad_meses + 2) {
 			$ws1->mergeCells($filas, $col, $filas, $col+3);
-			$ws1->write($filas, $col+1, $meses[$x_mes].' '.$x_anio, $formato_titulo);
-			$ws1->write($filas, $col,'', $formato_titulo);
-			$ws1->write($filas, $col+2,'', $formato_titulo);
+			$ws1->write($filas, $col, $meses[$x_mes] . ' ' . $x_anio, $formato_titulo);
 			$ws1->write($filas, $col+3,'', $formato_titulo);
 			$ws1->write($filas+1, $col++, __('Mayor'), $formato_titulo);
 			$ws1->write($filas+1, $col++, __('Menor'), $formato_titulo);
 			$ws1->write($filas+1, $col++, __('Promedio'), $formato_titulo);
 			$ws1->write($filas+1, $col++, __('N° Trabajos'), $formato_titulo);
-			if( $x_mes == 12 )
-				{
+			if( $x_mes == 12 ) {
 					$x_anio++;
 					$x_mes = 1;
-		}
-			else
+			} else {
 				$x_mes++;
+			}
 		}
+
 		$filas += 2;
 		$i = 1;
-		while( list( $id_usuario, $NombreUsuario ) = mysql_fetch_array($resp_usuarios) )
-		{
+		while (list($id_usuario, $NombreUsuario) = mysql_fetch_array($resp_usuarios)) {
 			$col = 1;
 			$ws1->write($filas, $col++, $NombreUsuario, $formato_texto);
 			$query_datos = " SELECT
-													MONTH( t.fecha ) as MesHora,
-													YEAR( t.fecha ) as AnioHora,
-													COUNT(*) as CantidadHoras,
-													MAX(DATEDIFF( t.fecha_creacion, t.fecha )) as MaxDemoraIngreso,
-													MIN(DATEDIFF( t.fecha_creacion, t.fecha )) as MinDemoraIngreso,
-													AVG(DATEDIFF( t.fecha_creacion, t.fecha )) as AvgDemoraIngreso
-												FROM trabajo t
-												WHERE t.id_usuario = '".$id_usuario."'
-													AND t.fecha >= '".$fecha1."'
-													AND t.fecha <= '".$fecha2."'
-												GROUP BY MONTH( t.fecha ),YEAR( t.fecha )
-												ORDER BY YEAR( t.fecha ) ASC, MONTH( t.fecha ) ASC ";
+								MONTH( t.fecha ) as MesHora,
+								YEAR( t.fecha ) as AnioHora,
+								COUNT(*) as CantidadHoras,
+								MAX(DATEDIFF( t.fecha_creacion, t.fecha )) as MaxDemoraIngreso,
+								MIN(DATEDIFF( t.fecha_creacion, t.fecha )) as MinDemoraIngreso,
+								AVG(DATEDIFF( t.fecha_creacion, t.fecha )) as AvgDemoraIngreso
+							FROM trabajo t
+							WHERE t.id_usuario = '".$id_usuario."'
+								AND t.fecha >= '".Utiles::fecha2sql($fecha1)."'
+								AND t.fecha <= '".Utiles::fecha2sql($fecha2)."'
+							GROUP BY MONTH( t.fecha ),YEAR( t.fecha )
+							ORDER BY YEAR( t.fecha ) ASC, MONTH( t.fecha ) ASC ";
 			$resp_datos = mysql_query($query_datos,$sesion->dbh) or Utiles::errorSQL($query_datos,__FILE__,__LINE__,$sesion->dbh);
 
 			$arreglo_datos = array();
-			for($i=2;$i< 4*$cantidad_meses+2;$i++)
+			for ($i=2; $i< 4*$cantidad_meses+2; $i++) {
 				$arreglo_datos[$i] = "0";
+			}
 
-			while( list( $MesHora, $AnioHora, $CantidadHoras, $MaxDemoraIngreso, $MinDemoraIngreso, $AvgDemoraIngreso ) = mysql_fetch_array($resp_datos) )
-			{
+			while (list($MesHora, $AnioHora, $CantidadHoras, $MaxDemoraIngreso, $MinDemoraIngreso, $AvgDemoraIngreso) = mysql_fetch_array($resp_datos)) {
 				$MesHora < 10 ? $fecha_dato = "$AnioHora-0$MesHora-01" : $fecha_dato = "$AnioHora-$MesHora-01";
 				$x_factor = Utiles::CantidadMeses($fecha1,$fecha_dato) - 1;
 				$i = 2 + 4 * $x_factor;
@@ -168,26 +165,26 @@
 				$arreglo_datos[$i] = abs($AvgDemoraIngreso) ? $AvgDemoraIngreso : "0";$i++;
 				$arreglo_datos[$i] = $CantidadHoras ? $CantidadHoras : "0";$i++;
 			}
-			foreach($arreglo_datos as $col => $val)
-				{
-					if(0 < ($col-1)%8 && ($col-1)%8 < 5)
-						{
-							if( ($col-1)%4 == 3 )
-								$ws1->write($filas,$col,$val,$formato_numero_decimales);
-							else
-								$ws1->write($filas,$col,$val,$formato_numero);
-						}
-					else
-						{
-							if( ($col-1)%4 == 3 )
-								$ws1->write($filas,$col,$val,$formato_numero_decimales_color);
-							else
-								$ws1->write($filas,$col,$val,$formato_numero_color);
-						}
+
+			foreach ($arreglo_datos as $col => $val) {
+				if (0 < ($col-1)%8 && ($col-1)%8 < 5) {
+					if (($col-1)%4 == 3) {
+						$ws1->write($filas,$col,$val,$formato_numero_decimales);
+					} else {
+						$ws1->write($filas,$col,$val,$formato_numero);
+					}
+				} else {
+					if (($col-1)%4 == 3) {
+						$ws1->write($filas,$col,$val,$formato_numero_decimales_color);
+					} else {
+						$ws1->write($filas,$col,$val,$formato_numero_color);
+					}
 				}
+			}
 			$filas++;
 		}
-		$wb->send("planilla_demora_ingreso_horas.xls");
+
+		$wb->send('planilla_demora_ingreso_horas.xls');
 		$wb->close();
 		exit;
 	}
@@ -201,34 +198,34 @@
 	<table class="border_plomo tb_base">
 		<tr>
 			<td align=right>
-				<?=__('Fecha desde')?>
+				<?php echo __('Fecha desde'); ?>
 			</td>
 			<td align=left>
-				<?= Html::PrintCalendar("fecha1", "$fecha1"); ?>
+				<?php echo $Html::PrintCalendar('fecha1', $fecha1); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align=right>
-				<?=__('Fecha hasta')?>
+				<?php echo __('Fecha hasta'); ?>
 			</td>
 			<td align=left>
-				<?= Html::PrintCalendar("fecha2", "$fecha2"); ?>
+				<?php echo $Html::PrintCalendar('fecha2', $fecha2); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align=center colspan="2"><!-- Nuevo Select -->
-			<?php echo $Form->select('usuarios[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => FALSE, 'style' => 'width: 200px', 'multiple' => 'multiple','size' => '6')); ?>
+				<?php echo $Form->select('usuarios[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => FALSE, 'style' => 'width: 200px', 'multiple' => 'multiple','size' => '6')); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align=center colspan=2>
 				<input type="hidden" name="opc" value="generar_reporte"/>
-				<input type="submit" class=btn value="<?=__('Generar reporte')?>" name="btn_reporte">
+				<input type="submit" class=btn value="<?php echo __('Generar reporte'); ?>" name="btn_reporte">
 			</td>
 		</tr>
 	</table>
 </form>
 
 <?php
-$pagina->PrintBottom();
+	$pagina->PrintBottom();
 ?>

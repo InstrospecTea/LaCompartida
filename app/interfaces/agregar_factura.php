@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
+$Html = new \TTB\Html;
 //La funcionalidad contenida en esta pagina puede invocarse desde integracion_contabilidad3.php (SOLO GUARDAR).
 //(desde_webservice será true). Esa pagina emula el POST, es importante revisar que los cambios realizados en la FORM
 //se repliquen en el ingreso de datos via webservice.
@@ -664,7 +665,9 @@ $Form->defaultLabel = false;
 		?>
 		<tr>
 			<td align="right"><?php echo __('Fecha') ?></td>
-			<td align="left" colspan=2><input type="text" name="fecha" clase="fechadiff" value="<?php echo $factura->fields['fecha'] ? Utiles::sql2date($factura->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" /></td>
+			<td align="left" colspan="2">
+				<?php echo $Html::PrintCalendar('fecha', Utiles::sql2date($factura->fields['fecha'])); ?>
+			</td>
 
 			<td><span style='display:none' id=letra_inicial>&nbsp;&nbsp;
 		<?php echo __('Letra') ?>
@@ -780,7 +783,9 @@ $Form->defaultLabel = false;
 		</tr>
 		<tr class="fecha_vencimiento_pago" style="visibility: visible;">
 			<td align="right" ><?php echo __('Fecha Vencimiento')?></td>
-			<td align="left" colspan="3" ><input type="text" name="fecha_vencimiento_pago_input" id="fecha_vencimiento_pago_input" value="<?php echo $factura->fields['fecha_vencimiento'] ? Utiles::sql2date($factura->fields['fecha_vencimiento']) : date('d-m-Y') ?>" size="11" maxlength="10" /></td>
+			<td align="left" colspan="3" >
+				<?php echo $Html::PrintCalendar('fecha_vencimiento_pago_input', Utiles::sql2date($factura->fields['fecha_vencimiento'])); ?>
+			</td>
 		</tr>
 
 

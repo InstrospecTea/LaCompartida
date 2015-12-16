@@ -1,5 +1,25 @@
 # Changelog
 
+## Hotfix 15.31.1
+Wednesday, December 16th
+* **Fix** [Problemas LEDES Gastos](https://github.com/LemontechSA/ttb/pull/1264)
+
+## [Release 15.31.0](https://github.com/LemontechSA/ttb/pull/1260)
+Tuesday, December 15th
+* **Feature** [Unificar calendarios](https://github.com/LemontechSA/ttb/pull/1225)
+
+## Hotfix 15.30.3
+Tuesday, December 15th
+* **Fix** [Error Documentos legales por defecto](https://github.com/LemontechSA/ttb/pull/1263)
+
+## Hotfix 15.30.2
+Tuesday, December 15th
+* **Fix** [Error Documentos legales por defecto](https://github.com/LemontechSA/ttb/pull/1262)
+
+## Hotfix 15.30.1
+Tuesday, December 15th
+* **Fix** [Excel revisión de Horas](https://github.com/LemontechSA/ttb/pull/1261)
+
 ## [Release 15.30.0](https://github.com/LemontechSA/ttb/pull/1258)
 Thursday 2015, December 10th
 * **Feature** [Reporte MTA](https://github.com/LemontechSA/ttb/pull/1254)
