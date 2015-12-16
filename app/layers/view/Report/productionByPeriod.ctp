@@ -27,13 +27,13 @@
 			<tr>
         <th align="right"><?php echo __('Área') ?></th>
 				<td align="left" colspan="2">
-          <?php echo $this->Form->select('areas', $areas, $this->data['areas'], array('empty' => __('Todos'))) ?>
+          <?php echo $this->Form->select('areas[]', $areas, $this->data['areas'], array('empty' => __('Todos'), 'multiple' => 'multiple')) ?>
 				</td>
 			</tr>
 			<tr>
         <th align="right"><?php echo __('Categoría de asunto'); ?></td>
 				<td align="left" colspan="2">
-          <?php echo $this->Form->select('id_tipo_asunto', $tipo_asunto, $this->data['id_tipo_asunto'], array('empty' => __('Todos'))) ?>
+          <?php echo $this->Form->select('id_tipo_asunto[]', $tipo_asunto, $this->data['id_tipo_asunto'], array('empty' => __('Todos'), 'multiple' => 'multiple')) ?>
 				</td>
 			</tr>
       <tr>
