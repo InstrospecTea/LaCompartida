@@ -39,7 +39,7 @@ class Objeto {
 	 * @param string $campo_id    PK de la tabla
 	 * @param string $campo_glosa Nombre de PK
 	 */
-	public function Objeto($sesion, $fields = '', $params = '', $tabla = '', $campo_id = '', $campo_glosa = '') {
+	public function __construct($sesion, $fields = '', $params = '', $tabla = '', $campo_id = '', $campo_glosa = '') {
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 		$this->tabla = $tabla;
@@ -364,7 +364,7 @@ class Objeto {
 	 * Funcion que elimina un elemento. Primero chequea que la funcion check delete retorne verdadero
 	 * @return boolean
 	 */
-	public function Delete() {
+	public function Delete($id = null) {
 		if (!$this->CheckDelete()) {
 			return false;
 		}

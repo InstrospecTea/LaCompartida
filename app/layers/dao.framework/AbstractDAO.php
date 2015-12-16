@@ -290,7 +290,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		}
 	}
 
-	public function delete($object) {
+	public function delete($object = null) {
 		$reflected = new ReflectionClass($this->getClass());
 		if (is_subclass_of($object, 'LoggeableEntity')) {
 			$newInstance = $reflected->newInstance();

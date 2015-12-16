@@ -14,7 +14,7 @@ class Observacion extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
-	function Delete()
+	function Delete($id = null)
 	{
 		if(!$this->Loaded())
 		{
@@ -34,7 +34,7 @@ class Observacion extends Objeto
                 }
                $query = "SELECT * FROM cobro_historial WHERE id_cobro = '".$id_cobro."' order by fecha DESC limit 0,1";
         $resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$this->sesion->dbh);
-        return mysql_fetch_array($resp);   
+        return mysql_fetch_array($resp);
         }
 }
 

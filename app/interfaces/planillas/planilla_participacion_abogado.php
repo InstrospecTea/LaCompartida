@@ -935,7 +935,7 @@
 </table>
 </form>
 <script type="text/javascript">
-<!-- //
+
 	function Rangos(obj, form) {
 		if (obj.checked) {
 			jQuery('#periodo').hide();
@@ -945,7 +945,7 @@
 			jQuery('#periodo_rango').hide();
 		}
 	}
-// ->
+
 </script>
 <?php
 	echo(InputId::Javascript($sesion));

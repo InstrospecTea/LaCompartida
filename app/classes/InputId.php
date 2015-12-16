@@ -4,7 +4,7 @@ require_once dirname(dirname(__FILE__)).'/conf.php';
 
 class InputId //Es cuando uno quiere unir un codigo con un selectbox
 {
-	function InputId($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="")
+	public function InputId($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected="", $opciones="", $onchange="")
 	{
 		$this->sesion = $sesion;
 		$this->tabla = $tabla;
@@ -76,7 +76,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 
 	}
 
-	function Imprimir($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected = '', $opciones = '', $onchange = '', $width = 320, $otro_filtro = '', $usa_inactivo = false, $desde = '', $filtro_banco = '')
+	static function Imprimir($sesion, $tabla, $campo_id, $campo_glosa, $name, $selected = '', $opciones = '', $onchange = '', $width = 320, $otro_filtro = '', $usa_inactivo = false, $desde = '', $filtro_banco = '')
 	{
 
 		$join = '';
@@ -200,7 +200,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 		return $output;
 	}
 
-	function Javascript($sesion, $desde = "", $mje_error = "No existen asuntos para este cliente.") {
+	static function Javascript($sesion, $desde = "", $mje_error = "No existen asuntos para este cliente.") {
 
 		$output .= "<script type=\"text/javascript\">
 						cargando = false;
@@ -230,7 +230,7 @@ class InputId //Es cuando uno quiere unir un codigo con un selectbox
 							var url = root_dir + '/app/ajax.php?accion=' + accion + '&id=' + select_origen.value + '&soloactivos=' + soloactivos;
 
 							jQuery('#' + id_destino).addClass('loadingbar');
-							
+
 							jQuery.get(url, function(response) {
 
 								if (response.indexOf('|') != -1) {
