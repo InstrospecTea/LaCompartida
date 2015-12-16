@@ -234,7 +234,9 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 				}
 			}
 
-			$searchCriteria->filter('id_area_proyecto')->restricted_by('in')->compare_with($areas)->for_entity('Matter');
+			if (!empty($areas)) {
+				$searchCriteria->filter('id_area_proyecto')->restricted_by('in')->compare_with($areas)->for_entity('Matter');
+			}
 		}
 
 		//Categoría Asunto
@@ -246,7 +248,9 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 				}
 			}
 
-			$searchCriteria->filter('id_tipo_asunto')->restricted_by('in')->compare_with($tipos)->for_entity('Matter');
+			if (!empty($tipos)) {
+				$searchCriteria->filter('id_tipo_asunto')->restricted_by('in')->compare_with($tipos)->for_entity('Matter');
+			}
 		}
 
 		//Rango de fechas
