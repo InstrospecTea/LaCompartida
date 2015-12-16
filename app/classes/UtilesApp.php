@@ -2380,4 +2380,13 @@ HTML;
 
 		return $_LANG;
 	}
+
+	/**
+	 * Obtiene la versión de la aplicación
+	 *
+	 * @return string versión de la aplicación
+	 */
+	public static function obtenerVersion() {
+		return file_get_contents(dirname(__FILE__) . '/../../VERSION');
+	}
 }
