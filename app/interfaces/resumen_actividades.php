@@ -169,8 +169,6 @@ else{
 
 $agrupadores = explode('-', $vista);
 ?>
-
-<script src="../../public/vendors/Chart.js/Chart.js" ></script>
 <script type="text/javascript">
 	function Generar(form, valor) {
 		if (form.tipo.value == 'Profesional') {

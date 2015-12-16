@@ -20,7 +20,6 @@
 	}
 
 ?>
-<script src="../../public/vendors/Chart.js/Chart.js" ></script>
 
 <form method='post' name='formulario'>
 <table class="border_plomo tb_base">

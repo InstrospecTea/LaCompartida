@@ -19,8 +19,6 @@
 	$pagina->PrintTop();
 ?>
 
-<script src="../../public/vendors/Chart.js/Chart.js" ></script>
-
 <form method="post" action="<?php echo $_SERVER[PHP_SELF]; ?>">
 <table class="border_plomo tb_base">
 	<tr>

@@ -13,7 +13,6 @@ $Form = new Form($sesion);
 $pagina->titulo = __('Reporte Gráfico por Período');
 $pagina->PrintTop();
 ?>
-<script src="../../public/vendors/Chart.js/Chart.js" ></script>
 <script type="text/javascript">
 
 jQuery(function() {
