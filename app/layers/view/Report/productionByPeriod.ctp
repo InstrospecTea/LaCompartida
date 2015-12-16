@@ -1,6 +1,6 @@
 
 <form name="form_busca" id="form_busca" action="" method="post">
-  <input type=hidden name="opc" id="opc" value="Html">
+  <input type="hidden" name="opc" id="opc" value="Html">
   <div id="calendar-container" style="width:221px; position:absolute; display:none;">
     <div class="floating" id="calendar"></div>
   </div>
@@ -71,10 +71,10 @@
         </td>
       </tr>
       <tr>
-        <th align=right >
+        <th align="right" >
           <?php echo __('Visualizar en Moneda') ?>:
         </td>
-        <td align=left>
+        <td align="left">
           <?php
           echo $this->Form->select('moneda_filtro', $monedas, $this->data['moneda_filtro'] ? $this->data['moneda_filtro'] : $moneda_base, array('empty' => false)) ?>
         </td>
