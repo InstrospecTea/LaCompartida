@@ -28,15 +28,17 @@ class ReportController extends AbstractController {
 	public function productionByPeriod() {
 		$this->loadBusiness('Working');
 		$this->loadBusiness('Coining');
-		$this->loadBusiness('ProjectAreaing');
-		$this->loadBusiness('ProjectTyping');
+		$this->loadBusiness('Searching');
+
+		$projectArea = $this->SearchingBusiness->getAssociativeArray('ProjectArea', 'id_area_proyecto', 'glosa');
+		$projectType = $this->SearchingBusiness->getAssociativeArray('ProjectType', 'id_tipo_proyecto', 'glosa_tipo_proyecto');
 
 		$this->layoutTitle = 'Reporte de Producción por Periodo';
 		$this->set('cobrable_estados', array('No', 'Si'));
 		$this->set('mostrar_estados', array(__('Horas Trabajadas'), __('Horas Cobradas'), __('Valor Cobrado')));
 		$this->set('monedas', $this->CoiningBusiness->currenciesToArray($this->CoiningBusiness->getCurrencies()));
-		$this->set('areas', $this->ProjectAreaingBusiness->projectAreasToArray($this->ProjectAreaingBusiness->getProjectAreas()));
-		$this->set('tipo_asunto', $this->ProjectTypingBusiness->projectTypesToArray($this->ProjectTypingBusiness->getProjectTypes()));
+		$this->set('areas', $projectArea);
+		$this->set('tipo_asunto', $projectType);
 		$moneda_base = $this->CoiningBusiness->getBaseCurrency();
 		$this->set('moneda_base', $moneda_base->get($moneda_base->getIdentity()));
 		if (!empty($this->data)) {
