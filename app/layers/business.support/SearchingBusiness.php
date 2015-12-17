@@ -94,6 +94,12 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 		return $criteria;
 	}
 
+	/**
+	 *
+	 * @param SearchCriteria $searchCriteria
+	 * @param Criteria       $criteria
+	 * @return Criteria|mixed
+	 */
 	public function getAssociativeArray($entity, $keyName, $value, $order = 'ASC') {
 		$this->loadService('Search');
 		$searchCriteria = new SearchCriteria($entity);
