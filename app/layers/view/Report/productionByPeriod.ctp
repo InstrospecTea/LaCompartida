@@ -25,7 +25,7 @@
         </td>
       </tr>
 			<tr>
-        <th align="right"><?php echo __('Área') ?></th>
+				<th align="right"><?php echo __('Área') . ' ' . __('Asunto') ?></th>
 				<td align="left" colspan="2">
           <?php echo $this->Form->select('areas[]', $areas, $this->data['areas'], array('empty' => __('Todos'), 'multiple' => 'multiple')) ?>
 				</td>
