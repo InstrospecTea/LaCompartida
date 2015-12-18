@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.31.5
+Friday, December 18th
+* **Fix** [Selecciona solo usuarios con rol profesional al cargar datos en ambiente DEMO](https://github.com/LemontechSA/ttb/pull/1269)
+
 ## Hotfix 15.31.4
 Friday, December 18th
 * **Fix** [Corregir reporte avanzado por agrupador tipo_asunto](https://github.com/LemontechSA/ttb/pull/1268)
