@@ -225,6 +225,34 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			$searchCriteria->filter($codigo)->restricted_by('equals')->compare_with("'$valor'")->for_entity('Matter');
 		}
 
+		//Área
+		if ($data['areas']) {
+			$areas = array();
+			foreach ($data['areas'] as $area => $value) {
+				if (!empty($value)) {
+					$areas[] = $value;
+				}
+			}
+
+			if (!empty($areas)) {
+				$searchCriteria->filter('id_area_proyecto')->restricted_by('in')->compare_with($areas)->for_entity('Matter');
+			}
+		}
+
+		//Categoría Asunto
+		if ($data['id_tipo_asunto']) {
+			$tipos = array();
+			foreach ($data['id_tipo_asunto'] as $tipo => $value) {
+				if (!empty($value)) {
+					$tipos[] = $value;
+				}
+			}
+
+			if (!empty($tipos)) {
+				$searchCriteria->filter('id_tipo_asunto')->restricted_by('in')->compare_with($tipos)->for_entity('Matter');
+			}
+		}
+
 		//Rango de fechas
 		if ($data['fecha_ini']) {
 			$date = Utiles::fecha2sql($data['fecha_ini']);
@@ -312,5 +340,4 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			return $results[0];
 		}
 	}
-
 }
