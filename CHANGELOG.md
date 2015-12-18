@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.31.3
+Friday, December 18th
+* **Fix** [Mostrar símbolo de moneda correcto en resumen escalonado](https://github.com/LemontechSA/ttb/pull/1267)
+
 ## Hotfix 15.31.2
 Wednesday, December 16th
 * **Fix** [Mejoras Reporte Producción por Periodo](https://github.com/LemontechSA/ttb/pull/1265)
