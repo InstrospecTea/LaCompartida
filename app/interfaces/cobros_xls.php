@@ -1185,7 +1185,7 @@ foreach ($chargeResults as $charge) {
 						if ($cobro->fields['opc_ver_profesional_categoria']) {
 							$ws->write($filas, 7, $usuarios['categoria'], $formato_normal);
 						}
-						//Debug::pr($cobro_valores['detalle']);exit;
+
 						$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($usuarios['duracion']/60, 2)), $formato_normal);
 						$ws->write($filas, 9, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal_centrado);
 						$ws->write($filas, 10, $cobro_moneda->moneda[$usuarios['id_moneda_total']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$usuarios['id_moneda_total']]['cifras_decimales'], '.', ''), $formato_normal);
