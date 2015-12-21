@@ -310,6 +310,10 @@ $Carta = new Carta($Sesion);
 $CobroRtf = new CobroRtf($Sesion);
 $Form = new Form();
 $Html = new \TTB\Html();
+
+if (!$contrato->Loaded()) {
+	$contrato->setFieldsNew('contrato');
+}
 ?>
 <script type="text/javascript">
 

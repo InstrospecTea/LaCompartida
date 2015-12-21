@@ -391,6 +391,13 @@ if (Conf::GetConf($Sesion, 'ClienteReferencia')) {
 $Pagina->titulo = __('Ingreso cliente');
 $Pagina->PrintTop();
 
+if (!$contrato->Loaded()) {
+	$contrato->setFieldsNew('contrato');
+}
+
+if (!$cliente->Loaded()) {
+	$contrato->setFieldsNew('contrato');
+}
 ?>
 
 <script src="//static.thetimebilling.com/js/bootstrap.min.js" type="text/javascript"></script>
@@ -641,30 +648,30 @@ $Pagina->PrintTop();
 
 					<table>
 						<tr>
-							<td align=right>
-								<input name="cliente_limite_hh" value="<?php echo $cliente->fields['limite_hh'] ? $cliente->fields['limite_hh'] : '0' ?>" size=5 title="<?php echo __('Total de Horas') ?>"/>
+							<td align="right">
+								<input name="cliente_limite_hh" value="<?php echo $cliente->fields['limite_hh'] ? $cliente->fields['limite_hh'] : '0' ?>" size="5" title="<?php echo __('Total de Horas') ?>"/>
 							</td>
-							<td colspan=3 align=left>
+							<td colspan="3" align="left">
 								<span title="<?php echo __('Total de Horas') ?>"><?php echo __('Límite de horas') ?></span>
 							</td>
-							<td align=right>
-								<input name=cliente_limite_monto value="<?php echo $cliente->fields['limite_monto'] ? $cliente->fields['limite_monto'] : '0' ?>" size=5 title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>"/>
+							<td align="right">
+								<input name="cliente_limite_monto" value="<?php echo $cliente->fields['limite_monto'] ? $cliente->fields['limite_monto'] : '0' ?>" size="5" title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>"/>
 							</td>
-							<td colspan=3 align=left>
+							<td colspan="3" align="left">
 								<span title="<?php echo __('Valor Total según Tarifa Hora Hombre') ?>"><?php echo __('Límite de monto') ?></span>
 							</td>
 						</tr>
 						<tr>
-							<td align=right>
-								<input name=cliente_alerta_hh value="<?php echo $cliente->fields['alerta_hh'] ? $cliente->fields['alerta_hh'] : '0' ?>" title="<?php echo __('Total de Horas en trabajos no cobrados') ?>" size=5 />
+							<td align="right">
+								<input name="cliente_alerta_hh" value="<?php echo $cliente->fields['alerta_hh'] ? $cliente->fields['alerta_hh'] : '0' ?>" title="<?php echo __('Total de Horas en trabajos no cobrados') ?>" size="5" />
 							</td>
-							<td colspan=3 align=left>
+							<td colspan="3" align="left">
 								<span title="<?php echo __('Total de Horas en trabajos no cobrados') ?>"><?php echo __('horas no cobradas') ?></span>
 							</td>
-							<td align=right>
-								<input name=cliente_alerta_monto value="<?php echo $cliente->fields['alerta_monto'] ? $cliente->fields['alerta_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>" size=5 />
+							<td align="right">
+								<input name="cliente_alerta_monto" value="<?php echo $cliente->fields['alerta_monto'] ? $cliente->fields['alerta_monto'] : '0' ?>" title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>" size="5" />
 							</td>
-							<td colspan=3 align=left>
+							<td colspan="3" align="left">
 								<span title="<?php echo __('Valor Total según Tarifa Hora Hombre en trabajos no cobrados') ?>"><?php echo __('monto según horas no cobradas') ?>
 							</td>
 						</tr>
