@@ -8191,7 +8191,6 @@ class NotaCobro extends Cobro {
 						tramite.tarifa_tramite as tarifa,
 						tramite.codigo_asunto,
 						tramite.id_moneda_tramite,
-						concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
 						CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
 					FROM tramite
 						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
