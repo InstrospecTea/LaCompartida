@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.31.6
+Monday, December 21st
+* **Fix** [Problema con diferencia de iniciales entre dos secciones de cobro_rtf](https://github.com/LemontechSA/ttb/pull/)
+
 ## Hotfix 15.31.5
 Friday, December 18th
 * **Fix** [Selecciona solo usuarios con rol profesional al cargar datos en ambiente DEMO](https://github.com/LemontechSA/ttb/pull/1269)
