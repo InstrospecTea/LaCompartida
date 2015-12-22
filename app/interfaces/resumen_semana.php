@@ -1,7 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/classes/UsuarioExt.php';
-require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
@@ -110,16 +108,16 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 		$sql_f = 'SELECT DATE_ADD( CURDATE(), INTERVAL - ( DAYOFWEEK(CURDATE()) - 2 ) DAY ) AS semana_inicio';
 		$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f, __FILE__, __LINE__, $sesion->dbh);
 		list($semana_actual) = mysql_fetch_array($resp);
-		$semana_anterior = date('Y-m-d', strtotime('$semana_actual-7 days'));
-		$semana_siguiente = date('Y-m-d', strtotime('$semana_actual+7 days'));
+		$semana_anterior = date('Y-m-d', strtotime($semana_actual . '-1 week'));
+		$semana_siguiente = date('Y-m-d', strtotime($semana_actual . '+1 week'));
 	} else {
 		$semana = date('Y-m-d', strtotime($semana));
 		$semana2 = "'$semana'";
 		$sql_f = "SELECT DATE_ADD( '" . $semana . "', INTERVAL - ( DAYOFWEEK('" . $semana . "') - 2 ) DAY ) AS semana_inicio";
 		$resp = mysql_query($sql_f, $sesion->dbh) or Utiles::errorSQL($sql_f, __FILE__, __LINE__, $sesion->dbh);
 		list($semana_actual) = mysql_fetch_array($resp);
-		$semana_anterior = date('Y-m-d', strtotime('$semana_actual-7 days'));
-		$semana_siguiente = date('Y-m-d', strtotime('$semana_actual+7 days'));
+		$semana_anterior = date('Y-m-d', strtotime($semana_actual . ' -1 week'));
+		$semana_siguiente = date('Y-m-d', strtotime($semana_actual . ' +1 week'));
 	}
 
 	switch ($tipo_dato) {
@@ -158,15 +156,15 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 		$tip_siguiente = Html::Tooltip('<b>' . __('Semana siguiente') . ':</b><br>' . Utiles::sql3fecha($semana_siguiente, '%d de %B de %Y'));
 		echo('<tr>');
 		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
-			echo("<td style='width: 100px; text-align:left;'><img src='" . Conf::ImgDir() . "/izquierda_nuevo.gif' $tip_anterior class='mano_on' onclick=\"CambiaSemana('$semana_anterior')\"></td>");
+			echo("<td style='width: 100px; text-align:left;'><img src='" . Conf::ImgDir() . "/izquierda_nuevo.gif' $tip_anterior class='mano_on' onclick=\"CambiaSemana('" . Utiles::sql2date($semana_anterior) . "')\"></td>");
 		} else {
-			echo("<td style='width: 100px; text-align:left;'><img src='" . Conf::ImgDir() . "/izquierda.gif' $tip_anterior class='mano_on' onclick=\"CambiaSemana('$semana_anterior')\"></td>");
+			echo("<td style='width: 100px; text-align:left;'><img src='" . Conf::ImgDir() . "/izquierda.gif' $tip_anterior class='mano_on' onclick=\"CambiaSemana('" . Utiles::sql2date($semana_anterior) . "')\"></td>");
 		}
 		echo("<td colspan='5' align='center' style='width: 500px;'><b>" . __('Semana del') . ":</b> " . $semana_del . "</td>");
 		if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ))) {
-			echo("<td style='width: 100px; text-align:right;'><img src='" . Conf::ImgDir() . "/derecha_nuevo.gif' $tip_siguiente class='mano_on' onclick=\"CambiaSemana('" . $semana_siguiente . "')\"></td>");
+			echo("<td style='width: 100px; text-align:right;'><img src='" . Conf::ImgDir() . "/derecha_nuevo.gif' $tip_siguiente class='mano_on' onclick=\"CambiaSemana('" . Utiles::sql2date($semana_siguiente) . "')\"></td>");
 		} else {
-			echo("<td style='width: 100px; text-align:right;'><img src='" . Conf::ImgDir() . "/derecha.gif' $tip_siguiente class='mano_on' onclick=\"CambiaSemana('" . $semana_siguiente . "')\"></td>");
+			echo("<td style='width: 100px; text-align:right;'><img src='" . Conf::ImgDir() . "/derecha.gif' $tip_siguiente class='mano_on' onclick=\"CambiaSemana('" . Utiles::sql2date($semana_siguiente) . "')\"></td>");
 		}
 		echo('</tr>');
 		/* fin semanas */
@@ -225,7 +223,7 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 		$duracion = $lista->Get($i)->fields['duracion_pedida'];
 		if (( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal' ) || ( method_exists('Conf', 'TipoIngresoHoras') && Conf::TipoIngresoHoras() == 'decimal' )) {
 			if (strpos($duracion, ':')) {
-				list($hh, $mm, $ss) = split(':', $duracion);
+				list($hh, $mm, $ss) = explode(':', $duracion);
 			} else {
 				$hh = floor($duracion / 3600);
 				$mm = floor(($duracion - $hh * 3600) / 60);
@@ -238,7 +236,7 @@ for ($j = 0; $j < count($usuarios); ++$j) {
 			$duracion = UtilesApp::Time2Decimal($duracion);
 		} else {
 			if (strpos($duracion, ':')) {
-				list($hh, $mm, $ss) = split(':', $duracion);
+				list($hh, $mm, $ss) = explode(':', $duracion);
 			} else {
 				$hh = floor($duracion / 3600);
 				$mm = floor(($duracion - $hh * 3600) / 60);
