@@ -1198,7 +1198,7 @@ foreach ($chargeResults as $charge) {
 				$celda_subtotales_totales += number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', '');
 				$ws->write($filas, 6, __('Sub Total'), $formato_total);
 				$ws->write($filas, 7, '', $formato_total);
-				$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion']/60, 2)), $formato_total);
+				$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion']/60, 2)), $formato_moneda_total);
 				$ws->write($filas, 9, '', $formato_total);
 				$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_moneda_total);
 			};
@@ -1207,7 +1207,7 @@ foreach ($chargeResults as $charge) {
 		// Sub Total
 		$ws->write(++$filas, 6, __('Total'), $formato_total);
 		$ws->write($filas, 7, '', $formato_total);
-		$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($celda_subtotales_horas/60, 2)), $formato_total);
+		$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($celda_subtotales_horas/60, 2)), $formato_moneda_total);
 		$ws->write($filas, 9, '', $formato_total);
 		$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $celda_subtotales_totales, $formato_moneda_total);
 	}
