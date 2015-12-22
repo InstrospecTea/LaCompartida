@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.31.8
+Tuesday, December 22nd
+* **Fix** [Problema en modulo de Resumen](https://github.com/LemontechSA/ttb/pull/1274)
+
 ## Hotfix 15.31.7
 Monday, December 21st
 * **Fix** [Brasil - Traduccion Importe](https://github.com/LemontechSA/ttb/pull/1271)
