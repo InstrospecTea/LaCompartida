@@ -1186,9 +1186,9 @@ foreach ($chargeResults as $charge) {
 							$ws->write($filas, 7, $usuarios['categoria'], $formato_normal);
 						}
 
-						$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($usuarios['duracion']/60, 2)), $formato_normal);
-						$ws->write($filas, 9, number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal_centrado);
-						$ws->write($filas, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_normal);
+						$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($usuarios['duracion']/60, 2)), $formato_moneda);
+						$ws->write($filas, 9, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_moneda);
+						$ws->write($filas, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_moneda);
 					}
 				}
 
@@ -1200,7 +1200,7 @@ foreach ($chargeResults as $charge) {
 				$ws->write($filas, 7, '', $formato_total);
 				$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['duracion']/60, 2)), $formato_total);
 				$ws->write($filas, 9, '', $formato_total);
-				$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_total);
+				$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($cobro_valores['detalle']['detalle_escalonadas'][$esc]['totales']['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $formato_moneda_total);
 			};
 		}
 
@@ -1209,7 +1209,7 @@ foreach ($chargeResults as $charge) {
 		$ws->write($filas, 7, '', $formato_total);
 		$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($celda_subtotales_horas/60, 2)), $formato_total);
 		$ws->write($filas, 9, '', $formato_total);
-		$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $celda_subtotales_totales, $formato_total);
+		$ws->write($filas++, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . $celda_subtotales_totales, $formato_moneda_total);
 	}
 
 	$filas += 2;
