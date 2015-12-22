@@ -5,6 +5,7 @@
 	$pagina = new Pagina($sesion);
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 	$Form = new Form($sesion);
+	$Html = new \TTB\Html;
 
 	$pagina->titulo = __('Reporte Gráfico asuntos');
 	$pagina->PrintTop();
@@ -22,14 +23,15 @@
 ?>
 
 <form method='post' name='formulario'>
+<input type="hidden" name="opcion" value="desplegar">
+
 <table class="border_plomo tb_base">
 	<tr>
 		<td align="right">
-			<?php echo __('Fecha desde');?>
+			<?php echo __('Fecha desde'); ?>
 		</td>
-		<td align="left">
-			<input type="text" name="fecha_ini" value="<?php echo $fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy - 1 month")); ?>" id="fecha_ini" size="11" maxlength="10" />
-			<img src="<?php echo Conf::ImgDir(); ?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+		<td align=left>
+			<?php echo $Html::PrintCalendar('fecha_ini', $fecha_ini); ?>
 		</td>
 	</tr>
 	<tr>
@@ -37,8 +39,7 @@
 			<?php echo __('Fecha hasta'); ?>
 		</td>
 		<td align="left">
-			<input type="text" name="fecha_fin" value="<?php echo $fecha_fin ? $fecha_fin : date("d-m-Y",strtotime("$hoy")); ?>" id="fecha_fin" size="11" maxlength="10" />
-			<img src="<?php echo Conf::ImgDir(); ?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+			<?php echo $Html::PrintCalendar('fecha_fin', $fecha_fin); ?>
 		</td>
 	</tr>
 	<tr>
@@ -60,10 +61,14 @@
 	</tr>
 	<tr>
 		<td align="right">
-			<?php echo __('Solo activos');?>
+			<?php echo __('Solo activos'); ?>
 		</td>
 		<td>
-			<? if( $solo_activos ) $chk = "checked='checked'"; ?>
+			<?php
+				if ($solo_activos) {
+					$chk = "checked='checked'";
+				}
+			?>
 			<input type="checkbox" name="solo_activos" id="solo_activos" value="1" <?php echo $chk; ?> />
 		</td>
 	</tr>
@@ -93,7 +98,6 @@
 <div id="contenedor_grafico_hito"></div>
 
 <script type="text/javascript">
-<!-- //
 jQuery(function() {
 	var graficoBarraHito;
 
@@ -149,21 +153,6 @@ function Planilla(form) {
 	form.action = "planillas/planilla_horas_general.php";
 	form.submit();
 }
-Calendar.setup(
-	{
-		inputField	: "fecha_ini",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_ini"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha_fin",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha_fin"		// ID of the button
-	}
-);
-
 </script>
 <?
 	$pagina->PrintBottom();

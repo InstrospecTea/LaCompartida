@@ -4,6 +4,7 @@
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
 	$Form = new Form($sesion);
+	$Html = new \TTB\Html;
 
   if($id_usuario == "")
 		$id_usuario = $sesion->usuario->fields['id_usuario'];
@@ -26,7 +27,7 @@
 			<?php echo __('Fecha desde');?>
 		</td>
 		<td align="left">
-			<input class="fechadiff" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+			<?php echo $Html::PrintCalendar('fecha1', $fecha1); ?>
 		</td>
 	</tr>
 	<tr>
@@ -34,12 +35,12 @@
 			<?php echo __('Fecha hasta'); ?>
 		</td>
 		<td align="left">
-			<input class="fechadiff" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+			<?php echo $Html::PrintCalendar('fecha2', $fecha2); ?>
 		</td>
 	</tr>
 	<tr>
 		<td align="right">
-			<?php echo __('Usuario');?>
+			<?php echo __('Usuario'); ?>
 		</td>
 		<td align="left"><!-- Nuevo Select -->
 			<?php echo $Form->select('id_usuario', $sesion->usuario->ListarActivos('', 'PRO'), $id_usuario, array('empty' => FALSE, 'style' => 'width: 200px')); ?>
@@ -66,7 +67,6 @@
 <canvas id="grafico_usuarios" width="600" height="400"></canvas>
 
 <script type="text/javascript">
-<!-- //
 jQuery(function() {
 	var graficoBarraUsuarios;
 
@@ -108,7 +108,6 @@ function Habilitar(form)
 	else
 		form.codigo_asunto.disabled = false;
 }
-// ->
 </script>
 
 <?

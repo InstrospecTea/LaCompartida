@@ -20,7 +20,9 @@ if (!$opc) {
 $confirma = $_POST['confirma'];
 $opc_informar_contabilidad = $_POST['opc_ic'];
 
-
+if (!$contrato->Loaded()) {
+	$contrato->setFieldsNew('contrato');
+}
 
 
 if (!$cobro->Load($id_cobro)) {
@@ -219,7 +221,7 @@ if ($opc == 'refrescar') {
 
 	$data_cobro = compact('id_cobro', 'saldo_honorarios', 'saldo_gastos_con_impuestos', 'saldo_gastos_sin_impuestos', 'descuento_honorarios', 'subtotal_honorarios', 'iva');
 	$data_cobro['fecha'] = date('d-m-Y', strtotime($charge->get('fecha_emision')));
-	
+
 	echo CobroHtml::cajafacturasCobro($data_cobro, $sesion);
 
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {

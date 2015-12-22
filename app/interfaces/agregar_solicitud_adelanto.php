@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('COB','PRO'));
 $Pagina = new Pagina($Sesion);
+$Html = new \TTB\Html;
 
 $SolicitudAdelanto = new SolicitudAdelanto($Sesion);
 
@@ -10,13 +11,21 @@ if ($_POST['opcion'] == 'guardar') {
 	$SolicitudAdelanto->Fill($_REQUEST, true);
 	$SolicitudAdelanto->Edit('id_usuario_ingreso', $Sesion->usuario->fields['id_usuario']);
 
+	if (Conf::GetConf($Sesion, 'CodigoSecundario') && !empty($_REQUEST['codigo_cliente_secundario'])) {
+		$Cliente = new Cliente($Sesion);
+		$Cliente->LoadByCodigoSecundario($_REQUEST['codigo_cliente_secundario']);
+		if ($Cliente->Loaded()) {
+			$SolicitudAdelanto->Edit('codigo_cliente', $Cliente->fields['codigo_cliente']);
+		}
+	}
+
 	if ($SolicitudAdelanto->fields['codigo_asunto'] == '') {
 		$SolicitudAdelanto->fields['codigo_asunto'] = NULL;
 	}
-	
+
 	if ($SolicitudAdelanto->Write()) {
 		$Pagina->AddInfo(__('Solicitud de Adelanto guardada con éxito'));
-		
+
 		if ($_REQUEST['notificar_solicitante']) {
 			$SolicitudAdelanto->NotificarSolicitante();
 		}
@@ -28,10 +37,9 @@ if ($_POST['opcion'] == 'guardar') {
 		$SolicitudAdelanto->Load($_REQUEST['id_solicitud_adelanto']);
 		unset($_REQUEST['id_solicitud_adelanto']);
 	}
-	
+
 	$SolicitudAdelanto->Fill($_REQUEST);
 }
-
 
 $popup = $_REQUEST['popup'];
 
@@ -39,7 +47,7 @@ $Pagina->titulo = __('Solicitud de Adelanto');
 
 if ($SolicitudAdelanto->Loaded()) {
 	$Pagina->titulo = __('Edición') . ' de ' . $Pagina->titulo . ' N° ' . $SolicitudAdelanto->fields['id_solicitud_adelanto'];
-	
+
 	if (!empty($SolicitudAdelanto->fields['id_contrato'])) {
 		$codigo_asunto = $SolicitudAdelanto->fields['codigo_asunto'];
 		if(empty($codigo_asunto)){
@@ -75,8 +83,7 @@ $Pagina->PrintTop($popup);
 				<label for="fecha"><?php echo __('Fecha') ?></label>
 			</td>
 			<td align="left">
-				<input type="text" name="fecha" value="<?php echo $documento->fields['fecha'] ? Utiles::sql2date($documento->fields['fecha']) : date('d-m-Y') ?>" id="fecha" size="11" maxlength="10" />
-				<img src="<?php echo Conf::ImgDir() ?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
+				<?php echo $Html::PrintCalendar('fecha', Utiles::sql2date($SolicitudAdelanto->fields['fecha'])); ?>
 			</td>
 		</tr>
 		<tr>
@@ -163,7 +170,7 @@ $Pagina->PrintTop($popup);
 			$('monto').focus();
 			return false;
 		}
-			
+
 <?php
 if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 	if (UtilesApp::GetConf($Sesion, 'TipoSelectCliente') == 'autocompletador') {
@@ -183,29 +190,27 @@ if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 				var cod_cli = document.getElementById('codigo_cliente');
 	<?php } else { ?>
 				var cod_cli = document.getElementById('campo_codigo_cliente');
-	<?php } ?>	
+	<?php } ?>
 			if (cod_cli == '-1' || cod_cli == "") {
 				alert('<?php echo __('Debe ingresar un cliente') ?>');
 				return false;
 			}
-<?php } ?> 
-        
+<?php } ?>
+
 		if (form.descripcion.value == "") {
 			alert('<?php echo __('Debe ingresar una descripción'); ?>');
 			form.descripcion.focus();
 			return false;
 		}
-		
+
 		var estado_anterior = '<?php echo $SolicitudAdelanto->fields['estado']; ?>';
-		
+
 		if (form.estado.value == "DEPOSITADO" && estado_anterior != form.estado.value) {
 			if (confirm('¿Desea notificar al solicitante la disponibilidad del adelanto?')) {
 				form.notificar_solicitante.value = true;
 			}
 		}
 	}
-	
-	Calendar.setup({ inputField	: "fecha", ifFormat : "%d-%m-%Y", button : "img_fecha" });
 </script>
 <?php if ($SolicitudAdelanto->Loaded()) { ?>
 	<script type="text/javascript">
@@ -218,7 +223,7 @@ if (UtilesApp::GetConf($Sesion, 'CodigoSecundario')) {
 					jQuery(this).attr({'href':'#', 'class':'printlinkpage','rel':valrel});
 				});
 			});
-				
+
 			jQuery('.printlinkpage').live('click',function() {
 				multi = jQuery("input[name=x_pag]").val();
 				//alert(multi);

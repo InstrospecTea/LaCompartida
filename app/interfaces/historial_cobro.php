@@ -12,6 +12,7 @@
 
 	$sesion = new Sesion('');
 	$pagina = new Pagina($sesion);
+	$Html = new \TTB\Html;
 
 	if($id_cobro) {
 		$cobro = new Cobro($sesion);
@@ -24,9 +25,9 @@
 		$pagina->FatalError(__('Debe especificar un cobro'));
 	}
 
-  if($opc == "guardar") {
+  if($opc == 'guardar') {
 		$his = new Observacion($sesion);
-		$his->Edit('fecha',$fecha_obs);
+		$his->Edit('fecha', date('Y-m-d', strtotime($fecha_obs)));
 		$his->Edit('comentario',$observacion_obs);
 		$his->Edit('id_usuario',$usuario_ingreso_obs);
 		$his->Edit('id_cobro',$id_cobro);
@@ -40,11 +41,11 @@
 		}
   }
 
-	if($desde == "") {
+	if($desde == '') {
 		$desde = 0;
 	}
 
-	if($x_pag == "") {
+	if($x_pag == '') {
 		$x_pag = 5;
 	}
 
@@ -116,7 +117,7 @@
 				<?php echo __('Fecha')?>
 			</td>
 			<td>
-				<?php echo Html::PrintCalendar('fecha_obs',''); ?>
+				<?php echo $Html::PrintCalendar('fecha_obs', $fecha_obs); ?>
 			</td>
 		</tr>
 		<tr>

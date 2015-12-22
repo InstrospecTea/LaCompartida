@@ -1,5 +1,49 @@
 # Changelog
 
+## Hotfix 15.31.7
+Monday, December 21st
+* **Fix** [Brasil - Traduccion Importe](https://github.com/LemontechSA/ttb/pull/1271)
+
+## Hotfix 15.31.6
+Monday, December 21st
+* **Fix** [Problema con diferencia de iniciales entre dos secciones de cobro_rtf](https://github.com/LemontechSA/ttb/pull/1270)
+
+## Hotfix 15.31.5
+Friday, December 18th
+* **Fix** [Selecciona solo usuarios con rol profesional al cargar datos en ambiente DEMO](https://github.com/LemontechSA/ttb/pull/1269)
+
+## Hotfix 15.31.4
+Friday, December 18th
+* **Fix** [Corregir reporte avanzado por agrupador tipo_asunto](https://github.com/LemontechSA/ttb/pull/1268)
+
+## Hotfix 15.31.3
+Friday, December 18th
+* **Fix** [Mostrar símbolo de moneda correcto en resumen escalonado](https://github.com/LemontechSA/ttb/pull/1267)
+
+## Hotfix 15.31.2
+Wednesday, December 16th
+* **Fix** [Mejoras Reporte Producción por Periodo](https://github.com/LemontechSA/ttb/pull/1265)
+
+## Hotfix 15.31.1
+Wednesday, December 16th
+* **Fix** [Problemas LEDES Gastos](https://github.com/LemontechSA/ttb/pull/1264)
+
+## [Release 15.31.0](https://github.com/LemontechSA/ttb/pull/1260)
+Tuesday, December 15th
+* **Feature** [Unificar calendarios](https://github.com/LemontechSA/ttb/pull/1225)
+
+## Hotfix 15.30.3
+Tuesday, December 15th
+* **Fix** [Error Documentos legales por defecto](https://github.com/LemontechSA/ttb/pull/1263)
+
+## Hotfix 15.30.2
+Tuesday, December 15th
+* **Fix** [Error Documentos legales por defecto](https://github.com/LemontechSA/ttb/pull/1262)
+
+## Hotfix 15.30.1
+Tuesday, December 15th
+* **Fix** [Excel revisión de Horas](https://github.com/LemontechSA/ttb/pull/1261)
+
 ## [Release 15.30.0](https://github.com/LemontechSA/ttb/pull/1258)
 Thursday 2015, December 10th
 * **Feature** [Reporte MTA](https://github.com/LemontechSA/ttb/pull/1254)

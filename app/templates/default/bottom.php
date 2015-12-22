@@ -1,6 +1,6 @@
 <div id="footer" style="clear:both;display:block;">
 	&nbsp;
-		<script type="text/javascript" src="//static.thetimebilling.com/js/bottom.js"></script>
+		<script type="text/javascript" src="//static.thetimebilling.com/js/bottom.20151207051018.js"></script>
 </div>
 
 <?php

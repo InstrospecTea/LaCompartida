@@ -1,6 +1,5 @@
 <?php
 
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__).'/../../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -23,7 +22,7 @@ if ($horas == 'duracion_cobrada') {
 $id_moneda_seleccionada = $moneda_mostrar;
 
 $query = "
-	SELECT 
+	SELECT
 		trabajo.id_usuario 'id_usuario',
 		trabajo.codigo_asunto 'cliente',
 		SUM( TIME_TO_SEC( $horas )) 'duracion',
@@ -45,7 +44,7 @@ $query = "
 
 		LEFT JOIN usuario_tarifa as usuario_tarifa_standard ON trabajo.id_usuario = usuario_tarifa_standard.id_usuario
 			AND usuario_tarifa_standard.id_moneda = contrato.id_moneda AND tarifa_defecto.id_tarifa = usuario_tarifa_standard.id_tarifa
-	
+
 	WHERE fecha >= '$fecha1' AND fecha <= '$fecha2'
 	GROUP BY trabajo.id_usuario, trabajo.codigo_asunto";
 
@@ -195,7 +194,7 @@ $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__
 		{
 			if($j == 0) #usuarios
 					$ws1->write($fila_inicial, $columna_inicial + 1 + $i, Utiles::Glosa($sesion, $usuarios[$i], $dato_usuario, "usuario"), $formato_titulo);
-	
+
 			if($i == 0)
 			{
 				$ws1->write($fila_inicial+1+$j, $columna_inicial, Utiles::Glosa($sesion, $clientes[$j], "glosa_asunto", "asunto", "codigo_asunto"), $formato_texto);
@@ -212,14 +211,14 @@ $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__
 				$ws1->write($fila_inicial + 1 + $j, $columna_inicial + 1 + $i, '', $formato_tiempo);
 		}
 	}
-	
+
 	$ws1->setColumn(0, 1, 20);
 	$ws1->setColumn(2, 2 + count($usuarios), 12);
-	
+
 	$columna_final = $columna_inicial + $i + 1;
 	$ws1->setColumn($columna_final, $columna_final+2, 18);
 	$fila_final = $fila_inicial + $j + 1;
-	
+
 	$ws1->write($fila_final, $columna_inicial, __(Total), $formato_texto_total);
 
 	$ws1->write($fila_inicial,$columna_final,'Total Cliente',$formato_titulo);

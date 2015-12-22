@@ -1,20 +1,24 @@
 <?php
-	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 
 	$sesion = new Sesion(array('REP'));
 	$pagina = new Pagina($sesion);
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 	$Form = new Form($sesion);
+	$Html = new \TTB\Html;
 
-	if($xls)
-	{
+	if ($fecha1 == '' AND $fecha2 == '') {
+		$fecha1 = date('d-m-Y', strtotime('- 1 month'));
+		$fecha2 = date('d-m-Y');
+	}
+
+	if ($xls) {
 		$moneda_base = Utiles::MonedaBase($sesion);
 		#ARMANDO XLS
 		$wb = new Spreadsheet_Excel_Writer();
 
-		$wb->setCustomColor ( 35, 220, 255, 220 );
-		$wb->setCustomColor ( 36, 255, 255, 220 );
+		$wb->setCustomColor(35, 220, 255, 220);
+		$wb->setCustomColor(36, 255, 255, 220);
 
 		$formato_encabezado =& $wb->addFormat(array('Size' => 12,
 									'VAlign' => 'top',
@@ -54,15 +58,16 @@
 				FROM prm_moneda
 				ORDER BY id_moneda';
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		while(list($id_moneda, $simbolo_moneda, $cifras_decimales) = mysql_fetch_array($resp)){
-			if($cifras_decimales>0)
-			{
+		while (list($id_moneda, $simbolo_moneda, $cifras_decimales) = mysql_fetch_array($resp)){
+			if ($cifras_decimales > 0) {
 				$decimales = '.';
-				while($cifras_decimales-- >0)
+				while($cifras_decimales-- > 0) {
 					$decimales .= '0';
-			}
-			else
+				}
+			} else {
 				$decimales = '';
+			}
+
 			$formatos_moneda[$id_moneda] =& $wb->addFormat(array('Size' => 11,
 																'VAlign' => 'top',
 																'Align' => 'right',
@@ -121,24 +126,23 @@
 		$filas += 1;
 		$ws1->mergeCells($filas, 1, $filas, 3);
 		$ws1->write($filas, $col_fecha_creacion, __('REPORTE COBROS POR AREA'), $formato_encabezado);
-		for($x=2;$x<4;$x++)
+		for($x = 2; $x < 4; $x++) {
 			$ws1->write($filas, $x, '', $formato_encabezado);
+		}
 		$filas += 2;
 		$ws1->write($filas, $col_fecha_creacion,__('GENERADO EL:'),$formato_texto);
 		$ws1->write($filas, $col_cliente,date("d-m-Y H:i:s"),$formato_texto);
 
 		$query_fecha = '';
-		if( $fecha1 != '' and $fecha2 != '' )
-		{
-			$query_fecha = " AND cobro.fecha_creacion >= '".Utiles::fecha2sql($fecha1)."' AND cobro.fecha_creacion <= '".Utiles::fecha2sql($fecha2)." 23:59:59'";
-			$filas +=1;
-			$ws1->write($filas, $col_fecha_creacion,__('FECHA CONSULTA:'),$formato_texto);
-			$ws1->write($filas, $col_cliente,$fecha1.' - '.$fecha2,$formato_texto);
+		if ($fecha1 != '' and $fecha2 != '') {
+			$query_fecha = " AND cobro.fecha_creacion >= '" . Utiles::fecha2sql($fecha1) . "' AND cobro.fecha_creacion <= '" . Utiles::fecha2sql($fecha2) . " 23:59:59'";
+			$filas += 1;
+			$ws1->write($filas, $col_fecha_creacion, __('FECHA CONSULTA:'), $formato_texto);
+			$ws1->write($filas, $col_cliente, $fecha1 . ' - ' . $fecha2, $formato_texto);
 		}
 		$query_estado = 'AND cobro.estado =';
 
-		switch($estado)
-		{
+		switch ($estado) {
 			case 'creado':
 				$query_estado .= "'CREADO'";
 				break;
@@ -166,8 +170,9 @@
 		}
 
 		$query_usuarios = '';
-		if(is_array($usuarios))
-			$query_usuarios = " AND usuario.id_usuario IN (".implode(',',$usuarios).") ";
+		if (is_array($usuarios)) {
+			$query_usuarios = " AND usuario.id_usuario IN (" . implode(',',$usuarios) . ") ";
+		}
 
 
 		//FFF se quita esto de la query:
@@ -175,116 +180,110 @@
 		// no hay que redondear en la moneda origen!
 
 		$filas +=4;
-		$query ="SELECT		asunto.id_area_proyecto
-							,cobro.fecha_creacion
-							,cliente.glosa_cliente
-							,asunto.codigo_asunto
-							,asunto.glosa_asunto
-							,CONCAT(usuario.nombre,' ', usuario.apellido1) AS nombre
-							,cobro.saldo_final_gastos
-							,cobro.estado
-							,cobro.documento as numero
-							,cobro.forma_cobro
-							,cobro.id_cobro
-							,cobro.opc_moneda_total
-							,area.glosa
-							,moneda_base.id_moneda as id_moneda_base
-							,moneda_cobro.simbolo
-							,moneda_cobro.id_moneda
-							,cobro.total_minutos
-							,cobro.opc_moneda_total
-							,(SUM( TIME_TO_SEC(duracion_cobrada))/60) AS duracion_cobrada
-							,(SUM( TIME_TO_SEC(duracion))/60) AS duracion
-							,ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) AS monto_proporcional
-							,ROUND( (cobro.monto_subtotal-cobro.descuento ) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales) AS total_moneda_base
-							FROM cobro
-							LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
-							LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
-							LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
-							LEFT JOIN trabajo ON trabajo.id_cobro = cobro.id_cobro AND trabajo.codigo_asunto = asunto.codigo_asunto
-							LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
-							LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
-							LEFT JOIN prm_area_proyecto AS area ON area.id_area_proyecto = asunto.id_area_proyecto
-							LEFT JOIN prm_moneda as moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
-							LEFT JOIN cobro_moneda as cobro_moneda_cobro ON cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = moneda_cobro.id_moneda
-							LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1
-							LEFT JOIN cobro_moneda as cobro_moneda_moneda_base ON cobro_moneda_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_moneda_base.id_moneda = moneda_base.id_moneda
-							WHERE 1 $query_fecha $query_estado $query_usuarios
-							GROUP BY cobro.id_cobro, asunto.id_area_proyecto
-							ORDER BY asunto.id_area_proyecto, cliente.glosa_cliente, cobro.id_cobro;";
+		$query ="SELECT	asunto.id_area_proyecto
+						,cobro.fecha_creacion
+						,cliente.glosa_cliente
+						,asunto.codigo_asunto
+						,asunto.glosa_asunto
+						,CONCAT(usuario.nombre,' ', usuario.apellido1) AS nombre
+						,cobro.saldo_final_gastos
+						,cobro.estado
+						,cobro.documento as numero
+						,cobro.forma_cobro
+						,cobro.id_cobro
+						,cobro.opc_moneda_total
+						,area.glosa
+						,moneda_base.id_moneda as id_moneda_base
+						,moneda_cobro.simbolo
+						,moneda_cobro.id_moneda
+						,cobro.total_minutos
+						,cobro.opc_moneda_total
+						,(SUM( TIME_TO_SEC(duracion_cobrada))/60) AS duracion_cobrada
+						,(SUM( TIME_TO_SEC(duracion))/60) AS duracion
+						,ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales) AS monto_proporcional
+						,ROUND( (cobro.monto_subtotal-cobro.descuento ) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales) AS total_moneda_base
+				FROM cobro
+				LEFT JOIN cliente ON cliente.codigo_cliente = cobro.codigo_cliente
+				LEFT JOIN cobro_asunto ON cobro_asunto.id_cobro = cobro.id_cobro
+				LEFT JOIN asunto ON asunto.codigo_asunto = cobro_asunto.codigo_asunto
+				LEFT JOIN trabajo ON trabajo.id_cobro = cobro.id_cobro AND trabajo.codigo_asunto = asunto.codigo_asunto
+				LEFT JOIN contrato ON contrato.id_contrato = cobro.id_contrato
+				LEFT JOIN usuario ON usuario.id_usuario = contrato.id_usuario_responsable
+				LEFT JOIN prm_area_proyecto AS area ON area.id_area_proyecto = asunto.id_area_proyecto
+				LEFT JOIN prm_moneda as moneda_cobro ON moneda_cobro.id_moneda = cobro.id_moneda
+				LEFT JOIN cobro_moneda as cobro_moneda_cobro ON cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = moneda_cobro.id_moneda
+				LEFT JOIN prm_moneda as moneda_base ON moneda_base.moneda_base = 1
+				LEFT JOIN cobro_moneda as cobro_moneda_moneda_base ON cobro_moneda_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_moneda_base.id_moneda = moneda_base.id_moneda
+				WHERE 1 $query_fecha $query_estado $query_usuarios
+				GROUP BY cobro.id_cobro, asunto.id_area_proyecto
+				ORDER BY asunto.id_area_proyecto, cliente.glosa_cliente, cobro.id_cobro;";
 
 		#Clientes
 		$area = '';
-		$area_total_moneda_base=0;
+		$area_total_moneda_base = 0;
 		$sin_area = false; //@todo: esto es temporal
 		$tabla_creada = false;
-                //echo "<script></script>$query";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-		while($cobro = mysql_fetch_array($resp))
-		{
+        //echo "<script></script>$query";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		while ($cobro = mysql_fetch_array($resp)) {
 			$cobro_moneda = new CobroMoneda($sesion);
 			$cobro_moneda->Load( $cobro['id_cobro'] );
 			$query = "SELECT SQL_CALC_FOUND_ROWS * FROM cta_corriente
-								 WHERE id_cobro=".$cobro['id_cobro']." AND ( ingreso > 0 OR egreso > 0 ) AND cta_corriente.incluir_en_cobro='SI'
-								 ORDER BY fecha ASC";
-			$lista_gastos = new ListaGastos($sesion,'',$query);
-			$saldo_gastos=0;
+						WHERE id_cobro=".$cobro['id_cobro']." AND ( ingreso > 0 OR egreso > 0 ) AND cta_corriente.incluir_en_cobro='SI'
+						ORDER BY fecha ASC";
+			$lista_gastos = new ListaGastos($sesion, '', $query);
+			$saldo_gastos = 0;
 
 			$x_resultados = UtilesApp::ProcesaCobroIdMoneda($sesion, $cobro['id_cobro']);
-			$saldo_monto=$x_resultados['monto'][$cobro['opc_moneda_total']];
-			$saldo_honorarios=$x_resultados['monto_honorarios'][$cobro['opc_moneda_total']];
-			$saldo_total_moneda_base=$cobro['total_moneda_base'];
+			$saldo_monto = $x_resultados['monto'][$cobro['opc_moneda_total']];
+			$saldo_honorarios = $x_resultados['monto_honorarios'][$cobro['opc_moneda_total']];
+			$saldo_total_moneda_base = $cobro['total_moneda_base'];
 
-			for($i=0;$i<$lista_gastos->num;$i++)
-			{
+			for ($i = 0; $i < $lista_gastos->num; $i++) {
 				$gasto = $lista_gastos->Get($i);
-				if($gasto->fields['egreso']>0)
-				{
+				if ($gasto->fields['egreso'] > 0) {
 					$saldo_gastos += UtilesApp::CambiarMoneda($gasto->fields['monto_cobrable'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'],  $cobro_moneda->moneda[$gasto->fields['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$cobro['id_moneda_base']]['tipo_cambio'],  $cobro_moneda->moneda[$cobro['id_moneda_base']]['cifras_decimales']);
 					//$saldo_gastos += $x_resultados['monto_cobrable'][$cobro['opc_moneda_total']];
 					//$saldo_gastos += $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'];
 				}
-				else if($gasto->fields['ingreso']>0)
-				{
+				else if ($gasto->fields['ingreso'] > 0) {
 					$saldo_gastos -= UtilesApp::CambiarMoneda($gasto->fields['monto_cobrable'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'],  $cobro_moneda->moneda[$gasto->fields['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$cobro['id_moneda_base']]['tipo_cambio'],  $cobro_moneda->moneda[$cobro['id_moneda_base']]['cifras_decimales']);
 					//$saldo_gastos -= $x_resultados['monto_cobrable'][$cobro['opc_moneda_total']];
 					//$saldo_gastos -= $gasto->fields['monto_cobrable'] * $cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio']/$cobro_moneda->moneda[$cobro['opc_moneda_total']]['tipo_cambio'];
 				}
 			}
 
-			if(!$sin_area&&empty($cobro['id_area_proyecto']))
-			{
+			if (!$sin_area && empty($cobro['id_area_proyecto'])) {
 				$filas += 2;
 				$ws1->mergeCells($filas, 1, $filas, 3);
-				$ws1->write($filas, $col_numero_factura,__('Sin Area'), $formato_encabezado);
-				for($x=2;$x<4;$x++)
+				$ws1->write($filas, $col_numero_factura, __('Sin Area'), $formato_encabezado);
+				for ($x = 2; $x < 4; $x++) {
 					$ws1->write($filas, $x, '', $formato_encabezado);
-				$filas +=1;
-				$ws1->write($filas, $col_numero_factura,__('N° Factura'),$formato_titulo);
-				$ws1->write($filas, $col_fecha_creacion,__('Fecha Creación'),$formato_titulo);
-				$ws1->write($filas, $col_cliente,__('Cliente'),$formato_titulo);
-				$ws1->write($filas, $col_codigo_asunto,__('Código'),$formato_titulo);
-				$ws1->write($filas, $col_asunto,__('Asunto'),$formato_titulo);
-				$ws1->write($filas, $col_encargado_comercial,__('Encargado Comercial'),$formato_titulo);
-				$ws1->write($filas, $col_duracion_trabajada,__('Duración Trabajada'),$formato_titulo);
-				$ws1->write($filas, $col_duracion_cobrada,__('Duración Cobrada'),$formato_titulo);
-				$ws1->write($filas, $col_ingreso,__('Ingreso'),$formato_titulo);
-				$ws1->write($filas, $col_ingreso_en_moneda_base,__('Ingreso en '.Moneda::GetGlosaPluralMonedaBase($sesion)),$formato_titulo);
-				$ws1->write($filas, $col_gastos_en_moneda_base,__('Gastos'),$formato_titulo);
-				$ws1->write($filas, $col_estado,__('Estado'),$formato_titulo);
-				$ws1->write($filas, $col_forma_de_cobro,__('Forma de Tarificación'),$formato_titulo);
-				$ws1->write($filas, $col_numero_cobro,__('N° del Cobro'),$formato_titulo);
-				$sin_area=true;
+				}
+				$filas += 1;
+				$ws1->write($filas, $col_numero_factura, __('N° Factura'), $formato_titulo);
+				$ws1->write($filas, $col_fecha_creacion, __('Fecha Creación'), $formato_titulo);
+				$ws1->write($filas, $col_cliente, __('Cliente'), $formato_titulo);
+				$ws1->write($filas, $col_codigo_asunto, __('Código'), $formato_titulo);
+				$ws1->write($filas, $col_asunto, __('Asunto'), $formato_titulo);
+				$ws1->write($filas, $col_encargado_comercial, __('Encargado Comercial'), $formato_titulo);
+				$ws1->write($filas, $col_duracion_trabajada, __('Duración Trabajada'), $formato_titulo);
+				$ws1->write($filas, $col_duracion_cobrada, __('Duración Cobrada'), $formato_titulo);
+				$ws1->write($filas, $col_ingreso, __('Ingreso'), $formato_titulo);
+				$ws1->write($filas, $col_ingreso_en_moneda_base, __('Ingreso en ' . Moneda::GetGlosaPluralMonedaBase($sesion)), $formato_titulo);
+				$ws1->write($filas, $col_gastos_en_moneda_base, __('Gastos'), $formato_titulo);
+				$ws1->write($filas, $col_estado, __('Estado'), $formato_titulo);
+				$ws1->write($filas, $col_forma_de_cobro, __('Forma de Tarificación'), $formato_titulo);
+				$ws1->write($filas, $col_numero_cobro, __('N° del Cobro'), $formato_titulo);
+				$sin_area = true;
 				$tabla_creada = true;
 				$fila_inicial = $filas + 2;
 			}
-			if ($cobro['glosa']!=$area)
-			{
+			if ($cobro['glosa'] != $area) {
 				//Escribiendo el Total del Area
-				if ($tabla_creada)
-				{
+				if ($tabla_creada) {
 					$filas +=1;
-					$ws1->write($filas, $col_numero_factura,__('Total'), $formato_encabezado);
+					$ws1->write($filas, $col_numero_factura, __('Total'), $formato_encabezado);
 					$ws1->writeFormula($filas, $col_duracion_trabajada, "=SUM($col_formula_duracion_trabajada$fila_inicial:$col_formula_duracion_trabajada$filas)", $formato_tiempo);
 					$ws1->writeFormula($filas, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada$fila_inicial:$col_formula_duracion_cobrada$filas)", $formato_tiempo);
 					$ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingreso_en_moneda_base$fila_inicial:$col_formula_ingreso_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
@@ -296,122 +295,122 @@
 					$total_horas_trabajadas = 0;
 					$total_minutos_trabajados = 0;
 				}
+
 				$filas += 2;
 				$ws1->mergeCells($filas, 1, $filas, 3);
-				$ws1->write($filas, $col_numero_factura,__('Area').' '.$cobro['glosa'], $formato_encabezado);
-				for($x=2;$x<4;$x++)
+				$ws1->write($filas, $col_numero_factura, __('Area') . ' ' . $cobro['glosa'], $formato_encabezado);
+				for ($x = 2; $x < 4; $x++){
 					$ws1->write($filas, $x, '', $formato_encabezado);
-				$filas +=1;
+				}
 
-				$ws1->write($filas, $col_numero_factura,__('N° Factura'),$formato_titulo);
-				$ws1->write($filas, $col_fecha_creacion,__('Fecha Creación'),$formato_titulo);
-				$ws1->write($filas, $col_cliente,__('Cliente'),$formato_titulo);
-				$ws1->write($filas, $col_codigo_asunto,__('Código'),$formato_titulo);
-				$ws1->write($filas, $col_asunto,__('Asunto'),$formato_titulo);
-				$ws1->write($filas, $col_encargado_comercial,__('Abogado'),$formato_titulo);
-				$ws1->write($filas, $col_duracion_trabajada,__('Duración Trabajada'),$formato_titulo);
-				$ws1->write($filas, $col_duracion_cobrada,__('Duración Cobrada'),$formato_titulo);
-				$ws1->write($filas, $col_ingreso,__('Ingreso'),$formato_titulo);
-				$ws1->write($filas, $col_ingreso_en_moneda_base,__('Ingreso en '.Moneda::GetGlosaPluralMonedaBase($sesion)),$formato_titulo);
-				$ws1->write($filas, $col_gastos_en_moneda_base,__('Gastos'),$formato_titulo);
-				$ws1->write($filas, $col_estado,__('Estado'),$formato_titulo);
-				$ws1->write($filas, $col_forma_de_cobro,__('Forma de Tarificación'),$formato_titulo);
-				$ws1->write($filas, $col_numero_cobro,__('N° del Cobro'),$formato_titulo);
+				$filas += 1;
+
+				$ws1->write($filas, $col_numero_factura, __('N° Factura'), $formato_titulo);
+				$ws1->write($filas, $col_fecha_creacion, __('Fecha Creación'), $formato_titulo);
+				$ws1->write($filas, $col_cliente, __('Cliente'), $formato_titulo);
+				$ws1->write($filas, $col_codigo_asunto, __('Código'), $formato_titulo);
+				$ws1->write($filas, $col_asunto, __('Asunto'), $formato_titulo);
+				$ws1->write($filas, $col_encargado_comercial, __('Abogado'), $formato_titulo);
+				$ws1->write($filas, $col_duracion_trabajada, __('Duración Trabajada'), $formato_titulo);
+				$ws1->write($filas, $col_duracion_cobrada, __('Duración Cobrada'), $formato_titulo);
+				$ws1->write($filas, $col_ingreso, __('Ingreso'), $formato_titulo);
+				$ws1->write($filas, $col_ingreso_en_moneda_base, __('Ingreso en ' . Moneda::GetGlosaPluralMonedaBase($sesion)), $formato_titulo);
+				$ws1->write($filas, $col_gastos_en_moneda_base, __('Gastos'), $formato_titulo);
+				$ws1->write($filas, $col_estado, __('Estado'), $formato_titulo);
+				$ws1->write($filas, $col_forma_de_cobro, __('Forma de Tarificación'), $formato_titulo);
+				$ws1->write($filas, $col_numero_cobro, __('N° del Cobro'), $formato_titulo);
 				$tabla_creada = true;
 				$fila_inicial = $filas + 2;
 			}
+
 			$area_total_cobros += $saldo_gastos;
 			$area_total_moneda_base += $cobro['total_moneda_base'];
-			$area=$cobro['glosa'];
-			$filas +=1;
-			$ws1->write($filas, $col_numero_factura,$cobro['numero'], $formato_texto_centrado);
-			$ws1->write($filas, $col_fecha_creacion,Utiles::sql2fecha($cobro['fecha_creacion'], $formato_fecha, "-"),$formato_texto_centrado);
-			$ws1->write($filas, $col_cliente,$cobro['glosa_cliente'],$formato_texto);
-			$ws1->write($filas, $col_codigo_asunto,$cobro['codigo_asunto'],$formato_texto);
-			$ws1->write($filas, $col_asunto,$cobro['glosa_asunto'],$formato_texto);
-			$ws1->write($filas, $col_encargado_comercial,$cobro['nombre'],$formato_texto);
+			$area = $cobro['glosa'];
+			$filas += 1;
+			$ws1->write($filas, $col_numero_factura, $cobro['numero'], $formato_texto_centrado);
+			$ws1->write($filas, $col_fecha_creacion, Utiles::sql2fecha($cobro['fecha_creacion'], $formato_fecha, "-"), $formato_texto_centrado);
+			$ws1->write($filas, $col_cliente, $cobro['glosa_cliente'], $formato_texto);
+			$ws1->write($filas, $col_codigo_asunto, $cobro['codigo_asunto'], $formato_texto);
+			$ws1->write($filas, $col_asunto, $cobro['glosa_asunto'], $formato_texto);
+			$ws1->write($filas, $col_encargado_comercial, $cobro['nombre'], $formato_texto);
 			$ws1->write($filas, $col_duracion_trabajada, str_replace(',', '.', $cobro['duracion_cobrada']/60/24), $formato_tiempo);
 			$ws1->write($filas, $col_duracion_cobrada, str_replace(',', '.', $cobro['duracion']/60/24), $formato_tiempo);
 			$valor_estimado = $cobro['monto_proporcional'];
-			$ws1->writeNumber($filas, $col_ingreso,$valor_estimado,$formatos_moneda[$cobro['id_moneda']]);
-			$ws1->writeNumber($filas, $col_ingreso_en_moneda_base,$saldo_total_moneda_base,$formatos_moneda[$moneda_base['id_moneda']]);
-			$ws1->writeNumber($filas, $col_gastos_en_moneda_base,$saldo_gastos,$formatos_moneda[$moneda_base['id_moneda']]);
-			$ws1->write($filas, $col_estado,$cobro['estado'],$formato_texto_centrado);
-			$ws1->write($filas, $col_forma_de_cobro,$cobro['forma_cobro'],$formato_texto_centrado);
-			$ws1->write($filas, $col_numero_cobro, $cobro['id_cobro'] ,$formato_texto_centrado);
+			$ws1->writeNumber($filas, $col_ingreso, $valor_estimado, $formatos_moneda[$cobro['id_moneda']]);
+			$ws1->writeNumber($filas, $col_ingreso_en_moneda_base, $saldo_total_moneda_base, $formatos_moneda[$moneda_base['id_moneda']]);
+			$ws1->writeNumber($filas, $col_gastos_en_moneda_base, $saldo_gastos, $formatos_moneda[$moneda_base['id_moneda']]);
+			$ws1->write($filas, $col_estado, $cobro['estado'], $formato_texto_centrado);
+			$ws1->write($filas, $col_forma_de_cobro, $cobro['forma_cobro'], $formato_texto_centrado);
+			$ws1->write($filas, $col_numero_cobro, $cobro['id_cobro'], $formato_texto_centrado);
 		}
-		if ($tabla_creada)
-		{
-			$filas +=1;
-			$ws1->write($filas, $col_numero_factura,__('Total'), $formato_encabezado);
+
+		if ($tabla_creada) {
+			$filas += 1;
+			$ws1->write($filas, $col_numero_factura, __('Total'), $formato_encabezado);
 			$ws1->writeFormula($filas, $col_duracion_trabajada, "=SUM($col_formula_duracion_trabajada$fila_inicial:$col_formula_duracion_trabajada$filas)", $formato_tiempo);
 			$ws1->writeFormula($filas, $col_duracion_cobrada, "=SUM($col_formula_duracion_cobrada$fila_inicial:$col_formula_duracion_cobrada$filas)", $formato_tiempo);
-$ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingreso_en_moneda_base$fila_inicial:$col_formula_ingreso_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
-			$ws1->writeFormula($filas, $col_gastos_en_moneda_base, "=SUM($col_formula_gastos_en_moneda_base$fila_inicial:$col_formula_gastos_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);		}
-		else
-		{
+			$ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingreso_en_moneda_base$fila_inicial:$col_formula_ingreso_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
+			$ws1->writeFormula($filas, $col_gastos_en_moneda_base, "=SUM($col_formula_gastos_en_moneda_base$fila_inicial:$col_formula_gastos_en_moneda_base$filas)", $formatos_moneda[$moneda_base['id_moneda']]);
+		} else {
 			$ws1->mergeCells($filas, 1, $filas, 3);
-			$ws1->write($filas, $col_numero_factura,__('No se encontraron resultados'), $formato_encabezado);
-			for($x=2;$x<4;$x++)
+			$ws1->write($filas, $col_numero_factura, __('No se encontraron resultados'), $formato_encabezado);
+			for($x = 2; $x < 4; $x++) {
 				$ws1->write($filas, $x, '', $formato_encabezado);
+			}
 		}
+
 		$wb->send("planilla cobros area.xls");
 		$wb->close();
 		exit;
 	}
 	$pagina->titulo = __('Reporte Cobros por Area');
 	$pagina->PrintTop();
-	$hoy = date("Y-m-d");
 ?>
 <form method=post name=formulario action="planilla_cobros_por_area.php?xls=1">
 <table width="90%"><tr><td>
 	<fieldset class="border_plomo tb_base">
 	<legend>
-	<?php echo __('Filtros')?>
+	<?php echo __('Filtros'); ?>
 	</legend>
 	<table style=" width: 90%;" cellpadding="4">
 		<tr>
 			<td align=right >
-				<?php echo __('Fecha desde')?>:
+				<?php echo __('Fecha desde'); ?>:
 			</td>
 			<td align=left>
-				<!--/<?php echo  Html::PrintCalendar("fecha1", "$fecha1"); ?>-->
-				<input type="text" name="fecha1" value="<?php echo  date("d-m-Y",strtotime("$hoy - 1 month")) ?>" id="fecha1" size="11" maxlength="10" />
-					<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+				<?php echo $Html::PrintCalendar('fecha1', $fecha1); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align=right >
-				<?php echo __('Fecha hasta')?>:
+				<?php echo __('Fecha hasta'); ?>:
 			</td>
 			<td align=left>
-				<!--<?php echo  Html::PrintCalendar("fecha2", "$fecha2"); ?>-->
-				<input type="text" name="fecha2" value="<?php echo  date("d-m-Y",strtotime("$hoy")) ?>" id="fecha2" size="11" maxlength="10" />
-					<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+				<?php echo $Html::PrintCalendar('fecha2', $fecha2); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align=right >
-				<?php echo __('Estado del Cobro')?>:
+				<?php echo __('Estado del Cobro'); ?>:
 			</td>
 			<td align=left>
 				<select name="estado" id="estado" >
-					<option value="todos" ><?php echo __('Todos') ?></option>
-					<option value="creado" ><?php echo __('Creado') ?></option>
-					<option value="en_revision" ><?php echo __('En Revisión') ?></option>
-					<option value="emitido" ><?php echo __('Emitido') ?></option>
-					<option value="facturado"><?php echo __('Facturado') ?></option>
+					<option value="todos" ><?php echo __('Todos'); ?></option>
+					<option value="creado" ><?php echo __('Creado'); ?></option>
+					<option value="en_revision" ><?php echo __('En Revisión'); ?></option>
+					<option value="emitido" ><?php echo __('Emitido'); ?></option>
+					<option value="facturado"><?php echo __('Facturado'); ?></option>
 					<!--<option value="enviado"><?php echo __('Facturado') ?></option>-->
-					<option value="enviado" ><?php echo __('Enviado al Cliente') ?></option>
-					<option value="pago_parcial"><?php echo __('Pago Parcial') ?></option>
-					<option value="pagado" ><?php echo __('Pagado') ?></option>
+					<option value="enviado" ><?php echo __('Enviado al Cliente'); ?></option>
+					<option value="pago_parcial"><?php echo __('Pago Parcial'); ?></option>
+					<option value="pagado" ><?php echo __('Pagado'); ?></option>
 				</select>
 			</td>
 		</tr>
 
 		<tr>
 			<td align=right>
-				<?php echo __("Encargado")?>:
+				<?php echo __("Encargado"); ?>:
 			</td>
 				<td align=left><!-- Nuevo Select -->
 					<?php echo $Form->select('usuarios[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple','size' => '6')); ?>
@@ -419,7 +418,7 @@ $ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingre
 		</tr>
 		<tr>
 			<td align=center colspan=2>
-				<input type="submit" class=btn value="<?php echo __('Generar reporte')?>" name="btn_reporte">
+				<input type="submit" class=btn value="<?php echo __('Generar reporte'); ?>" name="btn_reporte">
 			</td>
 		</tr>
 	</table>
@@ -427,23 +426,6 @@ $ws1->writeFormula($filas, $col_ingreso_en_moneda_base, "=SUM($col_formula_ingre
 </td></tr></table>
 </form>
 
-
-	<script>
-	Calendar.setup(
-		{
-			inputField	: "fecha1",				// ID of the input field
-			ifFormat		: "%d-%m-%Y",			// the date format
-			button			: "img_fecha_ini"		// ID of the button
-		}
-	);
-	Calendar.setup(
-		{
-			inputField	: "fecha2",				// ID of the input field
-			ifFormat		: "%d-%m-%Y",			// the date format
-			button			: "img_fecha_fin"		// ID of the button
-		}
-	);
-	</script>
 <?php
 	$pagina->PrintBottom();
 ?>

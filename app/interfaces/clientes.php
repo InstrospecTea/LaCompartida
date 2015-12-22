@@ -91,7 +91,7 @@ echo Autocompletador::Javascript($sesion,false);
 ?>
 <form method="post" action="#" name="form_cliente" id="form_cliente">
 <!--<input type=hidden name=opcion value="Buscar" />-->
-<input type="hidden" name="id_cliente" value="<?php echo  $cliente->fields['id_cliente'] ?>" />
+<input type="hidden" name="id_cliente" value="<?php echo isset($cliente->fields['id_cliente']) ? $cliente->fields['id_cliente'] : null ?>" />
 <?php if($p_admin) { ?>
 	<table style="border: 0px solid black" width="100%">
 		<tr>

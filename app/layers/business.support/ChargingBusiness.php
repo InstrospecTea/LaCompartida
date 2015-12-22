@@ -187,6 +187,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$detail = array();
 		$detalle_escalonadas = array();
 		$trabajos = array();
+		$this->loadService('Charge');
+		$charge = $this->ChargeService->get($charge_id);
+		$total_currency_id = $charge->get('opc_moneda_total');
 		foreach ($slidingScales as $scale) {
 			$detail['datos_escalonadas'][$scale->fields['order_number']]= array(
 				'monto' => $scale->fields['fixedAmount'],
@@ -228,6 +231,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				$id_usuario = $work->fields['id_usuario'];
 				$usuario[$id_usuario]['duracion'] = $usuario[$work->fields['id_usuario']]['duracion'] + $work->fields['usedTime'];
 				$usuario[$id_usuario]['valor'] = $usuario[$work->fields['id_usuario']]['valor'] + $neto;
+				$usuario[$id_usuario]['id_moneda_total'] = $total_currency_id;
 				$usuario[$id_usuario]['usuario'] = $nombre;
 				$usuario[$id_usuario]['tarifa'] = $tarifa_usuario->get('tarifa');
 				$usuario[$id_usuario]['descuento'] = $scale->fields['discountRate'];

@@ -1,6 +1,4 @@
 <?php
-
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
@@ -76,6 +74,13 @@ $formato_moneda_rojo = & $wb->addFormat(array('Size' => 11,
 						'Bold' => 1,
 						'Color' => 'red',
 						'NumFormat' => "[$$simbolo_moneda] #,###,0$string_decimales"));
+
+if ($fecha_ini != '' AND !DateTime::createFromFormat('Y-m-d', $fecha_ini)) {
+	$fecha_ini = date('Y-m-d', strtotime($fecha_ini));
+}
+if ($fecha_fin != '' AND !DateTime::createFromFormat('Y-m-d', $fecha_fin)) {
+	$fecha_fin = date('Y-m-d', strtotime($fecha_fin));
+}
 
 $periodo_inicial = substr($fecha_ini, 0, 4) * 12 + substr($fecha_ini, 5, 2);
 $periodo_final = substr($fecha_fin, 0, 4) * 12 + substr($fecha_fin, 5, 2);

@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 class FacturaPdfDatos extends Objeto {
-	function FacturaPdfDatos($sesion, $fields = '', $params = '') {
+	function __construct($sesion, $fields = '', $params = '') {
 		$this->tabla = 'factura_pdf_datos';
 		$this->campo_id = 'id_dato';
 		$this->guardar_fecha = false;
@@ -190,7 +190,7 @@ class FacturaPdfDatos extends Objeto {
 			'desc_glosa_factura' => __('Descripción Glosa'),
 			'glosa_factura' => $factura->fields['glosa'],
 			'desc_encargado_comercial' => __('Encargado Comercial'),
-			'encargado_comercial' => $factura->ObtenerEncargadoComercialUsername(),
+			'encargado_comercial' => $factura->ObtenerEncargadoComercialUsername($factura->fields['id_contrato']),
 			'descripcion_honorarios' => $factura->fields['descripcion'],
 			'descripcion_gastos_con_iva' => $factura->fields['descripcion_subtotal_gastos'],
 			'descripcion_gastos_sin_iva' => $factura->fields['descripcion_subtotal_gastos_sin_impuesto'],

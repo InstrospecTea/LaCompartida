@@ -9,7 +9,7 @@ require_once Conf::ServerDir().'/../app/classes/Debug.php';
 class TramiteTipo extends Objeto
 {
 
-	function TramiteTipo($sesion, $fields = "", $params = "")
+	function __construct($sesion, $fields = "", $params = "")
 	{
 		$this->tabla = "tramite_tipo";
     $this->campo_id = "id_tramite_tipo";
@@ -17,7 +17,9 @@ class TramiteTipo extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 
-		if( $this->fields['duracion_defecto']=='00:00:00' ) $this->fields['duracion_defecto']='-';
+		if (isset($this->fields['duracion_defecto']) && $this->fields['duracion_defecto'] == '00:00:00' ) {
+			$this->fields['duracion_defecto'] = '-';
+		}
 	}
 
 	function Eliminar()

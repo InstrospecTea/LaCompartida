@@ -20,6 +20,7 @@
 
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
+	$Html = new \TTB\Html;
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 
@@ -98,9 +99,9 @@
 			$b->AgregarEncabezado("nombre_cliente",__('Cliente'));
 		$b->AgregarEncabezado("fecha",__('Fecha'));
 		$b->AgregarEncabezado("glosa_documento",__('Descripción'), "align=left");
-		$b->AgregarFuncion(__("Egreso"),"Monto","align=right nowrap");
-		$b->AgregarFuncion(__("Ingreso"),"Ingreso","align=right nowrap");
-		$b->AgregarFuncion(__('Opción'),"Opciones","align=right nowrap");
+		$b->AgregarFuncion(__("Egreso"),"Monto","align='right' nowrap");
+		$b->AgregarFuncion(__("Ingreso"),"Ingreso","align='right' nowrap");
+		$b->AgregarFuncion(__('Opción'),"Opciones","align='right' nowrap");
 		$b->color_mouse_over = "#bcff5c";
 
 
@@ -642,8 +643,8 @@ function MostrarOcultarExcel(value)
 <legend><?php echo __('Filtros')?></legend>
 <table style="border: 0px solid black" width='720px'>
 	<tr>
-		<td align=right width='30%'><b><?php echo __('Cliente ')?></b></td>
-		<td colspan=3 align=left>
+		<td align="right" width='30%'><b><?php echo __('Cliente ')?></b></td>
+		<td colspan="3" align="left">
 			<?php
 	 	if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador' ) || ( method_exists('Conf','TipoSelectCliente') && Conf::TipoSelectCliente() ) )
 				{
@@ -662,31 +663,29 @@ function MostrarOcultarExcel(value)
 		</td>
 	</tr>
 	<tr>
-		<td align=right>
+		<td align="right">
 			<?php echo __('Con Fecha posterior a:')?>
 		</td>
-		<td nowrap align=center width='100px'>
-			<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-			<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha1" style="cursor:pointer" />
+		<td nowrap align="center" width='100px'>
+			<?php echo $Html::PrintCalendar('fecha1', $fecha1, 12, 'fechadiff', true); ?>
 		</td>
-		<td align=left width='80px'>
-			<?php echo __('y anterior a'); ?>:
+		<td align="left" width='80px'>
+			<?php echo __(' y anterior a:')?>
 		</td>
-		<td nowrap align=left>
-			<input onkeydown="if(event.keyCode==13)BuscarGastos(this.form,'buscar')" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-			<img src="<?php echo Conf::ImgDir()?>/calendar.gif" id="img_fecha2" style="cursor:pointer" />
+		<td nowrap align="left">
+			<?php echo $Html::PrintCalendar('fecha2', $fecha2, 12, 'fechadiff', true); ?>
 		</td>
 	</tr>
 	<tr>
 		<td></td>
-		<td colspan=2 align=center>
-			<input name=boton_buscar type=button value="<?php echo __('Buscar')?>" onclick="BuscarGastos(this.form,'buscar')" class=btn>
+		<td colspan="2" align="center">
+			<input name="boton_buscar" type="button" value="<?php echo __('Buscar')?>" onclick="BuscarGastos(this.form,'buscar')" class="btn">
 			<span id="mostrar_bajar_excel" style="display:<?php echo $codigo_cliente?'inline':'none' ?>;">
 				<input name="boton_xls" type="button" value="<?php echo __('Descargar Excel del cliente')?>" onclick="BuscarGastos(this.form,'excel_uno')" class="btn">
 			</span>
 			<input name="boton_xls" type="button" value="<?php echo __('Descargar Excel de todos los clientes')?>" onclick="BuscarGastos(this.form,'excel_todos')" class="btn">
 		</td>
-		<td align=right>
+		<td align="right">
 			<?php if($opc == 'buscar'): ?>
 			<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('ingreso')" title="Agregar Ingreso"><?php echo __('Agregar Pago')?></a>&nbsp;&nbsp;&nbsp;&nbsp;
 			<img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('egreso')" title="Agregar Egreso"><?php echo __('Agregar Cobro')?></a>
@@ -698,22 +697,7 @@ function MostrarOcultarExcel(value)
 </td></tr></table>
 </form>
 <br>
-<script type="text/javascript">
-Calendar.setup(
-	{
-		inputField	: "fecha1",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha1"		// ID of the button
-	}
-);
-Calendar.setup(
-	{
-		inputField	: "fecha2",				// ID of the input field
-		ifFormat		: "%d-%m-%Y",			// the date format
-		button			: "img_fecha2"		// ID of the button
-	}
-);
-</script>
+
 <?php 	if($opc == 'buscar')
 	{
 		echo($total_cta ? "<table width=100%><tr><td align=left><span style='font-size:11px'><b>".__('Balance cuenta corriente').": ".$simbolo_moneda." ".number_format($total_cta,$cifras_decimales,',','.')."</b></span></td></tr></table>":"");
