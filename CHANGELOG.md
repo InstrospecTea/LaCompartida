@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.31.10
+Wednesday, December 23nd
+* **Fix** [Corregir excel escalonado](https://github.com/LemontechSA/ttb/pull/1277)
+
 ## Hotfix 15.31.9
 Tuesday, December 22nd
 * **Fix** [Restaurar TAG %iniciales%](https://github.com/LemontechSA/ttb/pull/1276)
