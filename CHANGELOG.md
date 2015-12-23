@@ -1,7 +1,7 @@
 # Changelog
 
 ## Hotfix 15.31.10
-Wednesday, December 23nd
+Wednesday, December 23rd
 * **Fix** [Corregir excel escalonado](https://github.com/LemontechSA/ttb/pull/1277)
 
 ## Hotfix 15.31.9
