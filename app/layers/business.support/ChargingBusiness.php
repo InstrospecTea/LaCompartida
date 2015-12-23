@@ -820,8 +820,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	private function slidingScaleTimeCalculation($works, $scale, $charge, $scaleAmount = 0) {
 		$this->loadBusiness('Coining');
 		$remainingScaleHours = $scale->get('hours');
-		$scaleCurrency = $scale->get('currencyId') ? $scale->get('currencyId') : $charge->get('opc_moneda_total');
-		$chargeCurrency = $this->CoiningBusiness->getCurrency($charge->get('opc_moneda_total'));
+		$scaleCurrency = $scale->get('currencyId');
+		$chargeCurrency = $this->CoiningBusiness->getCurrency($scale->get('currencyId'));
 		$chargeCurrency = $this->CoiningBusiness->setCurrencyAmountByCharge($chargeCurrency, $charge);
 		$scaleCurrency = $this->CoiningBusiness->getCurrency($scaleCurrency);
 		//Ojo con esta línea. Estoy dando el tipo de cambio a la moneda que está guardado en cobro moneda
