@@ -93,10 +93,17 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	 * @param  int $charge_id identificador del cobro
 	 * @return void
 	 */
-	private function detachAllWorks($charge_id) {
-		$this->loadService('Agreement');
+	public function detachAllWorks($charge_id) {
+		$this->loadService('Charge');
+		$charge = $this->ChargeService->getWithRelations($charge_id);
 
-		$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro = NULL, monto_cobrado = NULL WHERE id_cobro = '{$charge_id}'";
+		if (empty($charge->fields['Agreement'])) {
+			throw new Exception(__('El cobro Nº') . $id_cobro . __(' no se puede borrar por por no tener un contrato asociado.'));
+		}
+
+		$id_moneda_original = $charge->fields['Agreement']->fields['id_moneda'];
+
+		$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro = NULL, monto_cobrado = NULL, id_moneda = {$id_moneda_original} WHERE id_cobro = '{$charge_id}'";
 		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 	}
 

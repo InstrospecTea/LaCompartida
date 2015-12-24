@@ -9,7 +9,7 @@
  */
 abstract class AbstractDAO extends Objeto implements BaseDAO {
 
-	var $sesion;
+	public $sesion;
 
 	/**
 	 * Indica a la Clase que al llamar a Write(), creará un registro en la tabla 'log_db'
@@ -353,5 +353,72 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$defaults = $table->getDefaults($object->getTableDefaults());
 		$object->fillDefaults($defaults);
 		return $object;
+	}
+
+	public function getWithRelations($id, array $relations_filters = array()) {
+		$entity = $this->get($id);
+		return $this->fillRelations($entity, $relations_filters);
+	}
+
+	private function fillRelations(Entity $entity, array $relations_filters = array()) {
+		foreach ($entity->getRelations() as $relation) {
+			switch ($relation['association_type']) {
+				case 'has_many':
+					$results = $this->findAllRelated($entity, $relation, $relations_filters);
+					$entity->set("{$relation['class']}s", $results);
+					break;
+				case 'has_one':
+					$result = $this->findRelated($entity, $relation, $relations_filters);
+					$entity->set($relation['class'], $result);
+					break;
+				default:
+					throw new DAOException("No se especificó association_type de {$relation['class']}.");
+			}
+		}
+
+		return $entity;
+	}
+
+	private function findAllRelated(Entity $entity, array $relation, array $relations_filters = array()) {
+		$Criteria = new Criteria($this->sesion);
+		$Reflected = new ReflectionClass($this->getClass());
+		$RelationReflected = new ReflectionClass($relation['class']);
+
+		$Instance = $Reflected->newInstance();
+		$RelationInstance = $RelationReflected->newInstance();
+
+		$output = array();
+
+		$results = $Criteria
+			->add_select($RelationInstance->getPersistenceTarget() . '.*')
+			->add_from($Instance->getPersistenceTarget())
+			->add_left_join_with(
+				$RelationInstance->getPersistenceTarget(),
+				$RelationInstance->getPersistenceTarget() . '.' . $RelationInstance->getIdentity() . ' = ' .
+				$Instance->getPersistenceTarget() . ".{$relation['foreign_key']}"
+			)->add_restriction(
+				CriteriaRestriction::equals($Instance->getIdentity(), $entity->fields[$Instance->getIdentity()])
+			)->run();
+
+		if (!empty($results)) {
+			foreach ($results as $result) {
+				$_RelationInstance = $RelationReflected->newInstance();
+				$_RelationInstance = $this->encapsulate($result, $_RelationInstance);
+				$output[] = $_RelationInstance;
+			}
+		}
+
+		return $output;
+	}
+
+	private function findRelated(Entity $entity, array $relation, array $relations_filters = array()) {
+		$output = null;
+		$result = $this->findAllRelated($entity, $relation, $relations_filters);
+
+		if (!empty($result)) {
+			$output = $result[0];
+		}
+
+		return $output;
 	}
 }

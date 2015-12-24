@@ -1,7 +1,7 @@
 <?php
 abstract class AbstractService implements BaseService {
 
-	var $sesion;
+	public $sesion;
 	private $loadedClass = array();
 
 	public function __construct(Sesion $sesion) {
@@ -118,4 +118,16 @@ abstract class AbstractService implements BaseService {
 		$this->{$alias} = new $classname($this->sesion);
 		$this->loadedClass[] = $alias;
 	}
+
+	public function getWithRelations($id, array $relations_filters = array()) {
+		$daoClass = $this->getDaoLayer();
+		$dao = new $daoClass($this->sesion);
+
+		try {
+			return $dao->getWithRelations($id, $relations_filters);
+		} catch(CouldNotFindEntityException $ex) {
+			throw new ServiceException($ex);
+		}
+	}
+
 }

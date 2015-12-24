@@ -67,6 +67,8 @@ class SandboxController extends AbstractController {
 
 	public function deleteCharge($charge_id) {
 		$this->loadBusiness('Charging');
+		$x = $this->ChargingBusiness->detachAllWorks($charge_id);
+		var_dump($x); exit;
 	}
 
 }

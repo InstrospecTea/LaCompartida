@@ -10,11 +10,4 @@ class ChargeService extends AbstractService implements IChargeService {
 		return 'Charge';
 	}
 
-	public function getAgreement($client_id) {
-		$results = $dao->getByClient($clientId);
-		foreach $results as $result) {
-			//Crear un DTO de Charge por cada result y retornar
-		}
-
-	}
 }
