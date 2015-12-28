@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.31.12
+Monday, December 28th
+* **Fix** [Campo Total horas facturables en Revisar Horas](https://github.com/LemontechSA/ttb/pull/)
+
 ## Hotfix 15.31.11
 Monday, December 28th
 * **Fix** [Muestra categoría de usuario en excel escalonado](https://github.com/LemontechSA/ttb/pull/1279)
