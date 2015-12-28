@@ -27,4 +27,8 @@ class User extends Entity {
 		return array();
 	}
 
+	public function getCategory($id) {
+
+	}
+
 }
