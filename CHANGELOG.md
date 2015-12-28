@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.31.11
+Monday, December 28th
+* **Fix** [Muestra categoría de usuario en excel escalonado](https://github.com/LemontechSA/ttb/pull/1279)
+
 ## Hotfix 15.31.10
 Wednesday, December 23rd
 * **Fix** [Corregir excel escalonado](https://github.com/LemontechSA/ttb/pull/1277)
