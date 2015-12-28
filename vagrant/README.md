@@ -2,7 +2,7 @@
 
 #### Vagrant ####
 
-Vagrant nos permite crear y configurar entornos de desarrollo portables y reproducibles. 
+Vagrant nos permite crear y configurar entornos de desarrollo portables y reproducibles.
 
 #### Instalar Vagrant ####
 
