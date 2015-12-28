@@ -1183,7 +1183,11 @@ foreach ($chargeResults as $charge) {
 						$ws->write(++$filas, 6, $usuarios['usuario'], $formato_normal);;
 
 						if ($cobro->fields['opc_ver_profesional_categoria']) {
-							$ws->write($filas, 7, $usuarios['categoria'], $formato_normal);
+							if ($lang == 'es') {
+								$ws->write($filas, 7, $usuarios['categoria'], $formato_normal);
+							} else {
+								$ws->write($filas, 7, !empty($usuarios['categoria_lang']) ? $usuarios['categoria_lang'] : $usuarios['categoria'] , $formato_normal);
+							}
 						}
 
 						$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($usuarios['duracion']/60, 2)), $formato_moneda);
