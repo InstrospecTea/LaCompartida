@@ -66,7 +66,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 			$this->overrideDocument();
 
-			$this->detachAllWorks($charge_id);
+			$this->detachAllWorks($id_cobro);
 
 			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = '{$id_cobro}'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
