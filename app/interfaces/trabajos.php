@@ -316,7 +316,8 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	// TOTAL HORAS
 	$query = "SELECT
 					SUM(TIME_TO_SEC(if(trabajo.cobrable=1,duracion_cobrada,0)))/3600 AS total_duracion,
-					SUM(TIME_TO_SEC(duracion))/3600 AS total_duracion_trabajada ";
+					SUM(TIME_TO_SEC(duracion))/3600 AS total_duracion_trabajada,
+					SUM(TIME_TO_SEC(duracion_cobrada))/3600 AS total_duracion_cobrable ";
 
 	  	($Slim=Slim::getInstance('default',true)) ?  $Slim->applyHook('hook_query_trabajos'):false;
 
@@ -331,7 +332,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 				WHERE $where ";
 
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	list($total_duracion, $total_duracion_trabajada) = mysql_fetch_array($resp);
+	list($total_duracion, $total_duracion_trabajada, $total_duracion_cobrable) = mysql_fetch_array($resp);
 
 	$select_glosa_actividad = "";
 	if (Conf::GetConf($sesion, 'UsoActividades')) {
@@ -491,8 +492,9 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	$b->nombre = "busc_gastos";
 	$b->titulo = __('Listado de') . ' ' . __('trabajos');
 
-	$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>" . __('Total horas trabajadas') . ": </b>" . number_format($total_duracion_trabajada, 1) . "</span></td></tr></table>";
-	$b->titulo .= "<table width=100%><tr><td align=right valign=top><span style='font-size:10px'><b>" . __('Total horas cobrables corregidas') . ": </b>" . number_format($total_duracion, 1) . "</span></td></tr></table>";
+	$b->titulo .= "<table width='100%' style='margin: 10px 0px 10px 0px;'><tr><td align='center' valign='top'><span style='font-size:10px'><b>" . __('Total horas trabajadas') . ": </b>" . number_format($total_duracion_trabajada, 1) . "</span></td>";
+	$b->titulo .= "<td align='center' valign='top'><span style='font-size:10px'><b>" . __('Total horas cobrables') . ": </b>" . number_format($total_duracion_cobrable, 1) . "</span></td>";
+	$b->titulo .= "<td align='center' valign='top'><span style='font-size:10px'><b>" . __('Total horas cobrables corregidas') . ": </b>" . number_format($total_duracion, 1) . "</span></td></tr></table>";
 
 	$b->AgregarFuncion("Editar", 'Editar', "align=center nowrap");
 	$b->AgregarEncabezado("trabajo.fecha", __('Fecha'));
