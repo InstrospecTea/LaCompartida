@@ -2943,10 +2943,11 @@ class NotaCobro extends Cobro {
 
 					$row = $row_tmpl;
 
-					if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1)
+					if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1) {
 						$row = str_replace('%td_categoria%', '<td>&nbsp;</td>', $row);
-					else
+					} else {
 						$row = str_replace('%td_categoria%', '', $row);
+					}
 
 
 
@@ -2957,9 +2958,6 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%td_tarifa%', '', $row);
 						$row = str_replace('%td_tarifa_ajustada%', '', $row);
 					}
-
-
-
 
 					if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 						$row = str_replace('%tarifa%', number_format(($trabajo->fields['monto_cobrado'] / $duracion_cobrada_decimal), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
@@ -6050,17 +6048,6 @@ class NotaCobro extends Cobro {
 					list($h_retainer, $m_retainer, $s_retainer) = explode(":", $duracion_retainer);
 					list($ht, $mt, $st) = explode(":", $duracion);
 
-					/* if ($this->fields['forma_cobro'] == 'RETAINER'){
-					  $horas = $h + $m / 60 + $s / 3600;
-					  $horas_retainer = $h_retainer + $m_retainer / 60 + $s_retainer / 3600;
-					  $horas_tarificadas = $horas - $horas_retainer;
-					  $horas_tarificadas_retainer = UtilesApp::Decimal2Time($horas_tarificadas);
-					  $horas_trabajadas = $ht + $mt /60 + $st / 3600;
-
-					  list($h, $m ,$s) = explode(":",$horas_tarificadas_retainer);
-					  $total_trabajo_importe = $tarifa_hh * $horas_tarificadas;
-					  } */
-
 					$duracion_cobrada_decimal = $h + $m / 60 + $s / 3600;
 					$asunto->fields['trabajos_total_duracion'] += $h * 60 + $m + $s / 60;
 					$asunto->fields['trabajos_total_valor'] += $trabajo->fields['monto_cobrado'];
@@ -6110,6 +6097,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
+
 					if ($this->fields['opc_ver_detalles_por_hora_iniciales']) {
 						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
 					} else {
@@ -6153,6 +6141,8 @@ class NotaCobro extends Cobro {
 
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
+
+					$row = str_replace('%iniciales%', $trabajo->fields['username'], $row);
 
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 
