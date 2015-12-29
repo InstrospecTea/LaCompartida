@@ -606,11 +606,3 @@ class Gasto extends Objeto {
 		}
 	}
 }
-
-if (!class_exists('ListaGastos')) {
-	class ListaGastos extends Lista {
-		function ListaGastos($sesion, $params, $query) {
-			$this->Lista($sesion, 'Gasto', $params, $query);
-		}
-	}
-}
