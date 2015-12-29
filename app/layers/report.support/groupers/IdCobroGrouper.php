@@ -12,7 +12,7 @@ class IdCobroGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Obtiene el campo por el cual se agrupará la query
-	 * @return String Campo por el que se agrupa en par tabl a.campo o alias
+	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
 		$undefined = $this->getUndefinedField();
