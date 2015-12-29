@@ -4,6 +4,7 @@ abstract class AppShell {
 
 	public $debug;
 	public $data;
+	private $loadedClass = array();
 
 	protected $Session;
 

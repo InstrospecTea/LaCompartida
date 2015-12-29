@@ -1077,11 +1077,13 @@ HTML;
 	}
 
 	public static function camelize($word) {
-		return preg_replace('/(_)([a-z])/e', 'strtoupper("\\2")', $word);
+    return preg_replace_callback('/(_)([a-z])/',
+       create_function ('$matches', 'return strtoupper($matches[2]);'), $word);
 	}
 
 	public static function pascalize($word) {
-		return preg_replace('/(^|_)([a-z])/e', 'strtoupper("\\2")', $word);
+    return preg_replace_callback('/(^|_)([a-z])/',
+       create_function ('$matches', 'return strtoupper($matches[2]);'), $word);
 	}
 
 	/**
