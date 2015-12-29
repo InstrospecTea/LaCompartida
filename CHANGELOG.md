@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.31.13
+Tuesday, December 29th
+* **Fix** [Corregir order by en agrupador IdCobro](https://github.com/LemontechSA/ttb/pull/1282)
+
 ## Hotfix 15.31.12
 Monday, December 28th
 * **Fix** [Campo Total horas facturables en Revisar Horas](https://github.com/LemontechSA/ttb/pull/1280)
