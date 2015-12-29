@@ -265,8 +265,10 @@ class CronNotificacion extends Cron {
 		$this->cobros_pagados();
 		$this->log('    hitos_cumplidos');
 		$this->hitos_cumplidos();
-		$this->log('    recordatorio_hitos_cumplidos');
-		$this->recordatorio_hitos_cumplidos();
+		if (UtilesApp::GetConf($this->Sesion, 'RepetirNotificaciones') == 'SI') {
+			$this->log('    recordatorio_hitos_cumplidos');
+			$this->recordatorio_hitos_cumplidos();
+		}
 		$this->log('    horas_mensuales');
 		$this->horas_mensuales($where_usuarios_vacaciones);
 		$this->log('    horas_por_facturar');
