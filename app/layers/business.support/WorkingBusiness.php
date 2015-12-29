@@ -147,6 +147,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			'Work.tarifa_hh_estandar',
 			'Work.id_moneda',
 			'Work.duracion',
+			'Work.cobrable',
 			'User.id_usuario',
 			'User.nombre',
 			'User.apellido1',

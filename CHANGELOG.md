@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.31.14
+Tuesday, December 29th
+* **Fix** [Modificación Listado Agrupado en Revisar Horas](https://github.com/LemontechSA/ttb/pull/1283)
+
 ## Hotfix 15.31.13
 Tuesday, December 29th
 * **Fix** [Corregir order by en agrupador IdCobro](https://github.com/LemontechSA/ttb/pull/1282)
