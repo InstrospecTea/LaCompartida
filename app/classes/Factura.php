@@ -360,6 +360,10 @@ class Factura extends Objeto {
 			'field' => 'email_contacto',
 			'title' => 'E-mail Contacto',
 			'visible' => false
+		),
+		array(
+			'field' => 'glosa',
+			'title' => 'Glosa'
 		)
 	);
 
@@ -2630,7 +2634,8 @@ class Factura extends Objeto {
 								, contrato.fono_contacto as telefono_contacto
 								, contrato.email_contacto as email_contacto
 								, cobro.estado as estado_cobro
-								, prm_documento_legal.glosa as glosa_doc_legal";
+								, prm_documento_legal.glosa as glosa_doc_legal
+								, factura.glosa";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (
