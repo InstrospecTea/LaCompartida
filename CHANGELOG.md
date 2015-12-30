@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.32.1
+Wednesday, December 30th
+* **Feature** [Disponibilizar campo factura.glosa en excel de facturas](https://github.com/LemontechSA/ttb/pull/1285)
+
 ## [Release 15.32.0](https://github.com/LemontechSA/ttb/pull/1284)
 Tuesday, December 29th
 * **Feature** [Repetir Notificaciones](https://github.com/LemontechSA/ttb/pull/1281)
