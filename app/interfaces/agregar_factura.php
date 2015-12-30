@@ -32,7 +32,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 
 	if ($id_cobro > 0) {
 		$cobro = new Cobro($sesion);
-		$cobro->load($id_cobro);
+		$cobro->Load($id_cobro);
 		$contrato = new Contrato($sesion);
 		if (empty($id_contrato)) {
 			$id_contrato = $cobro->fields['id_contrato'];
