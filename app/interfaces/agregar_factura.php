@@ -24,10 +24,6 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		if (empty($id_cobro)) {
 			$id_cobro = $factura->fields['id_cobro'];
 		}
-	} else {
-		if (empty($codigo_cliente)) {
-			$codigo_cliente = $cobro->fields['codigo_cliente'];
-		}
 	}
 
 	if ($id_cobro > 0) {
@@ -38,6 +34,10 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 			$id_contrato = $cobro->fields['id_contrato'];
 		}
 		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto', 'id_usuario_responsable'));
+	}
+
+	if ($cobro->Loaded() && empty($codigo_cliente)) {
+		$codigo_cliente = $cobro->fields['codigo_cliente'];
 	}
 
 	if (!empty($codigo_cliente) && empty($codigo_cliente_secundario)) {
