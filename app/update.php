@@ -10991,6 +10991,10 @@ QUERY;
 			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
 					VALUES ('DistanciaNotificacionesHitos', '3', 'Cantidad de días entre repeticiones de notificación de un hito', 'select;1;2;3;4;5', '3', '-1')";
 			break;
+		case 8.25:
+			$queries[] = "INSERT INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
+					VALUES ('RepetirNotificaciones', 'SI', 'Habilitar/deshabilitar la repetición de notificaciones', 'select;SI;NO', '3', '-1')";
+			break;
 	}
 
 	if (!empty($queries)) {
@@ -11003,7 +11007,7 @@ QUERY;
 
 $num = 0;
 $min_update = 2; //FFF: del 2 hacia atrás no tienen soporte
-$max_update = 8.24;
+$max_update = 8.25;
 
 $force = 0;
 if (isset($_GET['maxupdate'])) {
