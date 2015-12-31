@@ -1,8 +1,16 @@
 <?php
 $args = getopt('', array('script:', 'domain:', 'subdir:', 'data:', 'debug'));
 
-if (!isset($args['script']) || !isset($args['domain']) || !isset($args['subdir'])) {
-	exit("use: console script_name --domain=dev --subdir=ttb [--data='json_data'] [--debug]\n");
+if (!isset($args['script'])) {
+	exit("use: console script_name [--domain=dev] [--subdir=ttb] [--data='json_data'] [--debug]\n");
+}
+
+if (!isset($args['domain'])) {
+	$args['domain'] = 'dev';
+}
+
+if (!isset($args['subdir'])) {
+	$args['subdir'] = 'ttb';
 }
 
 define('__DIR__', dirname(__FILE__));
@@ -20,8 +28,14 @@ $Utiles = new \TTB\Utiles;
 $class_name = $Utiles->pascalize($args['script']);
 
 $script = new $class_name;
+
 if (isset($args['data'])) {
 	$script->data = json_decode($args['data'], true);
+	if ($script->data === null) {
+		$script->out('El argumento --data no tiene un json valido');
+		exit;
+	}
 }
+
 $script->debug = isset($args['debug']);
 $script->main();
