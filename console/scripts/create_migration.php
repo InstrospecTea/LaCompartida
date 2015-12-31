@@ -1,8 +1,8 @@
 <?php
 
 /**
- * IntegracionMorenoBaldivieso
- * console/console MigrationDb --data="{description}"
+ * Create Migration
+ * console/console CreateMigration --data='{"description":"migration for migration"}'
  */
 class CreateMigration extends AppShell {
 
@@ -15,9 +15,12 @@ class CreateMigration extends AppShell {
 	}
 
 	public function main() {
-		$this->out('Start Migration DB');
-		$this->out("Creating file for '{$this->data['description']}' on " . $this->Migration->getFileMigrationDirectory() . " directory");
+		$this->debug('Start Migration DB');
+		$this->debug("Creating file for '{$this->data['description']}' on " . $this->Migration->getFileMigrationDirectory() . " directory");
+
 		$file_name = $this->Migration->create($this->data['description']);
-		$this->out("The file was created on '" . $this->Migration->getFileMigrationDirectory() . "/{$file_name}'");
+
+		$this->out("The file '{$file_name}'' was created on '" . $this->Migration->getFileMigrationDirectory());
+		$this->debug('Finished Migration DB');
 	}
 }
