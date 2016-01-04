@@ -7,7 +7,7 @@ class CLASSNAME extends Migration implements ITemplateMigration {
    * @return void
    */
 	function up() {
-		$this->addQuery('');
+		$this->addQueryUp('');
 	}
 
 	/**
@@ -15,6 +15,6 @@ class CLASSNAME extends Migration implements ITemplateMigration {
    * @return void
    */
 	function down() {
-		$this->addQuery('');
+		$this->addQueryDown('');
 	}
 }

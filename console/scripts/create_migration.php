@@ -10,7 +10,7 @@ class CreateMigration extends AppShell {
 
 	public function __construct() {
 		parent::__construct();
-		$this->Migration = new Migration();
+		$this->Migration = new Migration($this->Session);
 		$this->Migration->setBaseDirectory('database');
 	}
 

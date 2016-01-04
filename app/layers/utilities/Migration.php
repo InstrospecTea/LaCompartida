@@ -3,9 +3,14 @@
 class Migration {
 
 	private $directory;
+	protected $Session;
+	private $query_up;
+	private $query_down;
 
-	public function __construct() {
-
+	public function __construct(Sesion $Session) {
+		$this->Session = $Session;
+		$this->query_up = array();
+		$this->query_down = array();
 	}
 
 	public function setBaseDirectory($directory) {
@@ -57,7 +62,36 @@ class Migration {
 		return str_replace('CLASSNAME', $class_name, $template);
 	}
 
-	public function run() {
+	public function addQueryUp($query) {
+		if (!empty($query)) {
+			array_push($query, $this->query_up);
+		}
+	}
 
+	public function addQueryDown($query) {
+		if (!empty($query)) {
+			array_push($query, $this->query_down);
+		}
+	}
+
+	public function runUp() {
+		$this->run($this->query_up);
+	}
+
+	public function runDown() {
+		$this->run($this->query_down);
+	}
+
+	public function run($query) {
+		if (!empty($query)) {
+			if (is_array($query)) {
+				foreach ($query as $_query) {
+					$this->run($_query);
+				}
+			} else {
+				$Statement = $this->Session->pdodbh->prepare($_query);
+				$Statement->execute();
+			}
+		}
 	}
 }
