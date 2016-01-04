@@ -1,10 +1,9 @@
 <?php
 
-class CLASSNAME extends Migration {
+class CLASSNAME extends Migration implements ITemplateMigration {
 
 	/**
    * Run the migrations.
-   *
    * @return void
    */
 	function up() {
@@ -13,7 +12,6 @@ class CLASSNAME extends Migration {
 
 	/**
    * Reverse the migrations.
-   *
    * @return void
    */
 	function down() {

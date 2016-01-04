@@ -56,4 +56,8 @@ class Migration {
 		$template = file_get_contents("{$this->directory}/TemplateMigration.php");
 		return str_replace('CLASSNAME', $class_name, $template);
 	}
+
+	public function run() {
+
+	}
 }
