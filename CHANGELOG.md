@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 15.32.2
+Wednesday, December 30th
+* **Fix** [Corregir asignación de codigo de cliente al generar una factura](https://github.com/LemontechSA/ttb/pull/1286)
+
+## Hotfix 15.32.1
+Wednesday, December 30th
+* **Feature** [Disponibilizar campo factura.glosa en excel de facturas](https://github.com/LemontechSA/ttb/pull/1285)
+
+## [Release 15.32.0](https://github.com/LemontechSA/ttb/pull/1284)
+Tuesday, December 29th
+* **Feature** [Repetir Notificaciones](https://github.com/LemontechSA/ttb/pull/1281)
+
 ## Hotfix 15.31.14
 Tuesday, December 29th
 * **Fix** [Modificación Listado Agrupado en Revisar Horas](https://github.com/LemontechSA/ttb/pull/1283)
