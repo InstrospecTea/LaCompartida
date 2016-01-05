@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.32.3
+Tuesday, January 5th
+* **Fix** [Nuevo Lang para cliente](https://github.com/LemontechSA/ttb/pull/1287)
+
 ## Hotfix 15.32.2
 Wednesday, December 30th
 * **Fix** [Corregir asignación de codigo de cliente al generar una factura](https://github.com/LemontechSA/ttb/pull/1286)
