@@ -1140,7 +1140,7 @@ class Trabajo extends Objeto
 
 	function EditarMasivo($trabajos, $data) {
 		$info = array();
-
+var_dump($data);
 		$permiso_revisor = $this->sesion->usuario->Es('REV');
 		$permiso_profesional = $this->sesion->usuario->Es('PRO');
 
@@ -1212,16 +1212,24 @@ class Trabajo extends Objeto
 				$cobros_regenerables[] = $t->fields['id_cobro'];
 			}
 
-			if((!$permiso_profesional || $permiso_revisor) && $data['cobrable'] != '') {
-				if($data['cobrable'] == '0') {
-					$t->Edit('cobrable', '0');
-					if($data['visible'] != '') {
-						$t->Edit('visible', $data['visible']);
+			if((!$permiso_profesional || $permiso_revisor)) {
+				if($data['cobrable'] != '') {
+					if($data['cobrable'] == '0') {
+						$t->Edit('cobrable', '0');
+					}
+					else {
+						$t->Edit('cobrable', '1');
+						$t->Edit('visible', '1');
 					}
 				}
-				else {
-					$t->Edit('cobrable', '1');
-					$t->Edit('visible', '1');
+
+				if($t->fields['cobrable'] == 0) {
+					if($data['visible'] != '') {
+						Debug::pr('llego acá?');
+						$t->Edit('visible', $data['visible']);
+					} else {
+						$t->Edit('visible', '1');
+					}
 				}
 			}
 

@@ -95,6 +95,7 @@
 
 	if($opcion == "guardar") {
 		$trabajo = new Trabajo($sesion);
+
 		$resultado = $trabajo->EditarMasivo($trabajos, $_POST);
 		if($resultado['error']){
 			$pagina->AddError($resultado['error']);
@@ -226,9 +227,9 @@
 			visible_editado.setAttribute('name', 'visible');
 			visible_editado.setAttribute('type', 'hidden');
 			if (jQuery('#visible').is(':checked')) {
-				cobrable_editado.setAttribute('value', '1');
+				visible_editado.setAttribute('value', '1');
 			} else {
-				cobrable_editado.setAttribute('value', '0');
+				visible_editado.setAttribute('value', '0');
 			}
 			form.appendChild(visible_editado);
 		}
