@@ -1140,7 +1140,7 @@ class Trabajo extends Objeto
 
 	function EditarMasivo($trabajos, $data) {
 		$info = array();
-var_dump($data);
+
 		$permiso_revisor = $this->sesion->usuario->Es('REV');
 		$permiso_profesional = $this->sesion->usuario->Es('PRO');
 
@@ -1225,7 +1225,6 @@ var_dump($data);
 
 				if($t->fields['cobrable'] == 0) {
 					if($data['visible'] != '') {
-						Debug::pr('llego acá?');
 						$t->Edit('visible', $data['visible']);
 					} else {
 						$t->Edit('visible', '1');
