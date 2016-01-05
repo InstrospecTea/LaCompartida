@@ -60,12 +60,20 @@ class ReportController extends AbstractController {
 			);
 			$this->loadBusiness('Charging');
 			$data = $this->ChargingBusiness->getAreaAgrupatedReport($filter);
-			$this->loadReport('AreaAgrupatedCharge');
-			$this->AreaAgrupatedChargeReport->setData($data);
-			$this->AreaAgrupatedChargeReport->setOutputType('XLS');
-			$this->AreaAgrupatedChargeReport->render();
+			$this->loadReport('AreaAgrupatedCharge', 'Report');
+			$this->Report->setParameters(
+				array(
+					'fechaIni' => $filter['desde'],
+					'fechaFin' => $filter['hasta'],
+					'format' => 'Spreadsheet'
+				)
+			);
+			$this->Report->setData($data);
+			$this->Report->setOutputType('XLS');
+			$this->Report->setConfiguration('sesion', $this->Session);
+			$this->Report->render();
 		}
-		$this->layoutTitle = 'Reporte de cobros por área';
+		$this->layoutTitle = 'Reporte Cobros por Area';
 		$listaUsuarios = $this->Session->usuario->ListarActivos('', 'PRO');
 		$this->set('listaUsuarios', $listaUsuarios);
 		$this->set('Html', new \TTB\Html());
