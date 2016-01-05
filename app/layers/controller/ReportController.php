@@ -49,4 +49,26 @@ class ReportController extends AbstractController {
 			}
 		}
 	}
+
+	public function areaCharge() {
+		if (!empty($_REQUEST['btn_reporte'])) {
+			$filter = array(
+				'desde' => \Carbon\Carbon::createFromFormat('d-m-Y', $_REQUEST['fecha1'])->format('Y-m-d'),
+				'hasta' => \Carbon\Carbon::createFromFormat('d-m-Y', $_REQUEST['fecha2'])->format('Y-m-d'),
+				'estado' => $_REQUEST['estado'] == 'todos' ? null : $_REQUEST['estado'],
+				'usuarios' => $_REQUEST['usuarios']
+			);
+			$this->loadBusiness('Charging');
+			$data = $this->ChargingBusiness->getAreaAgrupatedReport($filter);
+			$this->loadReport('AreaAgrupatedCharge');
+			$this->AreaAgrupatedChargeReport->setData($data);
+			$this->AreaAgrupatedChargeReport->setOutputType('XLS');
+			$this->AreaAgrupatedChargeReport->render();
+		}
+		$this->layoutTitle = 'Reporte de cobros por área';
+		$listaUsuarios = $this->Session->usuario->ListarActivos('', 'PRO');
+		$this->set('listaUsuarios', $listaUsuarios);
+		$this->set('Html', new \TTB\Html());
+		$this->set('Form', new Form($this->Session));
+	}
 }
