@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.32.4
+Tuesday, January 5th
+* **Fix** [Link a biblioteca WCH](https://github.com/LemontechSA/ttb/pull/1290)
+
 ## Hotfix 15.32.3
 Tuesday, January 5th
 * **Fix** [Nuevo Lang para cliente](https://github.com/LemontechSA/ttb/pull/1287)
