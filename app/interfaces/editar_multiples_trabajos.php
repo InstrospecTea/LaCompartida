@@ -412,9 +412,9 @@ else
 					<?php echo __('Total Horas') ?>
 				</td>
 				<td align="left">
-					<input type="text" name="total_duracion_cobrable_horas" size="5" value="<?php echo $total_duracion_cobrable_horas; ?>" />
+					<input type="text" id="total_duracion_cobrable_horas" name="total_duracion_cobrable_horas" size="5" value="<?php echo $total_duracion_cobrable_horas; ?>" />
 					&nbsp;<?php echo __('Hrs')?>&nbsp;
-					<input type="text" name="total_duracion_cobrable_minutos" size="5" value="<?php echo $total_duracion_cobrable_minutos; ?>" />
+					<input type="text" id="total_duracion_cobrable_minutos" name="total_duracion_cobrable_minutos" size="5" value="<?php echo $total_duracion_cobrable_minutos; ?>" />
 					&nbsp;<?php echo __('Min')?>&nbsp;&nbsp;&nbsp;<span style="color:red;font-size:7pt"><?php echo __('(se modificará la duración cobrable de los trabajos seleccionados)') ?></span>
 				</td>
 				<td>
