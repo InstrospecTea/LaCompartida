@@ -234,14 +234,6 @@
 		}
 	}
 
-	//solo se puede modificar el campo visible si no es cobrable
-	function CheckVisible()
-	{
-		var incobrable = jQuery('[name=cobrable]').val() == '0';
-		//.toggle lo deja como block
-		jQuery('#divVisible').css('display', incobrable ? 'inline' : 'none');
-	}
-
 	function CargarActividad() {
 		CargarSelect('<?php echo $campo_asunto ?>', 'codigo_actividad', 'cargar_actividades');
 	}
@@ -262,6 +254,7 @@
 					'#cobrable',
 					'#visible'
 				]);
+			checkVisible();
 		});
 
 		jQuery('#check_cliente').on('click', function() {
@@ -296,6 +289,19 @@
 				return false;
 			}
 		});
+
+		jQuery('#cobrable').on('click', function() {
+			checkVisible();
+		});
+
+		//solo se puede modificar el campo visible si no es cobrable
+		function checkVisible() {
+			if (jQuery('#cobrable').prop('checked')) {
+				jQuery('#tr_visible').css('display', 'none');
+			} else {
+				jQuery('#tr_visible').css('display', '');
+			}
+		}
 
 		function changeDisabledElement(id_check, id_elements) {
 			if (jQuery(id_check).prop('checked')) {
@@ -338,20 +344,20 @@ if($opcion == "eliminar")
 else
 {
 ?>
-<form id="form_editar_trabajo" name="form_editar_trabajo" method="post" action="<?php echo $_SERVER[PHP_SELF]?>">
-	<input type=hidden name=opcion value="guardar" />
-	<input type=hidden name=popup value='<?php echo $popup?>' id="popup">
+<form id="form_editar_trabajo" name="form_editar_trabajo" method="post" action="<?php echo $_SERVER[PHP_SELF]?>" style="display: inline-block !important;">
+	<input type="hidden" name="opcion" value="guardar" />
+	<input type="hidden" name="popup" value='<?php echo $popup?>' id="popup">
 
 	<?php	if($txt_opcion) {	?>
-		<table style='border: 0px' <?php echo $txt_opcion ? 'style=display:inline' : 'style=display:none'?> width="100%">
+		<table style="border: 0px" <?php echo $txt_opcion ? "style=display:inline" : "style=display:none"?>>
 			<tr>
-				<td align=left><span style=font-weight:bold; font-size:9px; backgroundcolor:#c6dead><?php echo $txt_opcion?></span></td>
+				<td align="left"><span style="font-weight:bold; font-size:9px; backgroundcolor:#c6dead"><?php echo $txt_opcion?></span></td>
 			</tr>
 		</table>
 		<br>
 	<?php	}	?>
 
-	<table style="border: 0px" id="tbl_trabajo" width="100%">
+	<table style="border: 0px" id="tbl_trabajo">
 		<tr>
 			<td>&nbsp;</td>
 			<td align="right">
@@ -384,10 +390,10 @@ else
 
 		<?php if (Conf::GetConf($sesion, 'UsoActividades')) { ?>
 			<tr>
-				<td colspan="2" align=right>
+				<td colspan="2" align="right">
 					<?php echo __('Actividad'); ?>
 				</td>
-				<td align=left>
+				<td align="left">
 					<?php echo  InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $valores_default['codigo_actividad']); ?>
 				</td>
 				<td>
@@ -401,7 +407,7 @@ else
 
 		<?php if($permiso_revisor) { ?>
 			<tr>
-				<td colspan="2" align=right>
+				<td colspan="2" align="right">
 					<?php echo __('Total Horas') ?>
 				</td>
 				<td align="left">
@@ -418,7 +424,7 @@ else
 
 		<?php if(!$permiso_profesional || $permiso_revisor) { ?>
 			<tr>
-								<td colspan="2" align="right">
+				<td colspan="2" align="right">
 					<?php echo __('Cobrable')?><br/>
 				</td>
 				<td align="left">
@@ -428,20 +434,16 @@ else
 					<input type="checkbox" id="check_cobrable" value="" />
 				</td>
 			</tr>
-			<div id="divVisible" style="" > <!-- Borrar este -->
-			<!--div id="divVisible" style="display:<?php echo $valores_default['cobrable'] != '0' ? 'none' : 'inline'?>" -->
-			<tr>
-				<td colspan="2" align="right">
-					<?php echo __('Visible'); ?>
-				</td>
-				<td align="left">
-					<input type="checkbox" id="visible" <?php echo $valores_default['visible'] == 1 ? 'checked' : ''; ?> />
-				</td>
-				<td>
-					<input type="checkbox" id="check_visible" value="" />
-				</td>
-			</tr>
-			</div>
+				<tr id="tr_visible">
+					<td colspan="2" align="right"><?php echo __('Visible'); ?></td>
+					<td align="left">
+						<input type="checkbox" id="visible" <?php echo $valores_default['visible'] == 1 ? 'checked' : ''; ?> />
+					</td>
+					<td>
+						<input type="checkbox" id="check_visible" value="" />
+					</td>
+				</tr>
+
 		<?php } ?>
 			<tr>
 				<td colspan="4" align="right">
