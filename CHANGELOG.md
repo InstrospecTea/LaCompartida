@@ -1,7 +1,7 @@
 # Changelog
 
 ## Hotfix 15.32.3
-Tuesday, December 5th
+Tuesday, January 5th
 * **Fix** [Nuevo Lang para cliente](https://github.com/LemontechSA/ttb/pull/1287)
 
 ## Hotfix 15.32.2
