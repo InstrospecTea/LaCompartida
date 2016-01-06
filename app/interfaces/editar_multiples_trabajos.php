@@ -42,8 +42,10 @@
 	$num_trabajos = count($ids_trabajos);
 
 	$campo_asunto = 'codigo_asunto';
+	$campo_cliente = 'codigo_cliente';
 	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$campo_asunto = 'codigo_asunto_secundario';
+		$campo_cliente = 'codigo_cliente_secundario';
 	}
 
 	// Cargar cada trabajo en un arreglo y validar que sigan siendo editables
@@ -240,12 +242,15 @@
 	}
 
 	jQuery(function() {
+		var campo_cliente = '<?php echo $campo_cliente; ?>';
+		var campo_asunto = '<?php echo $campo_asunto; ?>';
+
 		jQuery(document).ready(function() {
 			disabledElements(
 				[
-					'#codigo_cliente_secundario',
-					'#campo_codigo_cliente_secundario',
-					'#codigo_asunto_secundario',
+					'#' + campo_cliente,
+					'#campo_' + campo_cliente,
+					'#' + campo_asunto,
 					'#glosa_asunto',
 					'#glosa_asunto_btn',
 					'#campo_codigo_actividad',
@@ -259,11 +264,11 @@
 		});
 
 		jQuery('#check_cliente').on('click', function() {
-			changeDisabledElement('#check_cliente', ['#codigo_cliente_secundario', '#campo_codigo_cliente_secundario']);
+			changeDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
 		});
 
 		jQuery('#check_asunto').on('click', function() {
-			changeDisabledElement('#check_asunto', ['#codigo_asunto_secundario', '#glosa_asunto', '#glosa_asunto_btn']);
+			changeDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
 		});
 
 		jQuery('#check_actividad').on('click', function() {
