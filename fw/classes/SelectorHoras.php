@@ -6,7 +6,7 @@ require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 class SelectorHoras
 {
-	function PrintTimeSelector($sesion, $input_name, $value, $max_horas, $oncambio='', $editable=true)
+	static function PrintTimeSelector($sesion, $input_name, $value, $max_horas, $oncambio='', $editable=true)
     {
     	if( method_exists('Conf','GetConf') )
     		$intervalo = Conf::GetConf($sesion,'Intervalo');
@@ -63,7 +63,7 @@ class SelectorHoras
 		return $html;
     }
 
-  function Javascript()
+  static function Javascript()
   {
     $output = "
 		<script type=\"text/javascript\">

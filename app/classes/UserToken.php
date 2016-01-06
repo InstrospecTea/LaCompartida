@@ -119,7 +119,7 @@ class UserToken extends Objeto {
 	 * Delete data
 	 * returns true if the delete completed successfully, else false
 	 */
-	function delete($id) {
+	function delete($id = null) {
 		if (!isset($id) || empty($id)) {
 			return false;
 		}

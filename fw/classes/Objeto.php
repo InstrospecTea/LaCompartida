@@ -379,7 +379,7 @@ class Objeto {
 	 * Funcion que elimina un elemento. Primero chequea que la funcion check delete retorne verdadero
 	 * @return boolean
 	 */
-	public function Delete() {
+	public function Delete($id = null) {
 		if (!$this->CheckDelete()) {
 			return false;
 		}

@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . '/../ttbloader.php';
 ini_set('display_errors', 'Off');
 error_reporting(0);
 extract($_REQUEST);
+extract($_FILES);
 defined('APPPATH') || define('APPPATH', dirname(dirname(__FILE__)));
 
 $confFile = dirname(__FILE__) . '/../config/addbd.php';
