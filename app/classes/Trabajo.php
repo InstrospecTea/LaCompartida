@@ -247,7 +247,7 @@ class Trabajo extends Objeto
 	}
 
 	// Función que entrega false si supera las 23:59 horas trabajadas un usuario en un dia
-	function CantHorasDia($duracion_trabajo, $dia, $id_usuario, $sesion) {
+	static function CantHorasDia($duracion_trabajo, $dia, $id_usuario, $sesion) {
 		list($h, $m, $s) = explode(':', $duracion_trabajo);
 		$total_minutos = ($h * 60) + $m;
 
