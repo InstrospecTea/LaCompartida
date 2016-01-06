@@ -236,7 +236,7 @@
 	}
 
 	function CargarActividad() {
-		CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
+		CargarSelect('<?php echo $campo_asunto ?>', 'codigo_actividad', 'cargar_actividades');
 	}
 
 	jQuery(function() {
