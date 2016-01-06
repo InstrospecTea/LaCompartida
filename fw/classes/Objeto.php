@@ -53,10 +53,25 @@ class Objeto {
 	 * set field in true if allow null
 	 */
 	public function setFieldsAllowNull() {
+		if (empty($this->tabla)) {
+			return array();
+		}
+
 		// describe table
 		$rs = mysql_query("DESC {$this->tabla}", $this->sesion->dbh);
 		while ($field = mysql_fetch_assoc($rs)) {
 			$this->fields_allow_null[$field['Field']] = $field['Null'] == 'YES';
+		}
+	}
+
+	/**
+	 * set field in null by default when is a new record
+	 */
+	public function setFieldsNew($tabla) {
+		// describe table
+		$rs = mysql_query("DESC {$tabla}", $this->sesion->dbh);
+		while ($field = mysql_fetch_assoc($rs)) {
+			$this->fields[$field['Field']] = null;
 		}
 	}
 
@@ -157,7 +172,7 @@ class Objeto {
 			if ($this->changes[$key]) {
 				$do_update = true;
 
-				if (strtoupper($value) === 'NULL' || is_null($value)) {
+				if (strtoupper($value) === 'NULL' || is_null($value) || empty($value)) {
 					// if the given value is null, and the field in the data base not allow a null value, then assing the default value by data base
 					if ($this->fields_allow_null[$key]) {
 						$valores[] = "{$key} = NULL";
@@ -285,7 +300,7 @@ class Objeto {
 	 * @return boolean retorna verdadero si el registro está cargado, de lo contrario retorna falso
 	 */
 	public function Loaded() {
-		if ($this->fields[$this->campo_id]) {
+		if (isset($this->fields[$this->campo_id])) {
 			return true;
 		}
 

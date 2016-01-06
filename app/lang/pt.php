@@ -133,6 +133,8 @@ $_LANG['Mostrar detalle por hora'] = 'Mostrar detalhe por hora';
 $_LANG['Iniciales'] = 'Iniciais';
 $_LANG['Mostrar detalle por profesional'] = 'Mostrar detalhes por profissional';
 $_LANG['Importe'] = 'Valor Total';
+$_LANG['es_Importe'] = 'Quantia';
+$_LANG['es_IMPORTE'] = 'QUANTIA';
 $_LANG['Mostrar el descuento del cobro'] = 'Mostrar os descontos da cobrança';
 $_LANG['Mostrar gastos del cobro'] = 'Mostrar os gastos da cobrança';
 $_LANG['Mostrar concepto de gastos'] = 'Mostrar conceito de gastos';
@@ -1060,6 +1062,7 @@ $_LANG['Ingresar como nueva hora'] = 'Adicionar como nova hora';
 $_LANG['Nueva hora'] = 'Nova hora';
 $_LANG['Total horas trabajadas'] = 'Total horas trabalhadas';
 $_LANG['Total horas cobrables corregidas'] = 'Total horas faturáveis corrigidas';
+$_LANG['Total horas cobrables'] = 'Total horas faturáveis';
 $_LANG['Hrs Trab./Cobro.'] = 'Horas trabalhadas / Cobradas';
 $_LANG['Hrs trab.'] = 'Horas trabalhadas';
 

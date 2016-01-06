@@ -202,7 +202,10 @@ if (Conf::EsAmbientePrueba()) {
 		exit;
 	}
 
-	$query = "SELECT id_usuario FROM usuario WHERE activo = 1 AND rut != 99511620";
+	$query = "SELECT usuario.id_usuario, usuario_permiso.codigo_permiso
+		FROM usuario
+		INNER JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario
+		WHERE usuario.activo = 1 AND usuario_permiso.codigo_permiso = 'PRO' AND usuario.rut != 99511620";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 	$j = 0;

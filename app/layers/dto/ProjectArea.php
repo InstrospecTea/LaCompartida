@@ -1,13 +1,13 @@
 <?php
 
-class User extends Entity {
+class ProjectArea extends Entity {
 
 	/**
 	 * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
 	 * @return string
 	 */
 	public function getIdentity() {
-		return 'id_usuario';
+		return 'id_area_proyecto';
 	}
 
 	/**
@@ -16,9 +16,13 @@ class User extends Entity {
 	 * @return string
 	 */
 	public function getPersistenceTarget() {
-		return 'usuario';
+		return 'prm_area_proyecto';
 	}
 
+	/**
+	 * Obtiene los campos por defecto que debe llevar la entidad.
+	 * @return array
+	 */
 	public function getTableDefaults() {
 		return array();
 	}
@@ -26,9 +30,4 @@ class User extends Entity {
 	protected function getFixedDefaults() {
 		return array();
 	}
-
-	public function getCategory($id) {
-
-	}
-
 }

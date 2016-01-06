@@ -2943,10 +2943,11 @@ class NotaCobro extends Cobro {
 
 					$row = $row_tmpl;
 
-					if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1)
+					if ($this->fields['opc_ver_detalles_por_hora_categoria'] == 1) {
 						$row = str_replace('%td_categoria%', '<td>&nbsp;</td>', $row);
-					else
+					} else {
 						$row = str_replace('%td_categoria%', '', $row);
+					}
 
 
 
@@ -2957,9 +2958,6 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%td_tarifa%', '', $row);
 						$row = str_replace('%td_tarifa_ajustada%', '', $row);
 					}
-
-
-
 
 					if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 						$row = str_replace('%tarifa%', number_format(($trabajo->fields['monto_cobrado'] / $duracion_cobrada_decimal), $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
@@ -2992,10 +2990,8 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%valor_codigo_asunto%', $asunto->fields['codigo_asunto'], $row);
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
-
-					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $trabajo->fields['nombre_usuario'], 4);
-					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
+					//Las iniciales fueron reemplazas por el username. Pivotal: 109198728
+					$row = str_replace('%iniciales%', $trabajo->fields['username'], $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
 
@@ -3545,8 +3541,8 @@ class NotaCobro extends Cobro {
 							$row = str_replace('%td_tarifa_ajustada%', '', $row);
 						}
 						//muestra las iniciales de los profesionales
-						list($nombre, $apellido_paterno, $extra) = explode(' ', $prof, 3);
-						$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0], $row);
+						//Las iniciales fueron reemplazas por el username. Pivotal: 109198728
+						$row = str_replace('%iniciales%', $data['username'], $row);
 
 						$row = str_replace('%username%', $data['username'], $row);
 
@@ -6052,17 +6048,6 @@ class NotaCobro extends Cobro {
 					list($h_retainer, $m_retainer, $s_retainer) = explode(":", $duracion_retainer);
 					list($ht, $mt, $st) = explode(":", $duracion);
 
-					/* if ($this->fields['forma_cobro'] == 'RETAINER'){
-					  $horas = $h + $m / 60 + $s / 3600;
-					  $horas_retainer = $h_retainer + $m_retainer / 60 + $s_retainer / 3600;
-					  $horas_tarificadas = $horas - $horas_retainer;
-					  $horas_tarificadas_retainer = UtilesApp::Decimal2Time($horas_tarificadas);
-					  $horas_trabajadas = $ht + $mt /60 + $st / 3600;
-
-					  list($h, $m ,$s) = explode(":",$horas_tarificadas_retainer);
-					  $total_trabajo_importe = $tarifa_hh * $horas_tarificadas;
-					  } */
-
 					$duracion_cobrada_decimal = $h + $m / 60 + $s / 3600;
 					$asunto->fields['trabajos_total_duracion'] += $h * 60 + $m + $s / 60;
 					$asunto->fields['trabajos_total_valor'] += $trabajo->fields['monto_cobrado'];
@@ -6112,6 +6097,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $trabajo->fields['solicitante'] : '', $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
+
 					if ($this->fields['opc_ver_detalles_por_hora_iniciales']) {
 						$row = str_replace('%profesional%', $trabajo->fields['username'], $row);
 					} else {
@@ -6156,9 +6142,7 @@ class NotaCobro extends Cobro {
 					//paridad
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
 
-					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $trabajo->fields['nombre_usuario'], 4);
-					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
+					$row = str_replace('%iniciales%', $trabajo->fields['username'], $row);
 
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 
@@ -6808,8 +6792,8 @@ class NotaCobro extends Cobro {
 						}
 
 						//muestra las iniciales de los profesionales
-						list($nombre, $apellido_paterno, $extra) = explode(' ', $date['nombre_usuario'], 3);
-						$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0], $row);
+						//Las iniciales fueron reemplazas por el username. Pivotal: 109198728
+						$row = str_replace('%iniciales%', $data['nombre_usuario'], $row);
 
 						if ($descontado || $retainer || $flatfee) {
 							if ($this->fields['opc_ver_horas_trabajadas']) {
@@ -8199,7 +8183,6 @@ class NotaCobro extends Cobro {
 						tramite.tarifa_tramite as tarifa,
 						tramite.codigo_asunto,
 						tramite.id_moneda_tramite,
-						concat(left(usuario.nombre,1), left(usuario.apellido1,1), left(usuario.apellido2,1)) as iniciales,
 						CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
 					FROM tramite
 						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
@@ -8247,12 +8230,12 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
 					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $tramite->fields['nombre_usuario'], 4);
-					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
+					//Las iniciales fueron reemplazas por el username. Pivotal: 109198728
+					$row = str_replace('%iniciales%', $tramite->fields['username'], $row);
 					$row = str_replace('%username%', $tramite->fields['username'], $row);
 
 					if ($this->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
-						$row = str_replace('%profesional%', $tramite->fields['iniciales'], $row);
+						$row = str_replace('%profesional%', $tramite->fields['username'], $row);
 					} else {
 						$row = str_replace('%profesional%', $tramite->fields['nombre_usuario'], $row);
 					}
@@ -8777,8 +8760,8 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%paridad%', $i % 2 ? 'impar' : 'par', $row);
 
 					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $trabajo->fields['nombre_usuario'], 4);
-					$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $row);
+					//Las iniciales fueron reemplazas por el username. Pivotal: 109198728
+					$row = str_replace('%iniciales%', $trabajo->fields['username'], $row);
 
 					$row = str_replace('%username%', $trabajo->fields['username'], $row);
 
@@ -9408,8 +9391,8 @@ class NotaCobro extends Cobro {
 						}
 
 						//muestra las iniciales de los profesionales
-						list($nombre, $apellido_paterno, $extra) = explode(' ', $prof, 3);
-						$row = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0], $row);
+						//Las iniciales fueron reemplazas por el username. Pivotal: 109198728
+						$row = str_replace('%iniciales%', $data['username'], $row);
 						$row = str_replace('%username%', $data['username'], $row);
 
 						if ($descontado || $retainer || $flatfee) {
@@ -10806,8 +10789,8 @@ class NotaCobro extends Cobro {
 						$html3 = str_replace('%td_importe_ajustado%', '', $html3);
 					}
 					//muestra las iniciales de los profesionales
-					list($nombre, $apellido_paterno, $extra, $extra2) = explode(' ', $data['nombre_usuario'], 4);
-					$html3 = str_replace('%iniciales%', $nombre[0] . $apellido_paterno[0] . $extra[0] . $extra2[0], $html3);
+					//Las iniciales fueron reemplazas por el username. Pivotal: 109198728
+					$html3 = str_replace('%iniciales%', $data['username'], $html3);
 					if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['opc_ver_horas_trabajadas'] || Conf::GetConf($this->sesion, 'NotaDeCobroVFC')) {
 						$html3 = str_replace('%hrs_trabajadas%', $data['glosa_duracion_cobrada'], $html3);
 						$html3 = str_replace('%hrs_trabajadas_vio%', $data['glosa_duracion_cobrada'], $html3);

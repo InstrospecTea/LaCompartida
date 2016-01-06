@@ -111,6 +111,13 @@ if (Conf::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion')) {
 	$cobrosencero_chk = true;
 }
 
+if (!$cobros->Loaded()) {
+	$cobros->setFieldsNew('cobro');
+}
+
+if (!$contrato->Loaded()) {
+	$contrato->setFieldsNew('contrato');
+}
 ?>
 
 <script type="text/javascript">
@@ -1316,10 +1323,11 @@ function funcionTR(& $contrato) {
 		for ($z = 0; $z < $lista_cobros->num; $z++) {
 			$cobro = $lista_cobros->Get($z);
 			$idioma_cobro = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
-			if ($cobro->fields['codigo_idioma'] != '')
+			if ($cobro->fields['codigo_idioma'] != '') {
 				$idioma_cobro->Load($cobro->fields['codigo_idioma']);
-			else
+			} else {
 				$idioma_cobro->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
+			}
 			$total_horas = $cobros->TotalHorasCobro($cobro->fields['id_cobro']);
 			$texto_horas = $cobro->fields['fecha_ini'] != '0000-00-00' ? __('desde') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_ini'], $formato_fecha, "-") . ' ' . __('hasta') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-") : __('hasta') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-");
 

@@ -62,7 +62,7 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 		return $this->CurrencyService->get($id);
 	}
 
-	/** 
+	/**
 	 * Obtiene todas las instancias de {@link Currency} existentes en el ambiente del cliente
 	 */
 	function getCurrencies() {
@@ -72,7 +72,7 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 	}
 
 
-	/** 
+	/**
 	 * Obtiene un Array asociativo [identidad] => [glosa_moneda], a partir de un array de instancias de {@link Currency}.
 	 */
 	function currenciesToArray($currencies) {
@@ -104,4 +104,4 @@ class CoiningBusiness extends AbstractBusiness implements ICoiningBusiness {
 		return $currency;
 	}
 
-} 
+}

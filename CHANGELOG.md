@@ -1,5 +1,69 @@
 # Changelog
 
+## Hotfix 15.32.2
+Wednesday, December 30th
+* **Fix** [Corregir asignación de codigo de cliente al generar una factura](https://github.com/LemontechSA/ttb/pull/1286)
+
+## Hotfix 15.32.1
+Wednesday, December 30th
+* **Feature** [Disponibilizar campo factura.glosa en excel de facturas](https://github.com/LemontechSA/ttb/pull/1285)
+
+## [Release 15.32.0](https://github.com/LemontechSA/ttb/pull/1284)
+Tuesday, December 29th
+* **Feature** [Repetir Notificaciones](https://github.com/LemontechSA/ttb/pull/1281)
+
+## Hotfix 15.31.14
+Tuesday, December 29th
+* **Fix** [Modificación Listado Agrupado en Revisar Horas](https://github.com/LemontechSA/ttb/pull/1283)
+
+## Hotfix 15.31.13
+Tuesday, December 29th
+* **Fix** [Corregir order by en agrupador IdCobro](https://github.com/LemontechSA/ttb/pull/1282)
+
+## Hotfix 15.31.12
+Monday, December 28th
+* **Fix** [Campo Total horas facturables en Revisar Horas](https://github.com/LemontechSA/ttb/pull/1280)
+
+## Hotfix 15.31.11
+Monday, December 28th
+* **Fix** [Muestra categoría de usuario en excel escalonado](https://github.com/LemontechSA/ttb/pull/1279)
+
+## Hotfix 15.31.10
+Wednesday, December 23rd
+* **Fix** [Corregir excel escalonado](https://github.com/LemontechSA/ttb/pull/1277)
+
+## Hotfix 15.31.9
+Tuesday, December 22nd
+* **Fix** [Restaurar TAG %iniciales%](https://github.com/LemontechSA/ttb/pull/1276)
+
+## Hotfix 15.31.8
+Tuesday, December 22nd
+* **Fix** [Problema en modulo de Resumen](https://github.com/LemontechSA/ttb/pull/1274)
+
+## Hotfix 15.31.7
+Monday, December 21st
+* **Fix** [Brasil - Traduccion Importe](https://github.com/LemontechSA/ttb/pull/1271)
+
+## Hotfix 15.31.6
+Monday, December 21st
+* **Fix** [Problema con diferencia de iniciales entre dos secciones de cobro_rtf](https://github.com/LemontechSA/ttb/pull/1270)
+
+## Hotfix 15.31.5
+Friday, December 18th
+* **Fix** [Selecciona solo usuarios con rol profesional al cargar datos en ambiente DEMO](https://github.com/LemontechSA/ttb/pull/1269)
+
+## Hotfix 15.31.4
+Friday, December 18th
+* **Fix** [Corregir reporte avanzado por agrupador tipo_asunto](https://github.com/LemontechSA/ttb/pull/1268)
+
+## Hotfix 15.31.3
+Friday, December 18th
+* **Fix** [Mostrar símbolo de moneda correcto en resumen escalonado](https://github.com/LemontechSA/ttb/pull/1267)
+
+## Hotfix 15.31.2
+Wednesday, December 16th
+* **Fix** [Mejoras Reporte Producción por Periodo](https://github.com/LemontechSA/ttb/pull/1265)
+
 ## Hotfix 15.31.1
 Wednesday, December 16th
 * **Fix** [Problemas LEDES Gastos](https://github.com/LemontechSA/ttb/pull/1264)

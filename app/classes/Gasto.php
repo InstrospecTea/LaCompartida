@@ -166,7 +166,7 @@ class Gasto extends Objeto {
 		),
 	);
 
-	function Gasto($sesion, $fields = "", $params = "") {
+	function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "cta_corriente";
 		$this->campo_id = "id_movimiento";
 		#$this->guardar_fecha = false;
@@ -178,14 +178,14 @@ class Gasto extends Objeto {
 		# Los gastos dependiendo de si son generales o no, van a diferentes tablas.
 		# La tabla por defecto es cta_corriente
 		# Además a los gastos asociados a un asunto se les calcula un monto descontado que es con la tasa de cambio del dia en que se anoto. Esto es para que no cambie el monto que se descuenta si es que cambia la tasa.
-		if ($this->changes[general] == 1) {
+		if ($this->changes['general'] == 1) {
 			$this->tabla = "gasto_general";
 			$this->campo_id = "id_gasto_general";
-			unset($this->changes[general]);
+			unset($this->changes['general']);
 		} else {
 
-			if ($this->fields[id_moneda] > 0) {
-				$query = "SELECT tipo_cambio FROM prm_moneda WHERE id_moneda = " . $this->fields[id_moneda];
+			if (isset($this->fields['id_moneda']) && $this->fields['id_moneda'] > 0) {
+				$query = "SELECT tipo_cambio FROM prm_moneda WHERE id_moneda = " . $this->fields['id_moneda'];
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 				list($tasa) = mysql_fetch_array($resp);
 			}
@@ -603,14 +603,6 @@ class Gasto extends Objeto {
 			return array($total, $total_ingresos, $total_egresos, $egresos_borrador);
 		} else {
 			return $total;
-		}
-	}
-}
-
-if (!class_exists('ListaGastos')) {
-	class ListaGastos extends Lista {
-		function ListaGastos($sesion, $params, $query) {
-			$this->Lista($sesion, 'Gasto', $params, $query);
 		}
 	}
 }

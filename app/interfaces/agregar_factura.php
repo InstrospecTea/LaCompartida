@@ -16,9 +16,19 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 	$prm_codigo = new PrmCodigo($sesion);
 	$prm_plugin = new PrmPlugin($sesion);
 
+	if (!empty($id_factura)) {
+		$factura->Load($id_factura);
+		if (empty($codigo_cliente)) {
+			$codigo_cliente = $factura->fields['codigo_cliente'];
+		}
+		if (empty($id_cobro)) {
+			$id_cobro = $factura->fields['id_cobro'];
+		}
+	}
+
 	if ($id_cobro > 0) {
 		$cobro = new Cobro($sesion);
-		$cobro->load($id_cobro);
+		$cobro->Load($id_cobro);
 		$contrato = new Contrato($sesion);
 		if (empty($id_contrato)) {
 			$id_contrato = $cobro->fields['id_contrato'];
@@ -26,15 +36,8 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto', 'id_usuario_responsable'));
 	}
 
-	if (!empty($id_factura)) {
-		$factura->Load($id_factura);
-		if (empty($codigo_cliente)) {
-			$codigo_cliente = $factura->fields['codigo_cliente'];
-		}
-	} else {
-		if (empty($codigo_cliente)) {
-			$codigo_cliente = $cobro->fields['codigo_cliente'];
-		}
+	if ($cobro->Loaded() && empty($codigo_cliente)) {
+		$codigo_cliente = $cobro->fields['codigo_cliente'];
 	}
 
 	if (!empty($codigo_cliente) && empty($codigo_cliente_secundario)) {
@@ -132,7 +135,6 @@ if ($opcion == "guardar") {
 	}
 
 	if ($guardar_datos) {
-
 		//chequear
 		$mensaje_accion = 'guardado';
 		$factura->Edit('subtotal', $monto_neto);

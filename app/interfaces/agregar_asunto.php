@@ -485,10 +485,18 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 		<?php
 	}
 }
+
+if (!$Cliente->Loaded()) {
+	$Cliente->setFieldsNew('contrato');
+}
+
+if (!$Asunto->Loaded()) {
+	$Asunto->setFieldsNew('asunto');
+}
 ?>
 <script type="text/javascript">
 	function Volver(form) {
-			window.opener.location = 'agregar_cliente.php?id_cliente=<?php echo $Cliente->fields['id_cliente'] ?>';
+			window.opener.location = "agregar_cliente.php?id_cliente=<?php echo $Cliente->fields['id_cliente'] ?>";
 			window.close();
 	}
 
