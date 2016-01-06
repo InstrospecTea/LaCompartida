@@ -236,7 +236,7 @@
 	}
 
 	function CargarActividad() {
-		CargarSelect('<?php echo $campo_asunto ?>', 'codigo_actividad', 'cargar_actividades');
+		CargarSelect('codigo_asunto','codigo_actividad','cargar_actividades');
 	}
 
 	jQuery(function() {
@@ -395,7 +395,7 @@ else
 					<?php echo __('Actividad'); ?>
 				</td>
 				<td align="left">
-					<?php echo  InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $valores_default['codigo_actividad']); ?>
+					<?php echo  InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $valores_default['codigo_actividad'], '', '', 300, $valores_default['codigo_asunto']); ?>
 				</td>
 				<td>
 					<input type="checkbox" id="check_actividad" value="" />
