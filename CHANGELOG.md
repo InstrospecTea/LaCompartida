@@ -1,7 +1,7 @@
 # Changelog
 
 ## Hotfix 15.32.5
-Thursday, January 6th
+Thursday, January 7th
 * **Fix** [Instalación de wkhtmltopdf en Vagrant](https://github.com/LemontechSA/ttb/pull/1293)
 
 ## Hotfix 15.32.4
