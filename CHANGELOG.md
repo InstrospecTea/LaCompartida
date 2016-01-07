@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 15.32.5
+Thursday, January 6th
+* **Fix** [Instalación de wkhtmltopdf en Vagrant](https://github.com/LemontechSA/ttb/pull/1293)
+
 ## Hotfix 15.32.4
 Tuesday, January 5th
 * **Fix** [Link a biblioteca WCH](https://github.com/LemontechSA/ttb/pull/1290)
