@@ -1,5 +1,4 @@
 <?php
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('REV', 'ADM', 'PRO'));
 // Defino los permisos validos

@@ -1,6 +1,5 @@
 <?php
 require_once dirname(__FILE__).'/../conf.php';
-require_once 'Spreadsheet/Excel/Writer.php';
 
 $sesion = new Sesion();
 $pagina = new Pagina($sesion);

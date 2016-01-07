@@ -1,8 +1,5 @@
 <?php
-
 require_once dirname(__FILE__) . '/../conf.php';
-
-require_once 'Spreadsheet/Excel/Writer.php';
 
 $Sesion = new Sesion();
 $Pagina = new Pagina($Sesion);
@@ -78,7 +75,7 @@ $meses_corto = array(
 );
 
 $proporcionalidades = array(
-	'estandar' => __('EstÃ¡ndar'),
+	'estandar' => __('Estándar'),
 	'cliente' => __('Cliente')
 );
 ?>

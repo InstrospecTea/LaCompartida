@@ -1,9 +1,5 @@
 <?php
-	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/Funciones.php';
 
 	$sesion = new Sesion(array('REV', 'ADM', 'PRO'));
 	$pagina = new Pagina($sesion);
