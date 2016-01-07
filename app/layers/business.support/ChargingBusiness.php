@@ -95,18 +95,22 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	 */
 	public function detachAllWorks($charge_id) {
 		$this->loadService('Charge');
-		$charge = $this->ChargeService->getWithRelations($charge_id);
 
-		if (empty($charge->fields['Agreement'])) {
-			throw new Exception(__('El cobro Nº') . $id_cobro . __(' no se puede borrar por por no tener un contrato asociado.'));
+		try {
+			$charge = $this->ChargeService->getWithRelations($charge_id);
+
+			if (empty($charge->relations['Agreement'])) {
+				throw new Exception(__('El cobro Nº') . $id_cobro . __(' no se puede borrar por no tener un contrato asociado.'));
+			}
+
+			$id_moneda_original = $charge->relations['Agreement']->fields['id_moneda'];
+
+			$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro = NULL, monto_cobrado = NULL, id_moneda = {$id_moneda_original} WHERE id_cobro = '{$charge_id}'";
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
 		}
-
-		$id_moneda_original = $charge->fields['Agreement']->fields['id_moneda'];
-
-		$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro = NULL, monto_cobrado = NULL, id_moneda = {$id_moneda_original} WHERE id_cobro = '{$charge_id}'";
-		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 	}
-
 
 	public function overrideDocument($id_cobro = null, $estado = 'CREADO', $hay_pagos = false) {
 		$this->loadModel('Documento');

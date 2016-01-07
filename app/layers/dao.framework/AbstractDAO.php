@@ -365,15 +365,15 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			switch ($relation['association_type']) {
 				case 'has_many':
 					$results = $this->findAllRelated($entity, $relation, $relations_filters);
-					$entity->set("{$relation['class']}s", $results);
 					break;
 				case 'has_one':
-					$result = $this->findRelated($entity, $relation, $relations_filters);
-					$entity->set($relation['class'], $result);
+					$results = $this->findRelated($entity, $relation, $relations_filters);
 					break;
 				default:
 					throw new DAOException("No se especificó association_type de {$relation['class']}.");
 			}
+
+			$entity->relations[$relation['class']] = $results;
 		}
 
 		return $entity;
