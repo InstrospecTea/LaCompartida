@@ -5,5 +5,10 @@
 		"aws/aws-sdk-php": "2.2.*",
 		"amazonwebservices/aws-sdk-for-php": "1.6.*",
 		"nesbot/carbon": "1.14"
+	},
+	"autoload": {
+		"classmap": [
+			"database/lib"
+		]
 	}
 }

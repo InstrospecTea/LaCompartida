@@ -1,22 +1,38 @@
 <?php
 
+namespace Database;
+
+use \Database\Conf as DatabaseConf;
+use \PDO as PDO;
+
 class Migration {
 
 	protected $Session;
 	private $query_up;
 	private $query_down;
 
-	public function __construct(Sesion $Session) {
+	public function __construct(\TTB\Sesion $Session) {
 		$this->Session = $Session;
 		$this->query_up = array();
 		$this->query_down = array();
+		$this->confDatabaseConnection();
+	}
+
+	private function confDatabaseConnection() {
+		$dsn = 'mysql:dbname=' . \Conf::dbName() . ';host=' . \Conf::dbHost();
+		$this->Session->pdodbh = new PDO($dsn, DatabaseConf::getUserName(), DatabaseConf::getPassword());
+		$this->Session->pdodbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 
 	public function getBaseDirectory() {
 		return __BASEDIR__ . '/database';
 	}
 
-	public function getFileMigrationDirectory() {
+	public function getLibraryDirectory() {
+		return $this->getBaseDirectory() . '/lib';
+	}
+
+	public function getMigrationDirectory() {
 		return $this->getBaseDirectory() . '/migrations';
 	}
 
@@ -31,7 +47,7 @@ class Migration {
 	}
 
 	private function createFile($file_name, $template) {
-		$pfile = fopen($this->getFileMigrationDirectory() . "/{$file_name}", 'w') or die('Unable to open file!');
+		$pfile = fopen($this->getMigrationDirectory() . "/{$file_name}", 'w') or die('Unable to open file!');
 		fwrite($pfile, $template);
 		fclose($pfile);
 	}
@@ -58,7 +74,7 @@ class Migration {
 
 	private function getTemplate($description) {
 		$class_name = $this->sanitizeDescriptionForClassName($description);
-		$template = file_get_contents($this->getBaseDirectory() . '/TemplateMigration.php');
+		$template = file_get_contents($this->getLibraryDirectory() . '/TemplateMigration');
 		return str_replace('CLASSNAME', $class_name, $template);
 	}
 
@@ -138,7 +154,7 @@ class Migration {
 	}
 
 	public function getFilesMigration() {
-		$files = array_diff(scandir($this->getFileMigrationDirectory()), array('..', '.'));
+		$files = array_diff(scandir($this->getMigrationDirectory()), array('..', '.'));
 		return $files;
 	}
 

@@ -1,6 +1,8 @@
 <?php
 
-class CLASSNAME extends Migration implements ITemplateMigration {
+namespace Database;
+
+class CLASSNAME extends \Database\Migration implements \Database\ITemplateMigration {
 
 	/**
    * Run the migrations.

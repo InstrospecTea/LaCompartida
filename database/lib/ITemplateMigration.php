@@ -1,5 +1,7 @@
 <?php
 
+namespace Database;
+
 interface ITemplateMigration {
 	/**
 	 * Run the migrations.
