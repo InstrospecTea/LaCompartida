@@ -24,6 +24,7 @@ $_LANG['valor_cobrado'] = 'Valor liquidado';
 $_LANG['valor_por_cobrar'] = 'Valor por liquidar';
 
 $_LANG['Total horas cobrables corregidas'] = 'Total horas facturables corregidas';
+$_LANG['Total horas cobrables'] = 'Total horas facturables';
 
 $_LANG['Duración Cobrable'] = 'Hora Facturable';
 

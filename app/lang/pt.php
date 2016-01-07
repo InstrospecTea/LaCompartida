@@ -1062,6 +1062,7 @@ $_LANG['Ingresar como nueva hora'] = 'Adicionar como nova hora';
 $_LANG['Nueva hora'] = 'Nova hora';
 $_LANG['Total horas trabajadas'] = 'Total horas trabalhadas';
 $_LANG['Total horas cobrables corregidas'] = 'Total horas faturáveis corrigidas';
+$_LANG['Total horas cobrables'] = 'Total horas faturáveis';
 $_LANG['Hrs Trab./Cobro.'] = 'Horas trabalhadas / Cobradas';
 $_LANG['Hrs trab.'] = 'Horas trabalhadas';
 

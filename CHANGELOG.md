@@ -1,5 +1,45 @@
 # Changelog
 
+## Hotfix 15.32.5
+Thursday, January 7th
+* **Fix** [Instalación de wkhtmltopdf en Vagrant](https://github.com/LemontechSA/ttb/pull/1293)
+
+## Hotfix 15.32.4
+Tuesday, January 5th
+* **Fix** [Link a biblioteca WCH](https://github.com/LemontechSA/ttb/pull/1290)
+
+## Hotfix 15.32.3
+Tuesday, January 5th
+* **Fix** [Nuevo Lang para cliente](https://github.com/LemontechSA/ttb/pull/1287)
+
+## Hotfix 15.32.2
+Wednesday, December 30th
+* **Fix** [Corregir asignación de codigo de cliente al generar una factura](https://github.com/LemontechSA/ttb/pull/1286)
+
+## Hotfix 15.32.1
+Wednesday, December 30th
+* **Feature** [Disponibilizar campo factura.glosa en excel de facturas](https://github.com/LemontechSA/ttb/pull/1285)
+
+## [Release 15.32.0](https://github.com/LemontechSA/ttb/pull/1284)
+Tuesday, December 29th
+* **Feature** [Repetir Notificaciones](https://github.com/LemontechSA/ttb/pull/1281)
+
+## Hotfix 15.31.14
+Tuesday, December 29th
+* **Fix** [Modificación Listado Agrupado en Revisar Horas](https://github.com/LemontechSA/ttb/pull/1283)
+
+## Hotfix 15.31.13
+Tuesday, December 29th
+* **Fix** [Corregir order by en agrupador IdCobro](https://github.com/LemontechSA/ttb/pull/1282)
+
+## Hotfix 15.31.12
+Monday, December 28th
+* **Fix** [Campo Total horas facturables en Revisar Horas](https://github.com/LemontechSA/ttb/pull/1280)
+
+## Hotfix 15.31.11
+Monday, December 28th
+* **Fix** [Muestra categoría de usuario en excel escalonado](https://github.com/LemontechSA/ttb/pull/1279)
+
 ## Hotfix 15.31.10
 Wednesday, December 23rd
 * **Fix** [Corregir excel escalonado](https://github.com/LemontechSA/ttb/pull/1277)
