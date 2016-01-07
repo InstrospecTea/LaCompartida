@@ -356,6 +356,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	public function getWithRelations($id, array $relations_filters = array()) {
+		// TODO: Con el arreglo $relations_filters se retornarán solo las relaciones asignadas como elementos
 		$entity = $this->get($id);
 		return $this->fillRelations($entity, $relations_filters);
 	}
