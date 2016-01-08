@@ -121,11 +121,14 @@ $Slim->get('/matters', function () use ($Session, $Slim) {
 	outputJson($matters);
 });
 
-$Slim->get('/activities', function () use ($Session) {
+$Slim->get('/activities', function () use ($Session, $Slim) {
 	validateAuthTokenSendByHeaders();
 
+	$include = $Slim->request()->params('include');
+	$include_all = (!is_null($include) && $include == 'all');
+
 	$Activity = new Actividad($Session);
-	$activities = $Activity->findAll();
+	$activities = $Activity->findAll($include_all);
 
 	outputJson($activities);
 });
