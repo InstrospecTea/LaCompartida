@@ -30,14 +30,14 @@
 							<td align=left>
 								<select name="estado" id="estado">
 									<option value="todos"><?php echo __('Todos'); ?></option>
-									<option value="creado"><?php echo __('Creado'); ?></option>
-									<option value="en_revision"><?php echo __('En Revisión'); ?></option>
-									<option value="emitido"><?php echo __('Emitido'); ?></option>
-									<option value="facturado"><?php echo __('Facturado'); ?></option>
+									<option value="CREADO"><?php echo __('Creado'); ?></option>
+									<option value="EN REVISION"><?php echo __('En Revisión'); ?></option>
+									<option value="EMITIDO"><?php echo __('Emitido'); ?></option>
+									<option value="FACTURADO"><?php echo __('Facturado'); ?></option>
 									<!--<option value="enviado"><?php echo __('Facturado') ?></option>-->
-									<option value="enviado"><?php echo __('Enviado al Cliente'); ?></option>
-									<option value="pago_parcial"><?php echo __('Pago Parcial'); ?></option>
-									<option value="pagado"><?php echo __('Pagado'); ?></option>
+									<option value="ENVIADO"><?php echo __('Enviado al Cliente'); ?></option>
+									<option value="PAGO PARCIAL"><?php echo __('Pago Parcial'); ?></option>
+									<option value="PAGADO"><?php echo __('Pagado'); ?></option>
 								</select>
 							</td>
 						</tr>

@@ -192,9 +192,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$charge = $this->ChargeService->get($charge_id);
 		$total_currency_id = $charge->get('opc_moneda_total');
 		foreach ($slidingScales as $scale) {
-			$detail['datos_escalonadas'][$scale->fields['order_number']]= array(
+			$detail['datos_escalonadas'][$scale->fields['order_number']] = array(
 				'monto' => $scale->fields['fixedAmount'],
-				'descuento' =>$scale->fields['discountRate'],
+				'descuento' => $scale->fields['discountRate'],
 				'horas' => $scale->fields['hours'],
 				'id_moneda' => $scale->fields['currencyId']
 			);
@@ -914,58 +914,54 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 	public function getAreaAgrupatedReport($filters) {
-		$Criteria = new Criteria($this->Session);
-		$data = $Criteria
-			->add_select('cobro.id_cobro')
-			->add_select('asunto.id_area_proyecto')
-			->add_select('cobro.fecha_creacion')
-			->add_select('cliente.glosa_cliente')
-			->add_select('asunto.codigo_asunto')
-			->add_select('asunto.glosa_asunto')
-			->add_select('CONCAT(usuario.nombre,\' \', usuario.apellido1)', 'nombre')
-			->add_select('cobro.saldo_final_gastos')
-			->add_select('cobro.estado')
-			->add_select('cobro.documento', 'numero')
-			->add_select('cobro.forma_cobro')
-			->add_select('cobro.opc_moneda_total')
-			->add_select('prm_area_proyecto.glosa')
-			->add_select('moneda_base.id_moneda', 'id_moneda_base')
-			->add_select('moneda_cobro.simbolo')
-			->add_select('moneda_cobro.id_moneda')
-			->add_select('cobro.total_minutos')
-			->add_select('SUM(TIME_TO_SEC(trabajo.duracion_cobrada)/60)', 'duracion_cobrada')
-			->add_select('SUM(TIME_TO_SEC(trabajo.duracion)/60)', 'duracion')
-			->add_select('cobro.monto_subtotal')
-			->add_select('cobro.descuento')
-			->add_select('moneda_cobro.cifras_decimales')
-			->add_select('ROUND(cobro.monto_subtotal-cobro.descuento,moneda_cobro.cifras_decimales)', 'monto_proporcional')
-			->add_select('ROUND( (cobro.monto_subtotal-cobro.descuento ) * ( cobro_moneda_cobro.tipo_cambio / cobro_moneda_moneda_base.tipo_cambio ),moneda_base.cifras_decimales)', 'total_moneda_base')
-			->add_from('cobro')
-			->add_left_join_with('cliente', 'cliente.codigo_cliente = cobro.codigo_cliente')
-			->add_left_join_with('cobro_asunto', 'cobro_asunto.id_cobro = cobro.id_cobro')
-			->add_left_join_with('asunto', 'asunto.codigo_asunto = cobro_asunto.codigo_asunto')
-			->add_left_join_with('trabajo', 'trabajo.id_cobro = cobro.id_cobro AND trabajo.codigo_asunto = asunto.codigo_asunto')
-			->add_left_join_with('contrato', 'contrato.id_contrato = cobro.id_contrato')
-			->add_left_join_with('usuario', 'usuario.id_usuario = contrato.id_usuario_responsable')
-			->add_left_join_with('prm_area_proyecto', 'prm_area_proyecto.id_area_proyecto = asunto.id_area_proyecto')
-			->add_left_join_with(array('prm_moneda', 'moneda_cobro'), 'moneda_cobro.id_moneda = cobro.id_moneda')
-			->add_left_join_with(array('cobro_moneda', 'cobro_moneda_cobro'), 'cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = moneda_cobro.id_moneda')
-			->add_left_join_with(array('prm_moneda', 'moneda_base'), 'moneda_base.moneda_base = 1')
-			->add_left_join_with(array('cobro_moneda', 'cobro_moneda_moneda_base'), 'cobro_moneda_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_moneda_base.id_moneda = moneda_base.id_moneda');
-		if (!empty($filters['desde'])) {
-			$data->add_restriction(CriteriaRestriction::greater_or_equals_than('cobro.fecha_creacion', "'{$filters['desde']}'"));
+		$reporte = new ReporteCriteria($this->Session);
+
+		$filtros = array(
+			'clientes' => array(),
+			'encargados' => $filters['usuarios'],
+			'fecha_ini' => $filters['desde'],
+			'fecha_fin' => $filters['hasta'],
+			'estado_cobro' => array(
+				$filters['estado']
+			),
+			'campo_fecha' => 'creacion',
+			'dato' => 'valor_cobrado',
+			'vista' => 'area_asunto-id_cobro-glosa_asunto',
+			'prop' => 'estandar',
+			'id_moneda' => 1
+		);
+
+		$reporte->setFiltros($filtros);
+		$reporte->Query();
+		$rows = $reporte->row;
+		$result = array();
+		foreach ($rows as $row) {
+			$Criteria = new Criteria($this->Session);
+			$cobro = $Criteria
+				->add_select('cobro.fecha_creacion')
+				->add_select('cliente.glosa_cliente')
+				->add_select('CONCAT(usuario.nombre,\' \', usuario.apellido1)', 'nombre')
+				->add_select('cobro.estado')
+				->add_select('cobro.documento', 'numero')
+				->add_select('cobro.forma_cobro')
+				->add_select('moneda_base.id_moneda', 'id_moneda_base')
+				->add_select('moneda_cobro.simbolo')
+				->add_select('moneda_cobro.id_moneda')
+				->add_from('cobro')
+				->add_left_join_with('cliente', 'cliente.codigo_cliente = cobro.codigo_cliente')
+				->add_left_join_with('cobro_asunto', 'cobro_asunto.id_cobro = cobro.id_cobro')
+				->add_left_join_with('asunto', 'asunto.codigo_asunto = cobro_asunto.codigo_asunto')
+				->add_left_join_with('trabajo', 'trabajo.id_cobro = cobro.id_cobro AND trabajo.codigo_asunto = asunto.codigo_asunto')
+				->add_left_join_with('contrato', 'contrato.id_contrato = cobro.id_contrato')
+				->add_left_join_with('usuario', 'usuario.id_usuario = contrato.id_usuario_responsable')
+				->add_left_join_with(array('prm_moneda', 'moneda_cobro'), 'moneda_cobro.id_moneda = cobro.id_moneda')
+				->add_left_join_with(array('cobro_moneda', 'cobro_moneda_cobro'), 'cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = moneda_cobro.id_moneda')
+				->add_left_join_with(array('prm_moneda', 'moneda_base'), 'moneda_base.moneda_base = 1')
+				->add_left_join_with(array('cobro_moneda', 'cobro_moneda_moneda_base'), 'cobro_moneda_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_moneda_base.id_moneda = moneda_base.id_moneda')
+				->add_restriction(CriteriaRestriction::equals('cobro.id_cobro', $row['id_cobro']))
+				->run();
+			$result[] = array_merge($row, $cobro[0]);
 		}
-		if (!empty($filters['hasta'])) {
-			$data->add_restriction(CriteriaRestriction::lower_or_equals_than('cobro.fecha_creacion', "'{$filters['hasta']}'"));
-		}
-		if (!empty($filters['estado'])) {
-			$data->add_restriction(CriteriaRestriction::equals('cobro.estado', $filters['estado']));
-		}
-		if (!empty($filters['usuarios'])) {
-			$data->add_restriction(CriteriaRestriction::in('usuario.id_usuario', $filters['usuarios']));
-		}
-		$data->add_grouping('cobro.id_cobro')
-			->add_grouping('asunto.id_area_proyecto');
-		return $data->run();
+		return $result;
 	}
 }

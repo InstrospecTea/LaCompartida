@@ -53,8 +53,8 @@ class ReportController extends AbstractController {
 	public function areaCharge() {
 		if (!empty($_REQUEST['btn_reporte'])) {
 			$filter = array(
-				'desde' => \Carbon\Carbon::createFromFormat('d-m-Y', $_REQUEST['fecha1'])->format('Y-m-d'),
-				'hasta' => \Carbon\Carbon::createFromFormat('d-m-Y', $_REQUEST['fecha2'])->format('Y-m-d'),
+				'desde' => $_REQUEST['fecha1'],
+				'hasta' => $_REQUEST['fecha2'],
 				'estado' => $_REQUEST['estado'] == 'todos' ? null : $_REQUEST['estado'],
 				'usuarios' => $_REQUEST['usuarios']
 			);

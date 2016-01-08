@@ -28,7 +28,7 @@ class AreaAgrupatedChargeReport extends AbstractReport implements IAreaAgrupated
 	private function areaAgrupation($data) {
 		$areas = array();
 		foreach ($data as $item) {
-			$area = empty($item['glosa']) ? 'Sin area' : $item['glosa'];
+			$area = empty($item['area_asunto']) ? 'Sin area' : $item['area_asunto'];
 			if (array_key_exists($area, $areas)) {
 				array_push($areas[$area],  $item);
 			} else {
@@ -55,55 +55,36 @@ class AreaAgrupatedChargeReport extends AbstractReport implements IAreaAgrupated
 <th>N° Factura</th>
 <th>Fecha Creación</th>
 <th>Cliente</th>
-
+<th>Código</th>
+<th>Asunto</th>
 <th>Encargado comercial</th>
-<th>Duración trabajada</th>
-<th>Duración cobrada</th>
-<th>Ingreso</th>
-<th>Ingreso en base</th>
-<th>Gastos</th>
+<th>Valor cobrado</th>
 <th>Estado</th>
 <th>Forma de tarificación</th>
 <th>N° del cobro</th>
 </tr>";
-			$total_duracion = 0;
-			$total_duracion_cobrada = 0;
-			$total_base = 0;
-			$total_gastos = 0;
+			$total_cobrado = 0;
 			foreach ($cobros as $cobro) {
 				$BaseCurrency = $this->CoiningBusiness->getCurrency($cobro['id_moneda_base']);
-				$total_duracion += $cobro['duracion'];
-				$total_duracion_cobrada += $cobro['duracion_cobrada'];
-				$total_base += $cobro['total_moneda_base'];
-				$total_gastos += $cobro['saldo_final_gastos'];
+				$valor_cobrado = round($cobro['valor_cobrado'], $BaseCurrency->fields['decimales']);
+				$total_cobrado += $valor_cobrado;
 
 				$html .= "<tr>";
 				$html .= "<td>{$cobro['numero']}</td>";
 				$html .= "<td>{$cobro['fecha_creacion']}</td>";
 				$html .= "<td>{$cobro['glosa_cliente']}</td>";
-
+				$html .= "<td>{$cobro['codigo_asunto']}</td>";
+				$html .= "<td>{$cobro['glosa_asunto']}</td>";
 				$html .= "<td>{$cobro['nombre']}</td>";
-				$duracion = Utiles::Decimal2GlosaHora($cobro['duracion'] /60);
-				$html .= "<td>{$duracion}</td>";
-				$duracion_cobrada = Utiles::Decimal2GlosaHora($cobro['duracion_cobrada'] /60);
-				$html .= "<td>{$duracion_cobrada}</td>";
-				$html .= "<td>{$cobro['simbolo']} {$cobro['monto_proporcional']}</td>";
-				$html .= "<td>{$BaseCurrency->fields['simbolo']}{$cobro['total_moneda_base']}</td>";
-				$html .= "<td>{$BaseCurrency->fields['simbolo']}{$cobro['saldo_final_gastos']}</td>";
+				$html .= "<td>{$BaseCurrency->fields['simbolo']}{$valor_cobrado}</td>";
 				$html .= "<td>{$cobro['estado']}</td>";
 				$html .= "<td>{$cobro['forma_cobro']}</td>";
 				$html .= "<td>{$cobro['id_cobro']}</td>";
 				$html .= "</tr>";
 			}
-			$formato_total_duracion = Utiles::Decimal2GlosaHora($total_duracion /60);
-			$formato_total_duracion_cobrada = Utiles::Decimal2GlosaHora($total_duracion_cobrada /60);
 			$html .= "<tr>
-<td colspan='4'></td>
-<td>{$formato_total_duracion}</td>
-<td>{$formato_total_duracion_cobrada}</td>
-<td></td>
-<td>{$BaseCurrency->fields['simbolo']}{$total_base}</td>
-<td>{$BaseCurrency->fields['simbolo']}{$total_gastos}</td>
+<td colspan='6' class='total_label'>Totales</td>
+<td>{$BaseCurrency->fields['simbolo']}{$total_cobrado}</td>
 <td colspan='3'></td>
 </tr>";
 			$html .= "</table>";
