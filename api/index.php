@@ -7,8 +7,8 @@ $Session = new Sesion();
 define(MIN_TIMESTAMP, 315532800);
 define(MAX_TIMESTAMP, 4182191999);
 
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT');
+// header('Access-Control-Allow-Origin: *');
+// header('Access-Control-Allow-Methods: GET, POST, PUT');
 
 $Slim->post('/login', function () use ($Session, $Slim) {
 	$UserToken = new UserToken($Session);

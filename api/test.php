@@ -30,7 +30,7 @@
             }
           },
 
-          // url: 'login',
+          url: 'login',
           // url: 'clients',
           // url: 'clients/002538/matters',
           // url: 'users/1',
@@ -39,7 +39,6 @@
           // url: 'users/1/device',
           // url: 'users/1/device/bb9b7afc 4b246f19 f202b96d 5e70f59b a916cfbf',
           // url: 'activities',
-          url: 'http://stage.thetimebilling.com/16.0.1/api/login',
 
           data: { 'user' : '99511620', 'password' : 'Etropos2015', 'app_key' : 'ttb-desktop' },
           // data: { 'after' : '1356998400', 'before' : '1388534400' },
