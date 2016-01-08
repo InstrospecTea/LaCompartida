@@ -38,9 +38,10 @@
           // url: 'users/1/works/23643',
           // url: 'users/1/device',
           // url: 'users/1/device/bb9b7afc 4b246f19 f202b96d 5e70f59b a916cfbf',
-          url: 'activities',
+          // url: 'activities',
+          url: 'http://stage.thetimebilling.com/16.0.1/api/login',
 
-          // data: { 'user' : '99511620', 'password' : 'Etropos2015', 'app_key' : 'ttb-desktop' },
+          data: { 'user' : '99511620', 'password' : 'Etropos2015', 'app_key' : 'ttb-desktop' },
           // data: { 'after' : '1356998400', 'before' : '1388534400' },
           // data: {
           //   'created_date' : 1365193560.328282,
@@ -61,8 +62,8 @@
           // data: { 'receive_alerts' : 1, 'alert_hour' :  1357070400 },
           // data: { 'include' : 'all' },
 
-          type: 'get'
-          // type: 'post'
+          // type: 'get'
+          type: 'post'
           // type: 'put'
           // type: 'delete'
 
