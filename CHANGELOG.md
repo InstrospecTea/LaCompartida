@@ -1,5 +1,17 @@
 # Changelog
 
+## [Release 16.0.0](https://github.com/LemontechSA/ttb/pull/1294)
+Thursday, January 7th
+* **Feature** [Asignar la moneda original del trabajo](https://github.com/LemontechSA/ttb/pull/1278)
+
+## Hotfix 15.32.5
+Thursday, January 7th
+* **Fix** [Instalación de wkhtmltopdf en Vagrant](https://github.com/LemontechSA/ttb/pull/1293)
+
+## Hotfix 15.32.4
+Tuesday, January 5th
+* **Fix** [Link a biblioteca WCH](https://github.com/LemontechSA/ttb/pull/1290)
+
 ## Hotfix 15.32.3
 Tuesday, January 5th
 * **Fix** [Nuevo Lang para cliente](https://github.com/LemontechSA/ttb/pull/1287)
