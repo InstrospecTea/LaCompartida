@@ -30,7 +30,7 @@ class AreaAgrupatedChargeReport extends AbstractReport implements IAreaAgrupated
 		foreach ($data as $item) {
 			$area = empty($item['area_asunto']) ? 'Sin area' : $item['area_asunto'];
 			if (array_key_exists($area, $areas)) {
-				array_push($areas[$area],  $item);
+				array_push($areas[$area], $item);
 			} else {
 				$areas[$area][] = $item;
 			}
