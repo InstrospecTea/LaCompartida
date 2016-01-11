@@ -1192,15 +1192,17 @@ class Trabajo extends Objeto
 		}
 
 		//total escrito por usuario en minutos
-		$tiempo_total_minutos_editado = ($data['total_duracion_cobrable_horas'] * 60) + $data['total_duracion_cobrable_minutos'];
+		if (isset($data['total_duracion_cobrable_horas']) && isset($data['total_duracion_cobrable_minutos'])) {
+			$tiempo_total_minutos_editado = ($data['total_duracion_cobrable_horas'] * 60) + $data['total_duracion_cobrable_minutos'];
 
-		if($total_minutos_cobrables) {
-			$divisor = $tiempo_total_minutos_editado / $total_minutos_cobrables;
-		}
-		else if($tiempo_total_minutos_editado > 0 && $total_minutos_cobrables == 0) {
-			//Si el divisor es 0, cambiamos el divisor por el numero de trabajos. Más adelante se debe cambiar la duracion de cada trabajo (0) por 1 minuto.
-			$divisor = $tiempo_total_minutos_editado / $total_minutos_trabajados;
-			$forzar_editado_divisor_cero = true;
+			if($total_minutos_cobrables) {
+				$divisor = $tiempo_total_minutos_editado / $total_minutos_cobrables;
+			}
+			else if($tiempo_total_minutos_editado > 0 && $total_minutos_cobrables == 0) {
+				//Si el divisor es 0, cambiamos el divisor por el numero de trabajos. Más adelante se debe cambiar la duracion de cada trabajo (0) por 1 minuto.
+				$divisor = $tiempo_total_minutos_editado / $total_minutos_trabajados;
+				$forzar_editado_divisor_cero = true;
+			}
 		}
 
 		$intervalo = Conf::GetConf($this->sesion, 'Intervalo');
@@ -1249,35 +1251,36 @@ class Trabajo extends Objeto
 				$total_minutos_cobrables = $total_minutos_trabajados;
 			}
 
-			if($tiempo_total_minutos_editado != $total_minutos_cobrables || $forzar_editado_divisor_cero)
-			{
-				list($h, $m, $s) = split(':', $t->fields['duracion_cobrada']);
-				$minutos = ($h * 60) + $m;
-				//Si no tenia horas cobrables, se hace la proporcion de todo trabajo como si hubiese tenido 1 min.
-				if($forzar_editado_divisor_cero)
-				{
-					list($h, $m, $s) = split(':', $t->fields['duracion']);
+			if(isset($tiempo_total_minutos_editado)) {
+				if($tiempo_total_minutos_editado != $total_minutos_cobrables || $forzar_editado_divisor_cero) {
+					list($h, $m, $s) = split(':', $t->fields['duracion_cobrada']);
 					$minutos = ($h * 60) + $m;
-				}
-				$tiempo_trabajo_minutos_contador += $minutos;
-				$tiempo_trabajo_minutos_temporal = $tiempo_trabajo_minutos_contador * $divisor;
+					//Si no tenia horas cobrables, se hace la proporcion de todo trabajo como si hubiese tenido 1 min.
+					if($forzar_editado_divisor_cero)
+					{
+						list($h, $m, $s) = split(':', $t->fields['duracion']);
+						$minutos = ($h * 60) + $m;
+					}
+					$tiempo_trabajo_minutos_contador += $minutos;
+					$tiempo_trabajo_minutos_temporal = $tiempo_trabajo_minutos_contador * $divisor;
 
-				$tiempo_trabajo_minutos_editado = $tiempo_trabajo_minutos_temporal - $tiempo_total_minutos_temporal;
-				$tiempo_trabajo_minutos_editado -= ((1000 * $tiempo_trabajo_minutos_editado) % (1000 * $intervalo)) / 1000;
+					$tiempo_trabajo_minutos_editado = $tiempo_trabajo_minutos_temporal - $tiempo_total_minutos_temporal;
+					$tiempo_trabajo_minutos_editado -= ((1000 * $tiempo_trabajo_minutos_editado) % (1000 * $intervalo)) / 1000;
 
-				if($i==($num_trabajos-1)) {
-					$tiempo_trabajo_minutos_editado = $tiempo_total_minutos_editado - $tiempo_total_minutos_temporal;
-				}
-				else {
-					$tiempo_total_minutos_temporal += $tiempo_trabajo_minutos_editado;
-				}
+					if($i==($num_trabajos-1)) {
+						$tiempo_trabajo_minutos_editado = $tiempo_total_minutos_editado - $tiempo_total_minutos_temporal;
+					}
+					else {
+						$tiempo_total_minutos_temporal += $tiempo_trabajo_minutos_editado;
+					}
 
-				$t->Edit('duracion_cobrada', UtilesApp::Decimal2Time($tiempo_trabajo_minutos_editado / 60));
+					$t->Edit('duracion_cobrada', UtilesApp::Decimal2Time($tiempo_trabajo_minutos_editado / 60));
 
-				if($tiempo_trabajo_minutos_editado >= 1440) {
-					return array(
-						'error' => __('No se pudo modificar los ').__('trabajo').'s. '.__('Una duración sobrepasó las 24 horas.')
-					);
+					if($tiempo_trabajo_minutos_editado >= 1440) {
+						return array(
+							'error' => __('No se pudo modificar los ').__('trabajo').'s. '.__('Una duración sobrepasó las 24 horas.')
+						);
+					}
 				}
 			}
 		}

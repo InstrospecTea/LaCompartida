@@ -261,6 +261,7 @@
 					'#visible'
 				]);
 			checkVisible();
+			aceptarChangeDisabled();
 		});
 
 		jQuery('#check_cliente').on('click', function() {
@@ -326,6 +327,25 @@
 						jQuery(value).prop('disabled', true);
 					}
 				});
+			}
+			aceptarChangeDisabled();
+		}
+
+		function aceptarChangeDisabled(){
+			if (jQuery('#check_cliente').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else if (jQuery('#check_asunto').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else if (jQuery('#check_actividad').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else if (jQuery('#check_total_horas').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else if (jQuery('#check_cobrable').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else if (jQuery('#check_visible').prop('checked') && !jQuery('#cobrable').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else {
+				jQuery('#aceptar_btn').hide();
 			}
 		}
 
@@ -458,7 +478,7 @@ else
 					<?php if($num_trabajos > 0) { ?>
 						<input type="submit" id="eliminar_btn" class="btn" style="background: #ff0000 !important; color:#FFFFFF !important;" value="<?php echo __('Eliminar trabajos') ?>" />
 					<?php	} ?>
-					<input type="submit" class="btn" value="<?php echo __('Guardar')?>" onclick="return Validar(this.form);" />
+					<input type="submit" id="aceptar_btn" class="btn" value="<?php echo __('Guardar')?>" onclick="return Validar(this.form);" />
 				</td>
 			</tr>
 	</table>
