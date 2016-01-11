@@ -65,5 +65,10 @@ class SandboxController extends AbstractController {
 		$invoiced = $this->ChargingBusiness->getBilledAmount($charge, $currency);
 	}
 
+	public function deleteCharge($charge_id) {
+		$this->loadBusiness('Charging');
+		$this->ChargingBusiness->detachAllWorks($charge_id);
+	}
+
 }
 
