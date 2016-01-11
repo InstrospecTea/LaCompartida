@@ -261,31 +261,31 @@
 					'#visible'
 				]);
 			checkVisible();
-			aceptarChangeDisabled();
+			toggleButtonAcept();
 		});
 
 		jQuery('#check_cliente').on('click', function() {
-			changeDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
+			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
 		});
 
 		jQuery('#check_asunto').on('click', function() {
-			changeDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
+			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
 		});
 
 		jQuery('#check_actividad').on('click', function() {
-			changeDisabledElement('#check_actividad', ['#campo_codigo_actividad', '#codigo_actividad']);
+			toggleDisabledElement('#check_actividad', ['#campo_codigo_actividad', '#codigo_actividad']);
 		});
 
 		jQuery('#check_total_horas').on('click', function() {
-			changeDisabledElement('#check_total_horas', ['#total_duracion_cobrable_horas', '#total_duracion_cobrable_minutos']);
+			toggleDisabledElement('#check_total_horas', ['#total_duracion_cobrable_horas', '#total_duracion_cobrable_minutos']);
 		});
 
 		jQuery('#check_cobrable').on('click', function() {
-			changeDisabledElement('#check_cobrable', ['#cobrable']);
+			toggleDisabledElement('#check_cobrable', ['#cobrable']);
 		});
 
 		jQuery('#check_visible').on('click', function() {
-			changeDisabledElement('#check_visible', ['#visible']);
+			toggleDisabledElement('#check_visible', ['#visible']);
 		});
 
 		jQuery('#eliminar_btn').on('click', function() {
@@ -310,7 +310,7 @@
 			}
 		}
 
-		function changeDisabledElement(id_check, id_elements) {
+		function toggleDisabledElement(id_check, id_elements) {
 			if (jQuery(id_check).prop('checked')) {
 				jQuery.each(id_elements, function(index, value){
 					if (jQuery(value).is('a')) {
@@ -328,10 +328,10 @@
 					}
 				});
 			}
-			aceptarChangeDisabled();
+			toggleButtonAcept();
 		}
 
-		function aceptarChangeDisabled(){
+		function toggleButtonAcept(){
 			if (jQuery('#check_cliente').prop('checked')) {
 				jQuery('#aceptar_btn').show();
 			} else if (jQuery('#check_asunto').prop('checked')) {
