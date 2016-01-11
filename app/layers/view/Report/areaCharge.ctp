@@ -1,4 +1,4 @@
-<form method=post name=formulario action="">
+<form method="post" name="formulario" action="">
 	<table width="90%">
 		<tr>
 			<td>
@@ -8,26 +8,26 @@
 					</legend>
 					<table style=" width: 90%;" cellpadding="4">
 						<tr>
-							<td align=right>
+							<td align="right">
 								<?php echo __('Fecha desde'); ?>:
 							</td>
-							<td align=left>
+							<td align="left">
 								<?php echo $Html::PrintCalendar('fecha1', $fecha1); ?>
 							</td>
 						</tr>
 						<tr>
-							<td align=right>
+							<td align="right">
 								<?php echo __('Fecha hasta'); ?>:
 							</td>
-							<td align=left>
+							<td align="left">
 								<?php echo $Html::PrintCalendar('fecha2', $fecha2); ?>
 							</td>
 						</tr>
 						<tr>
-							<td align=right>
+							<td align="right">
 								<?php echo __('Estado del Cobro'); ?>:
 							</td>
-							<td align=left>
+							<td align="left">
 								<select name="estado" id="estado">
 									<option value="todos"><?php echo __('Todos'); ?></option>
 									<option value="CREADO"><?php echo __('Creado'); ?></option>
@@ -43,16 +43,16 @@
 						</tr>
 
 						<tr>
-							<td align=right>
+							<td align="right">
 								<?php echo __("Encargado"); ?>:
 							</td>
-							<td align=left><!-- Nuevo Select -->
+							<td align="left"><!-- Nuevo Select -->
 								<?php echo $Form->select('usuarios[]', $listaUsuarios, null, array('empty' => FALSE, 'style' => 'width: 200px', 'class' => 'selectMultiple', 'multiple' => 'multiple', 'size' => '6')); ?>
 							</td>
 						</tr>
 						<tr>
-							<td align=center colspan=2>
-								<input type="submit" class=btn value="<?php echo __('Generar reporte'); ?>" name="btn_reporte">
+							<td align="center" colspan="2">
+								<input type="submit" class="btn" value="<?php echo __('Generar reporte'); ?>" name="btn_reporte">
 							</td>
 						</tr>
 					</table>
