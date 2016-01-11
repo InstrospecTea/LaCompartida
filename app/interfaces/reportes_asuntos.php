@@ -154,6 +154,6 @@ function Planilla(form) {
 	form.submit();
 }
 </script>
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

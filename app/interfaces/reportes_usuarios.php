@@ -110,7 +110,7 @@ function Habilitar(form)
 }
 </script>
 
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>
