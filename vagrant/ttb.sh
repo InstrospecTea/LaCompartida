@@ -54,5 +54,11 @@ pear install Numbers_Words-0.16.4
 pear install Spreadsheet_Excel_Writer-beta
 pear install OLE-0.5
 
+# Instalar wkhtmltopdf
+apt-get update
+apt-get install libfontenc1 libxfont1 xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils fontconfig libxrender1 -y
+wget http://download.gna.org/wkhtmltopdf/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-precise-i386.deb -P /tmp
+dpkg -i /tmp/wkhtmltox-0.12.2.1_linux-precise-i386.deb
+
 # Actualizar la base de datos de ejemplo
 curl -I "http://localhost/ttb/app/update.php?hash=c85ef9997e6a30032a765a20ee69630b"

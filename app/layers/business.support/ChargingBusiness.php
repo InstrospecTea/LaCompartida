@@ -17,10 +17,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	 */
 	public function delete($id_cobro) {
 		$this->loadService('Charge');
+
 		$charge = $this->ChargeService->get($id_cobro);
 		if (!$charge->isLoaded()) {
 			throw new Exception(__('El cobro Nº') . $id_cobro . __(' no existe.'));
 		}
+
 		if ($charge->get('estado') != 'CREADO') {
 			throw new Exception(__('El cobro Nº') . $id_cobro . __(' no se puede borrar porque tiene un estado distinto a CREADO.'));
 		}
@@ -43,6 +45,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 
 		mysql_query('BEGIN', $this->sesion->dbh);
+
 		try {
 			//Elimina el gasto generado y la provision generada, SOLO si la provision no ha sido incluida en otro cobro:
 			if ($this->fields['id_provision_generada']) {
@@ -63,21 +66,21 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 			$this->overrideDocument();
 
-			$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = '$id_cobro'";
+			$this->detachAllWorks($id_cobro);
+
+			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = '{$id_cobro}'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
+			$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = '{$id_cobro}'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-			$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
-			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-			$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
+			$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = '{$id_cobro}'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 			$CobroAsunto = new CobroAsunto($this->sesion);
 			$CobroAsunto->eliminarAsuntos($id_cobro);
 			$this->ChargeService->delete($charge);
+
 			mysql_query('COMMIT', $this->sesion->dbh);
 		} catch (Exception $e) {
 			mysql_query('ROLLBACK', $this->sesion->dbh);
@@ -85,6 +88,29 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 	}
 
+	/**
+	 * Desvincula los trabajos asociados a un cobro, eliminando el cobro asociado y reestableciendo su moneda original
+	 * @param  int $charge_id identificador del cobro
+	 * @return void
+	 */
+	public function detachAllWorks($charge_id) {
+		$this->loadService('Charge');
+
+		try {
+			$charge = $this->ChargeService->getWithRelations($charge_id);
+
+			if (empty($charge->relations['Agreement'])) {
+				throw new Exception(__('El cobro Nº') . $id_cobro . __(' no se puede borrar por no tener un contrato asociado.'));
+			}
+
+			$id_moneda_original = $charge->relations['Agreement']->fields['id_moneda'];
+
+			$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro = NULL, monto_cobrado = NULL, id_moneda = {$id_moneda_original} WHERE id_cobro = '{$charge_id}'";
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+	}
 
 	public function overrideDocument($id_cobro = null, $estado = 'CREADO', $hay_pagos = false) {
 		$this->loadModel('Documento');

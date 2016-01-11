@@ -11,7 +11,18 @@ class Charge extends LoggeableEntity {
 	 * @return string
 	 */
 	public function getIdentity() {
-	    return 'id_cobro';
+		return 'id_cobro';
+	}
+
+	public function getRelations() {
+		return array(
+			array(
+				'class' => 'Agreement',
+				'association_type' => 'has_one',
+				'foreign_key' => 'id_contrato',
+				'association_foreign_key' => null
+			)
+		);
 	}
 
 	/**
@@ -20,7 +31,7 @@ class Charge extends LoggeableEntity {
 	 * @return string
 	 */
 	public function getPersistenceTarget() {
-	    return 'cobro';
+		return 'cobro';
 	}
 
 	/**
@@ -28,7 +39,7 @@ class Charge extends LoggeableEntity {
 	 * @return string
 	 */
 	public function getLoggingTable() {
-	    return 'cobro_movimiento';
+		return 'cobro_movimiento';
 	}
 
 	/**
@@ -36,7 +47,7 @@ class Charge extends LoggeableEntity {
 	 * entidad.
 	 * @return array
 	 */
-	public function getLoggeableProperties(){
+	public function getLoggeableProperties() {
 		return array(
 			'estado',
 			'codigo_cliente',
@@ -51,7 +62,8 @@ class Charge extends LoggeableEntity {
 
 	public function getInmutableLoggeableProperties() {
 		return array(
-			'id_cobro', 'id_contrato'
+			'id_cobro',
+			'id_contrato'
 		);
 	}
 
@@ -68,10 +80,14 @@ class Charge extends LoggeableEntity {
 	}
 
 	public function getTableDefaults() {
-		return array('modalidad_calculo');
+		return array(
+			'modalidad_calculo'
+		);
 	}
 
 	protected function getFixedDefaults() {
-		return array('estado' => 'CREADO');
+		return array(
+			'estado' => 'CREADO'
+		);
 	}
 }
