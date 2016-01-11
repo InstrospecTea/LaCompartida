@@ -14,16 +14,7 @@ a una version compatible de VirtualBox. Para más detalles de vagrant visitar su
 Clonar el repositorio de <a href="https://github.com/LemontechSA/ttb" target="_blank">TTB Clasic desde GitHub</a> en
 tu equipo en un directorio llamado **ttb**.
 
-Una vez descargado el código ejecutar los siguientes comandos de consola (desde el directorio ttb):
-
-```
-git hf init
-git submodule init
-git submodule update
-```
-
-Una vez realizado las anteriores tareas, se está en condiciones de usar el entonorno de desarrollo. Para levantar
-el entorno de desarrollo de debe ingresar al directorio de vagrant del proyecto TTB Clasic y ejecutar el siguiente comando:
+Para levantar el entorno de desarrollo de debe ingresar al directorio de vagrant del proyecto TTB Clasic y ejecutar el siguiente comando:
 
 ```
 vagrant up
