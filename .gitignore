@@ -211,7 +211,4 @@ bower_components
 # Node
 node_modules
 
-# Grunt
-/public/js/vendors*
-
 tags
