@@ -73,8 +73,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 					$Slim->applyHook('hook_link_shell_convertir_adelanto');
 				}
 
-				$Session = new \TTB\Sesion();
-				$Migration = new \Database\Migration($Session);
+				$Migration = new \Database\Migration();
 				$last_version_database = $Migration->getLastVersionOnDatabase();
 				$last_version_file_system = $Migration->getLastVersionOnFileSystem();
 				unset($Session, $Migration);

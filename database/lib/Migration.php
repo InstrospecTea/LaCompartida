@@ -2,28 +2,25 @@
 
 namespace Database;
 
+use \PDO;
+use \PDOException;
 use \Database\Conf as DatabaseConf;
-use \PDO as PDO;
 
 class Migration {
 
-	protected $Session;
 	private $query_up;
 	private $query_down;
 	private $root_directory;
+	private $Database;
 
-	public function __construct(\TTB\Sesion $Session) {
-		$this->Session = $Session;
+	public function __construct() {
 		$this->query_up = array();
 		$this->query_down = array();
-		$this->configDatabaseConnection();
 		$this->root_directory = __BASEDIR__;
-	}
 
-	private function configDatabaseConnection() {
 		$dsn = 'mysql:dbname=' . \Conf::dbName() . ';host=' . \Conf::dbHost();
-		$this->Session->pdodbh = new PDO($dsn, DatabaseConf::getUserName(), DatabaseConf::getPassword());
-		$this->Session->pdodbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$this->Database = new PDO($dsn, DatabaseConf::getUserName(), DatabaseConf::getPassword());
+		$this->Database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 
 	public function setRootDirectory($directory) {
@@ -109,16 +106,28 @@ class Migration {
 			if (is_array($query)) {
 				array_walk($query, array('self', 'executeQuery'));
 			} else {
-				$Statement = $this->Session->pdodbh->prepare($query);
-				$Statement->execute();
+				try {
+					$Statement = $this->Database->prepare($query);
+					$Statement->execute();
+				} catch (PDOException $e) {
+					// TODO: Registrar errores
+				}
 			}
 		}
 	}
 
 	private function getResultsQuery($query) {
-		$Statement = $this->Session->pdodbh->prepare($query);
-		$Statement->execute();
-		return $Statement->fetchAll(PDO::FETCH_ASSOC);
+		$results = null;
+
+		try {
+			$Statement = $this->Database->prepare($query);
+			$Statement->execute();
+			$results = $Statement->fetchAll(PDO::FETCH_ASSOC);
+		} catch (PDOException $e) {
+			// TODO: Registrar errores
+		}
+
+		return $results;
 	}
 
 	public function getClassNameByFileName($file_name) {

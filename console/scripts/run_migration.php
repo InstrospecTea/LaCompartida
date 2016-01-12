@@ -10,7 +10,7 @@ class RunMigration extends AppShell {
 
 	public function __construct() {
 		parent::__construct();
-		$this->Migration = new \Database\Migration($this->Session);
+		$this->Migration = new \Database\Migration();
 	}
 
 	public function main() {
@@ -27,7 +27,7 @@ class RunMigration extends AppShell {
 					$class_name = $this->Migration->getClassNameByFileName($file_name);
 
 					$ReflectedClass = new ReflectionClass("Database\\$class_name");
-					$CustomMigration = $ReflectedClass->newInstance($this->Session);
+					$CustomMigration = $ReflectedClass->newInstance();
 					$CustomMigration->up();
 					$CustomMigration->runUp();
 

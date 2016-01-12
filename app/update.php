@@ -7,8 +7,7 @@ if (empty($hash) || $hash != \Conf::Hash()) {
 	throw new Exception('Invalid credentials');
 }
 
-$Session = new \TTB\Sesion();
-$Migration = new \Database\Migration($Session);
+$Migration = new \Database\Migration();
 
 if (!$Migration->schemaExists()) {
 	$Migration->createSchema();
@@ -28,7 +27,7 @@ if (!empty($files)) {
 			$class_name = $Migration->getClassNameByFileName($file_name);
 
 			$ReflectedClass = new ReflectionClass("Database\\$class_name");
-			$CustomMigration = $ReflectedClass->newInstance($Session);
+			$CustomMigration = $ReflectedClass->newInstance();
 			$CustomMigration->up();
 			$CustomMigration->runUp();
 

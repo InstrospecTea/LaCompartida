@@ -339,8 +339,7 @@ $Slim->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
 			$datos['path_real'] = realpath(dirname(__FILE__) . '/../');
 
 			// Última versión como migración
-			$Session = new \TTB\Sesion();
-			$Migration = new \Database\Migration($Session);
+			$Migration = new \Database\Migration();
 			$datos['ultima_version_tt'] = $Migration->getLastVersionOnFileSystem();
 			unset($Session, $Migration);
 
