@@ -6,7 +6,7 @@ class XLSReportEngine extends AbstractReportEngine {
 		$html = $this->configuration['html'];
 		$filename = $this->configuration['filename'];
 		header('Content-type: application/excel');
-		header("Content-Disposition: attachment; filename={$filename}.xlsx");
+		header("Content-Disposition: attachment; filename={$filename}.xls");
 		echo $html;
 	}
 
