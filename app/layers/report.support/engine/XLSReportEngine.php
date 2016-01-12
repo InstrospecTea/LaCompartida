@@ -8,6 +8,7 @@ class XLSReportEngine extends AbstractReportEngine {
 		header('Content-type: application/excel');
 		header("Content-Disposition: attachment; filename={$filename}.xls");
 		echo $html;
+		exit();
 	}
 
 	protected function configurateReport() {
