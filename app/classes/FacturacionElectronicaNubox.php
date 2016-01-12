@@ -314,8 +314,8 @@ EOF;
 				'CODRECEPTOR' => '',
 				'CODITEM' => '',
 				'UNIDADMEDIDA' => 'UNID',
-				'PORCENTDSCTO2' => 0,
-				'PORCENTDSCTO3' => 0,
+				'PORCENTDSCTO2' => ($tipoDTE == 41) ? '' : 0,
+				'PORCENTDSCTO3' => ($tipoDTE == 41) ? '' : 0,
 				'CODIGOIMP' => '',
 				'MONTOIMP' => '',
 				'INDICADORTRASLADO' => '',
@@ -416,7 +416,7 @@ EOF;
 		if (!empty($arrayFactura)) {
 			array_unshift($arrayFactura, array_keys($arrayFactura[0]));
 		}
-		
+
 		foreach ($arrayFactura as $key => $item) {
 			$arrayFactura[$key] = implode(';', $item);
 		}
