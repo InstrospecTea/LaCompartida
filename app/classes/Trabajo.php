@@ -1164,31 +1164,6 @@ class Trabajo extends Objeto
 				$asunto->LoadByCodigo($data['codigo_asunto']);
 			}
 			$asunto_cobrable[$data['codigo_asunto']] = $asunto->fields['cobrable'] != 0;
-
-			/*
-			Ha cambiado el asunto del trabajo se setea nuevo Id_cobro de alguno que esté creado
-			y corresponda al nuevo asunto y esté entre las fechas que corresponda, sino, se setea NULL
-			*/
-			foreach($trabajos as $t) {
-				if($data['codigo_asunto'] != $t->fields['codigo_asunto']) {
-					$cobro = new Cobro($this->sesion);
-					$id_cobro_cambio = $cobro->ObtieneCobroByCodigoAsunto($data['codigo_asunto'], $t->fields['fecha']);
-					if(!$id_cobro_cambio) {
-						$id_cobro_cambio = 'NULL';
-					}
-					else {
-						$cobros_regenerables[] = $id_cobro_cambio;
-					}
-
-					if($t->fields['id_cobro']) {
-						$cobros_regenerables[] = $t->fields['id_cobro'];
-					}
-
-					$t->Edit('id_cobro', $id_cobro_cambio);
-
-					$t->Edit('codigo_asunto', $data['codigo_asunto']);
-				}
-			}
 		}
 
 		//total escrito por usuario en minutos
@@ -1209,7 +1184,35 @@ class Trabajo extends Objeto
 		$tiempo_total_minutos_temporal = 0;
 		$tiempo_trabajo_minutos_contador = 0;
 		$num_trabajos = count($trabajos);
-		foreach ($trabajos as $i => $t) {
+
+		foreach($trabajos as $t) {
+			/*
+			Ha cambiado el asunto del trabajo se setea nuevo Id_cobro de alguno que esté creado
+			y corresponda al nuevo asunto y esté entre las fechas que corresponda, sino, se setea NULL
+			*/
+			if(isset($data['codigo_asunto']) && ($data['codigo_asunto'] != $t->fields['codigo_asunto'])) {
+				$cobro = new Cobro($this->sesion);
+				$id_cobro_cambio = $cobro->ObtieneCobroByCodigoAsunto($data['codigo_asunto'], $t->fields['fecha']);
+				if(!$id_cobro_cambio) {
+					$id_cobro_cambio = 'NULL';
+				}
+				else {
+					$cobros_regenerables[] = $id_cobro_cambio;
+				}
+
+				if($t->fields['id_cobro']) {
+					$cobros_regenerables[] = $t->fields['id_cobro'];
+				}
+
+				$t->Edit('id_cobro', $id_cobro_cambio);
+				$t->Edit('codigo_asunto', $data['codigo_asunto']);
+				$t->Edit('codigo_actividad', empty($data['codigo_actividad']) ? NULL : $data['codigo_actividad']);
+			}
+
+			if(isset($data['codigo_actividad']) && ($data['codigo_actividad'] != $t->fields['codigo_actividad'])) {
+				$t->Edit('codigo_actividad', empty($data['codigo_actividad']) ? NULL : $data['codigo_actividad']);
+			}
+
 			if($t->fields['id_cobro']) {
 				$cobros_regenerables[] = $t->fields['id_cobro'];
 			}

@@ -142,6 +142,11 @@
 		$hay_cobros = $hay_cobros || !empty($t->fields['id_cobro']);
 	}
 
+	$estado_indeterminado = false;
+	if (!isset($valores_default['cobrable'])) {
+		$estado_indeterminado = true;
+	}
+
 	// Título opcion
 	if($opcion == '' && $num_trabajos > 0)
 		$txt_opcion = __('Modificación masiva de Trabajos');
@@ -244,8 +249,13 @@
 	jQuery(function() {
 		var campo_cliente = '<?php echo $campo_cliente; ?>';
 		var campo_asunto = '<?php echo $campo_asunto; ?>';
+		var estado_indeterminado = '<?php echo $estado_indeterminado; ?>';
 
 		jQuery(document).ready(function() {
+			if (estado_indeterminado) {
+				jQuery("#cobrable").prop("indeterminate", true);
+			}
+
 			disabledElements(
 				[
 					'#' + campo_cliente,
@@ -266,10 +276,26 @@
 
 		jQuery('#check_cliente').on('click', function() {
 			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
+
+			// Si edita un cliente se debe enviar el asunto también
+			if (jQuery('#check_cliente').prop('checked')) {
+				jQuery('#check_asunto').prop('checked', true);
+			} else {
+				jQuery('#check_asunto').prop('checked', false);
+			}
+			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
 		});
 
 		jQuery('#check_asunto').on('click', function() {
 			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
+
+			// Si edita un asunto se debe enviar el cliente también
+			if (jQuery('#check_asunto').prop('checked')) {
+				jQuery('#check_cliente').prop('checked', true);
+			} else {
+				jQuery('#check_cliente').prop('checked', false);
+			}
+			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
 		});
 
 		jQuery('#check_actividad').on('click', function() {
