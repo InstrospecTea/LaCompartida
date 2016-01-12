@@ -206,3 +206,6 @@ vagrant/machines/
 Vagrantfile
 
 tags
+
+/node_modules
+/bower_components
