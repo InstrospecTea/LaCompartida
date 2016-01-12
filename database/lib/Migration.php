@@ -10,22 +10,28 @@ class Migration {
 	protected $Session;
 	private $query_up;
 	private $query_down;
+	private $root_directory;
 
 	public function __construct(\TTB\Sesion $Session) {
 		$this->Session = $Session;
 		$this->query_up = array();
 		$this->query_down = array();
-		$this->confDatabaseConnection();
+		$this->configDatabaseConnection();
+		$this->root_directory = __BASEDIR__;
 	}
 
-	private function confDatabaseConnection() {
+	private function configDatabaseConnection() {
 		$dsn = 'mysql:dbname=' . \Conf::dbName() . ';host=' . \Conf::dbHost();
 		$this->Session->pdodbh = new PDO($dsn, DatabaseConf::getUserName(), DatabaseConf::getPassword());
 		$this->Session->pdodbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 
+	public function setRootDirectory($directory) {
+		$this->root_directory = $directory;
+	}
+
 	public function getBaseDirectory() {
-		return __BASEDIR__ . '/database';
+		return "{$this->root_directory}/database";
 	}
 
 	public function getLibraryDirectory() {
@@ -153,9 +159,19 @@ class Migration {
 		return $descompose_file_name;
 	}
 
-	public function getFilesMigration() {
-		$files = array_diff(scandir($this->getMigrationDirectory()), array('..', '.'));
+	/**
+	 * Obtiene un listado ordenado por defecto de forma ascendente
+	 * @param  integer $sorting_order 0: ascendente 1: descendente
+	 * @return array listado de archivos
+	 */
+	public function getFilesMigration($sorting_order = 0) {
+		$files = array_diff(scandir($this->getMigrationDirectory(), $sorting_order), array('..', '.'));
 		return $files;
+	}
+
+	public function getLastFileMigration() {
+		$files = $this->getFilesMigration(1);
+		return !empty($files) ? $files[0] : '';
 	}
 
 	public function registerMigration($file_name, $batch) {
@@ -163,8 +179,41 @@ class Migration {
 	}
 
 	public function getNextBatchNumber() {
-		$migrations = $this->getResultsQuery('SELECT MAX(`batch`) max_batch FROM `migrations`');
+		$migrations = $this->getResultsQuery('SELECT MAX(`batch`) AS max_batch FROM `migrations`');
 		$netx_batch = (int) $migrations[0]['max_batch'] + 1;
 		return $netx_batch;
+	}
+
+	public function getLastVersionOnDatabase() {
+		$version = 0;
+		$file = $this->getResultsQuery('SELECT `migration` AS file_name FROM `migrations` ORDER BY 1 DESC LIMIT 1');
+
+		if (!empty($file)) {
+			$file = $this->decomposeFileName($file[0]['file_name']);
+			$version = $file['version'];
+		}
+
+		return $version;
+	}
+
+	public function getLastVersionOnFileSystem() {
+		$file = $this->decomposeFileName($this->getLastFileMigration());
+		return $file['version'];
+	}
+
+	public function schemaExists() {
+		$migration = $this->getResultsQuery('SHOW TABLES LIKE "migrations"');
+		return !empty($migration);
+	}
+
+	public function createSchema() {
+		$this->executeQuery(
+			'CREATE TABLE `migrations` (
+			  `migration` varchar(255) NOT NULL,
+			  `batch` int(11) NOT NULL,
+			  PRIMARY KEY (`migration`),
+			  KEY `migrations_batch` (`batch`)
+			) ENGINE = InnoDB'
+		);
 	}
 }

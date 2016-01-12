@@ -54,10 +54,6 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 
 			//se revisa el rut lemontech en vez del permiso super admin para poder ejecutar la actualizacion que agrega el permiso super admin
 			if ($sesion->usuario->fields['rut'] == '99511620') {
-				$versiondb = $sesion->pdodbh->query("SELECT MAX(version) AS version FROM version_db");
-				$dato = $versiondb->fetch();
-				$versiondb->closeCursor();
-
 				echo '<br/><br/>';
 				echo '<a href="' . Conf::RootDir() . '/app/update.php?hash=' . Conf::Hash() . '"/>Update</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/configuracion.php"/>Configuracion</a>';
@@ -77,10 +73,15 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 					$Slim->applyHook('hook_link_shell_convertir_adelanto');
 				}
 
-				echo ' <br/><br/> Este software corre sobre la DB ' . Conf::dbHost() . ' <b>' . Conf::dbName() . '</b> version ' . $dato[0];
-				echo '. La m&aacute;s actual disponible es la ';
-				$_GET['lastver'] = 1;
-				include(Conf::ServerDir() . '/update.php');
+				$Session = new \TTB\Sesion();
+				$Migration = new \Database\Migration($Session);
+				$last_version_database = $Migration->getLastVersionOnDatabase();
+				$last_version_file_system = $Migration->getLastVersionOnFileSystem();
+				unset($Session, $Migration);
+
+				echo ' <br/><br/> Este software corre sobre la DB ' . Conf::dbHost() . ' <b>' . Conf::dbName() . '</b> version ' . $last_version_database;
+				echo '. La m&aacute;s actual disponible es la ' . $last_version_file_system;
+
 				echo '<br>Ruta real del repositorio: <b>' . realpath(dirname(__FILE__) . '/../../../') . '</b><br>';
 				$path_environment = dirname(__FILE__) . '/../../../environment.txt';
 				$path_source_version = dirname(__FILE__) . '/../../../VERSION';
