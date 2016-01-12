@@ -59,6 +59,9 @@ class ReportController extends AbstractController {
 				'usuarios' => $_REQUEST['usuarios']
 			);
 			$this->loadBusiness('Charging');
+			$this->loadBusiness('Coining');
+			$baseCurrency = $this->CoiningBusiness->getBaseCurrency();
+			$filter['id_moneda'] = $baseCurrency->fields['id_moneda'];
 			$data = $this->ChargingBusiness->getAreaAgrupatedReport($filter);
 			$this->loadReport('AreaAgrupatedCharge', 'Report');
 			$this->Report->setParameters(

@@ -954,7 +954,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			'dato' => 'valor_cobrado',
 			'vista' => 'area_asunto-id_cobro-glosa_asunto',
 			'prop' => 'estandar',
-			'id_moneda' => 1
+			'id_moneda' => $filters['id_moneda']
 		);
 
 		$reporte->setFiltros($filtros);
