@@ -2,7 +2,7 @@
 
 ## Hotfix 16.0.2
 Tuesday, January 12th
-* **Fix** [Refactor de reporte cobros por área](https://github.com/LemontechSA/ttb/pull/1296)
+* **Fix** [Refactor de reporte cobros por área](https://github.com/LemontechSA/ttb/pull/1297)
 
 ## Hotfix 16.0.1
 Friday, January 8th
