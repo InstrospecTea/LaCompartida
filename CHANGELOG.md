@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 16.0.3
+Tuesday, January 12th
+* **Fix** [Condición para Boletas Exentas](https://github.com/LemontechSA/ttb/pull/1298)
+
+## Hotfix 16.0.2
+Tuesday, January 12th
+* **Fix** [Refactor de reporte cobros por área](https://github.com/LemontechSA/ttb/pull/1297)
+
 ## Hotfix 16.0.1
 Friday, January 8th
 * **Feature** [Solo desplegar las actividades que están activas](https://github.com/LemontechSA/ttb/pull/1295)
