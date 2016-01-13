@@ -150,8 +150,6 @@
 	}
 	elseif($opc=='excel_cuenta_corriente_cliente')
 	{
-		require_once 'Spreadsheet/Excel/Writer.php';
-
 		$query_todas_monedas = 'SELECT id_moneda, simbolo, cifras_decimales, tipo_cambio
 				FROM prm_moneda
 				ORDER BY id_moneda';
@@ -353,8 +351,6 @@
 	}
 	elseif($opc=='excel_todos')
 	{
-		require_once 'Spreadsheet/Excel/Writer.php';
-
 		$query_todas_monedas = 'SELECT id_moneda, simbolo, cifras_decimales, tipo_cambio
 				FROM prm_moneda
 				ORDER BY id_moneda';

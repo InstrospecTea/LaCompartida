@@ -2,17 +2,6 @@
 	ini_set('max_execution_time', 300);
 
 	require_once dirname(__FILE__).'/../conf.php';
-    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-    require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-    require_once Conf::ServerDir().'/../fw/classes/Html.php';
-    require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-    require_once Conf::ServerDir().'/../app/classes/Debug.php';
-    require_once Conf::ServerDir().'/../app/classes/Cliente.php';
-    require_once Conf::ServerDir().'/../app/classes/InputId.php';
-    require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
-    require_once Conf::ServerDir().'/classes/Funciones.php';
-    require_once 'Spreadsheet/Excel/Writer.php';
 
     $sesion = new Sesion( array('REV','ADM') );
 

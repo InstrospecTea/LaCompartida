@@ -2,8 +2,6 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
-require_once 'Spreadsheet/Excel/Writer.php';
-
 $sesion = new Sesion(array('OFI', 'COB'));
 $pagina = new Pagina($sesion);
 $gasto =new Gasto($sesion);
@@ -176,13 +174,13 @@ if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable') || UtilesApp::GetConf($sesio
 }
 
 if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
-    $col_select .= ", cobro.estado as estado_cobro, 
-					
-					( SELECT SUM(subtotal_gastos * cmf.tipo_cambio / cmb.tipo_cambio ) + SUM(subtotal_gastos_sin_impuesto * cmf.tipo_cambio / cmb.tipo_cambio) as stgastosfactura 
-						FROM factura 
+    $col_select .= ", cobro.estado as estado_cobro,
+
+					( SELECT SUM(subtotal_gastos * cmf.tipo_cambio / cmb.tipo_cambio ) + SUM(subtotal_gastos_sin_impuesto * cmf.tipo_cambio / cmb.tipo_cambio) as stgastosfactura
+						FROM factura
 							JOIN cobro_moneda cmf ON (factura.id_cobro = cmf.id_cobro AND factura.id_moneda = cmf.id_moneda )
 							JOIN cobro_moneda cmb ON (factura.id_cobro = cmb.id_cobro AND cmb.id_moneda = {$moneda_base['id_moneda']} )
-						WHERE factura.id_cobro = cta_corriente.id_cobro AND cta_corriente.id_cobro IS NOT NULL AND ( factura.estado != 'ANULADA' OR factura.id_estado = 1 ) 
+						WHERE factura.id_cobro = cta_corriente.id_cobro AND cta_corriente.id_cobro IS NOT NULL AND ( factura.estado != 'ANULADA' OR factura.id_estado = 1 )
 	) as acumulado_factura";
     $join_extra .= "LEFT JOIN cobro_moneda as moneda_gastos_segun_cobro ON moneda_gastos_segun_cobro.id_cobro = cobro.id_cobro AND moneda_gastos_segun_cobro.id_moneda = cta_corriente.id_moneda ";
     $orden .= ", cta_corriente.id_cobro ASC ";
@@ -193,7 +191,7 @@ if ($flag_sin_orden_previo) {
 }
 $query=$gasto->SearchQuery($sesion, $where.'  ORDER BY '.$orden,  $col_select,$join_extra);
 
- 
+
  if($_GET['query']=='query') die($query);
  $gastos=$sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
@@ -226,10 +224,10 @@ if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
 
 foreach($gastos as $gasto) {
      $columna_actual = 0;
-     //echo '<pre><h2>'.$nombre_cliente_anterior.'</h2>';print_r($gasto);echo '</pre>'; 
-    
+     //echo '<pre><h2>'.$nombre_cliente_anterior.'</h2>';print_r($gasto);echo '</pre>';
 
- 
+
+
     if (UtilesApp::GetConf($sesion, 'MostrarMontosPorCobrar')) {
 	$gastos_por_cobrar = $gasto['estado_cobro']=='PAGADO'? 0 : $gasto['ingresooegreso'] == 'egreso' ? $gasto['monto_cobrable_moneda_base'] : (-1 * $gasto['monto_cobrable_moneda_base'] );
     }
@@ -249,7 +247,7 @@ foreach($gastos as $gasto) {
 			$total_balance_ingreso_cobrable +=($gasto['monto_cobrable_moneda_base']);
 		}
     }
-    
+
     if ($codigo_cliente_anterior == $gasto['codigo_cliente']) {
 		if ($gasto['ingresooegreso'] == 'egreso') {
 			$egreso += (double) ($gasto['egreso'] * $gasto['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio']);
@@ -290,8 +288,8 @@ foreach($gastos as $gasto) {
 	}
 
 			/*
-			 * esto va afuera, por que si el ultimo gasto para el cobro revisado es "no cobrable", 
-			 * omitiría descontar los gastos de facturas con pago parcial o facturadas 			 * 
+			 * esto va afuera, por que si el ultimo gasto para el cobro revisado es "no cobrable",
+			 * omitiría descontar los gastos de facturas con pago parcial o facturadas 			 *
 			 */
 			if ($gasto['id_cobro'] != $id_cobro_anterior && $gasto['estado_cobro']!='PAGADO') {
 			    $total_gastos_por_cobrar_cliente -= ( $acumulado_factura_cobro_anterior );
@@ -310,7 +308,7 @@ foreach($gastos as $gasto) {
 	    if ($gasto['esCobrable'] == 'No') {
 			if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
 			    $ws1->writeNumber($filas, $columna_egreso_cobrable, 0, $formato_moneda);
- 
+
 			    $ws1->writeNumber($filas, $columna_ingreso_cobrable, 0, $formato_moneda);
 			}
 
@@ -318,9 +316,9 @@ foreach($gastos as $gasto) {
 	    } else {
 			if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
 			    $ws1->writeNumber($filas, $columna_egreso_cobrable, $egreso_cobrable, $formato_moneda);
-	 
+
 			    $ws1->writeNumber($filas, $columna_ingreso_cobrable, $ingreso_cobrable, $formato_moneda);
-	 
+
 			    $ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_cobrable_para_formula" . ($filas + 1) . " - $col_egreso_cobrable_para_formula" . ($filas + 1), $formato_moneda);
 			} else {
 			    $ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_para_formula" . ($filas + 1) . " - $col_egreso_para_formula" . ($filas + 1), $formato_moneda);
@@ -330,9 +328,9 @@ foreach($gastos as $gasto) {
 	} else {
 		    if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
 				$ws1->writeNumber($filas, $columna_egreso_cobrable, $egreso_cobrable, $formato_moneda);
-		 
+
 				$ws1->writeNumber($filas, $columna_ingreso_cobrable, $ingreso_cobrable, $formato_moneda);
-		 
+
 				$ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_cobrable_para_formula" . ($filas + 1) . " - $col_egreso_cobrable_para_formula" . ($filas + 1), $formato_moneda);
 
 		    } else {
@@ -356,7 +354,7 @@ foreach($gastos as $gasto) {
 
 	$filas++;
 
-	
+
 
 	if ($gasto['ingresooegreso'] == 'egreso') {
 	    $egreso = (double) ($gasto['egreso'] * $gasto['tipo_cambio_segun_cobro'] / $moneda_base['tipo_cambio']);
@@ -375,7 +373,7 @@ foreach($gastos as $gasto) {
 	    if ($gasto['esCobrable'] == 'Si') {
 			if ($gasto['estado_cobro'] == ''
 				|| $gasto['estado_cobro'] == 'CREADO'
-				|| $gasto['estado_cobro'] == 'EN REVISION' 
+				|| $gasto['estado_cobro'] == 'EN REVISION'
 			  	|| $gasto['estado_cobro'] == 'EMITIDO'
 				|| $gasto['estado_cobro'] == 'FACTURADO'
 				|| $gasto['estado_cobro'] == 'ENVIADO AL CLIENTE'
@@ -401,7 +399,7 @@ foreach($gastos as $gasto) {
 //para que descuente facturas para el ultimo cobro (si es que tiene asociadas )
 $total_gastos_por_cobrar_cliente -= ( $acumulado_factura_cobro_anterior );
 $total_gastos_por_cobrar -= ( $acumulado_factura_cobro_anterior );
-//echo $query; exit; 
+//echo $query; exit;
 
 $columna_actual = 0;
 $ws1->write($filas, $columna_cliente, $nombre_cliente_anterior, $formato_normal);
@@ -418,7 +416,7 @@ if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
 
 
     if (UtilesApp::GetConf($sesion, 'UsaMontoCobrable')) {
-	
+
 				$ws1->writeFormula($filas, $columna_balance, "=$col_ingreso_cobrable_para_formula" . ($filas + 1) . " - $col_egreso_cobrable_para_formula" . ($filas + 1), $formato_moneda);
 
 		    } else {
@@ -466,4 +464,4 @@ $ws1->writeFormula(5, 2, "=$col_balance_para_formula" . ($filas + 1), $formato_m
 $wb->send('Planilla_gastos.xls');
 $wb->close();
 exit;
- 
+

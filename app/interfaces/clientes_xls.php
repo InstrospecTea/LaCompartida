@@ -1,18 +1,7 @@
 <?php
 	ini_set('max_execution_time', 300);
-	
+
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir().'/../app/classes/Cliente.php';
-	require_once Conf::ServerDir().'/../app/classes/InputId.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
-	require_once Conf::ServerDir().'/classes/Funciones.php';
-	require_once 'Spreadsheet/Excel/Writer.php';
 
 	$sesion = new Sesion( array('REV','ADM') );
 
@@ -56,9 +45,9 @@
 															'Border' => 1,
 															'Color' => 'black'));
 	$f4->setNumFormat("0");
-	
+
 		$formatos_moneda = array();
-		$query = 'SELECT id_moneda, simbolo, cifras_decimales 
+		$query = 'SELECT id_moneda, simbolo, cifras_decimales
 				FROM prm_moneda
 				ORDER BY id_moneda';
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -78,14 +67,14 @@
 																'Color' => 'black',
 																'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
 		}
-		
+
 	$time_format =& $wb->addFormat(array('Size' => 10,
 															'VAlign' => 'top',
 															'Align' => 'justify',
 															'Border' => 1,
 															'Color' => 'black'));
 	$time_format->setNumFormat('[h]:mm');
-	
+
 	$total =& $wb->addFormat(array('Size' => 10,
 																'Align' => 'right',
 																'Bold' => '1',
@@ -128,10 +117,10 @@ $col=0;
 	}
  	$col_fecha_creacion = $col++;
 	$col_fecha_inactivo = $col++;
-	
+
 	// Nueva columna estado del cliente
 	$col_estado = $col++;
-	
+
 	// se setea el ancho de las columnas
 	$columna=0;
 	$ws1->setColumn( $col_codigo, $col_codigo,  8.00);
@@ -164,8 +153,8 @@ $col=0;
 
 	$ws1->write(0, 0, 'LISTADO DE CLIENTES', $encabezado);
 			$ws1->mergeCells (0, 0, 0, 8);
-			
-	/* Filtro si es grupo */        
+
+	/* Filtro si es grupo */
 	if($id_grupo_cliente > 0)
 	{
 		$ws1->write(2, 0, __('Grupo').': '.Utiles::Glosa( $sesion, $id_grupo_cliente, 'glosa_grupo_cliente', 'grupo_cliente', 'id_grupo_cliente'), $encabezado);
@@ -189,7 +178,7 @@ $col=0;
 	$ws1->write($fila_inicial, $col_forma_cobro, __('Forma Tarificación'), $tit);
 	$ws1->write($fila_inicial, $col_monto, __('Monto(FF/R/C)'), $tit);
 	$ws1->write($fila_inicial, $col_direccion, __('Dirección'), $tit);
-	$ws1->write($fila_inicial, $col_telefono, __('Teléfono'), $tit);    
+	$ws1->write($fila_inicial, $col_telefono, __('Teléfono'), $tit);
 	$ws1->write($fila_inicial, $col_contacto, __('Nombre Contacto'), $tit);
 	$ws1->write($fila_inicial, $col_fono_contacto, __('Teléfono Contacto'), $tit);
 	$ws1->write($fila_inicial, $col_mail_contacto, __('E-mail Contacto'), $tit);
@@ -199,12 +188,12 @@ $col=0;
 	}
 	$ws1->write($fila_inicial, $col_fecha_creacion, __('Fecha Creación'), $tit);
 	$ws1->write($fila_inicial, $col_fecha_inactivo, __('Fecha Inactivo'), $tit);
-	
+
 	// Nueva columna estado del cliente
 	$ws1->write($fila_inicial, $col_estado, __('Activo'), $tit);
-	
+
 	$fila_inicial++;
-	
+
 	$where = '1';
 	if($glosa_cliente != '')
 	{
@@ -225,38 +214,38 @@ $col=0;
 		$where .= " AND cliente.activo = 1 ";
 
 	$query = "SELECT SQL_CALC_FOUND_ROWS cliente.codigo_cliente,
-								cliente.codigo_cliente_secundario, 
-								cliente.glosa_cliente, 
-								grupo_cliente.glosa_grupo_cliente, 
+								cliente.codigo_cliente_secundario,
+								cliente.glosa_cliente,
+								grupo_cliente.glosa_grupo_cliente,
 								moneda.glosa_moneda,
-								CONCAT(usuario.nombre,' ',usuario.apellido1) as usuario_nombre, 
+								CONCAT(usuario.nombre,' ',usuario.apellido1) as usuario_nombre,
 								usuario.username,
-								CONCAT(usuario_secundario.nombre,' ',usuario_secundario.apellido1) as usuario_secundario_nombre, 
+								CONCAT(usuario_secundario.nombre,' ',usuario_secundario.apellido1) as usuario_secundario_nombre,
 								usuario_secundario.username as username_secundario,
-								contrato.factura_razon_social, 
+								contrato.factura_razon_social,
 								CONCAT(contrato.cod_factura_telefono,' ',contrato.factura_telefono) as telefono,
-								contrato.factura_direccion, 
-								contrato.rut, 
-								CONCAT_WS(' ',contrato.contacto,contrato.apellido_contacto) as contacto, 
-								contrato.fono_contacto, 
-								contrato.email_contacto, 
+								contrato.factura_direccion,
+								contrato.rut,
+								CONCAT_WS(' ',contrato.contacto,contrato.apellido_contacto) as contacto,
+								contrato.fono_contacto,
+								contrato.email_contacto,
 								contrato.direccion_contacto,
 								contrato.forma_cobro,
 								contrato.monto,
-								prm_cliente_referencia.glosa_cliente_referencia, 
+								prm_cliente_referencia.glosa_cliente_referencia,
 								tarifa.glosa_tarifa,
 								contrato.id_moneda_monto,
 								cliente.fecha_creacion,
 								cliente.fecha_inactivo,
 								cliente.activo
-						FROM cliente 
+						FROM cliente
 						LEFT JOIN grupo_cliente USING (id_grupo_cliente)
-						LEFT JOIN prm_cliente_referencia ON cliente.id_cliente_referencia = prm_cliente_referencia.id_cliente_referencia 
-						LEFT JOIN contrato ON cliente.id_contrato = contrato.id_contrato 
-						LEFT JOIN prm_moneda AS moneda ON contrato.id_moneda = moneda.id_moneda 
-						LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario 
-						LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario 
-						LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa 
+						LEFT JOIN prm_cliente_referencia ON cliente.id_cliente_referencia = prm_cliente_referencia.id_cliente_referencia
+						LEFT JOIN contrato ON cliente.id_contrato = contrato.id_contrato
+						LEFT JOIN prm_moneda AS moneda ON contrato.id_moneda = moneda.id_moneda
+						LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
+						LEFT JOIN usuario as usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
+						LEFT JOIN tarifa ON contrato.id_tarifa=tarifa.id_tarifa
 						WHERE $where ORDER BY cliente.glosa_cliente ASC";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	while($row = mysql_fetch_array($resp))
@@ -285,7 +274,7 @@ $col=0;
 		} else {
 			$ws1->write($fila_inicial, $col_codigo_secundario, $row['codigo_cliente_secundario'], $f4);
 		}
-		$ws1->write($fila_inicial, $col_rut, $row['rut'], $f4);            
+		$ws1->write($fila_inicial, $col_rut, $row['rut'], $f4);
 		$ws1->write($fila_inicial, $col_rsocial, $row['factura_razon_social'], $f4);
 		$ws1->write($fila_inicial, $col_tarifa, $row['glosa_tarifa'], $f4);
 		$ws1->write($fila_inicial, $col_moneda, $row['glosa_moneda'], $f4);
@@ -302,10 +291,10 @@ $col=0;
 		}
                 $ws1->write($fila_inicial, $col_fecha_creacion, $row['fecha_creacion'], $f4);
                 $ws1->write($fila_inicial, $col_fecha_inactivo, $row['fecha_inactivo'], $f4);
-		
+
 		// Nueva columna estado del cliente
 		$ws1->write($fila_inicial, $col_estado, ($row['activo'] == 1 ? __('Si') : __('No')), $f4);
-		
+
 		$fila_inicial++;
 	}
 

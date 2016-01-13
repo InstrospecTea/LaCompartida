@@ -1,9 +1,5 @@
 <?php
-
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/Reporte.php';
 
 /*
 	Este archivo debe ser llamado mediante require_once() desde otro archivo (actualmente solo desde app/interfaces/reporte_financiero.php)

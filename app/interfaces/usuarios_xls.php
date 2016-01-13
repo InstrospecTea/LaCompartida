@@ -1,17 +1,6 @@
 <?php
 
 require_once dirname(__FILE__).'/../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-require_once Conf::ServerDir().'/../fw/classes/Html.php';
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
-require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-require_once Conf::ServerDir().'/../app/classes/Cliente.php';
-require_once Conf::ServerDir().'/../app/classes/InputId.php';
-require_once Conf::ServerDir().'/classes/Funciones.php';
-require_once 'Spreadsheet/Excel/Writer.php';
 
 //Parámetros generales para los 2 casos de listas a extraer
 $sesion = new Sesion( array('REV','ADM') );
@@ -76,7 +65,7 @@ if (method_exists('Conf','GetConf')) {
 	$PdfLinea1 = Conf::PdfLinea1();
 	$PdfLinea2 = Conf::PdfLinea2();
 }
-	
+
 $where = 1;
 
 if ($activo == 1 || $_GET['act']==1) {
@@ -85,9 +74,9 @@ if ($activo == 1 || $_GET['act']==1) {
 if( $nombre != "" && $nombre!="undefined") {
 	$where .= " AND (nombre LIKE '%$nombre%' OR apellido1 LIKE '%$nombre%' OR apellido2 LIKE '%$nombre%')";
 }
-  
+
 if(!empty($vacacion)) {
-  	
+
   	$wb->send('Lista_vacaciones_usuarios.xls');
   	$ws1->setColumn( 1, 1, 25.00);
 	$ws1->setColumn( 2, 2, 15.00);
@@ -110,7 +99,7 @@ if(!empty($vacacion)) {
 	} else {
 		$glosa_rut = 'DNI';
 	}
-		
+
 	$ws1->write($fila_inicial, 1, __('Nombre'), $tit);
 	$ws1->write($fila_inicial, 2, __('Iniciales'), $tit);
 	$ws1->write($fila_inicial, 3, __('Fecha inicio'), $tit);
@@ -137,22 +126,22 @@ if(!empty($vacacion)) {
 	} else {
 		$select_fecha2 = " UV.fecha_fin ";
 	}
-	
+
 	$query = "
-		SELECT 
-			u.id_usuario, 
-			CONCAT_WS(' ',u.nombre, u.apellido1, u.apellido2) AS nombre, 
-			CONCAT( SUBSTRING(u.nombre,1,1), SUBSTRING(u.apellido1,1,1), SUBSTRING(u.apellido2,1,1) ) as iniciales, 
-			u.username, 
-			u.rut, 
+		SELECT
+			u.id_usuario,
+			CONCAT_WS(' ',u.nombre, u.apellido1, u.apellido2) AS nombre,
+			CONCAT( SUBSTRING(u.nombre,1,1), SUBSTRING(u.apellido1,1,1), SUBSTRING(u.apellido2,1,1) ) as iniciales,
+			u.username,
+			u.rut,
 			u.dv_rut,
-			$select_fecha1, 
-			$select_fecha2 
+			$select_fecha1,
+			$select_fecha2
 		FROM usuario AS u
 			JOIN usuario_vacacion AS UV on u.id_usuario = UV.id_usuario
 				WHERE $where and u.rut != '99511620' ORDER BY u.id_usuario, nombre";
 
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);	
+	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	while($row = mysql_fetch_assoc($resp)) {
 		$i=0;
 		$CantidadDiasHabiles = UtilesApp::CantidadDiasHabiles($row['fecha_inicio'],$row['fecha_fin']);
@@ -184,13 +173,13 @@ if(!empty($vacacion)) {
 	$ws1->mergeCells (3, 0, 3, 8);
 	$i=0;
 	$fila_inicial = 7;
-		
+
 	if( strtolower(Conf::GetConf($sesion,'NombreIdentificador')) =='rut' ) {
 		$glosa_rut = 'Rut';
 	} else {
 		$glosa_rut = 'DNI';
 	}
-		
+
 	$ws1->write($fila_inicial, 1, __('Usuario'), $tit);
 	$ws1->write($fila_inicial, 2, __('Fecha creación'), $tit);
 	$ws1->write($fila_inicial, 3, __('Fecha modificación'), $tit);
@@ -201,7 +190,7 @@ if(!empty($vacacion)) {
 	$fila_inicial++;
 
 	$query = "
-		SELECT 
+		SELECT
 			u.id_usuario,
 			CONCAT_WS(' ',u.nombre, u.apellido1, u.apellido2) AS nombre,
 			u.rut,
@@ -216,9 +205,9 @@ if(!empty($vacacion)) {
 			JOIN usuario_cambio_historial AS UV on u.id_usuario = UV.id_usuario
 				WHERE $where AND u.rut != '99511620' ORDER BY u.id_usuario, UV.fecha DESC";
 
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);	
+	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	while($row = mysql_fetch_assoc($resp)) {
-		
+
 		$i=0;
 		if( trim($row['nombre_dato']) == 'id_categoria_usuario' ) {
 			$nombre_dato  = "Categoría";
@@ -255,7 +244,7 @@ if(!empty($vacacion)) {
 			$glosa_actual = (!empty($row['valor_actual'])) ? 'visible' : 'invisible';
 			$glosa_origen = (!empty($row['valor_original'])) ? 'visible' : 'invisible';
 		} else {
-				
+
 			switch( $row['nombre_dato'] ) {
 				case 'dir_comuna' : $nombre_dato = "Comuna";
 				case 'id_area_usuario' : $nombre_dato = "Area";
@@ -267,7 +256,7 @@ if(!empty($vacacion)) {
 			$glosa_actual = $row['valor_actual'];
 			$glosa_origen = $row['valor_original'];
 		}
-			
+
 		$ws1->write($fila_inicial, 1, $row[nombre], $f4);
 		$ws1->write($fila_inicial, 2, Utiles::sql2date($row[fecha_creacion]), $f4);
 	    $ws1->write($fila_inicial, 3, Utiles::sql2date($row[fecha]), $f4);
@@ -278,9 +267,9 @@ if(!empty($vacacion)) {
 	    $fila_inicial++;
 
 	}
-	
+
 } else {
-	  
+
 	$wb->send('Lista_Usuarios.xls');
 
 	$f4->setNumFormat("0");
@@ -291,7 +280,7 @@ if(!empty($vacacion)) {
 		'Border' => 1,
 		'Color' => 'black'
 	));
-  
+
 		$time_format->setNumFormat('[h]:mm');
 	$total =& $wb->addFormat(array(
 		'Size' => 10,
@@ -301,12 +290,12 @@ if(!empty($vacacion)) {
 		'Border' => 1,
 		'Color' => 'black'
 	));
-  
+
   	$total->setNumFormat("0");
 	$i=0;
 	$col++;
 	$col_nombre = $col++;
-	
+
 	if (Conf::GetConf($sesion,'MostrarCodigoUsuarioExcel')) {
 		$col_codigo_usuario =  $col++;
 	}
@@ -322,7 +311,7 @@ if(!empty($vacacion)) {
 	$col_restriccion_minima = $col++;
 	$col_restriccion_maxima = $col++;
 	$col_restriccion_mensual = $col++;
- 
+
 	// se setea el ancho de las columnas
 	$ws1->setColumn( $col_nombre, $col_nombre,  25.00);
 
@@ -352,13 +341,13 @@ if(!empty($vacacion)) {
 	$ws1->mergeCells (3, 0, 3, 8);
 	$i=0;
 	$fila_inicial = 7;
-	
+
 	if(strtolower(Conf::GetConf($sesion,'NombreIdentificador')) =='rut') {
 		$glosa_rut = 'Rut';
 	} else {
 		$glosa_rut = 'DNI';
 	}
-	
+
 	$ws1->write($fila_inicial, $col_nombre, __('Nombre'), $tit);
 
 	if (Conf::GetConf($sesion,'MostrarCodigoUsuarioExcel')  ) {
@@ -377,24 +366,24 @@ if(!empty($vacacion)) {
 	$ws1->write($fila_inicial, $col_restriccion_maxima, __('Restriccion maxima semanal'), $tit);
 	$ws1->write($fila_inicial, $col_restriccion_mensual, __('Restriccion mensual'), $tit);
 	$fila_inicial++;
-  
+
 	###################################### SQL ######################################
 	$query = "
-		SELECT 
+		SELECT
 			u.id_usuario,
 			CONCAT_WS(' ',u.nombre, u.apellido1, u.apellido2) AS nombre,
 			u.username,
-			cu.glosa_categoria, 
-			u.email, 
-			u.restriccion_min, 
+			cu.glosa_categoria,
+			u.email,
+			u.restriccion_min,
 			u.restriccion_max,
-			u.retraso_max, 
-			u.restriccion_mensual, 
+			u.retraso_max,
+			u.restriccion_mensual,
 			u.dias_ingreso_trabajo,
-			au.glosa, 
-			u.activo, 
-			u.rut, 
-			u.dv_rut 
+			au.glosa,
+			u.activo,
+			u.rut,
+			u.dv_rut
 		FROM usuario AS u
 			LEFT JOIN prm_categoria_usuario AS cu on u.id_categoria_usuario=cu.id_categoria_usuario
 			LEFT JOIN prm_area_usuario AS au on u.id_area_usuario=au.id
@@ -405,7 +394,7 @@ if(!empty($vacacion)) {
 	while($row = mysql_fetch_array($resp)) {
 		$i=0;
 		$ws1->write($fila_inicial, $col_nombre, $row['nombre'], $f4);
-		
+
 		if (Conf::GetConf($sesion,'MostrarCodigoUsuarioExcel')  ) {
 	   		$ws1->write( $fila_inicial, $col_codigo_usuario, $row['username'], $f4);
 		}
@@ -414,7 +403,7 @@ if(!empty($vacacion)) {
 		$ws1->write($fila_inicial, $col_email, $row['email'], $f4);
 		$rut = $row['rut'] . ($row['dv_rut'] ? '-' . $row['dv_rut'] : '');
 		$ceros_dni = UtilesApp::GetConf($sesion, 'CantidadCerosFormatoDNI');
-		
+
 		if ($ceros_dni) {
 			$rut = str_pad($rut, $ceros_dni , '0', STR_PAD_LEFT);
 		}
@@ -422,7 +411,7 @@ if(!empty($vacacion)) {
 		$ws1->writeString($fila_inicial, $col_rut, $rut, $f4);
 		$ws1->write($fila_inicial, $col_dias_ingreso_trabajo, $row['dias_ingreso_trabajo'], $f4);
 		$ws1->write($fila_inicial, $col_area, $row['glosa'], $f4);
-		
+
 		if($row[activo]==0) {
 			$ws1->write($fila_inicial, $col_activo, 'no', $f4);
 		}
@@ -431,7 +420,7 @@ if(!empty($vacacion)) {
 		}
 
 		$query_revisor = "
-			SELECT 
+			SELECT
 				CONCAT_WS(' ',u.nombre,u.apellido1,u.apellido2) as nombre
 				FROM usuario_revisor AS ur
 					JOIN usuario AS u ON ur.id_revisado=u.id_usuario

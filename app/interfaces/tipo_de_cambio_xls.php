@@ -1,19 +1,5 @@
 <?php
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir().'/../app/classes/Cliente.php';
-	require_once Conf::ServerDir().'/../app/classes/InputId.php';
-	require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-	require_once Conf::ServerDir().'/classes/Funciones.php';
-    require_once Conf::ServerDir().'/classes/Moneda.php';
-	require_once Conf::ServerDir().'/classes/UtilesApp.php';
-	require_once 'Spreadsheet/Excel/Writer.php';
 
 	//Parámetros generales para los 2 casos de listas a extraer
 	$sesion = new Sesion( array('REV','ADM') );
@@ -68,9 +54,9 @@
 		$PdfLinea1 = Conf::PdfLinea1();
 		$PdfLinea2 = Conf::PdfLinea2();
 	}
-	
+
 	$where = 1;
-  
+
 	//Lista de vacaciones
 	if(!empty($tipo_cambio))
 	{
@@ -90,10 +76,10 @@
 		$ws1->mergeCells (3, 0, 3, 8);
 		$i=0;
 		$fila_inicial = 7;
-		
-		$query = "SELECT 
+
+		$query = "SELECT
 						fecha, ";
-						/*,    
+						/*,
 						SUM( CASE id_moneda WHEN '2' THEN valor ELSE 0 END ),
 						SUM( CASE id_moneda WHEN '3' THEN valor ELSE 0 END ),
 						SUM( CASE id_moneda WHEN '4' THEN valor ELSE 0 END ),
@@ -103,7 +89,7 @@
 					GROUP BY fecha;";*/
 		$ws1->write($fila_inicial, 1, __('Fecha'), $tit);
 		$num_monedas_tmp = 0;
-		$lista = new ListaMonedas($sesion,"","SELECT * FROM prm_moneda");		
+		$lista = new ListaMonedas($sesion,"","SELECT * FROM prm_moneda");
 		$moneda = new Moneda($sesion);
 		$num_monedas_tmp = $lista->num;
 	    for($x=0;$x<$lista->num;$x++)
@@ -118,34 +104,34 @@
 			$ws1->write($fila_inicial, $x+2, $moneda->fields['glosa_moneda'], $tit);
 			$query .= "SUM( CASE id_moneda WHEN '" . $moneda->fields['id_moneda'] . "' THEN valor ELSE 0 END )";
 		}
-		
+
 
 
 		$fila_inicial++;
 		$where = "";
 		if( $fecha_ini )
 		{
-			$fecha_ini = Utiles::fecha2sql($fecha_ini);			
-			$where .= ( strlen( $where ) > 0 ? " AND " : " WHERE " );			
+			$fecha_ini = Utiles::fecha2sql($fecha_ini);
+			$where .= ( strlen( $where ) > 0 ? " AND " : " WHERE " );
 			$where .= " DATE_FORMAT(fecha, '%Y-%m-%d') >= '$fecha_ini' ";
 		}
-		
+
 		if( $fecha_fin )
 		{
-			$fecha_fin = Utiles::fecha2sql($fecha_fin);			
-			$where .= ( strlen( $where ) > 0 ? " AND " : " WHERE " );			
+			$fecha_fin = Utiles::fecha2sql($fecha_fin);
+			$where .= ( strlen( $where ) > 0 ? " AND " : " WHERE " );
 			$where .= " DATE_FORMAT(fecha, '%Y-%m-%d') <= '$fecha_fin' ";
 		}
-		
+
 		$query .= "FROM moneda_historial" . $where . "
 			GROUP BY fecha;";
-		
+
 		$fecha_formato = UtilesApp::ObtenerFormatoFecha($sesion);
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);	
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 		while($row = mysql_fetch_array($resp))
 		{
 			$i=0;
-			
+
 			$ws1->write($fila_inicial, 1, Utiles::sql2date($row[0], $fecha_formato, "-"), $f5);
 			for( $cm= 1; $cm <= $num_monedas_tmp; $cm++)
 			{

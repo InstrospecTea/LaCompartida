@@ -1,6 +1,4 @@
 <?php
-
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../classes/Utiles.php';
 require_once dirname(__FILE__) . '/../classes/Html.php';
 require_once dirname(__FILE__) . '/../classes/Lista.php';
@@ -35,11 +33,11 @@ class BuscadorExcel {
 	var $fila = 0;
 	var $estilo_encabezado;
 	var $estilo_titulo;
-	
+
 	var $agrupador;
 	var $grupos;
 	var $no_agrupar;
-	
+
 	var $primer_fila_lista;
 	var $ultima_fila_lista;
 
@@ -131,7 +129,7 @@ class BuscadorExcel {
 		global $sesion;
 		static $cont;
 		$cont++;
-		
+
 //		if (!empty($this->agrupador)) {
 //			$this->grupos[$fields[$this->agrupador]]++;
 //		}
@@ -211,7 +209,7 @@ class BuscadorExcel {
 		if (!empty($this->agrupador)) {
 			$this->Agrupar();
 		}
-		
+
 		$this->excel->close();
 	}
 
@@ -254,10 +252,10 @@ class BuscadorExcel {
 	}
 
 	function Agrupar() {
-		
+
 //		unset($this->fila);
 		$this->grupos = array();
-		
+
 		for ($i = 0; $i < $this->lista->num; $i++) {
 			$row = $this->lista->Get($i);
 			if (!array_key_exists($row->fields[$this->agrupador], $this->grupos)) {
@@ -265,7 +263,7 @@ class BuscadorExcel {
 			}
 			$this->grupos[$row->fields[$this->agrupador]]++;
 		}
-		
+
 		$this->col = 0;
 		foreach ($this->encabezados as $campo => $valor) {
 			$fila = $this->primer_fila_lista - 1;
@@ -281,7 +279,7 @@ class BuscadorExcel {
 		}
 		$this->col = 0;
 	}
-	
+
 	function AgregarAgrupador($campo, $no_agrupar) {
 		$this->agrupador = $campo;
 		$this->no_agrupar = $no_agrupar;

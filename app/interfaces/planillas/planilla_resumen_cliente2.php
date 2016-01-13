@@ -1,11 +1,5 @@
 <?php
-   require_once 'Spreadsheet/Excel/Writer.php';
     require_once dirname(__FILE__).'/../../conf.php';
-    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-    require_once Conf::ServerDir().'/../app/classes/Debug.php';
-		require_once Conf::ServerDir().'/classes/Cobro.php';
 
     $sesion = new Sesion( array('REP') );
 

@@ -1,10 +1,5 @@
 <?php
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__).'/../../conf.php';
-require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 $sesion = new Sesion( array('REP') );
 $pagina = new Pagina( $sesion );
@@ -25,8 +20,8 @@ $id_moneda_seleccionada = $moneda_mostrar;
 
 
 $query = "
-	SELECT 
-		trabajo.id_usuario, 
+	SELECT
+		trabajo.id_usuario,
 		cliente.codigo_cliente 'cliente',
 		SUM(TIME_TO_SEC( $horas )) 'duracion',
 		glosa_grupo_cliente,
@@ -41,7 +36,7 @@ $query = "
 		LEFT JOIN cliente ON asunto.codigo_cliente = cliente.codigo_cliente
 		LEFT JOIN contrato ON contrato.id_contrato = cliente.id_contrato
 		LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
-		
+
 		LEFT JOIN usuario_tarifa as usuario_tarifa_contrato ON trabajo.id_usuario = usuario_tarifa_contrato.id_usuario
 			AND usuario_tarifa_contrato.id_moneda = contrato.id_moneda AND contrato.id_tarifa = usuario_tarifa_contrato.id_tarifa
 
@@ -53,7 +48,7 @@ $query = "
 			ORDER BY grupo_cliente.glosa_grupo_cliente,usuario.id_categoria_usuario";
 
 
-							
+
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
 
@@ -154,7 +149,7 @@ $formato_tiempo_total =& $wb->addFormat(array(
 	'Color' => 'black',
 	'NumFormat' => '[h]:mm')
 );
-	
+
 $cifras_decimales = Utiles::glosa($sesion, $moneda_mostrar, 'cifras_decimales', 'prm_moneda', 'id_moneda');
 $simbolo_moneda = Utiles::glosa($sesion, $moneda_mostrar, 'simbolo', 'prm_moneda', 'id_moneda');
 
@@ -166,7 +161,7 @@ if($cifras_decimales>0) {
 } else {
 	$decimales = '';
 }
-		
+
 $formato_moneda =& $wb->addFormat(array(
 	'Size' => 11,
 	'VAlign' => 'top',
@@ -213,14 +208,14 @@ $ws1->write($fila_inicial, $columna_inicial-1, __('Grupo'), $formato_titulo);
 $ws1->write($fila_inicial, $columna_inicial, __('Cliente'), $formato_titulo);
 
 for($i = 0; $i < count($usuarios); $i++) {
-	
+
 	for($j = 0; $j < count($clientes); $j++) {
-		
+
 		//	usuarios
 		if($j == 0) {
 			$ws1->write($fila_inicial, $columna_inicial + 1 + $i, Utiles::Glosa($sesion, $usuarios[$i], $dato_usuario, "usuario"), $formato_titulo);
 		}
-	
+
 		if($i == 0) {
 			$ws1->write($fila_inicial+1+$j, $columna_inicial , Utiles::Glosa($sesion, $clientes[$j], "glosa_cliente", "cliente", "codigo_cliente"), $formato_texto);
 			$ws1->write($fila_inicial+1+$j, $columna_inicial -1 , $grupos[$clientes[$j]], $formato_texto);
@@ -235,10 +230,10 @@ for($i = 0; $i < count($usuarios); $i++) {
 		}
 	}
 }
-	
+
 $ws1->setColumn(0, 1, 20);
 $ws1->setColumn(2, 2 + count($usuarios), 12);
-	
+
 $columna_final = $columna_inicial + $i + 1;
 $ws1->setColumn($columna_final, $columna_final+2, 18);
 $fila_final = $fila_inicial + $j + 1;

@@ -1,15 +1,5 @@
 <?php
 	require_once dirname(__FILE__).'/../conf.php';
-    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-    require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-    require_once Conf::ServerDir().'/../fw/classes/Lista.php';
-    require_once Conf::ServerDir().'/../app/classes/Debug.php';
-    require_once Conf::ServerDir().'/../app/classes/Moneda.php';
-    require_once Conf::ServerDir().'/../app/classes/Gasto.php';
-    require_once Conf::ServerDir().'/classes/Funciones.php';
-    require_once Conf::ServerDir().'/classes/UtilesApp.php';
-    require_once 'Spreadsheet/Excel/Writer.php';
 
     $sesion = new Sesion( array('OFI','COB') );
 
