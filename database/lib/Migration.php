@@ -183,14 +183,40 @@ class Migration {
 		return !empty($files) ? $files[0] : '';
 	}
 
+	public function getFilesRollbackMigration($batch) {
+		$files = array();
+		$migrations = $this->getResultsQuery("SELECT `migration` FROM `migrations` WHERE `batch` = '{$batch}'");
+		if (!empty($migrations)) {
+			foreach ($migrations as $file) {
+				$files[] = $file['migration'];
+			}
+		}
+		return $files;
+	}
+
 	public function registerMigration($file_name, $batch) {
 		$this->executeQuery("INSERT INTO `migrations` SET `migration` = '{$file_name}', `batch` = '{$batch}'");
 	}
 
+	public function registerRollback($file_name) {
+		$this->executeQuery("DELETE FROM `migrations` WHERE `migration` = '{$file_name}'");
+	}
+
+	private function getMaxBatchNumber() {
+		$max_batch = 0;
+		$migration = $this->getResultsQuery('SELECT MAX(`batch`) AS max_batch FROM `migrations`');
+		if (!empty($migration)) {
+			$max_batch = (int) $migration[0]['max_batch'];
+		}
+		return $max_batch;
+	}
+
 	public function getNextBatchNumber() {
-		$migrations = $this->getResultsQuery('SELECT MAX(`batch`) AS max_batch FROM `migrations`');
-		$netx_batch = (int) $migrations[0]['max_batch'] + 1;
-		return $netx_batch;
+		return $this->getMaxBatchNumber() + 1;
+	}
+
+	public function getLastBatchNumber() {
+		return $this->getMaxBatchNumber();
 	}
 
 	public function getLastVersionOnDatabase() {

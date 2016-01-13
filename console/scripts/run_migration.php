@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Create Migration
- * console/console CreateMigration --data='{"description":"migration for migration"}'
+ * Run Migration
+ * console/console run_migration [--debug]
  */
 class RunMigration extends AppShell {
 
@@ -11,18 +11,18 @@ class RunMigration extends AppShell {
 	public function __construct() {
 		parent::__construct();
 		$this->Migration = new \Database\Migration();
+
+		if (!$this->Migration->schemaExists()) {
+			$this->out('Creating migration schema');
+			$this->Migration->createSchema();
+		}
 	}
 
 	public function main() {
 		$this->debug('Start Run Migration');
 
-		if (!$this->Migration->schemaExists()) {
-			$this->out("Creating migration schema");
-			$this->Migration->createSchema();
-		}
-
 		$files = $this->Migration->getFilesMigration();
-		$batch = $this->Migration->getNextBatchNumber();
+		$next_batch = $this->Migration->getNextBatchNumber();
 
 		if (!empty($files)) {
 			foreach ($files as $file_name) {
@@ -37,7 +37,7 @@ class RunMigration extends AppShell {
 					$CustomMigration->up();
 					$CustomMigration->runUp();
 
-					$this->Migration->registerMigration($file_name, $batch);
+					$this->Migration->registerMigration($file_name, $next_batch);
 				}
 			}
 		}
