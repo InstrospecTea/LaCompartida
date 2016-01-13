@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.4
+Wednesday, January 13th
+* **Fix** [hard-code al parámetro include en API/activities](https://github.com/LemontechSA/ttb/pull/1299)
+
 ## Hotfix 16.0.3
 Tuesday, January 12th
 * **Fix** [Condición para Boletas Exentas](https://github.com/LemontechSA/ttb/pull/1298)
