@@ -17,10 +17,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	 */
 	public function delete($id_cobro) {
 		$this->loadService('Charge');
+
 		$charge = $this->ChargeService->get($id_cobro);
 		if (!$charge->isLoaded()) {
 			throw new Exception(__('El cobro Nº') . $id_cobro . __(' no existe.'));
 		}
+
 		if ($charge->get('estado') != 'CREADO') {
 			throw new Exception(__('El cobro Nº') . $id_cobro . __(' no se puede borrar porque tiene un estado distinto a CREADO.'));
 		}
@@ -43,6 +45,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 
 		mysql_query('BEGIN', $this->sesion->dbh);
+
 		try {
 			//Elimina el gasto generado y la provision generada, SOLO si la provision no ha sido incluida en otro cobro:
 			if ($this->fields['id_provision_generada']) {
@@ -63,21 +66,21 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 			$this->overrideDocument();
 
-			$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro= 'NULL', monto_cobrado='NULL' WHERE id_cobro = '$id_cobro'";
+			$this->detachAllWorks($id_cobro);
+
+			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = '{$id_cobro}'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-			$query = "UPDATE tramite SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
+			$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = '{$id_cobro}'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
-			$query = "UPDATE cobro_pendiente SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
-			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-			$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = '$id_cobro'";
+			$query = "UPDATE cta_corriente SET id_cobro = NULL WHERE id_cobro = '{$id_cobro}'";
 			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 			$CobroAsunto = new CobroAsunto($this->sesion);
 			$CobroAsunto->eliminarAsuntos($id_cobro);
 			$this->ChargeService->delete($charge);
+
 			mysql_query('COMMIT', $this->sesion->dbh);
 		} catch (Exception $e) {
 			mysql_query('ROLLBACK', $this->sesion->dbh);
@@ -85,6 +88,29 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 	}
 
+	/**
+	 * Desvincula los trabajos asociados a un cobro, eliminando el cobro asociado y reestableciendo su moneda original
+	 * @param  int $charge_id identificador del cobro
+	 * @return void
+	 */
+	public function detachAllWorks($charge_id) {
+		$this->loadService('Charge');
+
+		try {
+			$charge = $this->ChargeService->getWithRelations($charge_id);
+
+			if (empty($charge->relations['Agreement'])) {
+				throw new Exception(__('El cobro Nº') . $id_cobro . __(' no se puede borrar por no tener un contrato asociado.'));
+			}
+
+			$id_moneda_original = $charge->relations['Agreement']->fields['id_moneda'];
+
+			$query = "UPDATE trabajo SET id_cobro = NULL, fecha_cobro = NULL, monto_cobrado = NULL, id_moneda = {$id_moneda_original} WHERE id_cobro = '{$charge_id}'";
+			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+	}
 
 	public function overrideDocument($id_cobro = null, $estado = 'CREADO', $hay_pagos = false) {
 		$this->loadModel('Documento');
@@ -192,9 +218,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$charge = $this->ChargeService->get($charge_id);
 		$total_currency_id = $charge->get('opc_moneda_total');
 		foreach ($slidingScales as $scale) {
-			$detail['datos_escalonadas'][$scale->fields['order_number']]= array(
+			$detail['datos_escalonadas'][$scale->fields['order_number']] = array(
 				'monto' => $scale->fields['fixedAmount'],
-				'descuento' =>$scale->fields['discountRate'],
+				'descuento' => $scale->fields['discountRate'],
 				'horas' => $scale->fields['hours'],
 				'id_moneda' => $scale->fields['currencyId']
 			);
@@ -911,5 +937,57 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			}
 		}
 		return array('works' => $works, 'scaleAmount' => $scaleAmount, 'scaleWorks' => $scaleWorks);
+	}
+
+	public function getAreaAgrupatedReport($filters) {
+		$reporte = new ReporteCriteria($this->Session);
+
+		$filtros = array(
+			'clientes' => array(),
+			'encargados' => $filters['usuarios'],
+			'fecha_ini' => $filters['desde'],
+			'fecha_fin' => $filters['hasta'],
+			'estado_cobro' => array(
+				$filters['estado']
+			),
+			'campo_fecha' => 'creacion',
+			'dato' => 'valor_cobrado',
+			'vista' => 'area_asunto-id_cobro-glosa_asunto',
+			'prop' => 'estandar',
+			'id_moneda' => $filters['id_moneda']
+		);
+
+		$reporte->setFiltros($filtros);
+		$reporte->Query();
+		$rows = $reporte->row;
+		$result = array();
+		foreach ($rows as $row) {
+			$Criteria = new Criteria($this->Session);
+			$cobro = $Criteria
+				->add_select('cobro.fecha_creacion')
+				->add_select('cliente.glosa_cliente')
+				->add_select('CONCAT(usuario.nombre,\' \', usuario.apellido1)', 'nombre')
+				->add_select('cobro.estado')
+				->add_select('cobro.documento', 'numero')
+				->add_select('cobro.forma_cobro')
+				->add_select('moneda_base.id_moneda', 'id_moneda_base')
+				->add_select('moneda_cobro.simbolo')
+				->add_select('moneda_cobro.id_moneda')
+				->add_from('cobro')
+				->add_left_join_with('cliente', 'cliente.codigo_cliente = cobro.codigo_cliente')
+				->add_left_join_with('cobro_asunto', 'cobro_asunto.id_cobro = cobro.id_cobro')
+				->add_left_join_with('asunto', 'asunto.codigo_asunto = cobro_asunto.codigo_asunto')
+				->add_left_join_with('trabajo', 'trabajo.id_cobro = cobro.id_cobro AND trabajo.codigo_asunto = asunto.codigo_asunto')
+				->add_left_join_with('contrato', 'contrato.id_contrato = cobro.id_contrato')
+				->add_left_join_with('usuario', 'usuario.id_usuario = contrato.id_usuario_responsable')
+				->add_left_join_with(array('prm_moneda', 'moneda_cobro'), 'moneda_cobro.id_moneda = cobro.id_moneda')
+				->add_left_join_with(array('cobro_moneda', 'cobro_moneda_cobro'), 'cobro_moneda_cobro.id_cobro = cobro.id_cobro AND cobro_moneda_cobro.id_moneda = moneda_cobro.id_moneda')
+				->add_left_join_with(array('prm_moneda', 'moneda_base'), 'moneda_base.moneda_base = 1')
+				->add_left_join_with(array('cobro_moneda', 'cobro_moneda_moneda_base'), 'cobro_moneda_moneda_base.id_cobro = cobro.id_cobro AND cobro_moneda_moneda_base.id_moneda = moneda_base.id_moneda')
+				->add_restriction(CriteriaRestriction::equals('cobro.id_cobro', $row['id_cobro']))
+				->run();
+			$result[] = array_merge($row, $cobro[0]);
+		}
+		return $result;
 	}
 }
