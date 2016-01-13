@@ -56,8 +56,9 @@ curl -I "http://localhost/ttb/app/update.php?hash=c85ef9997e6a30032a765a20ee6963
 
 # Instalar wkhtmltopdf
 apt-get update
-apt-get install wkhtmltopdf -y
-ln -s /usr/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
+apt-get install libfontenc1 libxfont1 xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils -y
+cd /tmp ; wget http://download.gna.org/wkhtmltopdf/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-jessie-amd64.deb
+dpkg -i wkhtmltox-0.12.2.1_linux-jessie-amd64.deb
 
 # Corrige config de AWS
 cp /vagrant/ttb/backups/AWSSDKforPHP/config-sample.inc.php /vagrant/ttb/backups/AWSSDKforPHP/config.inc.php

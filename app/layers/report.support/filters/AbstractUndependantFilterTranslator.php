@@ -18,7 +18,7 @@ abstract class AbstractUndependantFilterTranslator extends BaseFilterTranslator 
 		return $this->data;
 	}
 
-	public function addData($data, $criteria) {
+	public function addData($data, Criteria $criteria) {
 		if (is_array($data)) {
 			return $this->addDataFromArray($data, $criteria);
 		} else {
