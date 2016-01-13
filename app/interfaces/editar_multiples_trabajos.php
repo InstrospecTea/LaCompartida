@@ -211,7 +211,7 @@
 				return false;
 			}
 		}
-		return true;
+		sendPost('form_editar_trabajo', 'opcion', 'guardar');
 	}
 
 	function checkBoxValues(form)
@@ -244,6 +244,20 @@
 
 	function CargarActividad() {
 		CargarSelect('<?php echo $campo_asunto ?>', 'codigo_actividad', 'cargar_actividades');
+	}
+
+	function sendPost(form, name, value) {
+		var form = document.getElementById(form);
+
+		var field = document.createElement('input');
+		field.setAttribute('type', 'hidden');
+		field.setAttribute('name', name);
+		field.setAttribute('value', value);
+
+		form.appendChild(field);
+
+		document.body.appendChild(form);
+		form.submit();
 	}
 
 	jQuery(function() {
@@ -316,8 +330,7 @@
 
 		jQuery('#eliminar_btn').on('click', function() {
 			if (confirm("<?php echo __('¿Desea eliminar estos trabajos?'); ?>")) {
-				document.location.href += "&opcion=eliminar"
-				return true;
+				sendPost('form_editar_trabajo', 'opcion', 'eliminar');
 			} else {
 				return false;
 			}
@@ -397,7 +410,6 @@ else
 {
 ?>
 <form id="form_editar_trabajo" name="form_editar_trabajo" method="post" action="<?php echo $_SERVER[PHP_SELF]?>" style="display: inline-block !important;">
-	<input type="hidden" name="opcion" value="guardar" />
 	<input type="hidden" name="popup" value='<?php echo $popup?>' id="popup">
 
 	<?php	if($txt_opcion) {	?>
@@ -499,7 +511,6 @@ else
 		<?php } ?>
 			<tr>
 				<td colspan="4" align="right">
-					<input type="hidden" name="opcion" value="guardar" />
 					<input type="hidden" name="ids" value="<?php echo(''.$ids); ?>" />
 					<?php if($num_trabajos > 0) { ?>
 						<input type="submit" id="eliminar_btn" class="btn" style="background: #ff0000 !important; color:#FFFFFF !important;" value="<?php echo __('Eliminar trabajos') ?>" />
