@@ -93,6 +93,7 @@ class Pagina {
 
     public function PrintBottom($popup = false) {
         echo '<script type="text/javascript"> var intervalo =' . Conf::GetConf($this->sesion, 'Intervalo') . ';</script>';
+        echo '<script type="text/javascript" src="//static.thetimebilling.com/js/WCH.js"></script>';
         if (( method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'UsaDisenoNuevo') ) || ( method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo() )) {
 
             if (!$popup) {
