@@ -206,11 +206,19 @@
 		var codigoAsunto = form.codigo_asunto.value;
 		var asuntoOriginal = valoresDefault.codigo_asunto;
 		if(codigoAsunto && codigoAsunto != asuntoOriginal && hayCobros){
-			var msg = 'Ud. está modificando un trabajo que pertenece a <?php echo __('un cobro'); ?>. Si acepta, el trabajo se podría desvincular de este <?php echo __('cobro'); ?> y vincularse a <?php echo __('un cobro'); ?> pendiente para el nuevo asunto en caso de que exista.';
+			var msg = "Ud. está modificando un trabajo que pertenece a <?php echo __('un cobro'); ?>. Si acepta, el trabajo se podría desvincular de este <?php echo __('cobro'); ?> y vincularse a <?php echo __('un cobro'); ?> pendiente para el nuevo asunto en caso de que exista.";
 			if(!confirm(msg)){
 				return false;
 			}
 		}
+
+		var codigoCliente = form.codigo_cliente.value;
+		if(codigoCliente && (codigoAsunto == null || codigoAsunto == '')) {
+			var msg = "Los <?php echo __('Trabajos'); ?> seleccionados no se pueden asociar a este cliente ya que no cuentan con asuntos activos.";
+			alert(msg);
+			return false;
+		}
+
 		sendPost('form_editar_trabajo', 'opcion', 'guardar');
 	}
 
