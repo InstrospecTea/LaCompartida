@@ -142,9 +142,9 @@
 		$hay_cobros = $hay_cobros || !empty($t->fields['id_cobro']);
 	}
 
-	$estado_indeterminado = false;
+	$cobrable_indeterminado = false;
 	if (!isset($valores_default['cobrable'])) {
-		$estado_indeterminado = true;
+		$cobrable_indeterminado = true;
 	}
 
 	// Título opcion
@@ -249,10 +249,10 @@
 	jQuery(function() {
 		var campo_cliente = '<?php echo $campo_cliente; ?>';
 		var campo_asunto = '<?php echo $campo_asunto; ?>';
-		var estado_indeterminado = '<?php echo $estado_indeterminado; ?>';
+		var cobrable_indeterminado = '<?php echo $cobrable_indeterminado; ?>';
 
 		jQuery(document).ready(function() {
-			if (estado_indeterminado) {
+			if (cobrable_indeterminado) {
 				jQuery("#cobrable").prop("indeterminate", true);
 			}
 
