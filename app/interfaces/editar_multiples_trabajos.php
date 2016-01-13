@@ -305,6 +305,10 @@
 			} else {
 				jQuery('#check_asunto').prop('checked', false);
 			}
+
+			if (!jQuery('#check_cliente').prop('checked')) {
+				CargarActividad();
+			}
 			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
 		});
 
@@ -316,6 +320,10 @@
 				jQuery('#check_cliente').prop('checked', true);
 			} else {
 				jQuery('#check_cliente').prop('checked', false);
+			}
+
+			if (!jQuery('#check_asunto').prop('checked')) {
+				CargarActividad();
 			}
 			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
 		});
