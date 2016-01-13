@@ -15,6 +15,12 @@ class RunMigration extends AppShell {
 
 	public function main() {
 		$this->debug('Start Run Migration');
+
+		if (!$this->Migration->schemaExists()) {
+			$this->out("Creating migration schema");
+			$this->Migration->createSchema();
+		}
+
 		$files = $this->Migration->getFilesMigration();
 		$batch = $this->Migration->getNextBatchNumber();
 
