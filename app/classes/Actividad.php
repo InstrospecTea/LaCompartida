@@ -253,16 +253,23 @@ class Actividad extends Objeto {
 	}
 
 	/**
-	 * Find all activities
+	 * Find all active activities
 	 * Return an array with next elements:
 	 * 	code, name and matter_code
 	 */
-	function findAll() {
+	function findAll($include_all = false) {
 		$activities = array();
+		$where = '';
+
+		// by default only include active activities
+		if (!$include_all) {
+			$where = 'AND `activity`.`activo` = 1';
+		}
 
 		$sql = "SELECT `activity`.`codigo_asunto` AS `matter_code`, `activity`.`codigo_actividad` AS `code`,
 			`activity`.`glosa_actividad` AS `name`
 			FROM `actividad` AS `activity`
+			WHERE 1 {$where}
 			ORDER BY `activity`.`glosa_actividad` ASC";
 
 		$Statement = $this->sesion->pdodbh->prepare($sql);

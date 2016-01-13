@@ -49,4 +49,37 @@ class ReportController extends AbstractController {
 			}
 		}
 	}
+
+	public function areaCharge() {
+		if (!empty($_REQUEST['btn_reporte'])) {
+			$filter = array(
+				'desde' => $_REQUEST['fecha1'],
+				'hasta' => $_REQUEST['fecha2'],
+				'estado' => $_REQUEST['estado'] == 'todos' ? null : $_REQUEST['estado'],
+				'usuarios' => $_REQUEST['usuarios']
+			);
+			$this->loadBusiness('Charging');
+			$this->loadBusiness('Coining');
+			$baseCurrency = $this->CoiningBusiness->getBaseCurrency();
+			$filter['id_moneda'] = $baseCurrency->fields['id_moneda'];
+			$data = $this->ChargingBusiness->getAreaAgrupatedReport($filter);
+			$this->loadReport('AreaAgrupatedCharge', 'Report');
+			$this->Report->setParameters(
+				array(
+					'fechaIni' => $filter['desde'],
+					'fechaFin' => $filter['hasta'],
+					'format' => 'Spreadsheet'
+				)
+			);
+			$this->Report->setData($data);
+			$this->Report->setOutputType('XLS');
+			$this->Report->setConfiguration('sesion', $this->Session);
+			$this->Report->render();
+		}
+		$this->layoutTitle = 'Reporte Cobros por Area';
+		$listaUsuarios = $this->Session->usuario->ListarActivos('', 'PRO');
+		$this->set('listaUsuarios', $listaUsuarios);
+		$this->set('Html', new \TTB\Html());
+		$this->set('Form', new Form($this->Session));
+	}
 }

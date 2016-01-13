@@ -92,7 +92,7 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 													<li><a href='resumen_cliente.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte de Ventas') ?></a></li>
 													<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_facturacion_pendiente.php' style="color:#000;text-decoration: none;"><?php echo __('Horas por facturar') ?></a></li>
 													<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_reporte_hitos.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Hitos') ?></a></li>
-													<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_cobros_por_area.php' style="color:#000;text-decoration: none;"><?php echo __('Cobros por Area') ?></a></li>
+													<li><a href='<?php echo Conf::RootDir() ?>/app/Report/areaCharge' style="color:#000;text-decoration: none;"><?php echo __('Cobros por Area') ?></a></li>
 													<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/reporte_liq_no_facturadas.php' style="color:#000;text-decoration: none;"><?php echo __(__('Cobros') . ' por facturar'); ?></a></li>
 													<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_resumen_cobranza.php' style="color:#000;text-decoration: none;"><?php echo __('Resumen de Liquidaciones') ?></a></li>
 													<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_morosidad.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Morosidad') ?></a></li>
