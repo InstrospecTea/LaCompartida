@@ -597,7 +597,7 @@ if (!class_exists('Cobro')) {
 				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
 					/**
 					 *
-					 * La siguiente quuery obtiene el pago parcial que se ha realizado sobre un cobro, se suman todos los documentos tributarios emitidos
+					 * La siguiente query obtiene el pago parcial que se ha realizado sobre un cobro, se suman todos los documentos tributarios emitidos
 					 * y se les restan las notas de crédito emitias al cobro generando el monto pagado parcial.
 					 *
 					 */
