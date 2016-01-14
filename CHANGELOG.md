@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.6
+Thursday, January 14th
+* **Fix** [Nueva lógica Edición masiva de trabajos](https://github.com/LemontechSA/ttb/pull/1301)
+
 ## Hotfix 16.0.5
 Thursday, January 14th
 * **Fix** [Corrección query monto parcial cobros](https://github.com/LemontechSA/ttb/pull/1300)
