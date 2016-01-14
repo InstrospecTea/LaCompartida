@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.5
+Thursday, January 14th
+* **Fix** [Corrección query monto parcial cobros](https://github.com/LemontechSA/ttb/pull/1300)
+
 ## Hotfix 16.0.4
 Wednesday, January 13th
 * **Fix** [hard-code al parámetro include en API/activities](https://github.com/LemontechSA/ttb/pull/1299)
