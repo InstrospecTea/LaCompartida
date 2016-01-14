@@ -32,7 +32,7 @@ class GraficoDataset {
 	}
 
 	/**
-	 * Añade un FilColor al GraficoDataset.
+	 * Añade un FillColor al GraficoDataset.
 	 * @param int $r
 	 * @param int $g
 	 * @param int $b
@@ -122,9 +122,9 @@ class GraficoDataset {
 	 * @return boolean
 	 */
 	private function validarRGBA($r, $g, $b, $a) {
-		if ((is_int($r) AND $r <= 255) AND
-				(is_int($g) AND $g <= 255) AND
-				(is_int($b) AND $b <= 255) AND is_numeric($a)) {
+		if ((is_int($r) && $r <= 255) &&
+				(is_int($g) && $g <= 255) &&
+				(is_int($b) && $b <= 255) && is_numeric($a)) {
 			return true;
 		} else {
 			return false;

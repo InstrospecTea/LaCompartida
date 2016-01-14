@@ -21,7 +21,7 @@ class GraficoData {
 	 * @return GraficoData
 	 */
 	public function addValue($value) {
-		if (!empty($value) AND is_numeric($value)) {
+		if (!empty($value) && is_numeric($value)) {
 			$this->value = $value;
 			return $this;
 		} else {
@@ -87,9 +87,9 @@ class GraficoData {
 	 * @return boolean
 	 */
 	private function validarRGB($r, $g, $b) {
-		if ((is_int($r) AND $r <= 255) AND
-				(is_int($g) AND $g <= 255) AND
-				(is_int($b) AND $b <= 255)) {
+		if ((is_int($r) && $r <= 255) &&
+				(is_int($g) && $g <= 255) &&
+				(is_int($b) && $b <= 255)) {
 			return true;
 		} else {
 			return false;
