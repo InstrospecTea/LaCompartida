@@ -273,6 +273,10 @@
 		var campo_asunto = '<?php echo $campo_asunto; ?>';
 		var cobrable_indeterminado = '<?php echo $cobrable_indeterminado; ?>';
 
+		var codigo_cliente_default = "<?php echo $valores_default[$campo_cliente]; ?>";
+		var codigo_asunto_default = "<?php echo $valores_default[$campo_cliente]; ?>";
+		var glosa_asunto_default = jQuery('#glosa_asunto').val();
+
 		jQuery(document).ready(function() {
 			if (cobrable_indeterminado) {
 				jQuery("#cobrable").prop("indeterminate", true);
@@ -307,7 +311,7 @@
 			}
 
 			if (!jQuery('#check_cliente').prop('checked')) {
-				CargarActividad();
+				setDefaults();
 			}
 			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
 		});
@@ -323,7 +327,7 @@
 			}
 
 			if (!jQuery('#check_asunto').prop('checked')) {
-				CargarActividad();
+				setDefaults();
 			}
 			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
 		});
@@ -355,6 +359,16 @@
 		jQuery('#cobrable').on('click', function() {
 			checkVisible();
 		});
+
+		//se asignan los valores por defecto del Cliente y el Asunto
+		function setDefaults() {
+			jQuery('#codigo_cliente').val(codigo_cliente_default);
+			jQuery('#codigo_asunto').val(codigo_asunto_default);
+			jQuery('#glosa_asunto').val(glosa_asunto_default);
+			CargarActividad();
+			jQuery('#campo_codigo_actividad').val('');
+			jQuery('#codigo_actividad').val(0);
+		}
 
 		//solo se puede modificar el campo visible si no es cobrable
 		function checkVisible() {
