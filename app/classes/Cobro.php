@@ -593,30 +593,37 @@ if (!class_exists('Cobro')) {
 				}
 
 				// Tomar suma de todos los pagos aplicados a facturas
+				$criteria = new Criteria($this->sesion);
 				if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
-					$query = "SELECT ROUND(SUM(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio),m_cobro.cifras_decimales), SUM(IF(ccfmp.id_factura IS NULL,ROUND(ccfmn.monto*mf.tipo_cambio/mc.tipo_cambio,m_cobro.cifras_decimales),0))
-							FROM cta_cte_fact_mvto_neteo ccfmn
-								JOIN cta_cte_fact_mvto ccfm ON ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto
-								JOIN cta_cte_fact_mvto ccfmp ON ( ccfmn.id_mvto_pago = ccfmp.id_cta_cte_mvto )
-								JOIN factura f ON f.id_factura = ccfm.id_factura
-								JOIN cobro c ON c.id_cobro = f.id_cobro
-								JOIN prm_moneda as m_cobro ON m_cobro.id_moneda = c.opc_moneda_total
-								JOIN cobro_moneda as mf ON mf.id_cobro = f.id_cobro AND mf.id_moneda = f.id_moneda
-								JOIN cobro_moneda as mc ON mc.id_cobro = c.id_cobro AND mc.id_moneda = c.opc_moneda_total
-							WHERE f.id_cobro = '" . $this->fields['id_cobro'] . "'";
-				} else {
-					$query = "SELECT
-							ROUND( SUM( nd.valor_pago_honorarios + nd.valor_pago_gastos ), moneda.cifras_decimales ) AS monto_pagado,
-							ROUND( SUM( nd.valor_pago_honorarios + nd.valor_pago_gastos ), moneda.cifras_decimales ) AS monto_pago_menos_ncs
-						FROM documento
-						INNER JOIN neteo_documento nd ON nd.id_documento_cobro = documento.id_documento
-						INNER JOIN prm_moneda moneda ON moneda.id_moneda = '{$this->fields['opc_moneda_total']}'
-						WHERE documento.id_cobro = '{$this->fields['id_cobro']}' AND documento.tipo_doc = 'N'";
-				}
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-				list($monto_pagado, $monto_pago_menos_ncs) = mysql_fetch_array($resp);
+					/**
+					 *
+					 * La siguiente query obtiene el pago parcial que se ha realizado sobre un cobro, se suman todos los documentos tributarios emitidos
+					 * y se les restan las notas de crédito emitias al cobro generando el monto pagado parcial.
+					 *
+					 */
+					$criteria->add_select('(SUM(CCFMN.monto_pago) - SUM(CCFMNP.monto_pago))', 'monto_pago_parcial')
+										->add_from('cobro C')
+										->add_inner_join_with('factura F', 'F.id_cobro = C.id_cobro')
+										->add_left_join_with('cta_cte_fact_mvto CCFM', 'CCFM.id_factura = F.id_factura')
+										->add_left_join_with('cta_cte_fact_mvto_neteo CCFMN', 'CCFM.id_cta_cte_mvto = CCFMN.id_mvto_deuda')
+										->add_left_join_with('cta_cte_fact_mvto_neteo CCFMNP', 'CCFM.id_cta_cte_mvto = CCFMNP.id_mvto_pago')
+										->add_restriction(CriteriaRestriction::equals('C.id_cobro', $this->fields['id_cobro']));
 
-				if (empty($monto_pago_menos_ncs) || $monto_pago_menos_ncs == 'NULL') {
+					$result = $criteria->run();
+					$monto_pago_parcial = $result[0]['monto_pago_parcial'];
+				} else {
+					$criteria->add_select('ROUND( SUM( nd.valor_pago_honorarios + nd.valor_pago_gastos ), moneda.cifras_decimales )', 'monto_pago_parcial')
+										->add_from('documento')
+										->add_inner_join_with('neteo_documento nd', 'nd.id_documento_cobro = documento.id_documento')
+										->add_inner_join_with('prm_moneda moneda', "moneda.id_moneda = '{$this->fields['opc_moneda_total']}'")
+										->add_restriction(CriteriaRestriction::equals('documento.id_cobro', $this->fields['id_cobro']))
+										->add_restriction(CriteriaRestriction::equals('documento.tipo_doc', "'N'"));
+
+					$result = $criteria->run();
+					$monto_pago_parcial = $result[0]['monto_pago_parcial'];
+				}
+
+				if (empty($monto_pago_parcial) || $monto_pago_parcial == 'NULL') {
 					if ($num_facturas > 0) {
 						if (!empty($this->fields['fecha_enviado_cliente']) &&
 								$this->fields['fecha_enviado_cliente'] != '0000-00-00 00:00:00' &&
@@ -633,14 +640,14 @@ if (!class_exists('Cobro')) {
 						}
 						$this->Edit('fecha_facturacion', '0000-00-00 00:00:00');
 					}
-				} else if (!empty($monto_pago_menos_ncs) && $monto_pago_menos_ncs > 0) {
+				} else if (!empty($monto_pago_parcial) && $monto_pago_parcial > 0) {
 					// Ver si los pagos son por el monto total del cobro
 					$query = "SELECT monto
 							FROM documento
 							WHERE tipo_doc = 'N' AND id_cobro = '" . $this->fields['id_cobro'] . "'";
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					$monto_total = mysql_result($resp, 0, 0);
-					$estado = (round($monto_pagado, 2) < round($monto_total, 2)) ? 'PAGO PARCIAL' : 'PAGADO';
+					$estado = (round($monto_pago_parcial, 2) < round($monto_total, 2)) ? 'PAGO PARCIAL' : 'PAGADO';
 					if ($estado == 'PAGO PARCIAL' && ( empty($this->fields['fecha_pago_parcial']) || $this->fields['fecha_pago_parcial'] == '0000-00-00 00:00:00' )) {
 						$fecha_primer_pago = $this->FechaPrimerPago();
 						$this->Edit('fecha_pago_parcial', $fecha_primer_pago);
