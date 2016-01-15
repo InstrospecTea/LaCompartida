@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.7
+Friday, January 15th
+* **Feature** [Nuevo "activo" filtro para actividades](https://github.com/LemontechSA/ttb/pull/1302)
+
 ## Hotfix 16.0.6
 Thursday, January 14th
 * **Fix** [Nueva lógica Edición masiva de trabajos](https://github.com/LemontechSA/ttb/pull/1301)
