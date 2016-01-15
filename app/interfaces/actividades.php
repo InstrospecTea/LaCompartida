@@ -1,12 +1,11 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
-// var_dump($_POST); exit;
-
 $Sesion = new Sesion(array('DAT'));
 $Pagina = new Pagina($Sesion);
 $Actividad = new Actividad($Sesion);
 $Form = new Form();
+$Html = new \TTB\Html;
 
 switch ($opc) {
 	case 'eliminar':
@@ -80,6 +79,14 @@ echo $Form->hidden('id_actividad');
 			</td>
 		</tr>
 		<tr>
+			<td align="right">
+				<?php echo __('Activo'); ?>
+			</td>
+			<td align="left">
+				<?php echo $Html::SelectSiNo('activo', $_REQUEST['activo']); ?>
+			</td>
+		</tr>
+		<tr>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 		</tr>
@@ -118,6 +125,10 @@ if ($opc == 'buscar' || $opc == 'eliminar') {
 		$Actividad->fields['glosa_asunto'] = $_REQUEST['glosa_asunto'];
 	}
 
+	if (!empty($_REQUEST['activo'])) {
+		$Actividad->fields['activo'] = $_REQUEST['activo'] == 'SI' ? 1 : 0;
+	}
+
 	$x_pag = 25;
 	$b = new Buscador($Sesion, $Actividad->SearchQuery(), 'Actividad', $desde, $x_pag, $orden);
 	$b->AgregarEncabezado('codigo_actividad', __('Código Actividad'), 'align="left"');
@@ -127,6 +138,7 @@ if ($opc == 'buscar' || $opc == 'eliminar') {
 	$b->AgregarEncabezado('codigo_actividad', __('Código'), 'align="left"');
 	$b->AgregarFuncion('', 'acciones', 'align="center"');
 	$b->color_mouse_over = '#bcff5c';
+	$b->titulo = __('Listado de') . ' ' . __('Actividades');
 	$b->Imprimir();
 }
 

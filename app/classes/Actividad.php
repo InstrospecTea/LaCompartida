@@ -96,6 +96,10 @@ class Actividad extends Objeto {
 			$wheres[] = "asunto.glosa_asunto LIKE '%{$this->fields['glosa_asunto']}%'";
 		}
 
+		if ($this->fields['activo'] !== '' && !is_null($this->fields['activo'])) {
+			$wheres[] = "actividad.activo = '{$this->fields['activo']}'";
+		}
+
 		if (count($wheres) > 0) {
 			$query .= " WHERE " . implode(' AND ', $wheres);
 		}
