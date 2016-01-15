@@ -138,6 +138,7 @@ if ($opc == 'buscar' || $opc == 'eliminar') {
 	$b->AgregarEncabezado('codigo_actividad', __('Código'), 'align="left"');
 	$b->AgregarFuncion('', 'acciones', 'align="center"');
 	$b->color_mouse_over = '#bcff5c';
+	$b->titulo = __('Listado de') . ' ' . __('Actividades');
 	$b->Imprimir();
 }
 
