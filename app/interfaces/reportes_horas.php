@@ -221,6 +221,10 @@ jQuery(document).ready(function() {
             <td align=left>
                 <?php
                 $fecha_mes_desde = $fecha_mes_desde != '' ? $fecha_mes_desde : date('m') - 1;
+                if ($fecha_mes_desde == 0) {
+									$fecha_mes_desde = 12;
+									$fecha_anio_desde = date('Y') - 1;
+                }
                 ?>
                 <select name="fecha_mes_desde" style='width:100px' id="fecha_mes_desde">
                     <option value='01' <?php echo $fecha_mes_desde == 01 ? 'selected' : '' ?>><?php echo __('Enero') ?></option>
