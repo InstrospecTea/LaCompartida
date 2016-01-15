@@ -1,12 +1,11 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
-// var_dump($_POST); exit;
-
 $Sesion = new Sesion(array('DAT'));
 $Pagina = new Pagina($Sesion);
 $Actividad = new Actividad($Sesion);
 $Form = new Form();
+$Html = new \TTB\Html;
 
 switch ($opc) {
 	case 'eliminar':
@@ -80,6 +79,14 @@ echo $Form->hidden('id_actividad');
 			</td>
 		</tr>
 		<tr>
+			<td align="right">
+				<?php echo __('Activo'); ?>
+			</td>
+			<td align="left">
+				<?php echo $Html::SelectSiNo('activo', $_REQUEST['activo']); ?>
+			</td>
+		</tr>
+		<tr>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 		</tr>
@@ -116,6 +123,10 @@ if ($opc == 'buscar' || $opc == 'eliminar') {
 
 	if (empty($_REQUEST['codigo_asunto']) && !empty($_REQUEST['glosa_asunto'])) {
 		$Actividad->fields['glosa_asunto'] = $_REQUEST['glosa_asunto'];
+	}
+
+	if (!empty($_REQUEST['activo'])) {
+		$Actividad->fields['activo'] = $_REQUEST['activo'] == 'SI' ? 1 : 0;
 	}
 
 	$x_pag = 25;
