@@ -12,11 +12,13 @@ class Migration {
 	private $query_down;
 	private $root_directory;
 	private $Database;
+	private $files_ignore;
 
 	public function __construct() {
 		$this->query_up = array();
 		$this->query_down = array();
 		$this->root_directory = __BASEDIR__;
+		$this->files_ignore = array('..', '.', '.gitkeep');
 
 		$dsn = 'mysql:dbname=' . \Conf::dbName() . ';host=' . \Conf::dbHost();
 		$this->Database = new PDO($dsn, DatabaseConf::getUserName(), DatabaseConf::getPassword());
@@ -174,7 +176,7 @@ class Migration {
 	 * @return array listado de archivos
 	 */
 	public function getFilesMigration($sorting_order = 0) {
-		$files = array_diff(scandir($this->getMigrationDirectory(), $sorting_order), array('..', '.'));
+		$files = array_diff(scandir($this->getMigrationDirectory(), $sorting_order), $this->files_ignore);
 		return $files;
 	}
 
