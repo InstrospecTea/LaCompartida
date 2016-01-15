@@ -1412,7 +1412,7 @@ if ($opc == 'grafico') {
 			}
 		},
 		error: function(e) {
-			console.log(e);
+			alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
 		}
 	});
 
