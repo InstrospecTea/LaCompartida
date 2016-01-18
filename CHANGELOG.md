@@ -1,5 +1,29 @@
 # Changelog
 
+## Hotfix 16.0.7
+Friday, January 15th
+* **Feature** [Nuevo "activo" filtro para actividades](https://github.com/LemontechSA/ttb/pull/1302)
+
+## Hotfix 16.0.6
+Thursday, January 14th
+* **Fix** [Nueva lógica Edición masiva de trabajos](https://github.com/LemontechSA/ttb/pull/1301)
+
+## Hotfix 16.0.5
+Thursday, January 14th
+* **Fix** [Corrección query monto parcial cobros](https://github.com/LemontechSA/ttb/pull/1300)
+
+## Hotfix 16.0.4
+Wednesday, January 13th
+* **Fix** [hard-code al parámetro include en API/activities](https://github.com/LemontechSA/ttb/pull/1299)
+
+## Hotfix 16.0.3
+Tuesday, January 12th
+* **Fix** [Condición para Boletas Exentas](https://github.com/LemontechSA/ttb/pull/1298)
+
+## Hotfix 16.0.2
+Tuesday, January 12th
+* **Fix** [Refactor de reporte cobros por área](https://github.com/LemontechSA/ttb/pull/1297)
+
 ## Hotfix 16.0.1
 Friday, January 8th
 * **Feature** [Solo desplegar las actividades que están activas](https://github.com/LemontechSA/ttb/pull/1295)
