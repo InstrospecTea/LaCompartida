@@ -603,12 +603,12 @@ if (!class_exists('Cobro')) {
 					 */
 					$criteria->add_select('SUM(fp.monto_moneda_cobro)', 'monto_pago_parcial')
 										->add_from('factura_pago fp')
-										->add_left_join_with('cta_cte_fact_mvto ccfm_pago', 'fp.id_factura_pago = ccfm_pago.id_factura_pago')
-										->add_left_join_with('cta_cte_fact_mvto_neteo ccfmn', 'ccfmn.id_mvto_pago = ccfm_pago.id_cta_cte_mvto')
-										->add_left_join_with('cta_cte_fact_mvto ccfm_deuda', 'ccfmn.id_mvto_deuda = ccfm_deuda.id_cta_cte_mvto')
-										->add_left_join_with('neteo_documento nd', 'fp.id_neteo_documento_adelanto = nd.id_neteo_documento')
-										->add_left_join_with('factura f', 'f.id_factura = ccfm_deuda.id_factura')
-										->add_left_join_with('cobro c', 'c.id_cobro = f.id_cobro')
+										->add_left_join_with('cta_cte_fact_mvto ccfm_pago', CriteriaRestriction::equals('fp.id_factura_pago', 'ccfm_pago.id_factura_pago'))
+										->add_left_join_with('cta_cte_fact_mvto_neteo ccfmn', CriteriaRestriction::equals('ccfmn.id_mvto_pago', 'ccfm_pago.id_cta_cte_mvto'))
+										->add_left_join_with('cta_cte_fact_mvto ccfm_deuda', CriteriaRestriction::equals('ccfmn.id_mvto_deuda', 'ccfm_deuda.id_cta_cte_mvto'))
+										->add_left_join_with('neteo_documento nd', CriteriaRestriction::equals('fp.id_neteo_documento_adelanto', 'nd.id_neteo_documento'))
+										->add_left_join_with('factura f', CriteriaRestriction::equals('f.id_factura', 'ccfm_deuda.id_factura'))
+										->add_left_join_with('cobro c', CriteriaRestriction::equals('c.id_cobro', 'f.id_cobro'))
 										->add_restriction(CriteriaRestriction::equals('c.id_cobro', $this->fields['id_cobro']))
 										->add_grouping('c.id_cobro');
 
