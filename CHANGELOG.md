@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.8
+Monday, January 18th
+* **Feature** [Corrección query para pago de cobros](https://github.com/LemontechSA/ttb/pull/1303)
+
 ## Hotfix 16.0.7
 Friday, January 15th
 * **Feature** [Nuevo "activo" filtro para actividades](https://github.com/LemontechSA/ttb/pull/1302)
