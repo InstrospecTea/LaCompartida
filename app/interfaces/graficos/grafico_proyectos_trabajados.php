@@ -1,42 +1,44 @@
-<?php 
+<?php
+	require_once dirname(__FILE__).'/../../conf.php';
 
-require_once "GraficoBarras.php";
-require_once "../../../fw/classes/Sesion.php";
-require_once "../../../fw/classes/Utiles.php";
+	$sesion = new Sesion();
+	$Criteria = new Criteria($sesion);
 
-$sesion = new Sesion();
+	$Criteria
+		->add_select("CONCAT_WS(' - ', asunto.codigo_cliente, SUBSTRING(asunto.glosa_asunto, 1, 12))", 'glosa_asunto')
+		->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
+		->add_from('asunto')
+		->add_left_join_with('trabajo',
+				CriteriaRestriction::equals('trabajo.codigo_asunto', 'asunto.codigo_asunto')
+			)
+		->add_restriction(
+				CriteriaRestriction::equals('trabajo.id_usuario', "'$id_usuario'")
+			)
+		->add_restriction(
+				CriteriaRestriction::between('fecha', "'" . Utiles::fecha2sql($fecha1) . "'", "'" . Utiles::fecha2sql($fecha2) . "'")
+			)
+		->add_grouping('asunto.codigo_asunto')
+		->add_ordering('tiempo', 'DESC')
+		->add_limit(14, 0);
 
-$query = "SELECT glosa_asunto, SUM(TIME_TO_SEC(duracion))/3600 as tiempo, codigo_cliente
-			FROM asunto LEFT JOIN trabajo USING (codigo_asunto)
-				WHERE 
-					trabajo.id_usuario = '$id_usuario' AND
-				(fecha BETWEEN '$fecha1' AND '$fecha2')
-			GROUP BY asunto.codigo_asunto";
-$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
-for($i = 0; $fila = mysql_fetch_array($resp); $i++)
-{
-	$asunto[$i] = $fila[codigo_cliente]." - ".$fila[glosa_asunto];	
-	$tiempo[$i] = $fila[tiempo];	
-}
+	try{
+		$respuesta = $Criteria->run();
+	} catch(Exception $e) {
+		error_log('Error al ejecutar la SQL');
+	}
 
-$nombre_usuario = Utiles::Glosa($sesion, $id_usuario, "CONCAT_WS(' ',nombre,apellido1)", "usuario");
+	foreach ($respuesta as $i => $fila) {
+		$asunto[] = $fila['glosa_asunto'];
+		$tiempo[] = $fila['tiempo'];
+	}
 
-#Create a XYChart object of size 300 x 240 pixels
-$c = new GraficoBarras();
+	$grafico = new TTB\Graficos\GraficoBarra();
+	$dataset = new TTB\Graficos\GraficoDataset();
 
-#Add a title to the chart using 10 pt Arial font
-$title = __('Horas trabajadas').' - '.$nombre_usuario;
-$c->Titulo($title);
+	$dataset->addLabel(__('Horas trabajadas'))
+		->addData($tiempo);
 
-#Add a title to the y-axis
-$c->Ejes(__("Proyecto"),__("Horas"));
+	$grafico->addDataSets($dataset)
+		->addLabels($asunto);
 
-#Set the x axis labels
-$c->Labels($asunto);
-
-$c->layer->addDataSet($tiempo, 0xff8080, __("Horas trabajadas"));
-#$layer->addDataSet($terminados, 0x80ff80, "Terminadas");
-
-#output the chart
-$c->Imprimir();
-?>
+	echo $grafico->getJson();

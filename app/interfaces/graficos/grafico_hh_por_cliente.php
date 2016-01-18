@@ -1,79 +1,78 @@
 <?php
+	require_once dirname(__FILE__).'/../../conf.php';
 
-require_once "GraficoBarras.php";
-require_once "../../../fw/classes/Sesion.php";
+	$sesion = new Sesion();
+	$Criteria = new Criteria($sesion);
 
-$sesion = new Sesion();
-$Criteria = new Criteria($sesion);
+	if (!empty($usuarios)) {
+		$Criteria->add_restriction(
+			CriteriaRestriction::in('trabajo.id_usuario', $usuarios)
+		);
+	}
 
-if (!empty($usuarios)) {
-	$Criteria->add_restriction(
-		CriteriaRestriction::in('trabajo.id_usuario', explode(',', $usuarios))
-	);
-}
+	if($solo_activos) {
+		$Criteria->add_restriction(
+			CriteriaRestriction::equals('usuario.activo ', 1)
+		);
+	}
 
-if($solo_activos) {
-	$Criteria->add_restriction(
-		CriteriaRestriction::equals('usuario.activo ', 1)
-	);
-}
+	if(!empty($clientes)) {
+		$Criteria->add_restriction(
+			CriteriaRestriction::in('cliente.codigo_cliente', $clientes)
+		);
+	}
 
-if(!empty($clientes)) {
-	$Criteria->add_restriction(
-		CriteriaRestriction::in('cliente.codigo_cliente', explode(',', $clientes))
-	);
-}
+	if (method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario')) {
+ 		$codigo_cliente = 'codigo_cliente_secundario';
+ 	} else {
+ 		$codigo_cliente = 'codigo_cliente';
+ 	}
 
-$total_tiempo = 0;
 
-$Criteria
-	->add_select('cliente.glosa_cliente')
-	->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
-	->add_from('cliente')
-	->add_left_join_with(
-			'asunto',
-			CriteriaRestriction::equals('asunto.codigo_cliente', 'cliente.codigo_cliente')
-		)
-	->add_left_join_with(
-			'trabajo',
-			CriteriaRestriction::equals('trabajo.codigo_asunto', 'asunto.codigo_asunto')
-		)
-	->add_inner_join_with(
-			'usuario',
-			CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario')
-		)
-	->add_restriction(
-			CriteriaRestriction::between('trabajo.fecha', "'{$fecha_ini}'", "'{$fecha_fin}'")
-		)
-	->add_grouping('cliente.codigo_cliente')
-	->add_ordering('tiempo', 'DESC')
-	->add_limit(14, 0);
+	$total_tiempo = 0;
 
-$resp = $Criteria->run();
+	$Criteria
+		->add_select("CONCAT_WS(' - ', cliente." . $codigo_cliente . ", SUBSTRING(cliente.glosa_cliente, 1, 12))", 'glosa_cliente')
+		->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
+		->add_from('cliente')
+		->add_left_join_with(
+				'asunto',
+				CriteriaRestriction::equals('asunto.codigo_cliente', 'cliente.codigo_cliente')
+			)
+		->add_left_join_with(
+				'trabajo',
+				CriteriaRestriction::equals('trabajo.codigo_asunto', 'asunto.codigo_asunto')
+			)
+		->add_inner_join_with(
+				'usuario',
+				CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario')
+			)
+		->add_restriction(
+				CriteriaRestriction::between('trabajo.fecha', "'" . Utiles::fecha2sql($fecha_ini) . "'", "'" . Utiles::fecha2sql($fecha_fin) . "'")
+			)
+		->add_grouping('cliente.codigo_cliente')
+		->add_ordering('tiempo', 'DESC')
+		->add_limit(14, 0);
 
-foreach ($resp as $i => $fila) {
-	$cliente[$i] = $fila[glosa_cliente];
-	$tiempo[$i] = $fila[tiempo];
-	$total_tiempo += $fila[tiempo];
-}
+	try{
+		$respuesta = $Criteria->run();
+	} catch(Exception $e) {
+		error_log('Error al ejecutar la SQL');
+	}
 
-#Create a XYChart object of size 300 x 240 pixels
-$c = new GraficoBarras();
+	foreach ($respuesta as $i => $fila) {
+		$cliente[] = $fila['glosa_cliente'];
+		$tiempo[] = $fila['tiempo'];
+		$total_tiempo += $fila['tiempo'];
+	}
 
-#Add a title to the chart using 10 pt Arial font
-$title = __('Horas trabajadas').' / '.Utiles::sql2date($fecha_ini).' - '.Utiles::sql2date($fecha_fin).'  '.__('Sólo 14 más relevantes');
-$c->Titulo($title);
+	$grafico = new TTB\Graficos\GraficoBarra();
+	$dataset = new TTB\Graficos\GraficoDataset();
 
-#Add a title to the y-axis
-$c->Ejes(__("Cliente"),__("Horas"));
+	$dataset->addLabel('Horas trabajadas por cliente')
+		->addData($tiempo);
 
-#Set the x axis labels
-$c->Labels($cliente);
+	$grafico->addDataSets($dataset)
+		->addLabels($cliente);
 
-#Add a multi-bar layer with 2 data sets
-$c->layer->addDataSet($tiempo, 0xff8080, __("Horas trabajadas").': '.$total_tiempo);
-#$layer->addDataSet($terminados, 0x80ff80, "Terminadas");
-
-#output the chart
-$c->Imprimir();
-?>
+	echo $grafico->getJson();

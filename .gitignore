@@ -205,6 +205,12 @@ vagrant/.vagrant
 vagrant/machines/
 Vagrantfile
 
+# Bower
+bower_components
+
+# Node
+node_modules
+
 tags
 
 /node_modules
