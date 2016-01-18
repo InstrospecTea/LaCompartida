@@ -601,7 +601,7 @@ if (!class_exists('Cobro')) {
 					 * y se les restan las notas de crédito emitias al cobro generando el monto pagado parcial.
 					 *
 					 */
-					$criteria->add_select('(SUM(CCFMN.monto_pago) - SUM(CCFMNP.monto_pago))', 'monto_pago_parcial')
+					$criteria->add_select('(SUM(IFNULL(CCFMN.monto_pago, 0)) - SUM(IFNULL(CCFMNP.monto_pago, 0)))', 'monto_pago_parcial')
 										->add_from('cobro C')
 										->add_inner_join_with('factura F', 'F.id_cobro = C.id_cobro')
 										->add_left_join_with('cta_cte_fact_mvto CCFM', 'CCFM.id_factura = F.id_factura')
