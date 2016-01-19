@@ -1,7 +1,7 @@
 # Changelog
 
 ## Hotfix 16.0.9
-Monday, January 19th
+Tuesday, January 19th
 * **Feature** [Corrección query para listar usuarios Encargado Comercial en Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1304)
 
 ## Hotfix 16.0.8
