@@ -24,7 +24,7 @@ class GraficoDataset {
 	 */
 	public function addLabel($label) {
 		if (!empty($label)) {
-			$this->label = $label;
+			$this->label = mb_detect_encoding($label, 'UTF-8', true) ? $label : utf8_encode($label);
 			return $this;
 		} else {
 			error_log('Debe ingresar un String no vacío');
