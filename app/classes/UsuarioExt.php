@@ -1316,6 +1316,53 @@ class UsuarioExt extends Usuario {
 		}
 	}
 
+	/**
+	 *
+	 * Retorna listado de usuarios encargados comerciales
+	 *
+	 * @return array $rows contiene un arreglo con los usuarios encargados comerciales
+	 */
+	public function get_usuarios_reporte_avanzado() {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('U.id_usuario')
+				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
+				->add_from('usuario U')
+				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
+				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'SOC'"))
+		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
+
+		$and_clause = CriteriaRestriction::and_clause(array (
+				CriteriaRestriction::equals('U.activo', 0),
+				CriteriaRestriction::equals('U.visible', 1)
+				));
+
+		$or_clause = CriteriaRestriction::or_clause(
+				CriteriaRestriction::equals('U.activo', 1)
+			);
+
+		$criteria->add_restriction(CriteriaRestriction::or_clause(array(
+						CriteriaRestriction::equals('U.activo', 1)
+						,
+						array(
+							$and_clause
+							)
+					)));
+
+		try {
+			$result = $criteria->run();
+			$rows = array();
+
+			foreach ($result as $key => $value) {
+				$rows[$value['id_usuario']] = $value['nombre'];
+			}
+
+			return $rows;
+
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
 	public function Guardar($datos, &$pagina = null, $validaciones_segun_config = false) {
 		$arr1 = $this->fields;
 
