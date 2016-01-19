@@ -182,6 +182,37 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 										<br/>
 									</td>
 								</tr>
+								<tr>
+									<td>
+										<table width="90%" style="border: 1px solid #BDBDBD;" padding="10px" height="120px" class="tb_base">
+											<tr>
+												<td rowspan="2" width="15%"><img src="<?php echo Conf::ImgDir() . "/proyectos_32{$img_dir}.gif"; ?>" alt=""/></td>
+												<td valign="center" style='font-weight:bold; height: 15px;' width="85%"><?php echo __('Facturación Conceptos Contables'); ?></td>
+											</tr>
+											<tr valign="top" align="left" style="height: 5px;">
+												<td><hr size="1" width="100%"></td>
+											</tr>
+											<tr>
+												<td>&nbsp;</td>
+												<td>
+													<ul style="list-style-position: outside; text-align: left;">
+														<li>
+															<a href='<?php echo Conf::RootDir() ?>/app/Report/salesAccountingConcepts' style="color:#000;text-decoration: none;">
+																<?php echo __('Reporte de Ventas') ?>
+															</a>
+														</li>
+														<li>
+															<a href='<?php echo Conf::RootDir() ?>/app/Report/agePortfolio' style="color:#000;text-decoration: none;">
+																<?php echo __('Reporte de cartera por edades') ?>
+															</a>
+														</li>
+													</ul>
+												</td>
+											</tr>
+										</table>
+										<br/>
+									</td>
+								</tr>
 							<?php } else {
 								$pagina->AddInfo(__('Hay un error con ese reporte por favor comunicarse con soporte.'));
 							} ?>
