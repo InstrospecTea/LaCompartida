@@ -1329,24 +1329,12 @@ class UsuarioExt extends Usuario {
 				->add_from('usuario U')
 				->add_inner_join_with('usuario_permiso UP', 'UP.id_usuario = U.id_usuario')
 				->add_restriction(CriteriaRestriction::equals('UP.codigo_permiso', "'SOC'"))
+				->add_restriction(CriteriaRestriction::or_clause(array(
+						CriteriaRestriction::equals('U.activo', 1),
+						CriteriaRestriction::equals('U.visible', 1)
+					)
+				))
 		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
-
-		$and_clause = CriteriaRestriction::and_clause(array (
-				CriteriaRestriction::equals('U.activo', 0),
-				CriteriaRestriction::equals('U.visible', 1)
-				));
-
-		$or_clause = CriteriaRestriction::or_clause(
-				CriteriaRestriction::equals('U.activo', 1)
-			);
-
-		$criteria->add_restriction(CriteriaRestriction::or_clause(array(
-						CriteriaRestriction::equals('U.activo', 1)
-						,
-						array(
-							$and_clause
-							)
-					)));
 
 		try {
 			$result = $criteria->run();
