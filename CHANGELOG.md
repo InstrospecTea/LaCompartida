@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.10
+Wednesday, January 20th
+* **Fix** [Corregir flujo de Hitos al cambiar forma de cobro](https://github.com/LemontechSA/ttb/pull/1305)
+
 ## Hotfix 16.0.9
 Tuesday, January 19th
 * **Feature** [Corrección query para listar usuarios Encargado Comercial en Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1304)
