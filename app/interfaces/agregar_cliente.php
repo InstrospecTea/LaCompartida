@@ -214,7 +214,7 @@ if ($opcion == "guardar") {
 				}
 				$cliente->Edit("id_contrato", $contrato->fields['id_contrato']);
 
-				if ($contrato->fields['forma_cobro'] == 'HITOS') {
+				if ($forma_cobro == 'HITOS') {
 					foreach (array_keys($hito_fecha) as $i) {
 						if (empty($hito_monto_estimado[$i])) {
 							continue;

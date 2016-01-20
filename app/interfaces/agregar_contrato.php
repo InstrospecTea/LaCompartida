@@ -199,7 +199,7 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 			$cobro_pendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
 			$cobro_pendiente->Write();
 		}
-		if ($contrato->fields['forma_cobro'] == 'HITOS') {
+		if ($forma_cobro == 'HITOS') {
 			foreach (array_keys($hito_fecha) as $i) {
 				if (empty($hito_monto_estimado[$i])) {
 					continue;
@@ -667,8 +667,9 @@ $Html = new \TTB\Html();
 
 		// Valida que no existan hitos pendientes de gestión
 		if (laID != "fc7" && jQuery("#tabla_hitos #body_hitos").find("tr[data-pendiente]").length > 0) {
-			alert("El contrato tiene hitos sin gestionar, eliminelos antes de cambiar la forma de tarificación.");
-			laID = 'fc7';
+			if (!confirm("El contrato tiene hitos sin gestionar,  ¿está seguro que desea cambia la Forma de Tarificación?, Los hitos pendientes serán eliminados.")) {
+				laID = 'fc7';
+			}
 		}
 
 
