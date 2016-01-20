@@ -86,6 +86,11 @@ class ReportController extends AbstractController {
 	public function salesAccountingConcepts() {
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
+
+		if (!empty($this->data)) {
+			var_dump($this->data); exit;
+		}
+
 		$this->layoutTitle = __('Reporte de Ventas');
 
 		$restrictions = array(CriteriaRestriction::equals('Client.activo', 1));
@@ -98,9 +103,16 @@ class ReportController extends AbstractController {
 		$this->set('currency', $this->SearchingBusiness->getAssociativeArray('Currency', 'id_moneda', 'glosa_moneda'));
 		$base_currency = $this->CoiningBusiness->getBaseCurrency();
 		$this->set('base_currency', $base_currency->fields['id_moneda']);
-		$this->set('rate', array(
-			'monto_thh' => __('Tarifa del cliente'),
-			'monto_thh_estandar' => __('Tarifa estandar')
-		));
+
+		$this->set('rate',
+			array(
+				'monto_thh' => __('Tarifa del cliente'),
+				'monto_thh_estandar' => __('Tarifa estandar')
+			)
+		);
+
+		if (empty($this->data['start_date'])) {
+	  	$this->data['start_date'] = date('d-m-Y', strtotime('-1 month'));
+	  }
 	}
 }

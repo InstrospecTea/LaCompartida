@@ -7,7 +7,7 @@
 				<?php echo __('Fecha desde'); ?>
 			</td>
 			<td align="left">
-				<?php echo $this->Html->PrintCalendar('fecha_ini', $fecha_ini); ?>
+				<?php echo $this->Html->PrintCalendar('start_date', $this->data['start_date']); ?>
 			</td>
 		</tr>
 		<tr>
@@ -15,7 +15,7 @@
 				<?php echo __('Fecha hasta'); ?>
 			</td>
 			<td align="left">
-				<?php echo  $this->Html->PrintCalendar('fecha_fin', $fecha_fin); ?>
+				<?php echo $this->Html->PrintCalendar('end_date', $this->data['end_date']); ?>
 			</td>
 		</tr>
 		<tr>
@@ -71,7 +71,7 @@
 		</tr>
 		<tr>
 			<td colspan="4" align="center">
-				<?php echo $this->Form->submit(__('Generar planilla'), array('onclick' => "")); ?>
+				<?php echo $this->Form->submit(__('Generar planilla')); ?>
 			</td>
 		</tr>
 	</table>
