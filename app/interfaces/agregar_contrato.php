@@ -1459,31 +1459,6 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		return true;
 	}
 
-	function hitoValido(fila) {
-		var num = fila.id.match(/\d+$/)[0];
-		var fecha = $F('hito_fecha_'+num);
-		var fecha_split = fecha.split('-');
-		var valid_day = (parseInt(fecha_split[0], 10) > 0 && parseInt(fecha_split[0], 10) <= 31);
-		var valid_month = (parseInt(fecha_split[1], 10) > 0 && parseInt(fecha_split[1], 10) <= 12);
-		var valid_year = parseInt(fecha_split[2], 10) >= 1969;
-		var desc = $F('hito_descripcion_'+num);
-		var monto = Number($F('hito_monto_estimado_'+num));
-
-		if ($('hito_fecha_' + num).disabled) {
-			return true;
-		}
-		if (!valid_day || !valid_month || !valid_year) {
-			return false;
-		}
-		if(!desc){
-			return false;
-		}
-		if(isNaN(monto) || monto <= 0){
-			return false;
-		}
-		return true;
-	}
-
 	function eliminarHito(elem){
 		if (confirm('¿Está seguro que desea eliminar este hito?')) {
 			$(elem).up('tr').remove();
