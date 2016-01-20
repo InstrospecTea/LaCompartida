@@ -660,14 +660,14 @@ $Html = new \TTB\Html();
 		}
 
 		if (laID != "fc3" && jQuery("#tabla_fechas #id_body").children().length > 1) {
-			if(! confirm("El contrato tiene cobros programados, ¿está seguro que desea cambia la Forma de Tarificación?. Al aceptar, los cobros programados serán eliminados.")) {
+			if(! confirm("El contrato tiene cobros programados, ¿Está seguro que desea cambiar la Forma de Tarificación?. Al aceptar, los cobros programados serán eliminados.")) {
 				laID = "fc3";
 			}
 		}
 
 		// Valida que no existan hitos pendientes de gestión
 		if (laID != "fc7" && jQuery("#tabla_hitos #body_hitos").find("tr[data-pendiente]").length > 0) {
-			if (!confirm("El contrato tiene hitos sin gestionar,  ¿está seguro que desea cambia la Forma de Tarificación?, Los hitos pendientes serán eliminados.")) {
+			if (!confirm("El contrato tiene hitos sin gestionar,  ¿Está seguro que desea cambiar la Forma de Tarificación?, Los hitos pendientes serán eliminados.")) {
 				laID = 'fc7';
 			}
 		}
