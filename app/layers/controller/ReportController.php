@@ -86,33 +86,36 @@ class ReportController extends AbstractController {
 	public function salesAccountingConcepts() {
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
+		$this->loadBusiness('Charging');
 
 		if (!empty($this->data)) {
-			var_dump($this->data); exit;
+			$Report = $this->ChargingBusiness->getSalesAccountingConceptsReport($this->data);
+			$Report->render();
+			exit;
+		} else {
+			$this->layoutTitle = __('Reporte de Ventas');
+
+			$restrictions = array(CriteriaRestriction::equals('Client.activo', 1));
+			$client_code = Conf::GetConf($this->Session, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
+			$clients = $this->SearchingBusiness->getAssociativeArray('Client', $client_code, 'glosa_cliente', $restrictions);
+			$this->set('clients', $clients);
+
+			$this->set('client_group', $this->SearchingBusiness->getAssociativeArray('ClientGroup', 'id_grupo_cliente', 'glosa_grupo_cliente'));
+			$this->set('billing_strategy', $this->SearchingBusiness->getAssociativeArray('BillingStrategy', 'forma_cobro', 'descripcion'));
+			$this->set('currency', $this->SearchingBusiness->getAssociativeArray('Currency', 'id_moneda', 'glosa_moneda'));
+			$base_currency = $this->CoiningBusiness->getBaseCurrency();
+			$this->set('base_currency', $base_currency->fields['id_moneda']);
+
+			$this->set('rate',
+				array(
+					'monto_thh' => __('Tarifa del cliente'),
+					'monto_thh_estandar' => __('Tarifa estandar')
+				)
+			);
+
+			if (empty($this->data['start_date'])) {
+				$this->data['start_date'] = date('d-m-Y', strtotime('-1 month'));
+			}
 		}
-
-		$this->layoutTitle = __('Reporte de Ventas');
-
-		$restrictions = array(CriteriaRestriction::equals('Client.activo', 1));
-		$client_code = Conf::GetConf($this->Session, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
-		$clients = $this->SearchingBusiness->getAssociativeArray('Client', $client_code, 'glosa_cliente', $restrictions);
-		$this->set('clients', $clients);
-
-		$this->set('client_group', $this->SearchingBusiness->getAssociativeArray('ClientGroup', 'id_grupo_cliente', 'glosa_grupo_cliente'));
-		$this->set('billing_strategy', $this->SearchingBusiness->getAssociativeArray('BillingStrategy', 'forma_cobro', 'descripcion'));
-		$this->set('currency', $this->SearchingBusiness->getAssociativeArray('Currency', 'id_moneda', 'glosa_moneda'));
-		$base_currency = $this->CoiningBusiness->getBaseCurrency();
-		$this->set('base_currency', $base_currency->fields['id_moneda']);
-
-		$this->set('rate',
-			array(
-				'monto_thh' => __('Tarifa del cliente'),
-				'monto_thh_estandar' => __('Tarifa estandar')
-			)
-		);
-
-		if (empty($this->data['start_date'])) {
-	  	$this->data['start_date'] = date('d-m-Y', strtotime('-1 month'));
-	  }
 	}
 }
