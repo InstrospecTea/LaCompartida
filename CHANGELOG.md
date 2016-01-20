@@ -2,7 +2,7 @@
 
 ## Hotfix 16.0.10
 Wednesday, January 20th
-* **Fix** [Corregir flujo de Hitos al cambiar forma de cobro](https://github.com/LemontechSA/ttb/pull/1305)
+* **Fix** [Corregir flujo de Hitos al cambiar forma de cobro](https://github.com/LemontechSA/ttb/pull/1306)
 
 ## Hotfix 16.0.9
 Tuesday, January 19th
