@@ -186,7 +186,7 @@
 	{
 		var cobrableOriginal = valoresDefault.cobrable == 1 ? true : false;
 		var cobrable = jQuery('#cobrable').is(':checked');
-		var cobrable_check = jQuery('#cobrable_check').is(':checked');
+		var cobrable_check = jQuery('#check_cobrable').is(':checked');
 
 		checkBoxValues(form);
 
@@ -201,18 +201,23 @@
 				}
 			}
 		}
-
-		//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
-		var codigoAsunto = form.codigo_asunto.value;
-		var asuntoOriginal = valoresDefault.codigo_asunto;
+		//Valida si el asunto hacambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
+		var codigoAsunto = jQuery('#<?php echo $campo_asunto; ?>').val();
+		var asuntoOriginal = valoresDefault.<?php echo $campo_asunto; ?>;
 		if(codigoAsunto && codigoAsunto != asuntoOriginal && hayCobros){
-			var msg = "Ud. está modificando un trabajo que pertenece a <?php echo __('un cobro'); ?>. Si acepta, el trabajo se podría desvincular de este <?php echo __('cobro'); ?> y vincularse a <?php echo __('un cobro'); ?> pendiente para el nuevo asunto en caso de que exista.";
+			var msg;
+
+			if('<?php echo $motivo; ?>' == 'horas') {
+				msg = "Ud. está modificando un trabajo que pertenece a <?php echo __('un cobro'); ?>. Si acepta, el trabajo se podría desvincular de este <?php echo __('cobro'); ?> y vincularse a <?php echo __('un cobro'); ?> pendiente para el nuevo asunto en caso de que exista.";
+			} else if('<?php echo $motivo; ?>' == 'cobros') {
+				msg = "Está editando trabajos asociados a un <?php echo __('un cobro'); ?>. ¿Está seguro que desea continuar?, al aceptar se editaran el/los trabajos seleccionados.";
+			}
 			if(!confirm(msg)){
 				return false;
 			}
 		}
 
-		var codigoCliente = form.codigo_cliente.value;
+		var codigoCliente = jQuery('#<?php echo $campo_cliente; ?>').val();
 		if(codigoCliente && (codigoAsunto == null || codigoAsunto == '')) {
 			var msg = "Los <?php echo __('Trabajos'); ?> seleccionados no se pueden asociar a este cliente ya que no cuentan con asuntos activos.";
 			alert(msg);

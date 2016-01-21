@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.12
+Thursday, January 21st
+* **Fix** [Problema edición masiva](https://github.com/LemontechSA/ttb/pull/1309)
+
 ## Hotfix 16.0.11
 Thursday, January 21st
 * **Fix** [Corrección referencia variable](https://github.com/LemontechSA/ttb/pull/1307)
