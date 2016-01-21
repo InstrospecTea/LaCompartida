@@ -26,6 +26,10 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		}
 	}
 
+	if (!$factura->Loaded()) {
+		$factura->setFieldsNew('factura');
+	}
+
 	if ($id_cobro > 0) {
 		$cobro = new Cobro($sesion);
 		$cobro->Load($id_cobro);

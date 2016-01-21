@@ -39,7 +39,7 @@ $pagina->PrintTop();
         printf('<div class="grupoconf" id="caja%s" rel="%s|%s"> ', $fila['id_tabla'], $fila['glosa_tabla'], $fila['nombre_tabla']);
         printf('<a href="#" onclick="return editar(%s);"><img border="0" src="%s/agregar.gif"> Agregar Registro</a>', "'{$fila['nombre_tabla']}'", Conf::ImgDir());
         if (!empty($fila['info_tabla'])) {
-            printf('<p class="info_tabla"><strong>Descripción:</strong> %s</p>', $fila['info_tabla']);
+            printf('<p class="info_tabla"><strong>Descripción:</strong> %s</p>', utf8_decode($fila['info_tabla']));
         } else {
             echo '<br/><br/>';
         }
