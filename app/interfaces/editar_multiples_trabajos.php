@@ -3,6 +3,7 @@
 
 	$sesion = new Sesion(array('PRO','REV'));
 	$pagina = new Pagina($sesion);
+
 	$permiso_revisor = $sesion->usuario->Es('REV');
 	$permiso_profesional = $sesion->usuario->Es('PRO');
 
@@ -203,7 +204,6 @@
 		//Valida si el asunto hacambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
 		var codigoAsunto = jQuery('#<?php echo $campo_asunto; ?>').val();
 		var asuntoOriginal = valoresDefault.<?php echo $campo_asunto; ?>;
-
 		if(codigoAsunto && codigoAsunto != asuntoOriginal && hayCobros){
 			var msg;
 
