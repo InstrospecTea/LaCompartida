@@ -186,7 +186,7 @@
 	{
 		var cobrableOriginal = valoresDefault.cobrable == 1 ? true : false;
 		var cobrable = jQuery('#cobrable').is(':checked');
-		var cobrable_check = jQuery('#cobrable_check').is(':checked');
+		var cobrable_check = jQuery('#check_cobrable').is(':checked');
 
 		checkBoxValues(form);
 
