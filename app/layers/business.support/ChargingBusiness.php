@@ -994,7 +994,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	public function getSalesAccountingConceptsReport($parameters) {
 		$data = array();
 
-		var_dump($parameters); exit;
+		// var_dump($parameters); exit;
 
 		$this->loadReport('SalesAccountingConcepts', 'Report');
 		$this->Report->setData($data);

@@ -2,10 +2,10 @@
 
 abstract class AbstractReport implements BaseReport {
 
-	var $data;
-	var $reportEngine;
-	var $parameters;
-	var $Session;
+	public $data;
+	public $reportEngine;
+	public $parameters;
+	public $Session;
 	private $loadedClass = array();
 
 	public function __construct(Sesion $Session) {

@@ -89,9 +89,30 @@ class ReportController extends AbstractController {
 		$this->loadBusiness('Charging');
 
 		if (!empty($this->data)) {
+			$this->autoRender = false;
+
+			if (empty($this->data['start_date']) || empty($this->data['end_date'])) {
+				throw new Exception(__('Filtros de fecha sin contenido'));
+			} else {
+				if (!DateTime::createFromFormat('Y-m-d', $this->data['start_date'])) {
+					$this->data['start_date'] = date('Y-m-d', strtotime($this->data['start_date']));
+				}
+				if (!DateTime::createFromFormat('Y-m-d', $this->data['end_date'])) {
+					$this->data['end_date'] = date('Y-m-d', strtotime($this->data['end_date']));
+				}
+			}
+
+			$Currency = $this->CoiningBusiness->getCurrency($this->data['display_currency']);
+			if (empty($Currency)) {
+				throw new Exception(__('No existe la moneda seleccionada'));
+			} else {
+				$this->data['display_currency'] = $Currency;
+			}
+
+			// var_dump($this->data); exit;
+
 			$Report = $this->ChargingBusiness->getSalesAccountingConceptsReport($this->data);
 			$Report->render();
-			exit;
 		} else {
 			$this->layoutTitle = __('Reporte de Ventas');
 
