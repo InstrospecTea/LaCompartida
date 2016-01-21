@@ -13,10 +13,10 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 
 	/**
 	 * Constructor
-	 * @param Sesion $Session         La sesi√≥n para el acceso a datos
+	 * @param Sesion $Session         La sesiÛn para el acceso a datos
 	 * @param [type] $filtersFields   Los campos/keys por los que se debe filtrar y sus valores
 	 * @param [type] $grouperFields   Los campos/keys por los que se debe agrupar
-	 * @param [type] $currencyId      La moneda en la que se devolver√°n los valores
+	 * @param [type] $currencyId      La moneda en la que se devolver·n los valores
 	 * @param [type] $proportionality La proporcionalidad en la que se deben distribuir los valores
 	 */
 	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $options, $currencyId, $proportionality) {
@@ -45,7 +45,7 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	/**
 	 * Devuelve el par tabla.campo de la tarifa del trabajo
 	 * en base a la proporcionalidad elegida
-	 * @return string campo de donde se obtendr√° la tarifa
+	 * @return string campo de donde se obtendr· la tarifa
 	 */
 	function getWorksFeeField() {
 		$proportionality = $this->getProportionality();
@@ -53,7 +53,7 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 		$duration = 'TIME_TO_SEC(trabajo.duracion_cobrada)';
 		$duration_hours = "{$duration}/3600";
 		$duration_minutes = "{$duration}/60";
-		if ($proportionality == PROPORTIONALITY_STANDARD)  {
+		if ($proportionality == self::PROPORTIONALITY_STANDARD)  {
 			return "trabajo.tarifa_hh_estandar * {$duration_hours}";
 		} else {
 			return "IF(cobro.forma_cobro = 'ESCALONADA', ($duration_minutes), IF(cobro.forma_cobro = 'FLAT FEE', trabajo.tarifa_hh_estandar, trabajo.tarifa_hh) * {$duration_hours})";
@@ -63,12 +63,12 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	/**
 	 * Devuelve el campo del cobro desde donde se obtiene el monto total
 	 * producido de trabajos en base a la proporcionalidad elegida
-	 * @return string campo de donde se obtendr√° el monto
+	 * @return string campo de donde se obtendr· el monto
 	 */
 
 	function getWorksProportionalityAmountField() {
 		$proportionality = $this->getProportionality();
-		if ($proportionality == PROPORTIONALITY_STANDARD)  {
+		if ($proportionality == self::PROPORTIONALITY_STANDARD)  {
 			return 'IF(cobro.monto_thh_estandar > 0, cobro.monto_thh_estandar,
 					IF(cobro.monto_trabajos > 0, cobro.monto_trabajos, 1))';
 		} else {
@@ -96,9 +96,9 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	}
 
 	/**
-	 * Devuelve el par tabla.campo de la tarifa del tr√°mite
+	 * Devuelve el par tabla.campo de la tarifa del tr·mite
 	 * en base a la proporcionalidad elegida
-	 * @return string campo de donde se obtendr√° la tarifa
+	 * @return string campo de donde se obtendr· la tarifa
 	 */
 	function getErrandsFeeField() {
 		return 'tramite.tarifa_tramite';
@@ -106,9 +106,9 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 
 	/**
 	 * Devuelve el campo del cobro desde donde se obtiene el monto total
-	 * producido de tr√°mites en base a la proporcionalidad elegida.
-	 * Actualmente Tr√°mites no posee un campo total para tarifa est√°ndar
-	 * @return string campo de donde se obtendr√° el monto
+	 * producido de tr·mites en base a la proporcionalidad elegida.
+	 * Actualmente Tr·mites no posee un campo total para tarifa est·ndar
+	 * @return string campo de donde se obtendr· el monto
 	 */
 	function getErrandsProportionalityAmountField() {
 		return 'cobro.monto_tramites';
