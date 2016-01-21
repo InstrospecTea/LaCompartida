@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.11
+Thursday, January 21st
+* **Fix** [Corrección referencia variable](https://github.com/LemontechSA/ttb/pull/1307)
+
 ## Hotfix 16.0.10
 Wednesday, January 20th
 * **Fix** [Corregir flujo de Hitos al cambiar forma de cobro](https://github.com/LemontechSA/ttb/pull/1306)
