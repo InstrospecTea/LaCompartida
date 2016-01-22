@@ -10,7 +10,7 @@
  		$letra_profesional = 'usuario';
  	}
 
- 	if ($usuarios) {
+ 	if (is_array($usuarios)) {
  		$Criteria->add_restriction(
  			CriteriaRestriction::in('trabajo.id_usuario', $usuarios)
  		);
@@ -22,7 +22,7 @@
  			);
 	}
 
-	if ($clientes) {
+	if (is_array($clientes)) {
 		$Criteria->add_restriction(
 			CriteriaRestriction::in('cliente.codigo_cliente', $clientes)
 		);
