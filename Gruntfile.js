@@ -1,6 +1,9 @@
 module.exports = function(grunt) {
 	var vendors = [
-		'./bower_components/Chart.js/Chart.js'
+		'./bower_components/Chart.js/Chart.js',
+		'./bower_components/jspdf/dist/jspdf.min.js',
+		'./bower_components/html2canvas/build/html2canvas.js'
+
 	];
 
 	grunt.file.defaultEncoding = 'iso-8859-1';
