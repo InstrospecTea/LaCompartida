@@ -167,20 +167,14 @@ $html_info = '<style type="text/css">
 switch ($tipo_grafico) {
 	case 'barras': {
 		$datos_grafico .= $r['promedio'];
-		// $url = "graficos/barras_reporte_avanzado.php?titulo=" . $titulo_reporte . $datos_grafico . "&unidad=" . $tipo_dato . "&moneda=" . $id_moneda;
-		// $elemento = "<iframe name=planilla id=planilla src='$url'  frameborder=0 width=720px height=460px></iframe>";
 		graficoBarras($titulo_reporte, $labels, $valores, $valores_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda);
 		break;
 	}
 	case 'dispersion': {
-		// $url = "graficos/dispersion_reporte_avanzado.php?titulo=" . $titulo_reporte . $datos_grafico . "&unidad=" . $tipo_dato . "&moneda=" . $id_moneda;
-		// $elemento .= "<iframe name=planilla id=planilla src='$url'  frameborder=0 width=720px height=560px></iframe> ";
 		graficoLinea($titulo_reporte, $labels, $valores, $valores_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda);
 		break;
 	}
 	case 'circular': {
-		// $url = "graficos/circular_reporte_avanzado.php?titulo=" . $titulo_reporte . $datos_grafico . "&unidad=" . $tipo_dato . "&moneda=" . $id_moneda;
-		// $elemento .= "<img name=planilla id=planilla src='$url' alt='' />";
 		graficoTarta($titulo_reporte, $labels, $valores, $tipo_dato);
 		break;
 	}
