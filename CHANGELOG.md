@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.14
+Tuesday, January 26th
+* **Fix** [Problemas con resumen semanal](https://github.com/LemontechSA/ttb/pull/1316)
+
 ## Hotfix 16.0.13
 Monday, January 25th
 * **Fix** [Filtro trámites Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1312)
