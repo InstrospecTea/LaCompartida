@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.14
+Tuesday, January 26th
+* **Fix** [Evitar que se cambio el cliente de un contrato fuera de flujo](https://github.com/LemontechSA/ttb/pull/1313)
+
 ## Hotfix 16.0.13
 Monday, January 25th
 * **Fix** [Filtro trámites Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1312)
