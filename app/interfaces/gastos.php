@@ -578,18 +578,18 @@ function Refrescar() {
 <input type="hidden" name="serializacion" id="serializacion" size="70"/>
 <td>
     <input type="hidden" name="serializacion" id="serializacion" size="70"/>
-    <form method='post' name="form_gastos" action='' id="form_gastos">
+    <form method="post" name="form_gastos" action="" id="form_gastos">
 
 		<?php if (isset($_GET['opc']) && $_GET['opc'] == 'buscar' && $where != '') echo '<input type="hidden" name="where" id="where" value="' . base64_encode($where) . '"/>'; ?>
-        <input type='hidden' name='opc' id='opc' value=buscar>
-        <input type='hidden' name='motivo' id='motivo' value='gastos'/>
+        <input type="hidden" name="opc" id="opc" value="buscar">
+        <input type="hidden" name="motivo" id="motivo" value="gastos"/>
         <fieldset class="tb_base" style="width: 90%;border: 1px solid #BDBDBD;margin:auto;">
             <legend><?php echo __('Filtros') ?></legend>
 
-            <table style="border: 0px solid black" width='750px'>
+            <table style="border: 0px solid black" width="750px">
                 <tr>
-                    <td align=right><?php echo __('Cobrado') ?></td>
-                    <td align='left'>
+                    <td align="right"><?php echo __('Cobrado') ?></td>
+                    <td align="left">
 						<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", isset($cobrado) ? $cobrado : $selected_cobrado, '', 'Todos', '60') ?>
                     </td>
                     <td align="left" nowrap>
@@ -599,65 +599,71 @@ function Refrescar() {
                 </tr>
                 <tbody id="selectclienteasunto">
                     <tr>
-                        <td align=right width='20%'><?php echo __('Nombre Cliente') ?></td>
-                        <td nowrap colspan=3 align=left>
+                        <td align="right" width="20%"><?php echo __('Nombre Cliente') ?></td>
+                        <td nowrap colspan="3" align="left">
 							<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
                         </td>
                     </tr>
                     <tr>
-                        <td align=right><?php echo __('Asunto') ?></td>
-                        <td nowrap colspan=3 align=left>
+                        <td align="right"><?php echo __('Asunto') ?></td>
+                        <td nowrap colspan="3" align="left">
 							<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, 'CargarContrato(this.value)', '', false); ?>
-                            <input type="hidden" name='id_contrato' id='id_contrato' value='<?php $id_contrato ?>' />
+                            <input type="hidden" name="id_contrato" id="id_contrato" value="<?php $id_contrato ?>" />
                         </td>
                     </tr>
                 </tbody>
 
                 <tbody id="leyendaasunto">
                     <tr>
-                        <td nowrap colspan=4 align=center style='font-size:9px;'>
+                        <td nowrap colspan="4" align="center" style="font-size:9px;">
 							<?php echo __('Si Ud. selecciona el') . ' ' . __('asunto') . ' ' . __('mostrará los gastos de todos los') . ' ' . __('asuntos') . ' ' . __('que se cobrarán en la misma carta.') ?>
                         </td>
                     </tr>
                 </tbody>
 
                 <tr>
-                    <td align=right><?php echo __('Fecha Desde') ?></td>
-                    <td nowrap align=left>
+                    <td align="right"><?php echo __('Fecha Desde') ?></td>
+                    <td nowrap align="left">
                         <input class="fechadiff" onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
                     </td>
-                    <td nowrap align=left colspan=2>
+                    <td nowrap align="left" colspan="2">
                         &nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
                         <input  class="fechadiff" onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
                     </td>
                 </tr>
                 <tr>
-                    <td align=right><?php echo __('Encargado comercial') ?>&nbsp;</td>
-                    <td colspan=2 align=left><!-- Nuevo Select -->
+                    <td align="right"><?php echo __('Encargado comercial') ?>&nbsp;</td>
+                    <td colspan="2" align="left"><!-- Nuevo Select -->
                     	<?php echo $Form->select('id_usuario_responsable', $usuario->get_usuarios_gastos(1), $id_usuario_responsable, array('empty' => __('Cualquiera'), 'style' => 'width: 200px')); ?>
                     </td>
                 </tr>
                 <tr>
-                    <td align=right><?php echo __('Ordenado por') ?></td>
-                    <td align=left colspan=3><!-- Nuevo Select -->
+                    <td align="right"><?php echo __('Ordenado por') ?></td>
+                    <td align="left" colspan="3"><!-- Nuevo Select -->
 						<?php echo $Form->select('id_usuario_orden', $usuario->get_usuarios_gastos(), $id_usuario_orden, array('empty' => __('Ninguno'), 'style' => 'width: 200px')); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right"><?php echo __('Ingresado por') ?></td>
+                    <td align="left" colspan="3"><!-- Nuevo Select -->
+						<?php echo $Form->select('id_usuario', $usuario->get_usuarios_gastos(), $id_usuario, array('empty' => __('Ninguno'), 'style' => 'width: 200px')); ?>
                     </td>
                 </tr>
 				<?php if (Conf::GetConf($sesion, 'TipoGasto')) { ?>
 					<tr>
-						<td align=right><?php echo __('Tipo de Gasto') ?></td>
-						<td align=left colspan=3>
+						<td align="right"><?php echo __('Tipo de Gasto') ?></td>
+						<td align="left" colspan="3">
 							<?php echo Html::SelectQuery($sesion, "SELECT id_cta_corriente_tipo, glosa FROM prm_cta_corriente_tipo ORDER BY glosa", "id_tipo", $id_tipo, "", __('Cualquiera'), '200'); ?>
 						</td>
 					</tr>
 				<?php } ?>
                 <tr>
-                    <td align=right><?php echo __('Clientes activos') ?></td>
-                    <td colspan="2" align="left">
-                        <select name='clientes_activos' id='clientes_activos' style='width: 140px;'>
-                            <option value=''  selected="selected"> Todos </option>
-                            <option value='activos'> S&oacute;lo activos </option>
-                            <option value='inactivos'> S&oacute;lo inactivos </option>
+                    <td align="right"><?php echo __('Clientes activos') ?></td>
+                    <td colspan="2" align=""left"">
+                        <select name="clientes_activos" id="clientes_activos" style="width: 140px;">
+                            <option value=""  selected="selected"> Todos </option>
+                            <option value="activos"> S&oacute;lo activos </option>
+                            <option value="inactivos"> S&oacute;lo inactivos </option>
                         </select>
                     </td>
                     <td></td>
@@ -681,7 +687,7 @@ function Refrescar() {
 				}
 				?>
                 <tr>
-                    <td align=right><?php echo __('Moneda') ?></td>
+                    <td align="right"><?php echo __('Moneda') ?></td>
                     <td colspan="2" align="left">
 						<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda", "moneda_gasto", $moneda_gasto, "", __('Todas'), ''); ?>
                     </td>
@@ -689,7 +695,7 @@ function Refrescar() {
                 </tr>
 				<?php if (Conf::GetConf($sesion, 'UsarGastosCobrable')) { ?>
 					<tr>
-						<td align='right'><?php echo __('Cobrable') ?></td>
+						<td align="right"><?php echo __('Cobrable') ?></td>
 						<td  align="left">
 							<select name="cobrable" id="cobrable" style="width: 140px;">
 								<option value=""  >Todos </option>
