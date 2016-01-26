@@ -608,7 +608,7 @@ function Refrescar() {
                         <td align="right"><?php echo __('Asunto') ?></td>
                         <td nowrap colspan="3" align="left">
 							<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, 'CargarContrato(this.value)', '', false); ?>
-                            <input type="hidden" name="id_contrato" id="id_contrato" value="<?php $id_contrato ?>" />
+                            <input type="hidden" name="id_contrato" id="id_contrato" value="<?php echo $id_contrato; ?>" />
                         </td>
                     </tr>
                 </tbody>
