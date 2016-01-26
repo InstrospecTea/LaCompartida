@@ -449,8 +449,8 @@ class Criteria {
 				$this->generate_join_statement() .
 				$this->generate_where_statement() .
 				$this->generate_grouping_statement() .
-				$this->generate_ordering_statement() .
 				$this->generate_having_statement() .
+				$this->generate_ordering_statement() .
 				$this->limit;
 	}
 
