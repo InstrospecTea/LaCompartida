@@ -132,7 +132,7 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 
 		$result = array();
 		foreach ($reportData as $data) {
-			$result[$data->get($data->getIdentity())] = $data->fields[$value];
+			$result[$data->get($keyName)] = $data->fields[$value];
 		}
 
 		return $result;
