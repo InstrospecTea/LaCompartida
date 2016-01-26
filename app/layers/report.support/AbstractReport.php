@@ -35,7 +35,6 @@ abstract class AbstractReport implements BaseReport {
 	 * @throws ReportException
 	 */
 	function setOutputType($type) {
-		$type = strtoupper($type);
 		$classname = "{$type}ReportEngine";
 		try {
 			$class = new ReflectionClass($classname);
