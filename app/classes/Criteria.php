@@ -27,6 +27,7 @@ class Criteria {
 	private $grouping = ' GROUP BY';
 	private $ordering = ' ORDER BY';
 	private $limit = '';
+	private $having = ' HAVING';
 	private $order_criteria = '';
 
 	/*
@@ -38,6 +39,7 @@ class Criteria {
 	private $where_clauses = array();
 	private $grouping_clauses = array();
 	private $ordering_clauses = array();
+	private $having_clauses = array();
 
 	/**
 	 * Constructor de la clase.
@@ -309,6 +311,19 @@ class Criteria {
 	}
 
 	/**
+	 * Añade un having al criterio de búsqueda.
+	 * @param CriteriaRestriction $restriction
+	 * @return Criteria
+	 */
+	public function add_having(CriteriaRestriction $restriction) {
+		$string_restriction = $restriction->get_restriction();
+		if (!empty($string_restriction)) {
+			$this->having_clauses[] = $restriction->get_restriction();
+		}
+		return $this;
+	}
+
+	/**
 	 * Establece el criterio de ordenamiento para criteria.
 	 * @param $ordering_criteria
 	 * @return $this
@@ -407,6 +422,19 @@ class Criteria {
 
 	}
 
+	/**
+	 * Genera el statement HAVING de una query, si hubiere.
+	 * @return string
+	 */
+	private function generate_having_statement() {
+		if (!empty($this->having_clauses)) {
+			return $this->having . ' ' . implode(' AND ', $this->having_clauses);
+		} else {
+			return '';
+		}
+
+	}
+
 	/*
 	  QUERY ACCESS METHODS
 	 */
@@ -422,6 +450,7 @@ class Criteria {
 				$this->generate_where_statement() .
 				$this->generate_grouping_statement() .
 				$this->generate_ordering_statement() .
+				$this->generate_having_statement() .
 				$this->limit;
 	}
 
