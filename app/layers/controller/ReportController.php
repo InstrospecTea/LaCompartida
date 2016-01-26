@@ -109,16 +109,13 @@ class ReportController extends AbstractController {
 				$this->data['display_currency'] = $Currency;
 			}
 
-			// var_dump($this->data); exit;
-
 			$Report = $this->ChargingBusiness->getSalesAccountingConceptsReport($this->data);
 			$Report->render();
 		} else {
 			$this->layoutTitle = __('Reporte de Ventas');
 
 			$restrictions = array(CriteriaRestriction::equals('Client.activo', 1));
-			$client_code = Conf::GetConf($this->Session, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
-			$clients = $this->SearchingBusiness->getAssociativeArray('Client', $client_code, 'glosa_cliente', $restrictions);
+			$clients = $this->SearchingBusiness->getAssociativeArray('Client', 'codigo_cliente', 'glosa_cliente', $restrictions);
 			$this->set('clients', $clients);
 
 			$this->set('client_group', $this->SearchingBusiness->getAssociativeArray('ClientGroup', 'id_grupo_cliente', 'glosa_grupo_cliente'));
@@ -126,13 +123,6 @@ class ReportController extends AbstractController {
 			$this->set('currency', $this->SearchingBusiness->getAssociativeArray('Currency', 'id_moneda', 'glosa_moneda'));
 			$base_currency = $this->CoiningBusiness->getBaseCurrency();
 			$this->set('base_currency', $base_currency->fields['id_moneda']);
-
-			$this->set('rate',
-				array(
-					'monto_thh' => __('Tarifa del cliente'),
-					'monto_thh_estandar' => __('Tarifa estandar')
-				)
-			);
 
 			if (empty($this->data['start_date'])) {
 				$this->data['start_date'] = date('d-m-Y', strtotime('-1 month'));

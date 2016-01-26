@@ -992,12 +992,54 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 	public function getSalesAccountingConceptsReport($parameters) {
-		$data = array();
+		$CriteriaInvoice = new Criteria($this->Session);
+		$CriteriaInvoice
+			->add_select('cliente.codigo_cliente')
+			->add_select('cliente.glosa_cliente')
+			->add_select('factura.mes_contable')
+			->add_select('IF(prm_documento_legal.codigo = "FA", factura.total * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)', 'total_factura')
+			->add_select('IF(prm_documento_legal.codigo = "NC", factura.total * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)', 'total_nc')
+			->add_from('factura')
+			->add_left_join_with('prm_documento_legal', 'prm_documento_legal.id_documento_legal = factura.id_documento_legal')
+			->add_left_join_with('cobro', 'cobro.id_cobro = factura.id_cobro')
+			->add_left_join_with('cliente', 'cliente.codigo_cliente = factura.codigo_cliente')
+			->add_left_join_with('documento', 'documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = "N"')
+			->add_left_join_with(array('documento_moneda', 'cobro_moneda'), "cobro_moneda.id_documento = documento.id_documento AND cobro_moneda.id_moneda = {$parameters['display_currency']->fields['id_moneda']}")
+			->add_left_join_with(array('documento_moneda', 'cobro_moneda_cobro'), 'cobro_moneda_cobro.id_documento = documento.id_documento AND cobro_moneda_cobro.id_moneda = cobro.id_moneda')
+			->add_restriction(CriteriaRestriction::between('factura.fecha', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"))
+			->add_restriction(CriteriaRestriction::not_equal('factura.id_estado', 5));
 
-		// var_dump($parameters); exit;
+		if (!empty($parameters['clients'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::in('cliente.codigo_cliente', $parameters['clients']));
+		}
+
+		if (!empty($parameters['client_group'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::in('cliente.id_grupo_cliente', $parameters['client_group']));
+		}
+
+		if (!empty($parameters['billing_strategy'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::in('cobro.forma_cobro', $parameters['billing_strategy']));
+		}
+
+		if (!empty($parameters['invoiced'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::in('cobro.opc_moneda_total', $parameters['invoiced']));
+		}
+
+		$Criteria = new Criteria($this->Session);
+		$sales = $Criteria
+			->add_select('ventas.codigo_cliente', 'client_code')
+			->add_select('ventas.glosa_cliente', 'client')
+			->add_select('ventas.mes_contable', 'period')
+			->add_select('SUM(ventas.total_factura - ventas.total_nc)', 'total_period')
+			->add_from_criteria($CriteriaInvoice, 'ventas')
+			->add_grouping('ventas.codigo_cliente')
+			->add_grouping('ventas.mes_contable')
+			->add_ordering('ventas.glosa_cliente')
+			->add_ordering('ventas.mes_contable')
+			->run();
 
 		$this->loadReport('SalesAccountingConcepts', 'Report');
-		$this->Report->setData($data);
+		$this->Report->setData($sales);
 		$this->Report->setParameters($parameters);
 
 		return $this->Report;

@@ -59,14 +59,6 @@
 			</td>
 		</tr>
 		<tr>
-			<td align="right">
-				<?php echo __('Comparar seg&uacute;n:'); ?>
-			</td>
-			<td align="left">
-				<?php echo $this->Form->select('rate', $rate, $this->data['rate'], array('empty' => false)); ?>
-			</td>
-		</tr>
-		<tr>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
