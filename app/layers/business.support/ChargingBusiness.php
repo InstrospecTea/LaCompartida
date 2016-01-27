@@ -996,7 +996,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$CriteriaInvoice
 			->add_select('cliente.codigo_cliente')
 			->add_select('cliente.glosa_cliente')
-			->add_select('factura.mes_contable')
+			->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
 			->add_select('IF(prm_documento_legal.codigo = "FA", factura.total * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)', 'total_factura')
 			->add_select('IF(prm_documento_legal.codigo = "NC", factura.total * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)', 'total_nc')
 			->add_from('factura')
