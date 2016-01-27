@@ -392,6 +392,9 @@ class Gasto extends Objeto {
 		if ($request['id_usuario_orden']) {
 			$where .= " AND cta_corriente.id_usuario_orden = '{$request['id_usuario_orden']}'";
 		}
+		if ($request['id_usuario']) {
+			$where .= " AND cta_corriente.id_usuario = '{$request['id_usuario']}'";
+		}
 		if ($request['id_usuario_responsable']) {
 			$where .= " AND contrato.id_usuario_responsable = '{$request['id_usuario_responsable']}' ";
 		}
