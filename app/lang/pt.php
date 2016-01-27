@@ -299,6 +299,7 @@ $_LANG['Continuar con el cobro'] = 'Abrir uma cobrança';
 // Gastos
 $_LANG['Cobrado'] = 'Faturado';
 $_LANG['Ordenado por'] = 'Organizado por';
+$_LANG['Ingresado por'] = 'Inserido por';
 $_LANG['Clientes activos'] = 'Clientes ativos';
 $_LANG['Descargar Resumen Excel'] = 'Download do resumo em Excel';
 $_LANG['Ingreso de Gastos'] = 'Inserção de gastos';
