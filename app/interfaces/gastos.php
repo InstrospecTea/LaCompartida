@@ -577,201 +577,198 @@ function Refrescar() {
 
 <input type="hidden" name="serializacion" id="serializacion" size="70"/>
 <td>
-    <input type="hidden" name="serializacion" id="serializacion" size="70"/>
-    <form method="post" name="form_gastos" action="" id="form_gastos">
+	<input type="hidden" name="serializacion" id="serializacion" size="70"/>
+	<form method="post" name="form_gastos" action="" id="form_gastos">
 
 		<?php if (isset($_GET['opc']) && $_GET['opc'] == 'buscar' && $where != '') echo '<input type="hidden" name="where" id="where" value="' . base64_encode($where) . '"/>'; ?>
-        <input type="hidden" name="opc" id="opc" value="buscar">
-        <input type="hidden" name="motivo" id="motivo" value="gastos"/>
-        <fieldset class="tb_base" style="width: 90%;border: 1px solid #BDBDBD;margin:auto;">
-            <legend><?php echo __('Filtros') ?></legend>
+			<input type="hidden" name="opc" id="opc" value="buscar">
+			<input type="hidden" name="motivo" id="motivo" value="gastos"/>
+			<fieldset class="tb_base" style="width: 90%;border: 1px solid #BDBDBD;margin:auto;">
+				<legend><?php echo __('Filtros') ?></legend>
 
-            <table style="border: 0px solid black" width="750px">
-                <tr>
-                    <td align="right"><?php echo __('Cobrado') ?></td>
-                    <td align="left">
-						<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", isset($cobrado) ? $cobrado : $selected_cobrado, '', 'Todos', '60') ?>
-                    </td>
-                    <td align="left" nowrap>
-						<?php echo __('id_cobro') ?>&nbsp;
-                        <input onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" size="6" name="id_cobro" id="id_cobro" value="<?php echo $id_cobro ?>">
-                    </td>
-                </tr>
-                <tbody id="selectclienteasunto">
-                    <tr>
-                        <td align="right" width="20%"><?php echo __('Nombre Cliente') ?></td>
-                        <td nowrap colspan="3" align="left">
-							<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="right"><?php echo __('Asunto') ?></td>
-                        <td nowrap colspan="3" align="left">
-							<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, 'CargarContrato(this.value)', '', false); ?>
-                            <input type="hidden" name="id_contrato" id="id_contrato" value="<?php echo $id_contrato; ?>" />
-                        </td>
-                    </tr>
-                </tbody>
-
-                <tbody id="leyendaasunto">
-                    <tr>
-                        <td nowrap colspan="4" align="center" style="font-size:9px;">
-							<?php echo __('Si Ud. selecciona el') . ' ' . __('asunto') . ' ' . __('mostrará los gastos de todos los') . ' ' . __('asuntos') . ' ' . __('que se cobrarán en la misma carta.') ?>
-                        </td>
-                    </tr>
-                </tbody>
-
-                <tr>
-                    <td align="right"><?php echo __('Fecha Desde') ?></td>
-                    <td nowrap align="left">
-                        <input class="fechadiff" onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
-                    </td>
-                    <td nowrap align="left" colspan="2">
-                        &nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
-                        <input  class="fechadiff" onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right"><?php echo __('Encargado comercial') ?>&nbsp;</td>
-                    <td colspan="2" align="left"><!-- Nuevo Select -->
-                    	<?php echo $Form->select('id_usuario_responsable', $usuario->get_usuarios_gastos(1), $id_usuario_responsable, array('empty' => __('Cualquiera'), 'style' => 'width: 200px')); ?>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right"><?php echo __('Ordenado por') ?></td>
-                    <td align="left" colspan="3"><!-- Nuevo Select -->
-						<?php echo $Form->select('id_usuario_orden', $usuario->get_usuarios_gastos(), $id_usuario_orden, array('empty' => __('Ninguno'), 'style' => 'width: 200px')); ?>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right"><?php echo __('Ingresado por') ?></td>
-                    <td align="left" colspan="3"><!-- Nuevo Select -->
-						<?php echo $Form->select('id_usuario', $usuario->get_usuarios_gastos(), $id_usuario, array('empty' => __('Ninguno'), 'style' => 'width: 200px')); ?>
-                    </td>
-                </tr>
-				<?php if (Conf::GetConf($sesion, 'TipoGasto')) { ?>
+				<table style="border: 0px solid black" width="750px">
 					<tr>
-						<td align="right"><?php echo __('Tipo de Gasto') ?></td>
-						<td align="left" colspan="3">
-							<?php echo Html::SelectQuery($sesion, "SELECT id_cta_corriente_tipo, glosa FROM prm_cta_corriente_tipo ORDER BY glosa", "id_tipo", $id_tipo, "", __('Cualquiera'), '200'); ?>
+						<td align="right"><?php echo __('Cobrado') ?></td>
+						<td align="left">
+							<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", isset($cobrado) ? $cobrado : $selected_cobrado, '', 'Todos', '60') ?>
+						</td>
+						<td align="left" nowrap>
+							<?php echo __('id_cobro') ?>&nbsp;
+							<input onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" size="6" name="id_cobro" id="id_cobro" value="<?php echo $id_cobro ?>">
 						</td>
 					</tr>
-				<?php } ?>
-                <tr>
-                    <td align="right"><?php echo __('Clientes activos') ?></td>
-                    <td colspan="2" align=""left"">
-                        <select name="clientes_activos" id="clientes_activos" style="width: 140px;">
-                            <option value=""  selected="selected"> Todos </option>
-                            <option value="activos"> S&oacute;lo activos </option>
-                            <option value="inactivos"> S&oacute;lo inactivos </option>
-                        </select>
-                    </td>
-                    <td></td>
-                </tr>
-				<?php if (!$conf_nuevo_modulo_gastos) { ?>
+					<tbody id="selectclienteasunto">
+						<tr>
+							<td align="right" width="20%"><?php echo __('Nombre Cliente') ?></td>
+							<td nowrap colspan="3" align="left">
+								<?php UtilesApp::CampoCliente($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario); ?>
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><?php echo __('Asunto') ?></td>
+							<td nowrap colspan="3" align="left">
+								<?php UtilesApp::CampoAsunto($sesion, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, 320, 'CargarContrato(this.value)', '', false); ?>
+								<input type="hidden" name="id_contrato" id="id_contrato" value="<?php echo $id_contrato; ?>" />
+							</td>
+						</tr>
+					</tbody>
+
+					<tbody id="leyendaasunto">
+						<tr>
+							<td nowrap colspan="4" align="center" style="font-size:9px;">
+								<?php echo __('Si Ud. selecciona el') . ' ' . __('asunto') . ' ' . __('mostrará los gastos de todos los') . ' ' . __('asuntos') . ' ' . __('que se cobrarán en la misma carta.') ?>
+							</td>
+						</tr>
+					</tbody>
+
 					<tr>
-						<td align="right"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>                        </td>
+						<td align="right"><?php echo __('Fecha Desde') ?></td>
+						<td nowrap align="left">
+							<input class="fechadiff" onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" name="fecha1" value="<?php echo $fecha1 ?>" id="fecha1" size="11" maxlength="10" />
+						</td>
+						<td nowrap align="left" colspan="2">
+							&nbsp;&nbsp; <?php echo __('Fecha Hasta') ?>
+							<input  class="fechadiff" onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" name="fecha2" value="<?php echo $fecha2 ?>" id="fecha2" size="11" maxlength="10" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right"><?php echo __('Encargado comercial') ?>&nbsp;</td>
 						<td colspan="2" align="left">
-							<select name="egresooingreso" id="egresooingreso" style="width: 140px;">
-								<option value=""  selected="selected"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>  </option>
-								<option value="soloingreso"> Sólo <?php echo __('provisiones'); ?></option>
-								<option value="sologastos"> Sólo <?php echo __('gastos'); ?> </option>
-							</select>
+							<?php echo $Form->select('id_usuario_responsable', $usuario->get_usuarios_gastos(1), $id_usuario_responsable, array('empty' => __('Cualquiera'), 'style' => 'width: 200px')); ?>
 						</td>
-						<td></td>
 					</tr>
-					<?php
-				} else {
-					echo '<input name="egresooingreso" id="egresooingreso" type="hidden" value="" />';
-					$Slim = Slim::getInstance('default') ? $Slim->applyHook('hook_formulario_gastos') : false;
-				}
-				?>
-                <tr>
-                    <td align="right"><?php echo __('Moneda') ?></td>
-                    <td colspan="2" align="left">
-						<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda", "moneda_gasto", $moneda_gasto, "", __('Todas'), ''); ?>
-                    </td>
-                    <td></td>
-                </tr>
-				<?php if (Conf::GetConf($sesion, 'UsarGastosCobrable')) { ?>
 					<tr>
-						<td align="right"><?php echo __('Cobrable') ?></td>
-						<td  align="left">
-							<select name="cobrable" id="cobrable" style="width: 140px;">
-								<option value=""  >Todos </option>
-								<option value="1" selected="selected"> Sólo <?php echo __('Cobrable'); ?></option>
-								<option value="0"> Sólo No <?php echo __('Cobrable'); ?> </option>
+						<td align="right"><?php echo __('Ordenado por') ?></td>
+						<td align="left" colspan="3">
+							<?php echo $Form->select('id_usuario_orden', $usuario->get_usuarios_gastos(), $id_usuario_orden, array('empty' => __('Ninguno'), 'style' => 'width: 200px')); ?>
+						</td>
+					</tr>
+					<tr>
+						<td align="right"><?php echo __('Ingresado por') ?></td>
+						<td align="left" colspan="3">
+							<?php echo $Form->select('id_usuario', $usuario->get_usuarios_gastos(), $id_usuario, array('empty' => __('Ninguno'), 'style' => 'width: 200px')); ?>
+						</td>
+					</tr>
+					<?php if (Conf::GetConf($sesion, 'TipoGasto')) { ?>
+						<tr>
+							<td align="right"><?php echo __('Tipo de Gasto') ?></td>
+							<td align="left" colspan="3">
+								<?php echo Html::SelectQuery($sesion, "SELECT id_cta_corriente_tipo, glosa FROM prm_cta_corriente_tipo ORDER BY glosa", "id_tipo", $id_tipo, "", __('Cualquiera'), '200'); ?>
+							</td>
+						</tr>
+					<?php } ?>
+					<tr>
+						<td align="right"><?php echo __('Clientes activos') ?></td>
+						<td colspan="2" align="left">
+							<select name="clientes_activos" id="clientes_activos" style="width: 140px;">
+								<option value=""  selected="selected"> Todos </option>
+                <option value="activos"> S&oacute;lo activos </option>
+                <option value="inactivos"> S&oacute;lo inactivos </option>
 							</select>
 						</td>
 						<td></td>
 					</tr>
-				<?php } ?>
+					<?php if (!$conf_nuevo_modulo_gastos) { ?>
+						<tr>
+							<td align="right"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>                        </td>
+							<td colspan="2" align="left">
+								<select name="egresooingreso" id="egresooingreso" style="width: 140px;">
+									<option value=""  selected="selected"> <?php echo __('Gastos'); ?>  y  <?php echo __('Provisiones'); ?>  </option>
+									<option value="soloingreso"> Sólo <?php echo __('provisiones'); ?></option>
+									<option value="sologastos"> Sólo <?php echo __('gastos'); ?> </option>
+								</select>
+							</td>
+							<td></td>
+						</tr>
+						<?php
+					} else {
+						echo '<input name="egresooingreso" id="egresooingreso" type="hidden" value="" />';
+						$Slim = Slim::getInstance('default') ? $Slim->applyHook('hook_formulario_gastos') : false;
+					}
+					?>
+					<tr>
+						<td align="right"><?php echo __('Moneda') ?></td>
+						<td colspan="2" align="left">
+							<?php echo Html::SelectQuery($sesion, "SELECT id_moneda, glosa_moneda FROM prm_moneda", "moneda_gasto", $moneda_gasto, "", __('Todas'), ''); ?>
+						</td>
+						<td></td>
+					</tr>
+					<?php if (Conf::GetConf($sesion, 'UsarGastosCobrable')) { ?>
+						<tr>
+							<td align="right"><?php echo __('Cobrable') ?></td>
+							<td  align="left">
+								<select name="cobrable" id="cobrable" style="width: 140px;">
+									<option value=""  >Todos </option>
+									<option value="1" selected="selected"> Sólo <?php echo __('Cobrable'); ?></option>
+									<option value="0"> Sólo No <?php echo __('Cobrable'); ?> </option>
+								</select>
+							</td>
+							<td></td>
+						</tr>
+					<?php } ?>
+				</table>
 
-            </table>
+				<div style="padding:10px;text-align:right;float:left;margin-left:120px">
+					<?php
+						echo $Form->icon_button(__('Buscar'), 'find', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'buscar'));
+						echo $Form->icon_button(__('Descargar Excel'), 'xls', array('id' => 'boton_excel', 'class' => 'buscargastos', 'rel' => 'excel'));
+						echo $Form->icon_button(__('Descargar Resumen Excel'), 'xls', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'excel_resumen'));
+					?>
+				</div>
+				<div style="padding:10px;text-align:right;float:right;">
+					<?php
+						if (!$conf_nuevo_modulo_gastos) {
+							echo $Form->icon_button(__('Agregar provisión'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('provision')"));
+						}
+						echo $Form->icon_button(__('Agregar') . ' ' . __('gasto'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('gasto')"));
+					?>
+				</div>
 
-            <div style="padding:10px;text-align:right;float:left;margin-left:120px">
-							<?php
-								echo $Form->icon_button(__('Buscar'), 'find', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'buscar'));
-								echo $Form->icon_button(__('Descargar Excel'), 'xls', array('id' => 'boton_excel', 'class' => 'buscargastos', 'rel' => 'excel'));
-								echo $Form->icon_button(__('Descargar Resumen Excel'), 'xls', array('id' => 'boton_buscar', 'class' => 'buscargastos', 'rel' => 'excel_resumen'));
-							?>
-						</div>
-						<div style="padding:10px;text-align:right;float:right;">
-							<?php
-								if (!$conf_nuevo_modulo_gastos) {
-									echo $Form->icon_button(__('Agregar provisión'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('provision')"));
-								}
-								echo $Form->icon_button(__('Agregar') . ' ' . __('gasto'), 'agregar', array('id' => 'boton_buscar', 'onclick' => "AgregarNuevo('gasto')"));
-							?>
-						</div>
-
-        </fieldset>
-        <br>
-		<?php if ($buscar == 1 && ( $codigo_cliente != '' || $codigo_cliente_secundario != '')) { ?>
-			<table id="gran_tabla_gastos" width="100%">
-				<tr>
-					<td align="right">
-						<input type="button" value="Generar borrador" class="btn" name="boton" onclick="Preparar_Cobro(jQuery('#form_gastos').get(0));">
-					</td>
-				</tr>
-			</table>
-		<?php } ?>
+			</fieldset>
+			<br>
+			<?php if ($buscar == 1 && ( $codigo_cliente != '' || $codigo_cliente_secundario != '')) { ?>
+				<table id="gran_tabla_gastos" width="100%">
+					<tr>
+						<td align="right">
+							<input type="button" value="Generar borrador" class="btn" name="boton" onclick="Preparar_Cobro(jQuery('#form_gastos').get(0));">
+						</td>
+					</tr>
+				</table>
+			<?php } ?>
     </form>
-
-</tr>
+	</tr>
 </table>
 <?php echo $Form->script(); ?>
 <div id="totalcta" style='font-size:11px;z-index:999;'><b>
-		<?php
+	<?php
 		if ($opc == 'buscar') {
 			if ($total_cta) {
 				echo __('Balance cuenta gastos') . ': ' . UtilesApp::GetSimboloMonedaBase($sesion) . " " . $total_cta;
 			}
 		}
-		?>
-    </b></div>
+	?>
+</b></div>
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="tablon" style="width:920px;display:none;">
-    <thead>
-        <tr class="encabezadolight">
-            <th><?php echo __('Correlativo'); ?></th>
-            <th><?php echo __('Fecha'); ?></th>
-            <th><?php echo __('Nº OT'); ?></th>
-            <th width="190"><?php echo __('Cliente'); ?></th>
-            <th width="260"><?php echo __('Asunto'); ?><br><small>(<?php echo __('descripción'); ?>)</small></th>
-            <th><?php echo __('Descripción'); ?></th>
-            <th><?php echo __('Egreso'); ?><br/><small>(<?php echo __('Cobrable'); ?>)</small></th>
-            <th><?php echo __('Ingreso'); ?></th>
-            <th><?php echo __('Impuesto'); ?></th>
-            <th width="70"><?php echo __('Cobro'); ?><br/><small>(<?php echo __('estado'); ?>)</small></th>
-            <th><?php echo __('Cobro'); ?></th>
-            <th width="60"><?php echo __('Cobrable'); ?></th>
-            <th><?php echo __('Contrato'); ?><br><?php echo __('Activo'); ?></th>
-            <th width="60"><?php echo __('Opción'); ?> <input type="checkbox" id="selectodos"/></th>
-            <th><?php echo __('contrato'); ?> </th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
+	<thead>
+		<tr class="encabezadolight">
+      <th><?php echo __('Correlativo'); ?></th>
+      <th><?php echo __('Fecha'); ?></th>
+      <th><?php echo __('Nº OT'); ?></th>
+      <th width="190"><?php echo __('Cliente'); ?></th>
+      <th width="260"><?php echo __('Asunto'); ?><br><small>(<?php echo __('descripción'); ?>)</small></th>
+      <th><?php echo __('Descripción'); ?></th>
+      <th><?php echo __('Egreso'); ?><br/><small>(<?php echo __('Cobrable'); ?>)</small></th>
+      <th><?php echo __('Ingreso'); ?></th>
+      <th><?php echo __('Impuesto'); ?></th>
+      <th width="70"><?php echo __('Cobro'); ?><br/><small>(<?php echo __('estado'); ?>)</small></th>
+      <th><?php echo __('Cobro'); ?></th>
+      <th width="60"><?php echo __('Cobrable'); ?></th>
+      <th><?php echo __('Contrato'); ?><br><?php echo __('Activo'); ?></th>
+      <th width="60"><?php echo __('Opción'); ?> <input type="checkbox" id="selectodos"/></th>
+      <th><?php echo __('contrato'); ?> </th>
+		</tr>
+	</thead>
+	<tbody></tbody>
 </table>
 <?php
 $pagina->PrintBottom();
