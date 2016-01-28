@@ -50,12 +50,23 @@
 				<?php echo $this->Form->select('invoiced[]', $currency, $this->data['invoiced'], $select_options); ?>
 			</td>
 		</tr>
-			<tr>
+		<tr>
 			<td align="right">
-				<?php echo __('Mostrar valores en:'); ?>
+				<?php echo __('Mostrar valores en'); ?>
 			</td>
 			<td align="left">
 				<?php echo $this->Form->select('display_currency', $currency, ($this->data['display_currency'] ? $this->data['display_currency'] : $base_currency), array('empty' => false)); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
+				&nbsp;
+			</td>
+			<td align="left">
+				<label>
+					<?php echo $this->Form->checkbox('display_tax', 1, !empty($this->data['display_total']), array('label' => false)); ?>
+					<?php echo __('Mostrar valores con impuesto'); ?>
+				</label>
 			</td>
 		</tr>
 		<tr>

@@ -992,13 +992,15 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 	public function getSalesAccountingConceptsReport($parameters) {
+		$total_invoice = $parameters['display_tax'] == '1' ? 'factura.total' : 'factura.subtotal';
+
 		$CriteriaInvoice = new Criteria($this->Session);
 		$CriteriaInvoice
 			->add_select('cliente.codigo_cliente')
 			->add_select('cliente.glosa_cliente')
 			->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
-			->add_select('IF(prm_documento_legal.codigo = "FA", factura.total * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)', 'total_factura')
-			->add_select('IF(prm_documento_legal.codigo = "NC", factura.total * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)', 'total_nc')
+			->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_factura')
+			->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_nc')
 			->add_from('factura')
 			->add_left_join_with('prm_documento_legal', 'prm_documento_legal.id_documento_legal = factura.id_documento_legal')
 			->add_left_join_with('cobro', 'cobro.id_cobro = factura.id_cobro')

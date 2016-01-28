@@ -23,54 +23,27 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 		return $data;
 	}
 
-	private function setHeader() {
-		$this->row += 1;
-		$this->Ws->mergeCells($this->row, 1, $this->row, 13);
-		$this->Ws->write($this->row, 1, __('REPORTE TOTAL MONTOS FACTURADOS MENSUALMENTE'), $this->format['header']);
-
-		for ($x = 2; $x < 14; $x++) {
-			$this->Ws->write($this->row, $x, '', $this->format['header']);
-		}
-
-		$this->row += 2;
-		$this->Ws->write($this->row, 1, __('GENERADO EL:'), $this->format['text']);
-		$this->Ws->mergeCells($this->row, 2, $this->row, 13);
-		$this->Ws->write($this->row, 2, date("d-m-Y H:i:s"), $this->format['text']);
-
-		for ($x = 3; $x < 14; $x++) {
-			$this->Ws->write($this->row, $x, '', $this->format['text']);
-		}
-
-		$this->row += 1;
-		$this->Ws->write($this->row, 1, __('PERIODO ENTRE:'), $this->format['text']);
-		$this->Ws->mergeCells($this->row, 2, $this->row, 13);
-		$this->Ws->write($this->row, 2, "{$this->parameters['start_date']} HASTA {$this->parameters['end_date']}", $this->format['text']);
-
-		for ($x = 3; $x < 14; $x++) {
-			$this->Ws->write($this->row, $x, '', $this->format['text']);
-		}
-
+	private function writeNewRow($col_from, $col_to, $text, $format) {
 		$this->row++;
-		$comparison_text = __('Los montos facturados se comparan con el monto THH segun') . ' ';
+		$this->Ws->mergeCells($this->row, $col_from, $this->row, $col_to);
+		$this->Ws->write($this->row, $col_from, $text, $format);
+	}
 
-		if ($this->parameters['rate'] == 'monto_thh') {
-			$comparison_text .= __('tarifa del cliente');
-		} else {
-			$comparison_text .= __('tarifa estandar');
-		}
-
-		$this->Ws->write($this->row, 1, $comparison_text, $this->format['text']);
-		$this->Ws->mergeCells($this->row, 1, $this->row, 13);
+	private function setHeader() {
+		$this->writeNewRow(1, 13, __('REPORTE TOTAL MONTOS FACTURADOS MENSUALMENTE'), $this->format['header']);
+		$this->row++;
+		$this->writeNewRow(1, 13,  __('Generado el') . ' ' . date('d-m-Y H:i:s'), $this->format['text']);
+		$this->writeNewRow(1, 13,  __('Periodo entre') . " {$this->parameters['start_date']} hasta {$this->parameters['end_date']}", $this->format['text']);
+		$display_tax_text = ($this->parameters['display_tax'] == '1') ? __('Mostrar valores con impuesto') : __('Mostrar valores sin impuesto');
+		$this->writeNewRow(1, 13, $display_tax_text, $this->format['text']);
 	}
 
 	protected function present() {
 		$this->setFormat();
-		$row = 0;
+		$this->setHeader();
 
 		$currency = $this->parameters['display_currency']->fields['id_moneda'];
 		$currency_symbol = $this->parameters['display_currency']->fields['simbolo'];
-
-		$this->setHeader();
 
 		if (!empty($this->data)) {
 			foreach ($this->data as $sale) {
@@ -94,7 +67,7 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 				$next_period->add(new DateInterval('P1M'));
 			}
 
-			$this->row += 3;
+			$this->row++;
 
 			$col = 2;
 			foreach ($periods as $period_key => $period_value) {
@@ -127,12 +100,8 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 				$this->Ws->writeFormula($this->row, $x, "=SUM({$col}{$start_row}:{$col}{$this->row})", $this->format['currency']);
 			}
 		} else {
-			$this->Ws->mergeCells($this->row, 2, $this->row, 13);
-			$this->Ws->write($this->row, 2, __('No se encontraron resultados'), $this->format['text']);
-
-			for ($x = 3; $x < 14; $x++) {
-				$this->Ws->write($this->row, $x, '', $this->format['text']);
-			}
+			$this->row++;
+			$this->writeNewRow(1, 13, __('No se encontraron resultados'), $this->format['header']);
 		}
 	}
 
