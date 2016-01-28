@@ -1278,7 +1278,7 @@ class Asunto extends Objeto {
 		try {
 			$result = $criteria->add_select('count(asunto.id_asunto)', 'asuntos')
 				->add_from('contrato')
-				->add_left_join_with('asunto', 'asunto.id_contrato = contrato.id_contrato')
+				->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.id_contrato', 'contrato.id_contrato'))
 				->add_restriction(CriteriaRestriction::equals('contrato.id_contrato', $id_contrato))
 				->run();
 		} catch (Exception $e) {
