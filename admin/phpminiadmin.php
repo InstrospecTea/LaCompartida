@@ -1,24 +1,24 @@
 <?php
 require_once dirname(__FILE__).'/../app/conf.php';
-	
+
  	$sesion = new Sesion(array('ADM'));
  		 $pagina = new Pagina($sesion);
 		 $pagina->titulo = __('Administración de Base de Datos');
 	$pagina->PrintTop();
 	   if(!$sesion->usuario->TienePermiso('SADM')) {
 		die('No Autorizado');
-	   }  
-		   
-	 
+	   }
+
+
  //$ACCESS_PWD='lockerbie'; #!!!IMPORTANT!!! this is script access password, SET IT if you want to protect you DB from public access
  #DEFAULT db connection settings
  # --- WARNING! --- if you set defaults - always recommended to set $ACCESS_PWD to protect your db!
- 
+
 defined('DBUSER') || define('DBUSER',Conf::dbUser());
 defined('DBHOST') || define('DBHOST',Conf::dbHost());
 defined('DBPASS') || define('DBPASS',Conf::dbPass());
- 
- 
+
+
   $DBDEF=array(
  'user'=>DBUSER,#required
  'pwd'=> Conf::dbPass(), #required
@@ -27,7 +27,7 @@ defined('DBPASS') || define('DBPASS',Conf::dbPass());
  'port'=>3306,#optional
 'chset'=>"ISO-8859-1",#optional, default charset
  );
- 	 
+
  date_default_timezone_set('UTC');#required by PHP 5.1+
 
 //constants
@@ -101,7 +101,7 @@ defined('DBPASS') || define('DBPASS',Conf::dbPass());
 
  if (db_connect('nodie')){
     $time_start=microtime_float();
-   
+
     if ($_REQUEST['phpinfo']){
        ob_start();phpinfo();$sqldr='<div style="font-size:130%">'.ob_get_clean().'</div>';
     }else{
@@ -130,7 +130,7 @@ defined('DBPASS') || define('DBPASS',Conf::dbPass());
      }
     }
     $time_all=ceil((microtime_float()-$time_start)*10000)/10000;
-   
+
     print_screen();
  }else{
     print_cfg();
@@ -170,7 +170,7 @@ function display_select($sth,$q){
 
  $reccount=mysql_num_rows($sth);
  $fields_num=mysql_num_fields($sth);
- 
+
  $w="width='100%' ";
  if ($is_sht || $is_shd) {$w='';
    $url='?'.$xurl."&db=$dbn";
@@ -302,7 +302,7 @@ function after_load(){
 function chkall(cab){
  var e=document.DF.elements;
  if (e!=null){
-  var cl=e.length;                   
+  var cl=e.length;
   for (i=0;i<cl;i++){var m=e[i];if(m.checked!=null && m.type=="checkbox"){m.checked=cab.checked}}
  }
 }
@@ -322,7 +322,7 @@ function sht(f){
 <div class="inv">
 <a href="http://phpminiadmin.sourceforge.net/" target="_blank"><b>phpMiniAdmin <?php echo $VERSION?></b></a>
 <?php if ($_SESSION['is_logged'] && $dbh){ ?>
- | 
+ |
 <a href="?<?php echo $xurl?>&q=show+databases">Databases</a>: <select name="db" onChange="frefresh()"><option value='*'> - select/refresh -</option><option value=''> - show all -</option><?php echo get_db_select($dbn)?></select>
 <?php if($dbn){ $z=" &#183;<a href='$self?$xurl&db=$dbn"; ?>
 <?php echo $z?>&q=show+tables'>show tables</a>
@@ -330,7 +330,7 @@ function sht(f){
 <?php echo $z?>&shex=1'>export</a>
 <?php echo $z?>&shim=1'>import</a>
 <?php } ?>
- | <a href="?showcfg=1">Settings</a> 
+ | <a href="?showcfg=1">Settings</a>
 <?php } ?>
 <?php if ($GLOBALS['ACCESS_PWD']){?> | <a href="?<?php echo $xurl?>&logoff=1">Logoff</a> <?php }?>
  | <a href="?phpinfo=1">phpinfo</a>
@@ -345,7 +345,7 @@ function print_screen(){
  global $out_message, $SQLq, $err_msg, $reccount, $time_all, $sqldr, $page, $MAX_ROWS_PER_PAGE, $is_limited_sql;
 
  print_header();
- 
+
 if(isset($_GET['qry'])) $SQLq=base64_decode($_GET['qry']);
 ?>
 
@@ -358,7 +358,7 @@ SQL-query (or multiple queries separated by ";"):<br />
 
 <div class="dot" style="padding:5px 0 5px 20px">
 Records: <b><?php echo $reccount?></b> in <b><?php echo $time_all?></b> sec<br />
-<b><?php 
+<b><?php
 echo $out_message;
 
 if(isset($_POST['GoSQL']) && $_POST['GoSQL']=='Go') {
@@ -381,12 +381,14 @@ if(isset($_POST['GoSQL']) && $_POST['GoSQL']=='Go') {
 
 <?php
 
- print_footer();
-echo '<h4>Querys anteriores</h4>';
- foreach($_SESSION['queryhistoria'] as $queryhistoria) {
-	echo '<input type="text" style="width:800px;;" value="'.$queryhistoria.'"/><br><br>';
-}
- 
+	print_footer();
+	if (isset($_SESSION['queryhistoria'])) {
+		echo '<h4>Querys anteriores</h4>';
+		foreach($_SESSION['queryhistoria'] as $queryhistoria) {
+			echo '<input type="text" style="width:800px;;" value="'.$queryhistoria.'"/><br><br>';
+		}
+	}
+
 }
 
 function print_footer(){
@@ -553,9 +555,9 @@ function sel($arr,$n,$sel=''){
 }
 
 function microtime_float(){
- list($usec,$sec)=explode(" ",microtime()); 
- return ((float)$usec+(float)$sec); 
-} 
+ list($usec,$sec)=explode(" ",microtime());
+ return ((float)$usec+(float)$sec);
+}
 
 ############################
 # $pg=int($_[0]);     #current page
@@ -581,7 +583,7 @@ function make_List_Navigation($pg, $all, $PP, $ptpl, $show_all=''){
 
   if($sp>0){
     $pname=pen($sp-1,$ptpl);
-    $res.="<a href='$pname'>$w[0]</a>";       
+    $res.="<a href='$pname'>$w[0]</a>";
     $res.=$sep;
   }
   for($p_p=$sp;$p_p<$allp && $p_p<$sp+5;$p_p++){
@@ -590,17 +592,17 @@ function make_List_Navigation($pg, $all, $PP, $ptpl, $show_all=''){
      $pname=pen($p_p,$ptpl);
      if($last_s>$all){
        $last_s=$all;
-     }      
+     }
      if($p_p==$pg){
         $res.="<b>$first_s..$last_s</b>";
      }else{
         $res.="<a href='$pname'>$first_s..$last_s</a>";
-     }       
+     }
      if($p_p+1<$allp) $res.=$sep;
   }
   if($sp+5<$allp){
     $pname=pen($sp+5,$ptpl);
-    $res.="<a href='$pname'>$w[1]</a>";       
+    $res.="<a href='$pname'>$w[1]</a>";
   }
   $res.=" <br/>\n";
 
@@ -608,13 +610,13 @@ function make_List_Navigation($pg, $all, $PP, $ptpl, $show_all=''){
     $pname=pen($pg-1,$ptpl);
     $res.="<a href='$pname'>$w[2]</a> $n|$n ";
     $pname=pen(0,$ptpl);
-    $res.="<a href='$pname'>$w[4]</a>";   
+    $res.="<a href='$pname'>$w[4]</a>";
   }
   if($pg>0 && $pg+1<$allp) $res.=$sep;
   if($pg+1<$allp){
     $pname=pen($pg+1,$ptpl);
-    $res.="<a href='$pname'>$w[3]</a>";    
-  }    
+    $res.="<a href='$pname'>$w[3]</a>";
+  }
   if ($show_all) $res.=" <b>($w[5] - $all)</b> ";
 
   return $res;
@@ -1058,4 +1060,4 @@ function rw($s){#for debug
 }
 
 	$pagina->PrintBottom();
- 
+

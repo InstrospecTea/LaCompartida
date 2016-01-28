@@ -196,7 +196,7 @@ class Gasto extends Objeto {
 		return true;
 	}
 
-	function Load($id) {
+	function Load($id, $fields = null) {
 		$this->Check();
 		return Objeto::Load($id);
 	}

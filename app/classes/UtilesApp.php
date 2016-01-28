@@ -2281,8 +2281,6 @@ HTML;
 	}
 
 	public static function UploadToS3($name, $file, $contentType = 'application/octet-stream') {
-		require_once dirname(__FILE__) . '/../../backups/AWSSDKforPHP/sdk.class.php';
-
 		$s3 = new AmazonS3(array(
 			'key' => 'AKIAIQYFL5PYVQKORTBA',
 			'secret' => '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'
@@ -2305,7 +2303,6 @@ HTML;
 	}
 
 	public static function FileExistS3($name) {
-		require_once dirname(__FILE__) . '/../../backups/AWSSDKforPHP/sdk.class.php';
 
 		$s3 = new AmazonS3(array(
 			'key' => 'AKIAIQYFL5PYVQKORTBA',

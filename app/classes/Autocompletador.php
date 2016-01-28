@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 class Autocompletador {
 
-	function ImprimirSelector($Sesion, $codigo_cliente = '', $codigo_cliente_secundario = '', $mas_recientes = false, $width = 320, $oncambio = null) {
+	public static function ImprimirSelector($Sesion, $codigo_cliente = '', $codigo_cliente_secundario = '', $mas_recientes = false, $width = 320, $oncambio = null) {
 		$Form = new Form;
 		$Html = new \TTB\Html;
 		$sesion = $Sesion;
@@ -46,7 +46,7 @@ class Autocompletador {
 		return $output;
 	}
 
-	function Javascript($sesion, $cargar_select = true, $onchange = '') {
+	public static function Javascript($sesion, $cargar_select = true, $onchange = '') {
 		$Html = new \TTB\Html;
 		$campo_codigo_cliente = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
 		$campo_codigo_asunto = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_asunto_secundario' : 'codigo_asunto';
@@ -131,7 +131,7 @@ SCRIPT;
 		return $Html->script_block($output);
 	}
 
-	function CSS() {
+	public static function CSS() {
 		return;
 	}
 
