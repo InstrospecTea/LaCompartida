@@ -1,8 +1,16 @@
 # Changelog
 
+## Hotfix 16.0.16
+Thursday, January 28th
+* **Fix**  [Mejora en flujo al cambiar un asunto de cliente](https://github.com/LemontechSA/ttb/pull/1319)
+
+## Hotfix 16.0.15
+Wednesday, January 27th
+* **Fix** [Filtro Ingresado por en el buscador de Gastos](https://github.com/LemontechSA/ttb/pull/1318)
+
 ## Hotfix 16.0.14
 Tuesday, January 26th
-* **Fix** [Evitar que se cambio el cliente de un contrato fuera de flujo](https://github.com/LemontechSA/ttb/pull/1313)
+* **Fix** [Problemas con resumen semanal](https://github.com/LemontechSA/ttb/pull/1316)
 
 ## Hotfix 16.0.13
 Monday, January 25th
