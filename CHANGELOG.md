@@ -1,12 +1,8 @@
 # Changelog
 
-## Hotfix 16.0.15
-Wednesday, January 27th
-* **Fix** [Filtro Ingresado por en el buscador de Gastos](https://github.com/LemontechSA/ttb/pull/1318)
-
 ## Hotfix 16.0.14
 Tuesday, January 26th
-* **Fix** [Problemas con resumen semanal](https://github.com/LemontechSA/ttb/pull/1316)
+* **Fix** [Evitar que se cambio el cliente de un contrato fuera de flujo](https://github.com/LemontechSA/ttb/pull/1313)
 
 ## Hotfix 16.0.13
 Monday, January 25th
