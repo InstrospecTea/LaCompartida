@@ -874,4 +874,206 @@ jQuery(document).ready(function() {
 		selector = '.submit_options.' + el.attr('rel');
 		jQuery(selector).show();
 	});
+
+	var graficoBarras;
+
+	jQuery('#barras').on('click', function() {
+		var vista = [];
+		jQuery('#agrupadores select:visible').each(function(i) {
+			vista[i] = jQuery(this).val();
+		});
+		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="barras" />');
+		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista + '" />');
+		jQuery('#iframereporte').empty();
+
+		jQuery.ajax({
+			url: 'reporte_avanzado_grafico.php',
+			data: jQuery('#formulario').serialize(),
+			dataType: 'json',
+			type: 'POST',
+			success: function(respuesta) {
+				if (respuesta != null) {
+					agregarCanvas('barras', jQuery('#iframereporte'));
+					var canvas = jQuery("#grafico_barras")[0];
+					var context = canvas.getContext('2d');
+
+					if (graficoBarras) {
+						graficoBarras.destroy();
+					}
+
+					jQuery('#iframereporte h3').append(respuesta['name_chart']);
+					graficoBarras = new Chart(context).Bar(respuesta, {
+						multiTooltipTemplate: '<%= datasetLabel %> <%= value %>'
+					});
+				} else {
+					jQuery('#iframereporte').append('<h3>No exiten datos para generar el gráfico</h3>');
+				}
+			},
+			error: function(e) {
+				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
+			}
+		});
+	});
+
+	var graficoTarta;
+
+	jQuery('#circular').on('click', function() {
+		var vista = [];
+		jQuery('#agrupadores select:visible').each(function(i) {
+			vista[i] = jQuery(this).val();
+		});
+		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="circular" />');
+		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista + '" />');
+		jQuery('#iframereporte').empty();
+
+		jQuery.ajax({
+			url: 'reporte_avanzado_grafico.php',
+			data: jQuery('#formulario').serialize(),
+			dataType: 'json',
+			type: 'POST',
+			success: function(respuesta) {
+				if (respuesta != null && respuesta['json'] != null) {
+					agregarCanvas('tarta', jQuery('#iframereporte'), true);
+					var canvas = jQuery('#grafico_tarta')[0];
+					var context = canvas.getContext('2d');
+
+					if (graficoTarta) {
+						graficoTarta.destroy();
+					}
+
+					jQuery('#iframereporte h3').append(respuesta['chart_name']);
+
+					graficoTarta = new Chart(context).Pie(respuesta['json'], {
+						tooltipTemplate:  '<%= label %>: <%= value %>hrs. (<%= Math.round(circumference / 6.283 * 100) %>%)',
+						legendTemplate : '<ul>'
+							+ '<% for (var i=0; i<segments.length; i++) { %>'
+							+ '<li>'
+							+ '<span style=\"background-color: <%=segments[i].fillColor%>;\"></span>'
+							+ '<% if (segments[i].label) { %><%= segments[i].label %><% } %>'
+							+ '</li>'
+							+ '<% } %>'
+							+ '</ul>'
+					});
+
+					jQuery('#leyenda').append(graficoTarta.generateLegend());
+				} else {
+					jQuery('#iframereporte').append('<h3>No exiten datos para generar el gráfico</h3>');
+				}
+			},
+			error: function(e) {
+				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
+			}
+		});
+	});
+
+	var graficoLinea;
+
+	jQuery('#dispersion').on('click', function() {
+		var vista = [];
+		jQuery('#agrupadores select:visible').each(function(i) {
+			vista[i] = jQuery(this).val();
+		});
+		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="dispersion" />');
+		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista + '" />');
+		jQuery('#iframereporte').empty();
+
+		jQuery.ajax({
+			url: 'reporte_avanzado_grafico.php',
+			data: jQuery('#formulario').serialize(),
+			dataType: 'json',
+			type: 'POST',
+			success: function(respuesta) {
+				if (respuesta != null) {
+					agregarCanvas('linea', jQuery('#iframereporte'));
+					var canvas = jQuery('#grafico_linea')[0];
+					var context = canvas.getContext('2d');
+
+					if (graficoLinea) {
+						graficoLinea.destroy();
+					}
+
+					jQuery('#iframereporte h3').append(respuesta['name_chart']);
+
+					graficoLinea = new Chart(context).Line(respuesta, {
+						multiTooltipTemplate: '<%= datasetLabel %> <%= value %>'
+					});
+				} else {
+					jQuery('#iframereporte').append('<h3>No exiten datos para generar el gráfico</h3>');
+				}
+			},
+			error: function(e) {
+				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
+			}
+		});
+	});
+
+	jQuery(document).on('click', '#btn_imprimir', function() {
+		var oldClassDropLine = document.getElementById('droplinetabs1').className;
+		var oldClassFdMenus = document.getElementById('fd_menu_grey').className;
+		var oldClassZenbox = document.getElementById('zenbox_tab').className;
+
+		document.getElementById('droplinetabs1').className += ' no-print';
+		document.getElementById('fd_menu_grey').className += ' no-print';
+		document.getElementById('zenbox_tab').className += ' no-print';
+
+		window.print();
+
+		document.getElementById('droplinetabs1').className = oldClassDropLine;
+		document.getElementById('fd_menu_grey').className = oldClassFdMenus;
+		document.getElementById('zenbox_tab').className = oldClassZenbox;
+	});
+
+	jQuery(document).on('click', '#btn_pdf', function() {
+		html2canvas(document.getElementById('iframereporte'), {
+			onrendered: function (canvas) {
+				var doc = new jsPDF();
+				doc.addImage(canvas.toDataURL('image/png'), 'png', -10, 0);
+				doc.save('grafico_reporte_avanzado.pdf');
+			}
+		});
+	});
+
+	function agregarCanvas(id, contenedor, leyenda) {
+		leyenda = leyenda || false;
+
+		var div = document.createElement('div');
+		var canvas = document.createElement('canvas');
+		var botonera = document.createElement('div');
+		var imprimir = document.createElement('button');
+		var pdf = document.createElement('button');
+
+		canvas.width = 600;
+		canvas.height = 400;
+		canvas.style.margin = '10px';
+		canvas.id = 'grafico_' + id;
+
+		botonera.id = 'botonera';
+
+		imprimir.id = 'btn_imprimir';
+		imprimir.className = 'botones_gaficos';
+		imprimir.appendChild(document.createTextNode('Imprimir'));
+		botonera.appendChild(imprimir);
+
+		pdf.id = 'btn_pdf';
+		pdf.className = 'botones_gaficos';
+		pdf.appendChild(document.createTextNode('PDF'));
+		botonera.appendChild(pdf);
+
+		div.id = 'contenedor_grafico_' + id;
+		div.className = 'contenedorCanvas';
+
+		div.appendChild(document.createElement('h3'));
+		div.appendChild(botonera);
+		div.appendChild(canvas);
+
+		if (leyenda) {
+			var divLeyenda = document.createElement('div');
+			divLeyenda.id = 'leyenda';
+			divLeyenda.className = 'chart-legend';
+
+			div.appendChild(divLeyenda);
+		}
+
+		contenedor.append(div);
+	}
 });

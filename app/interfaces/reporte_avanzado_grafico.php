@@ -105,7 +105,7 @@ $valores = array();
 $labels = array();
 foreach ($r as $id => $fila) {
 	if (is_array($fila)) {
-		$labels[] = urlencode($fila['label']);
+		$labels[] = substr($fila['label'], 0, 12);
 		$valores[] = str_replace(',', '.', $fila['valor']);
 		$existen_datos = true;
 	}
@@ -166,32 +166,83 @@ $html_info = '<style type="text/css">
 
 switch ($tipo_grafico) {
 	case 'barras': {
-			$datos_grafico .= "&p=" . $r['promedio'];
-			$url = "graficos/barras_reporte_avanzado.php?titulo=" . $titulo_reporte . $datos_grafico . "&unidad=" . $tipo_dato . "&moneda=" . $id_moneda;
-			$elemento = "<iframe name=planilla id=planilla src='$url'  frameborder=0 width=720px height=460px></iframe>";
-			break;
-		}
+		$datos_grafico .= $r['promedio'];
+		graficoBarras($titulo_reporte, $labels, $valores, $valores_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda);
+		break;
+	}
 	case 'dispersion': {
-			$url = "graficos/dispersion_reporte_avanzado.php?titulo=" . $titulo_reporte . $datos_grafico . "&unidad=" . $tipo_dato . "&moneda=" . $id_moneda;
-			$elemento .= "<iframe name=planilla id=planilla src='$url'  frameborder=0 width=720px height=560px></iframe> ";
-			break;
-		}
+		graficoLinea($titulo_reporte, $labels, $valores, $valores_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda);
+		break;
+	}
 	case 'circular': {
-			$url = "graficos/circular_reporte_avanzado.php?titulo=" . $titulo_reporte . $datos_grafico . "&unidad=" . $tipo_dato . "&moneda=" . $id_moneda;
-			$elemento .= "<img name=planilla id=planilla src='$url' alt='' />";
-			break;
-		}
+		graficoTarta($titulo_reporte, $labels, $valores, $tipo_dato);
+		break;
+	}
 }
 
-$html_info .= "<div id='print_link' align=right>";
-$html_info .= "<a href='javascript:void(0)' onclick='window.print()'>" . __('Imprimir') . "</a> | ";
-$html_info .= "<a href='$url" . '&imp_pdf=1' . "'>" . __('Guardar PDF') . "</a>";
-$html_info .= "</div>";
+function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
+	$grafico = new TTB\Graficos\GraficoBarra();
+	$dataset = new TTB\Graficos\GraficoDataset();
 
-$html_info .= $elemento;
+	$dataset->addLabel(__($tipo_dato))
+		->addData($datos);
 
-if (!$existen_datos) {
-	$html_info = " <h2> No se existen Datos del Tipo elegido para este Periodo. </h2> ";
+	$grafico->addDataSets($dataset)
+		->addNameChart($titulo)
+		->addLabels($labels);
+
+	if ($datos_comparados) {
+		$dataset_comparado = new TTB\Graficos\GraficoDataset();
+
+		$dataset_comparado->addLabel(__($tipo_dato_comparado))
+			->addFillColor(39, 174, 96, 0.5)
+			->addStrokeColor(39, 174, 96, 0.8)
+			->addHighlightFill(39, 174, 96, 0.75)
+			->addHighlightStroke(39, 174, 96, 1)
+		  ->addData($datos_comparados);
+
+		$grafico->addDataSets($dataset_comparado);
+	}
+
+	echo $grafico->getJson();
 }
 
-echo $html_info;
+function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
+	$grafico = new TTB\Graficos\GraficoTarta();
+
+	foreach ($datos as $key => $value) {
+		$data_grafico = new TTB\Graficos\GraficoData();
+
+		$data_grafico->addLabel($labels[$key], true)
+		->addValue($value);
+
+		$grafico->addData($data_grafico);
+	}
+
+	$titulo = mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo);
+
+	echo json_encode(array('json' => json_decode($grafico->getJson()), 'chart_name' => $titulo));
+}
+
+function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
+	$grafico = new TTB\Graficos\GraficoLinea();
+	$datasetLinea = new TTB\Graficos\GraficoDatasetLine();
+	$datasetLineaComparado = new TTB\Graficos\GraficoDatasetLine();
+
+	$datasetLinea->addLabel(__($tipo_dato))
+		->addData($datos);
+
+	$datasetLineaComparado->addLabel(__($tipo_dato_comparado))
+		->addFillColor(151, 187, 205, 0.2)
+		->addStrokeColor(151, 187, 205, 1)
+		->addPointColor(151, 187, 205, 1)
+		->addPointHighlightStroke(151, 187, 205, 1)
+		->addData($datos_comparados);
+
+	$grafico->addDataSets($datasetLinea)
+		->addDataSets($datasetLineaComparado)
+		->addNameChart($titulo)
+		->addLabels($labels);
+
+	echo $grafico->getJson();
+}
