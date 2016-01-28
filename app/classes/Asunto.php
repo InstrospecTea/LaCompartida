@@ -1211,7 +1211,6 @@ class Asunto extends Objeto {
 	 * Cambia el cliente de un asunto y todas sus cositas
 	 * @param [Cliente] $NuevoCliente: Instancia del nuevo cliente
 	 * @return array
-	 * @return array
 	 */
 	public function CambiaCliente($NuevoCliente) {
 		$nuevo_codigo_cliente = $NuevoCliente->fields['codigo_cliente'];
