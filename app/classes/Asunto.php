@@ -1293,8 +1293,7 @@ class Asunto extends Objeto {
 	 * @return bool
 	 */
 	public function ActualizarContratoAsunto(Cliente $Cliente) {
-		$nuevo_id_contrato = $Cliente->fields['id_contrato'];
-		$this->fields['id_contrato'] = $nuevo_id_contrato;
+		$this->fields['id_contrato'] = $Cliente->fields['id_contrato'];
 	}
 
 	public function ActualizaClienteContratoAsunto($nuevo_codigo_cliente) {
