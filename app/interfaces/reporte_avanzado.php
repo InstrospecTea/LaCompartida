@@ -3,6 +3,7 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
+$usuarioExt = new UsuarioExt($sesion);
 
 /*
  * Debe tener habilitado la Conf ReportesAvanzados para acceder a este reporte.
@@ -592,8 +593,8 @@ if (!$popup) {
 														<div class = 'encargados_full' style='width:200px;<?php echo $check_encargados ? "display:none;" : "" ?>'>
 															<label for="check_encargados" style="cursor:pointer;" ><hr></label>
 														</div>
-														<div class = 'encargados_full' style="<?php echo $check_encargados ? "" : "display:none;" ?>" >
-															<?php echo Html::SelectQuery($sesion, "SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "encargados[]", $encargados, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "200"); ?>
+														<div class = 'encargados_full' style="<?php echo $check_encargados ? "" : "display:none;" ?>">
+															<?php echo $Form->select('encargados[]', $usuarioExt->get_usuarios_reporte_avanzado(), $encargados, array('empty' => FALSE, 'class' => 'selectMultiple', 'style' => 'width: 200px', 'multiple' => 'multiple', 'size' => $largo_select)); ?>
 														</div>
 													</td>
 												</tr>

@@ -214,18 +214,20 @@ if ($opcion == "guardar") {
 				}
 				$cliente->Edit("id_contrato", $contrato->fields['id_contrato']);
 
-				foreach (array_keys($hito_fecha) as $i) {
-					if (empty($hito_monto_estimado[$i])) {
-						continue;
+				if ($forma_cobro == 'HITOS') {
+					foreach (array_keys($hito_fecha) as $i) {
+						if (empty($hito_monto_estimado[$i])) {
+							continue;
+						}
+						$cobro_pendiente = new CobroPendiente($Sesion);
+						$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+						$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
+						$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
+						$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
+						$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
+						$cobro_pendiente->Edit("hito", '1');
+						$cobro_pendiente->Write();
 					}
-					$cobro_pendiente = new CobroPendiente($Sesion);
-					$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-					$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
-					$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
-					$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
-					$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
-					$cobro_pendiente->Edit("hito", '1');
-					$cobro_pendiente->Write();
 				}
 
 				ContratoDocumentoLegal::EliminarDocumentosLegales($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);

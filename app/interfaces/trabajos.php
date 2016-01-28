@@ -1189,8 +1189,9 @@ echo $Form->script();
 		// Los id de los trabajos seleccionados están en un solo string separados por el caracter 't'.
 		// La página editar_multiples_trabajos.php se encarga de parsear este string.
 		var ids = getIdTrabajosSeleccionados();
+		var motivo = '<?php echo $motivo;?>';
 		if (ids != '') {
-			nuovaFinestra('Editar_múltiples_trabajos', 700, 500, 'editar_multiples_trabajos.php?ids='+ids+'&popup=1','');
+			nuovaFinestra('Editar_múltiples_trabajos', 700, 500, 'editar_multiples_trabajos.php?ids='+ids+'&popup=1&motivo='+motivo+'','');
 		} else {
 			alert('Debe seleccionar por lo menos un trabajo para editar.');
 		}
@@ -1198,8 +1199,10 @@ echo $Form->script();
 
 	function EditarTodosLosArchivos()
 	{
+		var motivo = '<?php echo $motivo;?>';
+
 		var where = $('where_query_listado_completo').value;
-		nuovaFinestra('Editar_multiples_trabajos', 700, 450, 'editar_multiples_trabajos.php?popup=1&listado='+where, '');
+		nuovaFinestra('Editar_multiples_trabajos', 700, 450, 'editar_multiples_trabajos.php?popup=1&motivo='+motivo+'&listado='+where, '');
 	}
 
 

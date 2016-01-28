@@ -1,16 +1,5 @@
 <?php
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/Trabajo.php';
-	require_once Conf::ServerDir().'/classes/Asunto.php';
-	require_once Conf::ServerDir().'/classes/UtilesApp.php';
-	require_once Conf::ServerDir().'/classes/Autocompletador.php';
 
 	$sesion = new Sesion(array('PRO','REV'));
 	$pagina = new Pagina($sesion);
@@ -51,6 +40,13 @@
 	// Parsear el string con la lista de ids, vienen separados por el caracter 't' ("t1t2t35t23456")
 	$ids_trabajos = explode('t', substr($ids, 1));
 	$num_trabajos = count($ids_trabajos);
+
+	$campo_asunto = 'codigo_asunto';
+	$campo_cliente = 'codigo_cliente';
+	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+		$campo_asunto = 'codigo_asunto_secundario';
+		$campo_cliente = 'codigo_cliente_secundario';
+	}
 
 	// Cargar cada trabajo en un arreglo y validar que sigan siendo editables
 	$trabajos = array();
@@ -101,6 +97,7 @@
 
 	if($opcion == "guardar") {
 		$trabajo = new Trabajo($sesion);
+
 		$resultado = $trabajo->EditarMasivo($trabajos, $_POST);
 		if($resultado['error']){
 			$pagina->AddError($resultado['error']);
@@ -145,6 +142,11 @@
 		$hay_cobros = $hay_cobros || !empty($t->fields['id_cobro']);
 	}
 
+	$cobrable_indeterminado = false;
+	if (!isset($valores_default['cobrable'])) {
+		$cobrable_indeterminado = true;
+	}
+
 	// Título opcion
 	if($opcion == '' && $num_trabajos > 0)
 		$txt_opcion = __('Modificación masiva de Trabajos');
@@ -182,9 +184,13 @@
 
 	function Validar(form)
 	{
-		var cobrableOriginal = valoresDefault.cobrable;
-		var cobrable = jQuery('#cobrable').val();
-		if(cobrable){
+		var cobrableOriginal = valoresDefault.cobrable == 1 ? true : false;
+		var cobrable = jQuery('#cobrable').is(':checked');
+		var cobrable_check = jQuery('#check_cobrable').is(':checked');
+
+		checkBoxValues(form);
+
+		if(cobrable_check){
 			if(cobrable != cobrableOriginal){
 				var msg = 'Uno o más trabajos no cobrables pasarán a estado cobrable. ¿Desea continuar?';
 				if(cobrable == '0'){
@@ -195,26 +201,239 @@
 				}
 			}
 		}
-
-		//Valida si el asunto ha cambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
-		var codigoAsunto = form.codigo_asunto.value;
-		var asuntoOriginal = valoresDefault.codigo_asunto;
+		//Valida si el asunto hacambiado para este trabajo que es parte de un cobro, si ha cambiado se emite un mensaje indicandole lo ki pa
+		var codigoAsunto = jQuery('#<?php echo $campo_asunto; ?>').val();
+		var asuntoOriginal = valoresDefault.<?php echo $campo_asunto; ?>;
 		if(codigoAsunto && codigoAsunto != asuntoOriginal && hayCobros){
-			var msg = 'Ud. está modificando un trabajo que pertenece a <?php echo __('un cobro'); ?>. Si acepta, el trabajo se podría desvincular de este <?php echo __('cobro'); ?> y vincularse a <?php echo __('un cobro'); ?> pendiente para el nuevo asunto en caso de que exista.';
+			var msg;
+
+			if('<?php echo $motivo; ?>' == 'horas') {
+				msg = "Ud. está modificando un trabajo que pertenece a <?php echo __('un cobro'); ?>. Si acepta, el trabajo se podría desvincular de este <?php echo __('cobro'); ?> y vincularse a <?php echo __('un cobro'); ?> pendiente para el nuevo asunto en caso de que exista.";
+			} else if('<?php echo $motivo; ?>' == 'cobros') {
+				msg = "Está editando trabajos asociados a un <?php echo __('un cobro'); ?>. ¿Está seguro que desea continuar?, al aceptar se editaran el/los trabajos seleccionados.";
+			}
 			if(!confirm(msg)){
 				return false;
 			}
 		}
-		return true;
+
+		var codigoCliente = jQuery('#<?php echo $campo_cliente; ?>').val();
+		if(codigoCliente && (codigoAsunto == null || codigoAsunto == '')) {
+			var msg = "Los <?php echo __('Trabajos'); ?> seleccionados no se pueden asociar a este cliente ya que no cuentan con asuntos activos.";
+			alert(msg);
+			return false;
+		}
+
+		sendPost('form_editar_trabajo', 'opcion', 'guardar');
 	}
 
-	//solo se puede modificar el campo visible si no es cobrable
-	function CheckVisible()
+	function checkBoxValues(form)
 	{
-		var incobrable = jQuery('[name=cobrable]').val() == '0';
-		//.toggle lo deja como block
-		jQuery('#divVisible').css('display', incobrable ? 'inline' : 'none');
+		if (jQuery('#check_cobrable').is(':checked')) {
+			cobrable_editado = document.createElement('input');
+			cobrable_editado.setAttribute('name', 'cobrable');
+			cobrable_editado.setAttribute('type', 'hidden');
+			if (jQuery('#cobrable').is(':checked')) {
+				cobrable_editado.setAttribute('value', '1');
+			} else {
+				cobrable_editado.setAttribute('value', '0');
+			}
+
+			form.appendChild(cobrable_editado);
+		}
+
+		if (jQuery('#check_visible').is(':checked')) {
+			visible_editado = document.createElement('input');
+			visible_editado.setAttribute('name', 'visible');
+			visible_editado.setAttribute('type', 'hidden');
+			if (jQuery('#visible').is(':checked')) {
+				visible_editado.setAttribute('value', '1');
+			} else {
+				visible_editado.setAttribute('value', '0');
+			}
+			form.appendChild(visible_editado);
+		}
 	}
+
+	function CargarActividad() {
+		CargarSelect('<?php echo $campo_asunto ?>', 'codigo_actividad', 'cargar_actividades');
+	}
+
+	function sendPost(form, name, value) {
+		var form = document.getElementById(form);
+
+		var field = document.createElement('input');
+		field.setAttribute('type', 'hidden');
+		field.setAttribute('name', name);
+		field.setAttribute('value', value);
+
+		form.appendChild(field);
+
+		document.body.appendChild(form);
+		form.submit();
+	}
+
+	jQuery(function() {
+		var campo_cliente = '<?php echo $campo_cliente; ?>';
+		var campo_asunto = '<?php echo $campo_asunto; ?>';
+		var cobrable_indeterminado = '<?php echo $cobrable_indeterminado; ?>';
+
+		var codigo_cliente_default = "<?php echo $valores_default[$campo_cliente]; ?>";
+		var codigo_asunto_default = "<?php echo $valores_default[$campo_cliente]; ?>";
+		var glosa_asunto_default = jQuery('#glosa_asunto').val();
+
+		jQuery(document).ready(function() {
+			if (cobrable_indeterminado) {
+				jQuery("#cobrable").prop("indeterminate", true);
+			}
+
+			disabledElements(
+				[
+					'#' + campo_cliente,
+					'#campo_' + campo_cliente,
+					'#' + campo_asunto,
+					'#glosa_asunto',
+					'#glosa_asunto_btn',
+					'#campo_codigo_actividad',
+					'#codigo_actividad',
+					'#total_duracion_cobrable_horas',
+					'#total_duracion_cobrable_minutos',
+					'#cobrable',
+					'#visible'
+				]);
+			checkVisible();
+			toggleButtonAcept();
+		});
+
+		jQuery('#check_cliente').on('click', function() {
+			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
+
+			// Si edita un cliente se debe enviar el asunto también
+			if (jQuery('#check_cliente').prop('checked')) {
+				jQuery('#check_asunto').prop('checked', true);
+			} else {
+				jQuery('#check_asunto').prop('checked', false);
+			}
+
+			if (!jQuery('#check_cliente').prop('checked')) {
+				setDefaults();
+			}
+			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
+		});
+
+		jQuery('#check_asunto').on('click', function() {
+			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
+
+			// Si edita un asunto se debe enviar el cliente también
+			if (jQuery('#check_asunto').prop('checked')) {
+				jQuery('#check_cliente').prop('checked', true);
+			} else {
+				jQuery('#check_cliente').prop('checked', false);
+			}
+
+			if (!jQuery('#check_asunto').prop('checked')) {
+				setDefaults();
+			}
+			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
+		});
+
+		jQuery('#check_actividad').on('click', function() {
+			toggleDisabledElement('#check_actividad', ['#campo_codigo_actividad', '#codigo_actividad']);
+		});
+
+		jQuery('#check_total_horas').on('click', function() {
+			toggleDisabledElement('#check_total_horas', ['#total_duracion_cobrable_horas', '#total_duracion_cobrable_minutos']);
+		});
+
+		jQuery('#check_cobrable').on('click', function() {
+			toggleDisabledElement('#check_cobrable', ['#cobrable']);
+		});
+
+		jQuery('#check_visible').on('click', function() {
+			toggleDisabledElement('#check_visible', ['#visible']);
+		});
+
+		jQuery('#eliminar_btn').on('click', function() {
+			if (confirm("<?php echo __('¿Desea eliminar estos trabajos?'); ?>")) {
+				sendPost('form_editar_trabajo', 'opcion', 'eliminar');
+			} else {
+				return false;
+			}
+		});
+
+		jQuery('#cobrable').on('click', function() {
+			checkVisible();
+		});
+
+		//se asignan los valores por defecto del Cliente y el Asunto
+		function setDefaults() {
+			jQuery('#codigo_cliente').val(codigo_cliente_default);
+			jQuery('#codigo_asunto').val(codigo_asunto_default);
+			jQuery('#glosa_asunto').val(glosa_asunto_default);
+			CargarActividad();
+			jQuery('#campo_codigo_actividad').val('');
+			jQuery('#codigo_actividad').val(0);
+		}
+
+		//solo se puede modificar el campo visible si no es cobrable
+		function checkVisible() {
+			if (jQuery('#cobrable').prop('checked')) {
+				jQuery('#tr_visible').css('display', 'none');
+			} else {
+				jQuery('#tr_visible').css('display', '');
+			}
+		}
+
+		function toggleDisabledElement(id_check, id_elements) {
+			if (jQuery(id_check).prop('checked')) {
+				jQuery.each(id_elements, function(index, value){
+					if (jQuery(value).is('a')) {
+						jQuery(value).show();
+					} else {
+						jQuery(value).prop('disabled', false);
+					}
+				});
+			} else {
+				jQuery.each(id_elements, function(index, value){
+					if (jQuery(value).is('a')) {
+						jQuery(value).hide();
+					} else {
+						jQuery(value).prop('disabled', true);
+					}
+				});
+			}
+			toggleButtonAcept();
+		}
+
+		function toggleButtonAcept(){
+			if (jQuery('#check_cliente').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else if (jQuery('#check_asunto').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else if (jQuery('#check_actividad').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else if (jQuery('#check_total_horas').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else if (jQuery('#check_cobrable').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else if (jQuery('#check_visible').prop('checked') && !jQuery('#cobrable').prop('checked')) {
+				jQuery('#aceptar_btn').show();
+			} else {
+				jQuery('#aceptar_btn').hide();
+			}
+		}
+
+		function disabledElements(id_elements){
+			jQuery.each(id_elements, function(index, value){
+				if (jQuery(value).is('a')) {
+						jQuery(value).hide();
+					} else {
+						jQuery(value).prop('disabled', true);
+					}
+			});
+		}
+	});
+
 </script>
 <?php
 echo(Autocompletador::CSS());
@@ -225,20 +444,19 @@ if($opcion == "eliminar")
 else
 {
 ?>
-<form id="form_editar_trabajo" name="form_editar_trabajo" method="post" action="<?php echo $_SERVER[PHP_SELF]?>">
-	<input type=hidden name=opcion value="guardar" />
-	<input type=hidden name=popup value='<?php echo $popup?>' id="popup">
+<form id="form_editar_trabajo" name="form_editar_trabajo" method="post" action="<?php echo $_SERVER[PHP_SELF]?>" style="display: inline-block !important;">
+	<input type="hidden" name="popup" value='<?php echo $popup?>' id="popup">
 
 	<?php	if($txt_opcion) {	?>
-		<table style='border:1px solid black' <?php echo $txt_opcion ? 'style=display:inline' : 'style=display:none'?> width=90%>
+		<table style="border: 0px" <?php echo $txt_opcion ? "style=display:inline" : "style=display:none"?>>
 			<tr>
-				<td align=left><span style=font-weight:bold; font-size:9px; backgroundcolor:#c6dead><?php echo $txt_opcion?></span></td>
+				<td align="left"><span style="font-weight:bold; font-size:9px; backgroundcolor:#c6dead"><?php echo $txt_opcion?></span></td>
 			</tr>
 		</table>
 		<br>
 	<?php	}	?>
 
-	<table style="border:1px solid black" id="tbl_trabajo" width="90%">
+	<table style="border: 0px" id="tbl_trabajo">
 		<tr>
 			<td>&nbsp;</td>
 			<td align="right">
@@ -246,6 +464,9 @@ else
 			</td>
 			<td align="left">
 				<?php UtilesApp::CampoCliente($sesion, $valores_default['codigo_cliente'], $valores_default['codigo_cliente_secundario'], $valores_default['codigo_asunto'], $valores_default['codigo_asunto_secundario']); ?>
+			</td>
+			<td>
+				<input type="checkbox" id="check_cliente" value="" />
 			</td>
 		</tr>
 		<tr>
@@ -261,15 +482,21 @@ else
 				}
 				UtilesApp::CampoAsunto($sesion, $valores_default['codigo_cliente'], $valores_default['codigo_cliente_secundario'], $valores_default['codigo_asunto'], $valores_default['codigo_asunto_secundario'], 320, $oncambio, $glosa_asunto, false); ?>
 			</td>
+			<td>
+				<input type="checkbox" id="check_asunto" value="" />
+			</td>
 		</tr>
 
 		<?php if (Conf::GetConf($sesion, 'UsoActividades')) { ?>
 			<tr>
-				<td colspan="2" align=right>
+				<td colspan="2" align="right">
 					<?php echo __('Actividad'); ?>
 				</td>
-				<td align=left>
-					<?php echo  InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $valores_default['codigo_actividad']); ?>
+				<td align="left">
+					<?php echo  InputId::Imprimir($sesion, 'actividad', 'codigo_actividad', 'glosa_actividad', 'codigo_actividad', $valores_default['codigo_actividad'], '', '', 300, $valores_default['codigo_asunto']); ?>
+				</td>
+				<td>
+					<input type="checkbox" id="check_actividad" value="" />
 				</td>
 			</tr>
 		<?php } else { ?>
@@ -279,51 +506,53 @@ else
 
 		<?php if($permiso_revisor) { ?>
 			<tr>
-				<td colspan="2" align=right>
+				<td colspan="2" align="right">
 					<?php echo __('Total Horas') ?>
 				</td>
-				<td align=left>
-					<input type="text" name="total_duracion_cobrable_horas" size="5" value="<?php echo $total_duracion_cobrable_horas; ?>" />
+				<td align="left">
+					<input type="text" id="total_duracion_cobrable_horas" name="total_duracion_cobrable_horas" size="5" value="<?php echo $total_duracion_cobrable_horas; ?>" />
 					&nbsp;<?php echo __('Hrs')?>&nbsp;
-					<input type="text" name="total_duracion_cobrable_minutos" size="5" value="<?php echo $total_duracion_cobrable_minutos; ?>" />
+					<input type="text" id="total_duracion_cobrable_minutos" name="total_duracion_cobrable_minutos" size="5" value="<?php echo $total_duracion_cobrable_minutos; ?>" />
 					&nbsp;<?php echo __('Min')?>&nbsp;&nbsp;&nbsp;<span style="color:red;font-size:7pt"><?php echo __('(se modificará la duración cobrable de los trabajos seleccionados)') ?></span>
+				</td>
+				<td>
+					<input type="checkbox" id="check_total_horas" value="" />
 				</td>
 			</tr>
 		<?php } ?>
 
 		<?php if(!$permiso_profesional || $permiso_revisor) { ?>
 			<tr>
-				<td colspan="2" align=right>
+				<td colspan="2" align="right">
 					<?php echo __('Cobrable')?><br/>
 				</td>
 				<td align="left">
-					<?php echo Html::SelectArray(array(array('', ''), array('0', 'No'), array('1', 'Si')), 'cobrable', $valores_default['cobrable'], 'onchange="CheckVisible()"', '', '50px'); ?>
-					<div id="divVisible" style="display:<?php echo $valores_default['cobrable'] != '0' ? 'none' : 'inline'?>" >
-						<?php if($permiso_revisor) {
-							echo __('Visible');
-							echo Html::SelectArray(array(array('', ''), array('0', 'No'), array('1', 'Si')), 'visible', $valores_default['visible'], 'onMouseover="ddrivetip(\'Trabajo será visible en la '.__('Nota de Cobro').'\')" onMouseout="hideddrivetip()"', '', '50px');
-						} ?>
-					</div>
+					<input type="checkbox" id="cobrable" <?php echo $valores_default['cobrable'] == 1 ? 'checked' : ''; ?> />
+				</td>
+				<td>
+					<input type="checkbox" id="check_cobrable" value="" />
 				</td>
 			</tr>
-		<?php } ?>
-		<?php if($num_trabajos > 0) { ?>
-				<tr>
-					<td colspan=2></td>
-					<td colspan=3 align=left>
-						<a onclick="return confirm('<?php echo __('¿Desea eliminar estos trabajos?'); ?>')" href="?opcion=eliminar&ids=<?php echo "$ids&popup=$popup"; ?>">
-							<span style="border: 1px solid black; background-color: #ff0000;color:#FFFFFF;">&nbsp;<?php echo __('Eliminar trabajos') ?>&nbsp;</span>
-						</a>
+				<tr id="tr_visible">
+					<td colspan="2" align="right"><?php echo __('Visible'); ?></td>
+					<td align="left">
+						<input type="checkbox" id="visible" <?php echo $valores_default['visible'] == 1 ? 'checked' : ''; ?> />
+					</td>
+					<td>
+						<input type="checkbox" id="check_visible" value="" />
 					</td>
 				</tr>
-		<?php	} ?>
-		<tr>
-			<td colspan='3' align='right'>
-				<input type="hidden" name="opcion" value="guardar" />
-				<input type="hidden" name="ids" value="<?php echo(''.$ids); ?>" />
-				<input type="submit" class="btn" value="<?php echo __('Guardar')?>" onclick="return Validar(this.form);" />
-			</td>
-		</tr>
+
+		<?php } ?>
+			<tr>
+				<td colspan="4" align="right">
+					<input type="hidden" name="ids" value="<?php echo(''.$ids); ?>" />
+					<?php if($num_trabajos > 0) { ?>
+						<input type="submit" id="eliminar_btn" class="btn" style="background: #ff0000 !important; color:#FFFFFF !important;" value="<?php echo __('Eliminar trabajos') ?>" />
+					<?php	} ?>
+					<input type="submit" id="aceptar_btn" class="btn" value="<?php echo __('Guardar')?>" onclick="return Validar(this.form);" />
+				</td>
+			</tr>
 	</table>
 </form>
 

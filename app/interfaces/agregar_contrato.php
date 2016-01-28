@@ -199,21 +199,23 @@ if ($opcion_contrato == "guardar_contrato" && $popup && !$motivo) {
 			$cobro_pendiente->Edit("monto_estimado", $valor_monto_estimado[$i]);
 			$cobro_pendiente->Write();
 		}
-
-		foreach (array_keys($hito_fecha) as $i) {
-			if (empty($hito_monto_estimado[$i])) {
-				continue;
+		if ($forma_cobro == 'HITOS') {
+			foreach (array_keys($hito_fecha) as $i) {
+				if (empty($hito_monto_estimado[$i])) {
+					continue;
+				}
+				$cobro_pendiente = new CobroPendiente($Sesion);
+				$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
+				$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
+				$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
+				$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
+				$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
+				$cobro_pendiente->Edit("hito", '1');
+				$cobro_pendiente->Edit("notificado", 0);
+				$cobro_pendiente->Write();
 			}
-			$cobro_pendiente = new CobroPendiente($Sesion);
-			$cobro_pendiente->Edit("id_contrato", $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
-			$cobro_pendiente->Edit("fecha_cobro", empty($hito_fecha[$i]) ? 'NULL' : Utiles::fecha2sql($hito_fecha[$i]));
-			$cobro_pendiente->Edit("descripcion", $hito_descripcion[$i]);
-			$cobro_pendiente->Edit("observaciones", $hito_observaciones[$i]);
-			$cobro_pendiente->Edit("monto_estimado", $hito_monto_estimado[$i]);
-			$cobro_pendiente->Edit("hito", '1');
-			$cobro_pendiente->Edit("notificado", 0);
-			$cobro_pendiente->Write();
 		}
+
 
 		ContratoDocumentoLegal::EliminarDocumentosLegales($Sesion, $contrato->fields['id_contrato'] ? $contrato->fields['id_contrato'] : $id_contrato);
 		if (is_array($docs_legales)) {
@@ -662,10 +664,19 @@ if (!$contrato->Loaded()) {
 		}
 
 		if (laID != "fc3" && jQuery("#tabla_fechas #id_body").children().length > 1) {
-			if(! confirm("El contrato tiene cobros programados, ¿está seguro que desea cambia la Forma de Tarificación?. Al aceptar, los cobros programados serán eliminados.")) {
+			if(! confirm("El contrato tiene cobros programados, ¿Está seguro que desea cambiar la Forma de Tarificación?. Al aceptar, los cobros programados serán eliminados.")) {
 				laID = "fc3";
-			};
-		};
+			}
+		}
+
+		// Valida que no existan hitos pendientes de gestión
+		if (laID != "fc7" && jQuery("#tabla_hitos #body_hitos").find("tr[data-pendiente]").length > 0) {
+			if (!confirm("El contrato tiene hitos sin gestionar,  ¿Está seguro que desea cambiar la Forma de Tarificación?, Los hitos pendientes serán eliminados.")) {
+				laID = 'fc7';
+			}
+		}
+
+
 
 		jQuery("#div_cobro label").removeClass('ui-state-focus');
 		jQuery("#div_cobro label").removeClass('ui-state-active');
@@ -2257,9 +2268,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									for ($i = 2; $i - 2 < $total_cobros_pendientes; $i++) {
 										$temp = $cobros_pendientes[$i - 2];
 										$disabled = empty($temp['id_cobro']) ? '' : ' disabled="disabled" ';
+										$pendiente = empty($temp['id_cobro']) ? 'data-pendiente="true"' : '';
 										$claseFecha = empty($temp['id_cobro']) ? 'fechadiff' : 'fechadiff_disabled';
 										?>
-										<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_<?php echo $i ?>" >
+										<tr bgcolor="<?php echo $i % 2 == 0 ? $color_par : $color_impar ?>" id="fila_hito_<?php echo $i ?>" <?php echo $pendiente?>>
 											<td align="center" nowrap>
 												<?php if ($disabled) { ?>
 													<input type="hidden" name="hito_disabled[<?php echo $i ?>]" value= "" />

@@ -1,5 +1,53 @@
 # Changelog
 
+## Hotfix 16.0.15
+Wednesday, January 27th
+* **Fix** [Filtro Ingresado por en el buscador de Gastos](https://github.com/LemontechSA/ttb/pull/1318)
+
+## Hotfix 16.0.14
+Tuesday, January 26th
+* **Fix** [Problemas con resumen semanal](https://github.com/LemontechSA/ttb/pull/1316)
+
+## Hotfix 16.0.13
+Monday, January 25th
+* **Fix** [Filtro trámites Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1312)
+
+## Hotfix 16.0.12
+Thursday, January 21st
+* **Fix** [Problema edición masiva](https://github.com/LemontechSA/ttb/pull/1309)
+
+## Hotfix 16.0.11
+Thursday, January 21st
+* **Fix** [Corrección referencia variable](https://github.com/LemontechSA/ttb/pull/1307)
+
+## Hotfix 16.0.10
+Wednesday, January 20th
+* **Fix** [Corregir flujo de Hitos al cambiar forma de cobro](https://github.com/LemontechSA/ttb/pull/1306)
+
+## Hotfix 16.0.9
+Tuesday, January 19th
+* **Feature** [Corrección query para listar usuarios Encargado Comercial en Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1304)
+
+## Hotfix 16.0.8
+Monday, January 18th
+* **Feature** [Corrección query para pago de cobros](https://github.com/LemontechSA/ttb/pull/1303)
+
+## Hotfix 16.0.7
+Friday, January 15th
+* **Feature** [Nuevo "activo" filtro para actividades](https://github.com/LemontechSA/ttb/pull/1302)
+
+## Hotfix 16.0.6
+Thursday, January 14th
+* **Fix** [Nueva lógica Edición masiva de trabajos](https://github.com/LemontechSA/ttb/pull/1301)
+
+## Hotfix 16.0.5
+Thursday, January 14th
+* **Fix** [Corrección query monto parcial cobros](https://github.com/LemontechSA/ttb/pull/1300)
+
+## Hotfix 16.0.4
+Wednesday, January 13th
+* **Fix** [hard-code al parámetro include en API/activities](https://github.com/LemontechSA/ttb/pull/1299)
+
 ## Hotfix 16.0.3
 Tuesday, January 12th
 * **Fix** [Condición para Boletas Exentas](https://github.com/LemontechSA/ttb/pull/1298)

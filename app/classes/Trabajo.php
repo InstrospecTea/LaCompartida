@@ -1164,64 +1164,76 @@ class Trabajo extends Objeto
 				$asunto->LoadByCodigo($data['codigo_asunto']);
 			}
 			$asunto_cobrable[$data['codigo_asunto']] = $asunto->fields['cobrable'] != 0;
-
-			/*
-			Ha cambiado el asunto del trabajo se setea nuevo Id_cobro de alguno que esté creado
-			y corresponda al nuevo asunto y esté entre las fechas que corresponda, sino, se setea NULL
-			*/
-			foreach($trabajos as $t) {
-				if($data['codigo_asunto'] != $t->fields['codigo_asunto']) {
-					$cobro = new Cobro($this->sesion);
-					$id_cobro_cambio = $cobro->ObtieneCobroByCodigoAsunto($data['codigo_asunto'], $t->fields['fecha']);
-					if(!$id_cobro_cambio) {
-						$id_cobro_cambio = 'NULL';
-					}
-					else {
-						$cobros_regenerables[] = $id_cobro_cambio;
-					}
-
-					if($t->fields['id_cobro']) {
-						$cobros_regenerables[] = $t->fields['id_cobro'];
-					}
-
-					$t->Edit('id_cobro', $id_cobro_cambio);
-
-					$t->Edit('codigo_asunto', $data['codigo_asunto']);
-				}
-			}
 		}
 
 		//total escrito por usuario en minutos
-		$tiempo_total_minutos_editado = ($data['total_duracion_cobrable_horas'] * 60) + $data['total_duracion_cobrable_minutos'];
+		if (isset($data['total_duracion_cobrable_horas']) && isset($data['total_duracion_cobrable_minutos'])) {
+			$tiempo_total_minutos_editado = ($data['total_duracion_cobrable_horas'] * 60) + $data['total_duracion_cobrable_minutos'];
 
-		if($total_minutos_cobrables) {
-			$divisor = $tiempo_total_minutos_editado / $total_minutos_cobrables;
-		}
-		else if($tiempo_total_minutos_editado > 0 && $total_minutos_cobrables == 0) {
-			//Si el divisor es 0, cambiamos el divisor por el numero de trabajos. Más adelante se debe cambiar la duracion de cada trabajo (0) por 1 minuto.
-			$divisor = $tiempo_total_minutos_editado / $total_minutos_trabajados;
-			$forzar_editado_divisor_cero = true;
+			if($total_minutos_cobrables) {
+				$divisor = $tiempo_total_minutos_editado / $total_minutos_cobrables;
+			}
+			else if($tiempo_total_minutos_editado > 0 && $total_minutos_cobrables == 0) {
+				//Si el divisor es 0, cambiamos el divisor por el numero de trabajos. Más adelante se debe cambiar la duracion de cada trabajo (0) por 1 minuto.
+				$divisor = $tiempo_total_minutos_editado / $total_minutos_trabajados;
+				$forzar_editado_divisor_cero = true;
+			}
 		}
 
 		$intervalo = Conf::GetConf($this->sesion, 'Intervalo');
 		$tiempo_total_minutos_temporal = 0;
 		$tiempo_trabajo_minutos_contador = 0;
 		$num_trabajos = count($trabajos);
-		foreach ($trabajos as $i => $t) {
+
+		foreach($trabajos as $t) {
+			/*
+			Ha cambiado el asunto del trabajo se setea nuevo Id_cobro de alguno que esté creado
+			y corresponda al nuevo asunto y esté entre las fechas que corresponda, sino, se setea NULL
+			*/
+			if(isset($data['codigo_asunto']) && ($data['codigo_asunto'] != $t->fields['codigo_asunto'])) {
+				$cobro = new Cobro($this->sesion);
+				$id_cobro_cambio = $cobro->ObtieneCobroByCodigoAsunto($data['codigo_asunto'], $t->fields['fecha']);
+				if(!$id_cobro_cambio) {
+					$id_cobro_cambio = 'NULL';
+				}
+				else {
+					$cobros_regenerables[] = $id_cobro_cambio;
+				}
+
+				if($t->fields['id_cobro']) {
+					$cobros_regenerables[] = $t->fields['id_cobro'];
+				}
+
+				$t->Edit('id_cobro', $id_cobro_cambio);
+				$t->Edit('codigo_asunto', $data['codigo_asunto']);
+				$t->Edit('codigo_actividad', empty($data['codigo_actividad']) ? NULL : $data['codigo_actividad']);
+			}
+
+			if(isset($data['codigo_actividad']) && ($data['codigo_actividad'] != $t->fields['codigo_actividad'])) {
+				$t->Edit('codigo_actividad', empty($data['codigo_actividad']) ? NULL : $data['codigo_actividad']);
+			}
+
 			if($t->fields['id_cobro']) {
 				$cobros_regenerables[] = $t->fields['id_cobro'];
 			}
 
-			if((!$permiso_profesional || $permiso_revisor) && $data['cobrable'] != '') {
-				if($data['cobrable'] == '0') {
-					$t->Edit('cobrable', '0');
-					if($data['visible'] != '') {
-						$t->Edit('visible', $data['visible']);
+			if((!$permiso_profesional || $permiso_revisor)) {
+				if($data['cobrable'] != '') {
+					if($data['cobrable'] == '0') {
+						$t->Edit('cobrable', '0');
+					}
+					else {
+						$t->Edit('cobrable', '1');
+						$t->Edit('visible', '1');
 					}
 				}
-				else {
-					$t->Edit('cobrable', '1');
-					$t->Edit('visible', '1');
+
+				if($t->fields['cobrable'] == 0) {
+					if($data['visible'] != '') {
+						$t->Edit('visible', $data['visible']);
+					} else {
+						$t->Edit('visible', '1');
+					}
 				}
 			}
 
@@ -1242,35 +1254,36 @@ class Trabajo extends Objeto
 				$total_minutos_cobrables = $total_minutos_trabajados;
 			}
 
-			if($tiempo_total_minutos_editado != $total_minutos_cobrables || $forzar_editado_divisor_cero)
-			{
-				list($h, $m, $s) = explode(':', $t->fields['duracion_cobrada']);
-				$minutos = ($h * 60) + $m;
-				//Si no tenia horas cobrables, se hace la proporcion de todo trabajo como si hubiese tenido 1 min.
-				if($forzar_editado_divisor_cero)
-				{
-					list($h, $m, $s) = explode(':', $t->fields['duracion']);
+			if(isset($tiempo_total_minutos_editado)) {
+				if($tiempo_total_minutos_editado != $total_minutos_cobrables || $forzar_editado_divisor_cero) {
+					list($h, $m, $s) = split(':', $t->fields['duracion_cobrada']);
 					$minutos = ($h * 60) + $m;
-				}
-				$tiempo_trabajo_minutos_contador += $minutos;
-				$tiempo_trabajo_minutos_temporal = $tiempo_trabajo_minutos_contador * $divisor;
+					//Si no tenia horas cobrables, se hace la proporcion de todo trabajo como si hubiese tenido 1 min.
+					if($forzar_editado_divisor_cero)
+					{
+						list($h, $m, $s) = split(':', $t->fields['duracion']);
+						$minutos = ($h * 60) + $m;
+					}
+					$tiempo_trabajo_minutos_contador += $minutos;
+					$tiempo_trabajo_minutos_temporal = $tiempo_trabajo_minutos_contador * $divisor;
 
-				$tiempo_trabajo_minutos_editado = $tiempo_trabajo_minutos_temporal - $tiempo_total_minutos_temporal;
-				$tiempo_trabajo_minutos_editado -= ((1000 * $tiempo_trabajo_minutos_editado) % (1000 * $intervalo)) / 1000;
+					$tiempo_trabajo_minutos_editado = $tiempo_trabajo_minutos_temporal - $tiempo_total_minutos_temporal;
+					$tiempo_trabajo_minutos_editado -= ((1000 * $tiempo_trabajo_minutos_editado) % (1000 * $intervalo)) / 1000;
 
-				if($i==($num_trabajos-1)) {
-					$tiempo_trabajo_minutos_editado = $tiempo_total_minutos_editado - $tiempo_total_minutos_temporal;
-				}
-				else {
-					$tiempo_total_minutos_temporal += $tiempo_trabajo_minutos_editado;
-				}
+					if($i==($num_trabajos-1)) {
+						$tiempo_trabajo_minutos_editado = $tiempo_total_minutos_editado - $tiempo_total_minutos_temporal;
+					}
+					else {
+						$tiempo_total_minutos_temporal += $tiempo_trabajo_minutos_editado;
+					}
 
-				$t->Edit('duracion_cobrada', UtilesApp::Decimal2Time($tiempo_trabajo_minutos_editado / 60));
+					$t->Edit('duracion_cobrada', UtilesApp::Decimal2Time($tiempo_trabajo_minutos_editado / 60));
 
-				if($tiempo_trabajo_minutos_editado >= 1440) {
-					return array(
-						'error' => __('No se pudo modificar los ').__('trabajo').'s. '.__('Una duración sobrepasó las 24 horas.')
-					);
+					if($tiempo_trabajo_minutos_editado >= 1440) {
+						return array(
+							'error' => __('No se pudo modificar los ').__('trabajo').'s. '.__('Una duración sobrepasó las 24 horas.')
+						);
+					}
 				}
 			}
 		}
