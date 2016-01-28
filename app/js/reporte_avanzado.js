@@ -905,6 +905,8 @@ jQuery(document).ready(function() {
 					graficoBarras = new Chart(context).Bar(respuesta, {
 						multiTooltipTemplate: '<%= datasetLabel %> <%= value %>'
 					});
+				} else {
+					jQuery('#iframereporte').append('<h3>No exiten datos para generar el gráfico</h3>');
 				}
 			},
 			error: function(e) {
@@ -930,8 +932,7 @@ jQuery(document).ready(function() {
 			dataType: 'json',
 			type: 'POST',
 			success: function(respuesta) {
-
-				if (respuesta != null) {
+				if (respuesta != null && respuesta['json'] != null) {
 					agregarCanvas('tarta', jQuery('#iframereporte'), true);
 					var canvas = jQuery('#grafico_tarta')[0];
 					var context = canvas.getContext('2d');
@@ -955,6 +956,8 @@ jQuery(document).ready(function() {
 					});
 
 					jQuery('#leyenda').append(graficoTarta.generateLegend());
+				} else {
+					jQuery('#iframereporte').append('<h3>No exiten datos para generar el gráfico</h3>');
 				}
 			},
 			error: function(e) {
@@ -994,6 +997,8 @@ jQuery(document).ready(function() {
 					graficoLinea = new Chart(context).Line(respuesta, {
 						multiTooltipTemplate: '<%= datasetLabel %> <%= value %>'
 					});
+				} else {
+					jQuery('#iframereporte').append('<h3>No exiten datos para generar el gráfico</h3>');
 				}
 			},
 			error: function(e) {
