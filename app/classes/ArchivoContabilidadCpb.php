@@ -20,7 +20,7 @@ class ArchivoContabilidadCpb {
 		}
 		global $factura, $where, $numero, $fecha1, $fecha2,
 		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario,
-		$codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_cia,
+		$codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social,
 		$descripcion_factura, $serie, $desde_asiento_contable;
 
@@ -35,7 +35,7 @@ class ArchivoContabilidadCpb {
 			$tipo_documento_legal_buscado = explode(',', $pdl['ids']);
 		}
 
-		$results = $factura->DatosReporte(false, $where, $numero, $fecha1, $fecha2, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_cia, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
+		$results = $factura->DatosReporte(false, $where, $numero, $fecha1, $fecha2, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable, null);
 
 		$total_results = count($results);
 		$documents = array();
@@ -167,7 +167,7 @@ class ArchivoContabilidadCpb {
 				);
 			}
 		}
-
+		// exit();
 		$SimpleReport->LoadConfigFromArray($cofiguracion_mini);
 
 		$SimpleReport->LoadResults($report_data);
@@ -397,7 +397,6 @@ class ArchivoContabilidadCpb {
 				LEFT JOIN prm_area_usuario area_padre ON area_padre.id = area_hijo.id_padre
 				WHERE area_hijo.id IN ($areas)
 				ORDER BY area_padre.glosa ASC, area_hijo.glosa ASC";
-
 		return self::query($query_areas)->fetchAll(PDO::FETCH_ASSOC);
 	}
 
@@ -491,6 +490,8 @@ class ArchivoContabilidadCpb {
 				$r_peso['trabajo_duracion']
 			);
 		}
+
+		// pr($socios);
 
 		$total = $neto;
 		$areas = array(
@@ -610,7 +611,7 @@ class ArchivoContabilidadCpb {
 			$pdl = self::query($query)->fetch(PDO::FETCH_ASSOC);
 		}
 
-		$results = $factura->DatosReporte(false, '', $numero, null, null, $pdl['id_documento_legal'], null, null, null, null, null, null, null, null, null, null, null, null, $serie, null);
+		$results = $factura->DatosReporte(false, '', $numero, null, null, $pdl['id_documento_legal'], null, null, null, null, null, null, null, null, null, null, null, null, $serie, null, null);
 		return self::addExtraData($results[0]);
 	}
 
