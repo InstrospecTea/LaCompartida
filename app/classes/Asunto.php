@@ -1210,9 +1210,12 @@ class Asunto extends Objeto {
 	/**
 	 * Cambia el cliente de un asunto y todas sus cositas
 	 * @param [Cliente] $NuevoCliente: Instancia del nuevo cliente
+	 * @return array
+	 * @return array
 	 */
 	public function CambiaCliente($NuevoCliente) {
 		$nuevo_codigo_cliente = $NuevoCliente->fields['codigo_cliente'];
+		$mover_asunto = false;
 		if ($nuevo_codigo_cliente == $this->fields['codigo_cliente']) {
 			return false;
 		} else {
@@ -1236,11 +1239,18 @@ class Asunto extends Objeto {
 			if (!empty($cobros['cobros'])) {
 				$errors[] = "El asunto tiene <b>Adelantos</b> en los siguientes cobros: {$cobros['cobros']}";
 			}
+			if ($this->ObtenerCantidadAsuntosContrato($this->fields['id_contrato']) > 1) {
+				$mover_asunto = true;
+			}
 			if (!empty($errors)) {
 				array_unshift($errors, "No se puede cambiar el cliente:");
 			} else {
 				$nuevo_codigo_asunto = $this->AsignarCodigoAsunto($nuevo_codigo_cliente);
-				$this->ActualizaClienteContratoAsunto($nuevo_codigo_cliente);
+				if (!$mover_asunto) {
+					$this->ActualizaClienteContratoAsunto($nuevo_codigo_cliente);
+				} else {
+					$this->ActualizarContratoAsunto($NuevoCliente);
+				}
 				$this->ActualizaClienteLogTrabajo($nuevo_codigo_cliente);
 				$this->ActualizaClienteSolicitudAdelanto($nuevo_codigo_cliente);
 				$this->ActualizaClienteDocumentoAdelanto($nuevo_codigo_cliente);
@@ -1258,8 +1268,38 @@ class Asunto extends Objeto {
 		}
 	}
 
+	/**
+	 * Obtiene la cantidad de asuntos asociados al contrato indicado
+	 * @param integer $id_contrato
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function ObtenerCantidadAsuntosContrato($id_contrato) {
+		$criteria = new Criteria($this->sesion);
+		try {
+			$result = $criteria->add_select('count(asunto.id_asunto)', 'asuntos')
+				->add_from('contrato')
+				->add_left_join_with('asunto', 'asunto.id_contrato = contrato.id_contrato')
+				->add_restriction(CriteriaRestriction::equals('contrato.id_contrato', $id_contrato))
+				->run();
+		} catch (Exception $e) {
+			die($e->getMessage());
+		}
+		return $result[0]['asuntos'];
+	}
+
+	/**
+	 * Actualiza el asunto actual a un nuevo cliente
+	 * @param Cliente $Cliente
+	 * @return bool
+	 */
+	public function ActualizarContratoAsunto(Cliente $Cliente) {
+		$nuevo_id_contrato = $Cliente->fields['id_contrato'];
+		$this->fields['id_contrato'] = $nuevo_id_contrato;
+	}
+
 	public function ActualizaClienteContratoAsunto($nuevo_codigo_cliente) {
-		$query = "UPDATE contrato
+			$query = "UPDATE contrato
 			SET codigo_cliente = '{$nuevo_codigo_cliente}'
 			WHERE id_contrato = '{$this->fields['id_contrato']}';";
 
