@@ -15,6 +15,12 @@ $usuario = new UsuarioExt($Sesion);
 
 $CodigoClienteAsuntoModificable = (boolean) Conf::GetConf($Sesion, 'CodigoClienteAsuntoModificable');
 
+if (!empty($_GET['codigo_cliente'])) {
+	$codigo_cliente = $_GET['codigo_cliente'];
+	$cliente->LoadByCodigo($codigo_cliente);
+	$id_cliente = $cliente->fields['id_cliente'];
+}
+
 if ($id_cliente > 0) {
 	$cliente->Load($id_cliente);
 	$contrato->Load($cliente->fields['id_contrato']);
