@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.16
+Thursday, January 28th
+* **Fix**  [Mejora en flujo al cambiar un asunto de cliente](https://github.com/LemontechSA/ttb/pull/1319)
+
 ## Hotfix 16.0.15
 Wednesday, January 27th
 * **Fix** [Filtro Ingresado por en el buscador de Gastos](https://github.com/LemontechSA/ttb/pull/1318)
