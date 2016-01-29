@@ -79,25 +79,28 @@ if ($opcion == 'guardar') {
 
 	// validación para que al cambiar un asunto de un cliente a otro,
 	// no existan cobros ni gastos asociados para el cliente inicial
-	$query = "SELECT COUNT(*) FROM cobro WHERE id_cobro IN (SELECT c.id_cobro FROM cobro_asunto c WHERE codigo_asunto = '" . $Asunto->fields['codigo_asunto'] . "' ) AND codigo_cliente = '" . $Cliente->fields['codigo_cliente'] . "' ";
-	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-	list($count) = mysql_fetch_array($resp);
+	if ($Asunto->Loaded() && $Asunto->fields['codigo_cliente'] != $codigo_cliente) {
+		$query = "SELECT COUNT(*) FROM cobro WHERE id_cobro IN (SELECT c.id_cobro FROM cobro_asunto c WHERE codigo_asunto = '" . $Asunto->fields['codigo_asunto'] . "' ) AND codigo_cliente = '" . $Cliente->fields['codigo_cliente'] . "' ";
+		$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+		list($count) = mysql_fetch_array($resp);
 
-	if ($count > 0) {
-		$Pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene ') . __('cobros') . ' ' . __('asociados'));
+		if ($count > 0) {
+			$Pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene ') . __('cobros') . ' ' . __('asociados'));
+		}
+
+		$query = "SELECT COUNT(*) FROM cta_corriente WHERE codigo_asunto = '" . $Asunto->fields['codigo_asunto'] . "' AND codigo_cliente = '" . $Cliente->fields['codigo_cliente'] . "' ";
+		$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+		list($count) = mysql_fetch_array($resp);
+
+		if ($count > 0) {
+			$Pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene gastos asociados'));
+		}
+
+		if (!$Cliente->Loaded()) {
+			$Pagina->AddError(__('El cliente seleccionado no existe en el sistema'));
+		}
 	}
 
-	$query = "SELECT COUNT(*) FROM cta_corriente WHERE codigo_asunto = '" . $Asunto->fields['codigo_asunto'] . "' AND codigo_cliente = '" . $Cliente->fields['codigo_cliente'] . "' ";
-	$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-	list($count) = mysql_fetch_array($resp);
-
-	if ($count > 0) {
-		$Pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene gastos asociados'));
-	}
-
-	if (! $Cliente->Loaded()) {
-		$Pagina->AddError(__('El cliente seleccionado no existe en el sistema'));
-	}
 
 	if (empty($glosa_asunto)) {
 		$Pagina->AddError(__('Por favor ingrese un título para el ') . __('asunto'));

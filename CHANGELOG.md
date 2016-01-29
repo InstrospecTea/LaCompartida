@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.0.17
+Friday, January 29th
+* **Fix**  [Corregir validación de cambio cliente asunto](https://github.com/LemontechSA/ttb/pull/1321)
+
 ## Hotfix 16.0.16
 Thursday, January 28th
 * **Fix**  [Mejora en flujo al cambiar un asunto de cliente](https://github.com/LemontechSA/ttb/pull/1319)
