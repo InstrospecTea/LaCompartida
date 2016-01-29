@@ -202,8 +202,8 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 															</a>
 														</li>
 														<li>
-															<a href='<?php echo Conf::RootDir() ?>/app/Report/agePortfolio' style="color:#000;text-decoration: none;">
-																<?php echo __('Reporte de cartera por edades') ?>
+															<a href='<?php echo Conf::RootDir() ?>/app/Report/clientOldDueAccountingConcepts' style="color:#000;text-decoration: none;">
+																<?php echo __('Reporte antigüedad deudas clientes') ?>
 															</a>
 														</li>
 													</ul>

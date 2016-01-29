@@ -129,4 +129,12 @@ class ReportController extends AbstractController {
 			}
 		}
 	}
+
+	public function clientOldDueAccountingConcepts() {
+		if (!empty($this->data)) {
+			var_dump($this->data); exit;
+		}
+
+		$this->layoutTitle = __('Reporte Antigüedad Deudas Clientes');
+	}
 }
