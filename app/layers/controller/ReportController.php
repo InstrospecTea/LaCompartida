@@ -132,9 +132,44 @@ class ReportController extends AbstractController {
 
 	public function clientOldDueAccountingConcepts() {
 		if (!empty($this->data)) {
-			var_dump($this->data); exit;
+			$this->data['client_code'] = $this->data['codigo_cliente'];
+			$this->data['client_secondary_code'] = $this->data['codigo_cliente_secundario'];
+			$this->data['matter_code'] = $this->data['matter_code'];
+			$this->data['matter_secondary_code'] = $this->data['codigo_asunto_secundario'];
+
+			$options = array(
+				'solo_monto_facturado' => 1,
+				'mostrar_detalle' => $this->data['show_detail'],
+				'encargado_comercial' => $this->data['include_trade_manager'],
+				'opcion_usuario' => $this->data['option'],
+				'totales_especiales' => $this->data['total_special']
+			);
+
+			$data = array(
+				'codigo_cliente' => $this->data['client_code'],
+				'codigo_cliente_secundario' => $this->data['client_secondary_code'],
+				'codigo_asunto' => $this->data['matter_code'],
+				'codigo_asunto_secundario' => $this->data['matter_secondary_code'],
+				'id_contrato' => $this->data['id_contrato'],
+				'tipo_liquidacion' => $this->data['billing_type'],
+				'encargado_comercial' => $this->data['trade_manager_id'],
+				'id_grupo_cliente' => $this->data['client_group_id']
+			);
+
+			$reporte = new ReporteAntiguedadDeudas($this->Session, $options, $data);
+			$SimpleReport = $reporte->generar();
+
+			if ($this->data['option'] == 'buscar') {
+				$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Html');
+				$this->set('simple_report_html', $writer->save());
+			}
 		}
 
 		$this->layoutTitle = __('Reporte Antigüedad Deudas Clientes');
+		$this->set('billing_type', array(
+			array('1', __('Sólo Honorarios')),
+			array('2', __('Sólo Gastos')),
+			array('3', __('Sólo Mixtas (Honorarios y Gastos)'))
+		));
 	}
 }

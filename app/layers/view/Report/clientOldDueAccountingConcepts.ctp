@@ -1,6 +1,7 @@
 <?php echo $this->Html->css(Conf::RootDir() . '/app/layers/assets/css/clientOldDueAccountingConcepts.css'); ?>
 
-<form method="post" name="form" action="">
+<?php echo $this->Form->create('client_old_due_accounting_concepts', array('method' => 'post')); ?>
+	<?php echo $this->Form->hidden('option', 'buscar'); ?>
 	<table class="border_plomo tb_base" width="80%">
 		<tr>
 			<td align="right">
@@ -28,46 +29,37 @@
 			</td>
 			<td align="left">
 				<?php echo $this->Form->select(
-					'id_encargado_comercial',
+					'trade_manager_id',
 					UsuarioExt::QueryComerciales($this->Session),
-					$id_encargado_comercial,
+					$this->data['trade_manager_id'],
 					array('empty' => __('Ninguno'))
 				); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">
-				<label for="solo_monto_facturado"><?php echo __('Considerar sólo monto facturado'); ?></label>
+				<label for="total_special"><?php echo __('Incluir totales normales y vencidos'); ?></label>
 			</td>
 			<td align="left">
-				<?php echo $this->Form->checkbox('solo_monto_facturado', 1, !empty($this->data['solo_monto_facturado']), array('label' => false)); ?>
-				<div class="inlinehelp help" title="<?php echo __('Sólo monto facturado'); ?>" help="<?php echo __('El reporte por defecto considera el saldo liquidado de cada liquidación. Active este campo para considerar sólo el saldo facturado'); ?>">?</div>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<label for="totales_especiales"><?php echo __('Incluir totales normales y vencidos'); ?></label>
-			</td>
-			<td align="left">
-				<?php echo $this->Form->checkbox('totales_especiales', 1, !empty($this->data['totales_especiales']), array('label' => false)); ?>
+				<?php echo $this->Form->checkbox('total_special', 1, !empty($this->data['total_special']), array('label' => false)); ?>
 				<div class="inlinehelp help" title="<?php echo __('Totales normales y vencidos'); ?>" help="<?php echo __('Incluir en el reporte el cálculo de montos totales, tanto normales como vencidos'); ?>">?</div>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">
-				<label for="mostrar_detalle"><?php echo __('Desglosar reporte'); ?></label>
+				<label for="show_detail"><?php echo __('Desglosar reporte'); ?></label>
 			</td>
 			<td align="left">
-				<?php echo $this->Form->checkbox('mostrar_detalle', 1, !empty($this->data['mostrar_detalle']), array('label' => false)); ?>
+				<?php echo $this->Form->checkbox('show_detail', 1, !empty($this->data['show_detail']), array('label' => false)); ?>
 				<div class="inlinehelp help" title="<?php echo __('Desglosar reporte'); ?>" help="<?php echo __('El reporte por defecto solo muestra los totales agrupados para cada resultado que se obtiene. Active esta opción para mostrar el detalle de cada agrupación de totales'); ?>">?</div>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">
-				<label for="encargado_comercial"><?php echo __('Incluir encargado comercial'); ?></label>
+				<label for="include_trade_manager"><?php echo __('Incluir encargado comercial'); ?></label>
 			</td>
 			<td align="left">
-				<?php echo $this->Form->checkbox('encargado_comercial', 1, !empty($this->data['encargado_comercial']), array('label' => false)); ?>
+				<?php echo $this->Form->checkbox('include_trade_manager', 1, !empty($this->data['include_trade_manager']), array('label' => false)); ?>
 				<div class="inlinehelp help" title="<?php echo __('Incluir encargado comercial'); ?>" help="<?php echo __('Incluye en el reporte información respecto del encargado comercial asociado a los clientes'); ?>">?</div>
 			</td>
 		</tr>
@@ -76,25 +68,15 @@
 				<?php echo __('Grupo Cliente'); ?>
 			</td>
 			<td align="left">
-				<?php echo $this->Form->select('id_grupo_cliente', GrupoCliente::obtenerGruposSelect($this->Session), $id_grupo_cliente); ?>
+				<?php echo $this->Form->select('client_group_id', GrupoCliente::obtenerGruposSelect($this->Session), $this->data['client_group_id']); ?>
 			</td>
 		</tr>
 		<tr>
 			<td align="right">
-				<label for="tipo_liquidacion"><?php echo __('Tipo de Liquidación'); ?></label>
+				<label for="billing_type"><?php echo __('Tipo de Liquidación'); ?></label>
 			</td>
 			<td align="left">
-				<?php echo Html::SelectArray(
-					array(
-						array('1', __('Sólo Honorarios')),
-						array('2', __('Sólo Gastos')),
-						array('3', __('Sólo Mixtas (Honorarios y Gastos)'))
-					),
-					'tipo_liquidacion',
-					$_REQUEST['tipo_liquidacion'],
-					'',
-					__('Todas')
-				); ?>
+				<?php echo Html::SelectArray($billing_type, 'billing_type', $this->data['billing_type'], '', __('Todas')); ?>
 			</td>
 		</tr>
 		<tr>
@@ -118,13 +100,34 @@
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td colspan="4" align="center">
-				<?php echo $this->Form->submit(__('Buscar')); ?>
-				<?php echo $this->Form->submit(__('Descargar Excel')); ?>
+			<td colspan="2" align="center">
+				<?php echo $this->Form->button(__('Buscar'), array('id' => 'button_search')); ?>
+				<?php echo $this->Form->button(__('Descargar Excel'), array('id' => 'button_download_excel')); ?>
 			</td>
 		</tr>
 	</table>
-</form>
+<?php $this->Form->end(); ?>
+
+<div id="seguimiento_template">
+	<div class="popover left">
+		<div class="arrow"></div>
+		<h3 class="popover-title"><?php echo __('Seguimiento del cliente'); ?></h3>
+		<div class="popover-content">
+			<iframe id="seguimiento_iframe" width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php"></iframe>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var img_dir = '<?php echo Conf::ImgDir(); ?>';
+	var root_dir = '<?php echo Conf::RootDir(); ?>';
+</script>
 
 <?php echo $this->Html->script('//static.thetimebilling.com/js/bootstrap.min.js'); ?>
 <?php echo $this->Html->script(Conf::RootDir() . '/app/layers/assets/js/clientOldDueAccountingConcepts.js'); ?>
+
+<?php if ($simple_report_html) { ?>
+	<div class="simple_report_html">
+		<?php echo $simple_report_html; ?>
+	</div>
+<?php } ?>
