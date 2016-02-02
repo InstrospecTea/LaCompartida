@@ -160,6 +160,10 @@ class Documento extends Objeto {
 			$this->Edit("numero_operacion", $numero_operacion);
 			$this->Edit("numero_cheque", $numero_cheque);
 			$this->Edit("id_factura_pago", $id_factura_pago ? $id_factura_pago : "NULL" );
+			if ($this->fields['id_usuario_ingresa'] == null) {
+				$this->Edit("id_usuario_ingresa", $id_usuario_ingresa ? $id_usuario_ingresa : $this->sesion->usuario->fields['id_usuario']);
+			}
+
 
 			if ($pago_retencion) {
 				$this->Edit("pago_retencion", "1");
