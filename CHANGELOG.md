@@ -1,7 +1,11 @@
 # Changelog
 
+## Hotfix 16.0.20
+Tuesday, February 2nd
+* **Fix**  [Cambio query pago parcial](https://github.com/LemontechSA/ttb/pull/1325)
+
 ## Hotfix 16.0.19
-Tuesday, February 2st
+Tuesday, February 2nd
 * **Fix**  [Mejora Adelantos](https://github.com/LemontechSA/ttb/pull/1324)
 
 ## Hotfix 16.0.18
