@@ -1,5 +1,4 @@
 <?php
-
 $_LANG['Vacaciones'] = "Vacaciones";
 $_LANG['Asuntos'] = "Asuntos";
 $_LANG['Nº Registro'] = "#";
