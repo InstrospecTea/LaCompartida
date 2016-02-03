@@ -2,6 +2,10 @@
 
 ## Hotfix 16.0.20
 Tuesday, February 2nd
+* **Fix**  [Cambio glosa cuenta corriente para ebmo](https://github.com/LemontechSA/ttb/pull/1326)
+
+## Hotfix 16.0.20
+Tuesday, February 2nd
 * **Fix**  [Cambio query pago parcial](https://github.com/LemontechSA/ttb/pull/1325)
 
 ## Hotfix 16.0.19
