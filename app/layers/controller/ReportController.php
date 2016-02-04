@@ -130,38 +130,36 @@ class ReportController extends AbstractController {
 		}
 	}
 
-	public function clientOldDueAccountingConcepts() {
+	public function clientOldDebtAccountingConcepts() {
+		$parameters = array();
+
 		if (!empty($this->data)) {
-			$this->data['client_code'] = $this->data['codigo_cliente'];
-			$this->data['client_secondary_code'] = $this->data['codigo_cliente_secundario'];
-			$this->data['matter_code'] = $this->data['matter_code'];
-			$this->data['matter_secondary_code'] = $this->data['codigo_asunto_secundario'];
+			$this->loadBusiness('Charging');
+			$parameters['end_date'] = date('Y-m-d', strtotime($this->data['end_date']));
 
-			$options = array(
-				'solo_monto_facturado' => 1,
-				'mostrar_detalle' => $this->data['show_detail'],
-				'encargado_comercial' => $this->data['include_trade_manager'],
-				'opcion_usuario' => $this->data['option'],
-				'totales_especiales' => $this->data['total_special']
+			$debts = $this->ChargingBusiness->getClientOldDebtAccountingConcepts($parameters);
+
+			$fields = array(
+				array(
+					'field' => 'glosa_cliente',
+					'title' => __('Cliente'),
+					'extras' => array(
+						'attrs' => 'width="'.'35'.'%" style="text-align:left; "'
+					)
+				)
 			);
 
-			$data = array(
-				'codigo_cliente' => $this->data['client_code'],
-				'codigo_cliente_secundario' => $this->data['client_secondary_code'],
-				'codigo_asunto' => $this->data['matter_code'],
-				'codigo_asunto_secundario' => $this->data['matter_secondary_code'],
-				'id_contrato' => $this->data['id_contrato'],
-				'tipo_liquidacion' => $this->data['billing_type'],
-				'encargado_comercial' => $this->data['trade_manager_id'],
-				'id_grupo_cliente' => $this->data['client_group_id']
-			);
-
-			$reporte = new ReporteAntiguedadDeudas($this->Session, $options, $data);
-			$SimpleReport = $reporte->generar();
+			$SimpleReport = new SimpleReport($this->Session);
+			$SimpleReport->LoadConfigFromArray($fields);
+			$SimpleReport->LoadResults($debts);
+			$writer_type = $this->data['option'] == 'buscar' ? 'Html' : 'Spreadsheet';
+			$Writer = SimpleReport_IOFactory::createWriter($SimpleReport, $writer_type);
 
 			if ($this->data['option'] == 'buscar') {
-				$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Html');
-				$this->set('simple_report_html', $writer->save());
+				$this->set('simple_report_html', $Writer->save());
+			} else {
+				$this->autoRender = false;
+				$Writer->save('Reporte_antiguedad_deuda');
 			}
 		}
 

@@ -5,12 +5,12 @@ jQuery(function () {
 
 	jQuery('#button_download_excel').click(function() {
 		jQuery('#option').val('xls');
-		jQuery('#client_old_due_accounting_concepts').submit();
+		jQuery('#client_old_debt_accounting_concepts').submit();
 	});
 
 	jQuery('#button_search').click(function() {
 		jQuery('#option').val('buscar');
-		jQuery('#client_old_due_accounting_concepts').submit();
+		jQuery('#client_old_debt_accounting_concepts').submit();
 	});
 
 	jQuery('.subreport tr.encabezado td.encabezado').css('background-color','#ddd');
@@ -27,7 +27,7 @@ jQuery(function () {
 				text: label,
 				style: 'white-space:nowrap;',
 				href: 'javascript:void(0)',
-				onclick: "nuovaFinestra('Cobro', 1000, 700,'../cobros6.php?id_cobro=" + id + "&popup=1&contitulo=true&id_foco=2', 'top=100, left=155');"
+				onclick: "nuovaFinestra('Cobro', 1000, 700, '" + root_dir + "/app/interfaces/cobros6.php?id_cobro=" + id + "&popup=1&contitulo=true&id_foco=2', 'top=100, left=155');"
 			})).append(' ');
 		});
 	});

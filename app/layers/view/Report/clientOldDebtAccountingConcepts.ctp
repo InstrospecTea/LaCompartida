@@ -1,6 +1,6 @@
-<?php echo $this->Html->css(Conf::RootDir() . '/app/layers/assets/css/clientOldDueAccountingConcepts.css'); ?>
+<?php echo $this->Html->css(Conf::RootDir() . '/app/layers/assets/css/clientOldDebtAccountingConcepts.css'); ?>
 
-<?php echo $this->Form->create('client_old_due_accounting_concepts', array('method' => 'post')); ?>
+<?php echo $this->Form->create('client_old_debt_accounting_concepts', array('method' => 'post')); ?>
 	<?php echo $this->Form->hidden('option', 'buscar'); ?>
 	<table class="border_plomo tb_base" width="80%">
 		<tr>
@@ -124,7 +124,7 @@
 </script>
 
 <?php echo $this->Html->script('//static.thetimebilling.com/js/bootstrap.min.js'); ?>
-<?php echo $this->Html->script(Conf::RootDir() . '/app/layers/assets/js/clientOldDueAccountingConcepts.js'); ?>
+<?php echo $this->Html->script(Conf::RootDir() . '/app/layers/assets/js/clientOldDebtAccountingConcepts.js'); ?>
 
 <?php if ($simple_report_html) { ?>
 	<div class="simple_report_html">

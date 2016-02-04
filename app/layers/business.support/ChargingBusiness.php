@@ -1046,4 +1046,36 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		return $this->Report;
 	}
+
+	public function getClientOldDebtAccountingConcepts($parameters) {
+		$CriteriaInvoice = new Criteria($this->Session);
+		$CriteriaInvoice
+			->add_select('f.id_factura')
+			->add_select("DATEDIFF('{$parameters['end_date']}', f.fecha)", 'dias_desde_facturacion')
+			->add_select('SUM(IF(ccfmn.monto_pago IS NULL, 0, ccfmn.monto_pago))', 'total_pagado')
+			->add_select('f.total', 'total_facturado')
+			->add_select('cl.codigo_cliente')
+			->add_select('cl.glosa_cliente')
+			->add_from('factura', 'f')
+			->add_left_join_with(array('cta_cte_fact_mvto', 'ccfm'), 'ccfm.id_factura = f.id_factura')
+			->add_left_join_with(array('cta_cte_fact_mvto_neteo', 'ccfmn'), "ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto AND ccfmn.fecha_movimiento <= '{$parameters['end_date']}'")
+			->add_left_join_with(array('cobro', 'c'), 'c.id_cobro = f.id_cobro')
+			->add_left_join_with(array('cliente', 'cl'), 'cl.codigo_cliente = c.codigo_cliente')
+			->add_restriction(CriteriaRestriction::lower_or_equals_than('f.fecha', "'{$parameters['end_date']}'"))
+			->add_grouping('f.id_factura');
+
+		$Criteria = new Criteria($this->Session);
+		$debts = $Criteria
+			->add_select('v.glosa_cliente')
+			->add_select('GROUP_CONCAT(DISTINCT v.id_factura ORDER BY 1)', 'facturas')
+			->add_select('SUM(IF(v.dias_desde_facturacion <= 30, v.total_facturado - v.total_pagado, 0))', "'rango1'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 30 AND v.dias_desde_facturacion <= 60, v.total_facturado - v.total_pagado, 0))', "'rango2'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 60 AND v.dias_desde_facturacion <= 90, v.total_facturado - v.total_pagado, 0))', "'rango3'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 90, v.total_facturado - v.total_pagado, 0))', "'rango4'")
+			->add_from_criteria($CriteriaInvoice, 'v')
+			->add_grouping('v.codigo_cliente')
+			->run();
+
+		return $debts;
+	}
 }
