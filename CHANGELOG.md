@@ -1,7 +1,7 @@
 # Changelog
 
-## Hotfix 16.0.20
-Tuesday, February 2nd
+## Hotfix 16.0.21
+Tuesday, February 3rd
 * **Fix**  [Cambio glosa cuenta corriente para ebmo](https://github.com/LemontechSA/ttb/pull/1326)
 
 ## Hotfix 16.0.20
