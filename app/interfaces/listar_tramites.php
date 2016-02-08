@@ -276,17 +276,15 @@ for ($x = 0; $x < $lista_tramites->num; $x++) {
 	$ids_listado_tramites.="t" . $tramite->fields['id_tramite'];
 }
 if ($orden == "") {
+	$orden = Conf::GetConf($sesion,'OrdenRevisarTramites');
 
-	if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
-		$orden = " cliente.glosa_cliente ASC, tramite.fecha ASC";
-	} else {
-
+	// Se intenta seguir la lógica de negocio anterior.
+	if ($orden != "cliente.glosa_cliente ASC, tramite.fecha ASC") {
 		if ($opc_orden == 'edit') {
 			$orden = "tramite.fecha_modificacion DESC";
 		} else {
 			$orden = "tramite.fecha DESC, tramite.descripcion";
 		}
-
 	}
 }
 
@@ -567,7 +565,7 @@ $pagina->PrintTop($popup);
 										if (! $p_revisor) {
 											$where_usuario = "AND {$sesion->usuario->tabla}.id_usuario IN (SELECT id_revisado FROM usuario_revisor WHERE id_revisor={$sesion->usuario->fields['id_usuario']}) OR usuario.id_usuario={$sesion->usuario->fields['id_usuario']}";
 										}
-										
+
 										echo $Form->select('id_usuario', $sesion->usuario->ListarActivos($where_usuario, 'PRO'), $id_usuario, array('empty' => 'Todos', 'style' => 'width: 200px'));
 										?>
 									</td>
