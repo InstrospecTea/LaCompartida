@@ -118,7 +118,7 @@ class Migration {
 		}
 	}
 
-	private function getResultsQuery($query) {
+	public function getResultsQuery($query) {
 		$results = null;
 
 		try {
