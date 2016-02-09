@@ -131,35 +131,44 @@ class ReportController extends AbstractController {
 	}
 
 	public function clientOldDebtAccountingConcepts() {
+		$this->loadBusiness('Searching');
+
 		$parameters = array();
 
 		if (!empty($this->data)) {
 			$this->loadBusiness('Charging');
+
+			$this->data['client_code'] = $this->data['codigo_cliente'];
+			$this->data['client_secondary_code'] = $this->data['codigo_cliente_secundario'];
+			$this->data['matter_code'] = $this->data['matter_code'];
+			$this->data['matter_secondary_code'] = $this->data['codigo_asunto_secundario'];
+
+			if (Conf::GetConf($this->Session, 'CodigoSecundario')) {
+				$Client = new Cliente($this->Session);
+				$Client->LoadByCodigoSecundario($this->data['client_secondary_code']);
+				if ($Client->Loaded()) {
+					$this->data['client_code'] = $Client->fields['codigo_cliente'];
+				}
+
+				$Matter = new Asunto($this->Session);
+				$Matter->LoadByCodigoSecundario($this->data['matter_secondary_code']);
+				if ($Matter->Loaded()) {
+					$this->data['matter_code'] = $Matter->fields['codigo_asunto'];
+				}
+			}
+
+			$parameters['client_code'] = $this->data['client_code'];
+			$parameters['matter_code'] = $this->data['matter_code'];
 			$parameters['end_date'] = date('Y-m-d', strtotime($this->data['end_date']));
+			$parameters['format'] = $this->data['option'] == 'buscar' ? 'Html' : 'Spreadsheet';
 
-			$debts = $this->ChargingBusiness->getClientOldDebtAccountingConcepts($parameters);
+			$Report = $this->ChargingBusiness->getClientOldDebtAccountingConceptsReport($parameters);
 
-			$fields = array(
-				array(
-					'field' => 'glosa_cliente',
-					'title' => __('Cliente'),
-					'extras' => array(
-						'attrs' => 'width="'.'35'.'%" style="text-align:left; "'
-					)
-				)
-			);
-
-			$SimpleReport = new SimpleReport($this->Session);
-			$SimpleReport->LoadConfigFromArray($fields);
-			$SimpleReport->LoadResults($debts);
-			$writer_type = $this->data['option'] == 'buscar' ? 'Html' : 'Spreadsheet';
-			$Writer = SimpleReport_IOFactory::createWriter($SimpleReport, $writer_type);
-
-			if ($this->data['option'] == 'buscar') {
-				$this->set('simple_report_html', $Writer->save());
+			if ($parameters['format'] == 'Html') {
+				$this->set('Report', $Report);
 			} else {
 				$this->autoRender = false;
-				$Writer->save('Reporte_antiguedad_deuda');
+				$Report->render();
 			}
 		}
 
@@ -169,5 +178,6 @@ class ReportController extends AbstractController {
 			array('2', __('Sólo Gastos')),
 			array('3', __('Sólo Mixtas (Honorarios y Gastos)'))
 		));
+		$this->set('client_group', $this->SearchingBusiness->getAssociativeArray('ClientGroup', 'id_grupo_cliente', 'glosa_grupo_cliente'));
 	}
 }

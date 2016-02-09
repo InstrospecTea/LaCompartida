@@ -22,12 +22,12 @@ jQuery(function () {
 		var td = jQuery(this);
 		var contenido = td.html();
 		td.html('');
-		jQuery.each(jQuery.parseJSON(contenido), function(id, label) {
+		jQuery.each(jQuery.parseJSON(contenido), function(invoce, charge_id) {
 			td.append(jQuery('<a/>', {
-				text: label,
+				text: invoce,
 				style: 'white-space:nowrap;',
 				href: 'javascript:void(0)',
-				onclick: "nuovaFinestra('Cobro', 1000, 700, '" + root_dir + "/app/interfaces/cobros6.php?id_cobro=" + id + "&popup=1&contitulo=true&id_foco=2', 'top=100, left=155');"
+				onclick: "nuovaFinestra('Cobro', 1000, 700, '" + root_dir + "/app/interfaces/cobros6.php?id_cobro=" + charge_id + "&popup=1&contitulo=true&id_foco=2', 'top=100, left=155');"
 			})).append(' ');
 		});
 	});

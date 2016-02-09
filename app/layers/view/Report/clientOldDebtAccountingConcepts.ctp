@@ -68,7 +68,7 @@
 				<?php echo __('Grupo Cliente'); ?>
 			</td>
 			<td align="left">
-				<?php echo $this->Form->select('client_group_id', GrupoCliente::obtenerGruposSelect($this->Session), $this->data['client_group_id']); ?>
+				<?php echo $this->Form->select('client_group_id', $client_group, $this->data['client_group_id']); ?>
 			</td>
 		</tr>
 		<tr>
@@ -85,15 +85,6 @@
 			</td>
 			<td align="left">
 				<?php echo $this->Html->PrintCalendar('end_date', $this->data['end_date']); ?>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">&nbsp;</td>
-			<td align="left">
-				<label>
-					<?php echo $this->Form->checkbox('display_tax', 1, !empty($this->data['display_tax']), array('label' => false)); ?>
-					<?php echo __('Mostrar valores con impuesto'); ?>
-				</label>
 			</td>
 		</tr>
 		<tr>
@@ -126,8 +117,8 @@
 <?php echo $this->Html->script('//static.thetimebilling.com/js/bootstrap.min.js'); ?>
 <?php echo $this->Html->script(Conf::RootDir() . '/app/layers/assets/js/clientOldDebtAccountingConcepts.js'); ?>
 
-<?php if ($simple_report_html) { ?>
+<?php if ($Report) { ?>
 	<div class="simple_report_html">
-		<?php echo $simple_report_html; ?>
+		<?php $Report->render(); ?>
 	</div>
 <?php } ?>

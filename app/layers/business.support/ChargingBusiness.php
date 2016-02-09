@@ -1047,10 +1047,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $this->Report;
 	}
 
-	public function getClientOldDebtAccountingConcepts($parameters) {
+	public function getClientOldDebtAccountingConceptsReport($parameters) {
+		Criteria::query('SET group_concat_max_len = 1000000', $this->Session, true);
+
 		$CriteriaInvoice = new Criteria($this->Session);
 		$CriteriaInvoice
-			->add_select('f.id_factura')
+			->add_select("CONCAT('\"', pdl.codigo , ' ', LPAD(f.serie_documento_legal, '3', '0'), '-', LPAD(f.numero, '7', '0'), '\":\"', c.id_cobro, '\"')", 'identificador')
 			->add_select("DATEDIFF('{$parameters['end_date']}', f.fecha)", 'dias_desde_facturacion')
 			->add_select('SUM(IF(ccfmn.monto_pago IS NULL, 0, ccfmn.monto_pago))', 'total_pagado')
 			->add_select('f.total', 'total_facturado')
@@ -1059,23 +1061,43 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_from('factura', 'f')
 			->add_left_join_with(array('cta_cte_fact_mvto', 'ccfm'), 'ccfm.id_factura = f.id_factura')
 			->add_left_join_with(array('cta_cte_fact_mvto_neteo', 'ccfmn'), "ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto AND ccfmn.fecha_movimiento <= '{$parameters['end_date']}'")
-			->add_left_join_with(array('cobro', 'c'), 'c.id_cobro = f.id_cobro')
+			->add_inner_join_with(array('cobro', 'c'), 'c.id_cobro = f.id_cobro')
 			->add_left_join_with(array('cliente', 'cl'), 'cl.codigo_cliente = c.codigo_cliente')
+			->add_left_join_with(array('prm_documento_legal', 'pdl'),'pdl.id_documento_legal = f.id_documento_legal')
 			->add_restriction(CriteriaRestriction::lower_or_equals_than('f.fecha', "'{$parameters['end_date']}'"))
+			->add_restriction(CriteriaRestriction::not_equal('pdl.codigo', "'NC'"))
 			->add_grouping('f.id_factura');
+
+		if (!empty($parameters['client_code'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::equals('cl.codigo_cliente', "'{$parameters['client_code']}'"));
+		}
+
+		if (!empty($parameters['matter_code'])) {
+			$CriteriaInvoice
+				->add_left_join_with(array('cobro_asunto', 'ca'), 'ca.id_cobro = c.id_cobro')
+				->add_left_join_with(array('asunto', 'a'), 'a.codigo_asunto = ca.codigo_asunto')
+				->add_restriction(CriteriaRestriction::equals('a.codigo_asunto', "'{$parameters['matter_code']}'"));
+		}
 
 		$Criteria = new Criteria($this->Session);
 		$debts = $Criteria
 			->add_select('v.glosa_cliente')
-			->add_select('GROUP_CONCAT(DISTINCT v.id_factura ORDER BY 1)', 'facturas')
+			->add_select('CONCAT("{", GROUP_CONCAT(DISTINCT v.identificador ORDER BY 1), "}")', 'facturas')
 			->add_select('SUM(IF(v.dias_desde_facturacion <= 30, v.total_facturado - v.total_pagado, 0))', "'rango1'")
 			->add_select('SUM(IF(v.dias_desde_facturacion > 30 AND v.dias_desde_facturacion <= 60, v.total_facturado - v.total_pagado, 0))', "'rango2'")
 			->add_select('SUM(IF(v.dias_desde_facturacion > 60 AND v.dias_desde_facturacion <= 90, v.total_facturado - v.total_pagado, 0))', "'rango3'")
 			->add_select('SUM(IF(v.dias_desde_facturacion > 90, v.total_facturado - v.total_pagado, 0))', "'rango4'")
+			->add_select('SUM(v.total_facturado - v.total_pagado)', "'total'")
 			->add_from_criteria($CriteriaInvoice, 'v')
 			->add_grouping('v.codigo_cliente')
 			->run();
 
-		return $debts;
+		$this->loadReport('ClientOldDebtAccountingConcepts', 'Report');
+		$this->Report->setOutputType('SR');
+		$this->Report->setData($debts);
+		$this->Report->setParameters($parameters);
+		$this->Report->setConfiguration('sesion', $this->Session);
+
+		return $this->Report;
 	}
 }
