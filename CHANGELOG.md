@@ -1,7 +1,11 @@
 # Changelog
 
+## Hotfix 16.0.22
+Tuesday, February 9th
+* **Fix**  [Tag MB conversión moneda Trámites](https://github.com/LemontechSA/ttb/pull/1330)
+
 ## Hotfix 16.0.21
-Tuesday, February 3rd
+Wednesday, February 3rd
 * **Fix**  [Cambio glosa cuenta corriente para ebmo](https://github.com/LemontechSA/ttb/pull/1326)
 
 ## Hotfix 16.0.20
