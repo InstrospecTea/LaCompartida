@@ -2515,19 +2515,17 @@ class Factura extends Objeto {
 	, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
 	, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
-		global $query, $where, $groupby;
-
 		if ($where == '') {
 			$where = 1;
 			if ($numero != '' && $numero != null && $numero !== false) {
-				$where .= " AND numero*1 = $numero*1 ";
+				$where .= " AND factura.numero*1 = $numero*1 ";
 			}
 			if ($fecha1 && $fecha2) {
-				$where .= " AND fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . " 00:00:00' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
+				$where .= " AND factura.fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . " 00:00:00' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
 			} else if ($fecha1) {
-				$where .= " AND fecha >= '" . Utiles::fecha2sql($fecha1) . ' 00:00:00' . "' ";
+				$where .= " AND factura.fecha >= '" . Utiles::fecha2sql($fecha1) . ' 00:00:00' . "' ";
 			} else if ($fecha2) {
-				$where .= " AND fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
+				$where .= " AND factura.fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
 			}
 			if (Conf::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
 				$cliente = new Cliente($this->sesion);
@@ -2596,8 +2594,10 @@ class Factura extends Objeto {
 								, factura.numero
 								, factura.serie_documento_legal
 								, factura.codigo_cliente
+								, factura.porcentaje_impuesto
 								, cliente.glosa_cliente
 								, contrato.id_contrato as idcontrato
+								, contrato.codigo_contrato
 								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
 											OR contrato.factura_razon_social IN ('',' ')
 											OR contrato.factura_razon_social IS NULL,
@@ -2620,6 +2620,7 @@ class Factura extends Objeto {
 								, prm_moneda.simbolo
 								, prm_moneda.cifras_decimales
 								, prm_moneda.tipo_cambio
+								, cta_cte_fact_mvto_moneda.tipo_cambio AS tipo_cambio_factura
 								, factura.id_moneda
 								, factura.honorarios
 								, factura.subtotal
@@ -2636,6 +2637,11 @@ class Factura extends Objeto {
 								, GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
 								, GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
 								, factura.RUT_cliente
+								, factura_padre.fecha AS factura_padre_fecha
+								, factura_padre.serie_documento_legal AS factura_padre_serie
+								, factura_padre.numero AS factura_padre_numero
+								, documento_legal_padre.codigo AS factura_padre_codigo
+								, ccfmm_padre.tipo_cambio AS factura_padre_tipo_cambio
 								, prm_estudio.glosa_estudio
 								, factura.fecha_anulacion
 								, factura.dte_folio_fiscal
@@ -2681,6 +2687,15 @@ class Factura extends Objeto {
 			 JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
 			 LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 			 LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
+			 LEFT JOIN cta_cte_fact_mvto_moneda
+				ON cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto = cta_cte_fact_mvto.id_factura
+				AND cta_cte_fact_mvto_moneda.id_moneda = factura.id_moneda
+			 LEFT JOIN factura factura_padre ON factura_padre.id_factura = factura.id_factura_padre
+			 LEFT JOIN prm_documento_legal documento_legal_padre ON factura_padre.id_documento_legal = documento_legal_padre.id_documento_legal
+			 LEFT JOIN cta_cte_fact_mvto ccfm_padre ON ccfm_padre.id_factura = factura_padre.id_factura
+			 LEFT JOIN cta_cte_fact_mvto_moneda ccfmm_padre
+				ON ccfmm_padre.id_cta_cte_fact_mvto = ccfm_padre.id_cta_cte_mvto
+				AND ccfmm_padre.id_moneda = factura_padre.id_moneda
 			 LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
 			 LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
 			 LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato

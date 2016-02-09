@@ -38,7 +38,6 @@ class ArchivoContabilidadCpb {
 		$results = $factura->DatosReporte(false, $where, $numero, $fecha1, $fecha2, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_cia, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
 
 		$total_results = count($results);
-
 		$documents = array();
 		$report_data = array();
 
@@ -618,6 +617,7 @@ class ArchivoContabilidadCpb {
 	private static function addExtraData($result) {
 		$tipo_doc = self::getType($result['tipo']);
 		$serie = $result['serie_documento_legal'];
+
 		$result['id'] = sprintf('%s_%s_%s', $tipo_doc, $result['serie_documento_legal'], $result['numero']);
 		$result['numero'] = sprintf('%1$08d', $result['numero']);
 		$result['descrec'] = 0;
