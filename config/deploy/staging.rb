@@ -28,7 +28,7 @@ namespace :composer do
 
   desc "Install libs"
   task :install do
-    run "cd #{composer_folder} && /usr/local/bin/composer update"
+    run "cd #{composer_folder} && /usr/local/bin/composer update --no-dev"
   end
 
   desc "Update composer symlinks"
