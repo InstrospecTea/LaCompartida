@@ -328,9 +328,6 @@ $b->color_mouse_over = "#bcff5c";
 $b->funcionTR = "funcionTR";
 
 if ($excel) {
-	if ($p_cobranza) {
-		$orden = "cliente.glosa_cliente,contrato.id_contrato,asunto.glosa_asunto,tramite.fecha,tramite.descripcion";
-	}
 	$b1 = new Buscador($sesion, $query, "Trabajo", $desde, '', $orden);
 	$lista = $b1->lista;
 
