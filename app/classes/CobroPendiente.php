@@ -169,6 +169,7 @@ class CobroPendiente extends Objeto {
 			->add_left_join_with('cliente', 'contrato.codigo_cliente = cliente.codigo_cliente')
 			->add_left_join_with('asunto', 'contrato.id_contrato = asunto.id_contrato')
 			->add_restriction(CriteriaRestriction::equals('cobro_pendiente.hito', 1))
+			->add_restriction(CriteriaRestriction::equals('contrato.activo', "'SI'"))
 			->add_restriction(CriteriaRestriction::is_not_null('cobro_pendiente.fecha_cobro'))
 			->add_restriction(CriteriaRestriction::lower_or_equals_than('cobro_pendiente.fecha_cobro', 'DATE_FORMAT(NOW(), \'%Y-%m-%d\')'))
 			->add_restriction(CriteriaRestriction::is_null('cobro_pendiente.id_cobro'))

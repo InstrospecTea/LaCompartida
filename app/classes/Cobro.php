@@ -601,13 +601,16 @@ if (!class_exists('Cobro')) {
 					 * y se les restan las notas de crédito emitias al cobro generando el monto pagado parcial.
 					 *
 					 */
-					$criteria->add_select('(SUM(CCFMN.monto_pago) - SUM(CCFMNP.monto_pago))', 'monto_pago_parcial')
-										->add_from('cobro C')
-										->add_inner_join_with('factura F', 'F.id_cobro = C.id_cobro')
-										->add_left_join_with('cta_cte_fact_mvto CCFM', 'CCFM.id_factura = F.id_factura')
-										->add_left_join_with('cta_cte_fact_mvto_neteo CCFMN', 'CCFM.id_cta_cte_mvto = CCFMN.id_mvto_deuda')
-										->add_left_join_with('cta_cte_fact_mvto_neteo CCFMNP', 'CCFM.id_cta_cte_mvto = CCFMNP.id_mvto_pago')
-										->add_restriction(CriteriaRestriction::equals('C.id_cobro', $this->fields['id_cobro']));
+					$criteria->add_select('SUM(ccfmn.monto_pago)', 'monto_pago_parcial')
+										->add_from('factura_pago fp')
+										->add_left_join_with('cta_cte_fact_mvto ccfm_pago', CriteriaRestriction::equals('fp.id_factura_pago', 'ccfm_pago.id_factura_pago'))
+										->add_left_join_with('cta_cte_fact_mvto_neteo ccfmn', CriteriaRestriction::equals('ccfmn.id_mvto_pago', 'ccfm_pago.id_cta_cte_mvto'))
+										->add_left_join_with('cta_cte_fact_mvto ccfm_deuda', CriteriaRestriction::equals('ccfmn.id_mvto_deuda', 'ccfm_deuda.id_cta_cte_mvto'))
+										->add_left_join_with('neteo_documento nd', CriteriaRestriction::equals('fp.id_neteo_documento_adelanto', 'nd.id_neteo_documento'))
+										->add_left_join_with('factura f', CriteriaRestriction::equals('f.id_factura', 'ccfm_deuda.id_factura'))
+										->add_left_join_with('cobro c', CriteriaRestriction::equals('c.id_cobro', 'f.id_cobro'))
+										->add_restriction(CriteriaRestriction::equals('c.id_cobro', $this->fields['id_cobro']))
+										->add_grouping('c.id_cobro');
 
 					$result = $criteria->run();
 					$monto_pago_parcial = $result[0]['monto_pago_parcial'];

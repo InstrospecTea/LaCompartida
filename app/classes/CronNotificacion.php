@@ -170,25 +170,32 @@ class CronNotificacion extends Cron {
 			$cache_revisados[$id_usuario]['horas_cobrables'] = number_format($horas_cobrables, 1);
 		}
 
-		if ($reporte_revisados_a_todos_los_abogados || $resumen_horas_semanales_a_abogados_individuales || $alerta_semanal_todos_abogadosa_administradores ) {
-			$having = '';
-		} else {
+		// seleccionar a los usuarios que serán alertados según $having o si es administrador o revisor
+		$criteria = new Criteria($this->Sesion);
+		$criteria->add_select('usuario.id_usuario', 'id_usuario')
+							->add_select('usuario.nombre', 'nombre_pila')
+							->add_select('alerta_semanal')
+							->add_select('codigo_permiso')
+							->add_select('IFNULL(GROUP_CONCAT(DISTINCT usuario_revisor.id_revisado), (SELECT GROUP_CONCAT(DISTINCT id_usuario) FROM usuario))', 'revisados')
+							->add_from('usuario')
+							->add_left_join_with('usuario_permiso', "(usuario.id_usuario = usuario_permiso.id_usuario) AND
+																												(usuario_permiso.codigo_permiso = 'REV' OR usuario_permiso.codigo_permiso = 'ADM')")
+							->add_left_join_with('usuario_revisor', 'usuario.id_usuario = usuario_revisor.id_revisor')
+							->add_restriction(CriteriaRestriction::equals('alerta_revisor', 1))
+							->add_restriction(CriteriaRestriction::equals('activo', 1))
+							->add_restriction(CriteriaRestriction::not_equal('rut', 99511620))
+							->add_grouping('usuario.id_usuario');
+
+		if (!$reporte_revisados_a_todos_los_abogados || !$resumen_horas_semanales_a_abogados_individuales || !$alerta_semanal_todos_abogadosa_administradores ) {
 			// si no existen configuraciones especiales, las alertas serán generadas para los usuarios con permiso revisor o que tenga usuarios en revisión
-			$having = " AND (codigo_permiso = 'REV' OR revisados IS NOT NULL)";
+			$criteria->add_having(CriteriaRestriction::or_clause(array(
+										CriteriaRestriction::equals('codigo_permiso', "'REV'"),
+										CriteriaRestriction::is_not_null('revisados'),
+									)
+								));
 		}
 
-		// seleccionar a los usuarios que serán alertados según $having o si es administrador o revisor
-		$query = "SELECT usuario.id_usuario, usuario.nombre AS nombre_pila,
-				alerta_semanal, codigo_permiso,
-				GROUP_CONCAT(DISTINCT usuario_revisor.id_revisado SEPARATOR ',') as revisados
-			FROM usuario
-				LEFT JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario AND (usuario_permiso.codigo_permiso = 'REV' OR usuario_permiso.codigo_permiso = 'ADM')
-				LEFT JOIN usuario_revisor ON (usuario.id_usuario = usuario_revisor.id_revisor)
-			WHERE activo = 1 AND (alerta_revisor = 1 OR usuario_permiso.codigo_permiso = 'ADM')
-			GROUP BY usuario.id_usuario
-			HAVING 1 {$having}";
-
-		$resultados = $this->query($query);
+		$resultados = $criteria->run();
 		$total_resultados = count($resultados);
 
 		for ($x = 0; $x < $total_resultados; ++$x) {

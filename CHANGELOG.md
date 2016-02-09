@@ -1,5 +1,61 @@
 # Changelog
 
+## Hotfix 16.0.21
+Tuesday, February 3rd
+* **Fix**  [Cambio glosa cuenta corriente para ebmo](https://github.com/LemontechSA/ttb/pull/1326)
+
+## Hotfix 16.0.20
+Tuesday, February 2nd
+* **Fix**  [Cambio query pago parcial](https://github.com/LemontechSA/ttb/pull/1325)
+
+## Hotfix 16.0.19
+Tuesday, February 2nd
+* **Fix**  [Mejora Adelantos](https://github.com/LemontechSA/ttb/pull/1324)
+
+## Hotfix 16.0.18
+Monday, February 1st
+* **Fix**  [Reestructuración Query Alerta Semanal](https://github.com/LemontechSA/ttb/pull/1322)
+
+## Hotfix 16.0.17
+Friday, January 29th
+* **Fix**  [Corregir validación de cambio cliente asunto](https://github.com/LemontechSA/ttb/pull/1321)
+
+## Hotfix 16.0.16
+Thursday, January 28th
+* **Fix**  [Mejora en flujo al cambiar un asunto de cliente](https://github.com/LemontechSA/ttb/pull/1319)
+
+## Hotfix 16.0.15
+Wednesday, January 27th
+* **Fix** [Filtro Ingresado por en el buscador de Gastos](https://github.com/LemontechSA/ttb/pull/1318)
+
+## Hotfix 16.0.14
+Tuesday, January 26th
+* **Fix** [Problemas con resumen semanal](https://github.com/LemontechSA/ttb/pull/1316)
+
+## Hotfix 16.0.13
+Monday, January 25th
+* **Fix** [Filtro trámites Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1312)
+
+## Hotfix 16.0.12
+Thursday, January 21st
+* **Fix** [Problema edición masiva](https://github.com/LemontechSA/ttb/pull/1309)
+
+## Hotfix 16.0.11
+Thursday, January 21st
+* **Fix** [Corrección referencia variable](https://github.com/LemontechSA/ttb/pull/1307)
+
+## Hotfix 16.0.10
+Wednesday, January 20th
+* **Fix** [Corregir flujo de Hitos al cambiar forma de cobro](https://github.com/LemontechSA/ttb/pull/1306)
+
+## Hotfix 16.0.9
+Tuesday, January 19th
+* **Feature** [Corrección query para listar usuarios Encargado Comercial en Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1304)
+
+## Hotfix 16.0.8
+Monday, January 18th
+* **Feature** [Corrección query para pago de cobros](https://github.com/LemontechSA/ttb/pull/1303)
+
 ## Hotfix 16.0.7
 Friday, January 15th
 * **Feature** [Nuevo "activo" filtro para actividades](https://github.com/LemontechSA/ttb/pull/1302)
