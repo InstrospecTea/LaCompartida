@@ -15,10 +15,7 @@ class OrdenTrabajos extends \Database\Migration implements \Database\ITemplateMi
 
 		// Según la lógica de negocio existente si está activa la configuración RevHrsClienteFecha se debe ordenar por Fecha,
 		// si no se ordenará por Cliente y Fecha.
-		if ($conf_value[0]['valor_opcion'] == '0') {
-			$order_works = 'trabajo.fecha ASC';
-			$order_errand = 'tramite.fecha ASC';
-		} else if ($conf_value[0]['valor_opcion'] == '1') {
+		if ($conf_value[0]['valor_opcion'] == '1') {
 			$order_works = 'cliente.glosa_cliente ASC, trabajo.fecha ASC';
 			$order_errand = 'cliente.glosa_cliente ASC, tramite.fecha ASC';
 		} else {
@@ -54,7 +51,8 @@ class OrdenTrabajos extends \Database\Migration implements \Database\ITemplateMi
    * @return void
    */
 	function down() {
-		$this->addQueryDown("DELETE FROM `configuracion` WHERE  glosa_opcion = 'OrdenTrabajos'");
-		$this->addQueryDown("DELETE FROM `configuracion` WHERE  glosa_opcion = 'OrdenTramites'");
+		$this->addQueryDown("DELETE FROM `configuracion` WHERE  glosa_opcion = 'OrdenRevisarTrabajos'");
+		$this->addQueryDown("DELETE FROM `configuracion` WHERE  glosa_opcion = 'OrdenRevisarTramites'");
+		$this->addQueryDown("INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES ('RevHrsClienteFecha', 0, 'Glosa Detraccion', 'boolean', '6', '-1')");
 	}
 }

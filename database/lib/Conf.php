@@ -10,7 +10,7 @@ class Conf {
 			'host' => 'email-smtp.us-east-1.amazonaws.com',
 			'user_name' => 'AKIAIDG2BX4WGJMFC2TA',
 			'password' => 'Aqru/Fbu3Yu7gjrYoTUhpYgEA2KFArUHQ7krh1/yjoO4',
-			'receptors' => 'cbriones@lemontech.cl',
+			'receptors' => 'ttbc-devs@lemontech.cl',
 			'sender' => 'migraciones@lemontech.cl',
 			'sender_alias' => 'Migraciones TTB-C',
 			'subject' => 'Error en Migración'
