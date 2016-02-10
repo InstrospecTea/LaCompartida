@@ -1,0 +1,22 @@
+<?php
+
+namespace Database;
+
+class CLASSNAME extends \Database\Migration implements \Database\ITemplateMigration {
+
+	/**
+   * Run the migrations.
+   * @return void
+   */
+	function up() {
+		$this->addQueryUp('');
+	}
+
+	/**
+   * Reverse the migrations.
+   * @return void
+   */
+	function down() {
+		$this->addQueryDown('');
+	}
+}

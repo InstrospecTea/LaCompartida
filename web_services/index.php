@@ -337,11 +337,11 @@ $Slim->map('/DatosPanel(/:callback)', 'DatosPanel')->via('GET', 'POST');
 			$datos = $datos[0];
 
 			$datos['path_real'] = realpath(dirname(__FILE__) . '/../');
-			//ultima version disponible en el update
-			//(se parsea el archivo porque las versiones viejan del update no tienen ese dato)
-			$up = file_get_contents(Conf::ServerDir() . '/update.php');
-			preg_match_all('/case\s+(\d+\.\d+)\s*:/', $up, $matches);
-			$datos['ultima_version_tt'] = end($matches[1]);
+
+			// Última versión como migración
+			$Migration = new \Database\Migration();
+			$datos['ultima_version_tt'] = $Migration->getLastVersionOnFileSystem();
+			unset($Session, $Migration);
 
 			if(empty($datos['version_tt']) && file_exists(Conf::ServerDir() . '/version.php')){
 				$_GET['show'] = 0;
