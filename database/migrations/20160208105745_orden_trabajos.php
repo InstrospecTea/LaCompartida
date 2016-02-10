@@ -11,7 +11,7 @@ class OrdenTrabajos extends \Database\Migration implements \Database\ITemplateMi
 	function up() {
 		$order_works = '';
 		$order_errand = '';
-		$conf_value = $this->getResultsQuery("SELECT `valor_opcion FROM `configuracion` WHERE glosa_opcion = 'RevHrsClienteFecha'");
+		$conf_value = $this->getResultsQuery("SELECT `valor_opcion` FROM `configuracion` WHERE glosa_opcion = 'RevHrsClienteFecha'");
 
 		// Según la lógica de negocio existente si está activa la configuración RevHrsClienteFecha se debe ordenar por Fecha,
 		// si no se ordenará por Cliente y Fecha.
