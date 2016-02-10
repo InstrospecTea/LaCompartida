@@ -15,7 +15,7 @@ class OrdenTrabajos extends \Database\Migration implements \Database\ITemplateMi
 
 		// Según la lógica de negocio existente si está activa la configuración RevHrsClienteFecha se debe ordenar por Fecha,
 		// si no se ordenará por Cliente y Fecha.
-		if ($conf_value[0]['valor_opcion'] == '1') {
+		if (is_array($conf_value) && $conf_value[0]['valor_opcion'] == '1') {
 			$order_works = 'cliente.glosa_cliente ASC, trabajo.fecha ASC';
 			$order_errand = 'cliente.glosa_cliente ASC, tramite.fecha ASC';
 		} else {
@@ -24,20 +24,20 @@ class OrdenTrabajos extends \Database\Migration implements \Database\ITemplateMi
 		}
 
 		$query_works = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (" .
-						"'OrdenRevisarTrabajos', " .
-						"'" . $order_works . "', " .
-						"'Ordenamientos de los Trabajos en el módulo de Revisar Horas', " .
-						"'string', " .
-						"'6', " .
-						"'-1')";
+			"'OrdenRevisarTrabajos', " .
+			"'{$order_works}', " .
+			"'Ordenamientos de los Trabajos en el módulo de Revisar Horas', " .
+			"'string', " .
+			"'6', " .
+			"'-1')";
 
 		$query_errand = "INSERT IGNORE INTO `configuracion` (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`) VALUES (" .
-						"'OrdenRevisarTramites', " .
-						"'" . $order_errand . "', " .
-						"'Ordenamientos de los Tramites en el módulo Revisar Tramites', " .
-						"'string', " .
-						"'6', " .
-						"'-1')";
+			"'OrdenRevisarTramites', " .
+			"'{$order_errand}', " .
+			"'Ordenamientos de los Tramites en el módulo Revisar Tramites', " .
+			"'string', " .
+			"'6', " .
+			"'-1')";
 
 		$this->addQueryUp($query_works);
 		$this->addQueryUp($query_errand);
