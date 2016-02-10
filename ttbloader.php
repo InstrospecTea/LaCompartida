@@ -27,8 +27,8 @@ $directorios = array(
 	'/app/layers/utilities/',
 	'/app/layers/utilities/twig/',
 	'/app/layers/view/helpers/',
-	'/database/lib/'
-	'/fw/classes/',
+	'/database/lib/',
+	'/fw/classes/'
 );
 
 function autocargattb($class_name) {
