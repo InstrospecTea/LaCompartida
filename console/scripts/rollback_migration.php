@@ -33,6 +33,11 @@ class RollbackMigration extends AppShell {
 
 				$ReflectedClass = new ReflectionClass("Database\\$class_name");
 				$CustomMigration = $ReflectedClass->newInstance();
+
+				if ($this->debug) {
+					$CustomMigration->setDebug(true);
+				}
+
 				$CustomMigration->down();
 				$CustomMigration->runDown();
 
