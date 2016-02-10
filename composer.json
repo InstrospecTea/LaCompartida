@@ -4,6 +4,7 @@
 		"mikehaertl/phpwkhtmltopdf": "2.0.1",
 		"aws/aws-sdk-php": "2.2.*",
 		"amazonwebservices/aws-sdk-for-php": "1.6.*",
-		"nesbot/carbon": "1.14"
+		"nesbot/carbon": "1.14",
+		"phpmailer/phpmailer": "~5.2"
 	}
 }
