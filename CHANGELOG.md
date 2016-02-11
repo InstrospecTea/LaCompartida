@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.1.1
+Thursday, February 11th
+* **Fix**  [Obtener la última migración](https://github.com/LemontechSA/ttb/pull/1332)
+
 ## [Release 16.1.0](https://github.com/LemontechSA/ttb/pull/1331)
 Wednesday, February 10th
 * **Feature** [Ordenamiento de Trabajos y Tramites](https://github.com/LemontechSA/ttb/pull/1329)
