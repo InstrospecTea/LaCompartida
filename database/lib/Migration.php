@@ -219,7 +219,8 @@ class Migration {
 
 	public function getLastFileMigration() {
 		$files = $this->getFilesMigration(1);
-		return !empty($files) ? $files[0] : '';
+		$file = array_shift($files);
+		return !empty($file) ? $file : '';
 	}
 
 	public function getFilesRollbackMigration($batch) {
