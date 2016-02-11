@@ -219,7 +219,7 @@ class Migration {
 
 	public function getLastFileMigration() {
 		$files = $this->getFilesMigration(1);
-		$file = array_shift(array_values($files));
+		$file = array_shift($files);
 		return !empty($file) ? $file : '';
 	}
 
