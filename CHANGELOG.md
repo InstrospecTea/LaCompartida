@@ -1,8 +1,12 @@
 # Changelog
 
+## Hotfix 16.1.2
+Friday, February 12th
+* **Fix** [Tag MB conversión moneda Trámites - Validación según moneda de despliegue](https://github.com/LemontechSA/ttb/pull/1333)
+
 ## Hotfix 16.1.1
 Thursday, February 11th
-* **Fix**  [Obtener la última migración](https://github.com/LemontechSA/ttb/pull/1332)
+* **Fix** [Obtener la última migración](https://github.com/LemontechSA/ttb/pull/1332)
 
 ## [Release 16.1.0](https://github.com/LemontechSA/ttb/pull/1331)
 Wednesday, February 10th
