@@ -1,11 +1,12 @@
 require 'capistrano/cli'
+
 load 'config/cap_notify'
 load 'config/cap_shared'
 load 'config/cap_servers_staging'
 
-mysqlCmd = "mysql -u root -padmin1awdx"
+mysqlCmd = 'mysql -uroot -pasdwsx2016'
 
-set :home_directory, "/mnt/disk1"
+set :home_directory, "/var/www/html"
 set :base_directory, "#{home_directory}/deploys"
 
 
@@ -87,12 +88,12 @@ namespace :deploy do
                   .split("\n")
                   .collect(&:strip)
                   .reject!{ |db|
-                    ['information_schema', 'mysql', 'performance_schema'].include?( db )
+                    ['information_schema', 'mysql', 'performance_schema', 'Warning: Using a password on the command line interface can be insecure.'].include?( db )
                   }
 
     dbname = ask_option databases
 
-    run "sed -e \"s/<<DBNAME>>/#{dbname}/\" /mnt/disk1/miconf.php.template > #{current_path}/app/miconf.php"
+    run "sed -e \"s/<<DBNAME>>/#{dbname}/\" #{home_directory}/miconf.php.template > #{current_path}/app/miconf.php"
   end
 
   task :clean_deploys do
@@ -136,10 +137,7 @@ namespace :deploy do
 
   before "deploy", "deploy:ask_branch"
   before "deploy:update_code", "deploy:setup"
-
   after  "deploy:update", "deploy:cleanup"
-  #after  "deploy", 'deploy:send_notification'
-
   after "deploy", "deploy:configure_env"
 end
 
@@ -172,7 +170,7 @@ namespace :db do
 
     downloadUrl = bucket.objects[ backupName ].url_for( :read, :expires => 20*60 )
 
-    outputFile = "/mnt/disk1/backups/#{client}_#{backupDate}.tar.gz"
+    outputFile = "#{home_directory}/backups/#{client}_#{backupDate}.tar.gz"
     run "wget '#{downloadUrl}' -O #{outputFile}"
 
     bd = "#{client}_#{backupDate}_staging"
