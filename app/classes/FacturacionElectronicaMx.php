@@ -280,7 +280,7 @@ EOF;
 				'formaDePago|' . 'PAGO EN UNA SOLA EXHIBICION',
 				'TipoCambio|' . number_format($Factura->get_tipo_cambio($Factura->fields['id_moneda']), 2, '.', ''),
 				'condicionesDePago|' . 'EFECTOS FISCALES AL PAGO', // $Factura->fields['condicion_pago'],
-				'Moneda|' . ($monedas[$Factura->fields['id_moneda']]['codigo']),
+				'Moneda|' . $monedas[$Factura->fields['id_moneda']]['simbolo_factura'],
 				'metodoDePago|' . self::PaymentMethod($Sesion, $Factura),
 				'total|' . number_format($Factura->fields['total'], 2, '.', ''),
 				'LugarExpedicion|' . 'México Distrito Federal',
@@ -341,7 +341,7 @@ EOF;
 		if ($Factura->fields['subtotal'] > 0) {
 			$r['CON_honorarios'] = array(
 				'cantidad|1.00',
-				'unidad|N/A',
+				'unidad|' . __('N/A'),
 				'descripcion|' . ($Factura->fields['descripcion']),
 				'valorUnitario|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
 				'importe|' . number_format($Factura->fields['subtotal'], 2, '.', ''),
@@ -352,7 +352,7 @@ EOF;
 		if ($Factura->fields['subtotal_gastos'] > 0) {
 			$r['CON_gastos_con_iva'] = array(
 				'cantidad|1.00',
-				'unidad|N/A',
+				'unidad|' . __('N/A'),
 				'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos']),
 				'valorUnitario|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', ''),
 				'importe|' . number_format($Factura->fields['subtotal_gastos'], 2, '.', ''),
@@ -363,7 +363,7 @@ EOF;
 		if ($Factura->fields['subtotal_gastos_sin_impuesto'] > 0) {
 			$r['CON_gastos_sin_iva'] = array(
 				'cantidad|1.00',
-				'unidad|N/A',
+				'unidad|' . __('N/A'),
 				'descripcion|' . ($Factura->fields['descripcion_subtotal_gastos_sin_impuesto']),
 				'valorUnitario|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),
 				'importe|' . number_format($Factura->fields['subtotal_gastos_sin_impuesto'], 2, '.', ''),
