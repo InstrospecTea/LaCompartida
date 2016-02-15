@@ -475,11 +475,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	$desde = ($check_trabajo == 1) ? 0 : $desde;
 
 	if ($orden == "") {
-		if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
-			$orden = " cliente.glosa_cliente ASC, trabajo.fecha ASC";
-		} else {
-			$orden = " trabajo.fecha ASC";
-		}
+		$orden = Conf::GetConf($sesion,'OrdenRevisarTrabajos');
 	}
 
 	if (stristr($orden, ".") === FALSE) {

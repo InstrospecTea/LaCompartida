@@ -8331,6 +8331,7 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'TRAMITES_TOTAL': //GenerarDocumentoComun
+				global $x_resultados;
 				$horas_cobrables_tramites = floor(($asunto->fields['tramites_total_duracion_trabajado']) / 60);
 				$minutos_cobrables_tramites = sprintf("%02d", $asunto->fields['tramites_total_duracion_trabajado'] % 60);
 				$horas_cobrables = floor(($asunto->fields['trabajos_total_duracion_trabajada']) / 60);
@@ -8346,6 +8347,13 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%duracion%', $horas_cobrables . ':' . $minutos_cobrables, $html);
 
 				$html = str_replace('%valor_tramites%', $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($totales['total_tramites'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
+				if ($this->fields['opc_moneda_total'] == $this->fields['id_moneda']) {
+					$html = str_replace('%valor_tramites_monedabase_mb%', '', $html);
+				} else {
+					$html = str_replace('%valor_tramites_monedabase_mb%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				}
+
 				$html = str_replace('%valor_siempre%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['tramites_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				break;
