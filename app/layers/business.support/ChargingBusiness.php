@@ -998,6 +998,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$CriteriaInvoice
 			->add_select('cliente.codigo_cliente')
 			->add_select('cliente.glosa_cliente')
+			->add_select('factura.cliente')
 			->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
 			->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_factura')
 			->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_nc')
@@ -1034,13 +1035,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$Criteria = new Criteria($this->Session);
 		$sales = $Criteria
 			->add_select('ventas.codigo_cliente', 'client_code')
-			->add_select('ventas.glosa_cliente', 'client')
+			->add_select('ventas.cliente', 'client')
 			->add_select('ventas.mes_contable', 'period')
 			->add_select('SUM(ventas.total_factura - ventas.total_nc)', 'total_period')
 			->add_from_criteria($CriteriaInvoice, 'ventas')
 			->add_grouping('ventas.codigo_cliente')
 			->add_grouping('ventas.mes_contable')
-			->add_ordering('ventas.glosa_cliente')
+			->add_ordering('ventas.cliente')
 			->add_ordering('ventas.mes_contable')
 			->run();
 
