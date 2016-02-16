@@ -87,6 +87,7 @@ class ReportController extends AbstractController {
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
 		$this->loadBusiness('Charging');
+		$this->loadBusiness('Parameterizing');
 
 		if (!empty($this->data)) {
 			$this->autoRender = false;
@@ -109,6 +110,11 @@ class ReportController extends AbstractController {
 				$this->data['display_currency'] = $Currency;
 			}
 
+			if (!empty($this->data['company'])) {
+				$Company = $this->ParameterizingBusiness->get('Company', $this->data['company']);
+				$this->data['company_name'] = $Company->fields['glosa_estudio'];
+			}
+
 			$Report = $this->ChargingBusiness->getSalesAccountingConceptsReport($this->data);
 			$Report->render();
 		} else {
@@ -123,6 +129,7 @@ class ReportController extends AbstractController {
 			$this->set('currency', $this->SearchingBusiness->getAssociativeArray('Currency', 'id_moneda', 'glosa_moneda'));
 			$base_currency = $this->CoiningBusiness->getBaseCurrency();
 			$this->set('base_currency', $base_currency->fields['id_moneda']);
+			$this->set('companies', $this->SearchingBusiness->getAssociativeArray('Company', 'id_estudio', 'glosa_estudio'));
 
 			if (empty($this->data['start_date'])) {
 				$this->data['start_date'] = date('d-m-Y', strtotime('-1 month'));

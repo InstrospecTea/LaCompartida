@@ -1027,6 +1027,10 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$CriteriaInvoice->add_restriction(CriteriaRestriction::in('cobro.opc_moneda_total', $parameters['invoiced']));
 		}
 
+		if (!empty($parameters['company'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::equals('factura.id_estudio', $parameters['company']));
+		}
+
 		$Criteria = new Criteria($this->Session);
 		$sales = $Criteria
 			->add_select('ventas.codigo_cliente', 'client_code')

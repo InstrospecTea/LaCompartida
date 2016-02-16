@@ -36,6 +36,10 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 		$this->writeNewRow(1, 13,  __('Periodo entre') . " {$this->parameters['start_date']} hasta {$this->parameters['end_date']}", $this->format['text']);
 		$display_tax_text = ($this->parameters['display_tax'] == '1') ? __('Mostrar valores con impuesto') : __('Mostrar valores sin impuesto');
 		$this->writeNewRow(1, 13, $display_tax_text, $this->format['text']);
+
+		if (!empty($this->parameters['company'])) {
+			$this->writeNewRow(1, 13, __('glosa_estudio') . ' ' . $this->parameters['company_name'], $this->format['text']);
+		}
 	}
 
 	protected function present() {

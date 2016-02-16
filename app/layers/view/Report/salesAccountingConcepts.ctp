@@ -20,6 +20,14 @@
 		</tr>
 		<tr>
 			<td align="right">
+			 <?php echo __('glosa_estudio'); ?>
+			</td>
+			<td align="left">
+				<?php echo $this->Form->select('company', $companies, $this->data['company']); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
 			 <?php echo __('Clientes'); ?>
 			</td>
 			<td align="left">
