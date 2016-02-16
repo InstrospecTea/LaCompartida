@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.2.0](https://github.com/LemontechSA/ttb/pull/1336)
+Tuesday, February 16th
+* **Feature** [Cambios Facturacion MX](https://github.com/LemontechSA/ttb/pull/1334)
+
 ## Hotfix 16.1.2
 Friday, February 12th
 * **Fix** [Tag MB conversión moneda Trámites - Validación según moneda de despliegue](https://github.com/LemontechSA/ttb/pull/1333)
