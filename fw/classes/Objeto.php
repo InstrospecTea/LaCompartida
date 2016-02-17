@@ -300,7 +300,9 @@ class Objeto {
 	 * @return boolean retorna verdadero si el registro está cargado, de lo contrario retorna falso
 	 */
 	public function Loaded() {
-		if (isset($this->fields[$this->campo_id])) {
+		if (isset($this->fields[$this->campo_id]) &&
+				!is_null($this->fields[$this->campo_id]) &&
+				!empty($this->fields[$this->campo_id])) {
 			return true;
 		}
 
