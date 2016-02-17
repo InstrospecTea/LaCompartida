@@ -277,9 +277,10 @@ for ($x = 0; $x < $lista_tramites->num; $x++) {
 }
 if ($orden == "") {
 
-	if (Conf::GetConf($sesion,'RevHrsClienteFecha')) {
-		$orden = " cliente.glosa_cliente ASC, tramite.fecha ASC";
-	} else {
+	$orden = Conf::GetConf($sesion,'OrdenRevisarTramites');
+
+	// Se intenta seguir la lógica de negocio anterior.
+	if ($orden != "cliente.glosa_cliente ASC, tramite.fecha ASC") {
 
 		if ($opc_orden == 'edit') {
 			$orden = "tramite.fecha_modificacion DESC";
@@ -330,9 +331,7 @@ $b->color_mouse_over = "#bcff5c";
 $b->funcionTR = "funcionTR";
 
 if ($excel) {
-	if ($p_cobranza) {
-		$orden = "cliente.glosa_cliente,contrato.id_contrato,asunto.glosa_asunto,tramite.fecha,tramite.descripcion";
-	}
+
 	$b1 = new Buscador($sesion, $query, "Trabajo", $desde, '', $orden);
 	$lista = $b1->lista;
 

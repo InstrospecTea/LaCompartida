@@ -165,7 +165,8 @@ class Moneda extends Objeto {
 					prm_moneda.tipo_cambio,
 					prm_moneda.cifras_decimales,
 					prm_moneda.simbolo,
-					prm_moneda.codigo
+					prm_moneda.codigo,
+					prm_moneda.simbolo_factura
 				FROM prm_moneda";
 
 		if (!empty($id_moneda)) {

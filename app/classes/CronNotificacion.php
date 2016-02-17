@@ -181,13 +181,9 @@ class CronNotificacion extends Cron {
 							->add_left_join_with('usuario_permiso', "(usuario.id_usuario = usuario_permiso.id_usuario) AND
 																												(usuario_permiso.codigo_permiso = 'REV' OR usuario_permiso.codigo_permiso = 'ADM')")
 							->add_left_join_with('usuario_revisor', 'usuario.id_usuario = usuario_revisor.id_revisor')
+							->add_restriction(CriteriaRestriction::equals('alerta_revisor', 1))
 							->add_restriction(CriteriaRestriction::equals('activo', 1))
 							->add_restriction(CriteriaRestriction::not_equal('rut', 99511620))
-							->add_restriction(CriteriaRestriction::or_clause(array(
-										CriteriaRestriction::equals('alerta_revisor', 1),
-										CriteriaRestriction::equals('usuario_permiso.codigo_permiso', "'ADM'"),
-									)
-								))
 							->add_grouping('usuario.id_usuario');
 
 		if (!$reporte_revisados_a_todos_los_abogados || !$resumen_horas_semanales_a_abogados_individuales || !$alerta_semanal_todos_abogadosa_administradores ) {

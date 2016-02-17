@@ -1,5 +1,50 @@
 # Changelog
 
+## [Release 16.2.0](https://github.com/LemontechSA/ttb/pull/1336)
+Tuesday, February 16th
+* **Feature** [Cambios Facturacion MX](https://github.com/LemontechSA/ttb/pull/1334)
+
+## Hotfix 16.1.2
+Friday, February 12th
+* **Fix** [Tag MB conversión moneda Trámites - Validación según moneda de despliegue](https://github.com/LemontechSA/ttb/pull/1333)
+
+## Hotfix 16.1.1
+Thursday, February 11th
+* **Fix** [Obtener la última migración](https://github.com/LemontechSA/ttb/pull/1332)
+
+## [Release 16.1.0](https://github.com/LemontechSA/ttb/pull/1331)
+Wednesday, February 10th
+* **Feature** [Ordenamiento de Trabajos y Tramites](https://github.com/LemontechSA/ttb/pull/1329)
+* **Feature** [Nuevo sistema de migración de base de datos](https://github.com/LemontechSA/ttb/pull/1292)
+
+## Hotfix 16.0.22
+Tuesday, February 9th
+* **Fix**  [Tag MB conversión moneda Trámites](https://github.com/LemontechSA/ttb/pull/1330)
+
+## Hotfix 16.0.21
+Wednesday, February 3rd
+* **Fix**  [Cambio glosa cuenta corriente para ebmo](https://github.com/LemontechSA/ttb/pull/1326)
+
+## Hotfix 16.0.20
+Tuesday, February 2nd
+* **Fix**  [Cambio query pago parcial](https://github.com/LemontechSA/ttb/pull/1325)
+
+## Hotfix 16.0.19
+Tuesday, February 2nd
+* **Fix**  [Mejora Adelantos](https://github.com/LemontechSA/ttb/pull/1324)
+
+## Hotfix 16.0.18
+Monday, February 1st
+* **Fix**  [Reestructuración Query Alerta Semanal](https://github.com/LemontechSA/ttb/pull/1322)
+
+## Hotfix 16.0.17
+Friday, January 29th
+* **Fix**  [Corregir validación de cambio cliente asunto](https://github.com/LemontechSA/ttb/pull/1321)
+
+## Hotfix 16.0.16
+Thursday, January 28th
+* **Fix**  [Mejora en flujo al cambiar un asunto de cliente](https://github.com/LemontechSA/ttb/pull/1319)
+
 ## Hotfix 16.0.15
 Wednesday, January 27th
 * **Fix** [Filtro Ingresado por en el buscador de Gastos](https://github.com/LemontechSA/ttb/pull/1318)

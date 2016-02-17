@@ -52,25 +52,6 @@ if ($id_asunto > 0) {
 			$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
 		}
 
-		// validación para que al cambiar un asunto de un cliente a otro,
-		// no existan cobros ni gastos asociados para el cliente inicial
-		if ($opcion == "guardar") { //entra aqui cuando la edicion viene desde guardar
-			$query = "SELECT COUNT(*) FROM cobro WHERE id_cobro IN (SELECT c.id_cobro FROM cobro_asunto c WHERE codigo_asunto = '" . $Asunto->fields['codigo_asunto'] . "' ) AND codigo_cliente = '" . $Cliente->fields['codigo_cliente'] . "' ";
-			$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-			list($count) = mysql_fetch_array($resp);
-
-			if ($count > 0) {
-				$Pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene ') . __('cobros') . ' ' . __('asociados'));
-			}
-
-			$query = "SELECT COUNT(*) FROM cta_corriente WHERE codigo_asunto = '" . $Asunto->fields['codigo_asunto'] . "' AND codigo_cliente = '" . $Cliente->fields['codigo_cliente'] . "' ";
-			$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
-			list($count) = mysql_fetch_array($resp);
-
-			if ($count > 0) {
-				$Pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene gastos asociados'));
-			}
-		}
 	} elseif ($Cliente->fields['codigo_cliente_secundario'] != $codigo_cliente_secundario && Conf::GetConf($Sesion, 'CodigoSecundario')) {
 		$codigo_asunto = $Asunto->AsignarCodigoAsunto($codigo_cliente);
 	}
@@ -96,9 +77,30 @@ if ($Cliente->Loaded() && empty($id_asunto) && (!isset($opcion) || $opcion != "g
 if ($opcion == 'guardar') {
 	$enviar_mail = 1;
 
-	if (! $Cliente->Loaded()) {
-		$Pagina->AddError(__('El cliente seleccionado no existe en el sistema'));
+	// validación para que al cambiar un asunto de un cliente a otro,
+	// no existan cobros ni gastos asociados para el cliente inicial
+	if ($Asunto->Loaded() && $Asunto->fields['codigo_cliente'] != $codigo_cliente) {
+		$query = "SELECT COUNT(*) FROM cobro WHERE id_cobro IN (SELECT c.id_cobro FROM cobro_asunto c WHERE codigo_asunto = '" . $Asunto->fields['codigo_asunto'] . "' ) AND codigo_cliente = '" . $Cliente->fields['codigo_cliente'] . "' ";
+		$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+		list($count) = mysql_fetch_array($resp);
+
+		if ($count > 0) {
+			$Pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene ') . __('cobros') . ' ' . __('asociados'));
+		}
+
+		$query = "SELECT COUNT(*) FROM cta_corriente WHERE codigo_asunto = '" . $Asunto->fields['codigo_asunto'] . "' AND codigo_cliente = '" . $Cliente->fields['codigo_cliente'] . "' ";
+		$resp = mysql_query($query, $Sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $Sesion->dbh);
+		list($count) = mysql_fetch_array($resp);
+
+		if ($count > 0) {
+			$Pagina->AddError(__('No se puede cambiar el cliente a un asunto que tiene gastos asociados'));
+		}
+
+		if (!$Cliente->Loaded()) {
+			$Pagina->AddError(__('El cliente seleccionado no existe en el sistema'));
+		}
 	}
+
 
 	if (empty($glosa_asunto)) {
 		$Pagina->AddError(__('Por favor ingrese un título para el ') . __('asunto'));
@@ -258,11 +260,15 @@ if ($opcion == 'guardar') {
 				$_REQUEST['contacto'] = trim($_REQUEST['nombre_contacto']);
 			}
 
-			$contrato->Fill($_REQUEST, true);
-			$contrato->Edit('codigo_cliente', $codigo_cliente);
-			$contrato->Edit('fecha_inicio_cap', Utiles::fecha2sql($fecha_inicio_cap));
-
-			if ($contrato->Write()) {
+			$errors = $Pagina->GetErrors();
+			$valid_write = false;
+			if (!$val && empty($errors)) {
+				$contrato->Fill($_REQUEST, true);
+				$contrato->Edit('codigo_cliente', $codigo_cliente);
+				$contrato->Edit('fecha_inicio_cap', Utiles::fecha2sql($fecha_inicio_cap));
+				$valid_write = $contrato->Write();
+			}
+			if ($valid_write) {
 
 				// Subiendo Archivo
 				if (!empty($archivo_data)) {

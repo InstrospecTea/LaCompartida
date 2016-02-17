@@ -161,6 +161,8 @@ defined('CACHEDIR') || define('CACHEDIR', '/var/www/virtual/cache/');
 defined('LOGDIR') || define('LOGDIR', '/tmp/logs/');
 defined('S3_UPLOAD_BUCKET') || define('S3_UPLOAD_BUCKET', 'timebilling-uploads');
 
+defined('__BASEDIR__') || define('__BASEDIR__', dirname(__DIR__));
+
 require_once APPPATH . '/fw/funciones/funciones.php';
 require_once APPPATH . '/app/lang/es.php'; // Para que cargue el idioma por defecto
 require_once APPPATH . '/app/lang/abogado.php';	// Por si hay palabras especificas relacionadas con el rubro

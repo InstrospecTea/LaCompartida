@@ -944,19 +944,19 @@ $_LANG['conforme a su equivalencia en peso según el Dólar Observado publicado po
 $_LANG['%detalle_ebmo%'] = "
 <p>De nuestra consideraci&oacute;n:</p>
 <p>Por medio de la presente, le hacemos llegar nuestra carta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios prestados %fecha_con_de%%detalle_cuenta_honorarios_primer_dia_mes%%detalle_cuenta_gastos%.</p>
-<p>Agradeceremos depositar la cantidad señalada en la cuenta corriente de Eyzaguirre Burlé Montes y Ossa Abogados Ltda., Nº 15-72831-0, Rut 76.819.660-5, del Banco BICE.</p>
+<p>Agradeceremos depositar la cantidad señalada en la cuenta corriente de Eyzaguirre Burlé y Montes Abogados Ltda., Nº 15-72831-0, Rut 76.819.660-5, del Banco BICE.</p>
 <p>Asimismo, por favor, confirmar su depósito o transferencia por e-mail a info@ebmo.cl.</p>
 <p>Atentamente,</p>";
 $_LANG['%detalle_ebmo_solo_gastos%'] = "
 <p>De nuestra consideraci&oacute;n:</p>
 <p>Por medio de la presente, le hacemos llegar nuestra carta de reembolso de gastos incurridos por nuestro Estudio %fecha_con_de%, por la cantidad total de <b>%monto_con_gasto%</b>.</p>
-<p>Agradeceremos depositar la cantidad señalada en la cuenta corriente de Eyzaguirre Burlé Montes y Ossa Abogados Ltda., Nº 15-72831-0, Rut 76.819.660-5, del Banco BICE.</p>
+<p>Agradeceremos depositar la cantidad señalada en la cuenta corriente de Eyzaguirre Burlé y Montes Abogados Ltda., Nº 15-72831-0, Rut 76.819.660-5, del Banco BICE.</p>
 <p>Asimismo, por favor, confirmar su depósito o transferencia por e-mail a info@ebmo.cl.</p>
 <p>Atentamente,</p>";
 $_LANG['%detalle_ebmo_solo_honorarios%'] = "
 <p>De nuestra consideraci&oacute;n:</p>
 <p>Por medio de la presente, le hacemos llegar nuestra carta de honorarios %si_gastos% por la cantidad total de <b>%monto_con_gasto%</b>, correspondiente a los servicios prestados %fecha_con_de%%detalle_cuenta_honorarios_primer_dia_mes%%detalle_cuenta_gastos%.</p>
-<p>Agradeceremos depositar la cantidad señalada en la cuenta corriente de Eyzaguirre Burlé Montes y Ossa Abogados Ltda., Nº 15-72831-0, Rut 76.819.660-5, del Banco BICE.</p>
+<p>Agradeceremos depositar la cantidad señalada en la cuenta corriente de Eyzaguirre Burlé y Montes Abogados Ltda., Nº 15-72831-0, Rut 76.819.660-5, del Banco BICE.</p>
 <p>Asimismo, por favor, confirmar su depósito o transferencia por e-mail a info@ebmo.cl.</p>
 <p>Atentamente,</p>";
 $_LANG['correspondiente a'] = "correspondiente a";
