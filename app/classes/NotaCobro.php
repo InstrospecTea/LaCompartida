@@ -8214,14 +8214,16 @@ class NotaCobro extends Cobro {
 				for ($i = 0; $i < $lista_tramites->num; $i++) {
 					$tramite = $lista_tramites->Get($i);
 					list($h, $m, $s) = split(":", $tramite->fields['duracion']);
-					if ($tramite->fields['cobrable'] == 0) {
-						$tramite->fields['tarifa'] = 0;
+					if (!$tramite->fields['cobrable']) {
+						$tarifa_tramite = 0;
+					} else {
+						$tarifa_tramite = $tramite->fields['tarifa'];
 					}
 					$asunto->fields['tramites_total_duracion'] += $h * 60 + $m + $s / 60;
-					$asunto->fields['tramites_total_valor'] += $tramite->fields['tarifa'];
-					$categoria_duracion_horas+=round($h);
-					$categoria_duracion_minutos+=round($m);
-					$categoria_valor+=$tramite->fields['tarifa'];
+					$asunto->fields['tramites_total_valor'] += $tarifa_tramite;
+					$categoria_duracion_horas += round($h);
+					$categoria_duracion_minutos += round($m);
+					$categoria_valor += $tarifa_tramite;
 
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
@@ -8250,7 +8252,7 @@ class NotaCobro extends Cobro {
 
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 
-					$saldo = $tramite->fields['tarifa'];
+					$saldo = $tarifa_tramite;
 					$monto_tramite = $saldo;
 					$monto_tramite_moneda_total = $saldo * ($cobro_moneda->moneda[$tramite->fields['id_moneda_tramite']]['tipo_cambio'] / $cobro_moneda->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio']);
 					$totales['total_tramites'] += $saldo;
