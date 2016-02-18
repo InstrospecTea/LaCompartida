@@ -1006,8 +1006,14 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_left_join_with('cobro', 'cobro.id_cobro = factura.id_cobro')
 			->add_left_join_with('cliente', 'cliente.codigo_cliente = factura.codigo_cliente')
 			->add_left_join_with('documento', 'documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = "N"')
-			->add_left_join_with(array('documento_moneda', 'cobro_moneda'), "cobro_moneda.id_documento = documento.id_documento AND cobro_moneda.id_moneda = {$parameters['display_currency']->fields['id_moneda']}")
-			->add_left_join_with(array('documento_moneda', 'cobro_moneda_cobro'), 'cobro_moneda_cobro.id_documento = documento.id_documento AND cobro_moneda_cobro.id_moneda = cobro.id_moneda')
+			->add_left_join_with(
+				array('documento_moneda', 'cobro_moneda'),
+				"cobro_moneda.id_documento = documento.id_documento AND cobro_moneda.id_moneda = {$parameters['display_currency']->fields['id_moneda']}"
+			)
+			->add_left_join_with(
+				array('documento_moneda', 'cobro_moneda_cobro'),
+				'cobro_moneda_cobro.id_documento = documento.id_documento AND cobro_moneda_cobro.id_moneda = cobro.opc_moneda_total'
+			)
 			->add_restriction(CriteriaRestriction::between('factura.fecha', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"))
 			->add_restriction(CriteriaRestriction::not_equal('factura.id_estado', 5));
 
