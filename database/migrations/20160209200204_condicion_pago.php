@@ -41,6 +41,15 @@ class CondicionPago extends \Database\Migration implements \Database\ITemplateMi
 					REFERENCES `condicion_pago` (`id_condicion_pago`)";
 
 		$this->addQueryUp($query_fk);
+
+		$query_mantecion_tablas = "INSERT IGNORE INTO
+					`prm_mantencion_tablas` (`nombre_tabla`, `glosa_tabla`, `info_tabla`)
+					VALUES ('condicion_pago',
+									'Condición de Pago',
+									'Desde acá podrá modificar las distintas condiciones de pago del sistema'
+					)";
+
+		$this->addQueryUp($query_mantecion_tablas);
 	}
 
 	/**
@@ -50,5 +59,6 @@ class CondicionPago extends \Database\Migration implements \Database\ITemplateMi
 	function down() {
 		$this->addQueryDown('ALTER TABLE `factura` DROP FOREIGN KEY `factura_fk_condicion_pago`');
 		$this->addQueryDown('DROP TABLE `condicion_pago`');
+		$this->addQueryDown("DELETE FROM `prm_mantencion_tablas` where `nombre_tabla` = 'condicion_pago'");
 	}
 }
