@@ -34,8 +34,14 @@ class RunMigration extends AppShell {
 
 					$ReflectedClass = new ReflectionClass("Database\\$class_name");
 					$CustomMigration = $ReflectedClass->newInstance();
+
+					if ($this->debug) {
+						$CustomMigration->setDebug(true);
+					}
+
 					$CustomMigration->up();
 					$CustomMigration->runUp();
+					// TODO si runUp falla, ejecutar rollback
 
 					$this->Migration->registerMigration($file_name, $next_batch);
 				}

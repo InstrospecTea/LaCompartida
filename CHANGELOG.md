@@ -1,7 +1,32 @@
 # Changelog
 
+## [Release 16.3.0](https://github.com/LemontechSA/ttb/pull/1338)
+Wednesday, February 17th
+* **Feature** [Mostrar tramites no cobrables en nota de cobro](https://github.com/LemontechSA/ttb/pull/1335)
+
+## [Release 16.2.0](https://github.com/LemontechSA/ttb/pull/1336)
+Tuesday, February 16th
+* **Feature** [Cambios Facturacion MX](https://github.com/LemontechSA/ttb/pull/1334)
+
+## Hotfix 16.1.2
+Friday, February 12th
+* **Fix** [Tag MB conversión moneda Trámites - Validación según moneda de despliegue](https://github.com/LemontechSA/ttb/pull/1333)
+
+## Hotfix 16.1.1
+Thursday, February 11th
+* **Fix** [Obtener la última migración](https://github.com/LemontechSA/ttb/pull/1332)
+
+## [Release 16.1.0](https://github.com/LemontechSA/ttb/pull/1331)
+Wednesday, February 10th
+* **Feature** [Ordenamiento de Trabajos y Tramites](https://github.com/LemontechSA/ttb/pull/1329)
+* **Feature** [Nuevo sistema de migración de base de datos](https://github.com/LemontechSA/ttb/pull/1292)
+
+## Hotfix 16.0.22
+Tuesday, February 9th
+* **Fix**  [Tag MB conversión moneda Trámites](https://github.com/LemontechSA/ttb/pull/1330)
+
 ## Hotfix 16.0.21
-Tuesday, February 3rd
+Wednesday, February 3rd
 * **Fix**  [Cambio glosa cuenta corriente para ebmo](https://github.com/LemontechSA/ttb/pull/1326)
 
 ## Hotfix 16.0.20

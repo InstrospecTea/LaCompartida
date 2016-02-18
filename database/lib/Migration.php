@@ -4,7 +4,8 @@ namespace Database;
 
 use \PDO;
 use \PDOException;
-use \Database\Conf as DatabaseConf;
+use \Database\Conf as MigrationConfig;
+use \Database\MigrationMailing;
 
 class Migration {
 
@@ -13,16 +14,32 @@ class Migration {
 	private $root_directory;
 	private $Database;
 	private $files_ignore;
+	private $MigrationMailing;
+	private $debug;
 
 	public function __construct() {
 		$this->query_up = array();
 		$this->query_down = array();
 		$this->root_directory = __BASEDIR__;
 		$this->files_ignore = array('..', '.', '.gitkeep');
+		$this->debug = false;
 
-		$dsn = 'mysql:dbname=' . \Conf::dbName() . ';host=' . \Conf::dbHost();
-		$this->Database = new PDO($dsn, DatabaseConf::getUserName(), DatabaseConf::getPassword());
+		$dsn = "mysql:dbname={$this->getDatabaseName()};host={$this->getHostName()}";
+		$this->Database = new PDO($dsn, MigrationConfig::get('user_name'), MigrationConfig::get('password'));
 		$this->Database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$this->MigrationMailing = new MigrationMailing();
+	}
+
+	public function setDebug($is_debug) {
+		$this->debug = $is_debug;
+	}
+
+	private function getDatabaseName() {
+		return \Conf::dbName();
+	}
+
+	private function getHostName() {
+		return \Conf::dbHost();
 	}
 
 	public function setRootDirectory($directory) {
@@ -112,10 +129,30 @@ class Migration {
 					$Statement = $this->Database->prepare($query);
 					$Statement->execute();
 				} catch (PDOException $e) {
-					// TODO: Registrar errores
+					$separator = ($this->debug) ? "\n" : '<br/>';
+					$message = $this->buildMessage($e, $query, $separator);
+
+					if ($this->debug) {
+						echo $message;
+					} else {
+						$this->MigrationMailing->send($message);
+					}
+
+					exit;
 				}
 			}
 		}
+	}
+
+	public function buildMessage(PDOException $e, $query = '', $separator = '<br/>') {
+		$message = "Error en la ejecución de instruccion SQL: %t%"
+		. "{$e->getMessage()} %t%"
+		. "Code: {$e->getCode()} %t%"
+		. "Host: {$this->getHostName()} %t%"
+		. "Database: {$this->getDatabaseName()} %t%"
+		. "Query: {$query}\n";
+
+		return str_replace('%t%', $separator, $message);
 	}
 
 	public function getResultsQuery($query) {
@@ -182,7 +219,8 @@ class Migration {
 
 	public function getLastFileMigration() {
 		$files = $this->getFilesMigration(1);
-		return !empty($files) ? $files[0] : '';
+		$file = array_shift($files);
+		return !empty($file) ? $file : '';
 	}
 
 	public function getFilesRollbackMigration($batch) {
