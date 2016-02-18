@@ -1889,7 +1889,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%DETALLE_GASTOS%', '', $html);
 				}
 
-				if ($this->fields['monto_tramites'] > 0) {
+				if ($this->fields['monto_tramites'] > 0 || $this->fields['opc_mostrar_tramites_no_cobrables']) {
 					$html = str_replace('%DETALLE_TRAMITES%', $this->GenerarDocumento($parser, 'DETALLE_TRAMITES', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				} else {
 					$html = str_replace('%DETALLE_TRAMITES%', '', $html);
@@ -8165,6 +8165,10 @@ class NotaCobro extends Cobro {
 					$order_categoria = "";
 				}
 
+				$tramite_cobrable = '';
+				if (!$this->fields['opc_mostrar_tramites_no_cobrables']) {
+					$tramite_cobrable = ' AND tramite.cobrable=1 ';
+				}
 				$query_lista_tramites = "
 					SELECT SQL_CALC_FOUND_ROWS
 						tramite.duracion,
@@ -8177,18 +8181,19 @@ class NotaCobro extends Cobro {
 						tramite.tarifa_tramite as tarifa,
 						tramite.codigo_asunto,
 						tramite.id_moneda_tramite,
-						CONCAT_WS(' ', nombre, apellido1) as nombre_usuario $select_categoria, usuario.username
+						tramite.cobrable,
+						CONCAT_WS(' ', nombre, apellido1) as nombre_usuario {$select_categoria}, usuario.username
 					FROM tramite
 						JOIN asunto ON asunto.codigo_asunto=tramite.codigo_asunto
 						JOIN contrato ON asunto.id_contrato=contrato.id_contrato
 						JOIN tramite_tipo ON tramite.id_tramite_tipo=tramite_tipo.id_tramite_tipo
 						LEFT JOIN usuario ON tramite.id_usuario=usuario.id_usuario
-						$join_categoria
-							WHERE tramite.id_cobro = '" . $this->fields['id_cobro'] . "'
-								AND tramite.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-								AND tramite.cobrable=1
-								AND tramite.fecha BETWEEN '" . $this->fields['fecha_ini'] . "' AND '" . $this->fields['fecha_fin'] . "'
-						ORDER BY $order_categoria tramite.fecha ASC,tramite.descripcion";
+						{$join_categoria}
+							WHERE tramite.id_cobro = '{$this->fields['id_cobro']}'
+								AND tramite.codigo_asunto = '{$asunto->fields['codigo_asunto']}'
+								{$tramite_cobrable}
+								AND tramite.fecha BETWEEN '{$this->fields['fecha_ini']} ' AND '{$this->fields['fecha_fin']}'
+						ORDER BY {$order_categoria} tramite.fecha ASC,tramite.descripcion";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query_lista_tramites);
 
@@ -8203,17 +8208,23 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%valor%', '&nbsp;', $row);
 					$row = str_replace('%duracion_tramites%', '&nbsp;', $row);
 					$row = str_replace('%valor_tramites%', '&nbsp;', $row);
+					$row = str_replace('%valor_siempre%', '&nbsp;', $row);
 					$html .= $row;
 				}
 
 				for ($i = 0; $i < $lista_tramites->num; $i++) {
 					$tramite = $lista_tramites->Get($i);
 					list($h, $m, $s) = split(":", $tramite->fields['duracion']);
+					if (!$tramite->fields['cobrable']) {
+						$tarifa_tramite = 0;
+					} else {
+						$tarifa_tramite = $tramite->fields['tarifa'];
+					}
 					$asunto->fields['tramites_total_duracion'] += $h * 60 + $m + $s / 60;
-					$asunto->fields['tramites_total_valor'] += $tramite->fields['tarifa'];
-					$categoria_duracion_horas+=round($h);
-					$categoria_duracion_minutos+=round($m);
-					$categoria_valor+=$tramite->fields['tarifa'];
+					$asunto->fields['tramites_total_valor'] += $tarifa_tramite;
+					$categoria_duracion_horas += round($h);
+					$categoria_duracion_minutos += round($m);
+					$categoria_valor += $tarifa_tramite;
 
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
@@ -8242,7 +8253,7 @@ class NotaCobro extends Cobro {
 
 					$ImprimirDuracionTrabajada = Conf::GetConf($this->sesion, 'ImprimirDuracionTrabajada');
 
-					$saldo = $tramite->fields['tarifa'];
+					$saldo = $tarifa_tramite;
 					$monto_tramite = $saldo;
 					$monto_tramite_moneda_total = $saldo * ($cobro_moneda->moneda[$tramite->fields['id_moneda_tramite']]['tipo_cambio'] / $cobro_moneda->moneda[$moneda_total->fields['id_moneda']]['tipo_cambio']);
 					$totales['total_tramites'] += $saldo;

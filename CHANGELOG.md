@@ -1,5 +1,13 @@
 # Changelog
 
+## [Release 16.3.0](https://github.com/LemontechSA/ttb/pull/1338)
+Wednesday, February 17th
+* **Feature** [Mostrar tramites no cobrables en nota de cobro](https://github.com/LemontechSA/ttb/pull/1335)
+
+## [Release 16.2.0](https://github.com/LemontechSA/ttb/pull/1336)
+Tuesday, February 16th
+* **Feature** [Cambios Facturacion MX](https://github.com/LemontechSA/ttb/pull/1334)
+
 ## Hotfix 16.1.2
 Friday, February 12th
 * **Fix** [Tag MB conversión moneda Trámites - Validación según moneda de despliegue](https://github.com/LemontechSA/ttb/pull/1333)
