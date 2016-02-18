@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.3.1
+Thursday, February 18th
+* **Fix** [Corrección query obtención trámites](https://github.com/LemontechSA/ttb/pull/1339)
+
 ## [Release 16.3.0](https://github.com/LemontechSA/ttb/pull/1338)
 Wednesday, February 17th
 * **Feature** [Mostrar tramites no cobrables en nota de cobro](https://github.com/LemontechSA/ttb/pull/1335)

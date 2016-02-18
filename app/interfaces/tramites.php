@@ -148,6 +148,7 @@ function Validar(form, desde, ids)
 {
 	var arrayids=new Array;
 	arrayids=ids.split(',');
+	var tarifa_vacia = true;
 
 	if(!form.glosa_tramite.value)
 	{
@@ -159,12 +160,18 @@ function Validar(form, desde, ids)
 	for(var i=0; i<arrayids.length; i++)
 	{
 		if(document.getElementById('tarifa_tramite['+arrayids[i]+']').value)
-			{
+		{
 			if(!IsNumeric(document.getElementById('tarifa_tramite['+arrayids[i]+']').value))
-				{
-					document.getElementById('tarifa_tramite['+arrayids[i]+']').value=0;
-				}
+			{
+				document.getElementById('tarifa_tramite['+arrayids[i]+']').value=0;
 			}
+			tarifa_vacia = false;
+		}
+	}
+
+	if (tarifa_vacia) {
+		alert("Al menos una moneda debe tener tarifa asignada.")
+		return false;
 	}
 
 	if( form.trabajo_si_no_defecto.checked )
@@ -176,10 +183,11 @@ function Validar(form, desde, ids)
 			return false;
 		}
 	}
-	if( desde=='agregar' )
-	form.action = 'tramites.php?accion=guardar&opcion=agregar&popup=1';
-	else if(desde=='editar')
-	form.action = 'tramites.php?accion=guardar&opcion=editar&popup=1';
+	if (desde == 'agregar') {
+		form.action = 'tramites.php?accion=guardar&opcion=agregar&popup=1';
+	} else if (desde == 'editar') {
+		form.action = 'tramites.php?accion=guardar&opcion=editar&popup=1';
+	}
 
 	form.submit();
 	return true;
