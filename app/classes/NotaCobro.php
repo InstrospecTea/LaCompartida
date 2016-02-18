@@ -8208,6 +8208,7 @@ class NotaCobro extends Cobro {
 					$row = str_replace('%valor%', '&nbsp;', $row);
 					$row = str_replace('%duracion_tramites%', '&nbsp;', $row);
 					$row = str_replace('%valor_tramites%', '&nbsp;', $row);
+					$row = str_replace('%valor_siempre%', '&nbsp;', $row);
 					$html .= $row;
 				}
 
