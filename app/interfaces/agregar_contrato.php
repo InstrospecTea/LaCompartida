@@ -2946,6 +2946,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					$contrato->Edit('opc_ver_solicitante', Conf::GetConf($Sesion, 'OpcVerSolicitante') == 1 ? 1 : 0);
 					$contrato->Edit('opc_ver_tipo_cambio', Conf::GetConf($Sesion, 'OpcVerTipoCambio') == 1 ? 1 : 0);
 					$contrato->Edit('opc_ver_valor_hh_flat_fee', Conf::GetConf($Sesion, 'OpcVerValorHHFlatFee') == 1 ? 1 : 0);
+					$contrato->Edit('opc_mostrar_tramites_no_cobrables', Conf::GetConf($Sesion, 'OpcMostrarTramitesNoCobrables') == 1 ? 1 : 0);
 				}
 				?>
 
@@ -3050,6 +3051,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<tr>
 					<td align="right" colspan='1'><input type="hidden" name="opc_ver_cobrable" value="0"/><input type="checkbox" name="opc_ver_cobrable"  value="1" <?php echo $contrato->fields['opc_ver_cobrable'] == '1' ? 'checked="checked"' : '' ?> ></td>
 					<td align="left" colspan='5'><label><?php echo __('Mostrar trabajos no visibles') ?></label></td>
+				</tr>
+				<tr>
+					<td align="right" colspan='1'><input type="hidden" name="opc_mostrar_tramites_no_cobrables" value="0"/><input type="checkbox" name="opc_mostrar_tramites_no_cobrables"  value="1" <?php echo $contrato->fields['opc_mostrar_tramites_no_cobrables'] == '1' ? 'checked="checked"' : '' ?> ></td>
+					<td align="left" colspan='5'><label><?php echo __('Mostrar trámites no cobrables') ?></label></td>
 				</tr>
 				<?php if (Conf::GetConf($Sesion, 'ResumenProfesionalVial') ) { ?>
 					<tr>

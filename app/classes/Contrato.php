@@ -148,7 +148,8 @@ class Contrato extends Objeto {
 			'retribucion_usuario_secundario',
 			'id_estudio',
 			'emitir_liquidacion_al_generar',
-			'enviar_liquidacion_al_generar'
+			'enviar_liquidacion_al_generar',
+			'opc_mostrar_tramites_no_cobrables'
 	);
 
 	function Contrato($sesion, $fields = "", $params = "") {

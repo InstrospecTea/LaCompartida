@@ -2215,6 +2215,9 @@ if (!class_exists('Cobro')) {
 					$this->Edit("id_moneda_monto", $Contrato->fields['id_moneda_monto']);
 					$this->Edit("opc_ver_columna_cobrable", $Contrato->fields['opc_ver_columna_cobrable']);
 
+					// Mostrar Trámites no cobrables
+					$this->Edit('opc_mostrar_tramites_no_cobrables', $Contrato->fields['opc_mostrar_tramites_no_cobrables']);
+
 					if ($fecha_ini != '') {
 						$this->Edit('fecha_ini', $fecha_ini);
 					}
