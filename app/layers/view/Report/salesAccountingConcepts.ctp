@@ -72,8 +72,19 @@
 			</td>
 			<td align="left">
 				<label>
-					<?php echo $this->Form->checkbox('display_tax', 1, !empty($this->data['display_total']), array('label' => false)); ?>
+					<?php echo $this->Form->checkbox('display_tax', 1, !empty($this->data['display_tax']), array('label' => false)); ?>
 					<?php echo __('Mostrar valores con impuesto'); ?>
+				</label>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
+				&nbsp;
+			</td>
+			<td align="left">
+				<label>
+					<?php echo $this->Form->checkbox('separated_by_invoice', 1, !empty($this->data['separated_by_invoice']), array('label' => false)); ?>
+					<?php echo __('Separar por') . ' ' . __('factura'); ?>
 				</label>
 			</td>
 		</tr>

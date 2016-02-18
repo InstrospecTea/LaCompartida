@@ -16,7 +16,7 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 		$this->Ws->setInputEncoding('utf-8');
 		$this->Ws->fitToPages(1, 0);
 		$this->Ws->setZoom(90);
-		$this->Ws->setColumn(1, 1, 70.00);
+		$this->Ws->setColumn(1, 1, 100);
 	}
 
 	protected function agrupateData($data) {
@@ -45,16 +45,37 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 	protected function present() {
 		$this->setFormat();
 		$this->setHeader();
+		$separated_by_invoice = false;
+		$col_periods = 2;
+
+		$this->row++;
+
+		if ($this->parameters['separated_by_invoice'] == '1') {
+			$separated_by_invoice = true;
+			$col_periods = 3;
+			$this->Ws->write($this->row, 2, __('Factura'), $this->format['title']);
+			$this->Ws->setColumn(2, 2, 16);
+		}
 
 		$currency = $this->parameters['display_currency']->fields['id_moneda'];
 		$currency_symbol = $this->parameters['display_currency']->fields['simbolo'];
 
 		if (!empty($this->data)) {
 			foreach ($this->data as $sale) {
-				if (empty($sales_client[$sale['client_code']]['name'])) {
-					$sales_client[$sale['client_code']]['name'] = $sale['client'];
+				if (!$separated_by_invoice) {
+					if (empty($sales_client[$sale['client_code']]['name'])) {
+						$sales_client[$sale['client_code']]['name'] = $sale['client'];
+					}
+					$sales_client[$sale['client_code']]['periods'][$sale['period']] = $sale['total_period'];
+				} else {
+					$sales_client[] = array(
+						'name' => $sale['client'],
+						'invoice' => $sale['invoice'],
+						'periods' => array(
+							$sale['period'] => $sale['total_period']
+						)
+					);
 				}
-				$sales_client[$sale['client_code']]['periods'][$sale['period']] = $sale['total_period'];
 			}
 
 			$start_date = new DateTime($this->parameters['start_date']);
@@ -64,16 +85,14 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 			$periods = array();
 			$next_period = $start_date;
 
-			$this->Ws->setColumn(2, $total_months + 2, 16);
+			$this->Ws->setColumn($col_periods, $total_months + $col_periods, 16);
 
 			for ($x = 0; $x <= $total_months ; $x++) {
 				$periods[date_format($next_period, 'Ym')] = date_format($next_period, 'M Y');
 				$next_period->add(new DateInterval('P1M'));
 			}
 
-			$this->row++;
-
-			$col = 2;
+			$col = $col_periods;
 			foreach ($periods as $period_key => $period_value) {
 				$this->Ws->write($this->row, $col, $period_value, $this->format['title']);
 				$col++;
@@ -84,7 +103,13 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 
 			foreach ($sales_client as $sale_client) {
 				$this->Ws->write($this->row, 1, $sale_client['name'], $this->format['title']);
-				$col = 2;
+
+				if ($this->parameters['separated_by_invoice'] == '1') {
+					$this->Ws->write($this->row, 2, $sale_client['invoice'], $this->format['invoice']);
+				}
+
+				$col = $col_periods;
+
 				foreach ($periods as $period_key => $period_value) {
 					$total_period = 0;
 					if (!empty($sale_client['periods'][$period_key])) {
@@ -94,12 +119,13 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 					$this->Ws->write($this->row, $col, $total_period, $format);
 					$col++;
 				}
+
 				$this->row++;
 			}
 
 			$this->Ws->write($this->row, 1, __('Total'), $this->format['title']);
 
-			for ($x = 2; $x <= 2 + $total_months; $x++) {
+			for ($x = $col_periods; $x <= ($total_months + $col_periods); $x++) {
 				$col = Utiles::NumToColumnaExcel($x);
 				$this->Ws->writeFormula($this->row, $x, "=SUM({$col}{$start_row}:{$col}{$this->row})", $this->format['currency']);
 			}
@@ -146,6 +172,15 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 				'FgColor' => '35',
 				'Border' => 1,
 				'Locked' => 1,
+				'Color' => 'black'
+			)
+		);
+		$this->format['invoice'] = $this->reportEngine->engine->addFormat(
+			array(
+				'Size' => 11,
+				'VAlign' => 'top',
+				'Align' => 'center',
+				'Border' => 1,
 				'Color' => 'black'
 			)
 		);

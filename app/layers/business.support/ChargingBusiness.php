@@ -996,8 +996,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$CriteriaInvoice = new Criteria($this->Session);
 		$CriteriaInvoice
-			->add_select('cliente.codigo_cliente')
-			->add_select('cliente.glosa_cliente')
+			->add_select('factura.RUT_cliente')
 			->add_select('factura.cliente')
 			->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
 			->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_factura')
@@ -1032,18 +1031,34 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$CriteriaInvoice->add_restriction(CriteriaRestriction::equals('factura.id_estudio', $parameters['company']));
 		}
 
+		if ($parameters['separated_by_invoice'] == '1') {
+			$CriteriaInvoice
+				->add_select('factura.id_factura')
+				->add_select("CONCAT(prm_documento_legal.codigo , ' ', LPAD(factura.serie_documento_legal, '3', '0'), '-', LPAD(factura.numero, '7', '0'))", 'identificador');
+		}
+
 		$Criteria = new Criteria($this->Session);
-		$sales = $Criteria
-			->add_select('ventas.codigo_cliente', 'client_code')
+		$CriteriaSale = $Criteria
+			->add_select('ventas.RUT_cliente', 'client_code')
 			->add_select('ventas.cliente', 'client')
 			->add_select('ventas.mes_contable', 'period')
 			->add_select('SUM(ventas.total_factura - ventas.total_nc)', 'total_period')
-			->add_from_criteria($CriteriaInvoice, 'ventas')
-			->add_grouping('ventas.codigo_cliente')
+			->add_from_criteria($CriteriaInvoice, 'ventas');
+
+		if ($parameters['separated_by_invoice'] == '1') {
+			$CriteriaSale
+				->add_select('ventas.identificador', 'invoice')
+				->add_grouping('ventas.id_factura');
+		} else {
+			$CriteriaSale->add_grouping('ventas.RUT_cliente');
+		}
+
+		$CriteriaSale
 			->add_grouping('ventas.mes_contable')
 			->add_ordering('ventas.cliente')
-			->add_ordering('ventas.mes_contable')
-			->run();
+			->add_ordering('ventas.mes_contable');
+
+		$sales = $CriteriaSale->run();
 
 		$this->loadReport('SalesAccountingConcepts', 'Report');
 		$this->Report->setData($sales);
