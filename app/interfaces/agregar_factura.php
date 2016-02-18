@@ -754,31 +754,26 @@ $Form->defaultLabel = false;
 			<td align="left" colspan="3">
 				<select type="text" name="condicion_pago" value="<?php echo $factura->fields['condicion_pago'] ?>" id="condicion_pago" >
 					<?php
-					$condiciones_pago = array(
-						1 => 'CONTADO',
-						3 => 'CC 15 días',
-						4 => 'CC 30 días',
-						5 => 'CC 45 días',
-						6 => 'CC 60 días',
-						7 => 'CC 75 días',
-						8 => 'CC 90 días',
-						9 => 'CC 120 días',
-						12 => 'LETRA 30 días',
-						13 => 'LETRA 45 días',
-						14 => 'LETRA 60 días',
-						15 => 'LETRA 90 días',
-						18 => 'CHEQUE 30 días',
-						19 => 'CHEQUE 45 días',
-						20 => 'CHEQUE 60 días',
-						21 => 'CHEQUE A FECHA'
-					);
-					foreach ($condiciones_pago as $vc => $cond) {
-						echo "<option ";
-						if ($factura->fields['condicion_pago'] == $vc) {
-							echo "selected";
+						$Criteria = new Criteria($sesion);
+						$condiciones_pago = $Criteria
+							->add_select('id_condicion_pago, glosa, defecto')
+							->add_from('condicion_pago')
+							->add_ordering('orden')
+							->run();
+
+						foreach ($condiciones_pago as $condicion) {
+							if (empty($factura->fields['condicion_pago'])) {
+								$select = $condicion['defecto'] == 1 ? 'selected' : '';
+							} else {
+								$select = $factura->fields['condicion_pago'] == $condicion['id_condicion_pago'] ? 'selected' : '';
+							}
+
+							echo "<option value='" .
+								$condicion['id_condicion_pago'] . "' " .
+								$select . " >" .
+								str_pad($condicion['id_condicion_pago'], 2, '0', STR_PAD_LEFT) . ': ' . $condicion['glosa'] .
+								"</option>";
 						}
-						echo " value=" . $vc . ">" . str_pad($vc, 2, '0', STR_PAD_LEFT) . ': ' . $cond . "</option>";
-					}
 					?>
 				</select>
 			</td>
