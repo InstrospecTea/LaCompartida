@@ -992,15 +992,28 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 	public function getSalesAccountingConceptsReport($parameters) {
+		$CriteriaInvoiced = $this->getInvoiceForSalesReport($parameters, false);
+		$invoice = $CriteriaInvoiced->run();
+
+		$CriteriaAnnulledInvoiced = $this->getInvoiceForSalesReport($parameters, true);
+		$annulled_invoice = $CriteriaAnnulledInvoiced->run();
+		$sales = array_merge($invoice, $annulled_invoice);
+
+		$this->loadReport('SalesAccountingConcepts', 'Report');
+		$this->Report->setData($sales);
+		$this->Report->setParameters($parameters);
+
+		return $this->Report;
+	}
+
+	private function getInvoiceForSalesReport($parameters, $annulled = false) {
 		$total_invoice = $parameters['display_tax'] == '1' ? 'factura.total' : 'factura.subtotal';
 
 		$CriteriaInvoice = new Criteria($this->Session);
 		$CriteriaInvoice
 			->add_select('factura.RUT_cliente')
 			->add_select('factura.cliente')
-			->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
 			->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_factura')
-			->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_nc')
 			->add_from('factura')
 			->add_left_join_with('prm_documento_legal', 'prm_documento_legal.id_documento_legal = factura.id_documento_legal')
 			->add_left_join_with('cobro', 'cobro.id_cobro = factura.id_cobro')
@@ -1013,9 +1026,18 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_left_join_with(
 				array('documento_moneda', 'cobro_moneda_cobro'),
 				'cobro_moneda_cobro.id_documento = documento.id_documento AND cobro_moneda_cobro.id_moneda = cobro.opc_moneda_total'
-			)
-			->add_restriction(CriteriaRestriction::between('factura.fecha', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"))
-			->add_restriction(CriteriaRestriction::not_equal('factura.id_estado', 5));
+			);
+
+		if (!$annulled) {
+			$CriteriaInvoice
+				->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
+				->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_nc')
+				->add_restriction(CriteriaRestriction::between('factura.fecha', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"));
+		} else {
+			$CriteriaInvoice
+				->add_select('DATE_FORMAT(factura.fecha_anulacion, "%Y%m")', 'mes_contable')
+				->add_restriction(CriteriaRestriction::between('factura.fecha_anulacion', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"));
+		}
 
 		if (!empty($parameters['clients'])) {
 			$CriteriaInvoice->add_restriction(CriteriaRestriction::in('cliente.codigo_cliente', $parameters['clients']));
@@ -1048,8 +1070,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_select('ventas.RUT_cliente', 'client_code')
 			->add_select('ventas.cliente', 'client')
 			->add_select('ventas.mes_contable', 'period')
-			->add_select('SUM(ventas.total_factura - ventas.total_nc)', 'total_period')
 			->add_from_criteria($CriteriaInvoice, 'ventas');
+
+		if (!$annulled) {
+			$CriteriaSale->add_select('SUM(ventas.total_factura - ventas.total_nc)', 'total_period');
+		} else {
+			$CriteriaSale->add_select('SUM(ventas.total_factura * -1)', 'total_period');
+		}
 
 		if ($parameters['separated_by_invoice'] == '1') {
 			$CriteriaSale
@@ -1064,13 +1091,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_ordering('ventas.cliente')
 			->add_ordering('ventas.mes_contable');
 
-		$sales = $CriteriaSale->run();
-
-		$this->loadReport('SalesAccountingConcepts', 'Report');
-		$this->Report->setData($sales);
-		$this->Report->setParameters($parameters);
-
-		return $this->Report;
+		return $CriteriaSale;
 	}
 
 	public function getClientOldDebtAccountingConceptsReport($parameters) {

@@ -47,6 +47,7 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 		$this->setHeader();
 		$separated_by_invoice = false;
 		$col_periods = 2;
+		$sales_client = array();
 
 		$this->row++;
 
@@ -66,7 +67,7 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 					if (empty($sales_client[$sale['client_code']]['name'])) {
 						$sales_client[$sale['client_code']]['name'] = $sale['client'];
 					}
-					$sales_client[$sale['client_code']]['periods'][$sale['period']] = $sale['total_period'];
+					$sales_client[$sale['client_code']]['periods'][$sale['period']] += $sale['total_period'];
 				} else {
 					$sales_client[] = array(
 						'name' => $sale['client'],
