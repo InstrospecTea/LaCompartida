@@ -3053,8 +3053,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					<td align="left" colspan='5'><label><?php echo __('Mostrar trabajos no visibles') ?></label></td>
 				</tr>
 				<tr>
-					<td align="right" colspan='1'><input type="hidden" name="opc_mostrar_tramites_no_cobrables" value="0"/><input type="checkbox" name="opc_mostrar_tramites_no_cobrables"  value="1" <?php echo $contrato->fields['opc_mostrar_tramites_no_cobrables'] == '1' ? 'checked="checked"' : '' ?> ></td>
-					<td align="left" colspan='5'><label><?php echo __('Mostrar trámites no cobrables') ?></label></td>
+					<td align="right" colspan="1"><input type="hidden" name="opc_mostrar_tramites_no_cobrables" value="0"/><input type="checkbox" name="opc_mostrar_tramites_no_cobrables"  value="1" <?php echo $contrato->fields['opc_mostrar_tramites_no_cobrables'] == '1' ? 'checked="checked"' : '' ?> ></td>
+					<td align="left" colspan="5"><label><?php echo __('Mostrar trámites no cobrables') ?></label></td>
 				</tr>
 				<?php if (Conf::GetConf($Sesion, 'ResumenProfesionalVial') ) { ?>
 					<tr>
