@@ -6,7 +6,7 @@ require_once dirname(__FILE__) . '/../conf.php';
  * Esta clase extiende de Objeto
  *
  * De esta forma se puede agregar funcionalidad sin romper las
- * bases del sistema (llÃ¡mese framework)
+ * bases del sistema (llámese framework)
  */
 class ObjetoExt extends Objeto {
 
@@ -42,6 +42,34 @@ class ObjetoExt extends Objeto {
 			$result[$key] = $value[0];
 		}
 		return $result;
+	}
+
+	/**
+	 * Obtiene un listado para ser usado en un select
+	 * @param $sesion
+	 * @param $key_field
+	 * @param $value_field
+	 * @return array
+	 * @throws Exception
+	 */
+	public static function getList($sesion) {
+		$list = array();
+		$class = get_called_class();
+		$object = new $class;
+		$orden = $object->campo_id;
+		if (!empty($object->campo_orden)) {
+			$orden = $object->campo_orden;
+		}
+		$criteria = new Criteria($sesion);
+		$result =$criteria->add_select($object->campo_id)
+			->add_select($object->campo_glosa)
+			->add_from($object->tabla)
+			->add_ordering($orden)
+			->run();
+		foreach ($result as $item) {
+			$list[$item[$object->campo_id]] = $item[$object->campo_glosa];
+		}
+		return $list;
 	}
 
 }

@@ -6,7 +6,7 @@ $pagina = new Pagina($sesion);
 $gasto = new Gasto($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 $usuario = new UsuarioExt($sesion);
-
+$Html = new \TTB\Html();
 $conf_nuevo_modulo_gastos = Conf::GetConf($sesion, 'NuevoModuloGastos') == '0' ? false : true;
 $conf_codigo_secundario = Conf::GetConf($sesion, 'CodigoSecundario') == '0' ? false : true;
 $selected_cobrado = Conf::GetConf($sesion, 'FiltroFacturacionGastosCobrado') == '' ? 'NO' : Conf::GetConf($sesion, 'FiltroFacturacionGastosCobrado');
@@ -590,7 +590,8 @@ function Refrescar() {
 					<tr>
 						<td align="right"><?php echo __('Cobrado') ?></td>
 						<td align="left">
-							<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", isset($cobrado) ? $cobrado : $selected_cobrado, '', 'Todos', '60') ?>
+							<?php echo $Html->SelectSiNo('cobrado', $cobrado,'');
+							//Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", isset($cobrado) ? $cobrado : $selected_cobrado, '', 'Todos', '60') ?>
 						</td>
 						<td align="left" nowrap>
 							<?php echo __('id_cobro') ?>&nbsp;

@@ -683,7 +683,7 @@ $pagina->PrintTop();
 						<b><?php echo __('Documento legal') ?></b>
 					</td>
 					<td colspan="2" align="left">
-						<?php echo Html::SelectQuery($sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal', $tipo_documento_legal, '', __('Cualquiera'), 100); ?>
+						<?php echo $Form->select('tipo_documento_legal', PrmDocumentoLegal::getList($sesion,'id_documento_legal', 'glosa'), $tipo_documento_legal, array('empty' => __('Cualquiera'), 'style' => 'width:100px' )); ?>
 						<?php echo Html::SelectQuery($sesion, $series_documento->SeriesQuery(), "serie", $serie ? str_pad($serie, 3, '0', STR_PAD_LEFT) : __('Serie'), '', __('Serie'), 60); ?>
 						<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type="text" size="6" name="factura" id="factura" value="<?php echo $factura ?>">
 					</td>
@@ -811,7 +811,9 @@ $pagina->PrintTop();
 					<b><?php echo __(__('Estado') . ' de ' . __('Cobro')); ?></b>
 				</td>
 				<td align="left" colspan="2">
-					<?php echo Html::SelectQuery($sesion, "SELECT codigo_estado_cobro FROM prm_estado_cobro ORDER BY orden", "estado[]", $estado, 'multiple="multiple" size="7"', __('Vacio'), '150') ?>
+					<?php
+						echo $Form->select('estado[]', PrmEstadoCobro::getList($sesion), $estado, array('multiple' => 'multiple', 'size' => '7', 'empty' => __('Vacio'), 'style' => 'width:150px'));
+					?>
 				</td>
 			</tr>
 
@@ -820,7 +822,7 @@ $pagina->PrintTop();
 					<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene ' . __('Honorarios')); ?>
 					<br/><input type="checkbox" name="tienegastos"   value="1" id="tienegastos"  <?php if (isset($_POST['tienegastos'])) echo 'checked="checked"'; ?>/> <?php echo __('Tiene ' . __('Gastos')); ?>
 					<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene ' . __('Trámites')); ?>
-					<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> <?php echo __('Hay ' . __('Adelantos') . ' disponibles'); ?>
+					<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> <?php echo __('Hay ' . __('Adelantos') . __(' disponibles')); ?>
 				</div>
 			</tr>
 
