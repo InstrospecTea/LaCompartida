@@ -344,13 +344,12 @@ class Contrato extends Objeto {
 				JOIN prm_moneda as moneda_tramite_individual ON moneda_tramite_individual.id_moneda = tramite.id_moneda_tramite_individual
 				JOIN prm_moneda as moneda_contrato ON moneda_contrato.id_moneda = contrato.id_moneda
 				JOIN tramite_tipo on tramite.id_tramite_tipo = tramite_tipo.id_tramite_tipo
-				LEFT JOIN tramite_valor ON (tramite.id_tramite_tipo = tramite_valor.id_tramite_tipo AND contrato.id_moneda = tramite_valor.id_moneda AND contrato.id_tramite_tarifa = tramite_valor.id_tramite_tarifa)
+				JOIN tramite_valor ON (tramite.id_tramite_tipo = tramite_valor.id_tramite_tipo AND contrato.id_moneda = tramite_valor.id_moneda AND contrato.id_tramite_tarifa = tramite_valor.id_tramite_tarifa)
 				LEFT JOIN cobro ON tramite.id_cobro=cobro.id_cobro
 			WHERE $wheretramite
 				AND cobro.estado IS NULL
 				AND tramite.cobrable = 1
 				AND contrato.id_contrato = '$id_contrato'
-				AND (tramite.tarifa_tramite_individual > 0 OR tramite_valor.tarifa > 0)
 			GROUP BY contrato.id_contrato";
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
