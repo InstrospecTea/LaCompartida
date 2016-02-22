@@ -1,7 +1,7 @@
 # Changelog
 
 ## Hotfix 16.3.2
-Monday, February 22th
+Monday, February 22nd
 * **Fix** [Error suma de importes Word](https://github.com/LemontechSA/ttb/pull/1342)
 
 ## Hotfix 16.3.1
