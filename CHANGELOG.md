@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.3.3
+Monday, February 22nd
+* **Fix** [Eliminación version 16.3.1](https://github.com/LemontechSA/ttb/pull/1343)
+
 ## Hotfix 16.3.2
 Monday, February 22nd
 * **Fix** [Error suma de importes Word](https://github.com/LemontechSA/ttb/pull/1342)
