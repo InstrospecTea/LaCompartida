@@ -731,7 +731,7 @@ $pagina->PrintTop();
 			<tr>
 				<td align=right><b><?php echo __('Forma de Tarificación') ?>&nbsp;</b></td>
 				<td colspan=2 align=left>
-					<?php echo Html::SelectQuery($sesion, $query_forma_cobro, "forma_cobro", $forma_cobro, '', __('Cualquiera'), '210') ?>
+					<?php echo $Form->select('forma_cobro', PrmFormaCobro::getList($sesion), $forma_cobro, array('empty' => __('Cualquiera'), 'style' => 'width:210px')); ?>
 				</td>
 			</tr>
 			<tr>
