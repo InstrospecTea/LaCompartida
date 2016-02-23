@@ -1173,3 +1173,4 @@ $_LANG['Saldo Pendiente Gastos'] = 'Saldo Pendente Gastos';
 $_LANG['Fecha Vencimiento'] = 'Data Vencimento';
 $_LANG['Honorarios legales'] = 'Honorários Legais';
 $_LANG['Gastos c/ IVA'] = 'Gastos com Imposto';
+$_LANG['COBRO CREADO'] = 'Cobrança Criado';
