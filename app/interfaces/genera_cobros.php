@@ -1060,7 +1060,7 @@ if ($proceso !== false) {
 						<tr>
 							<td align=right><b><?php echo __('Forma de Tarificación') ?>&nbsp;</b></td>
 							<td colspan=2 align=left>
-								<?php echo $Form->select('forma_cobro',PrmFormaCobro::getList($sesion,'forma_cobro', 'descripcion'),$forma_cobro, array('empty' => __('Cualquiera'), 'style' => 'width: 210px')) ?>
+								<?php echo $Form->select('forma_cobro',PrmFormaCobro::getList($sesion),$forma_cobro, array('empty' => __('Cualquiera'), 'style' => 'width: 210px')) ?>
 							</td>
 						</tr>
 						<tr>
