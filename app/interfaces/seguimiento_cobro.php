@@ -79,7 +79,7 @@ if ($opc == 'buscar') {
 		if ($codigo_cliente) {
 			$where .= " AND cliente.codigo_cliente = '$codigo_cliente' ";
 		}
-		if (!empty($estado) && $estado[0] != '-1') {
+		if (!empty($estado) && !empty($estado[0])) {
 			$where .= " AND cobro.estado in ('" . implode("','", $estado) . "') ";
 		}
 
@@ -819,7 +819,7 @@ $pagina->PrintTop();
 
 			<tr>
 				<div style="text-align: left;position: absolute;left: 600px;top: 300px;">
-					<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene ' . __('Honorarios')); ?>
+					<br/><input type="checkbox" name="tienehonorario"  value="1" id="tienehonorario" <?php if (isset($_POST['tienehonorario'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene Honorarios'); ?>
 					<br/><input type="checkbox" name="tienegastos"   value="1" id="tienegastos"  <?php if (isset($_POST['tienegastos'])) echo 'checked="checked"'; ?>/> <?php echo __('Tiene ' . __('Gastos')); ?>
 					<br/><input type="checkbox"  name="tienetramites"  value="1"   id="tienetramites" <?php if (isset($_POST['tienetramites'])) echo 'checked="checked"'; ?> /> <?php echo __('Tiene ' . __('Trámites')); ?>
 					<br/><input type="checkbox"  name="tieneadelantos"  value="1"   id="tieneadelantos" <?php if (isset($_POST['tieneadelantos'])) echo 'checked="checked"'; ?> /> <?php echo __('Hay ' . __('Adelantos') . __(' disponibles')); ?>
