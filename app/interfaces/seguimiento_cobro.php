@@ -683,7 +683,7 @@ $pagina->PrintTop();
 						<b><?php echo __('Documento legal') ?></b>
 					</td>
 					<td colspan="2" align="left">
-						<?php echo $Form->select('tipo_documento_legal', PrmDocumentoLegal::getList($sesion,'id_documento_legal', 'glosa'), $tipo_documento_legal, array('empty' => __('Cualquiera'), 'style' => 'width:100px' )); ?>
+						<?php echo $Form->select('tipo_documento_legal', PrmDocumentoLegal::getList($sesion), $tipo_documento_legal, array('empty' => __('Cualquiera'), 'style' => 'width:100px' )); ?>
 						<?php echo Html::SelectQuery($sesion, $series_documento->SeriesQuery(), "serie", $serie ? str_pad($serie, 3, '0', STR_PAD_LEFT) : __('Serie'), '', __('Serie'), 60); ?>
 						<input onkeydown="if (event.keyCode == 13) GeneraCobros(this.form, '', false)" type="text" size="6" name="factura" id="factura" value="<?php echo $factura ?>">
 					</td>
