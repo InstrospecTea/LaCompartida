@@ -590,8 +590,7 @@ function Refrescar() {
 					<tr>
 						<td align="right"><?php echo __('Cobrado') ?></td>
 						<td align="left">
-							<?php echo $Html->SelectSiNo('cobrado', $cobrado,'');
-							//Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", isset($cobrado) ? $cobrado : $selected_cobrado, '', 'Todos', '60') ?>
+							<?php echo $Html->SelectSiNo('cobrado', isset($cobrado) ? $cobrado : $selected_cobrado); ?>
 						</td>
 						<td align="left" nowrap>
 							<?php echo __('id_cobro') ?>&nbsp;
