@@ -124,12 +124,6 @@ if ($accion == "consistencia_cliente_asunto") {
 	$cantidad_contratos = mysql_num_rows($resp);
 
 	echo $cantidad_contratos;
-} else if ($accion == 'contratos_con_esta_tramite_tarifa') {
-	$query = "SELECT id_contrato FROM contrato WHERE id_tramite_tarifa = '{$_REQUEST['id_tarifa']}'";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	$cantidad_contratos = mysql_num_rows($resp);
-
-	echo $cantidad_contratos;
 } else if ($accion == 'obtener_tarifa_defecto') {
 	$query = "SELECT id_tarifa FROM tarifa WHERE tarifa_defecto = 1 ORDER BY id_tarifa ASC LIMIT 1";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -148,16 +142,6 @@ if ($accion == "consistencia_cliente_asunto") {
 	list($id_tarifa_defecto) = mysql_fetch_array($resp);
 
 	$query = "UPDATE contrato SET id_tarifa = $id_tarifa_defecto WHERE id_tarifa = '{$_REQUEST['id_tarifa']}'";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	$cantidad_contratos = mysql_num_rows($resp);
-
-	echo $cantidad_contratos;
-} else if ($accion == 'cambiar_a_tramite_tarifa_por_defecto') {
-	$query = "SELECT id_tramite_tarifa FROM tramite_tarifa WHERE tarifa_defecto = 1 ORDER BY id_tramite_tarifa ASC LIMIT 1";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	list($id_tramite_tarifa_defecto) = mysql_fetch_array($resp);
-
-	$query = "UPDATE contrato SET id_tramite_tarifa = $id_tramite_tarifa_defecto WHERE id_tramite_tarifa = '{$_REQUEST['id_tarifa']}'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	$cantidad_contratos = mysql_num_rows($resp);
 
