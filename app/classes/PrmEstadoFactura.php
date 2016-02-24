@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
-class PrmEstadoFactura extends Objeto
+class PrmEstadoFactura extends ObjetoExt
 {
   public static $llave_carga_masiva = 'codigo';
 
@@ -11,5 +11,6 @@ class PrmEstadoFactura extends Objeto
     $this->sesion = $sesion;
     $this->fields = $fields;
     $this->guardar_fecha = false;
+		$this->campo_glosa = 'glosa';
   }
 }

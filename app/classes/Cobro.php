@@ -53,9 +53,9 @@ if (!class_exists('Cobro')) {
 				$his = new Observacion($this->sesion);
 
 				if ($ultimaobservacion = $his->UltimaObservacion($this->fields['id_cobro'])) {
-					if ($ultimaobservacion['comentario'] != __("COBRO {$this->fields['estado']}")) {
+					if ($ultimaobservacion['comentario'] != __('COBRO') . ' ' . __($this->fields['estado'])) {
 						$his->Edit('fecha', date('Y-m-d H:i:s'));
-						$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
+						$his->Edit('comentario', __('COBRO') . ' ' . __($this->fields['estado']));
 						$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 						$his->Edit('id_cobro', $this->fields['id_cobro']);
 						$his->Write();
