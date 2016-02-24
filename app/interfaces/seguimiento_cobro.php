@@ -812,7 +812,7 @@ $pagina->PrintTop();
 				</td>
 				<td align="left" colspan="2">
 					<?php
-						echo $Form->select('estado[]', PrmEstadoCobro::getList($sesion), $estado, array('multiple' => 'multiple', 'size' => '7', 'empty' => __('Vacio'), 'style' => 'width:150px'));
+						echo $Form->select('estado[]', PrmEstadoCobro::getList($sesion), $estado, array('multiple' => 'multiple', 'size' => '7', 'empty' => '', 'style' => 'width:150px'));
 					?>
 				</td>
 			</tr>
