@@ -1,6 +1,6 @@
 # Changelog
 
-## [Release 16.4.0](https://github.com/LemontechSA/ttb/pull/1346)
+## [Release 16.4.0](https://github.com/LemontechSA/ttb/pull/1347)
 Wednesday, February 24th
 * **Feature** [Mostrar checkbox tramites no cobrables en contrato](https://github.com/LemontechSA/ttb/pull/1340)
 * **Feature** [Condiciones de pago](https://github.com/LemontechSA/ttb/pull/1341)
