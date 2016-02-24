@@ -168,16 +168,16 @@ function getDNETVersion(reportError)
 	{
 		if(reportError)
 		{
-			result = "¡La presencia de .NET <b>NO</b> ha sido reportada por su browser!<br />Descárguelo en el siguiente enlace: <a href='http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5'>Framework .NET</a>";
+			result = "<?php echo __("¡La presencia de .NET <b>NO</b> ha sido reportada por su browser!<br />Descárguelo en el siguiente enlace:"); ?> <a href='http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5'>Framework .NET</a>";
 			if(ie < 0)
 			{
-				result += "<br> Este browser no es Internet Explorer. La manera más fácil de chequear la presencia del framework .NET es abrir esta página en Internet Explorer.";
+				result += "<br><?php echo __('Este browser no es Internet Explorer. La manera más fácil de chequear la presencia del framework .NET es abrir esta página en Internet Explorer.') ?>";
 			}
 		}
 		else result = null;
 		res['conpuntonet'] = false;
 	}
-	
+
 	res['texto'] = result;
 
 	return res;
@@ -202,24 +202,24 @@ function writeDNetReport(doc)
 		</div>
 
 		<div class="chrome" style="background-color:#ff0000; border:1px solid black; font-size:1.3em; display:block; width: 100%">
-			En caso de descargar con chrome dar clic derecho a "Instalar y ejecutar" y "guardar enlace como".
+			<?php echo __('En caso de descargar con chrome dar clic derecho a "Instalar y ejecutar" y "guardar enlace como".') ?>
 			<br />
 		</div>
 
 		<div class="explorer explorer6" align="left">
 			Usted está utilizando Internet Explorer 6. Por su seguridad, Lemontech recomienda actualizar a la última versión de <a target="_blank" href="http://www.microsoft.com/windows/ie/">Internet Explorer</a>
 			<hr style="color:black;" size=1 />
-		</div>		
-		
+		</div>
+
 		<div align=left>
 			<ul>
-			<li>A continuación usted podrá instalar la aplicación que le permitirá utilizar el sistema cuando no cuente con una conexión a Internet.</li>
-			<li>Esta aplicación requiere el framework .NET de Microsoft. Al comienzo de esta página podrá ver si su computador necesita instalar este componente.</li>
-			<li>Esta aplicación tiene algunos prerrequisitos que de no estar instalados en su computador, serán descargados desde el sitio web de Microsoft. Esta operación puede tardar varios minutos.</li>
-			<li>Haga clic en el siguiente botón para instalar o ejecutar la aplicación:</li>
+			<li><?php echo __('A continuación usted podrá instalar la aplicación que le permitirá utilizar el sistema cuando no cuente con una conexión a Internet.') ?></li>
+			<li><?php echo __('Esta aplicación requiere el framework .NET de Microsoft. Al comienzo de esta página podrá ver si su computador necesita instalar este componente.') ?></li>
+			<li><?php echo __('Esta aplicación tiene algunos prerrequisitos que de no estar instalados en su computador, serán descargados desde el sitio web de Microsoft. Esta operación puede tardar varios minutos.') ?></li>
+			<li><?php echo __('Haga clic en el siguiente botón para instalar o ejecutar la aplicación:') ?></li>
 			<br /><br />
 			<center>
-			<SPAN style="border: 1px solid black; padding: 3px; background-color:#A7DF60">
+			<span style="border: 1px solid black; padding: 3px; background-color:#A7DF60">
 <?
 		if (method_exists('Conf','GetConf'))
 		{
@@ -230,8 +230,8 @@ function writeDNetReport(doc)
 			$PdfLinea1 = Conf::PdfLinea1();
 		}
 ?>
-			<A style="text-decoration: none;" HREF="../../cliente_windows/application.php?titulo=<?= urlencode($PdfLinea1); ?>&host=<?= urlencode(Conf::Host()); ?>&titulo_asunto=<?=__('Asunto')?>">Instalar y ejecutar</A>
-			</SPAN>
+			<a style="text-decoration: none;" HREF="../../cliente_windows/application.php?titulo=<?= urlencode($PdfLinea1); ?>&host=<?= urlencode(Conf::Host()); ?>&titulo_asunto=<?=__('Asunto')?>"><?php echo __('Instalar y ejecutar') ?></a>
+			</span>
 			</center>
 		</div>
 
