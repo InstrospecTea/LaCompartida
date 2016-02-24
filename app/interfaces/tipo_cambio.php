@@ -66,7 +66,7 @@ $pagina->PrintTop();
 				<tr>
 					<td align="right">
 						<?php echo $moneda->fields['glosa_moneda']; ?>:
-						<?php echo $moneda->fields['moneda_base'] ? '<br/><small style="color:#999;"">(moneda base)</small>' : ''; ?>
+						<?php echo $moneda->fields['moneda_base'] ? '<br/><small style="color:#999;">('. __('moneda base'). ')</small>' : ''; ?>
 					</td>
 					<td>
 						<input type="text" class="txt_input" size="10" value="<?php echo $moneda->fields['tipo_cambio']; ?>" <?php echo $moneda->fields['tipo_cambio_referencia'] ? 'disabled' : ''; ?> name="valor_<?php echo $moneda->fields['id_moneda']; ?>" id="valor_<?php echo $moneda->fields['id_moneda']; ?>">
