@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.3.4
+Wednesday, February 24th
+* **Fix** [Nuevas traducciones para Brasil](https://github.com/LemontechSA/ttb/pull/1344)
+
 ## Hotfix 16.3.3
 Monday, February 22nd
 * **Fix** [Eliminación version 16.3.1](https://github.com/LemontechSA/ttb/pull/1343)
