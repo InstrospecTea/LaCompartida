@@ -17,6 +17,8 @@ $pagina = new Pagina($Sesion);
 
 $factura = new Factura($Sesion);
 
+$Form = new Form();
+
 $series_documento = new DocumentoLegalNumero($Sesion);
 
 if ($id_factura != "") {
@@ -420,7 +422,8 @@ else
 <?php echo __('Tipo de Documento') ?>
 				</td>
 				<td align=left >
-<?php echo Html::SelectQuery($Sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal_buscado', $tipo_documento_legal_buscado, '', __('Cualquiera'), 150); ?>
+<?php echo $Form->select('tipo_documento_legal_buscado', PrmDocumentoLegal::getList($Sesion), $tipo_documento_legal_buscado, array('empty' => __('Cualquiera'), 'style:width:150px'));
+?>
 				</td>
 				<td align=right width="25%">
 <?php echo __('Grupo Ventas') ?>
@@ -436,9 +439,9 @@ else
 				<td align=left>
 <?php
 if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
-	echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado[]", $id_estado, ' multiple size="5" onchange="mostrarAccionesEstado(this.form)"', __('Cualquiera'), "190");
+	echo $Form->select('id_estado[]', PrmEstadoFactura::getList($Sesion), $id_estado, array('multiple' => 'multiple', 'size' => '5', 'onchange' => 'mostrarAccionesEstado(this.form)', 'style' => 'width:190px', 'empty' => __('Cualquiera')));
 } else {
-	echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $id_estado, ' onchange="mostrarAccionesEstado(this.form)"', __('Cualquiera'), "150");
+	echo $Form->select('id_estado', PrmEstadoFactura::getList($Sesion), $id_estado, array('onchange' => 'mostrarAccionesEstado(this.form)', 'style' => 'width:150px', 'empty' => __('Cualquiera')));
 }
 ?>
 				</td>
@@ -476,9 +479,10 @@ if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 				<td align=left>
 <?php
 if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
-	echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto[]", $id_concepto, ' multiple size="5" ', __('Cualquiera'), "190");
+	echo $Form->select('id_concepto', PrmFacturaPagoConcepto::getList($Sesion), $id_concepto, array('multiple' => 'multiple', 'size' => 5, 'empty' => __('Cualquiera'), 'style' => 'width:190px'));
+
 } else {
-	echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto", $id_concepto, '', __('Cualquiera'), "150");
+	echo $Form->select('id_concepto', PrmFacturaPagoConcepto::getList($Sesion), $id_concepto, array('empty' => __('Cualquiera'), 'style' => 'width:150px'));
 }
 ?>
 				</td>

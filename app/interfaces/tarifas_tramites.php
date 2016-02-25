@@ -168,23 +168,6 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 		}
 	}
 
-	jQuery(function() {
-		var tarifa_temp = '';
-		jQuery('.tarifas').on('focus', function() {
-			tarifa_temp = jQuery.trim(jQuery(this).val());
-		});
-
-		jQuery('.tarifas').on('blur', function() {
-			if (jQuery.trim(jQuery(this).val()) == '' && tarifa_temp != '') {
-				if (confirm('¿Está seguro de querer eliminar la tarifa?\nEsto puede provocar inconsistencia de datos en los trámites ya creados.')) {
-					jQuery(this).val('0');
-				} else {
-					jQuery(this).val(tarifa_temp);
-					jQuery(this).focus();
-				}
-			}
-		});
-	});
 </script>
 
 <style>
@@ -309,10 +292,10 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 			$glosa_moneda=$money->fields['glosa_moneda'];
 
 			if ($id_moneda == $money->fields['id_moneda'] && $id_tramite_valor == $id_tramite_tipo) {
-				$td_tarifas .= "<td align='right' class=\"border_plomo\"><input type='text' size='6' id='' class='tarifas' name='tarifa_moneda[$id_tramite_tipo][".$money->fields['id_moneda']."]' value='".$tarifa."' $active tabindex='$tab'></td> \n";
+				$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 id='' name='tarifa_moneda[$id_tramite_tipo][".$money->fields['id_moneda']."]' value='".$tarifa."' $active tabindex=$tab></td> \n";
 				list($id_tramite_valor, $id_tramite_tarifa, $tarifa, $id_moneda) = mysql_fetch_array($resp);
 			} else {
-				$td_tarifas .= "<td align='right' class=\"border_plomo\"><input type='text' size='6' id='' class='tarifas' name='tarifa_moneda[$id_tramite_tipo][".$money->fields['id_moneda']."]' value='' $active tabindex='$tab'></td> \n";
+				$td_tarifas .= "<td align=right class=\"border_plomo\"><input type=text size=6 name='tarifa_moneda[$id_tramite_tipo][".$money->fields['id_moneda']."]' value='' $active tabindex=$tab></td> \n";
 			}
 		}
 		$td_tarifas .= '</tr>';

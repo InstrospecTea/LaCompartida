@@ -6463,7 +6463,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_importe%', '', $html);
 					$html = str_replace('%td_importe_ajustado%', '', $html);
 				}
-				$html = str_replace('%importe%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%importe%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_importe'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%importe_ajustado%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_importe'] * $x_factor_ajuste, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
@@ -9140,7 +9140,7 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_importe%', '', $html);
 					$html = str_replace('%td_importe_ajustado%', '', $html);
 				}
-				$html = str_replace('%importe%', number_format($asunto->fields['trabajos_total_valor'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%importe%', number_format($asunto->fields['trabajos_total_importe'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%importe_ajustado%', number_format($asunto->fields['trabajos_total_importe'] * $x_factor_ajuste, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {

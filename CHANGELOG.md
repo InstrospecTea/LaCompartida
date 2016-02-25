@@ -1,5 +1,22 @@
 # Changelog
 
+## [Release 16.4.0](https://github.com/LemontechSA/ttb/pull/1347)
+Wednesday, February 24th
+* **Feature** [Mostrar checkbox tramites no cobrables en contrato](https://github.com/LemontechSA/ttb/pull/1340)
+* **Feature** [Condiciones de pago](https://github.com/LemontechSA/ttb/pull/1341)
+
+## Hotfix 16.3.4
+Wednesday, February 24th
+* **Fix** [Nuevas traducciones para Brasil](https://github.com/LemontechSA/ttb/pull/1345)
+
+## Hotfix 16.3.3
+Monday, February 22nd
+* **Fix** [Eliminación version 16.3.1](https://github.com/LemontechSA/ttb/pull/1343)
+
+## Hotfix 16.3.2
+Monday, February 22nd
+* **Fix** [Error suma de importes Word](https://github.com/LemontechSA/ttb/pull/1342)
+
 ## Hotfix 16.3.1
 Thursday, February 18th
 * **Fix** [Corrección query obtención trámites](https://github.com/LemontechSA/ttb/pull/1339)

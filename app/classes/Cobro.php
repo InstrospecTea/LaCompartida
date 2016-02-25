@@ -53,9 +53,9 @@ if (!class_exists('Cobro')) {
 				$his = new Observacion($this->sesion);
 
 				if ($ultimaobservacion = $his->UltimaObservacion($this->fields['id_cobro'])) {
-					if ($ultimaobservacion['comentario'] != __("COBRO {$this->fields['estado']}")) {
+					if ($ultimaobservacion['comentario'] != __('COBRO') . ' ' . __($this->fields['estado'])) {
 						$his->Edit('fecha', date('Y-m-d H:i:s'));
-						$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
+						$his->Edit('comentario', __('COBRO') . ' ' . __($this->fields['estado']));
 						$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 						$his->Edit('id_cobro', $this->fields['id_cobro']);
 						$his->Write();
@@ -2214,6 +2214,9 @@ if (!class_exists('Cobro')) {
 
 					$this->Edit("id_moneda_monto", $Contrato->fields['id_moneda_monto']);
 					$this->Edit("opc_ver_columna_cobrable", $Contrato->fields['opc_ver_columna_cobrable']);
+
+					// Mostrar Trámites no cobrables
+					$this->Edit('opc_mostrar_tramites_no_cobrables', $Contrato->fields['opc_mostrar_tramites_no_cobrables']);
 
 					if ($fecha_ini != '') {
 						$this->Edit('fecha_ini', $fecha_ini);
