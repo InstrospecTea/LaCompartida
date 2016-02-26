@@ -38,24 +38,6 @@
 		</tr>
 		<tr>
 			<td align="right">
-				<label for="total_special"><?php echo __('Incluir totales normales y vencidos'); ?></label>
-			</td>
-			<td align="left">
-				<?php echo $this->Form->checkbox('total_special', 1, !empty($this->data['total_special']), array('label' => false)); ?>
-				<div class="inlinehelp help" title="<?php echo __('Totales normales y vencidos'); ?>" help="<?php echo __('Incluir en el reporte el cálculo de montos totales, tanto normales como vencidos'); ?>">?</div>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<label for="show_detail"><?php echo __('Desglosar reporte'); ?></label>
-			</td>
-			<td align="left">
-				<?php echo $this->Form->checkbox('show_detail', 1, !empty($this->data['show_detail']), array('label' => false)); ?>
-				<div class="inlinehelp help" title="<?php echo __('Desglosar reporte'); ?>" help="<?php echo __('El reporte por defecto solo muestra los totales agrupados para cada resultado que se obtiene. Active esta opción para mostrar el detalle de cada agrupación de totales'); ?>">?</div>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
 				<label for="include_trade_manager"><?php echo __('Incluir encargado comercial'); ?></label>
 			</td>
 			<td align="left">
@@ -63,6 +45,7 @@
 				<div class="inlinehelp help" title="<?php echo __('Incluir encargado comercial'); ?>" help="<?php echo __('Incluye en el reporte información respecto del encargado comercial asociado a los clientes'); ?>">?</div>
 			</td>
 		</tr>
+		<?php if (!empty($client_group)) { ?>
 		<tr>
 			<td align="right">
 				<?php echo __('Grupo Cliente'); ?>
@@ -71,14 +54,7 @@
 				<?php echo $this->Form->select('client_group_id', $client_group, $this->data['client_group_id']); ?>
 			</td>
 		</tr>
-		<tr>
-			<td align="right">
-				<label for="billing_type"><?php echo __('Tipo de Liquidación'); ?></label>
-			</td>
-			<td align="left">
-				<?php echo Html::SelectArray($billing_type, 'billing_type', $this->data['billing_type'], '', __('Todas')); ?>
-			</td>
-		</tr>
+		<?php } ?>
 		<tr>
 			<td align="right">
 				<?php echo __('Fecha de corte'); ?>
@@ -99,15 +75,7 @@
 	</table>
 <?php $this->Form->end(); ?>
 
-<div id="seguimiento_template">
-	<div class="popover left">
-		<div class="arrow"></div>
-		<h3 class="popover-title"><?php echo __('Seguimiento del cliente'); ?></h3>
-		<div class="popover-content">
-			<iframe id="seguimiento_iframe" width="100%" border="0" style="border: 1px solid white" src="../ajax/ajax_seguimiento.php"></iframe>
-		</div>
-	</div>
-</div>
+
 
 <script type="text/javascript">
 	var img_dir = '<?php echo Conf::ImgDir(); ?>';
