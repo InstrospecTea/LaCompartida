@@ -1106,6 +1106,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_select('cl.codigo_cliente')
 			->add_select('cl.glosa_cliente')
 			->add_from('factura', 'f')
+			->add_left_join_with('contrato', 'f.id_contrato = contrato.id_contrato')
 			->add_left_join_with(array('cta_cte_fact_mvto', 'ccfm'), 'ccfm.id_factura = f.id_factura')
 			->add_left_join_with(array('cta_cte_fact_mvto_neteo', 'ccfmn'), "ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto AND ccfmn.fecha_movimiento <= '{$parameters['end_date']}'")
 			->add_inner_join_with(array('cobro', 'c'), 'c.id_cobro = f.id_cobro')
@@ -1119,6 +1120,15 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$CriteriaInvoice->add_restriction(CriteriaRestriction::equals('cl.codigo_cliente', "'{$parameters['client_code']}'"));
 		}
 
+		if (!empty($parameters['include_trade_manager'])) {
+			$CriteriaInvoice->add_select('CONCAT(usuario.nombre,\' \', usuario.apellido1)','encargado_comercial');
+			$CriteriaInvoice->add_left_join_with('usuario', 'contrato.id_usuario_responsable = usuario.id_usuario');
+		}
+
+		if (!empty($parameters['trade_manager_id'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::equals('contrato.id_usuario_responsable', $parameters['trade_manager_id']));
+		}
+
 		if (!empty($parameters['matter_code'])) {
 			$CriteriaInvoice
 				->add_left_join_with(array('cobro_asunto', 'ca'), 'ca.id_cobro = c.id_cobro')
@@ -1127,7 +1137,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 
 		$Criteria = new Criteria($this->Session);
-		$debts = $Criteria
+		$Criteria
 			->add_select('v.glosa_cliente')
 			->add_select('CONCAT("{", GROUP_CONCAT(DISTINCT v.identificador ORDER BY 1), "}")', 'facturas')
 			->add_select('SUM(IF(v.dias_desde_facturacion <= 30, v.total_facturado - v.total_pagado, 0))', "'rango1'")
@@ -1136,8 +1146,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_select('SUM(IF(v.dias_desde_facturacion > 90, v.total_facturado - v.total_pagado, 0))', "'rango4'")
 			->add_select('SUM(v.total_facturado - v.total_pagado)', "'total'")
 			->add_from_criteria($CriteriaInvoice, 'v')
-			->add_grouping('v.codigo_cliente')
-			->run();
+			->add_grouping('v.codigo_cliente');
+		if (!empty($parameters['include_trade_manager'])) {
+			$Criteria->add_select('v.encargado_comercial');
+		}
+
+		$debts = $Criteria->run();
 
 		$this->loadReport('ClientOldDebtAccountingConcepts', 'Report');
 		$this->Report->setOutputType('SR');
