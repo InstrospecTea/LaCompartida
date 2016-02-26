@@ -48,6 +48,7 @@ class ClientOldDebtAccountingConceptsReport extends AbstractReport implements IC
 			array(
 				'field' => 'rango1',
 				'title' => '0-30 ' . __('días'),
+				'format' => 'number',
 				'extras' => array(
 					'attrs' => 'width="5%" style="text-align:left;"'
 				)
@@ -55,6 +56,7 @@ class ClientOldDebtAccountingConceptsReport extends AbstractReport implements IC
 			array(
 				'field' => 'rango2',
 				'title' => '31-60 ' . __('días'),
+				'format' => 'number',
 				'extras' => array(
 					'attrs' => 'width="5%" style="text-align:left;"'
 				)
@@ -62,6 +64,7 @@ class ClientOldDebtAccountingConceptsReport extends AbstractReport implements IC
 			array(
 				'field' => 'rango3',
 				'title' => '61-90 ' . __('días'),
+				'format' => 'number',
 				'extras' => array(
 					'attrs' => 'width="5%" style="text-align:left;"'
 				)
@@ -69,6 +72,7 @@ class ClientOldDebtAccountingConceptsReport extends AbstractReport implements IC
 			array(
 				'field' => 'rango4',
 				'title' => '91+ ' . __('días'),
+				'format' => 'number',
 				'extras' => array(
 					'attrs' => 'width="5%" style="text-align:left;"'
 				)
@@ -76,11 +80,22 @@ class ClientOldDebtAccountingConceptsReport extends AbstractReport implements IC
 			array(
 				'field' => 'total',
 				'title' => __('Total'),
+				'format' => 'number',
 				'extras' => array(
 					'attrs' => 'width="5%" style="text-align:left;font-weight:bold"'
 				)
 			)
 		);
+		if (!empty($this->parameters['include_trade_manager'])) {
+			array_push($config, array(
+				'field' => 'encargado_comercial',
+				'title' => __('Encargado Comercial'),
+				'extras' => array(
+					'attrs' => 'width="25%" style="text-align:left;"'
+				)
+			));
+		}
+
 		return $config;
 	}
 }
