@@ -140,8 +140,6 @@ class ReportController extends AbstractController {
 	public function clientOldDebtAccountingConcepts() {
 		$this->loadBusiness('Searching');
 
-		$parameters = array();
-
 		if (!empty($this->data)) {
 			$this->loadBusiness('Charging');
 
@@ -163,7 +161,7 @@ class ReportController extends AbstractController {
 					$this->data['matter_code'] = $Matter->fields['codigo_asunto'];
 				}
 			}
-
+			$parameters = $this->data;
 			$parameters['client_code'] = $this->data['client_code'];
 			$parameters['matter_code'] = $this->data['matter_code'];
 			$parameters['end_date'] = date('Y-m-d', strtotime($this->data['end_date']));
