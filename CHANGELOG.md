@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.3
+Tuesday, March 1st
+* **Fix** [Link PDF Factura Electrónica](https://github.com/LemontechSA/ttb/pull/1353)
+
 ## Hotfix 16.4.2
 Tuesday, March 1st
 * **Fix** [Problemas con edición masiva de trabajos](https://github.com/LemontechSA/ttb/pull/1352)
