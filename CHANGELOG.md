@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.2
+Tuesday, March 1st
+* **Fix** [Problemas con edición masiva de trabajos](https://github.com/LemontechSA/ttb/pull/1352)
+
 ## Hotfix 16.4.1
 Monday, February 29th
 * **Fix** [Corrección query para pagos parciales](https://github.com/LemontechSA/ttb/pull/1351)
