@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.1
+Monday, February 29th
+* **Fix** [Corrección query para pagos parciales](https://github.com/LemontechSA/ttb/pull/1351)
+
 ## [Release 16.4.0](https://github.com/LemontechSA/ttb/pull/1347)
 Wednesday, February 24th
 * **Feature** [Mostrar checkbox tramites no cobrables en contrato](https://github.com/LemontechSA/ttb/pull/1340)
