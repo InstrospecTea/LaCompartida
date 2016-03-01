@@ -2635,6 +2635,7 @@ class Factura extends Objeto {
 								, contrato.email_contacto as email_contacto
 								, cobro.estado as estado_cobro
 								, prm_documento_legal.glosa as glosa_doc_legal
+								, factura.dte_url_pdf as dte_url_pdf
 								, factura.glosa";
 
 		if ($opciones['mostrar_pagos']) {
