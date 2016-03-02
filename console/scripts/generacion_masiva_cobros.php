@@ -206,7 +206,7 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->with_error['gg'][$this->getContractInfo($id_contrato)] ++;
 			$this->status('mensajes', $e->getMessage());
 		}
-		$mensajes = $this->getWithError('gg');
+
 		$msg_generado = $this->sp(
 				$this->generated['gg'],
 			__('Se ha generado') . ' 1 ' . __('liquidación de gastos'),
@@ -218,10 +218,6 @@ class GeneracionMasivaCobros extends AppShell {
 			"{$this->errors['gg']} " . __('con errores'),
 			__('sin errores'));
 		$this->status('gg', "{$msg_generado}. ({$msg_error})");
-		if (extension_loaded('newrelic')) {
-			newrelic_set_appname('ttb');
-			newrelic_notice_error($mensajes);
-		}
 	}
 
 	/**
@@ -246,13 +242,16 @@ class GeneracionMasivaCobros extends AppShell {
 				++$this->errors['hh'];
 			}
 		} catch (Exception $e) {
+			if (extension_loaded('newrelic')) {
+				newrelic_notice_error($e->getMessage());
+			}
 			$this->log('Error generaHH: ' . $e->getMessage());
 			++$this->errors['hh'];
 			array_push($this->messages['hh'], $e->getMessage());
 			array_push($this->with_error['hh'], $this->getContractInfo($id_contrato));
 			$this->status('mensajes', $e->getMessage());
 		}
-		//$mensajes = $this->getWithError('hh');
+
 		$msg_generado = $this->sp(
 				$this->generated['hh'],
 			__('Se ha generado 1 liquidación de honorarios'),
@@ -263,10 +262,7 @@ class GeneracionMasivaCobros extends AppShell {
 			__('1 con error'),
 			"{$this->errors['hh']} " . __('con errores'),
 			__('sin errores'));
-		$this->status('hh', "{$msg_generado}. ({$msg_error}) {$mensajes}");
-		if (extension_loaded('newrelic')) {
-			newrelic_notice_error(null, "{$msg_generado}. ({$msg_error})");
-		}
+		$this->status('hh', "{$msg_generado}. ({$msg_error})");
 	}
 
 	/**
@@ -308,13 +304,13 @@ class GeneracionMasivaCobros extends AppShell {
 			__('Se ha generado 1 liquidación mixta'),
 			__('Se han generado') . " {$this->generated['mixtas']} " . __('liquidaciones mixtas'),
 			__('No se han generado liquidaciones mixtas'));
-		//$mensajes = $this->getWithError('mixtas');
+
 		$msg_error = $this->sp(
 			$this->errors['mixtas'],
 			__('1 con error'),
 			"{$this->errors['mixtas']} " . __('con errores'),
 			__('sin errores'));
-		$this->status('mixtas', "{$msg_generado}. ({$msg_error}) {$mensajes}");
+		$this->status('mixtas', "{$msg_generado}. ({$msg_error})");
 	}
 
 	/**
@@ -383,6 +379,9 @@ class GeneracionMasivaCobros extends AppShell {
 				return json_decode(trim($body), true);
 			}
 		} catch (Exception $e) {
+			if (extension_loaded('newrelic')) {
+				newrelic_notice_error($e->getMessage());
+			}
 			$response .= $e->getMessage();
 		}
 		$this->log('Ocurrió un error interno.');
@@ -422,16 +421,6 @@ class GeneracionMasivaCobros extends AppShell {
 		$message = '';
 		if (!empty($this->messages[$key])) {
 			$message = implode(', ', $this->messages[$key]);
-		}
-		return $message;
-	}
-
-	private function getWithError($key) {
-		$message = '';
-		if (!empty($this->with_error[$key])) {
-			foreach($this->with_error[$key] as $cliente => $valor) {
-				$message .= " {$cliente} : {$valor},";
-			}
 		}
 		return $message;
 	}
