@@ -264,6 +264,10 @@ class GeneracionMasivaCobros extends AppShell {
 			"{$this->errors['hh']} " . __('con errores'),
 			__('sin errores'));
 		$this->status('hh', "{$msg_generado}. ({$msg_error}) {$mensajes}");
+		if (extension_loaded('newrelic')) {
+			newrelic_set_appname('ttb');
+			newrelic_notice_error($msg_generado);
+		}
 	}
 
 	/**
