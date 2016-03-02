@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.5
+Wednesday, March 2nd
+* **Fix** [Corrección Condición](https://github.com/LemontechSA/ttb/pull/1355)
+
 ## Hotfix 16.4.4
 Wednesday, March 2nd
 * **Fix** [Fechas Reporte MTA](https://github.com/LemontechSA/ttb/pull/1354)
