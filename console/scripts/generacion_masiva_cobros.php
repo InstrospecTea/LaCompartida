@@ -32,6 +32,12 @@ class GeneracionMasivaCobros extends AppShell {
 			'mixtas' => array()
 	);
 
+	private $with_error = array(
+		'hh' => array(),
+		'gg' => array(),
+		'mixtas' => array()
+	);
+
 	public function main() {
 		$this->Session->usuario = new Usuario($this->Session);
 		$this->Session->usuario->LoadId($this->data['user_id']);
@@ -191,18 +197,31 @@ class GeneracionMasivaCobros extends AppShell {
 			if (!empty($result['mensajes'])) {
 				array_push($this->messages['gg'] ,$result['mensajes']);
 				++$this->errors['gg'];
+				$this->with_error['gg'][$this->getContractInfo($id_contrato)] ++;
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaGG: ' . $e->getMessage());
 			++$this->errors['gg'];
 			array_push($this->messages['gg'], $e->getMessage());
+			$this->with_error['gg'][$this->getContractInfo($id_contrato)] ++;
 			$this->status('mensajes', $e->getMessage());
 		}
-		$mensajes = $this->getMessage('gg');
+		$mensajes = $this->getWithError('gg');
 		$msg_generado = $this->sp(
-				$this->generated['gg'], __('Se ha generado') . ' 1 ' . __('liquidación de gastos'), __('Se han generado') . " {$this->generated['gg']} " . __('liquidaciones de gastos'), __('No se han generado liquidaciones de gastos'));
-		$msg_error = $this->sp($this->errors['gg'], __('1 con error'), "{$this->errors['gg']} " . __('con errores'), __('sin errores'));
-		$this->status('gg', "{$msg_generado}. ({$msg_error} {$mensajes})");
+				$this->generated['gg'],
+			__('Se ha generado') . ' 1 ' . __('liquidación de gastos'),
+			__('Se han generado') . " {$this->generated['gg']} " . __('liquidaciones de gastos'),
+			__('No se han generado liquidaciones de gastos'));
+		$msg_error = $this->sp(
+			$this->errors['gg'],
+			__('1 con error'),
+			"{$this->errors['gg']} " . __('con errores'),
+			__('sin errores'));
+		$this->status('gg', "{$msg_generado}. ({$msg_error})");
+		if (extension_loaded('newrelic')) {
+			newrelic_set_appname('ttb');
+			newrelic_notice_error($mensajes);
+		}
 	}
 
 	/**
@@ -223,19 +242,28 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 			if (!empty($result['mensajes'])) {
 				array_push($this->messages['hh'] ,$result['mensajes']);
+				array_push($this->with_error['hh'], $this->getContractInfo($id_contrato));
 				++$this->errors['hh'];
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaHH: ' . $e->getMessage());
 			++$this->errors['hh'];
 			array_push($this->messages['hh'], $e->getMessage());
+			array_push($this->with_error['hh'], $this->getContractInfo($id_contrato));
 			$this->status('mensajes', $e->getMessage());
 		}
-		$mensajes = $this->getMessage('hh');
+		//$mensajes = $this->getWithError('hh');
 		$msg_generado = $this->sp(
-				$this->generated['hh'], __('Se ha generado 1 liquidación de honorarios'), __('Se han generado') . " {$this->generated['hh']} " . __('liquidaciones de honorarios'), __('No se han generado liquidaciones de honorarios'));
-		$msg_error = $this->sp($this->errors['hh'], __('1 con error'), "{$this->errors['hh']} " . __('con errores'), __('sin errores'));
-		$this->status('hh', "{$msg_generado}. ({$msg_error} {$mensajes})");
+				$this->generated['hh'],
+			__('Se ha generado 1 liquidación de honorarios'),
+			__('Se han generado') . " {$this->generated['hh']} " . __('liquidaciones de honorarios'),
+			__('No se han generado liquidaciones de honorarios'));
+		$msg_error = $this->sp(
+			$this->errors['hh'],
+			__('1 con error'),
+			"{$this->errors['hh']} " . __('con errores'),
+			__('sin errores'));
+		$this->status('hh', "{$msg_generado}. ({$msg_error}) {$mensajes}");
 	}
 
 	/**
@@ -262,19 +290,28 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 			if (!empty($result['mensajes'])) {
 				array_push($this->messages['mixtas'] ,$result['mensajes']);
+				array_push($this->with_error['mixtas'], $this->getContractInfo($id_contrato));
 				++$this->errors['mixtas'];
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaMIXTAS: ' . $e->getMessage());
 			++$this->errors['mixtas'];
 			array_push($this->messages['mixtas'], $e->getMessage());
+			array_push($this->with_error['mixtas'], $this->getContractInfo($id_contrato));
 			$this->status('mensajes', $e->getMessage());
 		}
 		$msg_generado = $this->sp(
-				$this->generated['mixtas'], __('Se ha generado 1 liquidación mixta'), __('Se han generado') . " {$this->generated['mixtas']} " . __('liquidaciones mixtas'), __('No se han generado liquidaciones mixtas'));
-		$mensajes = $this->getMessage('mixtas');
-		$msg_error = $this->sp($this->errors['mixtas'], __('1 con error'), "{$this->errors['mixtas']} " . __('con errores'), __('sin errores'));
-		$this->status('mixtas', "{$msg_generado}. ({$msg_error} {$mensajes})");
+				$this->generated['mixtas'],
+			__('Se ha generado 1 liquidación mixta'),
+			__('Se han generado') . " {$this->generated['mixtas']} " . __('liquidaciones mixtas'),
+			__('No se han generado liquidaciones mixtas'));
+		//$mensajes = $this->getWithError('mixtas');
+		$msg_error = $this->sp(
+			$this->errors['mixtas'],
+			__('1 con error'),
+			"{$this->errors['mixtas']} " . __('con errores'),
+			__('sin errores'));
+		$this->status('mixtas', "{$msg_generado}. ({$msg_error}) {$mensajes}");
 	}
 
 	/**
@@ -345,9 +382,9 @@ class GeneracionMasivaCobros extends AppShell {
 		} catch (Exception $e) {
 			$response .= $e->getMessage();
 		}
-		$this->log('Ocurrio un error en la llamada post.');
+		$this->log('Ocurrió un error interno.');
 		$this->log($response);
-		throw new Exception('Ocurrio un error en la llamada post.');
+		throw new Exception('Ocurrió un error interno.');
 	}
 
 	/**
@@ -384,6 +421,22 @@ class GeneracionMasivaCobros extends AppShell {
 			$message = implode(', ', $this->messages[$key]);
 		}
 		return $message;
+	}
+
+	private function getWithError($key) {
+		$message = '';
+		if (!empty($this->with_error[$key])) {
+			foreach($this->with_error[$key] as $cliente => $valor) {
+				$message .= " {$cliente} : {$valor},";
+			}
+		}
+		return $message;
+	}
+
+	private function getContractInfo($id_contrato) {
+		$contrato = new Contrato($this->Session);
+		$contrato->Load($id_contrato);
+		return $contrato->fields['codigo_cliente'];
 	}
 
 }
