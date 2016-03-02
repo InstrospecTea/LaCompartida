@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.4
+Wednesday, March 2nd
+* **Fix** [Fechas Reporte MTA](https://github.com/LemontechSA/ttb/pull/1354)
+
 ## Hotfix 16.4.3
 Tuesday, March 1st
 * **Fix** [Link PDF Factura Electrónica](https://github.com/LemontechSA/ttb/pull/1353)
