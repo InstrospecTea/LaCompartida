@@ -366,7 +366,9 @@ class GeneracionMasivaCobros extends AppShell {
 
 			curl_setopt($ch, CURLOPT_HEADER, true);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
+			if (rand(1,10) == 5) {
+				throw new Exception('Ocurrió un error interno.');
+			}
 			$response = curl_exec($ch);
 
 			$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
