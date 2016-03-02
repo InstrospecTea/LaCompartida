@@ -366,9 +366,6 @@ class GeneracionMasivaCobros extends AppShell {
 
 			curl_setopt($ch, CURLOPT_HEADER, true);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			if (rand(1,10) == 5) {
-				throw new Exception('Ocurrió un error interno.');
-			}
 			$response = curl_exec($ch);
 
 			$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -382,7 +379,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			if (extension_loaded('newrelic')) {
-				newrelic_notice_error($e->getMessage());
+				newrelic_notice_error('Proceso : generación masiva de cobros => ' . $e->getMessage());
 			}
 			$response .= $e->getMessage();
 		}
