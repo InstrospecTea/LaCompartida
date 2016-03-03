@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.6
+Thursday, March 3rd
+* **Fix** [Nueva Columna en Reporte Excel](https://github.com/LemontechSA/ttb/pull/1356)
+
 ## Hotfix 16.4.5
 Wednesday, March 2nd
 * **Fix** [Corrección Condición](https://github.com/LemontechSA/ttb/pull/1355)
