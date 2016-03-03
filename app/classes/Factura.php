@@ -364,6 +364,11 @@ class Factura extends Objeto {
 		array(
 			'field' => 'glosa',
 			'title' => 'Glosa'
+		),
+		array(
+			'field' => 'glosa_asunto',
+			'title' => 'Glosa Asunto',
+			'visible' => false
 		)
 	);
 
@@ -2636,7 +2641,8 @@ class Factura extends Objeto {
 								, cobro.estado as estado_cobro
 								, prm_documento_legal.glosa as glosa_doc_legal
 								, factura.dte_url_pdf as dte_url_pdf
-								, factura.glosa";
+								, factura.glosa
+								, asunto.glosa_asunto";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (
