@@ -100,15 +100,27 @@ class WorksheetMiddleware {
 	}
 
 	public function write($row, $col, $token, $format = null) {
-		$this->elements[] = array($row, $col, $token, $format);
+		$this->elements[] = array('row' => $row,
+															'col' => $col,
+															'data' => $token,
+															'format' => $format,
+															'type' => 'text');
 	}
 
 	public function writeNumber($row, $col, $num, $format = null) {
-		$this->write($row, $col, $num, $format);
+		$this->elements[] = array('row' => $row,
+															'col' => $col,
+															'data' => $num,
+															'format' => $format,
+															'type' => 'number');
 	}
 
 	public function writeFormula($row, $col, $formula, $format = null) {
-		$this->write($row, $col, $formula, $format);
+		$this->elements[] = array('row' => $row,
+															'col' => $col,
+															'data' => $formula,
+															'format' => $format,
+															'type' => 'formula');
 	}
 
 
