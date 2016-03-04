@@ -383,9 +383,9 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 			$response .= $e->getMessage();
 		}
-		$this->log('Ocurrió un error interno.');
+		$this->log('Ocurrió un error interno. Por faqvor contacte a soporte');
 		$this->log($response);
-		throw new Exception('Ocurrió un error interno.');
+		throw new Exception('Ocurrió un error interno. Por faqvor contacte a soporte');
 	}
 
 	/**
