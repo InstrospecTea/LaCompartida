@@ -392,8 +392,6 @@ class GeneracionMasivaCobros extends AppShell {
 		$this->log('Ocurrió un error interno. Por faqvor contacte a soporte');
 		$this->log($response);
 		throw new Exception('Proceso : generación masiva de cobros => ' .
-			$e->getMessage() .
-			'\n' .
 			print_r($post_data, true) .
 		  '\n' .
 		  print_r($response, true));
