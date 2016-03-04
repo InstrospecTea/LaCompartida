@@ -781,15 +781,18 @@ $Form = new Form;
 				<?php echo $Form->select('id_usuario', $usuario->get_usuarios_gastos(), isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
 			</td>
 		</tr>
+		<tr>
+			<td></td>
+		</tr>
+		<tr>
+			<td align="right">
+				<?php echo $Form->icon_submit(__('Guardar'), 'save'); ?>
+			</td>
+			<td align=left>
+				<?php echo $Form->icon_button(__('Cancelar'), 'exit', array('onclick' => 'window.close();')); ?>
+			</td>
+		</tr>
 	</table>
-
-	<br/>
-	<div class="fl">
-		<?php
-		echo $Form->icon_submit(__('Guardar'), 'save');
-		echo $Form->icon_button(__('Cancelar'), 'exit', array('onclick' => 'window.close();'));
-		?>
-	</div>
 </form>
 <?php echo $Form->script(); ?>
 <script type="text/javascript">
