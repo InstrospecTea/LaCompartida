@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.7
+Friday, March 4th
+* **Fix** [Diseño Formulario](https://github.com/LemontechSA/ttb/pull/1358)
+
 ## Hotfix 16.4.6
 Thursday, March 3rd
 * **Fix** [Nueva Columna en Reporte Excel](https://github.com/LemontechSA/ttb/pull/1356)
