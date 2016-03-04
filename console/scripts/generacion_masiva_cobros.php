@@ -379,7 +379,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			if (extension_loaded('newrelic')) {
-				newrelic_notice_error('Proceso : generación masiva de cobros => ' . $e->getMessage());
+				newrelic_notice_error('Proceso : generación masiva de cobros => ' . $e->getMessage() . '\n' . print_r($post_data, true));
 			}
 			$response .= $e->getMessage();
 		}
