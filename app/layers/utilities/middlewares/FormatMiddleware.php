@@ -10,6 +10,8 @@ class FormatMiddleware {
 
 	protected $bold;
 
+	protected $italic;
+
 	protected $color;
 
 	protected $locked;
@@ -25,6 +27,16 @@ class FormatMiddleware {
 	protected $numformat;
 
 	protected $border;
+
+	protected $type;
+
+	public function __construct($properties = null) {
+		if (!is_null($properties) && is_array($properties)) {
+			foreach ($properties as $key => $value) {
+				$this->assignValue($key, $value);
+			}
+		}
+	}
 
 
 	public function setSize($size) {
@@ -63,6 +75,10 @@ class FormatMiddleware {
 		$this->bold = $bold == 1 ? true : false;
 	}
 
+	public function setItalic($italic) {
+		$this->italic = $italic == 1 ? true : false;
+	}
+
 	public function setColor() {
 
 	}
@@ -75,8 +91,12 @@ class FormatMiddleware {
 
 	}
 
-	public function setBottom() {
+	public function setBottom($bottom) {
+		$this->bottom = $bottom == 1 ? true : false;
+	}
 
+	public function setBorder($border) {
+		$this->border = $border;
 	}
 
 	public function setFgcolor() {
@@ -87,11 +107,68 @@ class FormatMiddleware {
 
 	}
 
-	public function setNumformat() {
-
+	public function setNumformat($numformat) {
+		$this->numformat = $numformat;
 	}
 
 	public function setFormat() {
 
+	}
+
+	public function setType($type) {
+		$this->type = $type;
+	}
+
+	public function getElements() {
+		$elements = [];
+		foreach ($this as $key => $value) {
+			$elements[$key] = $value;
+		}
+
+		return $elements;
+	}
+
+	private function assignValue($key, $value) {
+		switch ($key) {
+			case 'Size':
+				$this->setSize($value);
+				break;
+			case 'Align':
+				$this->setAlign($value);
+				break;
+			case 'VAlign':
+				$this->setValign($value);
+				break;
+			case 'Bold':
+				$this->setBold($value);
+				break;
+			case 'Color':
+				$this->setColor($value);
+				break;
+			case 'Locked':
+				$this->setLocked($value);
+				break;
+			case 'Top':
+				$this->setTop($value);
+				break;
+			case 'Bottom':
+				$this->setBottom($value);
+				break;
+			case 'FgColor':
+				$this->setFgcolor($value);
+				break;
+			case 'TextWrap':
+				$this->setTextwrap($value);
+				break;
+			case 'NumFormat':
+				$this->setNumformat($value);
+				break;
+			case 'Border':
+				$this->setBorder($value);
+				break;
+			case 'Italic':
+				$this->setItalic($value);
+				break;
+		}
 	}
 }
