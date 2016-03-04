@@ -385,13 +385,13 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			if (extension_loaded('newrelic')) {
-				newrelic_notice_error('Proceso : generación masiva de cobros => ' . $e->getMessage() . '\n' . print_r($post_data, true));
+				newrelic_notice_error('['. Conf::ServerIP() .'] Proceso : generación masiva de cobros => ' . $e->getMessage() . '\n' . print_r($post_data, true));
 			}
 			$response .= $e->getMessage();
 		}
 		$this->log('Ocurrió un error interno. Por faqvor contacte a soporte');
 		$this->log($response);
-		throw new Exception('Proceso : generación masiva de cobros => ' .
+		throw new Exception('['. Conf::ServerIP() .'] Proceso : generación masiva de cobros => ' .
 			print_r($post_data, true) .
 		  '\n' .
 		  print_r($response, true));
