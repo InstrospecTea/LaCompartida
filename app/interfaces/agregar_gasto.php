@@ -768,7 +768,7 @@ $Form = new Form;
 				<td align="right">
 					<?php echo __('Ordenado por'); ?>
 				</td>
-				<td align=left><!-- Nuevo Select -->
+				<td align="left"><!-- Nuevo Select -->
 					<?php echo $Form->select('id_usuario_orden', $usuario->get_usuarios_gastos(), $gasto->fields['id_usuario_orden'] ? $gasto->fields['id_usuario_orden'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
 				</td>
 			</tr>
@@ -777,7 +777,7 @@ $Form = new Form;
 			<td align="right">
 				<?php echo __('Ingresado por'); ?>
 			</td>
-			<td align=left><!-- Nuevo Select -->
+			<td align="left">
 				<?php echo $Form->select('id_usuario', $usuario->get_usuarios_gastos(), isset($gasto->fields['id_usuario']) ? $gasto->fields['id_usuario'] : $usuario_defecto, array('style' => 'width: 170px')); ?>
 			</td>
 		</tr>
@@ -788,7 +788,7 @@ $Form = new Form;
 			<td align="right">
 				<?php echo $Form->icon_submit(__('Guardar'), 'save'); ?>
 			</td>
-			<td align=left>
+			<td align="left">
 				<?php echo $Form->icon_button(__('Cancelar'), 'exit', array('onclick' => 'window.close();')); ?>
 			</td>
 		</tr>
