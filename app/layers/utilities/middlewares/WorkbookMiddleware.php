@@ -42,9 +42,9 @@ class WorkbookMiddleware {
 	}
 
 	public function addFormat($properties = array()) {
-		$this->formats[] = $properties;
+		$format = new FormatMiddleware($properties);
 
-		return $properties;
+		return $format;
 	}
 
 	public function addWorksheet($name = '') {
@@ -70,14 +70,6 @@ class WorkbookMiddleware {
 		// $phpExcel->addSheet($sheet);
 
 		foreach ($this->worksheet->getCellsMerged() as $value) {
-			// var_dump($value);
-			// print("'" .
-			// 		PHPExcel_Cell::stringFromColumnIndex($value[1]).($value[0]+1) .
-			// 		":" .
-			// 		PHPExcel_Cell::stringFromColumnIndex($value[3]).($value[2]+1) .
-			// 		"'");
-			// print "\n";
-
 			$cellsMerged =
 					PHPExcel_Cell::stringFromColumnIndex($value[1]).($value[0]+1) .
 					":" .
@@ -88,19 +80,72 @@ class WorkbookMiddleware {
 
 		}
 
-var_dump($this->formats);
+// var_dump($this->formats);
 
 
 
 		foreach ($this->worksheet->getElements() as $value) {
-			// var_dump($value);
+			$cellCode = PHPExcel_Cell::stringFromColumnIndex($value['col']).($value['row']+1);
+var_dump($value);
 			$phpExcel->getActiveSheet()->setCellValue(
-					PHPExcel_Cell::stringFromColumnIndex($value[1]).($value[0]+1),
-					utf8_encode($value[2])
+					$cellCode,
+					utf8_encode($value['data'])
 			);
+
+			if (!is_null($value['format'])) {
+				$value['format']->setType($value['type']);
+
+				foreach ($value['format']->getElements() as $key => $formatValue) {
+					if (!is_null($formatValue)) {
+						switch ($key) {
+							case 'Size':
+								$phpExcel->getActiveSheet()->getStyle($cellCode)->getFont()->setSize($formatValue);
+								break;
+							case 'Align':
+								$phpExcel->getActiveSheet()->getStyle($cellCode)->getAlignment()->setHorizontal($formatValue);
+								break;
+							case 'VAlign':
+								$phpExcel->getActiveSheet()->getStyle($cellCode)->getAlignment()->setVertical($formatValue);
+								break;
+							case 'Bold':
+								$phpExcel->getActiveSheet()->getStyle($cellCode)->getFont()->setBold($formatValue);
+								break;
+							case 'Italic':
+								$phpExcel->getActiveSheet()->getStyle($cellCode)->getFont()->setItalic($formatValue);
+								break;
+							case 'Color':
+
+								break;
+							case 'Locked':
+								if ($value) {
+									$phpExcel->getStyle($cellCode)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_UNPROTECTED);
+								}
+								break;
+							case 'Top':
+
+								break;
+							case 'Bottom':
+
+								break;
+							case 'FgColor':
+
+								break;
+							case 'TextWrap':
+
+								break;
+							case 'NumFormat':
+								$phpExcel->getActiveSheet()->getStyle($cellCode)->getNumberFormat()->setFormatCode($formatValue);
+								break;
+							case 'Border':
+
+								break;
+						}
+					}
+				}
+			}
 		}
 
-		// $this->downloadExcel($phpExcel, $filename);
+		 // $this->downloadExcel($phpExcel, $filename);
 	}
 
 	public function close() {
