@@ -201,10 +201,13 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaGG: ' . $e->getMessage());
+			if (extension_loaded('newrelic')) {
+				newrelic_notice_error($e->getMessage());
+			}
 			++$this->errors['gg'];
 			array_push($this->messages['gg'], $e->getMessage());
 			$this->with_error['gg'][$this->getContractInfo($id_contrato)] ++;
-			$this->status('mensajes', $e->getMessage());
+			$this->status('mensajes', 'Ocurrió un error interno, contáctese con soporte');
 		}
 
 		$msg_generado = $this->sp(
@@ -249,7 +252,7 @@ class GeneracionMasivaCobros extends AppShell {
 			++$this->errors['hh'];
 			array_push($this->messages['hh'], $e->getMessage());
 			array_push($this->with_error['hh'], $this->getContractInfo($id_contrato));
-			$this->status('mensajes', $e->getMessage());
+			$this->status('mensajes', 'Ocurrió un error interno, contáctese con soporte');
 		}
 
 		$msg_generado = $this->sp(
@@ -294,10 +297,13 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaMIXTAS: ' . $e->getMessage());
+			if (extension_loaded('newrelic')) {
+				newrelic_notice_error($e->getMessage());
+			}
 			++$this->errors['mixtas'];
 			array_push($this->messages['mixtas'], $e->getMessage());
 			array_push($this->with_error['mixtas'], $this->getContractInfo($id_contrato));
-			$this->status('mensajes', $e->getMessage());
+			$this->status('mensajes', 'Ocurrió un error interno, contáctese con soporte');
 		}
 		$msg_generado = $this->sp(
 				$this->generated['mixtas'],
@@ -385,7 +391,12 @@ class GeneracionMasivaCobros extends AppShell {
 		}
 		$this->log('Ocurrió un error interno. Por faqvor contacte a soporte');
 		$this->log($response);
-		throw new Exception('Ocurrió un error interno. Por faqvor contacte a soporte');
+		throw new Exception('Proceso : generación masiva de cobros => ' .
+			$e->getMessage() .
+			'\n' .
+			print_r($post_data, true) .
+		  '\n' .
+		  print_r($response, true));
 	}
 
 	/**
