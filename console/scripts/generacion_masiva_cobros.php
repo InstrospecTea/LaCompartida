@@ -329,14 +329,10 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $this->statusText());
 		} catch (PDOException $e) {
 			$this->log('ERROR: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
-			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->notice();
 			$this->status['error'] = __('Ocurrio un error inesperado.');
 			++$this->errors[$type];
 		} catch (Exception $e) {
 			$this->log('ERROR: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
-			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->notice();
 			$this->status['error'] = __('Ocurrio un error inesperado.');
 			++$this->errors[$type];
 		}
