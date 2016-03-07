@@ -64,7 +64,7 @@ if ($individual && $id_contrato) {
 
 	Log::write(" |- Contrato: {$id_contrato}", Cobro::PROCESS_NAME);
 
-	set_time_limit(0);
+	set_time_limit(3600);
 
 	$Cobro = new Cobro($Sesion);
 
