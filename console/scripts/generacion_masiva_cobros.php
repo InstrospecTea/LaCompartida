@@ -391,6 +391,10 @@ class GeneracionMasivaCobros extends AppShell {
 			$newrelic->notice();
 			$response .= $e->getMessage();
 		}
+		$newrelic = new NewRelic(Cobro::PROCESS_NAME);
+		$newrelic->addMessage($response);
+		$newrelic->addMessage($post_data);
+		$newrelic->notice();
 		$this->log('Ocurrió un error interno, contáctese con soporte');
 		$this->log($response);
 		throw new Exception("POST DATA:{$post_data} \n RESPONSE: {$response}");
