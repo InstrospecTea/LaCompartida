@@ -172,7 +172,7 @@ class GeneracionMasivaCobros extends AppShell {
 				}
 			} catch (Exception $e) {
 				$this->log('Error clients: ' . $e->getMessage());
-				$newrelic = new \TTB\NewRelic(Cobro::PROCESS_NAME);
+				$newrelic = new NewRelic(Cobro::PROCESS_NAME);
 				$newrelic->addMessage($e->getMessage())->notice();
 			}
 		}
@@ -203,7 +203,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaGG: ' . $e->getMessage());
-			$newrelic = new \TTB\NewRelic(Cobro::PROCESS_NAME);
+			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
 			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->notice();
 			++$this->errors['gg'];
 			array_push($this->messages['gg'], $e->getMessage());
@@ -246,7 +246,7 @@ class GeneracionMasivaCobros extends AppShell {
 				++$this->errors['hh'];
 			}
 		} catch (Exception $e) {
-			$newrelic = new \TTB\NewRelic(Cobro::PROCESS_NAME);
+			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
 			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->notice();
 			$this->log('Error generaHH: ' . $e->getMessage());
 			++$this->errors['hh'];
@@ -297,7 +297,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaMIXTAS: ' . $e->getMessage());
-			$newrelic = new \TTB\NewRelic(Cobro::PROCESS_NAME);
+			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
 			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->notice();
 			++$this->errors['mixtas'];
 			array_push($this->messages['mixtas'], $e->getMessage());
@@ -329,13 +329,13 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->BloqueoProceso->updateStatus(Cobro::PROCESS_NAME, $this->statusText());
 		} catch (PDOException $e) {
 			$this->log('ERROR: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
-			$newrelic = new \TTB\NewRelic(Cobro::PROCESS_NAME);
+			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
 			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->notice();
 			$this->status['error'] = __('Ocurrio un error inesperado.');
 			++$this->errors[$type];
 		} catch (Exception $e) {
 			$this->log('ERROR: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
-			$newrelic = new \TTB\NewRelic(Cobro::PROCESS_NAME);
+			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
 			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->notice();
 			$this->status['error'] = __('Ocurrio un error inesperado.');
 			++$this->errors[$type];
@@ -388,7 +388,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 
-			$newrelic = new \TTB\NewRelic(Cobro::PROCESS_NAME);
+			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
 			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->addMessage($post_data)->notice();
 			$response .= $e->getMessage();
 		}
