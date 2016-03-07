@@ -172,8 +172,6 @@ class GeneracionMasivaCobros extends AppShell {
 				}
 			} catch (Exception $e) {
 				$this->log('Error clients: ' . $e->getMessage());
-				$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-				$newrelic->addMessage($e->getMessage())->notice();
 			}
 		}
 		$msg_procesando = $this->sp($processing, __('Se ha procesado 1 cliente'), __('Se han procesado') . " {$processing}");
