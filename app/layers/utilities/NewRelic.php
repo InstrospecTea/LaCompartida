@@ -11,6 +11,7 @@ class NewRelic {
 	public function __construct($process = 'TTB')	{
 		$this->tenant = Conf::ServerIP();
 		$this->process = $process;
+		$this->message = '';
 	}
 
 	public function notice() {
