@@ -1,5 +1,33 @@
 # Changelog
 
+## Hotfix 16.4.7
+Friday, March 4th
+* **Fix** [Diseño Formulario](https://github.com/LemontechSA/ttb/pull/1358)
+
+## Hotfix 16.4.6
+Thursday, March 3rd
+* **Fix** [Nueva Columna en Reporte Excel](https://github.com/LemontechSA/ttb/pull/1356)
+
+## Hotfix 16.4.5
+Wednesday, March 2nd
+* **Fix** [Corrección Condición](https://github.com/LemontechSA/ttb/pull/1355)
+
+## Hotfix 16.4.4
+Wednesday, March 2nd
+* **Fix** [Fechas Reporte MTA](https://github.com/LemontechSA/ttb/pull/1354)
+
+## Hotfix 16.4.3
+Tuesday, March 1st
+* **Fix** [Link PDF Factura Electrónica](https://github.com/LemontechSA/ttb/pull/1353)
+
+## Hotfix 16.4.2
+Tuesday, March 1st
+* **Fix** [Problemas con edición masiva de trabajos](https://github.com/LemontechSA/ttb/pull/1352)
+
+## Hotfix 16.4.1
+Monday, February 29th
+* **Fix** [Corrección query para pagos parciales](https://github.com/LemontechSA/ttb/pull/1351)
+
 ## [Release 16.4.0](https://github.com/LemontechSA/ttb/pull/1347)
 Wednesday, February 24th
 * **Feature** [Mostrar checkbox tramites no cobrables en contrato](https://github.com/LemontechSA/ttb/pull/1340)
