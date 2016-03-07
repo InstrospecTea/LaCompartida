@@ -21,7 +21,7 @@ class NewRelic {
 	}
 
 	public function addMessage($message) {
-		$this->message .= "{$message}\n";
+		$this->message = $this->message . "{$message}\n";
 		return $this;
 	}
 }
