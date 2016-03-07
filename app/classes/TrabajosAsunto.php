@@ -33,8 +33,9 @@ class TrabajosAsunto {
   }
 
   public function QueryReporte($params = array()) {
-    $period_from = $params['period_from'];
-    $period_to = $params['period_to'];
+    $period_from = Utiles::fecha2sql($params['period_from']);
+    $period_to = Utiles::fecha2sql($params['period_to']);
+
     $currency_id = $params['currency_id'];
 
     $coiningBusiness = new CoiningBusiness($this->sesion);
@@ -89,7 +90,6 @@ class TrabajosAsunto {
       ->add_left_join_with(
         'trabajo_tarifa',
         $trabajo_tarifa);
-
 
     $clauses[] = CriteriaRestriction::greater_or_equals_than('fecha', "'$period_from'");
     $clauses[] = CriteriaRestriction::lower_or_equals_than('fecha', "'$period_to'");

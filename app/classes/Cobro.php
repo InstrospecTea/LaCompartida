@@ -53,9 +53,9 @@ if (!class_exists('Cobro')) {
 				$his = new Observacion($this->sesion);
 
 				if ($ultimaobservacion = $his->UltimaObservacion($this->fields['id_cobro'])) {
-					if ($ultimaobservacion['comentario'] != __("COBRO {$this->fields['estado']}")) {
+					if ($ultimaobservacion['comentario'] != __('COBRO') . ' ' . __($this->fields['estado'])) {
 						$his->Edit('fecha', date('Y-m-d H:i:s'));
-						$his->Edit('comentario', __("COBRO {$this->fields['estado']}"));
+						$his->Edit('comentario', __('COBRO') . ' ' . __($this->fields['estado']));
 						$his->Edit('id_usuario', $this->sesion->usuario->fields['id_usuario']);
 						$his->Edit('id_cobro', $this->fields['id_cobro']);
 						$his->Write();
@@ -601,7 +601,7 @@ if (!class_exists('Cobro')) {
 					 * y se les restan las notas de crédito emitias al cobro generando el monto pagado parcial.
 					 *
 					 */
-					$criteria->add_select('SUM(ccfmn.monto_pago)', 'monto_pago_parcial')
+					$criteria->add_select('SUM(ccfmn.monto)', 'monto_pago_parcial')
 										->add_from('factura_pago fp')
 										->add_left_join_with('cta_cte_fact_mvto ccfm_pago', CriteriaRestriction::equals('fp.id_factura_pago', 'ccfm_pago.id_factura_pago'))
 										->add_left_join_with('cta_cte_fact_mvto_neteo ccfmn', CriteriaRestriction::equals('ccfmn.id_mvto_pago', 'ccfm_pago.id_cta_cte_mvto'))
@@ -2214,6 +2214,9 @@ if (!class_exists('Cobro')) {
 
 					$this->Edit("id_moneda_monto", $Contrato->fields['id_moneda_monto']);
 					$this->Edit("opc_ver_columna_cobrable", $Contrato->fields['opc_ver_columna_cobrable']);
+
+					// Mostrar Trámites no cobrables
+					$this->Edit('opc_mostrar_tramites_no_cobrables', $Contrato->fields['opc_mostrar_tramites_no_cobrables']);
 
 					if ($fecha_ini != '') {
 						$this->Edit('fecha_ini', $fecha_ini);

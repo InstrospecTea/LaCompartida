@@ -43,9 +43,15 @@
 
 	$campo_asunto = 'codigo_asunto';
 	$campo_cliente = 'codigo_cliente';
+	$glosa_campo_asunto = 'glosa_asunto';
 	if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		$campo_asunto = 'codigo_asunto_secundario';
 		$campo_cliente = 'codigo_cliente_secundario';
+	}
+
+	if (!Conf::GetConf($sesion, 'SelectClienteAsuntoEspecial')) {
+		$campo_asunto = 'campo_' . $campo_asunto;
+		$glosa_campo_asunto = Conf::GetConf($sesion, 'CodigoSecundario') == 0 ? 'codigo_asunto' : 'codigo_asunto_secundario';
 	}
 
 	// Cargar cada trabajo en un arreglo y validar que sigan siendo editables
@@ -218,10 +224,18 @@
 		}
 
 		var codigoCliente = jQuery('#<?php echo $campo_cliente; ?>').val();
-		if(codigoCliente && (codigoAsunto == null || codigoAsunto == '')) {
-			var msg = "Los <?php echo __('Trabajos'); ?> seleccionados no se pueden asociar a este cliente ya que no cuentan con asuntos activos.";
-			alert(msg);
-			return false;
+		if (jQuery('#check_cliente').prop('checked') || jQuery('#check_asunto').prop('checked')) {
+			if (codigoCliente == null || codigoCliente == '') {
+				var msg = "Debe seleccionar un cliente.";
+				alert(msg);
+				return false;
+			}
+
+			if(codigoCliente && (codigoAsunto == null || codigoAsunto == '')) {
+				var msg = "Debe seleccionar un asunto.";
+				alert(msg);
+				return false;
+			}
 		}
 
 		sendPost('form_editar_trabajo', 'opcion', 'guardar');
@@ -276,23 +290,24 @@
 	jQuery(function() {
 		var campo_cliente = '<?php echo $campo_cliente; ?>';
 		var campo_asunto = '<?php echo $campo_asunto; ?>';
+		var glosa_asunto = '<?php echo $glosa_campo_asunto; ?>';
 		var cobrable_indeterminado = '<?php echo $cobrable_indeterminado; ?>';
 
 		var codigo_cliente_default = "<?php echo $valores_default[$campo_cliente]; ?>";
-		var codigo_asunto_default = "<?php echo $valores_default[$campo_cliente]; ?>";
-		var glosa_asunto_default = jQuery('#glosa_asunto').val();
+		var codigo_asunto_default = "<?php echo $valores_default[$campo_asunto]; ?>";
+		var glosa_asunto_default = jQuery('#' + glosa_asunto).val();
 
 		jQuery(document).ready(function() {
 			if (cobrable_indeterminado) {
 				jQuery("#cobrable").prop("indeterminate", true);
 			}
-
 			disabledElements(
 				[
 					'#' + campo_cliente,
+					'#glosa_cliente',
 					'#campo_' + campo_cliente,
 					'#' + campo_asunto,
-					'#glosa_asunto',
+					'#' + glosa_asunto,
 					'#glosa_asunto_btn',
 					'#campo_codigo_actividad',
 					'#codigo_actividad',
@@ -306,7 +321,7 @@
 		});
 
 		jQuery('#check_cliente').on('click', function() {
-			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
+			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente, '#glosa_cliente']);
 
 			// Si edita un cliente se debe enviar el asunto también
 			if (jQuery('#check_cliente').prop('checked')) {
@@ -318,11 +333,11 @@
 			if (!jQuery('#check_cliente').prop('checked')) {
 				setDefaults();
 			}
-			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
+			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#' + glosa_asunto, '#glosa_asunto_btn']);
 		});
 
 		jQuery('#check_asunto').on('click', function() {
-			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#glosa_asunto', '#glosa_asunto_btn']);
+			toggleDisabledElement('#check_asunto', ['#' + campo_asunto, '#' + glosa_asunto, '#glosa_asunto_btn']);
 
 			// Si edita un asunto se debe enviar el cliente también
 			if (jQuery('#check_asunto').prop('checked')) {
@@ -334,7 +349,7 @@
 			if (!jQuery('#check_asunto').prop('checked')) {
 				setDefaults();
 			}
-			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente]);
+			toggleDisabledElement('#check_cliente', ['#' + campo_cliente, '#campo_' + campo_cliente, '#glosa_cliente']);
 		});
 
 		jQuery('#check_actividad').on('click', function() {
@@ -367,9 +382,9 @@
 
 		//se asignan los valores por defecto del Cliente y el Asunto
 		function setDefaults() {
-			jQuery('#codigo_cliente').val(codigo_cliente_default);
-			jQuery('#codigo_asunto').val(codigo_asunto_default);
-			jQuery('#glosa_asunto').val(glosa_asunto_default);
+			jQuery('#' + campo_cliente).val(codigo_cliente_default);
+			jQuery('#' + campo_asunto).val(codigo_asunto_default);
+			jQuery('#' + glosa_asunto).val(glosa_asunto_default);
 			CargarActividad();
 			jQuery('#campo_codigo_actividad').val('');
 			jQuery('#codigo_actividad').val(0);

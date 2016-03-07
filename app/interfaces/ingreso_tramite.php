@@ -572,18 +572,6 @@ $pagina->PrintTop($popup);
 			}
 		<?php } ?>
 
-		if (jQuery('#tarifa_tramite_individual').is(':visible') && jQuery.trim(jQuery('#tarifa_tramite_individual').val()) == '') {
-			alert("<?php echo __('Debe ingresar valor de tarifa modificada') ?>");
-			jQuery('#tarifa_tramite_individual').focus();
-			return false;
-		}
-
-		if (jQuery('#tarifa_tramite').is(':visible') && jQuery.trim(jQuery('#tarifa_tramite').val()) == '') {
-			alert("<?php echo __('Debe seleccionar un tipo trámite con tarifa denifida o definir la tarifa para el trámite') ?>");
-			jQuery('#tarifa_tramite').focus();
-			return false;
-		}
-
 		// Si la configuracion lo indica convertimos en mayuscula todo el contenido de la descripcion
 		<?php if (Conf::GetConf($sesion, 'TodoMayuscula')) { ?>
 			form.descripcion.value = form.descripcion.value.toUpperCase();
@@ -1088,7 +1076,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 								echo SelectorHoras::PrintTimeSelector($sesion, "duracion", $tramite->fields['duracion'] ? $tramite->fields['duracion'] : $duracion, 14, '', $nuevo || $sesion->usuario->fields['id_usuario'] == $id_usuario || $permiso_rev);
 							} else if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 								?>
-								<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion); ?>" id="duracion" size="6" maxlength="4" <?php echo (!$nuevo && $sesion->usuario->fields['id_usuario'] != $id_usuario ) || !$permiso_rev ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form, 'duracion');" />
+								<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion); ?>" id="duracion" size="6" maxlength="4" <?php echo (!$nuevo && $sesion->usuario->fields['id_usuario'] != $id_usuario ) && !$permiso_rev ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form, 'duracion');" />
 								<?php
 							} else if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'java') {
 								echo Html::PrintTime("duracion", $duracion, "onchange='CambiaDuracion(this.form ,\"duracion\");'", $nuevo || $sesion->usuario->fields['id_usuario'] == $id_usuario);
@@ -1167,7 +1155,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr id="tr_tarifa_mod" <?php echo $display_tr_mod; ?>>
 			<td align="right">
-				<?php echo __('Tarifa modificada'); ?>
+				<?php echo __('Tarifa modificado'); ?>
 			</td>
 			<td align="left">
 				<input type="text" size="6" name="tarifa_tramite_individual" id="tarifa_tramite_individual" value="<?php echo $tramite->fields['tarifa_tramite_individual'] ? $tramite->fields['tarifa_tramite_individual'] : '0'; ?>" />

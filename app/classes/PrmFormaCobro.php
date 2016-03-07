@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
-class PrmFormaCobro extends Objeto {
+class PrmFormaCobro extends ObjetoExt {
 
   public function __construct($sesion, $fields = '', $params = '') {
     $this->tabla = 'prm_forma_cobro';

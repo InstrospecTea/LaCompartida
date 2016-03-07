@@ -5,6 +5,7 @@ require_once dirname(dirname(__FILE__)).'/conf.php';
 $sesion = new Sesion(array('PRO', 'REV', 'ADM', 'COB', 'SEC'));
 $pagina = new Pagina($sesion);
 $Form = new Form;
+$Html = new \TTB\Html();
 
 $p_revisor = $sesion->usuario->Es('REV');
 $p_secretaria = $sesion->usuario->Es('SEC');
@@ -587,9 +588,11 @@ $pagina->PrintTop($popup);
 
 						<td style="width:180px;" class="buscadorlabel"><?php echo __('Cobrado') ?></td>
 						<td align='left'>
-							<?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrado", $cobrado, ' class="fl" ', 'Todos', '60') ?>
-							<div class="fl buscadorlabel" style="margin-top: 3px;width:70px;display:inline-block;" ><?php echo __('Cobrable') ?></div> <?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "cobrable", $cobrable, ' class="fl" ', 'Todos', '60') ?>
-							<div class="fl buscadorlabel" style="margin-top: 3px;width:70px;display:inline-block;"><?php echo __('Revisado') ?></div> <?php echo Html::SelectQuery($sesion, "SELECT codigo_si_no, codigo_si_no FROM prm_si_no", "revisado", $revisado, ' class="fl" ', 'Todos', '60') ?>
+							<?php echo $Html->SelectSiNo('cobrado', $cobrado, 'class="fl"') ?>
+							<div class="fl buscadorlabel" style="margin-top: 3px;width:70px;display:inline-block;" ><?php echo __('Cobrable') ?></div>
+							<?php echo $Html->SelectSiNo('cobrable',$cobrable,'class="fl"') ?>
+							<div class="fl buscadorlabel" style="margin-top: 3px;width:70px;display:inline-block;"><?php echo __('Revisado') ?></div>
+							<?php echo $Html->SelectSiNo('revisado', $revisado, 'class="fl"') ?>
 						</td>
 						<td class="buscadorlabel">
 							<?php
