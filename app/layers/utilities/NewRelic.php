@@ -2,6 +2,7 @@
 
 namespace TTB;
 
+require_once dirname(dirname(__FILE__)) . '/conf.php';
 
 class NewRelic {
 
