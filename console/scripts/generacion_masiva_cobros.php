@@ -202,7 +202,7 @@ class GeneracionMasivaCobros extends AppShell {
 		} catch (Exception $e) {
 			$this->log('Error generaGG: ' . $e->getMessage());
 			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->notice();
+			$newrelic->addMessage($e->getMessage())->notice();
 			++$this->errors['gg'];
 			array_push($this->messages['gg'], $e->getMessage());
 			$this->with_error['gg'][$this->getContractInfo($id_contrato)] ++;
@@ -245,7 +245,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->notice();
+			$newrelic->addMessage($e->getMessage())->notice();
 			$this->log('Error generaHH: ' . $e->getMessage());
 			++$this->errors['hh'];
 			array_push($this->messages['hh'], $e->getMessage());
@@ -296,7 +296,7 @@ class GeneracionMasivaCobros extends AppShell {
 		} catch (Exception $e) {
 			$this->log('Error generaMIXTAS: ' . $e->getMessage());
 			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->notice();
+			$newrelic->addMessage($e->getMessage())->notice();
 			++$this->errors['mixtas'];
 			array_push($this->messages['mixtas'], $e->getMessage());
 			array_push($this->with_error['mixtas'], $this->getContractInfo($id_contrato));
@@ -383,7 +383,7 @@ class GeneracionMasivaCobros extends AppShell {
 		} catch (Exception $e) {
 
 			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-			$newrelic->addMessage($e->getMessage())->addMessage($e->getFile())->addMessage($e->getLine())->addMessage($post_data)->notice();
+			$newrelic->addMessage($e->getMessage())->addMessage($post_data)->notice();
 			$response .= $e->getMessage();
 		}
 		$this->log('Ocurrió un error interno, contáctese con soporte');
