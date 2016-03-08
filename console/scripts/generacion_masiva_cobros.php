@@ -383,15 +383,12 @@ class GeneracionMasivaCobros extends AppShell {
 			if ($http_code == 200) {
 				return json_decode(trim($body), true);
 			} else {
-				$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-				$newrelic->addMessage($response);
-				$newrelic->addMessage($post_data);
-				$newrelic->notice();
-				$this->log('Ocurrió un error interno, contáctese con soporte');
-				$this->log($response);
 				throw new Exception("POST DATA:{$post_data} \n RESPONSE: {$response}");
 			}
 		} catch (Exception $e) {
+			$this->log('Ocurrio un error en el POST REQUEST');
+			$this->log($e->getMessage());
+			$this->log($response);
 			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
 			$newrelic->addMessage($e->getMessage());
 			$newrelic->addMessage($post_data);
