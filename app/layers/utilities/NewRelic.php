@@ -2,9 +2,9 @@
 
 class NewRelic {
 
-	public $tenant;
-	public $process;
-	public $message;
+	protected $tenant;
+	protected $process;
+	protected $message;
 
 	public function __construct($process = 'TTB')	{
 		$this->tenant = Conf::ServerIP();
@@ -12,6 +12,9 @@ class NewRelic {
 		$this->message = '';
 	}
 
+	/**
+	 * Genera la notificación de error a New Relic
+	 */
 	public function notice() {
 		if (extension_loaded('newrelic')) {
 			newrelic_notice_error("[{$this->tenant}] {$this->process} : {$this->message}");
@@ -22,6 +25,11 @@ class NewRelic {
 		}
 	}
 
+	/**
+	 * Agrega un nuevo mensaje para ser enviado
+	 * @param string $message
+	 * @return $this
+	 */
 	public function addMessage($message) {
 		$this->message = $this->message . "{$message}\n";
 		return $this;
