@@ -188,6 +188,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaGG: ' . $e->getMessage());
+			$this->NewRelic->addMessage("[Generando Liquidaciones Gastos] Error Procesando Contrato : $id_contrato");
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['gg'];
@@ -232,6 +233,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaHH: ' . $e->getMessage());
+			$this->NewRelic->addMessage("[Generando Liquidaciones Honorarios] Error Procesando Contrato : $id_contrato");
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['hh'];
@@ -282,6 +284,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaMIXTAS: ' . $e->getMessage());
+			$this->NewRelic->addMessage("[Generando Liquidaciones Mixtas] Error Procesando Contrato : $id_contrato");
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['mixtas'];
