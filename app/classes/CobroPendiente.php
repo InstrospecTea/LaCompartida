@@ -32,7 +32,7 @@ class CobroPendiente extends Objeto {
 	 * - Solo se podrá generar un máximo de 2 liquidaciones pendientes de facturar
 	 * - Solo se podrá generar un máximo de liquidaciones pendientes de acuerdo a las repeticiones configuradas
 	 * - No se generarán liquidaciones con mas de 2 meses de anticipación
-	 * - No se consideran los cobros pendientes de HITOS
+	 * - Solo se consideran los contratos cuya forma de cobro sea FLAT FEE
 	 *
 	 * @param $Sesion
 	 * @return bool
@@ -55,7 +55,7 @@ class CobroPendiente extends Objeto {
 				ON cp.id_contrato = c.id_contrato
 				AND cp.hito = 0
 			WHERE c.activo = 'SI'
-				AND c.forma_cobro != 'HITOS'
+				AND c.forma_cobro = 'FLAT FEE'
 				-- REF: https://dev.mysql.com/doc/refman/5.5/en/sql-mode.html#sqlmode_no_zero_date
 				AND c.periodo_fecha_inicio != '0000-00-00'
 				AND DATE(c.periodo_fecha_inicio) IS NOT NULL
@@ -97,11 +97,11 @@ class CobroPendiente extends Objeto {
 				$next_amount = in_array($contrato['forma_cobro'], array('FLAT FEE', 'RETAINER')) ? $contrato['monto'] : 0;
 
 				$CobroPendiente = new CobroPendiente($Sesion);
-				$CobroPendiente->Edit("id_contrato", $contrato['id_contrato']);
-				$CobroPendiente->Edit("fecha_cobro", $next_date);
-				$CobroPendiente->Edit("descripcion", $next_description);
-				$CobroPendiente->Edit("monto_estimado", $next_amount);
-				$CobroPendiente->Edit("hito", '0');
+				$CobroPendiente->Edit('id_contrato', $contrato['id_contrato']);
+				$CobroPendiente->Edit('fecha_cobro', $next_date);
+				$CobroPendiente->Edit('descripcion', $next_description);
+				$CobroPendiente->Edit('monto_estimado', $next_amount);
+				$CobroPendiente->Edit('hito', '0');
 				$CobroPendiente->Write();
 			}
 		}
