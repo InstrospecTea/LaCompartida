@@ -17,6 +17,7 @@ class NewRelic {
 	public function notice() {
 		if (extension_loaded('newrelic')) {
 			newrelic_notice_error("[{$this->tenant}] {$this->process} : {$this->message}");
+			$this->message = '';
 		} else {
 			Log::write('La extension newrelic no esta cargada');
 			Log::write("[{$this->tenant}] {$this->process} : {$this->message}");
