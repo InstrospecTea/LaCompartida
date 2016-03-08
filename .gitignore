@@ -4,6 +4,7 @@
 /app/miconf.php
 /app/test/spec/conf.rb
 /app/tests/_log/
+/app/tests/api.suite.yml
 /app/tests/acceptance.suite.yml
 /app/tests/functional.suite.yml
 /app/tests/unit.suite.yml

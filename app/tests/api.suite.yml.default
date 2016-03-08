@@ -1,0 +1,8 @@
+class_name: ApiTester
+modules:
+  enabled:
+    - REST:
+      url: http://localhost/ttb/api/v1/
+      depends: PhpBrowser
+      part: Json
+
