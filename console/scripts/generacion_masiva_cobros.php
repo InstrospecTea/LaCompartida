@@ -38,6 +38,14 @@ class GeneracionMasivaCobros extends AppShell {
 		'mixtas' => array()
 	);
 
+	private $NewRelic;
+
+	public function __construct()
+	{
+		parent::__construct();
+		$this->NewRelic = new NewRelic(Cobro::PROCESS_NAME);
+	}
+
 	public function main() {
 		$this->Session->usuario = new Usuario($this->Session);
 		$this->Session->usuario->LoadId($this->data['user_id']);
@@ -70,27 +78,6 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->status('error', '<strong>Ocurrio un error inesperado.</strong>');
 			$this->unlookProcess();
 		}
-//		try {
-//			$Criteria = $this->loadModel('Criteria', null, true);
-//			$result = $Criteria
-//				->add_from('usuario')
-//				->add_select('nombre')
-//				->add_select('email')
-//				->add_restriction(CriteriaRestriction::equals('id_usuario', $this->data['user_id']))
-//				->run();
-//			if (empty($result)) {
-//				throw new Exception("No se pudo cargar el usuario {$this->data['user_id']}");
-//			}
-//			$usuario = $result[0];
-//			$subject = __('Generación de') . ' ' . __('Cobros') . ' ' . __('finalizada');
-//			$messaje = __('Estimado') .
-//						" {$usuario['nombre']}:\n\n" .
-//						__('El proceso a finalizado con el siguiente resultado') .
-//						":\n\n{$this->statusText()}\n\n--\nThe Time Billing";
-//			\TTB\Utiles::InsertarPlus($this->Session, $subject, $messaje, $usuario['email'], $usuario['nombre'], false, $this->data['user_id'], 'proceso');
-//		} catch (Exception $e) {
-//			$this->log('ERROR al generar correo: ' . $e->getMessage() . ' ' . $e->getFile() . ' (' . $e->getLine() . ').');
-//		}
 	}
 
 	private function reconectDb() {
@@ -201,9 +188,8 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaGG: ' . $e->getMessage());
-			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-			$newrelic->addMessage($e->getMessage());
-			$newrelic->notice();
+			$this->NewRelic->addMessage($e->getMessage());
+			$this->NewRelic->notice();
 			++$this->errors['gg'];
 			array_push($this->messages['gg'], $e->getMessage());
 			$this->with_error['gg'][$this->getContractInfo($id_contrato)] ++;
@@ -245,10 +231,9 @@ class GeneracionMasivaCobros extends AppShell {
 				++$this->errors['hh'];
 			}
 		} catch (Exception $e) {
-			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-			$newrelic->addMessage($e->getMessage());
-			$newrelic->notice();
 			$this->log('Error generaHH: ' . $e->getMessage());
+			$this->NewRelic->addMessage($e->getMessage());
+			$this->NewRelic->notice();
 			++$this->errors['hh'];
 			array_push($this->messages['hh'], $e->getMessage());
 			array_push($this->with_error['hh'], $this->getContractInfo($id_contrato));
@@ -297,9 +282,8 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaMIXTAS: ' . $e->getMessage());
-			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-			$newrelic->addMessage($e->getMessage());
-			$newrelic->notice();
+			$this->NewRelic->addMessage($e->getMessage());
+			$this->NewRelic->notice();
 			++$this->errors['mixtas'];
 			array_push($this->messages['mixtas'], $e->getMessage());
 			array_push($this->with_error['mixtas'], $this->getContractInfo($id_contrato));
@@ -383,17 +367,20 @@ class GeneracionMasivaCobros extends AppShell {
 			if ($http_code == 200) {
 				return json_decode(trim($body), true);
 			} else {
-				throw new Exception("POST DATA:{$post_data} \n RESPONSE: {$response}");
+
 			}
 		} catch (Exception $e) {
 			$this->log('Ocurrio un error en el POST REQUEST');
 			$this->log($e->getMessage());
 			$this->log($response);
-			$newrelic = new NewRelic(Cobro::PROCESS_NAME);
-			$newrelic->addMessage($e->getMessage());
-			$newrelic->addMessage($post_data);
-			$newrelic->notice();
+			$this->NewRelic->addMessage($e->getMessage());
+			$this->NewRelic->addMessage($post_data);
+			$this->NewRelic->notice();
 		}
+		throw new Exception("POST DATA:{$post_data} \n RESPONSE: {$response}");
+		$this->log(Cobro::PROCESS_NAME);
+		$this->log('El POST REQUEST no responde 200');
+		$this->log("POST DATA:{$post_data} \n RESPONSE: {$response}");
 	}
 
 	/**
