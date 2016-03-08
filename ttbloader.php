@@ -3,6 +3,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 $directorios = array(
 	'/app/classes/',
+	'/app/classes/Api/',
 	'/app/classes/Graficos/',
 	'/app/layers/business.support/',
 	'/app/layers/business/',

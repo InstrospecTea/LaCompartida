@@ -2,8 +2,8 @@
 
 class AbstractSlimAPI  {
 
-	private $session;
-	private $slim;
+	protected $session;
+	protected $slim;
 
 	const MIN_TIMESTAMP = 315532800;
 	const MAX_TIMESTAMP = 4182191999;
