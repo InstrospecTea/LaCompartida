@@ -1,6 +1,11 @@
 <?php
 
 class RateController extends AbstractController {
+
+	/**
+	 * Carga la página principal del módulo
+	 * @return mixed
+	 */
 	public function ErrandsRate() {
 		$this->layoutTitle = __('Ingreso de Tarifas de Trámites');
 
@@ -27,6 +32,10 @@ class RateController extends AbstractController {
 		$this->set('Form', new Form($this->Session));
 	}
 
+	/**
+	 * Retorna los valores de cada casillero de tarifa trámite
+	 * @return Object
+	 */
 	public function ErrandsRateValue() {
 		$this->loadBusiness('Rating');
 		$errands_rate_values = $this->RatingBusiness->getErrandsRateValue($this->params['id_tarifa']);
@@ -39,6 +48,10 @@ class RateController extends AbstractController {
 		$this->renderJSON($response);
 	}
 
+	/**
+	 * Retorna la cantidad de contratos que tiene la tarifa trámite seleccionada
+	 * @return int
+	 */
 	public function contractsWithErrandRate() {
 		$this->loadBusiness('Rating');
 		$num_contracts = $this->RatingBusiness->getContractsWithErrandRate($this->params['id_tarifa']);
@@ -46,9 +59,13 @@ class RateController extends AbstractController {
 		$this->renderJSON($num_contracts);
 	}
 
+	/**
+	 * Cambia la tarifa trámite por defecto de los contratos
+	 * @return Object
+	 */
 	public function changeDefaultErrandRateOnContract() {
 		$this->loadBusiness('Rating');
-		$result = $this->RatingBusiness->updateDefaultErrandRateOnContract($this->params['id_tarifa']);
+		$result = $this->RatingBusiness->updateDefaultErrandRateOnContracts($this->params['id_tarifa']);
 
 		$response = new stdClass();
 		$response->success = $result;
@@ -56,6 +73,10 @@ class RateController extends AbstractController {
 		$this->renderJSON($response);
 	}
 
+	/**
+	 * Elimina una tarifa trámite
+	 * @return Object
+	 */
 	public function deleteErrandRate() {
 		$this->loadBusiness('Rating');
 		$total_rates = $this->RatingBusiness->countRates();
@@ -66,7 +87,7 @@ class RateController extends AbstractController {
 			$result = $this->RatingBusiness->deleteErrandRate($this->params['id_tarifa']);
 			if ($result == true) {
 				$response->success = true;
-				$response->message = __('La tarifa tramite se ha eliminado satisfactoriamente');
+				$response->message = utf8_encode(__('La tarifa trámite se ha eliminado satisfactoriamente'));
 			} else {
 				$response->success = false;
 				$response->message = __('Ha ocurrido un problema');
@@ -79,6 +100,10 @@ class RateController extends AbstractController {
 		$this->renderJSON($response);
 	}
 
+	/**
+	 * Guarda una tarifa trámite
+	 * @return Object
+	 */
 	public function saveErrandRate() {
 		$this->loadBusiness('Rating');
 		$errand_rate_id = $this->params['params']['rate_id'];
@@ -119,6 +144,24 @@ class RateController extends AbstractController {
 			$response->success = $result == true ? true : false;
 			$response->message = __('La tarifa se ha creado satisfactoriamente');
 		}
+
+		$this->renderJSON($response);
+	}
+
+	/**
+	 * Retorna al JS el texto traducido
+	 * @return Object
+	 */
+	public function ErrandsRateMessages() {
+		$response = new stdClass();
+
+		$response->confirm_cambio_tarifa = utf8_encode('¿' . __('Confirma cambio de tarifa') . '?');
+		$response->tarifa_posee = utf8_encode(__('La tarifa posee'));
+		$response->contratos_asociados = utf8_encode(__('contratos asociados.
+Si continua se le asignará la tarifa estándar a los contratos afectados.\n¿Está seguro de continuar?.'));
+		$response->seguro_eliminar = utf8_encode('¿' . __('Está seguro de eliminar la') . ' ' . __('tarifa') . '?');
+		$response->seguro_eliminar_valor = utf8_encode(__('¿Está seguro de querer eliminar la tarifa?
+Esto puede provocar inconsistencia de datos en los trámites ya creados.'));
 
 		$this->renderJSON($response);
 	}
