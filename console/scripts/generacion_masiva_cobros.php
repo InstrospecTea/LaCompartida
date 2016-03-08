@@ -380,7 +380,7 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->NewRelic->addMessage($post_data);
 			$this->NewRelic->notice();
 		}
-		throw new Exception("POST DATA:{$post_data} \n RESPONSE: {$response}");
+		throw new Exception("RESPONSE: {$response} \n POST DATA:{$post_data}");
 		$this->log(Cobro::PROCESS_NAME);
 		$this->log('El POST REQUEST no responde 200');
 		$this->log("POST DATA:{$post_data} \n RESPONSE: {$response}");
