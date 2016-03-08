@@ -369,8 +369,6 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->log($body);
 			if ($http_code == 200) {
 				return json_decode(trim($body), true);
-			} else {
-
 			}
 		} catch (Exception $e) {
 			$this->log('Ocurrio un error en el POST REQUEST');
