@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.8
+Wednesday, March 9th
+* **Fix** [Generación cobros programados](https://github.com/LemontechSA/ttb/pull/1360)
+
 ## Hotfix 16.4.7
 Friday, March 4th
 * **Fix** [Diseño Formulario](https://github.com/LemontechSA/ttb/pull/1358)
