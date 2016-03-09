@@ -132,7 +132,7 @@ jQuery.deleteRate = function(rate_id) {
 					location.reload();
 				}, 1);
 			} else {
-				alert(success.message);
+				alert(response.message);
 			};
 		},
 		error: function(response) {
@@ -191,7 +191,7 @@ jQuery.saveRate = function() {
 					location.reload();
 				}, 1);
 			} else {
-				alert(success.message);
+				alert(response.message);
 			};
 		},
 		error: function(response) {
@@ -226,7 +226,7 @@ jQuery.changeDefaultRateOnContract = function(rate_id) {
 	var num_contratos = 0;
 
 	jQuery.ajax({
-		url: dm_root + 'changeDefaultErrandRateOnContract',
+		url: dm_root + 'changeDefaultErrandRateOnContracts',
 		data: {
 			'id_tarifa': rate_id
 		},
