@@ -63,7 +63,7 @@ class RateController extends AbstractController {
 	 * Cambia la tarifa trámite por defecto de los contratos
 	 * @return Object
 	 */
-	public function changeDefaultErrandRateOnContract() {
+	public function changeDefaultErrandRateOnContracts() {
 		$this->loadBusiness('Rating');
 		$result = $this->RatingBusiness->updateDefaultErrandRateOnContracts($this->params['id_tarifa']);
 
@@ -126,8 +126,8 @@ class RateController extends AbstractController {
 
 			$result = $this->RatingBusiness->updateErrandRate($errand_rate_id, $errand_rate, $rates);
 
-			$response->success = $result == true ? true : false;
-			$response->message = $result == true ? __('La tarifa se ha modificado satisfactoriamente') : __('Ha ocurrido un problema');
+			$response->success = $result ? true : false;
+			$response->message = $result ? __('La tarifa se ha modificado satisfactoriamente') : __('Ha ocurrido un problema');
 		} else {
 			$rates = $this->params['params']['rates'];
 
@@ -141,8 +141,8 @@ class RateController extends AbstractController {
 
 			$result = $this->RatingBusiness->insertErrandRate($errand_rate, $rates);
 
-			$response->success = $result == true ? true : false;
-			$response->message = __('La tarifa se ha creado satisfactoriamente');
+			$response->success = $result->success ? true : false;
+			$response->message = $result->success ? __('La tarifa se ha creado satisfactoriamente') : __('Ha ocurrido un problema: ' . $result->message);
 		}
 
 		$this->renderJSON($response);
@@ -158,7 +158,8 @@ class RateController extends AbstractController {
 		$response->confirm_cambio_tarifa = utf8_encode('¿' . __('Confirma cambio de tarifa') . '?');
 		$response->tarifa_posee = utf8_encode(__('La tarifa posee'));
 		$response->contratos_asociados = utf8_encode(__('contratos asociados.
-Si continua se le asignará la tarifa estándar a los contratos afectados.\n¿Está seguro de continuar?.'));
+Si continua se le asignará la tarifa estándar a los contratos afectados.
+¿Está seguro de continuar?.'));
 		$response->seguro_eliminar = utf8_encode('¿' . __('Está seguro de eliminar la') . ' ' . __('tarifa') . '?');
 		$response->seguro_eliminar_valor = utf8_encode(__('¿Está seguro de querer eliminar la tarifa?
 Esto puede provocar inconsistencia de datos en los trámites ya creados.'));
