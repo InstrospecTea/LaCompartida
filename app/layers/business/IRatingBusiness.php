@@ -55,7 +55,7 @@ interface IRatingBusiness  extends BaseBusiness {
 	 * Actualiza la tarifa trámite por defento en los contratos
 	 * @return boolean
 	 */
-	public function updateDefaultErrandRateOnContract($id_rate);
+	public function updateDefaultErrandRateOnContracts($id_rate);
 
 	/**
 	 * Cuenta las tarifas de trámites del sistema

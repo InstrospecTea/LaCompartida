@@ -8,10 +8,10 @@ class RatingBusiness extends AbstractBusiness implements IRatingBusiness {
 	 */
 	public function deleteErrandRate($errand_rate_id) {
 		$query = "DELETE FROM tramite_valor WHERE id_tramite_tarifa = '{$errand_rate_id}'";
-		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$this->Session->pdodbh->query($query);
 
 		$query = "DELETE FROM tramite_tarifa WHERE id_tramite_tarifa = '{$errand_rate_id}'";
-		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$this->Session->pdodbh->query($query);
 
 		return true;
 	}
@@ -22,20 +22,22 @@ class RatingBusiness extends AbstractBusiness implements IRatingBusiness {
 	 */
 	public function updateErrandRate($errand_rate_id, $errand_rate, $rates) {
 		$query = "DELETE FROM tramite_valor WHERE id_tramite_tarifa = '{$errand_rate_id}'";
-		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$this->Session->pdodbh->query($query);
 
-		$query = 'INSERT INTO tramite_valor (id_tramite_tipo, id_moneda, tarifa, id_tramite_tarifa) VALUES ';
-		$values = array();
-		foreach ($rates as $rate) {
-			$rate_values = implode(', ', $rate);
-			$values[] = "({$rate_values})";
+		$insertCriteria = new InsertCriteria($this->Session);
+		$insertCriteria->set_into('tramite_valor');
+		foreach ($rates as $key => $rate) {
+			foreach ($rate as $pivot => $value) {
+				$insertCriteria->add_pivot_with_value($pivot, $value, true);
+			}
+			$insertCriteria->add_insert();
 		}
-		$query .= implode(', ', $values) . ';';
-		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+
+		$insertCriteria->run();
 
 		if ($errand_rate['tarifa_defecto'] == 1) {
 			$query = 'UPDATE tramite_tarifa SET tarifa_defecto = 0;';
-			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			$this->Session->pdodbh->query($query);
 		}
 
 		$query = 'UPDATE tramite_tarifa SET ';
@@ -45,7 +47,7 @@ class RatingBusiness extends AbstractBusiness implements IRatingBusiness {
 		}
 
 		$query .= implode(', ', $values) . " WHERE id_tramite_tarifa = '{$errand_rate_id}';";
-		mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$this->Session->pdodbh->query($query);
 
 		return true;
 	}
@@ -57,36 +59,44 @@ class RatingBusiness extends AbstractBusiness implements IRatingBusiness {
 	public function insertErrandRate($errand_rate, $rates) {
 		if ($errand_rate['tarifa_defecto'] == 1) {
 			$query = 'UPDATE tramite_tarifa SET tarifa_defecto = 0;';
-			mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			$this->Session->pdodbh->query($query);
 		}
 
 		$errand_rate['fecha_creacion'] = 'NOW()';
 
-		$query = 'INSERT INTO tramite_tarifa (glosa_tramite_tarifa, tarifa_defecto, fecha_creacion) VALUES (' . implode(', ', $errand_rate) . ');';;
-		$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$insertCriteria = new InsertCriteria($this->Session);
+		$insertCriteria->set_into('tramite_tarifa');
+
+		foreach ($errand_rate as $key => $value) {
+			$insertCriteria->add_pivot_with_value($key, $value, true);
+		}
+
+		$result = $insertCriteria->run();
 
 		$response = new stdClass();
-		$response->success = $result == true ? true : false;
-		$response->rate_id = mysql_insert_id($this->sesion->dbh);
+		if ($result->success) {
+			$response->success = true;
+			$response->rate_id = $insertCriteria->get_last_insert_id();
+		} else {
+			$response->success = false;
+			$response->message = $result->message;
+		}
 
 		if (!$response->success) {
 			return $response;
 		}
 
-		foreach ($rates as $key => $value) {
-			$rates[$key]['id_tramite_tarifa'] = $response->rate_id;
+		$insertCriteria = new InsertCriteria($this->Session);
+		$insertCriteria->set_into('tramite_valor');
+		foreach ($rates as $key => $rate) {
+			foreach ($rate as $pivot => $value) {
+				$insertCriteria->add_pivot_with_value($pivot, $value, true);
+			}
+			$insertCriteria->add_pivot_with_value('id_tramite_tarifa', $response->rate_id);
+			$insertCriteria->add_insert();
 		}
 
-		$query = 'INSERT INTO tramite_valor (id_tramite_tipo, id_moneda, tarifa, id_tramite_tarifa) VALUES ';
-		$values = array();
-		foreach ($rates as $rate) {
-			$rate_values = implode(', ', $rate);
-			$values[] = "({$rate_values})";
-		}
-		$query .= implode(', ', $values) . ';';
-		$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-		$response->success = $result == true ? true : false;
+		$insertCriteria->run();
 
 		return $response;
 	}
@@ -175,7 +185,7 @@ class RatingBusiness extends AbstractBusiness implements IRatingBusiness {
 		$Criteria = new Criteria($this->Session);
 		$num_contratos = $Criteria->add_select('COUNT(*)', 'num_rows')
 			->add_from('contrato')
-			->add_restriction(CriteriaRestriction::equals('id_tramite_tarifa', $_REQUEST['id_tarifa']))
+			->add_restriction(CriteriaRestriction::equals('id_tramite_tarifa', $errand_rate_id))
 			->run();
 
 		return $num_contratos[0];
@@ -185,15 +195,19 @@ class RatingBusiness extends AbstractBusiness implements IRatingBusiness {
 	 * Actualiza la tarifa trámite por defento en los contratos
 	 * @return boolean
 	 */
-	public function updateDefaultErrandRateOnContract($errand_rate_id) {
-		$query = "SELECT id_tramite_tarifa FROM tramite_tarifa WHERE tarifa_defecto = 1 ORDER BY id_tramite_tarifa ASC LIMIT 1";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($id_tramite_tarifa_defecto) = mysql_fetch_array($resp);
+	public function updateDefaultErrandRateOnContracts($errand_rate_id) {
+		$Criteria = new Criteria($this->Session);
+		$id_tramite_tarifa = $Criteria->add_select('id_tramite_tarifa', 'id_tramite_tarifa')
+			->add_from('tramite_tarifa')
+			->add_restriction(CriteriaRestriction::equals('tarifa_defecto', 1))
+			->run();
 
-		$query = "UPDATE contrato SET id_tramite_tarifa = $id_tramite_tarifa_defecto WHERE id_tramite_tarifa = '{$errand_rate_id}'";
-		$result = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$id_tramite_tarifa_defecto = $id_tramite_tarifa[0]['id_tramite_tarifa'];
 
-		return $result;
+		$query = "UPDATE contrato SET id_tramite_tarifa = {$id_tramite_tarifa_defecto} WHERE id_tramite_tarifa = {$errand_rate_id}";
+		$this->Session->pdodbh->query($query);
+
+		return true;
 	}
 
 	/**
