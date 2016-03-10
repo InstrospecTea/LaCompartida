@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.9
+Thursday, March 10th
+* **Fix** [Cambio Tarifa Aplicar Pago](https://github.com/LemontechSA/ttb/pull/1361)
+
 ## Hotfix 16.4.8
 Wednesday, March 9th
 * **Fix** [Generación cobros programados](https://github.com/LemontechSA/ttb/pull/1360)
