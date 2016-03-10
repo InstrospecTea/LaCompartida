@@ -2960,6 +2960,44 @@ class ApiTester extends \Codeception\AbstractGuy
      * Documentation taken from corresponding module.
      * ----------------------------------------------
      *
+     *
+     * @see Codeception\Module\ApiTesterHelper::someProject()
+     * @return \Codeception\Maybe
+     */
+    public function someProject() {
+        $this->scenario->addStep(new \Codeception\Step\Action('someProject', func_get_args()));
+        if ($this->scenario->running()) {
+            $result = $this->scenario->runStep();
+            return new Maybe($result);
+        }
+        return new Maybe();
+    }
+
+ 
+    /**
+     * This method is generated.
+     * Documentation taken from corresponding module.
+     * ----------------------------------------------
+     *
+     *
+     * @see Codeception\Module\ApiTesterHelper::createTimeEntry()
+     * @return \Codeception\Maybe
+     */
+    public function createTimeEntry() {
+        $this->scenario->addStep(new \Codeception\Step\Action('createTimeEntry', func_get_args()));
+        if ($this->scenario->running()) {
+            $result = $this->scenario->runStep();
+            return new Maybe($result);
+        }
+        return new Maybe();
+    }
+
+ 
+    /**
+     * This method is generated.
+     * Documentation taken from corresponding module.
+     * ----------------------------------------------
+     *
      * Inserts SQL record into database. This record will be erased after the test.
      *
      * ``` php

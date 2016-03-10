@@ -35,6 +35,36 @@ class ApiTesterHelper extends \Codeception\Module
 		return $client_code[0]->code;
 	}
 
+	function someProject() {
+		$this->getModule('REST')->sendGET(
+			'/matters'
+		);
+		$matters = json_decode($this->getModule('REST')->response);
+		return $matters[0];
+	}
 
+	function createTimeEntry() {
+		$project = $this->someProject();
+		$user_id = 1;
 
+		$timeEntry = array(
+			'date' => time(),
+			'created_date' => time(),
+			'duration' => 120,
+			'notes' => 'description of time entry',
+			'rate' => 0,
+			'requester' => 'someone',
+			'activity_code' => '',
+			'area_code' => '',
+			'matter_code' => $project->code,
+			'task_code' => '',
+			'user_id' => $user_id,
+			'billable' => 1,
+			'visible' => 1
+		);
+
+		$this->getModule('REST')->sendPUT("/users/{$user_id}/works", $timeEntry);
+		$timeEntry = json_decode($this->getModule('REST')->response);
+		return $timeEntry;
+	}
 }
