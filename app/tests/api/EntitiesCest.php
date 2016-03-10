@@ -30,4 +30,19 @@ class EntitiesCest
 			$I->seeResponseContains('"name":"caquita"');
 		}
 
+		public function successfulGetTasks(ApiTester $I) {
+			$I->wantTo('Get tasks via API');
+			$I->login();
+
+			$I->haveInDatabase('tarea', array('nombre' => 'taskita'));
+
+			$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+			$I->sendGET("/tasks");
+
+			$I->seeResponseCodeIs(200);
+			$I->seeResponseIsJSON();
+
+			$I->seeResponseContains('"code":');
+			$I->seeResponseContains('"name":"taskita"');
+		}
 }
