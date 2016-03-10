@@ -3,7 +3,7 @@ use \ApiTester;
 use Codeception\Util\Stub;
 use Helpers\ApiTesterHelper;
 
-class ActivitiesCest
+class EntitiesCest
 {
 
 		public function _before()
@@ -14,22 +14,20 @@ class ActivitiesCest
 		{
 		}
 
-		public function successfulGetActivities(ApiTester $I) {
-			$I->wantTo('Get activities via API');
+		public function successfulGetAreas(ApiTester $I) {
+			$I->wantTo('Get areas via API');
 			$I->login();
 
-			$I->haveInDatabase('actividad', array('glosa_actividad' => 'caquita', 'activo' => 1));
+			$I->haveInDatabase('prm_area_trabajo', array('glosa' => 'caquita'));
 
 			$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
-			$I->sendGET("/activities");
+			$I->sendGET("/areas");
 
 			$I->seeResponseCodeIs(200);
 			$I->seeResponseIsJSON();
 
 			$I->seeResponseContains('"code":');
 			$I->seeResponseContains('"name":"caquita"');
-			$I->seeResponseContains('"matter_code":');
 		}
 
 }
-
