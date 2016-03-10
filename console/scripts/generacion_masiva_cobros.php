@@ -176,6 +176,7 @@ class GeneracionMasivaCobros extends AppShell {
 					'incluye_honorarios' => 0,
 					'incluye_gastos' => 1
 			);
+			$codigo_asunto = $this->getMatterFromAgreement($id_contrato);
 			$post_data = array_merge($this->data['form'], $datos_cobro);
 			$result = $this->post($post_data);
 			if (!empty($result['cobro'])) {
@@ -184,16 +185,17 @@ class GeneracionMasivaCobros extends AppShell {
 			if (!empty($result['mensajes'])) {
 				array_push($this->messages['gg'] ,$result['mensajes']);
 				++$this->errors['gg'];
-				$this->with_error['gg'][$this->getContractInfo($id_contrato)] ++;
+				$this->with_error['gg'][$this->getClientFromAgreement($id_contrato)] ++;
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaGG: ' . $e->getMessage());
 			$this->NewRelic->addMessage("[Generando Liquidaciones Gastos] Error Procesando Contrato : $id_contrato");
+			$this->NewRelic->addMessage("Asunto : {$codigo_asunto}");
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['gg'];
 			array_push($this->messages['gg'], $e->getMessage());
-			$this->with_error['gg'][$this->getContractInfo($id_contrato)] ++;
+			$this->with_error['gg'][$this->getClientFromAgreement($id_contrato)] ++;
 			$this->status('mensajes', 'Ocurrió un error interno, contáctese con soporte');
 		}
 
@@ -221,6 +223,7 @@ class GeneracionMasivaCobros extends AppShell {
 					'incluye_honorarios' => 1,
 					'incluye_gastos' => 0
 			);
+			$codigo_asunto = $this->getMatterFromAgreement($id_contrato);
 			$post_data = array_merge($this->data['form'], $datos_cobro);
 			$result = $this->post($post_data);
 			if (!empty($result['cobro'])) {
@@ -228,17 +231,18 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 			if (!empty($result['mensajes'])) {
 				array_push($this->messages['hh'] ,$result['mensajes']);
-				array_push($this->with_error['hh'], $this->getContractInfo($id_contrato));
+				array_push($this->with_error['hh'], $this->getClientFromAgreement($id_contrato));
 				++$this->errors['hh'];
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaHH: ' . $e->getMessage());
 			$this->NewRelic->addMessage("[Generando Liquidaciones Honorarios] Error Procesando Contrato : $id_contrato");
+			$this->NewRelic->addMessage("Asunto : {$codigo_asunto}");
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['hh'];
 			array_push($this->messages['hh'], $e->getMessage());
-			array_push($this->with_error['hh'], $this->getContractInfo($id_contrato));
+			array_push($this->with_error['hh'], $this->getClientFromAgreement($id_contrato));
 			$this->status('mensajes', 'Ocurrió un error interno, contáctese con soporte');
 		}
 
@@ -266,6 +270,7 @@ class GeneracionMasivaCobros extends AppShell {
 					'incluye_honorarios' => 1,
 					'incluye_gastos' => 1,
 			);
+			$codigo_asunto = $this->getMatterFromAgreement($id_contrato);
 			if ($this->data['solo'] == 'honorarios') {
 				$datos_cobro = array_merge($datos_cobro, array('incluye_honorarios' => 1, 'incluye_gastos' => 0));
 			} else if ($this->data['solo'] == 'gastos') {
@@ -279,17 +284,18 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 			if (!empty($result['mensajes'])) {
 				array_push($this->messages['mixtas'] ,$result['mensajes']);
-				array_push($this->with_error['mixtas'], $this->getContractInfo($id_contrato));
+				array_push($this->with_error['mixtas'], $this->getClientFromAgreement($id_contrato));
 				++$this->errors['mixtas'];
 			}
 		} catch (Exception $e) {
 			$this->log('Error generaMIXTAS: ' . $e->getMessage());
 			$this->NewRelic->addMessage("[Generando Liquidaciones Mixtas] Error Procesando Contrato : $id_contrato");
+			$this->NewRelic->addMessage("Asunto : {$codigo_asunto}");
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['mixtas'];
 			array_push($this->messages['mixtas'], $e->getMessage());
-			array_push($this->with_error['mixtas'], $this->getContractInfo($id_contrato));
+			array_push($this->with_error['mixtas'], $this->getClientFromAgreement($id_contrato));
 			$this->status('mensajes', 'Ocurrió un error interno, contáctese con soporte');
 		}
 		$msg_generado = $this->sp(
@@ -420,10 +426,16 @@ class GeneracionMasivaCobros extends AppShell {
 		return $message;
 	}
 
-	private function getContractInfo($id_contrato) {
+	private function getClientFromAgreement($id_contrato) {
 		$contrato = new Contrato($this->Session);
 		$contrato->Load($id_contrato);
 		return $contrato->fields['codigo_cliente'];
+	}
+
+	private function getMatterFromAgreement($id_contrato) {
+		$asunto = new Asunto($this->Session);
+		$asunto->LoadByContrato($id_contrato);
+		return $asunto->fields['codigo_asunto'];
 	}
 
 }
