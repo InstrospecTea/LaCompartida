@@ -196,10 +196,11 @@ class GeneracionMasivaCobros extends AppShell {
 			++$this->errors['gg'];
 			array_push($this->messages['gg'], "Error al procesar asunto {$codigo_asunto}");
 			$this->with_error['gg'][$this->getClientFromAgreement($id_contrato)] ++;
+			$mensajes = $this->getMessage('gg');
 			if ($this->errors['gg'] > 10) {
 				$this->status('mensajes', 'Ocurrió un error, favor procesar nuevamente');
 			} else {
-				$this->status('mensajes', 'Ocurrió un error al procesar algunos asuntos');
+				$this->status('mensajes', "Ocurrió un error al procesar algunos asuntos : {$mensajes}");
 			}
 		}
 
@@ -252,10 +253,11 @@ class GeneracionMasivaCobros extends AppShell {
 			++$this->errors['hh'];
 			array_push($this->messages['hh'], "Error al procesar asunto {$codigo_asunto}");
 			$this->with_error['hh'][$this->getClientFromAgreement($id_contrato)] ++;
+			$mensajes = $this->getMessage('hh');
 			if ($this->errors['hh'] > 10) {
 				$this->status('mensajes', 'Ocurrió un error, favor procesar nuevamente');
 			} else {
-				$this->status('mensajes', 'Ocurrió un error al procesar algunos asuntos');
+				$this->status('mensajes', "Ocurrió un error al procesar algunos asuntos : {$mensajes}");
 			}
 		}
 
@@ -314,10 +316,11 @@ class GeneracionMasivaCobros extends AppShell {
 			++$this->errors['mixtas'];
 			array_push($this->messages['mixtas'], "Error al procesar asunto {$codigo_asunto}");
 			$this->with_error['mixtas'][$this->getClientFromAgreement($id_contrato)] ++;
+			$mensajes = $this->getMessage('mixtas');
 			if ($this->errors['mixtas'] > 10) {
 				$this->status('mensajes', 'Ocurrió un error, favor procesar nuevamente');
 			} else {
-				$this->status('mensajes', 'Ocurrió un error al procesar algunos asuntos');
+				$this->status('mensajes', "Ocurrió un error al procesar algunos asuntos : {$mensajes}");
 			}
 		}
 		$msg_generado = $this->sp(
