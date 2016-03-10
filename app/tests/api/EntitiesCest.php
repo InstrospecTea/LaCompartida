@@ -64,4 +64,25 @@ class EntitiesCest
 			$I->seeResponseContains('"value":"Clientes"');
 		}
 
+		public function successfulGetSettings(ApiTester $I) {
+			$I->wantTo('Get settings via API');
+			$I->login();
+
+			$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+			$I->sendGET("/settings");
+
+			$I->seeResponseCodeIs(200);
+			$I->seeResponseIsJSON();
+
+			$I->seeResponseContains('"code":"IncrementalStep"');
+			$I->seeResponseContains('"code":"UseWorkingAreas"');
+			$I->seeResponseContains('"code":"UseActivities"');
+			$I->seeResponseContains('"code":"UseAreas"');
+			$I->seeResponseContains('"code":"UseWorkRate"');
+			$I->seeResponseContains('"code":"UseRequester"');
+			$I->seeResponseContains('"code":"UseUppercase"');
+			$I->seeResponseContains('"code":"AllowBillable"');
+			$I->seeResponseContains('"code":"MaxWorkDuration"');
+		}
+
 }
