@@ -7,15 +7,30 @@ class WorkbookMiddleware {
 	protected $palette = [];
 	protected $formats = [];
 
-
-	public function __construct($fileName) {
+	/**
+	 * Construct of the class
+	 * @param string $fileName
+	 */
+	public function __construct($filename) {
 		$this->filename = $filename;
 	}
 
+	/**
+	 *
+	 * @todo implement?
+	 */
 	public function setVersion() {
 
 	}
 
+	/**
+	 * This method is copy of Spreadsheet_Excel_Writer
+	 * @param string $index
+	 * @param string $red
+	 * @param string $green
+	 * @param string $blue
+	 * @return int
+	 */
 	public function setCustomColor($index, $red, $green, $blue) {
 	  // Check that the colour index is the right range
 	  if ($index < 8 or $index > 64) {
@@ -39,44 +54,74 @@ class WorkbookMiddleware {
 	  return ($index + 8);
 	}
 
+	/**
+	 * Return a new FormatMiddleware
+	 * @param array $properties
+	 * @return FormatMiddleware
+	 */
 	public function addFormat($properties = array()) {
 		$format = new FormatMiddleware($properties);
 
 		return $format;
 	}
 
+	/**
+	 * Add a new WorksheetMiddleware
+	 * @param string $name
+	 * @return WorksheetMiddleware
+	 *
+	 * @todo Implement multiple sheets
+	 */
 	public function addWorksheet($name = '') {
 		$this->worksheet = new WorksheetMiddleware($name);
 
 		return $this->worksheet;
 	}
 
+	/**
+	 * Build and download the document
+	 * @param string $filename
+	 */
 	public function send($filename) {
 		$phpExcel = new PHPExcel();
 
-		$this->initExcel($phpExcel);
 		$this->setProperties($phpExcel);
 		$this->setColumns($phpExcel);
 		$this->setRows($phpExcel);
 		$this->mergeCells($phpExcel);
-		$this->setData($phpExcel);
+		foreach ($this->worksheet->getElements() as $value) {
+			$cellCode = PHPExcel_Cell::stringFromColumnIndex($value['col']).($value['row']+1);
+
+			$this->setData($phpExcel, $value, $cellCode);
+
+			if (!is_null($value['format'])) {
+				$this->setFormats($phpExcel, $value['format'], $cellCode);
+			}
+		}
 		$this->downloadExcel($phpExcel, $filename);
 	}
 
+	/**
+	 *
+	 *
+	 * @todo implement?
+	 */
 	public function close() {
 
 	}
 
-	private function initExcel($phpExcel) {
+	/**
+	 * Set document properties
+	 * @param PHPExcel $phpExcel
+	 */
+	private function setProperties($phpExcel) {
 		$phpExcel->getProperties()->setCreator('LemonTech')
 							 ->setLastModifiedBy('LemonTech')
 							 ->setTitle($filename)
 							 ->setSubject($filename)
 							 ->setDescription('Reporte generado por The TimeBilling, http://thetimebilling.com/.')
 							 ->setKeywords('timebilling lemontech');
-	}
 
-	private function setProperties($phpExcel) {
 		$phpExcel->getActiveSheet()->setTitle($this->worksheet->getTitle());
 		$phpExcel->getActiveSheet()->getPageMargins()
 																->setTop($this->worksheet->getMarginTop())
@@ -91,6 +136,12 @@ class WorkbookMiddleware {
 		$phpExcel->getActiveSheet()->getPageSetup()->setFitToHeight($this->worksheet->getFitHeight());
 	}
 
+	/**
+	 * Set columns properties
+	 * @param PHPExcel $phpExcel
+	 *
+	 * @todo formats and levels
+	 */
 	private function setColumns($phpExcel) {
 		foreach ($this->worksheet->getColumns() as $value) {
 			$column = PHPExcel_Cell::stringFromColumnIndex($value['firstcol']);
@@ -101,10 +152,16 @@ class WorkbookMiddleware {
 				$phpExcel->getActiveSheet()->getColumnDimension($column)->setVisible(false);
 			}
 
-			//TODO: format y level.
+			//TODO: format and level.
 		}
 	}
 
+	/**
+	 * Set the row properties
+	 * @param PHPExcel $phpExcel
+	 *
+	 * @todo formats and levels
+	 */
 	private function setRows($phpExcel) {
 		foreach ($this->worksheet->getRows() as $value) {
 			$row = $value['row'] + 1;
@@ -115,10 +172,14 @@ class WorkbookMiddleware {
 				$phpExcel->getActiveSheet()->getRowDimension($row)->setVisible(false);
 			}
 
-			//TODO: format y level.
+			//TODO: format and level.
 		}
 	}
 
+	/**
+	 * Merge cells
+	 * @param PHPExcel $phpExcel
+	 */
 	private function mergeCells($phpExcel) {
 		foreach ($this->worksheet->getCellsMerged() as $value) {
 			$cellsMerged =
@@ -131,26 +192,32 @@ class WorkbookMiddleware {
 		}
 	}
 
-	private function setData($phpExcel) {
-		foreach ($this->worksheet->getElements() as $value) {
-			$cellCode = PHPExcel_Cell::stringFromColumnIndex($value['col']).($value['row']+1);
-
-			if ($value['type'] == 'formula') {
-				$value['data'] = str_replace(';', ',', $value['data']);
-				$phpExcel->getActiveSheet()->getCell($cellCode)->setDataType(PHPExcel_Cell_DataType::TYPE_FORMULA);
-			}
-
-			$phpExcel->getActiveSheet()->setCellValue(
-					$cellCode,
-					utf8_encode($value['data'])
-			);
-
-			if (!is_null($value['format'])) {
-				$this->setFormats($phpExcel, $value['format'], $cellCode);
-			}
+	/**
+	 * Add data to cells
+	 * @param PHPExcel $phpExcel
+	 * @param array $element
+	 * @param string $cellCode
+	 */
+	private function setData($phpExcel, $element, $cellCode) {
+		if ($element['type'] == 'formula') {
+			$element['data'] = str_replace(';', ',', $element['data']);
+			$phpExcel->getActiveSheet()->getCell($cellCode)->setDataType(PHPExcel_Cell_DataType::TYPE_FORMULA);
 		}
+
+		$phpExcel->getActiveSheet()->setCellValue(
+				$cellCode,
+				utf8_encode($element['data'])
+		);
 	}
 
+	/**
+	 * Add formats to cells
+	 * @param PHPExcel $phpExcel
+	 * @param FormatMiddleware $formats
+	 * @param string $cellCode
+	 *
+	 * @todo Implement the border format
+	 */
 	private function setFormats($phpExcel, $formats, $cellCode) {
 		foreach ($formats->getElements() as $key => $formatValue) {
 			if (!is_null($formatValue)) {
@@ -186,8 +253,8 @@ class WorkbookMiddleware {
 						break;
 					case 'fgcolor':
 						if (is_int($formatValue) && ($formatValue > 8 && $formatValue < 64)) {
-							// La resta es para seguir la lógica del método setCustomColor
-							$rgb = $this->palette[$formatValue-8];
+							// the subtraction is to continue the logic of the method setCustomColor
+							$rgb = $this->palette[$formatValue - 8];
 
 							$phpExcel->getActiveSheet()->getStyle($cellCode)
 											->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
@@ -201,13 +268,18 @@ class WorkbookMiddleware {
 						$phpExcel->getActiveSheet()->getStyle($cellCode)->getNumberFormat()->setFormatCode($formatValue);
 						break;
 					case 'border':
-						// TODO: Implementar
+						// TODO: Implement
 						break;
 				}
 			}
 		}
 	}
 
+	/**
+	 * Download the Excel
+	 * @param PHPExcel $phpExcel
+	 * @param string $filename
+	 */
 	private function downloadExcel($phpExcel, $filename) {
 		header('Content-Type: application/vnd.ms-excel');
 		header('Content-Disposition: attachment;filename="' + $filename + '"');
@@ -224,6 +296,11 @@ class WorkbookMiddleware {
 		$writer->save('php://output');
 	}
 
+	/**
+	 * Convert a RGB code to hexadecimal
+	 * @param string $rgb
+	 * @return hexadecimal code
+	 */
 	private function rgb2hex($rgb) {
 		if (is_array($rgb)) {
 			$hex = '';
