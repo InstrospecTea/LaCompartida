@@ -198,9 +198,9 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->with_error['gg'][$this->getClientFromAgreement($id_contrato)] ++;
 			$mensajes = $this->getMessage('gg');
 			if ($this->errors['gg'] > 10) {
-				$this->status('mensajes', 'Ocurrió un error, favor procesar nuevamente');
+				$this->status('mensajes', '<span style="color:red">Ocurrió un error, favor procesar nuevamente</span>');
 			} else {
-				$this->status('mensajes', "Ocurrió un error al procesar algunos asuntos : {$mensajes}");
+				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : {$mensajes}</span>");
 			}
 		}
 
@@ -218,7 +218,7 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->status('gg', "{$msg_generado}. ({$msg_error})");
 		} else {
 			$mensajes = $this->getMessage('gg');
-			$this->status('gg', "{$msg_generado}. ({$msg_error}) {$mensajes}");
+			$this->status('gg', "{$msg_generado}. ({$msg_error})");
 		}
 	}
 
@@ -275,7 +275,7 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->status('hh', "{$msg_generado}. ({$msg_error})");
 		} else {
 			$mensajes = $this->getMessage('hh');
-			$this->status('hh', "{$msg_generado}. ({$msg_error}) {$mensajes}");
+			$this->status('hh', "{$msg_generado}. ({$msg_error})");
 		}
 	}
 
@@ -318,9 +318,9 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->with_error['mixtas'][$this->getClientFromAgreement($id_contrato)] ++;
 			$mensajes = $this->getMessage('mixtas');
 			if ($this->errors['mixtas'] > 10) {
-				$this->status('mensajes', 'Ocurrió un error, favor procesar nuevamente');
+				$this->status('mensajes', '<span style="color:red">Ocurrió un error, favor procesar nuevamente</span>');
 			} else {
-				$this->status('mensajes', "Ocurrió un error al procesar algunos asuntos : {$mensajes}");
+				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : {$mensajes}</span>");
 			}
 		}
 		$msg_generado = $this->sp(
@@ -338,7 +338,7 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->status('mixtas', "{$msg_generado}. ({$msg_error})");
 		} else {
 			$mensajes = $this->getMessage('mixtas');
-			$this->status('mixtas', "{$msg_generado}. ({$msg_error}) {$mensajes}");
+			$this->status('mixtas', "{$msg_generado}. ({$msg_error})");
 		}
 	}
 
