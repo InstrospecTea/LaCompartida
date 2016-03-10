@@ -45,4 +45,23 @@ class EntitiesCest
 			$I->seeResponseContains('"code":');
 			$I->seeResponseContains('"name":"taskita"');
 		}
+
+		public function successfulGetTranslations(ApiTester $I) {
+			$I->wantTo('Get translations via API');
+			$I->login();
+
+			$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+			$I->sendGET("/translations");
+
+			$I->seeResponseCodeIs(200);
+			$I->seeResponseIsJSON();
+
+			$I->seeResponseContains('"code":"Matters"');
+			$I->seeResponseContains('"value":"Asuntos"');
+			$I->seeResponseContains('"code":"Works"');
+			$I->seeResponseContains('"value":"Trabajos"');
+			$I->seeResponseContains('"code":"Clients"');
+			$I->seeResponseContains('"value":"Clientes"');
+		}
+
 }
