@@ -207,3 +207,4 @@ vagrant/machines/
 Vagrantfile
 
 tags
+app/tests/_log

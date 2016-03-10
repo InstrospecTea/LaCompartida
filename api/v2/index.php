@@ -34,7 +34,7 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
 	$API->getClients();
 });
 
-$Slim->get('/clients/:code/matters', function ($code) use ($Session) {
+$Slim->get('/clients/:code/matters', function ($code) use ($Session, $Slim) {
 	$API = new ClientsAPI($Session, $Slim);
 	$API->getMattersOfClient($code);
 });
@@ -49,27 +49,27 @@ $Slim->get('/activities', function () use ($Session, $Slim) {
 	$API->getActivities();
 });
 
-$Slim->get('/areas', function () use ($Session) {
+$Slim->get('/areas', function () use ($Session, $Slim) {
 	$API = new AreasAPI($Session, $Slim);
 	$API->getAreas();
 });
 
-$Slim->get('/tasks', function () use ($Session) {
+$Slim->get('/tasks', function () use ($Session, $Slim) {
 	$API = new TasksAPI($Session, $Slim);
 	$API->getTasks();
 });
 
-$Slim->get('/translations', function () use ($Session) {
+$Slim->get('/translations', function () use ($Session, $Slim) {
 	$API = new TranslationsAPI($Session, $Slim);
 	$API->getTranslations();
 });
 
-$Slim->get('/settings', function () use ($Session) {
+$Slim->get('/settings', function () use ($Session, $Slim) {
 	$API = new SettingsAPI($Session, $Slim);
 	$API->getSettings();
 });
 
-$Slim->get('/users/:id', function ($id) use ($Session) {
+$Slim->get('/users/:id', function ($id) use ($Session, $Slim) {
 	$API = new UsersAPI($Session, $Slim);
 	$API->getUserById($id);
 });
@@ -89,7 +89,7 @@ $Slim->put('/users/:user_id/works/:id', function ($user_id, $id) use ($Session, 
 	$API->updateTimeEntryByUserId($user_id, $id);
 });
 
-$Slim->delete('/users/:user_id/works/:id', function ($user_id, $id)  use ($Session) {
+$Slim->delete('/users/:user_id/works/:id', function ($user_id, $id)  use ($Session, $Slim) {
 	$API = new TimeEntriesAPI($Session, $Slim);
 	$API->deleteTimeEntryByUserId($user_id, $id);
 });
@@ -99,7 +99,7 @@ $Slim->post('/users/:user_id/devices', function ($user_id) use ($Session, $Slim)
 	$API->findOrCreateDeviceByUserId($user_id);
 });
 
-$Slim->delete('/users/:user_id/devices/:token', function ($user_id, $token) use ($Session) {
+$Slim->delete('/users/:user_id/devices/:token', function ($user_id, $token) use ($Session, $Slim) {
 	$API = new DevicesAPI($Session, $Slim);
 	$API->deleteDeviceByUserId($user_id, $token);
 });
@@ -109,7 +109,7 @@ $Slim->put('/users/:id', function ($id) use ($Session, $Slim) {
 	$API->updateUserSettings($id);
 });
 
-$Slim->get('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session) {
+$Slim->get('/clients/:client_id/contracts/:contract_id/generators', function ($client_id, $contract_id) use ($Session, $Slim) {
 	$API = new ContractsGeneratorsAPI($Session, $Slim);
 	$API->getGenerators($client_id, $contract_id);
 });
@@ -124,7 +124,7 @@ $Slim->post('/clients/:client_id/contracts/:contract_id/generators', function ($
 	$API->createGenerator($client_id, $contract_id);
 });
 
-$Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session) {
+$Slim->delete('/clients/:client_id/contracts/:contract_id/generators/:generator_id', function ($client_id, $contract_id, $generator_id) use ($Session, $Slim) {
 	$API = new ContractsGeneratorsAPI($Session, $Slim);
 	$API->deleteGenerator($client_id, $contract_id, $generator_id);
 });

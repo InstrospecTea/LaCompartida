@@ -2914,5 +2914,24 @@ class ApiTester extends \Codeception\AbstractGuy
         }
         return new Maybe();
     }
+
+ 
+    /**
+     * This method is generated.
+     * Documentation taken from corresponding module.
+     * ----------------------------------------------
+     *
+     *
+     * @see Codeception\Module\ApiTesterHelper::login()
+     * @return \Codeception\Maybe
+     */
+    public function login() {
+        $this->scenario->addStep(new \Codeception\Step\Action('login', func_get_args()));
+        if ($this->scenario->running()) {
+            $result = $this->scenario->runStep();
+            return new Maybe($result);
+        }
+        return new Maybe();
+    }
 }
 
