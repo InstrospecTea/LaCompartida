@@ -255,9 +255,9 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->with_error['hh'][$this->getClientFromAgreement($id_contrato)] ++;
 			$mensajes = $this->getMessage('hh');
 			if ($this->errors['hh'] > 10) {
-				$this->status('mensajes', 'Ocurrió un error, favor procesar nuevamente');
+				$this->status('mensajes', '<span style="color:red">Ocurrió un error, favor procesar nuevamente</span>');
 			} else {
-				$this->status('mensajes', "Ocurrió un error al procesar algunos asuntos : {$mensajes}");
+				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : {$mensajes}</span>");
 			}
 		}
 
