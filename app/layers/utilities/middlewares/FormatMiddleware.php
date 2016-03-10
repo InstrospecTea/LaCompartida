@@ -3,32 +3,19 @@
 class FormatMiddleware {
 
 	protected $size;
-
 	protected $align;
-
 	protected $valign;
-
 	protected $bold;
-
 	protected $italic;
-
 	protected $color;
-
 	protected $locked;
-
 	protected $top;
-
 	protected $bottom;
-
 	protected $fgcolor;
-
 	protected $textwrap;
-
 	protected $numformat;
-
 	protected $border;
 
-	protected $type;
 
 	public function __construct($properties = null) {
 		if (!is_null($properties) && is_array($properties)) {
@@ -37,7 +24,6 @@ class FormatMiddleware {
 			}
 		}
 	}
-
 
 	public function setSize($size) {
 		$this->size = $size;
@@ -79,16 +65,51 @@ class FormatMiddleware {
 		$this->italic = $italic == 1 ? true : false;
 	}
 
-	public function setColor() {
-
+	public function setColor($color) {
+		if (!ctype_xdigit($color)) {
+			switch ($color) {
+				case 'black':
+					$this->color = PHPExcel_Style_Color::COLOR_BLACK;
+					break;
+				case 'white':
+					$this->color = PHPExcel_Style_Color::COLOR_WHITE;
+					break;
+				case 'blue':
+					$this->color = PHPExcel_Style_Color::COLOR_BLUE;
+					break;
+				case 'darkblue':
+					$this->color = PHPExcel_Style_Color::COLOR_DARKBLUE;
+					break;
+				case 'green':
+					$this->color = PHPExcel_Style_Color::COLOR_GREEN;
+					break;
+				case 'darkgreen':
+					$this->color = PHPExcel_Style_Color::COLOR_DARKGREEN;
+					break;
+				case 'red':
+					$this->color = PHPExcel_Style_Color::COLOR_RED;
+					break;
+				case 'darkred':
+					$this->color = PHPExcel_Style_Color::COLOR_DARKRED;
+					break;
+				case 'yellow':
+					$this->color = PHPExcel_Style_Color::COLOR_YELLOW;
+					break;
+				case 'darkyellow':
+					$this->color = PHPExcel_Style_Color::COLOR_DARKYELLOW;
+					break;
+			}
+		} else {
+			$this->color = $color;
+		}
 	}
 
 	public function setLocked($locked) {
 		$this->locked = $locked == 1 ? true : false;
 	}
 
-	public function setTop() {
-
+	public function setTop($top) {
+		$this->top = $top == 1 ? true : false;
 	}
 
 	public function setBottom($bottom) {
@@ -99,24 +120,16 @@ class FormatMiddleware {
 		$this->border = $border;
 	}
 
-	public function setFgcolor() {
-
+	public function setFgcolor($fgcolor) {
+		$this->fgcolor = $fgcolor;
 	}
 
-	public function setTextwrap() {
-
+	public function setTextwrap($textwrap) {
+		$this->textwrap = $textwrap == 1 ? true : false;
 	}
 
 	public function setNumformat($numformat) {
 		$this->numformat = $numformat;
-	}
-
-	public function setFormat() {
-
-	}
-
-	public function setType($type) {
-		$this->type = $type;
 	}
 
 	public function getElements() {

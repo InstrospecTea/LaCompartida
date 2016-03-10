@@ -3,43 +3,28 @@
 class WorksheetMiddleware {
 
 	protected $title;
-
 	protected $paper_size;
-
 	protected $print_gridlines;
-
 	protected $screen_gridlines;
-
 	protected $margin_left;
-
 	protected $margin_right;
-
 	protected $margin_top;
-
 	protected $margin_bottom;
-
 	protected $fit_page;
-
 	protected $fit_width;
-
 	protected $fit_height;
-
 	protected $columns = [];
-
 	protected $rows = [];
-
 	protected $bitmaps = [];
-
 	protected $cellsMerged = [];
-
 	protected $elements = [];
-
-
-
 
 
 	public function __construct($title) {
 		$this->title = $title;
+		$this->print_gridlines = true;
+		$this->screen_gridlines = true;
+		$this->fit_page = false;
 	}
 
 	public function setPaper($size = 0) {
@@ -83,12 +68,21 @@ class WorksheetMiddleware {
 		$this->fit_height = $height;
 	}
 
-	public function setColumn($firstcol, $lastcol, $width, $format = null, $hidden = 0, $level = 0) {
-		$this->columns[] = array($firstcol, $lastcol, $width, $format, $hidden, $level);
+	public function setColumn($firstcol, $lastcol, $width, $format = null, $hidden = false, $level = 0) {
+		$this->columns[] = array('firstcol' => $firstcol,
+															'lastcol' => $lastcol,
+															'width' => $width,
+															'format' => $format,
+															'hidden' => $hidden == 1 ? true : false,
+															'level' => $level);
 	}
 
 	public function setRow($row, $height, $format = null, $hidden = false, $level = 0) {
-		$this->rows[] = array($row, $height, $format, $hidden, $level);
+		$this->rows[] = array('row' => $row,
+													'height' => $height,
+													'format' => $format,
+													'hidden' => $hidden == 1 ? true : false,
+													'level' => $level);
 	}
 
 	public function insertBitmap($row, $col, $bitmap, $x = 0, $y = 0, $scale_x = 1, $scale_y = 1) {
@@ -100,6 +94,14 @@ class WorksheetMiddleware {
 	}
 
 	public function write($row, $col, $token, $format = null) {
+		if (is_numeric($token)) {
+			$this->writeNumber($row, $col, $token, $format);
+		} else {
+			$this->writeText($row, $col, $token, $format);
+		}
+	}
+
+	public function writeText($row, $col, $token, $format = null) {
 		$this->elements[] = array('row' => $row,
 															'col' => $col,
 															'data' => $token,
@@ -134,6 +136,54 @@ class WorksheetMiddleware {
 
 	public function getCellsMerged() {
 		return $this->cellsMerged;
+	}
+
+	public function getColumns() {
+		return $this->columns;
+	}
+
+	public function getRows() {
+		return $this->rows;
+	}
+
+	public function getPaper() {
+		return $this->paper_size;
+	}
+
+	public function getMarginLeft() {
+		return $this->margin_left;
+	}
+
+	public function getMarginRight() {
+		return $this->margin_right;
+	}
+
+	public function getMarginTop() {
+		return $this->margin_top;
+	}
+
+	public function getMarginBottom() {
+		return $this->margin_bottom;
+	}
+
+	public function getPrintGridlines() {
+		return $this->print_gridlines;
+	}
+
+	public function getScreenGridlines() {
+		return $this->screen_gridlines;
+	}
+
+	public function getFitPage(){
+		return $this->fit_page;
+	}
+
+	public function getFitWidth(){
+		return $this->fit_width;
+	}
+
+	public function getFitHeight(){
+		return $this->fit_height;
 	}
 
 }
