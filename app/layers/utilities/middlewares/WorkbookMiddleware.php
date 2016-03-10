@@ -90,7 +90,7 @@ class WorkbookMiddleware {
 		$this->setRows($phpExcel);
 		$this->mergeCells($phpExcel);
 		foreach ($this->worksheet->getElements() as $value) {
-			$cellCode = PHPExcel_Cell::stringFromColumnIndex($value['col']).($value['row']+1);
+			$cellCode = PHPExcel_Cell::stringFromColumnIndex($value['col']).($value['row'] + 1);
 
 			$this->setData($phpExcel, $value, $cellCode);
 
@@ -183,9 +183,9 @@ class WorkbookMiddleware {
 	private function mergeCells($phpExcel) {
 		foreach ($this->worksheet->getCellsMerged() as $value) {
 			$cellsMerged =
-					PHPExcel_Cell::stringFromColumnIndex($value[1]).($value[0]+1) .
+					PHPExcel_Cell::stringFromColumnIndex($value[1]).($value[0] + 1) .
 					":" .
-					PHPExcel_Cell::stringFromColumnIndex($value[3]).($value[2]+1)
+					PHPExcel_Cell::stringFromColumnIndex($value[3]).($value[2] + 1)
 					;
 
 			$phpExcel->getActiveSheet()->mergeCells($cellsMerged);
@@ -253,7 +253,7 @@ class WorkbookMiddleware {
 						break;
 					case 'fgcolor':
 						if (is_int($formatValue) && ($formatValue > 8 && $formatValue < 64)) {
-							// the subtraction is to continue the logic of the method setCustomColor
+							// the subtraction is for continue the logic of the method setCustomColor
 							$rgb = $this->palette[$formatValue - 8];
 
 							$phpExcel->getActiveSheet()->getStyle($cellCode)
