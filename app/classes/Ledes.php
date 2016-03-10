@@ -467,33 +467,7 @@ class Ledes extends Objeto {
 		//nombre del formato en la primera fila
 		$out = $formato . "[]" . "\r\n";
 
-		$numero = "N.{$this->decimales}";
-		$campos = array(
-			'INVOICE_DATE' => 'date',
-			'INVOICE_NUMBER' => 20,
-			'CLIENT_ID' => 20,
-			'LAW_FIRM_MATTER_ID' => 20,
-			'INVOICE_TOTAL' => $numero,
-			'BILLING_START_DATE' => 'date',
-			'BILLING_END_DATE' => 'date',
-			'INVOICE_DESCRIPTION' => 15000,
-			'LINE_ITEM_NUMBER' => 20,
-			'EXP/FEE/INV_ADJ_TYPE' => 2,
-			'LINE_ITEM_NUMBER_OF_UNITS' => $numero,
-			'LINE_ITEM_ADJUSTMENT_AMOUNT' => $numero,
-			'LINE_ITEM_TOTAL' => $numero,
-			'LINE_ITEM_DATE' => 'date',
-			'LINE_ITEM_TASK_CODE' => 20,
-			'LINE_ITEM_EXPENSE_CODE' => 20,
-			'LINE_ITEM_ACTIVITY_CODE' => 20,
-			'TIMEKEEPER_ID' => 20,
-			'LINE_ITEM_DESCRIPTION' => 15000,
-			'LAW_FIRM_ID' => 20,
-			'LINE_ITEM_UNIT_COST' => $numero,
-			'TIMEKEEPER_NAME' => 30,
-			'TIMEKEEPER_CLASSIFICATION' => 10,
-			'CLIENT_MATTER_ID' => 20
-		);
+		$campos = $this->getFormat($formato);
 
 		//nombres de los campos en la segunda
 		$out .= implode('|', array_keys($campos)) . "[]" . "\r\n";
@@ -635,6 +609,94 @@ class Ledes extends Objeto {
 	 */
 	public function setDecimales($decimales) {
 		$this->decimales = $decimales;
+	}
+
+	protected function getFormat($format) {
+		$numero = "N.{$this->decimales}";
+		$ledes = array(
+			'LEDES98BI V2' => array(
+				'INVOICE_DATE' => 'date',
+				'INVOICE_NUMBER' => 20,
+				'CLIENT_ID' => 20,
+				'LAW_FIRM_MATTER_ID' => 20,
+				'INVOICE_TOTAL' => $numero,
+				'BILLING_START_DATE' => 'date',
+				'BILLING_END_DATE' => 'date',
+				'INVOICE_DESCRIPTION' => 15000,
+				'LINE_ITEM_NUMBER' => 20,
+				'EXP/FEE/INV_ADJ_TYPE' => 2,
+				'LINE_ITEM_NUMBER_OF_UNITS' => $numero,
+				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $numero,
+				'LINE_ITEM_TOTAL' => $numero,
+				'LINE_ITEM_DATE' => 'date',
+				'LINE_ITEM_TASK_CODE' => 20,
+				'LINE_ITEM_EXPENSE_CODE' => 20,
+				'LINE_ITEM_ACTIVITY_CODE' => 20,
+				'TIMEKEEPER_ID' => 20,
+				'LINE_ITEM_DESCRIPTION' => 15000,
+				'LAW_FIRM_ID' => 20,
+				'LINE_ITEM_UNIT_COST' => $numero,
+				'TIMEKEEPER_NAME' => 30,
+				'TIMEKEEPER_CLASSIFICATION' => 10,
+				'CLIENT_MATTER_ID' => 20,
+				'PO_NUMBER' => 100,
+				'CLIENT_TAX_ID' => 20,
+				'MATTER_NAME' => 255,
+				'INVOICE_TAX_TOTAL' => $numero,
+				'INVOICE_NET_TOTAL' => $numero,
+				'INVOICE_CURRENCY' => 3,
+				'TIMEKEEPER_LAST_NAME' => 30,
+				'TIMEKEEPER_FIRST_NAME' => 30,
+				'ACCOUNT_TYPE' => 1,
+				'LAW_FIRM_NAME' => 60,
+				'LAW_FIRM_ADDRESS_1' => 60,
+				'LAW_FIRM_ADDRESS_2' => 60,
+				'LAW_FIRM_CITY' => 40,
+				'LAW_FIRM_STATEorREGION' => 40,
+				'LAW_FIRM_POSTCODE' => 40,
+				'LAW_FIRM_COUNTRY' => 3,
+				'CLIENT_NAME' => 60,
+				'CLIENT_ADDRESS_1' => 60,
+				'CLIENT_ADDRESS_2' => 60,
+				'CLIENT_CITY' => 40,
+				'CLIENT_STATEorREGION' => 40,
+				'CLIENT_POSTCODE' => 20,
+				'CLIENT_COUNTRY' => 3,
+				'LINE_ITEM_TAX_RATE' => $numero,
+				'LINE_ITEM_TAX_TOTAL' => $numero,
+				'LINE_ITEM_TAX_TYPE' => $numero,
+				'INVOICE_REPORTED_TAX_TOTAL' => $numero,
+				'INVOICE_TAX_CURRENCY' => 3
+			),
+			'LEDES1998B' => array(
+				'INVOICE_DATE' => 'date',
+				'INVOICE_NUMBER' => 20,
+				'CLIENT_ID' => 20,
+				'LAW_FIRM_MATTER_ID' => 20,
+				'INVOICE_TOTAL' => $numero,
+				'BILLING_START_DATE' => 'date',
+				'BILLING_END_DATE' => 'date',
+				'INVOICE_DESCRIPTION' => 15000,
+				'LINE_ITEM_NUMBER' => 20,
+				'EXP/FEE/INV_ADJ_TYPE' => 2,
+				'LINE_ITEM_NUMBER_OF_UNITS' => $numero,
+				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $numero,
+				'LINE_ITEM_TOTAL' => $numero,
+				'LINE_ITEM_DATE' => 'date',
+				'LINE_ITEM_TASK_CODE' => 20,
+				'LINE_ITEM_EXPENSE_CODE' => 20,
+				'LINE_ITEM_ACTIVITY_CODE' => 20,
+				'TIMEKEEPER_ID' => 20,
+				'LINE_ITEM_DESCRIPTION' => 15000,
+				'LAW_FIRM_ID' => 20,
+				'LINE_ITEM_UNIT_COST' => $numero,
+				'TIMEKEEPER_NAME' => 30,
+				'TIMEKEEPER_CLASSIFICATION' => 10,
+				'CLIENT_MATTER_ID' => 20
+			)
+		);
+
+		return $ledes[$format];
 	}
 
 
