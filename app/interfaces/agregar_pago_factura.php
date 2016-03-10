@@ -449,45 +449,38 @@ $Form->defaultLabel = false;
 		var ids_monedas = jQuery('#ids_monedas_factura_pago').val();
 		var arreglo_ids = ids_monedas.split(',');
 		var tipo_cambios_factura_pago = [];
-		for (var i = 0; i < arreglo_ids.length - 1; ++i) {
+		for (var i = 0; i < arreglo_ids.length; ++i) {
 			 tipo_cambios_factura_pago.push(jQuery('#factura_pago_moneda_' + arreglo_ids[i]).val());
 		}
-		i = arreglo_ids.length - 1;
-		tipo_cambios_factura_pago.push(jQuery('#factura_pago_moneda_' + arreglo_ids[i]).val());
+
 		jQuery('#tipo_cambios_factura_pago').val(tipo_cambios_factura_pago.join(','));
 
-		if (!jQuery('#id_factura_pago').val()) {
-			return true;
-		}
+		if (jQuery('#id_factura_pago').val()) {
+			jQuery('<img/>').attr('src', '<?php echo Conf::ImgDir() ?>/ajax_loader.gif').insertBefore('.ui-dialog-buttonpane button:first');
+			jQuery('.ui-dialog-buttonpane button:first').hide();
 
-		jQuery('<img/>').attr('src', '<?php echo Conf::ImgDir() ?>/ajax_loader.gif').insertBefore('.ui-dialog-buttonpane button:first');
-		jQuery('.ui-dialog-buttonpane button:first').hide();
-
-		var tc = new Array();
-		for (var i = 0; i < arreglo_ids.length; ++i) {
-			tc[i] = jQuery('#factura_pago_moneda_' + arreglo_ids[i]).val();
-		}
-
-		var url = root_dir + '/app/interfaces/ajax.php';
-		var data_get = {accion: 'actualizar_factura_pago_moneda', id_factura: '<?php echo $factura->fields['id_factura'] ?>', ids_monedas: ids_monedas, tcs: tc.join(',')};
-		var actualizado = false;
-		jQuery.ajax(url, {
-			async: false,
-			data: data_get,
-			dataType: 'text',
-			success: function(text) {
-				if (text == 'EXITO') {
-					actualizado = true;
-				}
-				jQuery('.ui-dialog-buttonpane img').remove();
-				jQuery('.ui-dialog-buttonpane button:first').show();
+			var tc = new Array();
+			for (var i = 0; i < arreglo_ids.length; ++i) {
+				tc[i] = jQuery('#factura_pago_moneda_' + arreglo_ids[i]).val();
 			}
-		});
-		return actualizado;
+
+			var url = root_dir + '/app/interfaces/ajax.php';
+			var data_get = {accion: 'actualizar_factura_pago_moneda', id_factura_pago: jQuery('#id_factura_pago').val(), ids_monedas: ids_monedas, tcs: tc.join(',')};
+			jQuery.ajax({
+				url: url,
+				async: false,
+				data: data_get,
+				dataType: 'text',
+				success: function(text) {
+					jQuery('.ui-dialog-buttonpane img').remove();
+					jQuery('.ui-dialog-buttonpane button:first').show();
+				}
+			});
+		};
+		ActualizarMontoMonedaCobro();
 	}
 
-	function ActualizarMonto()
-	{
+	function ActualizarMonto() {
 		<?php if (!empty($id_neteo_documento_adelanto)) echo 'return false;'; ?>
 		var lista_facturas = $('lista_facturas').value;
 		var arreglo_facturas = lista_facturas.split(',');
@@ -745,7 +738,6 @@ $Form->defaultLabel = false;
 			form.action = document.location.href;
 			form.opcion.value = 'guardar';
 			form.submit();
-			return Validar ? Validar(form) : true;
 		}
 	}
 
@@ -784,6 +776,52 @@ $Form->defaultLabel = false;
 	}
 </script>
 
+<div id="TipoCambioDocumentoPago" style="display: none" title="<?php echo __('Tipo de Cambio Documento de Pago') ?>">
+	<table style="width: 100%" cellpadding="3">
+		<?php
+		if ($pago->fields['id_factura_pago']) {
+			$query = "SELECT count(*)
+									FROM cta_cte_fact_mvto_moneda
+									LEFT JOIN cta_cte_fact_mvto AS ccfm ON ccfm.id_cta_cte_mvto=cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto
+									WHERE ccfm.id_factura_pago = '" . $pago->fields['id_factura_pago'] . "'";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			list($cont) = mysql_fetch_array($resp);
+		} else {
+			$cont = 0;
+		}
+
+		if ($cont > 0) {
+			$query = "SELECT prm_moneda.id_moneda, glosa_moneda, cta_cte_fact_mvto_moneda.tipo_cambio
+									FROM cta_cte_fact_mvto_moneda
+									JOIN prm_moneda ON cta_cte_fact_mvto_moneda.id_moneda = prm_moneda.id_moneda
+									LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_cta_cte_mvto = cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto
+									WHERE cta_cte_fact_mvto.id_factura_pago = '" . $pago->fields['id_factura_pago'] . "'";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		} else {
+			$query = "SELECT id_moneda, glosa_moneda, tipo_cambio FROM prm_moneda";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		}
+		$num_monedas = 0;
+		$ids_monedas = array();
+		$tipo_cambios = array();
+		while (list($id_moneda_tipo_cambio, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp)) {
+			?>
+			<tr>
+				<td class="ar tb">
+					<?php echo $glosa_moneda ?>:
+				</td>
+				<td class="al" style="width: 60%">
+					<?php echo $Form->input("factura_pago_moneda_{$id_moneda_tipo_cambio}", $tipo_cambio, array('size' => 9)); ?>
+				</td>
+			</tr>
+			<?php
+			++$num_monedas;
+			$ids_monedas[] = $id_moneda_tipo_cambio;
+			$tipo_cambios[] = $tipo_cambio;
+		}
+		?>
+	</table>
+</div>
 <form method=post action="" id="form_documentos" autocomplete='off'>
 	<input type="hidden" name="opcion" value="guardar" />
 	<input type="hidden" name='id_doc_cobro' id='id_doc_cobro' value='<?php echo $id_doc_cobro ?>' />
@@ -795,6 +833,10 @@ $Form->defaultLabel = false;
 	<input type="hidden" name="pago_retencion_monto_loaded" id="pago_retencion_monto_loaded" value="<?php echo $pago->fields['pago_retencion'] ? $pago->fields['monto'] : 'false' ?>" />
 	<input type="hidden" name="codigo_cliente_factura" value="<?php echo $pago->fields['codigo_cliente'] ? $pago->fields['codigo_cliente'] : $codigo_cliente ?>" >
 	<input type="hidden" name='id_neteo_documento_adelanto' id='id_neteo_documento_adelanto' value="<?php echo $id_neteo_documento_adelanto ?>" />
+	<?php
+	echo $Form->hidden('tipo_cambios_factura_pago', implode(',', $tipo_cambios));
+	echo $Form->hidden('ids_monedas_factura_pago', implode(',', $ids_monedas));
+	?>
 	<!-- Calendario DIV -->
 	<div id="calendar-container" style="width:221px; position:absolute; display:none;">
 		<div class="floating" id="calendar"></div>
@@ -1038,56 +1080,6 @@ $Form->defaultLabel = false;
 			</td>
 		</tr>
 	</table>
-	<div id="TipoCambioDocumentoPago" style="display: none" title="<?php echo __('Tipo de Cambio Documento de Pago') ?>">
-		<table style="width: 100%" cellpadding="3">
-			<?php
-			if ($pago->fields['id_factura_pago']) {
-				$query = "SELECT count(*)
-										FROM cta_cte_fact_mvto_moneda
-										LEFT JOIN cta_cte_fact_mvto AS ccfm ON ccfm.id_cta_cte_mvto=cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto
-										WHERE ccfm.id_factura_pago = '" . $pago->fields['id_factura_pago'] . "'";
-				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-				list($cont) = mysql_fetch_array($resp);
-			} else {
-				$cont = 0;
-			}
-
-			if ($cont > 0) {
-				$query = "SELECT prm_moneda.id_moneda, glosa_moneda, cta_cte_fact_mvto_moneda.tipo_cambio
-										FROM cta_cte_fact_mvto_moneda
-										JOIN prm_moneda ON cta_cte_fact_mvto_moneda.id_moneda = prm_moneda.id_moneda
-										LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_cta_cte_mvto = cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto
-										WHERE cta_cte_fact_mvto.id_factura_pago = '" . $pago->fields['id_factura_pago'] . "'";
-				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-			} else {
-				$query = "SELECT id_moneda, glosa_moneda, tipo_cambio FROM prm_moneda";
-				$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-			}
-			$num_monedas = 0;
-			$ids_monedas = array();
-			$tipo_cambios = array();
-			while (list($id_moneda, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp)) {
-				?>
-				<tr>
-					<td class="ar tb">
-						<?php echo $glosa_moneda ?>:
-					</td>
-					<td class="al" style="width: 60%">
-						<?php echo $Form->input("factura_pago_moneda_{$id_moneda}", $tipo_cambio, array('size' => 9)); ?>
-					</td>
-				</tr>
-				<?php
-				++$num_monedas;
-				$ids_monedas[] = $id_moneda;
-				$tipo_cambios[] = $tipo_cambio;
-			}
-			?>
-		</table>
-		<?php
-		echo $Form->hidden('tipo_cambios_factura_pago', implode(',', $tipo_cambios));
-		echo $Form->hidden('ids_monedas_factura_pago', implode(',', $ids_monedas));
-		?>
-	</div>
 	<hr/>
 	<table width='90%'>
 		<tr>
