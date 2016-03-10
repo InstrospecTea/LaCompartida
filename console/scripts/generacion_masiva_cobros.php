@@ -194,9 +194,13 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['gg'];
-			array_push($this->messages['gg'], $e->getMessage());
+			array_push($this->messages['gg'], "Error al procesar asunto {$codigo_asunto}");
 			$this->with_error['gg'][$this->getClientFromAgreement($id_contrato)] ++;
-			$this->status('mensajes', 'Ocurrió un error interno, contáctese con soporte');
+			if ($this->errors['gg'] > 10) {
+				$this->status('mensajes', 'Ocurrió un error, favor procesar nuevamente');
+			} else {
+				$this->status('mensajes', 'Ocurrió un error al procesar algunos asuntos');
+			}
 		}
 
 		$msg_generado = $this->sp(
@@ -209,7 +213,12 @@ class GeneracionMasivaCobros extends AppShell {
 			__('1 con error'),
 			"{$this->errors['gg']} " . __('con errores'),
 			__('sin errores'));
-		$this->status('gg', "{$msg_generado}. ({$msg_error})");
+		if ($this->errors['gg'] > 10) {
+			$this->status('gg', "{$msg_generado}. ({$msg_error})");
+		} else {
+			$mensajes = $this->getMessage('gg');
+			$this->status('gg', "{$msg_generado}. ({$msg_error}) {$mensajes}");
+		}
 	}
 
 	/**
@@ -241,9 +250,13 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['hh'];
-			array_push($this->messages['hh'], $e->getMessage());
-			array_push($this->with_error['hh'], $this->getClientFromAgreement($id_contrato));
-			$this->status('mensajes', 'Ocurrió un error interno, contáctese con soporte');
+			array_push($this->messages['hh'], "Error al procesar asunto {$codigo_asunto}");
+			$this->with_error['hh'][$this->getClientFromAgreement($id_contrato)] ++;
+			if ($this->errors['hh'] > 10) {
+				$this->status('mensajes', 'Ocurrió un error, favor procesar nuevamente');
+			} else {
+				$this->status('mensajes', 'Ocurrió un error al procesar algunos asuntos');
+			}
 		}
 
 		$msg_generado = $this->sp(
@@ -256,7 +269,12 @@ class GeneracionMasivaCobros extends AppShell {
 			__('1 con error'),
 			"{$this->errors['hh']} " . __('con errores'),
 			__('sin errores'));
-		$this->status('hh', "{$msg_generado}. ({$msg_error})");
+		if ($this->errors['hh'] > 10) {
+			$this->status('hh', "{$msg_generado}. ({$msg_error})");
+		} else {
+			$mensajes = $this->getMessage('gg');
+			$this->status('hh', "{$msg_generado}. ({$msg_error}) {$mensajes}");
+		}
 	}
 
 	/**
@@ -294,9 +312,13 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['mixtas'];
-			array_push($this->messages['mixtas'], $e->getMessage());
-			array_push($this->with_error['mixtas'], $this->getClientFromAgreement($id_contrato));
-			$this->status('mensajes', 'Ocurrió un error interno, contáctese con soporte');
+			array_push($this->messages['mixtas'], "Error al procesar asunto {$codigo_asunto}");
+			$this->with_error['mixtas'][$this->getClientFromAgreement($id_contrato)] ++;
+			if ($this->errors['mixtas'] > 10) {
+				$this->status('mensajes', 'Ocurrió un error, favor procesar nuevamente');
+			} else {
+				$this->status('mensajes', 'Ocurrió un error al procesar algunos asuntos');
+			}
 		}
 		$msg_generado = $this->sp(
 				$this->generated['mixtas'],
@@ -309,7 +331,12 @@ class GeneracionMasivaCobros extends AppShell {
 			__('1 con error'),
 			"{$this->errors['mixtas']} " . __('con errores'),
 			__('sin errores'));
-		$this->status('mixtas', "{$msg_generado}. ({$msg_error})");
+		if ($this->errors['mixtas'] > 10) {
+			$this->status('mixtas', "{$msg_generado}. ({$msg_error})");
+		} else {
+			$mensajes = $this->getMessage('gg');
+			$this->status('mixtas', "{$msg_generado}. ({$msg_error}) {$mensajes}");
+		}
 	}
 
 	/**
