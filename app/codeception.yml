@@ -12,7 +12,8 @@ settings:
 modules:
     config:
         Db:
-            dsn: ''
-            user: ''
-            password: ''
-            dump: tests/_data/dump.sql
+            cleanup: false
+            populate: false
+            dsn: 'mysql:host=localhost;dbname=cdr'
+            user: 'root'
+            password: 'admin.asdwsx'
