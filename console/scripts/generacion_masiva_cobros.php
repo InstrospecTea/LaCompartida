@@ -272,7 +272,7 @@ class GeneracionMasivaCobros extends AppShell {
 		if ($this->errors['hh'] > 10) {
 			$this->status('hh', "{$msg_generado}. ({$msg_error})");
 		} else {
-			$mensajes = $this->getMessage('gg');
+			$mensajes = $this->getMessage('hh');
 			$this->status('hh', "{$msg_generado}. ({$msg_error}) {$mensajes}");
 		}
 	}
@@ -334,7 +334,7 @@ class GeneracionMasivaCobros extends AppShell {
 		if ($this->errors['mixtas'] > 10) {
 			$this->status('mixtas', "{$msg_generado}. ({$msg_error})");
 		} else {
-			$mensajes = $this->getMessage('gg');
+			$mensajes = $this->getMessage('mixtas');
 			$this->status('mixtas', "{$msg_generado}. ({$msg_error}) {$mensajes}");
 		}
 	}
