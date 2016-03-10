@@ -90,7 +90,7 @@ class TimeEntriesCest
 		}
 
 		public function successfulRemoveTimeEntry(ApiTester $I) {
-			$I->wantTo('Update time via API');
+			$I->wantTo('Remove time via API');
 			$I->login();
 
 			$timeEntry = $I->createTimeEntry();
