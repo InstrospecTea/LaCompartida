@@ -3,7 +3,7 @@ use \ApiTester;
 use Codeception\Util\Stub;
 use Helpers\ApiTesterHelper;
 
-class UserCest
+class UsersCest
 {
 
 		public function _before()
