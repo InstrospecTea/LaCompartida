@@ -6,8 +6,8 @@ ini_set('soap.wsdl_cache_enabled', 0);
 
 class WsFacturacionNubox extends WsFacturacion{
 
-	protected $url = 'https://www.servipyme.cl/ServiFacturaCert/WebServices/ArchivoDeVentasElectronicas.asmx?WSDL';
-	protected $url_login = 'https://www.servipyme.cl/Perfilamiento/Ws/Autenticador.asmx?WSDL';
+	protected $url = 'http://www.servipyme.cl/ServiFacturaCert/WebServices/ArchivoDeVentasElectronicas.asmx?WSDL';
+	protected $url_login = 'http://www.servipyme.cl/Perfilamiento/Ws/Autenticador.asmx?WSDL';
 	protected $rutCliente;
 	protected $rutUsuario;
 	protected $contrasena;
