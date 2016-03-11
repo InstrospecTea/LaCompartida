@@ -200,7 +200,7 @@ class GeneracionMasivaCobros extends AppShell {
 			if ($this->errors['gg'] > 10) {
 				$this->status('mensajes', '<span style="color:red">Ocurrió un error, favor procesar nuevamente</span>');
 			} else {
-				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : {$mensajes}</span>");
+				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : <br>{$mensajes}</span>");
 			}
 		}$messages = $this->generateMessage('gg', 'gastos');
 		$this->status('gg', "<strong>{$messages['message']}. ({$messages['error']})</strong>");
@@ -241,7 +241,7 @@ class GeneracionMasivaCobros extends AppShell {
 			if ($this->errors['hh'] > 10) {
 				$this->status('mensajes', '<span style="color:red">Ocurrió un error, favor procesar nuevamente</span>');
 			} else {
-				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : {$mensajes}</span>");
+				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : <br>{$mensajes}</span>");
 			}
 		}
 		$messages = $this->generateMessage('hh', 'honorarios');
@@ -289,7 +289,7 @@ class GeneracionMasivaCobros extends AppShell {
 			if ($this->errors['mixtas'] > 10) {
 				$this->status('mensajes', '<span style="color:red">Ocurrió un error, favor procesar nuevamente</span>');
 			} else {
-				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : {$mensajes}</span>");
+				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : <br>{$mensajes}</span>");
 			}
 		}
 		$messages = $this->generateMessage('mixtas', 'mixtas');
