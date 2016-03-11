@@ -194,9 +194,9 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['gg'];
-			array_push($this->messages['gg'], "Error al procesar asunto {$detalle_asunto}");
+			array_push($this->messages['gg'], "{$detalle_asunto}");
 			$this->with_error['gg'][$this->getClientFromAgreement($id_contrato)] ++;
-			$mensajes = $this->getMessage('gg');
+			$mensajes = $this->getMessage();
 			if ($this->errors['gg'] > 10) {
 				$this->status('mensajes', '<span style="color:red">Ocurrió un error, favor procesar nuevamente</span>');
 			} else {
@@ -235,9 +235,9 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['hh'];
-			array_push($this->messages['hh'], "Error al procesar asunto {$detalle_asunto}");
+			array_push($this->messages['hh'], "{$detalle_asunto}");
 			$this->with_error['hh'][$this->getClientFromAgreement($id_contrato)] ++;
-			$mensajes = $this->getMessage('hh');
+			$mensajes = $this->getMessage();
 			if ($this->errors['hh'] > 10) {
 				$this->status('mensajes', '<span style="color:red">Ocurrió un error, favor procesar nuevamente</span>');
 			} else {
@@ -283,9 +283,9 @@ class GeneracionMasivaCobros extends AppShell {
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['mixtas'];
-			array_push($this->messages['mixtas'], "Error al procesar asunto {$detalle_asunto}");
+			array_push($this->messages['mixtas'], "{$detalle_asunto}");
 			$this->with_error['mixtas'][$this->getClientFromAgreement($id_contrato)] ++;
-			$mensajes = $this->getMessage('mixtas');
+			$mensajes = $this->getMessage();
 			if ($this->errors['mixtas'] > 10) {
 				$this->status('mensajes', '<span style="color:red">Ocurrió un error, favor procesar nuevamente</span>');
 			} else {
@@ -398,16 +398,15 @@ class GeneracionMasivaCobros extends AppShell {
 	}
 
 	/**
-	 * Obtiene los mensajes según el tipo
-	 * @param $key tipo
+	 * Obtiene los mensajes
 	 * @return string mensaje
 	 */
-	private function getMessage($key) {
-		$message = '';
-		if (!empty($this->messages[$key])) {
-			$message = implode(', ', $this->messages[$key]);
+	private function getMessage() {
+		$output = '';
+		foreach ($this->messages as $message) {
+			$output .= implode('<br/>', $message);
 		}
-		return $message;
+		return $output;
 	}
 
 	private function getClientFromAgreement($id_contrato) {
