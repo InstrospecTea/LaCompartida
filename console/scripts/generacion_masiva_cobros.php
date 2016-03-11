@@ -404,7 +404,7 @@ class GeneracionMasivaCobros extends AppShell {
 	private function getMessage() {
 		$output = '';
 		foreach ($this->messages as $message) {
-			$output .= implode('<br/>', $message);
+			$output .= implode('<br>', $message);
 		}
 		return $output;
 	}
