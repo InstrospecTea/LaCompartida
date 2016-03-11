@@ -176,7 +176,7 @@ class GeneracionMasivaCobros extends AppShell {
 					'incluye_honorarios' => 0,
 					'incluye_gastos' => 1
 			);
-			$codigo_asunto = $this->getMatterFromAgreement($id_contrato);
+			$detalle_asunto = $this->getMatterFromAgreement($id_contrato);
 			$post_data = array_merge($this->data['form'], $datos_cobro);
 			$result = $this->post($post_data);
 			if (!empty($result['cobro'])) {
@@ -190,11 +190,11 @@ class GeneracionMasivaCobros extends AppShell {
 		} catch (Exception $e) {
 			$this->log('Error generaGG: ' . $e->getMessage());
 			$this->NewRelic->addMessage("[Generando Liquidaciones Gastos] Error Procesando Contrato : $id_contrato");
-			$this->NewRelic->addMessage("Asunto : {$codigo_asunto}");
+			$this->NewRelic->addMessage("Asunto : {$detalle_asunto}");
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['gg'];
-			array_push($this->messages['gg'], "Error al procesar asunto {$codigo_asunto}");
+			array_push($this->messages['gg'], "Error al procesar asunto {$detalle_asunto}");
 			$this->with_error['gg'][$this->getClientFromAgreement($id_contrato)] ++;
 			$mensajes = $this->getMessage('gg');
 			if ($this->errors['gg'] > 10) {
@@ -202,24 +202,8 @@ class GeneracionMasivaCobros extends AppShell {
 			} else {
 				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : {$mensajes}</span>");
 			}
-		}
-
-		$msg_generado = $this->sp(
-				$this->generated['gg'],
-			__('Se ha generado') . ' 1 ' . __('liquidación de gastos'),
-			__('Se han generado') . " {$this->generated['gg']} " . __('liquidaciones de gastos'),
-			__('No se han generado liquidaciones de gastos'));
-		$msg_error = $this->sp(
-			$this->errors['gg'],
-			__('1 con error'),
-			"{$this->errors['gg']} " . __('con errores'),
-			__('sin errores'));
-		if ($this->errors['gg'] > 10) {
-			$this->status('gg', "{$msg_generado}. ({$msg_error})");
-		} else {
-			$mensajes = $this->getMessage('gg');
-			$this->status('gg', "{$msg_generado}. ({$msg_error})");
-		}
+		}$messages = $this->generateMessage('gg', 'gastos');
+		$this->status('mixtas', "<strong>{$messages['message']}. ({$messages['error']})</strong>");
 	}
 
 	/**
@@ -233,7 +217,7 @@ class GeneracionMasivaCobros extends AppShell {
 					'incluye_honorarios' => 1,
 					'incluye_gastos' => 0
 			);
-			$codigo_asunto = $this->getMatterFromAgreement($id_contrato);
+			$detalle_asunto = $this->getMatterFromAgreement($id_contrato);
 			$post_data = array_merge($this->data['form'], $datos_cobro);
 			$result = $this->post($post_data);
 			if (!empty($result['cobro'])) {
@@ -247,11 +231,11 @@ class GeneracionMasivaCobros extends AppShell {
 		} catch (Exception $e) {
 			$this->log('Error generaHH: ' . $e->getMessage());
 			$this->NewRelic->addMessage("[Generando Liquidaciones Honorarios] Error Procesando Contrato : $id_contrato");
-			$this->NewRelic->addMessage("Asunto : {$codigo_asunto}");
+			$this->NewRelic->addMessage("Asunto : {$detalle_asunto}");
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['hh'];
-			array_push($this->messages['hh'], "Error al procesar asunto {$codigo_asunto}");
+			array_push($this->messages['hh'], "Error al procesar asunto {$detalle_asunto}");
 			$this->with_error['hh'][$this->getClientFromAgreement($id_contrato)] ++;
 			$mensajes = $this->getMessage('hh');
 			if ($this->errors['hh'] > 10) {
@@ -260,23 +244,8 @@ class GeneracionMasivaCobros extends AppShell {
 				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : {$mensajes}</span>");
 			}
 		}
-
-		$msg_generado = $this->sp(
-				$this->generated['hh'],
-			__('Se ha generado 1 liquidación de honorarios'),
-			__('Se han generado') . " {$this->generated['hh']} " . __('liquidaciones de honorarios'),
-			__('No se han generado liquidaciones de honorarios'));
-		$msg_error = $this->sp(
-			$this->errors['hh'],
-			__('1 con error'),
-			"{$this->errors['hh']} " . __('con errores'),
-			__('sin errores'));
-		if ($this->errors['hh'] > 10) {
-			$this->status('hh', "{$msg_generado}. ({$msg_error})");
-		} else {
-			$mensajes = $this->getMessage('hh');
-			$this->status('hh', "{$msg_generado}. ({$msg_error})");
-		}
+		$messages = $this->generateMessage('hh', 'honorarios');
+		$this->status('mixtas', "<strong>{$messages['message']}. ({$messages['error']})</strong>");
 	}
 
 	/**
@@ -290,7 +259,7 @@ class GeneracionMasivaCobros extends AppShell {
 					'incluye_honorarios' => 1,
 					'incluye_gastos' => 1,
 			);
-			$codigo_asunto = $this->getMatterFromAgreement($id_contrato);
+			$detalle_asunto = $this->getMatterFromAgreement($id_contrato);
 			if ($this->data['solo'] == 'honorarios') {
 				$datos_cobro = array_merge($datos_cobro, array('incluye_honorarios' => 1, 'incluye_gastos' => 0));
 			} else if ($this->data['solo'] == 'gastos') {
@@ -310,11 +279,11 @@ class GeneracionMasivaCobros extends AppShell {
 		} catch (Exception $e) {
 			$this->log('Error generaMIXTAS: ' . $e->getMessage());
 			$this->NewRelic->addMessage("[Generando Liquidaciones Mixtas] Error Procesando Contrato : $id_contrato");
-			$this->NewRelic->addMessage("Asunto : {$codigo_asunto}");
+			$this->NewRelic->addMessage("Asunto : {$detalle_asunto}");
 			$this->NewRelic->addMessage($e->getMessage());
 			$this->NewRelic->notice();
 			++$this->errors['mixtas'];
-			array_push($this->messages['mixtas'], "Error al procesar asunto {$codigo_asunto}");
+			array_push($this->messages['mixtas'], "Error al procesar asunto {$detalle_asunto}");
 			$this->with_error['mixtas'][$this->getClientFromAgreement($id_contrato)] ++;
 			$mensajes = $this->getMessage('mixtas');
 			if ($this->errors['mixtas'] > 10) {
@@ -323,23 +292,8 @@ class GeneracionMasivaCobros extends AppShell {
 				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : {$mensajes}</span>");
 			}
 		}
-		$msg_generado = $this->sp(
-				$this->generated['mixtas'],
-			__('Se ha generado 1 liquidación mixta'),
-			__('Se han generado') . " {$this->generated['mixtas']} " . __('liquidaciones mixtas'),
-			__('No se han generado liquidaciones mixtas'));
-
-		$msg_error = $this->sp(
-			$this->errors['mixtas'],
-			__('1 con error'),
-			"{$this->errors['mixtas']} " . __('con errores'),
-			__('sin errores'));
-		if ($this->errors['mixtas'] > 10) {
-			$this->status('mixtas', "{$msg_generado}. ({$msg_error})");
-		} else {
-			$mensajes = $this->getMessage('mixtas');
-			$this->status('mixtas', "{$msg_generado}. ({$msg_error})");
-		}
+		$messages = $this->generateMessage('mixtas', 'mixtas');
+		$this->status('mixtas', "<strong>{$messages['message']}. ({$messages['error']})</strong>");
 	}
 
 	/**
@@ -463,9 +417,33 @@ class GeneracionMasivaCobros extends AppShell {
 	}
 
 	private function getMatterFromAgreement($id_contrato) {
-		$asunto = new Asunto($this->Session);
-		$asunto->LoadByContrato($id_contrato);
-		return $asunto->fields['codigo_asunto'];
+		$criteria = new Criteria($this->Session);
+		$matter = $criteria->add_select('asunto.codigo_asunto')
+			->add_select('cliente.glosa_cliente')
+			->add_select('asunto.glosa_asunto')
+			->add_from('asunto')
+			->add_left_join_with('cliente', 'cliente.codigo_cliente = asunto.codigo_cliente')
+			->add_restriction(CriteriaRestriction::equals('asunto.id_contrato', $id_contrato))
+			->add_limit(1)
+			->run();
+		$detail = "{$matter[0]['codigo_asunto']}:{$matter[0]['glosa_cliente']} - {$matter[0]['glosa_asunto']}";
+		return $detail;
+	}
+
+	private function generateMessage($key, $name) {
+		$msg_generado = $this->sp(
+			$this->generated[$key],
+			__("Se ha generado 1 liquidación {$name}"),
+			__('Se han generado') . " {$this->generated[$key]} " . __("liquidaciones {$name}"),
+			__("No se han generado liquidaciones {$name}"));
+
+		$msg_error = $this->sp(
+			$this->errors[$key],
+			__('1 con error'),
+			"{$this->errors['mixtas']} " . __('con errores'),
+			__('sin errores'));
+
+		return array('message' => $msg_generado, 'error' => $msg_error);
 	}
 
 }
