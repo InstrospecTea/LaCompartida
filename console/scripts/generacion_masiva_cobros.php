@@ -203,7 +203,7 @@ class GeneracionMasivaCobros extends AppShell {
 				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : {$mensajes}</span>");
 			}
 		}$messages = $this->generateMessage('gg', 'gastos');
-		$this->status('mixtas', "<strong>{$messages['message']}. ({$messages['error']})</strong>");
+		$this->status('gg', "<strong>{$messages['message']}. ({$messages['error']})</strong>");
 	}
 
 	/**
@@ -245,7 +245,7 @@ class GeneracionMasivaCobros extends AppShell {
 			}
 		}
 		$messages = $this->generateMessage('hh', 'honorarios');
-		$this->status('mixtas', "<strong>{$messages['message']}. ({$messages['error']})</strong>");
+		$this->status('hh', "<strong>{$messages['message']}. ({$messages['error']})</strong>");
 	}
 
 	/**
@@ -439,7 +439,7 @@ class GeneracionMasivaCobros extends AppShell {
 		$msg_error = $this->sp(
 			$this->errors[$key],
 			__('1 con error'),
-			"{$this->errors['mixtas']} " . __('con errores'),
+			"{$this->errors[$key]} " . __('con errores'),
 			__('sin errores'));
 
 		return array('message' => $msg_generado, 'error' => $msg_error);
