@@ -7,54 +7,54 @@ class TimeEntriesCest
 {
 
 		public function _before()
-		{
-		}
+	{
+	}
 
-		public function _after()
-		{
-		}
+	public function _after()
+	{
+	}
 
-		public function successfulGetTimeEntries(ApiTester $I) {
-			$I->wantTo('Get time entries via API');
-			$I->login();
+	public function successfulGetTimeEntries(ApiTester $I) {
+		$I->wantTo('Get time entries via API');
+		$I->login();
 
-			$userId = 1;
-			$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
-			$I->sendGET("/users/{$userId}/works");
+		$userId = 1;
+		$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+		$I->sendGET("/users/{$userId}/works");
 
-			$I->seeResponseCodeIs(200);
-			$I->seeResponseIsJSON();
-		}
+		$I->seeResponseCodeIs(200);
+		$I->seeResponseIsJSON();
+	}
 
-		public function successfulCreateTimeEntry(ApiTester $I) {
-			$I->wantTo('Create time entry');
-			$I->login();
+	public function successfulCreateTimeEntry(ApiTester $I) {
+		$I->wantTo('Create time entry');
+		$I->login();
 
-			$project = $I->someProject();
-			$userId = 1;
+		$project = $I->someProject();
+		$userId = 1;
 
-			$time_entry = array(
-				'date' => time(),
-				'created_date' => time(),
-				'duration' => 120,
-				'notes' => 'description of time entry',
-				'rate' => 0,
-				'requester' => 'someone',
-				'activity_code' => '',
-				'area_code' => '',
-				'matter_code' => $project->code,
-				'task_code' => '',
-				'user_id' => $userId,
-				'billable' => 1,
-				'visible' => 1
-			);
+		$time_entry = array(
+			'date' => time(),
+			'created_date' => time(),
+			'duration' => 120,
+			'notes' => 'description of time entry',
+			'rate' => 0,
+			'requester' => 'someone',
+			'activity_code' => '',
+			'area_code' => '',
+			'matter_code' => $project->code,
+			'task_code' => '',
+			'user_id' => $userId,
+			'billable' => 1,
+			'visible' => 1
+		);
 
-			$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
-			$I->sendPUT("/users/{$userId}/works", $time_entry);
+		$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+		$I->sendPUT("/users/{$userId}/works", $time_entry);
 
-			$I->seeResponseCodeIs(200);
-			$I->seeResponseIsJSON();
-		}
+		$I->seeResponseCodeIs(200);
+		$I->seeResponseIsJSON();
+	}
 
 		public function successfulUpdateTimeEntry(ApiTester $I) {
 			$I->wantTo('Update time via API');

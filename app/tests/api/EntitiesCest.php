@@ -6,83 +6,83 @@ use Helpers\ApiTesterHelper;
 class EntitiesCest
 {
 
-		public function _before()
-		{
-		}
+	public function _before()
+	{
+	}
 
-		public function _after()
-		{
-		}
+	public function _after()
+	{
+	}
 
-		public function successfulGetAreas(ApiTester $I) {
-			$I->wantTo('Get areas via API');
-			$I->login();
+	public function successfulGetAreas(ApiTester $I) {
+		$I->wantTo('Get areas via API');
+		$I->login();
 
-			$I->haveInDatabase('prm_area_trabajo', array('glosa' => 'caquita'));
+		$I->haveInDatabase('prm_area_trabajo', array('glosa' => 'caquita'));
 
-			$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
-			$I->sendGET("/areas");
+		$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+		$I->sendGET("/areas");
 
-			$I->seeResponseCodeIs(200);
-			$I->seeResponseIsJSON();
+		$I->seeResponseCodeIs(200);
+		$I->seeResponseIsJSON();
 
-			$I->seeResponseContains('"code":');
-			$I->seeResponseContains('"name":"caquita"');
-		}
+		$I->seeResponseContains('"code":');
+		$I->seeResponseContains('"name":"caquita"');
+	}
 
-		public function successfulGetTasks(ApiTester $I) {
-			$I->wantTo('Get tasks via API');
-			$I->login();
+	public function successfulGetTasks(ApiTester $I) {
+		$I->wantTo('Get tasks via API');
+		$I->login();
 
-			$I->haveInDatabase('tarea', array('nombre' => 'taskita'));
+		$I->haveInDatabase('tarea', array('nombre' => 'taskita'));
 
-			$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
-			$I->sendGET("/tasks");
+		$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+		$I->sendGET("/tasks");
 
-			$I->seeResponseCodeIs(200);
-			$I->seeResponseIsJSON();
+		$I->seeResponseCodeIs(200);
+		$I->seeResponseIsJSON();
 
-			$I->seeResponseContains('"code":');
-			$I->seeResponseContains('"name":"taskita"');
-		}
+		$I->seeResponseContains('"code":');
+		$I->seeResponseContains('"name":"taskita"');
+	}
 
-		public function successfulGetTranslations(ApiTester $I) {
-			$I->wantTo('Get translations via API');
-			$I->login();
+	public function successfulGetTranslations(ApiTester $I) {
+		$I->wantTo('Get translations via API');
+		$I->login();
 
-			$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
-			$I->sendGET("/translations");
+		$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+		$I->sendGET("/translations");
 
-			$I->seeResponseCodeIs(200);
-			$I->seeResponseIsJSON();
+		$I->seeResponseCodeIs(200);
+		$I->seeResponseIsJSON();
 
-			$I->seeResponseContains('"code":"Matters"');
-			$I->seeResponseContains('"value":"Asuntos"');
-			$I->seeResponseContains('"code":"Works"');
-			$I->seeResponseContains('"value":"Trabajos"');
-			$I->seeResponseContains('"code":"Clients"');
-			$I->seeResponseContains('"value":"Clientes"');
-		}
+		$I->seeResponseContains('"code":"Matters"');
+		$I->seeResponseContains('"value":"Asuntos"');
+		$I->seeResponseContains('"code":"Works"');
+		$I->seeResponseContains('"value":"Trabajos"');
+		$I->seeResponseContains('"code":"Clients"');
+		$I->seeResponseContains('"value":"Clientes"');
+	}
 
-		public function successfulGetSettings(ApiTester $I) {
-			$I->wantTo('Get settings via API');
-			$I->login();
+	public function successfulGetSettings(ApiTester $I) {
+		$I->wantTo('Get settings via API');
+		$I->login();
 
-			$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
-			$I->sendGET("/settings");
+		$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+		$I->sendGET("/settings");
 
-			$I->seeResponseCodeIs(200);
-			$I->seeResponseIsJSON();
+		$I->seeResponseCodeIs(200);
+		$I->seeResponseIsJSON();
 
-			$I->seeResponseContains('"code":"IncrementalStep"');
-			$I->seeResponseContains('"code":"UseWorkingAreas"');
-			$I->seeResponseContains('"code":"UseActivities"');
-			$I->seeResponseContains('"code":"UseAreas"');
-			$I->seeResponseContains('"code":"UseWorkRate"');
-			$I->seeResponseContains('"code":"UseRequester"');
-			$I->seeResponseContains('"code":"UseUppercase"');
-			$I->seeResponseContains('"code":"AllowBillable"');
-			$I->seeResponseContains('"code":"MaxWorkDuration"');
-		}
+		$I->seeResponseContains('"code":"IncrementalStep"');
+		$I->seeResponseContains('"code":"UseWorkingAreas"');
+		$I->seeResponseContains('"code":"UseActivities"');
+		$I->seeResponseContains('"code":"UseAreas"');
+		$I->seeResponseContains('"code":"UseWorkRate"');
+		$I->seeResponseContains('"code":"UseRequester"');
+		$I->seeResponseContains('"code":"UseUppercase"');
+		$I->seeResponseContains('"code":"AllowBillable"');
+		$I->seeResponseContains('"code":"MaxWorkDuration"');
+	}
 
 }

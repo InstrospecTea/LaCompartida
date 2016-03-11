@@ -2942,11 +2942,49 @@ class ApiTester extends \Codeception\AbstractGuy
      * ----------------------------------------------
      *
      *
+     * @see Codeception\Module\ApiTesterHelper::getFirstResponseData()
+     * @return \Codeception\Maybe
+     */
+    public function getFirstResponseData() {
+        $this->scenario->addStep(new \Codeception\Step\Action('getFirstResponseData', func_get_args()));
+        if ($this->scenario->running()) {
+            $result = $this->scenario->runStep();
+            return new Maybe($result);
+        }
+        return new Maybe();
+    }
+
+ 
+    /**
+     * This method is generated.
+     * Documentation taken from corresponding module.
+     * ----------------------------------------------
+     *
+     *
      * @see Codeception\Module\ApiTesterHelper::someClient()
      * @return \Codeception\Maybe
      */
     public function someClient() {
         $this->scenario->addStep(new \Codeception\Step\Action('someClient', func_get_args()));
+        if ($this->scenario->running()) {
+            $result = $this->scenario->runStep();
+            return new Maybe($result);
+        }
+        return new Maybe();
+    }
+
+ 
+    /**
+     * This method is generated.
+     * Documentation taken from corresponding module.
+     * ----------------------------------------------
+     *
+     *
+     * @see Codeception\Module\ApiTesterHelper::getClientDataFromDb()
+     * @return \Codeception\Maybe
+     */
+    public function getClientDataFromDb($code, $field) {
+        $this->scenario->addStep(new \Codeception\Step\Action('getClientDataFromDb', func_get_args()));
         if ($this->scenario->running()) {
             $result = $this->scenario->runStep();
             return new Maybe($result);
@@ -2985,6 +3023,25 @@ class ApiTester extends \Codeception\AbstractGuy
      */
     public function createTimeEntry() {
         $this->scenario->addStep(new \Codeception\Step\Action('createTimeEntry', func_get_args()));
+        if ($this->scenario->running()) {
+            $result = $this->scenario->runStep();
+            return new Maybe($result);
+        }
+        return new Maybe();
+    }
+
+ 
+    /**
+     * This method is generated.
+     * Documentation taken from corresponding module.
+     * ----------------------------------------------
+     *
+     *
+     * @see Codeception\Module\ApiTesterHelper::createDeviceToken()
+     * @return \Codeception\Maybe
+     */
+    public function createDeviceToken($user_id, $token) {
+        $this->scenario->addStep(new \Codeception\Step\Action('createDeviceToken', func_get_args()));
         if ($this->scenario->running()) {
             $result = $this->scenario->runStep();
             return new Maybe($result);

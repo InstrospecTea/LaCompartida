@@ -27,12 +27,25 @@ class ApiTesterHelper extends \Codeception\Module
 		$this->getModule('REST')->headers['AUTHTOKEN'] = $this->token;
 	}
 
+	function getFirstResponseData() {
+		$data = json_decode($this->getModule('REST')->response);
+		return $data[0];
+	}
+
 	function someClient() {
 		$this->getModule('REST')->sendGET(
 			'/clients'
 		);
 		$client_code = json_decode($this->getModule('REST')->response);
 		return $client_code[0]->code;
+	}
+
+	function getClientDataFromDb($code, $field) {
+		return $this->getModule('Db')->grabFromDatabase(
+			'cliente',
+			$field,
+			array('codigo_cliente' => $code)
+		);
 	}
 
 	function someProject() {
@@ -66,5 +79,16 @@ class ApiTesterHelper extends \Codeception\Module
 		$this->getModule('REST')->sendPUT("/users/{$user_id}/works", $timeEntry);
 		$timeEntry = json_decode($this->getModule('REST')->response);
 		return $timeEntry;
+	}
+
+	function createDeviceToken($user_id, $token) {
+		$deviceToken = array(
+			'user_id' => $user_id,
+			'token' => $token
+		);
+
+		$this->getModule('REST')->sendPUT("/users/{$user_id}/device", $deviceToken);
+		$deviceToken = json_decode($this->getModule('REST')->response);
+		return $deviceToken;
 	}
 }
