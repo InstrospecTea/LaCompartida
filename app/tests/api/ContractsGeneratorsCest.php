@@ -102,7 +102,7 @@ class ContractsGeneratorsCest
 
 
 	public function successfulDeleteGenerator(ApiTester $I) {
-		$I->wantTo('Update Generator');
+		$I->wantTo('Delete Generator');
 		$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
 		$I->login();
 
