@@ -101,5 +101,44 @@ class ContractsGeneratorsCest
 	}
 
 
+	public function successfulDeleteGenerator(ApiTester $I) {
+		$I->wantTo('Update Generator');
+		$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+		$I->login();
+
+		$userId = 1;
+		$clientCode = $I->someClient();
+		$clientId = $I->getClientDataFromDb($clientCode, 'id_cliente');
+		$clientContractId = $I->getClientDataFromDb($clientCode, 'id_contrato');
+
+		$generatorData = array(
+			'percent_generator' => 50,
+			'user_id' => $userId
+		);
+		$I->sendPUT("/clients/{$clientId}/contracts/{$clientContractId}/generators", $generatorData);
+
+		$generatorId = $I->grabFromDatabase(
+			'contrato_generador',
+			'id_contrato_generador',
+			array(
+				'id_cliente' => $clientId,
+				'id_contrato' => $clientContractId,
+				'id_usuario' => $userId,
+				'porcentaje_genera' => 50
+			)
+		);
+
+		$generatorData = array(
+			'percent_generator' => 100,
+			'user_id' => 1
+		);
+
+		$I->sendDELETE("/clients/{$clientId}/contracts/{$clientContractId}/generators/{$generatorId}", $generatorData);
+		$I->seeResponseCodeIs(200);
+		$I->seeResponseIsJSON();
+
+		$I->seeResponseContains('{"result":"OK"}');
+	}
+
 }
 
