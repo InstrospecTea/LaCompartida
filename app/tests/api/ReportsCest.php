@@ -55,9 +55,7 @@ class ReportsCest
 			$I->seeResponseContains('"headers":');
 			$I->seeResponseContains('"filters":');
 		}
-
 	}
-
 
 }
 

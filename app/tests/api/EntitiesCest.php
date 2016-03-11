@@ -85,4 +85,23 @@ class EntitiesCest
 		$I->seeResponseContains('"code":"MaxWorkDuration"');
 	}
 
+	public function successfulGetCurrencies(ApiTester $I) {
+		$I->wantTo('Get currencies via API');
+		$I->login();
+
+		$I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
+		$I->sendGET("/currencies");
+
+		$I->seeResponseCodeIs(200);
+		$I->seeResponseIsJSON();
+
+		$I->seeResponseContains('"id_moneda"');
+		$I->seeResponseContains('"glosa_moneda"');
+		$I->seeResponseContains('"glosa_moneda_plural"');
+		$I->seeResponseContains('"tipo_cambio"');
+		$I->seeResponseContains('"cifras_decimales"');
+		$I->seeResponseContains('"simbolo"');
+		$I->seeResponseContains('"codigo"');
+		$I->seeResponseContains('"simbolo_factura"');
+	}
 }
