@@ -11,6 +11,12 @@ class Ledes extends Objeto {
 	protected $decimales = 4;
 
 	/**
+	 * Nombre del formato a utilizar
+	 * @var string
+	 */
+	protected $format;
+
+	/**
 	 * @param $Sesion
 	 */
 	function __construct($Sesion) {
@@ -20,9 +26,11 @@ class Ledes extends Objeto {
 	/**
 	 * genera un archivo ledes para uno o mas cobros
 	 * @param mixed $ids_cobros id del cobro o array de ids
+	 * @param string $format
 	 * @return string contenido del archivo
 	 */
-	public function ExportarCobrosLedes($ids_cobros) {
+	public function ExportarCobrosLedes($ids_cobros, $format = 'LEDES1998B') {
+		$this->format = $format;
 		$datos = array();
 		if (!is_array($ids_cobros)) {
 			$ids_cobros = array($ids_cobros);
