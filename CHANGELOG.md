@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.9
+Friday, March 11
+* **Fix** [Cambia temporalmente URL de nubox a https](https://github.com/LemontechSA/ttb/pull/1363)
+
 ## Hotfix 16.4.8
 Wednesday, March 9th
 * **Fix** [Generación cobros programados](https://github.com/LemontechSA/ttb/pull/1360)
