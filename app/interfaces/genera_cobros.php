@@ -17,7 +17,6 @@ $query_cliente = 'SELECT codigo_cliente, glosa_cliente FROM cliente WHERE activo
 $query_moneda = 'SELECT glosa_moneda, tipo_cambio FROM prm_moneda ORDER BY moneda_base DESC';
 $resp_moneda = mysql_query($query_moneda, $sesion->dbh) or Utiles::errorSQL($query_moneda, __FILE__, __LINE__, $sesion->dbh);
 
-$query_forma_cobro = 'SELECT forma_cobro, descripcion FROM prm_forma_cobro';
 
 $sesion->pdodbh->exec('SET SESSION group_concat_max_len=15000');
 
@@ -832,7 +831,7 @@ if ($opc == 'buscar') {
 		text_window += ' ('
 		if (fecha_ini != '')
 			text_window += 'Fecha desde: ' + fecha_ini + '<br>';
-		text_window += 'Fecha hasta: ' + fecha_fin + ')';
+		text_window += '<?php echo __('Fecha hasta:') ?> ' + fecha_fin + ')';
 		text_window += '<br><br><b><?php echo __('¿Desea generar el borrador?') ?></b></p>';
 		text_window += '<div style="margin:10px auto;text-align:center;font-size:11px;" id="respuestadialog">&nbsp;</div>';
 		jQuery('<p/>')
@@ -1025,7 +1024,7 @@ if ($proceso !== false) {
 								<b><?php echo __('Grupo') ?></b>&nbsp;
 							</td>
 							<td align=left colspan=2>
-								<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", "Ninguno", '280px') ?>
+								<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente FROM grupo_cliente", "id_grupo_cliente", $id_grupo_cliente, "", __('Ninguno'), '280px') ?>
 							</td>
 						</tr>
 						<tr>
@@ -1068,7 +1067,7 @@ if ($proceso !== false) {
 						<tr>
 							<td align=right><b><?php echo __('Forma de Tarificación') ?>&nbsp;</b></td>
 							<td colspan=2 align=left>
-								<?php echo Html::SelectQuery($sesion, $query_forma_cobro, "forma_cobro", $forma_cobro, '', __('Cualquiera'), 'width="200"') ?>
+								<?php echo $Form->select('forma_cobro',PrmFormaCobro::getList($sesion),$forma_cobro, array('empty' => __('Cualquiera'), 'style' => 'width: 210px')) ?>
 							</td>
 						</tr>
 						<tr>
@@ -1082,7 +1081,8 @@ if ($proceso !== false) {
 								);
 								$attrs = array(
 									'id' => 'tipo_liquidacion',
-									'empty' => __('Todas')
+									'empty' => __('Todas'),
+									'style' => 'width: 210px'
 								);
 								echo $Form->select('tipo_liquidacion', $opts, $tipo_liquidacion, $attrs);
 								?>
@@ -1500,12 +1500,12 @@ function funcionTR(& $contrato) {
 	$html .= "<td width=2% align=center><img src='" . Conf::ImgDir() . "/color_verde.gif' style='align:center; vertical-align:middle;' border=0></td>";
 
 	$wip_honorarios = ($wip[0] != '' ? number_format($wip[0], 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' Hrs.' : '0 Hrs.') .
-			" (Según HH en " . $contrato->fields['simbolo'] . ' ' . number_format($wip[1], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ")";
+			" (" . __('Según HH en') . " " . $contrato->fields['simbolo'] . ' ' . number_format($wip[1], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ")";
 
-	$wip_gastos = $wip[4] . ' ' . number_format($wip[3], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' en gastos';
+	$wip_gastos = $wip[4] . ' ' . number_format($wip[3], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . __(' en gastos');
 	if ($wip[6] > 0) {
-		$wip_egresos = $wip[4] . number_format($wip[5], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' en egresos';
-		$wip_ingresos = $wip[4] . number_format($wip[6], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . ' en provisiones';
+		$wip_egresos = $wip[4] . number_format($wip[5], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . __(' en egresos');
+		$wip_ingresos = $wip[4] . number_format($wip[6], 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . __(' en provisiones');
 		$wip_gastos = '<div style="border-bottom: 1px black dotted;display:inline-block;cursor:help;" title="' . $wip_egresos . ' vs ' . $wip_ingresos . '">' . $wip_gastos . '</div>';
 	}
 	switch ($tipo_liquidacion) { //1-2 = honorarios-gastos, 3 = mixtas
@@ -1513,7 +1513,7 @@ function funcionTR(& $contrato) {
 			break;
 		case 2: $txt_wip = $wip_gastos;
 			break;
-		default: $txt_wip = $wip_honorarios . ' y ' . $wip_gastos;
+		default: $txt_wip = $wip_honorarios . __(' y ') . $wip_gastos;
 			break;
 	}
 

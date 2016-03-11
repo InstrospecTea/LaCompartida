@@ -167,6 +167,7 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 			self.location.href='tarifas_tramites.php?popup=<?php echo $popup?>&crear=1';
 		}
 	}
+
 </script>
 
 <style>

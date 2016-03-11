@@ -477,6 +477,7 @@ if ($opc == 'grabar_documento' || $opc == 'guardar ' || $opc == 'grabar_document
 	$cobro->Edit("opc_ver_horas_trabajadas", $opc_ver_horas_trabajadas);
 	$cobro->Edit("opc_ver_cobrable", $opc_ver_cobrable);
 	$cobro->Edit("modalidad_calculo", $modalidad_calculo); // permite especificar el uso de Cobro->GenerarDocumento2 en vez de GenerarDocumento
+	$cobro->Edit('opc_mostrar_tramites_no_cobrables', $opc_mostrar_tramites_no_cobrables);
 
 	// Opciones especificos para Vial Olivares
 	$cobro->Edit("opc_restar_retainer", $opc_restar_retainer);
@@ -1854,6 +1855,10 @@ if ($solicitante == 0) {  // no mostrar
                                         <td align="right"><input type="checkbox" name="opc_ver_cobrable" id="opc_ver_cobrable" value="1" <?php echo $cobro->fields['opc_ver_cobrable'] == '1' ? 'checked' : '' ?>></td>
                                         <td align="left" style="font-size: 10px;"><label for="opc_ver_cobrable"><?php echo __('Mostrar trabajos no visibles') ?></label></td>
                                     </tr>
+																	<tr>
+																		<td align="right"><input type="checkbox" name="opc_mostrar_tramites_no_cobrables" id="opc_mostrar_tramites_no_cobrables" value="1" <?php echo $cobro->fields['opc_mostrar_tramites_no_cobrables'] == '1' ? 'checked' : '' ?>></td>
+																		<td align="left" colspan="2" style="font-size: 10px;"><label for="opc_mostrar_tramites_no_cobrables"><?php echo __('Mostrar Trámites no cobrables') ?></label></td>
+																	</tr>
 <?php if (Conf::GetConf($sesion, 'ResumenProfesionalVial')) { ?>
 										<tr>
 											<td align="right"><input type="checkbox" name="opc_restar_retainer" id="opc_restar_retainer" value="1" onclick="ActivaCarta(this.checked)" <?php echo $cobro->fields['opc_restar_retainer'] == '1' ? 'checked="checked"' : '' ?>></td>

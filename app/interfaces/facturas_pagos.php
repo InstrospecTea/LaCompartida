@@ -17,6 +17,8 @@ $pagina = new Pagina($Sesion);
 
 $factura = new Factura($Sesion);
 
+$Form = new Form();
+
 $series_documento = new DocumentoLegalNumero($Sesion);
 
 if ($id_factura != "") {
@@ -217,9 +219,9 @@ function funcionTR(& $fila) {
 	$html .= "<tr id=\"t" . $fila->fields['id_factura'] . "\" bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B; border-bottom: 1px solid #409C0B;\">";
 	$html .= "<td align=left>" . Utiles::sql2fecha($fila->fields['fecha'], $formato_fechas, '-') . "</td>";
 	$html .= "<td align=left>" . $fila->fields['tipo'] . "</td>";
-	$html .= "<td align=right>#" . NumeroFactura($fila, $Sesion) . "&nbsp;</td>";
-	$html .= "<td align=left>" . GlosaCliente($fila) . "</td>";
-	$html .= "<td align=right>" . Glosa_asuntos($fila, $Sesion) . "</td>";
+	$html .= "<td align=right>#" . NumeroFactura(& $fila, $Sesion) . "&nbsp;</td>";
+	$html .= "<td align=left>" . GlosaCliente(& $fila) . "</td>";
+	$html .= "<td align=right>" . Glosa_asuntos(& $fila, $Sesion) . "</td>";
 	$html .= "<td align=left>" . $fila->fields['encargado_comercial'] . "</td>";
 	//$html .= "<td align=left>".$fila->fields['descripcion']."</td>";
 	if (method_exists('Conf', 'GetConf') && Conf::GetConf($Sesion, 'NuevoModuloFactura'))
@@ -228,20 +230,20 @@ function funcionTR(& $fila) {
 		$html .= "<td align=center>" . $fila->fields['anulado'] . "</td>";
 	$html .= "<td align=center><a href='javascript:void(0)' onclick=\"nuevaVentana('Editar_" . __("Cobro") . "',1024,660,'cobros6.php?id_cobro=" . $fila->fields['id_cobro'] . "&popup=1');\">" . $fila->fields['id_cobro'] . "</a></td>";
 
-	$html .= "<td align=right >" . RetencionImpuestoPago($fila, $Sesion) . "</td>";
-	$html .= "<td align=right >" . ConceptoPago($fila, $Sesion) . "</td>";
-	$html .= "<td align=right >" . DescripcionPago($fila, $Sesion) . "</td>";
-	$html .= "<td align=right >" . BancoPago($fila, $Sesion) . "</td>";
-	$html .= "<td align=right nowrap>" . CuentaPago($fila, $Sesion) . "</td>";
+	$html .= "<td align=right >" . RetencionImpuestoPago(& $fila, $Sesion) . "</td>";
+	$html .= "<td align=right >" . ConceptoPago(& $fila, $Sesion) . "</td>";
+	$html .= "<td align=right >" . DescripcionPago(& $fila, $Sesion) . "</td>";
+	$html .= "<td align=right >" . BancoPago(& $fila, $Sesion) . "</td>";
+	$html .= "<td align=right nowrap>" . CuentaPago(& $fila, $Sesion) . "</td>";
 	$html .= "<td align=right nowrap>" . Utiles::sql2fecha($fila->fields['fecha_pago'], $formato_fechas, '-') . "</td>";
-	//$html .= "<td align=right nowrap>".SubTotal($fila)."</td>";
-	//$html .= "<td align=right nowrap>".Iva($fila)."</td>";
-	$html .= "<td align=right nowrap>" . MontoTotal($fila) . "</td>";
-	//$html .= "<td align=right nowrap>".Pago($fila, $Sesion)."</td>";
-	$html .= "<td align=right nowrap>" . MontoPago($fila) . "</td>";
-	$html .= "<td align=right nowrap>" . SaldoPago($fila) . "</td>";
-	$html .= "<td align=right nowrap>" . Saldo($fila) . "</td>";
-	$html .= "<td align=center nowrap>" . Opciones($fila, $Sesion) . "</td>";
+	//$html .= "<td align=right nowrap>".SubTotal(& $fila)."</td>";
+	//$html .= "<td align=right nowrap>".Iva(& $fila)."</td>";
+	$html .= "<td align=right nowrap>" . MontoTotal(& $fila) . "</td>";
+	//$html .= "<td align=right nowrap>".Pago(& $fila, $Sesion)."</td>";
+	$html .= "<td align=right nowrap>" . MontoPago(& $fila) . "</td>";
+	$html .= "<td align=right nowrap>" . SaldoPago(& $fila) . "</td>";
+	$html .= "<td align=right nowrap>" . Saldo(& $fila) . "</td>";
+	$html .= "<td align=center nowrap>" . Opciones(& $fila, $Sesion) . "</td>";
 	$html .= "</tr>";
 
 	$i++;
@@ -420,7 +422,8 @@ else
 <?php echo __('Tipo de Documento') ?>
 				</td>
 				<td align=left >
-<?php echo Html::SelectQuery($Sesion, "SELECT id_documento_legal, glosa FROM prm_documento_legal", 'tipo_documento_legal_buscado', $tipo_documento_legal_buscado, '', __('Cualquiera'), 150); ?>
+<?php echo $Form->select('tipo_documento_legal_buscado', PrmDocumentoLegal::getList($Sesion), $tipo_documento_legal_buscado, array('empty' => __('Cualquiera'), 'style:width:150px'));
+?>
 				</td>
 				<td align=right width="25%">
 <?php echo __('Grupo Ventas') ?>
@@ -436,9 +439,9 @@ else
 				<td align=left>
 <?php
 if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
-	echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado[]", $id_estado, ' multiple size="5" onchange="mostrarAccionesEstado(this.form)"', __('Cualquiera'), "190");
+	echo $Form->select('id_estado[]', PrmEstadoFactura::getList($Sesion), $id_estado, array('multiple' => 'multiple', 'size' => '5', 'onchange' => 'mostrarAccionesEstado(this.form)', 'style' => 'width:190px', 'empty' => __('Cualquiera')));
 } else {
-	echo Html::SelectQuery($Sesion, "SELECT id_estado, glosa FROM prm_estado_factura ORDER BY id_estado ASC", "id_estado", $id_estado, ' onchange="mostrarAccionesEstado(this.form)"', __('Cualquiera'), "150");
+	echo $Form->select('id_estado', PrmEstadoFactura::getList($Sesion), $id_estado, array('onchange' => 'mostrarAccionesEstado(this.form)', 'style' => 'width:150px', 'empty' => __('Cualquiera')));
 }
 ?>
 				</td>
@@ -476,9 +479,10 @@ if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
 				<td align=left>
 <?php
 if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
-	echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto[]", $id_concepto, ' multiple size="5" ', __('Cualquiera'), "190");
+	echo $Form->select('id_concepto', PrmFacturaPagoConcepto::getList($Sesion), $id_concepto, array('multiple' => 'multiple', 'size' => 5, 'empty' => __('Cualquiera'), 'style' => 'width:190px'));
+
 } else {
-	echo Html::SelectQuery($Sesion, "SELECT id_concepto,glosa FROM prm_factura_pago_concepto ORDER BY orden", "id_concepto", $id_concepto, '', __('Cualquiera'), "150");
+	echo $Form->select('id_concepto', PrmFacturaPagoConcepto::getList($Sesion), $id_concepto, array('empty' => __('Cualquiera'), 'style' => 'width:150px'));
 }
 ?>
 				</td>

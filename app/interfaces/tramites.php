@@ -119,9 +119,6 @@
 	$pagina->titulo = __('Trámites');
 $pagina->PrintTop( $popup );
 
-if (!$tramite->Loaded()) {
-	$tramite->setFieldsNew('contrato');
-}
 ?>
 
 
@@ -163,12 +160,12 @@ function Validar(form, desde, ids)
 	for(var i=0; i<arrayids.length; i++)
 	{
 		if(document.getElementById('tarifa_tramite['+arrayids[i]+']').value)
-			{
+		{
 			if(!IsNumeric(document.getElementById('tarifa_tramite['+arrayids[i]+']').value))
-				{
-					document.getElementById('tarifa_tramite['+arrayids[i]+']').value=0;
-				}
+			{
+				document.getElementById('tarifa_tramite['+arrayids[i]+']').value=0;
 			}
+		}
 	}
 
 	if( form.trabajo_si_no_defecto.checked )
@@ -180,10 +177,11 @@ function Validar(form, desde, ids)
 			return false;
 		}
 	}
-	if( desde=='agregar' )
-	form.action = 'tramites.php?accion=guardar&opcion=agregar&popup=1';
-	else if(desde=='editar')
-	form.action = 'tramites.php?accion=guardar&opcion=editar&popup=1';
+	if (desde == 'agregar') {
+		form.action = 'tramites.php?accion=guardar&opcion=agregar&popup=1';
+	} else if (desde == 'editar') {
+		form.action = 'tramites.php?accion=guardar&opcion=editar&popup=1';
+	}
 
 	form.submit();
 	return true;
@@ -343,19 +341,19 @@ function Refrescar()
 
 <form method=post name="form_tramite" id="form_tramite">
 <!--<input type=hidden name=opcion value="Buscar" />-->
-<input type=hidden name="id_tramite_tipo" value="<?php echo $tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $id_tramite_tipo ?>" />
-<input type=hidden name="gIsMouseDown" id="gIsMouseDown" value="false" />
-<input type=hidden name="gRepeatTimeInMS" id="gRepeatTimeInMS" value="200" />
-<input type=hidden name="max_hora" id="max_hora" value="14" />
+<input type=hidden name=id_tramite_tipo value="<?php echo $tramite->fields['id_tramite_tipo'] ? $tramite->fields['id_tramite_tipo'] : $id_tramite_tipo ?>" />
+<input type=hidden name="gIsMouseDown" id="gIsMouseDown" value=false />
+<input type=hidden name="gRepeatTimeInMS" id="gRepeatTimeInMS" value=200 />
+<input type=hidden name=max_hora id=max_hora value=14 />
 <?php
 	if($p_admin)
 	{
 ?>
-	<table width='90%' cellspacing="3" cellpadding="3">
+	<table width='90%' cellspacing=3 cellpadding=3>
 		<tr>
 			<td></td>
-			<td align="right">
-				<a href="tramites.php"><img src="<?php echo Conf::ImgDir()?>/agregar.gif" border="0"> <?php echo __('Nuevo Trámite')?></a>
+			<td align=right>
+				<a href="tramites.php"><img src="<?php echo Conf::ImgDir()?>/agregar.gif" border=0> <?php echo __('Nuevo Trámite')?></a>
 			</td>
 		</tr>
 	</table>
