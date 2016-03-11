@@ -425,7 +425,7 @@ class GeneracionMasivaCobros extends AppShell {
 			->add_restriction(CriteriaRestriction::equals('asunto.id_contrato', $id_contrato))
 			->add_limit(1)
 			->run();
-		$detail = "{$matter[0]['codigo_asunto']}:{$matter[0]['glosa_cliente']} - {$matter[0]['glosa_asunto']}";
+		$detail = "{$matter[0]['codigo_asunto']}:{$matter[0]['glosa_cliente']} - {$matter[0]['glosa_asunto']}<br>";
 		return $detail;
 	}
 
