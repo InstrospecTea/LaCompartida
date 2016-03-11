@@ -183,9 +183,9 @@ class WorkbookMiddleware {
 	private function mergeCells($phpExcel) {
 		foreach ($this->worksheet->getCellsMerged() as $value) {
 			$cellsMerged =
-					PHPExcel_Cell::stringFromColumnIndex($value[1]).($value[0] + 1) .
+					PHPExcel_Cell::stringFromColumnIndex($value['first_col']).($value['first_row'] + 1) .
 					":" .
-					PHPExcel_Cell::stringFromColumnIndex($value[3]).($value[2] + 1)
+					PHPExcel_Cell::stringFromColumnIndex($value['last_col']).($value['last_row'] + 1)
 					;
 
 			$phpExcel->getActiveSheet()->mergeCells($cellsMerged);
@@ -273,6 +273,16 @@ class WorkbookMiddleware {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Add formats to cells
+	 * @param PHPExcel $phpExcel
+	 *
+	 * @todo Implement this method
+	 */
+	private function setPixmap($phpExcel) {
+		// TODO: implement
 	}
 
 	/**
