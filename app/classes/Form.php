@@ -83,7 +83,7 @@ class Form {
 						$op_attr['selected'] = true;
 					}
 				}
-				$html .= $this->Html->tag('option', $text, $op_attr);
+				$html .= $this->Html->tag('option', __($text), $op_attr);
 			}
 		}
 		return $html;

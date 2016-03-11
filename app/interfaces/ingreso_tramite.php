@@ -572,7 +572,6 @@ $pagina->PrintTop($popup);
 			}
 		<?php } ?>
 
-
 		// Si la configuracion lo indica convertimos en mayuscula todo el contenido de la descripcion
 		<?php if (Conf::GetConf($sesion, 'TodoMayuscula')) { ?>
 			form.descripcion.value = form.descripcion.value.toUpperCase();
@@ -1077,7 +1076,7 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 								echo SelectorHoras::PrintTimeSelector($sesion, "duracion", $tramite->fields['duracion'] ? $tramite->fields['duracion'] : $duracion, 14, '', $nuevo || $sesion->usuario->fields['id_usuario'] == $id_usuario || $permiso_rev);
 							} else if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
 								?>
-								<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion); ?>" id="duracion" size="6" maxlength="4" <?php echo (!$nuevo && $sesion->usuario->fields['id_usuario'] != $id_usuario ) || !$permiso_rev ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form, 'duracion');" />
+								<input type="text" name="duracion" value="<?php echo $tramite->fields['duracion'] ? UtilesApp::Time2Decimal($tramite->fields['duracion']) : UtilesApp::Time2Decimal($duracion); ?>" id="duracion" size="6" maxlength="4" <?php echo (!$nuevo && $sesion->usuario->fields['id_usuario'] != $id_usuario ) && !$permiso_rev ? 'readonly' : '' ?> onchange="CambiaDuracion(this.form, 'duracion');" />
 								<?php
 							} else if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'java') {
 								echo Html::PrintTime("duracion", $duracion, "onchange='CambiaDuracion(this.form ,\"duracion\");'", $nuevo || $sesion->usuario->fields['id_usuario'] == $id_usuario);

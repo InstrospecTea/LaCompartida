@@ -85,11 +85,6 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 		self.location.href = vurl;
 	}
 
-	function ImprimirPDF(id_factura) {
-		var vurl = 'facturas.php?opc=generar_factura_pdf&id_factura_grabada=' + id_factura;
-		self.location.href = vurl;
-	}
-
 	function Refrescar() {
 		document.form_buscador.submit();
 	}
@@ -127,6 +122,16 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 
 		alert(mensaje);
 	}
+
+	jQuery(function() {
+		jQuery(document).on("click", ".factura-documento", function() {
+			if (jQuery(this).data('link') != '') {
+				window.location = jQuery(this).data('link');
+			} else {
+				window.location = root_dir + '/app/interfaces/facturas.php?opc=generar_factura_pdf&id_factura_grabada=' + jQuery(this).data('factura');
+			};
+		});
+	});
 
 <?php ($Slim = Slim::getInstance()) ? $Slim->applyHook('hook_facturas_js') : false; ?>
 </script>
@@ -405,12 +410,12 @@ function Opciones($fila) {
 	}
 
 	if (Conf::GetConf($sesion, 'ImprimirFacturaPdf')) {
-		$boton_pdf = '<a class="fl ui-button pdf" href="javascript:void(0);" style="margin: 3px 1px;width: 18px;height: 18px;" onclick="ImprimirPDF(' . $fila->fields['id_factura'] . ');" title="Descargar PDF"></a>';
+		$boton_pdf = '<a class="fl ui-button pdf factura-documento" data-factura="' . $fila->fields['id_factura'] . '" data-link="' . $fila->fields['dte_url_pdf'] . '" href="javascript:void(0);" style="margin: 3px 1px;width: 18px;height: 18px;" title="Descargar PDF"></a>';
 	}
 
 	$boton_log = '<a class="fl ui-icon lupa logdialog" href="javascript:void(0);" rel="factura" id="factura_' . $fila->fields['id_factura'] . '"></a>';
 
-	return "$boton_editar $boton_word $boton_pdf $boton_log";
+	return "{$boton_editar} {$boton_word} {$boton_pdf} {$boton_log}";
 }
 
 $pagina->PrintBottom();
