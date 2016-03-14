@@ -328,8 +328,15 @@ $Form->defaultLabel = false;
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {
+		var adelantos = {};
+		jQuery('.saldojq').each(function() {
+			adelantos[jQuery(this).attr('id')] = jQuery(this).val();
+		});
 
 		jQuery('.saldojq').keyup(function() {
+			if (adelantos[jQuery(this).attr('id')] == jQuery(this).val()) {
+				return;
+			}
 			var $this = jQuery(this);
 			MontoValido($this.attr('id'));
 			if ($this.val() == 0) {
