@@ -13,7 +13,7 @@ modules:
     config:
         Db:
             cleanup: false
-            populate: false
+            populate: true
             dsn: 'mysql:host=localhost;dbname=cdr'
             user: 'root'
             password: 'admin.asdwsx'
