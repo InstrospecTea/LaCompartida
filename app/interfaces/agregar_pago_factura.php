@@ -508,7 +508,7 @@ $Form->defaultLabel = false;
 
 	var suma_saldo = 0;
 	var monto_tmp = 0;
-	function ActualizarMontoMonedaCobro() {
+	function ActualizarMontoMonedaCobro(change) {
 		var moneda = $('id_moneda').value;
 		if (moneda == '<?php echo $id_moneda_cobro ?>') {
 			$('span_monto_equivalente').style.visibility = 'hidden';
@@ -517,7 +517,11 @@ $Form->defaultLabel = false;
 		else {
 			$('span_monto_equivalente').style.visibility = 'visible';
 			$('monto_moneda_cobro').value = Redondear($('monto').value * $('factura_pago_moneda_' + moneda).value / $('factura_pago_moneda_<?php echo $id_moneda_cobro ?>').value, $('cifras_decimales_pago').value);
-		}
+			if (change) {
+				jQuery('#monto_moneda_cobro').val(jQuery('#monto').val());
+				jQuery('#monto_moneda_cobro').trigger('keyup');
+			};
+		};
 		ActualizarMontosIndividuales('monto_moneda_cobro');
 
 		<?php if (empty($id_neteo_documento_adelanto)) { ?>
@@ -944,7 +948,7 @@ $Form->defaultLabel = false;
 				);
 
 				$currency_input_id = 'id_moneda';
-				$currency_input_attributes = 'onchange="ActualizarMontoMonedaCobro()"';
+				$currency_input_attributes = 'onchange="ActualizarMontoMonedaCobro(true)"';
 				if (!is_null($id_factura_pago)) {
 					$currency_input_id = 'id_moneda_disabled';
 					$currency_input_attributes .= ' disabled';
@@ -957,7 +961,7 @@ $Form->defaultLabel = false;
 				?>
 				<span style="color:#FF0000; font-size:10px">*</span>
 
-				<span id="span_monto_equivalente" style="display:<?php echo $id_moneda_cobro == $id_moneda ? 'none' : 'inline' ?>">
+				<span id="span_monto_equivalente" style="visibility:<?php echo $id_moneda_cobro == $id_moneda ? 'hidden' : 'visible' ?>">
 					Equivalente a <?php echo $moneda_cobro->fields['simbolo'] ?>
 					<?php
 					echo $Form->input(
