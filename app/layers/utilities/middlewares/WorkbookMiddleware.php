@@ -292,7 +292,7 @@ class WorkbookMiddleware {
 	 */
 	private function downloadExcel($phpExcel, $filename) {
 		header('Content-Type: application/vnd.ms-excel');
-		header('Content-Disposition: attachment;filename="' + $filename + '"');
+		header('Content-Disposition: attachment;filename="' . $filename . '"');
 		header('Cache-Control: max-age=0');
 		header('Cache-Control: max-age=1'); // IE 9
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
