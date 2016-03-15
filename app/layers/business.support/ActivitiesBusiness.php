@@ -2,7 +2,6 @@
 
 class ActivitiesBusiness extends AbstractBusiness implements IActivitiesBusiness {
 
-
 	public function getActivitesByMatterId($matterId = null, $active = null) {
 		$activities = array();
 		$matter = null;
