@@ -2,10 +2,10 @@
 
 class WorkbookMiddleware {
 
-	protected $worksheet;
 	protected $filename;
 	protected $palette = [];
 	protected $formats = [];
+	protected $worksheets = [];
 
 	/**
 	 * Construct of the class
@@ -69,13 +69,13 @@ class WorkbookMiddleware {
 	 * Add a new WorksheetMiddleware
 	 * @param string $name
 	 * @return WorksheetMiddleware
-	 *
-	 * @todo Implement multiple sheets
 	 */
 	public function addWorksheet($name = '') {
-		$this->worksheet = new WorksheetMiddleware($name);
+		$worksheet = new WorksheetMiddleware($name);
 
-		return $this->worksheet;
+		$this->worksheets[] = $worksheet;
+
+		return $worksheet;
 	}
 
 	/**
@@ -85,19 +85,30 @@ class WorkbookMiddleware {
 	public function send($filename) {
 		$phpExcel = new PHPExcel();
 
-		$this->setProperties($phpExcel);
-		$this->setColumns($phpExcel);
-		$this->setRows($phpExcel);
-		$this->mergeCells($phpExcel);
-		foreach ($this->worksheet->getElements() as $value) {
-			$cellCode = PHPExcel_Cell::stringFromColumnIndex($value['col']).($value['row'] + 1);
+		$this->setDocumentProperties($phpExcel);
 
-			$this->setData($phpExcel, $value, $cellCode);
+		foreach ($this->worksheets as $key => $worksheet) {
+			if ($key == 0) {
+				$workSheetObj = $phpExcel->getActiveSheet();
+			} else {
+				$workSheetObj = $phpExcel->createSheet($key);
+			}
 
-			if (!is_null($value['format'])) {
-				$this->setFormats($phpExcel, $value['format'], $cellCode);
+			$this->setSheetProperties($workSheetObj, $worksheet);
+			$this->setColumns($workSheetObj, $worksheet);
+			$this->setRows($workSheetObj, $worksheet);
+			$this->mergeCells($workSheetObj, $worksheet);
+			foreach ($worksheet->getElements() as $value) {
+				$cellCode = PHPExcel_Cell::stringFromColumnIndex($value['col']).($value['row'] + 1);
+
+				$this->setData($workSheetObj, $value, $cellCode);
+
+				if (!is_null($value['format'])) {
+					$this->setFormats($workSheetObj, $value['format'], $cellCode);
+				}
 			}
 		}
+
 		$this->downloadExcel($phpExcel, $filename);
 	}
 
@@ -114,42 +125,50 @@ class WorkbookMiddleware {
 	 * Set document properties
 	 * @param PHPExcel $phpExcel
 	 */
-	private function setProperties($phpExcel) {
+	private function setDocumentProperties($phpExcel) {
 		$phpExcel->getProperties()->setCreator('LemonTech')
 							 ->setLastModifiedBy('LemonTech')
 							 ->setTitle($filename)
 							 ->setSubject($filename)
 							 ->setDescription('Reporte generado por The TimeBilling, http://thetimebilling.com/.')
 							 ->setKeywords('timebilling lemontech');
+	}
 
-		$phpExcel->getActiveSheet()->setTitle($this->worksheet->getTitle());
-		$phpExcel->getActiveSheet()->getPageMargins()
-																->setTop($this->worksheet->getMarginTop())
-																->setRight($this->worksheet->getMarginRight())
-																->setLeft($this->worksheet->getMarginLeft())
-																->setBottom($this->worksheet->getMarginBottom());
-		$phpExcel->getActiveSheet()->getPageSetup()->setPaperSize($this->worksheet->getPaper());
-		$phpExcel->getActiveSheet()->setPrintGridlines($this->worksheet->getPrintGridlines());
-		$phpExcel->getActiveSheet()->setShowGridlines($this->worksheet->getScreenGridlines());
-		$phpExcel->getActiveSheet()->getPageSetup()->setFitToPage($this->worksheet->getFitPage());
-		$phpExcel->getActiveSheet()->getPageSetup()->setFitToWidth($this->worksheet->getFitWidth());
-		$phpExcel->getActiveSheet()->getPageSetup()->setFitToHeight($this->worksheet->getFitHeight());
+	/**
+	 * Set sheet properties
+	 * @param PHPExcel_Worksheet $workSheetObj
+	 * @param WorksheetMiddleware $worksheet
+	 */
+	private function setSheetProperties($workSheetObj, $worksheet) {
+		$workSheetObj->setTitle(utf8_encode($worksheet->getTitle()));
+		$workSheetObj->getPageMargins()
+							->setTop($worksheet->getMarginTop())
+							->setRight($worksheet->getMarginRight())
+							->setLeft($worksheet->getMarginLeft())
+							->setBottom($worksheet->getMarginBottom());
+		$workSheetObj->getPageSetup()->setPaperSize($worksheet->getPaper());
+		$workSheetObj->setPrintGridlines($worksheet->getPrintGridlines());
+		$workSheetObj->setShowGridlines($worksheet->getScreenGridlines());
+		$workSheetObj->getPageSetup()->setFitToPage($worksheet->getFitPage());
+		$workSheetObj->getPageSetup()->setFitToWidth($worksheet->getFitWidth());
+		$workSheetObj->getPageSetup()->setFitToHeight($worksheet->getFitHeight());
 	}
 
 	/**
 	 * Set columns properties
-	 * @param PHPExcel $phpExcel
+	 * @param PHPExcel_Worksheet $workSheetObj
+	 * @param WorksheetMiddleware $worksheet
 	 *
 	 * @todo formats and levels
 	 */
-	private function setColumns($phpExcel) {
-		foreach ($this->worksheet->getColumns() as $value) {
+	private function setColumns($workSheetObj, $worksheet) {
+		foreach ($worksheet->getColumns() as $value) {
 			$column = PHPExcel_Cell::stringFromColumnIndex($value['firstcol']);
 
-			$phpExcel->getActiveSheet()->getColumnDimension($column)->setWidth($value['width']);
+			$workSheetObj->getColumnDimension($column)->setWidth($value['width']);
 
 			if (!is_null($value['hidden']) && $value['hidden']) {
-				$phpExcel->getActiveSheet()->getColumnDimension($column)->setVisible(false);
+				$workSheetObj->getColumnDimension($column)->setVisible(false);
 			}
 
 			//TODO: format and level.
@@ -158,18 +177,19 @@ class WorkbookMiddleware {
 
 	/**
 	 * Set the row properties
-	 * @param PHPExcel $phpExcel
+	 * @param PHPExcel_Worksheet $workSheetObj
+	 * @param WorksheetMiddleware $worksheet
 	 *
 	 * @todo formats and levels
 	 */
-	private function setRows($phpExcel) {
-		foreach ($this->worksheet->getRows() as $value) {
+	private function setRows($workSheetObj, $worksheet) {
+		foreach ($worksheet->getRows() as $value) {
 			$row = $value['row'] + 1;
 
-			$phpExcel->getActiveSheet()->getRowDimension($row)->setRowHeight($value['height']);
+			$workSheetObj->getRowDimension($row)->setRowHeight($value['height']);
 
 			if (!is_null($value['hidden']) && $value['hidden']) {
-				$phpExcel->getActiveSheet()->getRowDimension($row)->setVisible(false);
+				$workSheetObj->getRowDimension($row)->setVisible(false);
 			}
 
 			//TODO: format and level.
@@ -178,33 +198,34 @@ class WorkbookMiddleware {
 
 	/**
 	 * Merge cells
-	 * @param PHPExcel $phpExcel
+	 * @param PHPExcel_Worksheet $workSheetObj
+	 * @param WorksheetMiddleware $worksheet
 	 */
-	private function mergeCells($phpExcel) {
-		foreach ($this->worksheet->getCellsMerged() as $value) {
+	private function mergeCells($workSheetObj, $worksheet) {
+		foreach ($worksheet->getCellsMerged() as $value) {
 			$cellsMerged =
 					PHPExcel_Cell::stringFromColumnIndex($value['first_col']).($value['first_row'] + 1) .
 					":" .
 					PHPExcel_Cell::stringFromColumnIndex($value['last_col']).($value['last_row'] + 1)
 					;
 
-			$phpExcel->getActiveSheet()->mergeCells($cellsMerged);
+			$workSheetObj->mergeCells($cellsMerged);
 		}
 	}
 
 	/**
 	 * Add data to cells
-	 * @param PHPExcel $phpExcel
+	 * @param PHPExcel_Worksheet $workSheet
 	 * @param array $element
 	 * @param string $cellCode
 	 */
-	private function setData($phpExcel, $element, $cellCode) {
+	private function setData($workSheet, $element, $cellCode) {
 		if ($element['type'] == 'formula') {
 			$element['data'] = str_replace(';', ',', $element['data']);
-			$phpExcel->getActiveSheet()->getCell($cellCode)->setDataType(PHPExcel_Cell_DataType::TYPE_FORMULA);
+			$workSheet->getCell($cellCode)->setDataType(PHPExcel_Cell_DataType::TYPE_FORMULA);
 		}
 
-		$phpExcel->getActiveSheet()->setCellValue(
+		$workSheet->setCellValue(
 				$cellCode,
 				utf8_encode($element['data'])
 		);
@@ -212,60 +233,60 @@ class WorkbookMiddleware {
 
 	/**
 	 * Add formats to cells
-	 * @param PHPExcel $phpExcel
+	 * @param PHPExcel_Worksheet $workSheet
 	 * @param FormatMiddleware $formats
 	 * @param string $cellCode
 	 *
 	 * @todo Implement the border format
 	 */
-	private function setFormats($phpExcel, $formats, $cellCode) {
+	private function setFormats($workSheet, $formats, $cellCode) {
 		foreach ($formats->getElements() as $key => $formatValue) {
 			if (!is_null($formatValue)) {
 				switch ($key) {
 					case 'size':
-						$phpExcel->getActiveSheet()->getStyle($cellCode)->getFont()->setSize($formatValue);
+						$workSheet->getStyle($cellCode)->getFont()->setSize($formatValue);
 						break;
 					case 'align':
-						$phpExcel->getActiveSheet()->getStyle($cellCode)->getAlignment()->setHorizontal($formatValue);
+						$workSheet->getStyle($cellCode)->getAlignment()->setHorizontal($formatValue);
 						break;
 					case 'valign':
-						$phpExcel->getActiveSheet()->getStyle($cellCode)->getAlignment()->setVertical($formatValue);
+						$workSheet->getStyle($cellCode)->getAlignment()->setVertical($formatValue);
 						break;
 					case 'bold':
-						$phpExcel->getActiveSheet()->getStyle($cellCode)->getFont()->setBold($formatValue);
+						$workSheet->getStyle($cellCode)->getFont()->setBold($formatValue);
 						break;
 					case 'italic':
-						$phpExcel->getActiveSheet()->getStyle($cellCode)->getFont()->setItalic($formatValue);
+						$workSheet->getStyle($cellCode)->getFont()->setItalic($formatValue);
 						break;
 					case 'color':
-						$phpExcel->getActiveSheet()->getStyle($cellCode)->getFont()->getColor()->setARGB($formatValue);
+						$workSheet->getStyle($cellCode)->getFont()->getColor()->setARGB($formatValue);
 						break;
 					case 'locked':
 						if ($value) {
-							$phpExcel->getActiveSheet()->getStyle($cellCode)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
+							$workSheet->getStyle($cellCode)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
 						}
 						break;
 					case 'top':
-						$phpExcel->getActiveSheet()->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+						$workSheet->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
 						break;
 					case 'bottom':
-						$phpExcel->getActiveSheet()->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+						$workSheet->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
 						break;
 					case 'fgcolor':
 						if (is_int($formatValue) && ($formatValue > 8 && $formatValue < 64)) {
 							// the subtraction is for continue the logic of the method setCustomColor
 							$rgb = $this->palette[$formatValue - 8];
 
-							$phpExcel->getActiveSheet()->getStyle($cellCode)
+							$workSheet->getStyle($cellCode)
 											->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
 											->getStartColor()->setRGB($this->rgb2hex($rgb));
 						}
 						break;
 					case 'textwrap':
-						$phpExcel->getActiveSheet()->getStyle($cellCode)->getAlignment()->setWrapText($formatValue);
+						$workSheet->getStyle($cellCode)->getAlignment()->setWrapText($formatValue);
 						break;
 					case 'numformat':
-						$phpExcel->getActiveSheet()->getStyle($cellCode)->getNumberFormat()->setFormatCode($formatValue);
+						$workSheet->getStyle($cellCode)->getNumberFormat()->setFormatCode($formatValue);
 						break;
 					case 'border':
 						// TODO: Implement
@@ -277,11 +298,11 @@ class WorkbookMiddleware {
 
 	/**
 	 * Add formats to cells
-	 * @param PHPExcel $phpExcel
+	 * @param PHPExcel_Worksheet $workSheet
 	 *
 	 * @todo Implement this method
 	 */
-	private function setPixmap($phpExcel) {
+	private function setPixmap($workSheet) {
 		// TODO: implement
 	}
 
@@ -299,6 +320,8 @@ class WorkbookMiddleware {
 		header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 		header('Cache-Control: cache, must-revalidate');
 		header('Pragma: public');
+
+		$phpExcel->setActiveSheetIndex(0);
 
 		$writer = PHPExcel_IOFactory::createWriter($phpExcel, 'Excel5');
 		$writer->setPreCalculateFormulas(true);
