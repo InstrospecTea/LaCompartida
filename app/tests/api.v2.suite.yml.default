@@ -8,4 +8,4 @@ modules:
     PhpBrowser:
       url: http://localhost/ttb/
     REST:
-      url: http://localhost/ttb/api/
+      url: http://localhost/ttb/api/v2/index.php/

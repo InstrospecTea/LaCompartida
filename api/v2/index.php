@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../app/conf.php';
+require_once dirname(__FILE__) . '/../../app/conf.php';
 
 if (isset($_SERVER['HTTP_ORIGIN'])) {
 	header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
@@ -46,7 +46,7 @@ $Slim->get('/matters', function () use ($Session, $Slim) {
 
 $Slim->get('/activities', function () use ($Session, $Slim) {
 	$API = new ActivitiesAPI($Session, $Slim);
-	$API->getActivities();
+	$API->getAllActivitiesByProjectId();
 });
 
 $Slim->get('/areas', function () use ($Session, $Slim) {

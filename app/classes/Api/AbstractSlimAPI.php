@@ -14,6 +14,55 @@ class AbstractSlimAPI  {
 	}
 
 	/**
+	 * Present a list of objects or arrays
+	 * @param  [type] $arrayObj [description]
+	 * @param  [type] $entity   [description]
+	 * @return [type]           [description]
+	 */
+	public function present($arrayObj, $entity) {
+		function parse(&$element, $key, $entity) {
+			$newElement = array();
+
+			foreach ($entity as $field) {
+				$key = is_array($field) ? key($field) : $field;
+
+				if (!is_array($field)) {
+					$value = $field;
+
+					if (!is_object($element) && isset($element[$value])) {
+						$newElement[$key] = $element[$value];
+					} else {
+						if (isset($element->fields[$value])) {
+							$newElement[$key] = $element->fields[$value];
+						} else {
+							$newElement[$key] = null;
+						}
+					}
+				} else {
+					$value = $field[$key];
+
+					if (!is_object($element) && isset($element[$value])) {
+						$newElement[$key] = $element[$value];
+					} else {
+						if (array_key_exists($value, $element->fields)) {
+							$newElement[$key] = $element->fields[$value];
+						} else {
+							$newElement[$key] = null;
+						}
+					}
+				}
+			}
+
+			$element = $newElement;
+			return $newElement;
+		}
+
+		$results = $arrayObj->toArray();
+		array_walk($results, 'parse', $entity);
+		return $this->outputJson($results);
+	}
+
+	/**
 	 * Corta la ejecución de la aplicación y retorna código http
 	 * @param  [type]  $error_message [description]
 	 * @param  [type]  $error_code    [description]
