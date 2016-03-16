@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 	}
 }
 
-$Slim = new Slim();
-$Session = new Sesion();
+$Slim = new \Slim();
+$Session = new \Sesion();
 
 $Slim->map(':x+', function($x) {
 	$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');
@@ -30,8 +30,8 @@ $Slim->post('/login', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/clients', function () use ($Session, $Slim) {
-	$API = new ClientsAPI($Session, $Slim);
-	$API->getClients();
+	$API = new Api\V2\ClientsAPI($Session, $Slim);
+	$API->getUpdatedClients();
 });
 
 $Slim->get('/clients/:code/matters', function ($code) use ($Session, $Slim) {
@@ -45,7 +45,7 @@ $Slim->get('/matters', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/activities', function () use ($Session, $Slim) {
-	$API = new ActivitiesAPI($Session, $Slim);
+	$API = new Api\V2\ActivitiesAPI($Session, $Slim);
 	$API->getAllActivitiesByProjectId();
 });
 

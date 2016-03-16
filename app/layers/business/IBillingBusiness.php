@@ -13,7 +13,7 @@ interface IBillingBusiness extends BaseBusiness {
 	public function getInvoice($invoiceId);
 
 	/**
-	* Funci√≥n que carga con UNA sola query todos los invoices (facturas) de una sola vez
+	* FunciÛn que carga con UNA sola query todos los invoices (facturas) de una sola vez
 	* @param array $invoiceIds array de invoices id
 	* @return map list de array, donde cada indice es el id del invoice pedido
 	*/
@@ -23,14 +23,14 @@ interface IBillingBusiness extends BaseBusiness {
 	* Obitne una instancia de {@link GenericModel} con datos de honorarios de una Factura
 	*
 	* @param $invoice instancia de {@link Invoice}  Factura a evaluar
-	* @param $charge instancia de {@link Charge} Liquidaci√≥n a considerar para la factura
-	* @param $currency instancia de {@link Currency} moneda en la que se devuelven los c√°lculos
+	* @param $charge instancia de {@link Charge} LiquidaciÛn a considerar para la factura
+	* @param $currency instancia de {@link Currency} moneda en la que se devuelven los c·lculos
 	*
 	* @return {@link GenericModel}
 	*
 	* 	{
 	* 		subtotal_honorarios:  Monto bruto de honorarios de la factura
-	* 		descuento_honorarios: Monto de Descuento en base al prorateo de la liquidaci√≥n
+	* 		descuento_honorarios: Monto de Descuento en base al prorateo de la liquidaciÛn
 	* 		saldo_honorarios: subtotal_honorarios - descuento_honorarios
 	* 	}
 	*/
@@ -40,15 +40,15 @@ interface IBillingBusiness extends BaseBusiness {
 	* Obitne una instancia de {@link GenericModel} con datos de honorarios de una Factura
 	*
 	* @param $invoiceFees Monto de honorarios de la factura (monto neto descontado)
-	* @param $chargeFees Monto de honorarios de la liquidaci√≥n (monto neto descontado)
-	* @param $chargeDiscount Descuento que se aplic√≥ en la liquidaci√≥n
-	* @param $currency instancia de {@link Currency} moneda en la que se devuelven los c√°lculos
+	* @param $chargeFees Monto de honorarios de la liquidaciÛn (monto neto descontado)
+	* @param $chargeDiscount Descuento que se aplicÛ en la liquidaciÛn
+	* @param $currency instancia de {@link Currency} moneda en la que se devuelven los c·lculos
 	*
 	* @return {@link GenericModel}
 	*
 	* 	{
 	* 		subtotal_honorarios:  Monto bruto de honorarios de la factura
-	* 		descuento_honorarios: Monto de Descuento en base al prorateo de la liquidaci√≥n
+	* 		descuento_honorarios: Monto de Descuento en base al prorateo de la liquidaciÛn
 	* 		saldo_honorarios: subtotal_honorarios - descuento_honorarios
 	* 	}
 	*/
@@ -59,7 +59,7 @@ interface IBillingBusiness extends BaseBusiness {
 	* Obitne el monto de honorarios de una Factura en determinada moneda
 	*
 	* @param $invoice instancia de {@link Invoice}  Factura a evaluar
-	* @param $currency instancia de {@link Currency} moneda en la que se devuelven los c√°lculos
+	* @param $currency instancia de {@link Currency} moneda en la que se devuelven los c·lculos
 	*
 	* @return Number  monto de honorarios de la factura
 	*/

@@ -32,11 +32,25 @@ $directorios = array(
 	'/fw/classes/'
 );
 
-function autocargattb($class_name) {
-	global $directorios;
+$appNamespaces = array('Api\V1', 'Api\V2');
 
-	$class_name = explode('\\', $class_name);
-	$class_name = str_replace('_', DIRECTORY_SEPARATOR,  end($class_name));
+function autocargattb($class_name) {
+	global $directorios, $appNamespaces;
+	$hasNamespace = false;
+
+	foreach ($appNamespaces as $value) {
+		if (strpos($class_name, "{$value}\\") !== false) {
+			$hasNamespace = true;
+		}
+	}
+
+	if ($hasNamespace)  {
+		$class_name = str_replace('\\', '/', $class_name);
+		$class_name = str_replace('_', DIRECTORY_SEPARATOR, $class_name);
+	} else {
+		$class_name = explode('\\', $class_name);
+		$class_name = str_replace('_', DIRECTORY_SEPARATOR, end($class_name));
+	}
 
 	foreach ($directorios as $directorio) {
 		if (is_readable(dirname(__FILE__) . $directorio . $class_name . '.php')) {

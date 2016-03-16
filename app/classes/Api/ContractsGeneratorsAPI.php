@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * Clase con métodos para Generadores de Contratos

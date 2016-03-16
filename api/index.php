@@ -1,7 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../app/conf.php';
 
-
 $Session = new Sesion();
 $Slim = new Slim();
 

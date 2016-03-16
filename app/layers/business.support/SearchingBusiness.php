@@ -91,6 +91,7 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 			$genericMode
 		);
 		$criteria = $this->addScopes($searchCriteria, $criteria);
+		// pr($criteria->get_plain_query());
 		return $criteria;
 	}
 

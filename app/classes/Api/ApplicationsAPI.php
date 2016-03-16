@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * Clase con métodos para aplicaciones
@@ -16,7 +15,7 @@ class ApplicationsAPI extends AbstractSlimAPI {
 		$app_guid = $Slim->request()->params('guid');
 		$action_name = $Slim->request()->params('name');
 
-		$s3 = new AmazonS3(array(
+		$s3 = new \AmazonS3(array(
 	 		'key' => 'AKIAIQYFL5PYVQKORTBA',
 	 		'secret' => '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'
 	 	));
