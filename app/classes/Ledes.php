@@ -17,6 +17,17 @@ class Ledes extends Objeto {
 	protected $format;
 
 	/**
+	 * @var Currency
+	 */
+	protected $currency;
+
+	/**
+	 * Indica si se debe usar el impuesto, esto implica usar formato LEDES98BI
+	 * @var boolean
+	 */
+	protected $usar_impuesto;
+
+	/**
 	 * @param $Sesion
 	 */
 	function __construct($Sesion) {
@@ -26,11 +37,9 @@ class Ledes extends Objeto {
 	/**
 	 * genera un archivo ledes para uno o mas cobros
 	 * @param mixed $ids_cobros id del cobro o array de ids
-	 * @param string $format
 	 * @return string contenido del archivo
 	 */
-	public function ExportarCobrosLedes($ids_cobros, $format = 'LEDES1998B') {
-		$this->format = $format;
+	public function ExportarCobrosLedes($ids_cobros) {
 		$datos = array();
 		if (!is_array($ids_cobros)) {
 			$ids_cobros = array($ids_cobros);
@@ -53,10 +62,16 @@ class Ledes extends Objeto {
 		//cargar datos de la bd
 		$Cobro = new Cobro($this->sesion);
 		$Cobro->Load($id_cobro);
-
+		$Contrato = new Contrato($this->sesion);
+		$Contrato->Load($Cobro->fields['id_contrato']);
+		if ($Contrato->fields['usa_impuesto_separado']) {
+			$this->format = 'LEDES98BI V2';
+		}
+		$currencyBusiness = new CoiningBusiness($this->sesion);
+		$currency = $currencyBusiness->getCurrency($Cobro->fields['id_moneda']);
+		$this->currency = $currency;
 		$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $id_cobro);
 		$gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $id_cobro);
-
 		$moneda_cobro = $x_resultados['id_moneda'];
 		$cambios = $x_resultados['tipo_cambio'];
 		foreach ($cambios as $id_moneda => $tipo_cambio) {
@@ -213,10 +228,16 @@ class Ledes extends Objeto {
 			->add_select('trabajo.codigo_actividad')
 			->add_select('trabajo.codigo_tarea')
 			->add_select('asunto.codigo_homologacion')
+			->add_select('cobro.porcentaje_impuesto')
+			->add_select('cobro.porcentaje_impuesto_gastos')
+			->add_select('asunto.glosa_asunto')
+			->add_select('contrato.rut')
 			->add_from('trabajo')
 			->add_left_join_with('usuario', 'trabajo.id_usuario = usuario.id_usuario')
 			->add_left_join_with('prm_categoria_usuario', 'usuario.id_categoria_usuario = prm_categoria_usuario.id_categoria_usuario')
 			->add_left_join_with('asunto', 'trabajo.codigo_asunto = asunto.codigo_asunto')
+			->add_left_join_with('cobro', 'trabajo.id_cobro = cobro.id_cobro')
+			->add_left_join_with('contrato', 'cobro.id_contrato = contrato.id_contrato')
 			->add_restriction(CriteriaRestriction::equals('trabajo.id_cobro', $id_cobro))
 			->add_restriction(CriteriaRestriction::equals('trabajo.id_tramite', 0))
 			->run();
@@ -248,6 +269,13 @@ class Ledes extends Objeto {
 			}
 			$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
 
+			$porcentaje_impuesto = $trabajo['porcentaje_impuesto'];
+			if ($this->format == 'LEDES98BI V2') {
+				$impuesto = $monto * $porcentaje_impuesto / 100;
+			} else {
+				$impuesto = 0;
+			}
+
 			$descripcion = trim(str_replace("\n", ' ', $trabajo['descripcion']));
 
 			$fila = array(
@@ -256,7 +284,7 @@ class Ledes extends Objeto {
 				'EXP/FEE/INV_ADJ_TYPE' => 'F',
 				'LINE_ITEM_NUMBER_OF_UNITS' => $horas,
 				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $ajuste,
-				'LINE_ITEM_TOTAL' => $monto,
+				'LINE_ITEM_TOTAL' => $monto + $impuesto,
 				'LINE_ITEM_DATE' => $trabajo['fecha'],
 				'LINE_ITEM_TASK_CODE' => $trabajo['codigo_tarea'],
 				'LINE_ITEM_EXPENSE_CODE' => '',
@@ -266,7 +294,14 @@ class Ledes extends Objeto {
 				'LINE_ITEM_UNIT_COST' => $tarifa,
 				'TIMEKEEPER_NAME' => $trabajo['nombre_usuario'],
 				'TIMEKEEPER_CLASSIFICATION' => $trabajo['codigo_categoria'],
-				'CLIENT_MATTER_ID' => $trabajo['codigo_homologacion']
+				'CLIENT_MATTER_ID' => $trabajo['codigo_homologacion'],
+				'MATTER_NAME' => $trabajo['glosa_asunto'],
+				'CLIENT_TAX_ID' => $trabajo['rut'],
+				'LINE_ITEM_TAX_RATE' => $porcentaje_impuesto,
+				'LINE_ITEM_TAX_TOTAL' => $impuesto,
+				'INVOICE_NET_TOTAL' => $Cobro->fields['monto_subtotal'],
+				'INVOICE_CURRENCY' => $this->currency->fields['codigo'],
+				'INVOICE_TAX_TOTAL' => $Cobro->fields['impuesto']
 			);
 
 			$suma += $fila['LINE_ITEM_TOTAL'];
@@ -472,6 +507,9 @@ class Ledes extends Objeto {
 	 * @return string contenido del archivo
 	 */
 	public function GenerarArchivoLedes($datos, $formato = 'LEDES1998B') {
+		if (!empty($this->format)) {
+			$formato = $this->format;
+		}
 		//nombre del formato en la primera fila
 		$out = $formato . "[]" . "\r\n";
 
@@ -519,6 +557,7 @@ class Ledes extends Objeto {
 	 * @return array array(descripcionDelError => array(glosas, de, los, datos, fallados))
 	 */
 	public function ValidarDatos($id_cobro) {
+		return array();
 		$codigos_asuntos = array();
 		$queries = array(
 			"SELECT codigo_asunto FROM trabajo WHERE id_cobro = $id_cobro AND id_tramite = 0",

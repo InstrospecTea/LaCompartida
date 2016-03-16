@@ -129,10 +129,16 @@ class Serengeti  extends Ledes{
 			->add_select('trabajo.codigo_actividad')
 			->add_select('trabajo.codigo_tarea')
 			->add_select('asunto.codigo_homologacion')
+			->add_select('cobro.porcentaje_impuesto')
+			->add_select('cobro.porcentaje_impuesto_gastos')
+			->add_select('asunto.glosa_asunto')
+			->add_select('contrato.rut')
 			->add_from('trabajo')
 			->add_left_join_with('usuario', 'trabajo.id_usuario = usuario.id_usuario')
 			->add_left_join_with('prm_categoria_usuario', 'usuario.id_categoria_usuario = prm_categoria_usuario.id_categoria_usuario')
 			->add_left_join_with('asunto', 'trabajo.codigo_asunto = asunto.codigo_asunto')
+			->add_left_join_with('cobro', 'trabajo.id_cobro = cobro.id_cobro')
+			->add_left_join_with('contrato', 'cobro.id_contrato = contrato.id_contrato')
 			->add_restriction(CriteriaRestriction::equals('trabajo.id_cobro', $id_cobro))
 			->add_restriction(CriteriaRestriction::equals('trabajo.id_tramite', 0))
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
@@ -166,6 +172,13 @@ class Serengeti  extends Ledes{
 				$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
 			}
 
+			$porcentaje_impuesto = $trabajo['porcentaje_impuesto'];
+			if ($this->format == 'LEDES98BI V2') {
+				$impuesto = $monto * $porcentaje_impuesto / 100;
+			} else {
+				$impuesto = 0;
+			}
+
 			$descripcion = trim(str_replace("\n", ' ', $trabajo['descripcion']));
 
 			$fila = array(
@@ -174,7 +187,7 @@ class Serengeti  extends Ledes{
 				'EXP/FEE/INV_ADJ_TYPE' => 'F',
 				'LINE_ITEM_NUMBER_OF_UNITS' => $horas,
 				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $ajuste,
-				'LINE_ITEM_TOTAL' => $monto,
+				'LINE_ITEM_TOTAL' => $monto + $impuesto,
 				'LINE_ITEM_DATE' => $trabajo['fecha'],
 				'LINE_ITEM_TASK_CODE' => $trabajo['codigo_tarea'],
 				'LINE_ITEM_EXPENSE_CODE' => '',
@@ -184,7 +197,14 @@ class Serengeti  extends Ledes{
 				'LINE_ITEM_UNIT_COST' => $tarifa,
 				'TIMEKEEPER_NAME' => $trabajo['nombre_usuario'],
 				'TIMEKEEPER_CLASSIFICATION' => $trabajo['codigo_categoria'],
-				'CLIENT_MATTER_ID' => $trabajo['codigo_homologacion']
+				'CLIENT_MATTER_ID' => $trabajo['codigo_homologacion'],
+				'MATTER_NAME' => $trabajo['glosa_asunto'],
+				'CLIENT_TAX_ID' => $trabajo['rut'],
+				'LINE_ITEM_TAX_RATE' => $porcentaje_impuesto,
+				'LINE_ITEM_TAX_TOTAL' => $impuesto,
+				'INVOICE_NET_TOTAL' => $Cobro->fields['monto_subtotal'],
+				'INVOICE_CURRENCY' => $this->currency->fields['codigo'],
+				'INVOICE_TAX_TOTAL' => $Cobro->fields['impuesto']
 			);
 
 			$suma += $fila['LINE_ITEM_TOTAL'];
