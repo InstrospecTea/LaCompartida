@@ -557,7 +557,6 @@ class Ledes extends Objeto {
 	 * @return array array(descripcionDelError => array(glosas, de, los, datos, fallados))
 	 */
 	public function ValidarDatos($id_cobro) {
-		return array();
 		$codigos_asuntos = array();
 		$queries = array(
 			"SELECT codigo_asunto FROM trabajo WHERE id_cobro = $id_cobro AND id_tramite = 0",
