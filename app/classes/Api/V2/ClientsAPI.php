@@ -18,7 +18,7 @@ class ClientsAPI extends \AbstractSlimAPI {
 
 	public function getUpdatedClients() {
 		$Slim = $this->slim;
-		// $this->validateAuthTokenSendByHeaders();
+		$this->validateAuthTokenSendByHeaders();
 
 		$active = $Slim->request()->params('active');
 		$updatedFrom = $Slim->request()->params('updated_from');
@@ -28,9 +28,9 @@ class ClientsAPI extends \AbstractSlimAPI {
 		}
 
 		$Business = new \ClientsBusiness($this->session);
-		$clients = $Business->getUpdatedClients($active, $updatedFrom);
+		$results = $Business->getUpdatedClients($active, $updatedFrom);
 
-		$this->present($clients, self::$CilientEntity);
+		$this->present($results, self::$CilientEntity);
 	}
 
 }

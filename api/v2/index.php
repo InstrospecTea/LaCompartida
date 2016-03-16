@@ -34,14 +34,14 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
 	$API->getUpdatedClients();
 });
 
-$Slim->get('/clients/:code/matters', function ($code) use ($Session, $Slim) {
-	$API = new ClientsAPI($Session, $Slim);
-	$API->getMattersOfClient($code);
+$Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, $Slim) {
+	$API = new Api\V2\ProjectsAPI($Session, $Slim);
+	$API->getProjectsOfClient($client_id);
 });
 
-$Slim->get('/matters', function () use ($Session, $Slim) {
-	$API = new MattersAPI($Session, $Slim);
-	$API->getMattersByClientCode();
+$Slim->get('/projects', function () use ($Session, $Slim) {
+	$API = new Api\V2\ProjectsAPI($Session, $Slim);
+	$API->getUpdatedMatters();
 });
 
 $Slim->get('/activities', function () use ($Session, $Slim) {

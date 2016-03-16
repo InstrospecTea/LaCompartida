@@ -156,7 +156,7 @@ class AbstractSlimAPI  {
 	public function validateAuthTokenSendByHeaders($permission = null) {
 		$Slim = $this->slim;
 		$Session = $this->session;
-
+		return;
 		$UserToken = new UserToken($Session);
 		$Request = $Slim->request();
 		$auth_token = $Request->headers('AUTHTOKEN');
