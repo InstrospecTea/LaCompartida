@@ -65,8 +65,8 @@ $Slim->get('/translations', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/settings', function () use ($Session, $Slim) {
-	$API = new SettingsAPI($Session, $Slim);
-	$API->getSettings();
+	$API = new Api\V2\SettingsAPI($Session, $Slim);
+	$API->getTimeTrackingSettings();
 });
 
 $Slim->get('/users/:id', function ($id) use ($Session, $Slim) {
