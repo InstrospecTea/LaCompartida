@@ -64,10 +64,12 @@ class AbstractSlimAPI  {
 
 		$keys = array_keys($arrayObj);
 
-		if ($keys[0] === 0) {
-			array_walk($results, 'parse', $entity);
-		} else {
-			parse($results, 'parse',  $entity);
+		if (!empty($results)) {
+			if ($keys[0] === 0) {
+				array_walk($results, 'parse', $entity);
+			} else {
+				parse($results, 'parse',  $entity);
+			}
 		}
 		return $this->outputJson($results);
 	}
