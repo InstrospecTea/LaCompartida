@@ -55,8 +55,8 @@ $Slim->get('/areas', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/tasks', function () use ($Session, $Slim) {
-	$API = new TasksAPI($Session, $Slim);
-	$API->getTasks();
+	$API = new  Api\V2\TasksAPI($Session, $Slim);
+	$API->getUpdatedTasks();
 });
 
 $Slim->get('/translations', function () use ($Session, $Slim) {
