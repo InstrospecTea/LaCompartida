@@ -14,7 +14,9 @@ class ActivitiesAPI extends \AbstractSlimAPI {
 		array('code' => 'codigo_actividad'),
 		array('name' => 'glosa_actividad'),
 		array('active' => 'activo'),
-		array('project_id' => 'id_asunto')
+		array('project_id' => 'id_asunto'),
+		array('project_area_id' => 'id_area_proyecto'),
+		array('project_type_id' => 'id_tipo_proyecto')
 	);
 
 	public function getAllActivitiesByProjectId() {
