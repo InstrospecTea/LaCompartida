@@ -50,8 +50,8 @@ $Slim->get('/activities', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/areas', function () use ($Session, $Slim) {
-	$API = new AreasAPI($Session, $Slim);
-	$API->getAreas();
+	$API = new Api\V2\AreasAPI($Session, $Slim);
+	$API->getUpdatedWorkingAreas();
 });
 
 $Slim->get('/tasks', function () use ($Session, $Slim) {
