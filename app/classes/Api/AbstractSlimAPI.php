@@ -62,7 +62,7 @@ class AbstractSlimAPI  {
 			$results = $arrayObj;
 		}
 
-		$keys = array_keys($arrayObj);
+		$keys = array_keys($results);
 
 		if (!empty($results)) {
 			if ($keys[0] === 0) {
