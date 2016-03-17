@@ -40,11 +40,10 @@ class AbstractSlimAPI  {
 					}
 				} else {
 					$value = $field[$key];
-
 					if (!is_object($element) && isset($element[$value])) {
 						$newElement[$key] = $element[$value];
 					} else {
-						if (array_key_exists($value, $element->fields)) {
+						if (is_object($element) && array_key_exists($value, $element->fields)) {
 							$newElement[$key] = $element->fields[$value];
 						} else {
 							$newElement[$key] = null;
@@ -57,8 +56,19 @@ class AbstractSlimAPI  {
 			return $newElement;
 		}
 
-		$results = $arrayObj->toArray();
-		array_walk($results, 'parse', $entity);
+		if (get_class($arrayObj) == 'SplFixedArray') {
+			$results = $arrayObj->toArray();
+		} else {
+			$results = $arrayObj;
+		}
+
+		$keys = array_keys($arrayObj);
+
+		if ($keys[0] === 0) {
+			array_walk($results, 'parse', $entity);
+		} else {
+			parse($results, 'parse',  $entity);
+		}
 		return $this->outputJson($results);
 	}
 
@@ -156,7 +166,7 @@ class AbstractSlimAPI  {
 	public function validateAuthTokenSendByHeaders($permission = null) {
 		$Slim = $this->slim;
 		$Session = $this->session;
-		return;
+
 		$UserToken = new UserToken($Session);
 		$Request = $Slim->request();
 		$auth_token = $Request->headers('AUTHTOKEN');

@@ -74,23 +74,24 @@ $Slim->get('/users/:id', function ($id) use ($Session, $Slim) {
 	$API->getUserById($id);
 });
 
-$Slim->get('/users/:id/works', function ($id) use ($Session, $Slim) {
-	$API = new TimeEntriesAPI($Session, $Slim);
+$Slim->get('/users/:id/time_entries', function ($id) use ($Session, $Slim) {
+	 error_reporting(E_ALL & ~E_WARNING);
+	$API = new Api\V2\TimeEntriesAPI($Session, $Slim);
 	$API->getTimeEntriesByUserId($id);
 });
 
-$Slim->post('/users/:id/works', function ($id) use ($Session, $Slim) {
-	$API = new TimeEntriesAPI($Session, $Slim);
+$Slim->post('/users/:id/time_entries', function ($id) use ($Session, $Slim) {
+	$API = new Api\V2\TimeEntriesAPI($Session, $Slim);
 	$API->createTimeEntryByUserId($id);
 });
 
-$Slim->put('/users/:user_id/works/:id', function ($user_id, $id) use ($Session, $Slim) {
-	$API = new TimeEntriesAPI($Session, $Slim);
+$Slim->put('/users/:user_id/time_entries/:id', function ($user_id, $id) use ($Session, $Slim) {
+	$API = new Api\V2\TimeEntriesAPI($Session, $Slim);
 	$API->updateTimeEntryByUserId($user_id, $id);
 });
 
-$Slim->delete('/users/:user_id/works/:id', function ($user_id, $id)  use ($Session, $Slim) {
-	$API = new TimeEntriesAPI($Session, $Slim);
+$Slim->delete('/users/:user_id/time_entries/:id', function ($user_id, $id)  use ($Session, $Slim) {
+	$API = new Api\V2\TimeEntriesAPI($Session, $Slim);
 	$API->deleteTimeEntryByUserId($user_id, $id);
 });
 
