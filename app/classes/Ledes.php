@@ -429,6 +429,8 @@ class Ledes extends Objeto {
 
 		$id_cobro = $Cobro->fields['id_cobro'];
 		$filas = array();
+		$Cliente = new Cliente($this->sesion);
+		$Cliente->LoadByCodigo($Cobro->fields['codigo_cliente']);
 		/**
 		 * Obtener los gastos
 		 */
@@ -470,13 +472,19 @@ class Ledes extends Objeto {
 
 			$descripcion = trim(str_replace("\n", ' ', $gasto['descripcion']));
 
+			if ($this->format == 'LEDES98BI V2') {
+				$impuesto = $gasto['monto_total_impuesto'];
+			} else {
+				$impuesto = 0;
+			}
+
 			$fila = array(
 				'LAW_FIRM_MATTER_ID' => $gasto['codigo_asunto'],
 				'LINE_ITEM_NUMBER' => $linea++, //'G' . $gasto['id_movimiento'],
 				'EXP/FEE/INV_ADJ_TYPE' => 'E',
 				'LINE_ITEM_NUMBER_OF_UNITS' => '1',
 				'LINE_ITEM_ADJUSTMENT_AMOUNT' => $total - $sin_impuestos,
-				'LINE_ITEM_TOTAL' => $total,
+				'LINE_ITEM_TOTAL' => $total + $impuesto,
 				'LINE_ITEM_DATE' => $gasto['fecha'],
 				'LINE_ITEM_TASK_CODE' => '',
 				'LINE_ITEM_EXPENSE_CODE' => $datos['codigo_gasto'],
@@ -486,7 +494,14 @@ class Ledes extends Objeto {
 				'LINE_ITEM_UNIT_COST' => $sin_impuestos,
 				'TIMEKEEPER_NAME' => $datos['nombre_usuario'],
 				'TIMEKEEPER_CLASSIFICATION' => $datos['codigo_categoria'],
-				'CLIENT_MATTER_ID' => $datos['codigo_homologacion']
+				'CLIENT_MATTER_ID' => $datos['codigo_homologacion'],
+				'MATTER_NAME' => $gasto['descripcion'],
+				'CLIENT_TAX_ID' => $Cliente->fields['rut'],
+				'LINE_ITEM_TAX_RATE' => $Cobro->fields['porcentaje_impuesto_gastos'],
+				'LINE_ITEM_TAX_TOTAL' => $impuesto,
+				'INVOICE_NET_TOTAL' => $Cobro->fields['subtotal_gastos'],
+				'INVOICE_CURRENCY' => $this->currency->fields['codigo'],
+				'INVOICE_TAX_TOTAL' => $Cobro->fields['impuesto_gastos']
 			);
 
 			$suma += $fila['LINE_ITEM_TOTAL'];
