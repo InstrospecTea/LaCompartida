@@ -51,15 +51,16 @@ class ClientsBusiness extends AbstractBusiness implements IClientsBusiness {
 		$searchCriteria
 			->related_with('Client')->with_direction('INNER')->on_property('codigo_cliente');
 
-		$searchCriteria->filter('codigo_cliente')
-			->restricted_by('equals')
-			->compare_with("'$clientCode'");
+		$searchCriteria
+			->related_with('Language')->with_direction('LEFT')->on_property('id_idioma');
 
 		$results = $this->SearchingBusiness->searchByCriteria(
 			$searchCriteria,
 			array(
 				'*',
-				'Client.id_cliente'
+				'Client.id_cliente',
+				'Language.codigo_idioma',
+				'Language.glosa_idioma'
 			)
 		);
 		return $results;
@@ -90,11 +91,16 @@ class ClientsBusiness extends AbstractBusiness implements IClientsBusiness {
 		$searchCriteria
 			->related_with('Client')->with_direction('INNER')->on_property('codigo_cliente');
 
+		$searchCriteria
+			->related_with('Language')->with_direction('LEFT')->on_property('id_idioma');
+
 		$results = $this->SearchingBusiness->searchByCriteria(
 			$searchCriteria,
 			array(
 				'*',
-				'Client.id_cliente'
+				'Client.id_cliente',
+				'Language.codigo_idioma',
+				'Language.glosa_idioma'
 			)
 		);
 

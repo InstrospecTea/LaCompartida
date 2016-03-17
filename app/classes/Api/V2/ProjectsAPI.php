@@ -16,7 +16,9 @@ class ProjectsAPI extends \AbstractSlimAPI {
 		array('active' => 'activo'),
 		array('client_id' => 'id_cliente'),
 		array('project_area_id' => 'id_area_proyecto'),
-		array('project_type_id' => 'id_tipo_proyecto')
+		array('project_type_id' => 'id_tipo_proyecto'),
+		array('language_code' => 'codigo_idioma'),
+		array('language_name' => 'glosa_idioma')
 	);
 
 	public function getProjectsOfClient($client_id) {
