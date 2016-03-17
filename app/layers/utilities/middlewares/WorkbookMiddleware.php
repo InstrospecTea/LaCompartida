@@ -7,12 +7,20 @@ class WorkbookMiddleware {
 	protected $formats = [];
 	protected $worksheets = [];
 
+	protected $phpExcel;
+	protected $workSheetObj;
+	protected $indexsheet;
+
 	/**
 	 * Construct of the class
 	 * @param string $fileName
 	 */
 	public function __construct($filename) {
 		$this->filename = $filename;
+		$this->indexsheet = 0;
+
+		$this->phpExcel = new PHPExcel();
+		$this->setDocumentProperties($phpExcel);
 	}
 
 	/**
@@ -32,26 +40,25 @@ class WorkbookMiddleware {
 	 * @return int
 	 */
 	public function setCustomColor($index, $red, $green, $blue) {
-	  // Check that the colour index is the right range
-	  if ($index < 8 or $index > 64) {
-	      // TODO: assign real error codes
-	      return $this->raiseError('Color index $index outside range: 8 <= index <= 64');
-	  }
+		// Check that the colour index is the right range
+		if ($index < 8 or $index > 64) {
+			return $this->raiseError('Color index $index outside range: 8 <= index <= 64');
+		}
 
-	  // Check that the colour components are in the right range
-	  if (($red   < 0 or $red   > 255) ||
-	      ($green < 0 or $green > 255) ||
-	      ($blue  < 0 or $blue  > 255))
-	  {
-	      return $this->raiseError('Color component outside range: 0 <= color <= 255');
-	  }
+		// Check that the colour components are in the right range
+		if (($red   < 0 or $red   > 255) ||
+				($green < 0 or $green > 255) ||
+				($blue  < 0 or $blue  > 255))
+		{
+			return $this->raiseError('Color component outside range: 0 <= color <= 255');
+		}
 
-	  $index -= 8; // Adjust colour index (wingless dragonfly)
+		$index -= 8; // Adjust colour index (wingless dragonfly)
 
-	  // Set the RGB value
-	  $this->palette[$index] = array($red, $green, $blue, 0);
+		// Set the RGB value
+		$this->palette[$index] = array($red, $green, $blue, 0);
 
-	  return ($index + 8);
+		return ($index + 8);
 	}
 
 	/**
@@ -71,11 +78,17 @@ class WorkbookMiddleware {
 	 * @return WorksheetMiddleware
 	 */
 	public function addWorksheet($name = '') {
-		$worksheet = new WorksheetMiddleware($name);
+		if ($this->indexsheet <= 0) {
+			$this->workSheetObj = $this->phpExcel->getActiveSheet();
+			$this->indexsheet++;
+		} else {
+			$this->workSheetObj = $this->phpExcel->createSheet($this->indexsheet);
+			$this->indexsheet++;
+		}
 
-		$this->worksheets[] = $worksheet;
+		$this->workSheetObj->setTitle(utf8_encode($name));
 
-		return $worksheet;
+		return $this;
 	}
 
 	/**
@@ -83,42 +96,30 @@ class WorkbookMiddleware {
 	 * @param string $filename
 	 */
 	public function send($filename) {
-		$phpExcel = new PHPExcel();
+		header('Content-Type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment;filename="' . $filename . '"');
+		header('Cache-Control: max-age=0');
+		header('Cache-Control: max-age=1'); // IE 9
+		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+		header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+		header('Cache-Control: cache, must-revalidate');
+		header('Pragma: public');
 
-		$this->setDocumentProperties($phpExcel);
+		$this->phpExcel->setActiveSheetIndex(0);
 
-		foreach ($this->worksheets as $key => $worksheet) {
-			if ($key == 0) {
-				$workSheetObj = $phpExcel->getActiveSheet();
-			} else {
-				$workSheetObj = $phpExcel->createSheet($key);
-			}
+		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, 'Excel5');
+		$writer->setPreCalculateFormulas(true);
 
-			$this->setSheetProperties($workSheetObj, $worksheet);
-			$this->setColumns($workSheetObj, $worksheet);
-			$this->setRows($workSheetObj, $worksheet);
-			$this->mergeCells($workSheetObj, $worksheet);
-			foreach ($worksheet->getElements() as $value) {
-				$cellCode = PHPExcel_Cell::stringFromColumnIndex($value['col']).($value['row'] + 1);
-
-				$this->setData($workSheetObj, $value, $cellCode);
-
-				if (!is_null($value['format'])) {
-					$this->setFormats($workSheetObj, $value['format'], $cellCode);
-				}
-			}
-		}
-
-		$this->downloadExcel($phpExcel, $filename);
+		$writer->save('php://output');
 	}
 
 	/**
 	 *
 	 *
-	 * @todo implement?
 	 */
 	public function close() {
-
+		unset($this->workSheetObj);
+		unset($this->phpExcel);
 	}
 
 	/**
@@ -126,7 +127,7 @@ class WorkbookMiddleware {
 	 * @param PHPExcel $phpExcel
 	 */
 	private function setDocumentProperties($phpExcel) {
-		$phpExcel->getProperties()->setCreator('LemonTech')
+		$this->phpExcel->getProperties()->setCreator('LemonTech')
 							 ->setLastModifiedBy('LemonTech')
 							 ->setTitle($filename)
 							 ->setSubject($filename)
@@ -135,158 +136,61 @@ class WorkbookMiddleware {
 	}
 
 	/**
-	 * Set sheet properties
-	 * @param PHPExcel_Worksheet $workSheetObj
-	 * @param WorksheetMiddleware $worksheet
-	 */
-	private function setSheetProperties($workSheetObj, $worksheet) {
-		$workSheetObj->setTitle(utf8_encode($worksheet->getTitle()));
-		$workSheetObj->getPageMargins()
-							->setTop($worksheet->getMarginTop())
-							->setRight($worksheet->getMarginRight())
-							->setLeft($worksheet->getMarginLeft())
-							->setBottom($worksheet->getMarginBottom());
-		$workSheetObj->getPageSetup()->setPaperSize($worksheet->getPaper());
-		$workSheetObj->setPrintGridlines($worksheet->getPrintGridlines());
-		$workSheetObj->setShowGridlines($worksheet->getScreenGridlines());
-		$workSheetObj->getPageSetup()->setFitToPage($worksheet->getFitPage());
-		$workSheetObj->getPageSetup()->setFitToWidth($worksheet->getFitWidth());
-		$workSheetObj->getPageSetup()->setFitToHeight($worksheet->getFitHeight());
-	}
-
-	/**
-	 * Set columns properties
-	 * @param PHPExcel_Worksheet $workSheetObj
-	 * @param WorksheetMiddleware $worksheet
-	 *
-	 * @todo formats and levels
-	 */
-	private function setColumns($workSheetObj, $worksheet) {
-		foreach ($worksheet->getColumns() as $value) {
-			$column = PHPExcel_Cell::stringFromColumnIndex($value['firstcol']);
-
-			$workSheetObj->getColumnDimension($column)->setWidth($value['width']);
-
-			if (!is_null($value['hidden']) && $value['hidden']) {
-				$workSheetObj->getColumnDimension($column)->setVisible(false);
-			}
-
-			//TODO: format and level.
-		}
-	}
-
-	/**
-	 * Set the row properties
-	 * @param PHPExcel_Worksheet $workSheetObj
-	 * @param WorksheetMiddleware $worksheet
-	 *
-	 * @todo formats and levels
-	 */
-	private function setRows($workSheetObj, $worksheet) {
-		foreach ($worksheet->getRows() as $value) {
-			$row = $value['row'] + 1;
-
-			$workSheetObj->getRowDimension($row)->setRowHeight($value['height']);
-
-			if (!is_null($value['hidden']) && $value['hidden']) {
-				$workSheetObj->getRowDimension($row)->setVisible(false);
-			}
-
-			//TODO: format and level.
-		}
-	}
-
-	/**
-	 * Merge cells
-	 * @param PHPExcel_Worksheet $workSheetObj
-	 * @param WorksheetMiddleware $worksheet
-	 */
-	private function mergeCells($workSheetObj, $worksheet) {
-		foreach ($worksheet->getCellsMerged() as $value) {
-			$cellsMerged =
-					PHPExcel_Cell::stringFromColumnIndex($value['first_col']).($value['first_row'] + 1) .
-					":" .
-					PHPExcel_Cell::stringFromColumnIndex($value['last_col']).($value['last_row'] + 1)
-					;
-
-			$workSheetObj->mergeCells($cellsMerged);
-		}
-	}
-
-	/**
-	 * Add data to cells
-	 * @param PHPExcel_Worksheet $workSheet
-	 * @param array $element
-	 * @param string $cellCode
-	 */
-	private function setData($workSheet, $element, $cellCode) {
-		if ($element['type'] == 'formula') {
-			$element['data'] = str_replace(';', ',', $element['data']);
-			$workSheet->getCell($cellCode)->setDataType(PHPExcel_Cell_DataType::TYPE_FORMULA);
-		}
-
-		$workSheet->setCellValue(
-				$cellCode,
-				utf8_encode($element['data'])
-		);
-	}
-
-	/**
 	 * Add formats to cells
-	 * @param PHPExcel_Worksheet $workSheet
-	 * @param FormatMiddleware $formats
+	 * @param array $formats
 	 * @param string $cellCode
 	 *
 	 * @todo Implement the border format
 	 */
-	private function setFormats($workSheet, $formats, $cellCode) {
-		foreach ($formats->getElements() as $key => $formatValue) {
+	private function setFormat($format, $cellCode) {
+		// var_dump($format);
+		foreach ($format->getElements() as $key => $formatValue) {
 			if (!is_null($formatValue)) {
 				switch ($key) {
 					case 'size':
-						$workSheet->getStyle($cellCode)->getFont()->setSize($formatValue);
+						$this->workSheetObj->getStyle($cellCode)->getFont()->setSize($formatValue);
 						break;
 					case 'align':
-						$workSheet->getStyle($cellCode)->getAlignment()->setHorizontal($formatValue);
+						$this->workSheetObj->getStyle($cellCode)->getAlignment()->setHorizontal($formatValue);
 						break;
 					case 'valign':
-						$workSheet->getStyle($cellCode)->getAlignment()->setVertical($formatValue);
+						$this->workSheetObj->getStyle($cellCode)->getAlignment()->setVertical($formatValue);
 						break;
 					case 'bold':
-						$workSheet->getStyle($cellCode)->getFont()->setBold($formatValue);
+						$this->workSheetObj->getStyle($cellCode)->getFont()->setBold($formatValue);
 						break;
 					case 'italic':
-						$workSheet->getStyle($cellCode)->getFont()->setItalic($formatValue);
+						$this->workSheetObj->getStyle($cellCode)->getFont()->setItalic($formatValue);
 						break;
 					case 'color':
-						$workSheet->getStyle($cellCode)->getFont()->getColor()->setARGB($formatValue);
+						$this->workSheetObj->getStyle($cellCode)->getFont()->getColor()->setARGB($formatValue);
 						break;
 					case 'locked':
 						if ($value) {
-							$workSheet->getStyle($cellCode)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
+							$this->workSheetObj->getStyle($cellCode)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
 						}
 						break;
 					case 'top':
-						$workSheet->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+						$this->workSheetObj->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
 						break;
 					case 'bottom':
-						$workSheet->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+						$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
 						break;
 					case 'fgcolor':
 						if (is_int($formatValue) && ($formatValue > 8 && $formatValue < 64)) {
 							// the subtraction is for continue the logic of the method setCustomColor
 							$rgb = $this->palette[$formatValue - 8];
 
-							$workSheet->getStyle($cellCode)
+							$this->workSheetObj->getStyle($cellCode)
 											->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
 											->getStartColor()->setRGB($this->rgb2hex($rgb));
 						}
 						break;
 					case 'textwrap':
-						$workSheet->getStyle($cellCode)->getAlignment()->setWrapText($formatValue);
+						$this->workSheetObj->getStyle($cellCode)->getAlignment()->setWrapText($formatValue);
 						break;
 					case 'numformat':
-						$workSheet->getStyle($cellCode)->getNumberFormat()->setFormatCode($formatValue);
+						$this->workSheetObj->getStyle($cellCode)->getNumberFormat()->setFormatCode($formatValue);
 						break;
 					case 'border':
 						// TODO: Implement
@@ -307,29 +211,6 @@ class WorkbookMiddleware {
 	}
 
 	/**
-	 * Download the Excel
-	 * @param PHPExcel $phpExcel
-	 * @param string $filename
-	 */
-	private function downloadExcel($phpExcel, $filename) {
-		header('Content-Type: application/vnd.ms-excel');
-		header('Content-Disposition: attachment;filename="' . $filename . '"');
-		header('Cache-Control: max-age=0');
-		header('Cache-Control: max-age=1'); // IE 9
-		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-		header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-		header('Cache-Control: cache, must-revalidate');
-		header('Pragma: public');
-
-		$phpExcel->setActiveSheetIndex(0);
-
-		$writer = PHPExcel_IOFactory::createWriter($phpExcel, 'Excel5');
-		$writer->setPreCalculateFormulas(true);
-
-		$writer->save('php://output');
-	}
-
-	/**
 	 * Convert a RGB code to hexadecimal
 	 * @param string $rgb
 	 * @return hexadecimal code
@@ -347,4 +228,173 @@ class WorkbookMiddleware {
 		}
 	}
 
+	/* Worksheet Methods*/
+
+	/**
+	 * Set the type of papper
+	 * http://www.osakac.ac.jp/labs/koeda/tmp/phpexcel/Documentation/API/PHPExcel_Worksheet/PHPExcel_Worksheet_PageSetup.html#methodsetPaperSize
+	 * @param string $size
+	 */
+	public function setPaper($size = 0) {
+		$this->workSheetObj->getPageSetup()->setPaperSize($size);
+	}
+
+	/**
+	 * Hide printed Gridlines
+	 */
+	public function hideGridlines() {
+		$this->workSheetObj->setPrintGridlines(false);
+	}
+
+	/**
+	 * Hide document Gridlines
+	 */
+	public function hideScreenGridlines() {
+		$this->workSheetObj->setShowGridlines(false);
+	}
+
+	/**
+	 * Set document margins
+	 * @param float $margin
+	 */
+	public function setMargins($margin) {
+		$this->workSheetObj->getPageMargins()
+											->setTop($margin)
+											->setRight($margin)
+											->setLeft($margin)
+											->setBottom($margin);
+	}
+
+	/**
+	 * Set fit to pages
+	 * @param int $width
+	 * @param int $height
+	 */
+	public function fitToPages($width, $height) {
+		$this->workSheetObj->getPageSetup()
+											->setFitToPage(true)
+											->setFitToWidth($width)
+											->setFitToHeight($height);
+	}
+
+	/**
+	 * Add a column element (properties)
+	 * @param int $firstcol
+	 * @param int $lastcol
+	 * @param int $width
+	 * @param FormatMiddleware $format
+	 * @param boolean $hidden
+	 * @param int $level
+	 */
+	public function setColumn($firstcol, $lastcol, $width, $format = null, $hidden = false, $level = 0) {
+		$column = PHPExcel_Cell::stringFromColumnIndex($firstcol);
+
+		$this->workSheetObj->getColumnDimension($column)->setWidth($width);
+
+		if ($hidden) {
+			$this->workSheetObj->getColumnDimension($column)->setVisible(false);
+		}
+
+		//TODO: format and level.
+	}
+
+	/**
+	 * Add a row element (properties)
+	 * @param int $row
+	 * @param int $height
+	 * @param FormatMiddleware $format
+	 * @param boolean $hidden
+	 * @param int $level
+	 */
+	public function setRow($row, $height, $format = null, $hidden = false, $level = 0) {
+		$row = $row + 1;
+
+		$this->workSheetObj->getRowDimension($row)->setRowHeight($height);
+
+		if ($hidden) {
+			$this->workSheetObj->getRowDimension($row)->setVisible(false);
+		}
+
+		//TODO: format and level.
+	}
+
+	/**
+	 * Add cells merged
+	 * @param int $first_row
+	 * @param int $first_col
+	 * @param int $last_row
+	 * @param int $last_col
+	 */
+	public function mergeCells($first_row, $first_col, $last_row, $last_col) {
+		$cellsMerged =
+					PHPExcel_Cell::stringFromColumnIndex($first_col).($first_row + 1) .
+					":" .
+					PHPExcel_Cell::stringFromColumnIndex($last_col).($last_row + 1)
+					;
+
+		$this->workSheetObj->mergeCells($cellsMerged);
+	}
+
+	/**
+	 * Add data to cell
+	 * @param int $row
+	 * @param int $col
+	 * @param string $token
+	 * @param FormatMiddleware $format
+	 */
+	public function write($row, $col, $token, $format = null) {
+		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
+
+		$this->workSheetObj->setCellValue(
+				$cellCode,
+				utf8_encode($token)
+		);
+
+		if (!is_null($format)) {
+			$this->setFormat($format, $cellCode);
+		}
+	}
+
+		/**
+	 * Add number to cell
+	 * @param int $row
+	 * @param int $col
+	 * @param number $num
+	 * @param FormatMiddleware $format
+	 */
+	public function writeNumber($row, $col, $num, $format = null) {
+		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
+
+		$this->workSheetObj->setCellValue(
+				$cellCode,
+				utf8_encode($num)
+		);
+
+		if (!is_null($format)) {
+			$this->setFormat($format, $cellCode);
+		}
+	}
+
+	/**
+	 * Add formula to cell
+	 * @param int $row
+	 * @param int $col
+	 * @param string $formula
+	 * @param FormatMiddleware $format
+	 */
+	public function writeFormula($row, $col, $formula, $format = null) {
+		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
+
+		$formula = str_replace(';', ',', $formula);
+		$this->workSheetObj->getCell($cellCode)->setDataType(PHPExcel_Cell_DataType::TYPE_FORMULA);
+
+		$this->workSheetObj->setCellValue(
+				$cellCode,
+				utf8_encode($formula)
+		);
+
+		if (!is_null($format)) {
+			$this->setFormat($format, $cellCode);
+		}
+	}
 }
