@@ -352,10 +352,16 @@ class Ledes extends Objeto {
 			->add_select('tramite.codigo_tarea')
 			->add_select('asunto.codigo_homologacion')
 			->add_select('tramite.cobrable')
+			->add_select('cobro.porcentaje_impuesto')
+			->add_select('cobro.porcentaje_impuesto_gastos')
+			->add_select('asunto.glosa_asunto')
+			->add_select('contrato.rut')
 			->add_from('tramite')
 			->add_left_join_with('usuario', 'tramite.id_usuario = usuario.id_usuario')
 			->add_left_join_with('prm_categoria_usuario', 'prm_categoria_usuario.id_categoria_usuario = usuario.id_categoria_usuario')
 			->add_left_join_with('asunto', 'tramite.codigo_asunto = asunto.codigo_asunto')
+			->add_left_join_with('cobro', 'tramite.id_cobro = cobro.id_cobro')
+			->add_left_join_with('contrato', 'cobro.id_contrato = contrato.id_contrato')
 			->add_restriction(CriteriaRestriction::equals('tramite.id_cobro', $id_cobro))
 			->run();
 
@@ -380,6 +386,13 @@ class Ledes extends Objeto {
 			$tarifa = $this->round($tarifa / $horas);
 			$ajuste = ($monto != 0) ? ($monto - $tarifa * $horas) : 0;
 
+			$porcentaje_impuesto = $tramite['porcentaje_impuesto'];
+			if ($this->format == 'LEDES98BI V2') {
+				$impuesto = $monto * $porcentaje_impuesto / 100;
+			} else {
+				$impuesto = 0;
+			}
+
 			$descripcion = trim(str_replace("\n", ' ', $tramite['descripcion']));
 
 			$fila = array(
@@ -398,7 +411,14 @@ class Ledes extends Objeto {
 				'LINE_ITEM_UNIT_COST' => $tarifa,
 				'TIMEKEEPER_NAME' => $tramite['nombre_usuario'],
 				'TIMEKEEPER_CLASSIFICATION' => $tramite['codigo_categoria'],
-				'CLIENT_MATTER_ID' => $tramite['codigo_homologacion']
+				'CLIENT_MATTER_ID' => $tramite['codigo_homologacion'],
+				'MATTER_NAME' => $tramite['glosa_asunto'],
+				'CLIENT_TAX_ID' => $tramite['rut'],
+				'LINE_ITEM_TAX_RATE' => $porcentaje_impuesto,
+				'LINE_ITEM_TAX_TOTAL' => $impuesto,
+				'INVOICE_NET_TOTAL' => $Cobro->fields['monto_subtotal'],
+				'INVOICE_CURRENCY' => $this->currency->fields['codigo'],
+				'INVOICE_TAX_TOTAL' => $Cobro->fields['impuesto']
 			);
 
 			$suma += $fila['LINE_ITEM_TOTAL'];
