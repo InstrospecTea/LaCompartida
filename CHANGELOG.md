@@ -1,7 +1,11 @@
 # Changelog
 
+## Hotfix 16.4.10
+Friday, March 18th
+* **Fix** [Corrección query obtención trámites](https://github.com/LemontechSA/ttb/pull/1368)
+
 ## Hotfix 16.4.9
-Friday, March 11
+Friday, March 11th
 * **Fix** [Cambia temporalmente URL de nubox a https](https://github.com/LemontechSA/ttb/pull/1363)
 
 ## Hotfix 16.4.8
