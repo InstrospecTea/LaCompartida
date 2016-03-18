@@ -92,12 +92,32 @@ class WorkbookMiddleware {
 	}
 
 	/**
-	 * Build and download the document
+	 *
+	 * @param int $row
+	 * @param int $col
+	 */
+	public function rowcolToCell($row, $col) {
+		if (is_int($row) && is_int($col)) {
+			return PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 *
 	 * @param string $filename
 	 */
 	public function send($filename) {
+		$this->filename = $filename;
+	}
+
+	/**
+	 * Download the document
+	 */
+	public function close() {
 		header('Content-Type: application/vnd.ms-excel');
-		header('Content-Disposition: attachment;filename="' . $filename . '"');
+		header('Content-Disposition: attachment;filename="' . $this->filename . '"');
 		header('Cache-Control: max-age=0');
 		header('Cache-Control: max-age=1'); // IE 9
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -111,13 +131,7 @@ class WorkbookMiddleware {
 		$writer->setPreCalculateFormulas(true);
 
 		$writer->save('php://output');
-	}
 
-	/**
-	 *
-	 *
-	 */
-	public function close() {
 		unset($this->workSheetObj);
 		unset($this->phpExcel);
 	}
@@ -143,7 +157,6 @@ class WorkbookMiddleware {
 	 * @todo Implement the border format
 	 */
 	private function setFormat($format, $cellCode) {
-		// var_dump($format);
 		foreach ($format->getElements() as $key => $formatValue) {
 			if (!is_null($formatValue)) {
 				switch ($key) {
@@ -355,6 +368,26 @@ class WorkbookMiddleware {
 		}
 	}
 
+	/**
+	 * Add data to cell
+	 * @param int $row
+	 * @param int $col
+	 * @param string $token
+	 * @param FormatMiddleware $format
+	 */
+	public function writeString($row, $col, $token, $format = null) {
+		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
+
+		$this->workSheetObj->setCellValue(
+				$cellCode,
+				utf8_encode($token)
+		);
+
+		if (!is_null($format)) {
+			$this->setFormat($format, $cellCode);
+		}
+	}
+
 		/**
 	 * Add number to cell
 	 * @param int $row
@@ -397,4 +430,41 @@ class WorkbookMiddleware {
 			$this->setFormat($format, $cellCode);
 		}
 	}
+
+	/**
+	 * Set landscape orientation
+	 */
+	public function setLandscape() {
+		$this->workSheetObj->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+	}
+
+	/**
+	 * Freeze panes
+	 * @param array $panes
+	 */
+	public function freezePanes($panes) {
+		$row = is_null($panes[0]) ? 1 : $panes[0] + 1;
+		$col = is_null($panes[1]) ? 0 : $panes[1];
+
+		$this->workSheetObj->freezePaneByColumnAndRow($col, $row);
+	}
+
+	/**
+	 * Set input encoding
+	 * @param string $encode
+	 *
+	 * @todo implement
+	 */
+	public function setInputEncoding($encode) {
+
+	}
+
+	/**
+	 * Set sheet zoom
+	 * @param int $scale
+	 */
+	public function setZoom($scale) {
+		$this->workSheetObj->getSheetView()->setZoomScale($scale);
+	}
+
 }
