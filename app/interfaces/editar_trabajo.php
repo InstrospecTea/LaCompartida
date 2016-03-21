@@ -319,6 +319,10 @@ if ($opcion == "guardar") {
 				$pagina->AddInfo(__('Trabajo') . ' ' . ($nuevo ? __('guardado con éxito') : __('editado con éxito')));
 				// refresca el listado de horas.php cuando se graba la informacion desde el popup
 				$refresh_parent = true;
+				// Mixpanel Event: Ingreso Horas
+				$mp = Mixpanel::getInstance("35700d667425ad9858d92ff694febf63");
+				$mp->identify($RUT);
+				$mp->track("Ingreso Horas");
 			} else {
 				$pagina->AddError($t->error);
 			}
