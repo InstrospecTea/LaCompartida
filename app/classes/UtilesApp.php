@@ -1577,7 +1577,7 @@ HTML;
 
 
 
-					$monto_trabajo_con_descuento = $cobro->TotalCobrosCap($id_cobro) + $cobro->fields[$campo[$xtabla]['monto_trabajo']] - $datos_cobro->fields[$campo[$xtabla]['descuento']];
+					$monto_trabajo_con_descuento = $cobro->TotalCobrosCap($id_cobro) + $cobro->fields[$campo[$xtabla]['monto_trabajos']] - $datos_cobro->fields[$campo[$xtabla]['descuento']];
 					$arr_resultado['monto_trabajo_con_descuento'][$id_moneda_actual] = UtilesApp::CambiarMoneda($monto_trabajo_con_descuento//monto_moneda_l
 									, $cobro_moneda->moneda[$id_moneda_original]['tipo_cambio']//tipo de cambio ini
 									, $cobro_moneda->moneda[$id_moneda_original]['cifras_decimales']//decimales ini
@@ -1715,16 +1715,35 @@ HTML;
 							, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 			);
 
-			foreach ($arr_datos_gastos as $campo => $valor) {
+			foreach ($arr_datos_gastos as $_campo => $valor) {
 				if (is_array($valor))
 					continue;
-				$arr_resultado['gastos'][$campo][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor//monto_moneda_l
+				$arr_resultado['gastos'][$_campo][$id_moneda_actual] = UtilesApp::CambiarMoneda($valor//monto_moneda_l
 								, $cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['tipo_cambio']//tipo de cambio ini
 								, $cobro_moneda->moneda[$arr_resultado['opc_moneda_total']]['cifras_decimales']//decimales ini
 								, $cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio']//tipo de cambio fin
 								, $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']//decimales fin
 				);
 			}
+
+			$neto = $arr_resultado[$campo[$xtabla]['monto_subtotal']][$id_moneda_actual] - $arr_resultado[$campo[$xtabla]['descuento']][$id_moneda_actual];
+			$impuesto = round($neto * ($cobro->fields['porcentaje_impuesto'] / 100), $cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']);
+
+			$arr_resultado['impuesto'][$id_moneda_actual] = UtilesApp::CambiarMoneda(
+				$impuesto, '', $decimales_completos, '', $cifras_decimales_actual);
+
+			$arr_resultado[$campo[$xtabla]['monto']][$id_moneda_actual] = UtilesApp::CambiarMoneda($neto + $impuesto, '', $decimales_completos, '', $cifras_decimales_actual);
+
+			$monto_trabajos = $cobro->TotalCobrosCap($id_cobro) + $arr_resultado['monto_trabajos'][$cobro->fields['id_moneda']];
+			$monto_trabajos_con_descuento = $monto_trabajos - (round($monto_trabajos * ($cobro->fields['porcentaje_descuento'] / 100), $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales']));
+
+			$arr_resultado['monto_trabajo_con_descuento'][$id_moneda_actual] = UtilesApp::CambiarMoneda(
+				$monto_trabajos_con_descuento,
+				$cobro_moneda->moneda[$cobro->fields['id_moneda']]['tipo_cambio'],
+				$cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'],
+				$cobro_moneda->moneda[$id_moneda_actual]['tipo_cambio'],
+				$cobro_moneda->moneda[$id_moneda_actual]['cifras_decimales']
+			);
 
 			if ($xtabla == 'cobro') {
 				$arr_resultado['subtotal_honorarios'][$id_moneda_actual] = UtilesApp::CambiarMoneda($arr_resultado['monto_subtotal'][$id_moneda_actual], '', $cifras_decimales_actual, '', $cifras_decimales_actual);

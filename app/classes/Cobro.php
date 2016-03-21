@@ -1644,11 +1644,11 @@ if (!class_exists('Cobro')) {
 
 			#DESCUENTOS
 			if ($this->fields['tipo_descuento'] == 'PORCENTAJE') {
-				$cobro_descuento = ($_calcula_monto_tramites + $cobro_total_honorario_cobrable) * $this->fields['porcentaje_descuento'] / 100;
+				$cobro_descuento = ($_calcula_monto_tramites + round($cobro_total_honorario_cobrable, $moneda_del_cobro->fields['cifras_decimales'])) * $this->fields['porcentaje_descuento'] / 100;
 				$cobro_total = ($_calcula_monto_tramites + $cobro_total_honorario_cobrable) - $cobro_descuento;
 				$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - $cobro_descuento;
-				$this->Edit('descuento', number_format($cobro_descuento, 6, ".", ""));
+				$this->Edit('descuento', number_format($cobro_descuento, $moneda_del_cobro->fields['cifras_decimales'], ".", ""));
 			} else {
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - ($this->fields['descuento']);
 				$cobro_total = ($_calcula_monto_tramites + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
