@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.4.11
+Monday, March 21th
+* **Fix** [Mejora de mensajes en la generación masiva de cobros] (https://github.com/LemontechSA/ttb/pull/1369)
+
 ## Hotfix 16.4.10
 Friday, March 18th
 * **Fix** [Corrección query obtención trámites](https://github.com/LemontechSA/ttb/pull/1368)

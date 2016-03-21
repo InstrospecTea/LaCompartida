@@ -63,6 +63,11 @@ class Trabajo extends Objeto
 			$this->fields = $work->fields;
 			return true;
 		} catch(ServiceException $ex) {
+			$newrelic = new NewRelic('TrabajoWrite');
+			$newrelic->addMessage($ex->getMessage())
+				->addMessage($ex->getFile())
+				->addMessage($ex->getLine())
+				->notice();
 			return false;
 		}
 	}
