@@ -1,7 +1,5 @@
 <?php
 
-require_once 'Spreadsheet/Excel/Writer.php';
-
 class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 	/**
