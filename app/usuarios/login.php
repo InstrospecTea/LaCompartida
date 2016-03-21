@@ -134,6 +134,19 @@ if($desde == 'sitio' && (UtilesApp::GetConf($sesion, 'LoginDesdeSitio'))) {
 	$sesion->Login($rut, $dvrut, $password, $recordar, "", $use_ad);
 }
 
+if(isset($sesion->usuario)){
+	$usuario_fields = $sesion->usuario->fields;
+	$mp = Mixpanel::getInstance("35700d667425ad9858d92ff694febf63");
+	$mp->people->set($usuario_fields['rut'], array(
+		'$first_name' => $usuario_fields['nombre'],
+		'$last_name' => $usuario_fields['apellido1'],
+		'$email' => $usuario_fields['email'],
+		'cliente' => $subdominio
+	));
+	$mp->identify($usuario_fields['rut']);
+	$mp->track('login');
+}
+
 $pagina = new Pagina($sesion);
 
 //Validamos que url no sea vacio ni sea trabajo.php
