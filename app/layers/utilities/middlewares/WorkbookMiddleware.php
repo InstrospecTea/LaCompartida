@@ -153,8 +153,6 @@ class WorkbookMiddleware {
 	 * Add formats to cells
 	 * @param array $formats
 	 * @param string $cellCode
-	 *
-	 * @todo Implement the border format
 	 */
 	private function setFormat($format, $cellCode) {
 		foreach ($format->getElements() as $key => $formatValue) {
@@ -184,12 +182,22 @@ class WorkbookMiddleware {
 						}
 						break;
 					case 'top':
-						$this->workSheetObj->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+						if (strval($formatValue) == '1') {
+							$this->workSheetObj->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+						} else if (strval($formatValue) == '2') {
+							$this->workSheetObj->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
+						}
 						break;
 					case 'bottom':
-						$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+						if (strval($formatValue) == '1') {
+							$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+						} else if (strval($formatValue) == '2') {
+							$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
+						}
 						break;
 					case 'fgcolor':
+						$formatValue = is_string($formatValue) ? intval($formatValue) : $formatValue;
+
 						if (is_int($formatValue) && ($formatValue > 8 && $formatValue < 64)) {
 							// the subtraction is for continue the logic of the method setCustomColor
 							$rgb = $this->palette[$formatValue - 8];
@@ -206,7 +214,11 @@ class WorkbookMiddleware {
 						$this->workSheetObj->getStyle($cellCode)->getNumberFormat()->setFormatCode($formatValue);
 						break;
 					case 'border':
-						// TODO: Implement
+						if (strval($formatValue) == '1') {
+							$this->workSheetObj->getStyle($cellCode)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+						} else if (strval($formatValue) == '2') {
+							$this->workSheetObj->getStyle($cellCode)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
+						}
 						break;
 				}
 			}
@@ -360,7 +372,7 @@ class WorkbookMiddleware {
 
 		$this->workSheetObj->setCellValue(
 				$cellCode,
-				utf8_encode($token)
+				mb_detect_encoding($token, 'UTF-8', true) ? $token : utf8_encode($token)
 		);
 
 		if (!is_null($format)) {
@@ -378,9 +390,10 @@ class WorkbookMiddleware {
 	public function writeString($row, $col, $token, $format = null) {
 		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
 
-		$this->workSheetObj->setCellValue(
+		$this->workSheetObj->setCellValueExplicit(
 				$cellCode,
-				utf8_encode($token)
+				mb_detect_encoding($token, 'UTF-8', true) ? $token : utf8_encode($token),
+				PHPExcel_Cell_DataType::TYPE_STRING
 		);
 
 		if (!is_null($format)) {
@@ -398,9 +411,10 @@ class WorkbookMiddleware {
 	public function writeNumber($row, $col, $num, $format = null) {
 		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
 
-		$this->workSheetObj->setCellValue(
+		$this->workSheetObj->setCellValueExplicit(
 				$cellCode,
-				utf8_encode($num)
+				mb_detect_encoding($num, 'UTF-8', true) ? $num : utf8_encode($num),
+				PHPExcel_Cell_DataType::TYPE_NUMERIC
 		);
 
 		if (!is_null($format)) {
@@ -419,16 +433,31 @@ class WorkbookMiddleware {
 		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
 
 		$formula = str_replace(';', ',', $formula);
-		$this->workSheetObj->getCell($cellCode)->setDataType(PHPExcel_Cell_DataType::TYPE_FORMULA);
 
-		$this->workSheetObj->setCellValue(
+		$this->workSheetObj->setCellValueExplicit(
 				$cellCode,
-				utf8_encode($formula)
+				mb_detect_encoding($formula, 'UTF-8', true) ? $formula : utf8_encode($formula),
+				PHPExcel_Cell_DataType::TYPE_FORMULA
 		);
 
 		if (!is_null($format)) {
 			$this->setFormat($format, $cellCode);
 		}
+	}
+
+	/**
+	 * Add formula to cell
+	 * @param int $row
+	 * @param int $col
+	 * @param string $note
+	 */
+	public function writeNote($row, $col, $note) {
+		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
+
+		$this->workSheetObj->getComment($cellCode)->setAuthor('The TimeBilling');
+
+		$this->workSheetObj->getComment($cellCode)
+											->getText()->createTextRun($note);
 	}
 
 	/**
