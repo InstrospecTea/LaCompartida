@@ -320,9 +320,11 @@ if ($opcion == "guardar") {
 				// refresca el listado de horas.php cuando se graba la informacion desde el popup
 				$refresh_parent = true;
 				// Mixpanel Event: Ingreso Horas
-				$mp = Mixpanel::getInstance("35700d667425ad9858d92ff694febf63");
-				$mp->identify($RUT);
-				$mp->track("Ingreso Horas");
+				if($es_trabajo_nuevo == 1) {
+					$mp = Mixpanel::getInstance("35700d667425ad9858d92ff694febf63");
+					$mp->identify($RUT);
+					$mp->track("Ingreso Horas");
+				}
 			} else {
 				$pagina->AddError($t->error);
 			}
