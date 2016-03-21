@@ -142,7 +142,7 @@ $fecha_actual = date('Y-m-d');
 
 // Crear y preparar planilla
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 // Enviar headers a la pagina
 
