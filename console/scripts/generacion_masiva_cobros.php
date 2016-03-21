@@ -432,9 +432,9 @@ class GeneracionMasivaCobros extends AppShell {
 	private function generateMessage($key, $name) {
 		$msg_generado = $this->sp(
 			$this->generated[$key],
-			__("Se ha generado 1 liquidación {$name}"),
-			__('Se han generado') . " {$this->generated[$key]} " . __("liquidaciones {$name}"),
-			__("No se han generado liquidaciones {$name}"));
+			__('Se ha generado') . ' 1 ' . __('Cobro') . " {$name}",
+			__('Se han generado') . " {$this->generated[$key]} " . __('Cobros') . " {$name}",
+			__('No se han generado') . ' '.  __('Cobros') . " {$name}");
 
 		$msg_error = $this->sp(
 			$this->errors[$key],
