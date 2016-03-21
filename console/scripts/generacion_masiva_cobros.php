@@ -202,7 +202,8 @@ class GeneracionMasivaCobros extends AppShell {
 			} else {
 				$this->status('mensajes', "<span style=\"color:red\">Ocurrió un error al procesar algunos asuntos : <br>{$mensajes}</span>");
 			}
-		}$messages = $this->generateMessage('gg', 'gastos');
+		}
+		$messages = $this->generateMessage('gg', 'gastos');
 		$this->status('gg', "<strong>{$messages['message']}. ({$messages['error']})</strong>");
 	}
 
