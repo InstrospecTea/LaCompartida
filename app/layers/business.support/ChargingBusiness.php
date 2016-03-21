@@ -1078,18 +1078,19 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			$CriteriaSale->add_select('SUM(ventas.total_factura * -1)', 'total_period');
 		}
 
-		if ($parameters['separated_by_invoice'] == '1') {
-			$CriteriaSale
-				->add_select('ventas.identificador', 'invoice')
-				->add_grouping('ventas.id_factura');
-		} else {
-			$CriteriaSale->add_grouping('ventas.RUT_cliente');
-		}
-
 		$CriteriaSale
 			->add_grouping('ventas.mes_contable')
 			->add_ordering('ventas.cliente')
 			->add_ordering('ventas.mes_contable');
+
+		if ($parameters['separated_by_invoice'] == '1') {
+			$CriteriaSale
+				->add_select('ventas.identificador', 'invoice')
+				->add_grouping('ventas.id_factura')
+				->add_ordering('ventas.id_factura');
+		} else {
+			$CriteriaSale->add_grouping('ventas.RUT_cliente');
+		}
 
 		return $CriteriaSale;
 	}
