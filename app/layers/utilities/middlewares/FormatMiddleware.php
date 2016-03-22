@@ -15,6 +15,7 @@ class FormatMiddleware {
 	protected $textwrap;
 	protected $numformat;
 	protected $border;
+	protected $underline;
 
 
 	/**
@@ -189,6 +190,14 @@ class FormatMiddleware {
 	}
 
 	/**
+	 * Set underline
+	 * @param int $underline
+	 */
+	public function setUnderline($underline) {
+		$this->underline = $underline;
+	}
+
+	/**
 	 * Get element of this class
 	 * @return element of this class
 	 */
@@ -207,45 +216,48 @@ class FormatMiddleware {
 	 * @param string $value
 	 */
 	private function assignValue($key, $value) {
-		switch ($key) {
-			case 'Size':
+		switch (strtolower($key)) {
+			case 'size':
 				$this->setSize($value);
 				break;
-			case 'Align':
+			case 'align':
 				$this->setAlign($value);
 				break;
-			case 'VAlign':
+			case 'valign':
 				$this->setValign($value);
 				break;
-			case 'Bold':
+			case 'bold':
 				$this->setBold($value);
 				break;
-			case 'Color':
+			case 'color':
 				$this->setColor($value);
 				break;
-			case 'Locked':
+			case 'locked':
 				$this->setLocked($value);
 				break;
-			case 'Top':
+			case 'top':
 				$this->setTop($value);
 				break;
-			case 'Bottom':
+			case 'bottom':
 				$this->setBottom($value);
 				break;
-			case 'FgColor':
+			case 'fgcolor':
 				$this->setFgcolor($value);
 				break;
-			case 'TextWrap':
+			case 'textwrap':
 				$this->setTextwrap($value);
 				break;
-			case 'NumFormat':
+			case 'numformat':
 				$this->setNumformat($value);
 				break;
-			case 'Border':
+			case 'border':
 				$this->setBorder($value);
 				break;
-			case 'Italic':
+			case 'italic':
 				$this->setItalic($value);
+				break;
+			case 'underline':
+				$this->setUnderline($value);
 				break;
 		}
 	}

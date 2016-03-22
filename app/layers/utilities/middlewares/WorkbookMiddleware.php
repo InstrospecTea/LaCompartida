@@ -220,6 +220,13 @@ class WorkbookMiddleware {
 							$this->workSheetObj->getStyle($cellCode)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
 						}
 						break;
+					case 'underline':
+						if (strval($formatValue) == '1') {
+							$this->workSheetObj->getStyle($cellCode)->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_SINGLE);
+						} else if (strval($formatValue) == '2') {
+							$this->workSheetObj->getStyle($cellCode)->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_DOUBLE);
+						}
+						break;
 				}
 			}
 		}
