@@ -25,7 +25,7 @@ if ($moneda->fields['cifras_decimales'] == 0) {
 $simbolo_moneda = $moneda->fields['simbolo'];
 
 // ARMANDO XLS
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 $wb->send("Planilla montos facturados.xls");
 

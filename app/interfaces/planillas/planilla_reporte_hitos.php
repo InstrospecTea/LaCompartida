@@ -90,7 +90,7 @@ if ($xls) {
 	$resultado = $criteria->run();
 
 	// Creating a workbook
-	$workbook = new Spreadsheet_Excel_Writer();
+	$workbook = new WorkbookMiddleware();
 
 	// sending HTTP headers
 	$workbook->send("planilla_reporte_hitos.xls");

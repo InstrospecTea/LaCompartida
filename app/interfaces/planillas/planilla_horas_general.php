@@ -69,7 +69,7 @@
 			echo "error";
 	}
 
-    $wb = new Spreadsheet_Excel_Writer();
+    $wb = new WorkbookMiddleware();
 
     $wb->send("Planilla Horas General.xls");
 
