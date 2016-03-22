@@ -321,9 +321,8 @@ if ($opcion == "guardar") {
 				$refresh_parent = true;
 				// Mixpanel Event: Ingreso Horas
 				if($es_trabajo_nuevo == 1) {
-					$mp = Mixpanel::getInstance("35700d667425ad9858d92ff694febf63");
-					$mp->identify($RUT);
-					$mp->track("Ingreso Horas");
+					$mp = new \TTB\Mixpanel();
+					$mp->identifyAndTrack($RUT, 'Ingreso Horas');
 				}
 			} else {
 				$pagina->AddError($t->error);
