@@ -313,6 +313,38 @@ class WorkbookMiddleware {
 	}
 
 	/**
+	 * Set document right margin
+	 * @param float $margin
+	 */
+	public function setMarginRight($margin) {
+		$this->workSheetObj->getPageMargins()->setRight($margin);
+	}
+
+	/**
+	 * Set document left margin
+	 * @param float $margin
+	 */
+	public function setMarginLeft($margin) {
+		$this->workSheetObj->getPageMargins()->setLeft($margin);
+	}
+
+	/**
+	 * Set document top margin
+	 * @param float $margin
+	 */
+	public function setMarginTop($margin) {
+		$this->workSheetObj->getPageMargins()->setTop($margin);
+	}
+
+	/**
+	 * Set document bottom margin
+	 * @param float $margin
+	 */
+	public function setMarginBottom($margin) {
+		$this->workSheetObj->getPageMargins()->setBottom($margin);
+	}
+
+	/**
 	 * Set fit to pages
 	 * @param int $width
 	 * @param int $height
