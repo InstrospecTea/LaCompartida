@@ -237,7 +237,7 @@ class WorkbookMiddleware {
 								$this->workSheetObj->getStyle($cellCode)->getAlignment()->setTextRotation(-90);
 								break;
 							case 270:
-								$this->workSheetObj->getRowDimension($row + 1)->setRowHeight(-1)(true);
+								$this->workSheetObj->getRowDimension($row + 1)->setRowHeight(-1);
 								$this->workSheetObj->getStyle($cellCode)->getAlignment()->setTextRotation(90);
 								break;
 						}
