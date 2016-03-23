@@ -16,12 +16,24 @@ class Mixpanel
 	}
 
 	public function setUser($id, array $data = null) {
-		$this->mixpanelInstance->people->set($id, $data);
+		if ($this->validUser($id)) {
+			$this->mixpanelInstance->people->set($id, $data);
+		}
 	}
 
 	public function identifyAndTrack($id, $event, array $data = null) {
-		$this->mixpanelInstance->identify($id);
-		$this->mixpanelInstance->track($event, $data);
+		if ($this->validUser($id)) {
+			$this->mixpanelInstance->identify($id);
+			$this->mixpanelInstance->track($event, $data);
+		}
+	}
+
+	private function validUser($id) {
+		if($id == '99511620') {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 }
