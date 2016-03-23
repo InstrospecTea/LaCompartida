@@ -16,6 +16,7 @@ class FormatMiddleware {
 	protected $numformat;
 	protected $border;
 	protected $underline;
+	protected $textrotation;
 
 
 	/**
@@ -197,6 +198,10 @@ class FormatMiddleware {
 		$this->underline = $underline;
 	}
 
+	public function setTextRotation($angle) {
+		$this->textrotation = $angle;
+	}
+
 	/**
 	 * Get element of this class
 	 * @return element of this class
@@ -258,6 +263,9 @@ class FormatMiddleware {
 				break;
 			case 'underline':
 				$this->setUnderline($value);
+				break;
+			case 'textrotation':
+				$this->setTextRotation($value);
 				break;
 		}
 	}

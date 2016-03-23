@@ -152,9 +152,12 @@ class WorkbookMiddleware {
 	/**
 	 * Add formats to cells
 	 * @param array $formats
-	 * @param string $cellCode
+	 * @param int $row
+	 * @param int $col
 	 */
-	private function setFormat($format, $cellCode) {
+	private function setFormat($format, $row, $col) {
+		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
+
 		foreach ($format->getElements() as $key => $formatValue) {
 			if (!is_null($formatValue)) {
 				switch ($key) {
@@ -225,6 +228,18 @@ class WorkbookMiddleware {
 							$this->workSheetObj->getStyle($cellCode)->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_SINGLE);
 						} else if (strval($formatValue) == '2') {
 							$this->workSheetObj->getStyle($cellCode)->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_DOUBLE);
+						}
+						break;
+					case 'textrotation':
+						switch (intval($formatValue)) {
+							case 90:
+								$this->workSheetObj->getRowDimension($row + 1)->setRowHeight(-1);
+								$this->workSheetObj->getStyle($cellCode)->getAlignment()->setTextRotation(-90);
+								break;
+							case 270:
+								$this->workSheetObj->getRowDimension($row + 1)->setRowHeight(-1)(true);
+								$this->workSheetObj->getStyle($cellCode)->getAlignment()->setTextRotation(90);
+								break;
 						}
 						break;
 				}
@@ -383,7 +398,7 @@ class WorkbookMiddleware {
 		);
 
 		if (!is_null($format)) {
-			$this->setFormat($format, $cellCode);
+			$this->setFormat($format, $row, $col);
 		}
 	}
 
@@ -404,7 +419,7 @@ class WorkbookMiddleware {
 		);
 
 		if (!is_null($format)) {
-			$this->setFormat($format, $cellCode);
+			$this->setFormat($format, $row, $col);
 		}
 	}
 
@@ -425,7 +440,7 @@ class WorkbookMiddleware {
 		);
 
 		if (!is_null($format)) {
-			$this->setFormat($format, $cellCode);
+			$this->setFormat($format, $row, $col);
 		}
 	}
 
@@ -448,7 +463,7 @@ class WorkbookMiddleware {
 		);
 
 		if (!is_null($format)) {
-			$this->setFormat($format, $cellCode);
+			$this->setFormat($format, $row, $col);
 		}
 	}
 
