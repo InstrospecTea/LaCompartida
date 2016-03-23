@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 $wb->send('Reporte Anual.xls');
 
 /* FORMATOS */
@@ -178,7 +178,7 @@ function iniciar_hoja($hoja, $titulo_hoja, &$fila, &$col, $f, $ancho = 8.00) {
 /* TITULOS */
 
 function fila_col($fila, $col) {
-	return Spreadsheet_Excel_Writer::rowcolToCell($fila, $col);
+	return PHPExcel_Cell::stringFromColumnIndex($col).($fila + 1);
 }
 
 function print_headers($hoja, $encabezados, &$fila, $f) {
