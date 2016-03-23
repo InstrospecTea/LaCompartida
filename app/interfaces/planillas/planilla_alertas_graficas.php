@@ -15,7 +15,7 @@
 		$espacio = 3;
 
 		#ARMANDO XLS
-		$wb = new Spreadsheet_Excel_Writer();
+		$wb = new WorkbookMiddleware();
 
 		$wb->setCustomColor(35, 220, 255, 220);
 		$wb->setCustomColor(36, 255, 255, 220);
