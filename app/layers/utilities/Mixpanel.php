@@ -2,16 +2,13 @@
 
 namespace TTB;
 
-
-class Mixpanel
-{
+class Mixpanel {
 
 	const TOKEN = '35700d667425ad9858d92ff694febf63';
 
 	private $mixpanelInstance;
 
-	function __construct()
-	{
+	function __construct() {
 		$this->mixpanelInstance = \Mixpanel::getInstance(Mixpanel::TOKEN);
 	}
 
@@ -29,11 +26,10 @@ class Mixpanel
 	}
 
 	private function validUser($id) {
-		if($id == '99511620') {
+		if ($id == '99511620') {
 			return false;
 		} else {
 			return true;
 		}
 	}
-
 }

@@ -13,7 +13,7 @@ if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
 	$pagina->Redirect(Conf::RootDir() . '/app/interfaces/reportes_especificos.php');
 }
 
-if($REQUEST_METHOD == 'GET') {
+if ($REQUEST_METHOD == 'GET') {
 	$mp = new \TTB\Mixpanel();
 	$mp->identifyAndTrack($RUT, 'Ingreso Reporte Avanzado');
 }

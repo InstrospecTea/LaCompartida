@@ -320,7 +320,7 @@ if ($opcion == "guardar") {
 				// refresca el listado de horas.php cuando se graba la informacion desde el popup
 				$refresh_parent = true;
 				// Mixpanel Event: Ingreso Horas
-				if($es_trabajo_nuevo == 1) {
+				if ($es_trabajo_nuevo == 1) {
 					$mp = new \TTB\Mixpanel();
 					$mp->identifyAndTrack($RUT, 'Ingreso Horas');
 				}

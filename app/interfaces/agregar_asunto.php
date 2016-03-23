@@ -399,7 +399,7 @@ if ($opcion == 'guardar') {
 						$ContratoObj->Load($Contrato_indep);
 						$ContratoObj->Eliminar();
 					}
-					if($motivo == 'agregar_proyecto') {
+					if ($motivo == 'agregar_proyecto') {
 						$mp = new \TTB\Mixpanel();
 						$mp->identifyAndTrack($RUT, 'Agregar Asunto');
 					}
