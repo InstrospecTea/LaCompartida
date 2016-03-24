@@ -180,9 +180,7 @@ class WorkbookMiddleware {
 						$this->workSheetObj->getStyle($cellCode)->getFont()->getColor()->setARGB($formatValue);
 						break;
 					case 'locked':
-						if ($value) {
-							$this->workSheetObj->getStyle($cellCode)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
-						}
+						$this->workSheetObj->getStyle($cellCode)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
 						break;
 					case 'top':
 						if (strval($formatValue) == '1') {
