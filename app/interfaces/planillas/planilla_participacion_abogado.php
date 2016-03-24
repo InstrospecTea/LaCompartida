@@ -226,18 +226,6 @@
 		$ws1->hideGridlines();
 		$ws1->setLandscape();
 
-		$ws2 =& $wb->addWorksheet(__('Historial'));
-		$ws2->setInputEncoding('utf-8');
-		$ws2->fitToPages(2,5);
-		$ws2->setZoom(75);
-		$ws2->hideGridlines();
-		$ws2->setLandscape();
-		$filas2 = 1;
-		$col2_fecha = 1;
-		$col2_comentario = 2;
-		$ws2->setColumn($col2_fecha, $col2_fecha, 17);
-		$ws2->setColumn($col2_comentario, $col2_comentario, 40);
-
 		// Definir los números de las columnas
 		// El orden que tienen en esta sección es el que mantienen en la planilla.
 		$col = 0;
@@ -769,20 +757,10 @@
 				$query_historial="SELECT fecha, comentario FROM cobro_historial WHERE id_cobro=".$cobro['id_cobro'];
 				$resp_historial = mysql_query($query_historial, $sesion->dbh) or Utiles::errorSQL($query_historial, __FILE__, __LINE__, $sesion->dbh);
 
-				$ws2->mergeCells($filas2, $col2_fecha, $filas2, $col2_comentario);
-				$ws2->write($filas2, $col2_fecha, "Historial " . __('Cobro') . " ".$cobro['id_cobro'].' ('.$cobro['glosa_cliente'].')', $titulo_filas);
-				++$filas2;
-				$ws2->write($filas2, $col2_fecha, __('Fecha'), $titulo_filas);
-				$ws2->write($filas2, $col2_comentario, __('Comentario'), $titulo_filas);
-				++$filas2;
 				while($historial = mysql_fetch_array($resp_historial))
 				{
 					$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, "-").": ".$historial['comentario']."\n";
-					$ws2->write($filas2, $col2_fecha, Utiles::sql2fecha($historial['fecha'], $formato_fecha, "-"), $fecha);
-					$ws2->write($filas2, $col2_comentario, $historial['comentario'], $txt_opcion);
-					++$filas2;
 				}
-				++$filas2;
 				$ws1->writeNote($filas, $col_estado, $comentario);
 			}
 			$tabla_creada=true;
@@ -813,6 +791,44 @@
 			$ws1->mergeCells($filas, $col_numero_cobro, $filas, $col_fecha_pago);
 			$ws1->write($filas, $col_numero_cobro, __('No se encontraron resultados'), $encabezado);
 		}
+
+		$ws2 =& $wb->addWorksheet(__('Historial'));
+		$ws2->setInputEncoding('utf-8');
+		$ws2->fitToPages(2,5);
+		$ws2->setZoom(75);
+		$ws2->hideGridlines();
+		$ws2->setLandscape();
+		$filas2 = 1;
+		$col2_fecha = 1;
+		$col2_comentario = 2;
+		$ws2->setColumn($col2_fecha, $col2_fecha, 17);
+		$ws2->setColumn($col2_comentario, $col2_comentario, 40);
+
+		mysql_data_seek($resp, 0);
+
+		while($cobro = mysql_fetch_array($resp)) {
+			if($cobro['estado']!='CREADO' && $cobro['estado']!='EN REVISION') {
+				$comentario="";
+				$query_historial="SELECT fecha, comentario FROM cobro_historial WHERE id_cobro=".$cobro['id_cobro'];
+				$resp_historial = mysql_query($query_historial, $sesion->dbh) or Utiles::errorSQL($query_historial, __FILE__, __LINE__, $sesion->dbh);
+
+				$ws2->mergeCells($filas2, $col2_fecha, $filas2, $col2_comentario);
+				$ws2->write($filas2, $col2_fecha, "Historial " . __('Cobro') . " ".$cobro['id_cobro'].' ('.$cobro['glosa_cliente'].')', $titulo_filas);
+				++$filas2;
+				$ws2->write($filas2, $col2_fecha, __('Fecha'), $titulo_filas);
+				$ws2->write($filas2, $col2_comentario, __('Comentario'), $titulo_filas);
+				++$filas2;
+				while($historial = mysql_fetch_array($resp_historial))
+				{
+					$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, "-").": ".$historial['comentario']."\n";
+					$ws2->write($filas2, $col2_fecha, Utiles::sql2fecha($historial['fecha'], $formato_fecha, "-"), $fecha);
+					$ws2->write($filas2, $col2_comentario, $historial['comentario'], $txt_opcion);
+					++$filas2;
+				}
+				++$filas2;
+			}
+		}
+
 		$wb->send("planilla_participacion_abogado.xls");
 		$wb->close();
 		exit;
