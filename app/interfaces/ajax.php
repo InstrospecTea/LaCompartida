@@ -557,6 +557,20 @@ if ($accion == "consistencia_cliente_asunto") {
 	}
 	$mvto->ActualizarMvtoMoneda($tipos_cambios);
 	echo "EXITO";
+} else if ($accion == 'actualizar_factura_pago_moneda') {
+	$mvto = new CtaCteFactMvtoMoneda($sesion);
+	$mvto->LoadByFactura($id_factura_pago);
+
+	$ids_monedas = explode(',', $ids_monedas);
+	$tcs = explode(',', $tcs);
+	$tipos_cambios = array();
+
+	foreach ($ids_monedas as $i => $id_moneda) {
+		$tipos_cambios[$id_moneda] = $tcs[$i];
+	}
+
+	$mvto->ActualizarMvtoMoneda($tipos_cambios);
+	echo "EXITO";
 } else if ($accion == 'existe_glosa_cliente') {
 	//$dato_cliente = str_replace(' ','',$dato_cliente);
 	$where = "";
