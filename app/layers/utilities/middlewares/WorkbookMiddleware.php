@@ -199,15 +199,19 @@ class WorkbookMiddleware {
 						}
 						break;
 					case 'fgcolor':
-						$formatValue = is_string($formatValue) ? intval($formatValue) : $formatValue;
+						if (is_int($formatValue)) {
+							if ($formatValue > 8 && $formatValue < 64) {
+								// the subtraction is for continue the logic of the method setCustomColor
+								$rgb = $this->palette[$formatValue - 8];
 
-						if (is_int($formatValue) && ($formatValue > 8 && $formatValue < 64)) {
-							// the subtraction is for continue the logic of the method setCustomColor
-							$rgb = $this->palette[$formatValue - 8];
-
-							$this->workSheetObj->getStyle($cellCode)
+								$this->workSheetObj->getStyle($cellCode)
 											->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
 											->getStartColor()->setRGB($this->rgb2hex($rgb));
+							}
+						} else {
+							$this->workSheetObj->getStyle($cellCode)
+											->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
+											->getStartColor()->setARGB($formatValue);
 						}
 						break;
 					case 'textwrap':

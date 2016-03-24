@@ -96,42 +96,7 @@ class FormatMiddleware {
 	 * @param string $bold (hexadecimal code or name)
 	 */
 	public function setColor($color) {
-		if (!ctype_xdigit($color)) {
-			switch ($color) {
-				case 'black':
-					$this->color = PHPExcel_Style_Color::COLOR_BLACK;
-					break;
-				case 'white':
-					$this->color = PHPExcel_Style_Color::COLOR_WHITE;
-					break;
-				case 'blue':
-					$this->color = PHPExcel_Style_Color::COLOR_BLUE;
-					break;
-				case 'darkblue':
-					$this->color = PHPExcel_Style_Color::COLOR_DARKBLUE;
-					break;
-				case 'green':
-					$this->color = PHPExcel_Style_Color::COLOR_GREEN;
-					break;
-				case 'darkgreen':
-					$this->color = PHPExcel_Style_Color::COLOR_DARKGREEN;
-					break;
-				case 'red':
-					$this->color = PHPExcel_Style_Color::COLOR_RED;
-					break;
-				case 'darkred':
-					$this->color = PHPExcel_Style_Color::COLOR_DARKRED;
-					break;
-				case 'yellow':
-					$this->color = PHPExcel_Style_Color::COLOR_YELLOW;
-					break;
-				case 'darkyellow':
-					$this->color = PHPExcel_Style_Color::COLOR_DARKYELLOW;
-					break;
-			}
-		} else {
-			$this->color = $color;
-		}
+		$this->color = $this->getColor($color);
 	}
 
 	/**
@@ -171,7 +136,11 @@ class FormatMiddleware {
 	 * @param string $fgcolor
 	 */
 	public function setFgcolor($fgcolor) {
-		$this->fgcolor = $fgcolor;
+		if (is_numeric($fgcolor)) {
+			$this->fgcolor = intval($fgcolor);
+		} else {
+			$this->fgcolor = $this->getColor($fgcolor);
+		}
 	}
 
 	/**
@@ -267,6 +236,50 @@ class FormatMiddleware {
 			case 'textrotation':
 				$this->setTextRotation($value);
 				break;
+		}
+	}
+
+	/**
+	 * Assign properties of this class
+	 * @param string int $color
+	 * @return PHPExcel_Style_Color
+	 */
+	private function getColor($color) {
+		if (!ctype_xdigit($color)) {
+			switch ($color) {
+				case 'black':
+					return PHPExcel_Style_Color::COLOR_BLACK;
+					break;
+				case 'white':
+					return PHPExcel_Style_Color::COLOR_WHITE;
+					break;
+				case 'blue':
+					return PHPExcel_Style_Color::COLOR_BLUE;
+					break;
+				case 'darkblue':
+					return PHPExcel_Style_Color::COLOR_DARKBLUE;
+					break;
+				case 'green':
+					return PHPExcel_Style_Color::COLOR_GREEN;
+					break;
+				case 'darkgreen':
+					return PHPExcel_Style_Color::COLOR_DARKGREEN;
+					break;
+				case 'red':
+					return PHPExcel_Style_Color::COLOR_RED;
+					break;
+				case 'darkred':
+					return PHPExcel_Style_Color::COLOR_DARKRED;
+					break;
+				case 'yellow':
+					return PHPExcel_Style_Color::COLOR_YELLOW;
+					break;
+				case 'darkyellow':
+					return PHPExcel_Style_Color::COLOR_DARKYELLOW;
+					break;
+			}
+		} else {
+			return $color;
 		}
 	}
 }
