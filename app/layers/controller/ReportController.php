@@ -82,4 +82,107 @@ class ReportController extends AbstractController {
 		$this->set('Html', new \TTB\Html());
 		$this->set('Form', new Form($this->Session));
 	}
+
+	public function salesAccountingConcepts() {
+		$this->loadBusiness('Searching');
+		$this->loadBusiness('Coining');
+		$this->loadBusiness('Charging');
+		$this->loadBusiness('Parameterizing');
+
+		if (!empty($this->data)) {
+			$this->autoRender = false;
+
+			if (empty($this->data['start_date']) || empty($this->data['end_date'])) {
+				throw new Exception(__('Filtros de fecha sin contenido'));
+			} else {
+				if (!DateTime::createFromFormat('Y-m-d', $this->data['start_date'])) {
+					$this->data['start_date'] = date('Y-m-d', strtotime($this->data['start_date']));
+				}
+				if (!DateTime::createFromFormat('Y-m-d', $this->data['end_date'])) {
+					$this->data['end_date'] = date('Y-m-d', strtotime($this->data['end_date']));
+				}
+			}
+
+			$Currency = $this->CoiningBusiness->getCurrency($this->data['display_currency']);
+			if (empty($Currency)) {
+				throw new Exception(__('No existe la moneda seleccionada'));
+			} else {
+				$this->data['display_currency'] = $Currency;
+			}
+
+			if (!empty($this->data['company'])) {
+				$Company = $this->ParameterizingBusiness->get('Company', $this->data['company']);
+				$this->data['company_name'] = $Company->fields['glosa_estudio'];
+			}
+
+			$Report = $this->ChargingBusiness->getSalesAccountingConceptsReport($this->data);
+			$Report->render();
+		} else {
+			$this->layoutTitle = __('Reporte de Ventas');
+
+			$restrictions = array(CriteriaRestriction::equals('Client.activo', 1));
+			$clients = $this->SearchingBusiness->getAssociativeArray('Client', 'codigo_cliente', 'glosa_cliente', $restrictions);
+			$this->set('clients', $clients);
+
+			$this->set('client_group', $this->SearchingBusiness->getAssociativeArray('ClientGroup', 'id_grupo_cliente', 'glosa_grupo_cliente'));
+			$this->set('billing_strategy', $this->SearchingBusiness->getAssociativeArray('BillingStrategy', 'forma_cobro', 'descripcion'));
+			$this->set('currency', $this->SearchingBusiness->getAssociativeArray('Currency', 'id_moneda', 'glosa_moneda'));
+			$base_currency = $this->CoiningBusiness->getBaseCurrency();
+			$this->set('base_currency', $base_currency->fields['id_moneda']);
+			$this->set('companies', $this->SearchingBusiness->getAssociativeArray('Company', 'id_estudio', 'glosa_estudio'));
+
+			if (empty($this->data['start_date'])) {
+				$this->data['start_date'] = date('d-m-Y', strtotime('-1 month'));
+			}
+		}
+	}
+
+	public function clientOldDebtAccountingConcepts() {
+		$this->loadBusiness('Searching');
+
+		if (!empty($this->data)) {
+			$this->loadBusiness('Charging');
+
+			$this->data['client_code'] = $this->data['codigo_cliente'];
+			$this->data['client_secondary_code'] = $this->data['codigo_cliente_secundario'];
+			$this->data['matter_code'] = $this->data['matter_code'];
+			$this->data['matter_secondary_code'] = $this->data['codigo_asunto_secundario'];
+
+			if (Conf::GetConf($this->Session, 'CodigoSecundario')) {
+				$Client = new Cliente($this->Session);
+				$Client->LoadByCodigoSecundario($this->data['client_secondary_code']);
+				if ($Client->Loaded()) {
+					$this->data['client_code'] = $Client->fields['codigo_cliente'];
+				}
+
+				$Matter = new Asunto($this->Session);
+				$Matter->LoadByCodigoSecundario($this->data['matter_secondary_code']);
+				if ($Matter->Loaded()) {
+					$this->data['matter_code'] = $Matter->fields['codigo_asunto'];
+				}
+			}
+			$parameters = $this->data;
+			$parameters['client_code'] = $this->data['client_code'];
+			$parameters['matter_code'] = $this->data['matter_code'];
+			$parameters['end_date'] = date('Y-m-d', strtotime($this->data['end_date']));
+			$parameters['format'] = $this->data['option'] == 'buscar' ? 'Html' : 'Spreadsheet';
+
+			$Report = $this->ChargingBusiness->getClientOldDebtAccountingConceptsReport($parameters);
+
+			if ($parameters['format'] == 'Html') {
+				$this->set('Report', $Report);
+			} else {
+				$this->autoRender = false;
+				$Report->render();
+			}
+		}
+
+		$this->layoutTitle = __('Reporte Antigüedad Deudas Clientes');
+		$this->set('billing_type', array(
+			array('1', __('Sólo Honorarios')),
+			array('2', __('Sólo Gastos')),
+			array('3', __('Sólo Mixtas (Honorarios y Gastos)'))
+		));
+		$this->set('client_group', $this->SearchingBusiness->getAssociativeArray('ClientGroup', 'id_grupo_cliente', 'glosa_grupo_cliente'));
+	}
 }

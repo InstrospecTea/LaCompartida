@@ -104,7 +104,7 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	 * @param String $order orden para desplegar los datos
 	 * @return Array
 	 */
-	public function getAssociativeArray($entity, $keyName, $value, $order = 'ASC') {
+	public function getAssociativeArray($entity, $keyName, $value, $restrictions = array(), $order = 'ASC') {
 		$this->loadService('Search');
 		$searchCriteria = new SearchCriteria($entity);
 
@@ -120,13 +120,19 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 			$criteria
 		);
 
+		if (!empty($restrictions)) {
+			foreach ($restrictions as $restriction) {
+				$criteria->add_restriction($restriction);
+			}
+		}
+
 		$criteria->add_ordering("{$entity}.{$value}", $order);
 
 		$reportData = $this->SearchService->getResults($searchCriteria, $criteria);
 
 		$result = array();
 		foreach ($reportData as $data) {
-			$result[$data->get($data->getIdentity())] = $data->fields[$value];
+			$result[$data->get($keyName)] = $data->fields[$value];
 		}
 
 		return $result;

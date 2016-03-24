@@ -3,8 +3,6 @@
 /**
  * Class BusinessException
  */
-class BusinessException extends Exception{
+class BusinessException extends Exception {
 
-
-
-} 
+}
