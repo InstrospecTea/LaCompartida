@@ -1,9 +1,9 @@
 <?php
 
-class CurrencyDAO extends AbstractDAO implements ICurrencyDAO{
+class CurrencyDAO extends AbstractDAO implements ICurrencyDAO {
 
 	public function getClass() {
-        return 'Currency';
-    }
+		return 'Currency';
+	}
 
 }

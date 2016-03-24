@@ -990,4 +990,176 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		}
 		return $result;
 	}
+
+	public function getSalesAccountingConceptsReport($parameters) {
+		$CriteriaInvoiced = $this->getInvoiceForSalesReport($parameters, false);
+		$invoice = $CriteriaInvoiced->run();
+
+		$CriteriaAnnulledInvoiced = $this->getInvoiceForSalesReport($parameters, true);
+		$annulled_invoice = $CriteriaAnnulledInvoiced->run();
+		$sales = array_merge($invoice, $annulled_invoice);
+
+		$this->loadReport('SalesAccountingConcepts', 'Report');
+		$this->Report->setData($sales);
+		$this->Report->setParameters($parameters);
+
+		return $this->Report;
+	}
+
+	private function getInvoiceForSalesReport($parameters, $annulled = false) {
+		$total_invoice = $parameters['display_tax'] == '1' ? 'factura.total' : 'factura.subtotal';
+
+		$CriteriaInvoice = new Criteria($this->Session);
+		$CriteriaInvoice
+			->add_select('factura.RUT_cliente')
+			->add_select('factura.cliente')
+			->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_factura')
+			->add_from('factura')
+			->add_left_join_with('prm_documento_legal', 'prm_documento_legal.id_documento_legal = factura.id_documento_legal')
+			->add_left_join_with('cobro', 'cobro.id_cobro = factura.id_cobro')
+			->add_left_join_with('cliente', 'cliente.codigo_cliente = factura.codigo_cliente')
+			->add_left_join_with('documento', 'documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = "N"')
+			->add_left_join_with(
+				array('documento_moneda', 'cobro_moneda'),
+				"cobro_moneda.id_documento = documento.id_documento AND cobro_moneda.id_moneda = {$parameters['display_currency']->fields['id_moneda']}"
+			)
+			->add_left_join_with(
+				array('documento_moneda', 'cobro_moneda_cobro'),
+				'cobro_moneda_cobro.id_documento = documento.id_documento AND cobro_moneda_cobro.id_moneda = cobro.opc_moneda_total'
+			);
+
+		if (!$annulled) {
+			$CriteriaInvoice
+				->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
+				->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_nc')
+				->add_restriction(CriteriaRestriction::between('factura.fecha', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"));
+		} else {
+			$CriteriaInvoice
+				->add_select('DATE_FORMAT(factura.fecha_anulacion, "%Y%m")', 'mes_contable')
+				->add_restriction(CriteriaRestriction::between('factura.fecha_anulacion', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"));
+		}
+
+		if (!empty($parameters['clients'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::in('cliente.codigo_cliente', $parameters['clients']));
+		}
+
+		if (!empty($parameters['client_group'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::in('cliente.id_grupo_cliente', $parameters['client_group']));
+		}
+
+		if (!empty($parameters['billing_strategy'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::in('cobro.forma_cobro', $parameters['billing_strategy']));
+		}
+
+		if (!empty($parameters['invoiced'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::in('cobro.opc_moneda_total', $parameters['invoiced']));
+		}
+
+		if (!empty($parameters['company'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::equals('factura.id_estudio', $parameters['company']));
+		}
+
+		if ($parameters['separated_by_invoice'] == '1') {
+			$CriteriaInvoice
+				->add_select('factura.id_factura')
+				->add_select("CONCAT(prm_documento_legal.codigo , ' ', LPAD(factura.serie_documento_legal, '3', '0'), '-', LPAD(factura.numero, '7', '0'))", 'identificador');
+		}
+
+		$Criteria = new Criteria($this->Session);
+		$CriteriaSale = $Criteria
+			->add_select('ventas.RUT_cliente', 'client_code')
+			->add_select('ventas.cliente', 'client')
+			->add_select('ventas.mes_contable', 'period')
+			->add_from_criteria($CriteriaInvoice, 'ventas');
+
+		if (!$annulled) {
+			$CriteriaSale->add_select('SUM(ventas.total_factura - ventas.total_nc)', 'total_period');
+		} else {
+			$CriteriaSale->add_select('SUM(ventas.total_factura * -1)', 'total_period');
+		}
+
+		$CriteriaSale
+			->add_grouping('ventas.mes_contable')
+			->add_ordering('ventas.cliente')
+			->add_ordering('ventas.mes_contable');
+
+		if ($parameters['separated_by_invoice'] == '1') {
+			$CriteriaSale
+				->add_select('ventas.identificador', 'invoice')
+				->add_grouping('ventas.id_factura')
+				->add_ordering('ventas.id_factura');
+		} else {
+			$CriteriaSale->add_grouping('ventas.RUT_cliente');
+		}
+
+		return $CriteriaSale;
+	}
+
+	public function getClientOldDebtAccountingConceptsReport($parameters) {
+		Criteria::query('SET group_concat_max_len = 1000000', $this->Session, true);
+
+		$CriteriaInvoice = new Criteria($this->Session);
+		$CriteriaInvoice
+			->add_select("CONCAT('\"', pdl.codigo , ' ', LPAD(f.serie_documento_legal, '3', '0'), '-', LPAD(f.numero, '7', '0'), '\":\"', c.id_cobro, '\"')", 'identificador')
+			->add_select("DATEDIFF('{$parameters['end_date']}', f.fecha)", 'dias_desde_facturacion')
+			->add_select('SUM(IF(ccfmn.monto_pago IS NULL, 0, ccfmn.monto_pago))', 'total_pagado')
+			->add_select('f.total', 'total_facturado')
+			->add_select('cl.codigo_cliente')
+			->add_select('cl.glosa_cliente')
+			->add_from('factura', 'f')
+			->add_left_join_with('contrato', 'f.id_contrato = contrato.id_contrato')
+			->add_left_join_with(array('cta_cte_fact_mvto', 'ccfm'), 'ccfm.id_factura = f.id_factura')
+			->add_left_join_with(array('cta_cte_fact_mvto_neteo', 'ccfmn'), "ccfmn.id_mvto_deuda = ccfm.id_cta_cte_mvto AND ccfmn.fecha_movimiento <= '{$parameters['end_date']}'")
+			->add_inner_join_with(array('cobro', 'c'), 'c.id_cobro = f.id_cobro')
+			->add_left_join_with(array('cliente', 'cl'), 'cl.codigo_cliente = c.codigo_cliente')
+			->add_left_join_with(array('prm_documento_legal', 'pdl'),'pdl.id_documento_legal = f.id_documento_legal')
+			->add_restriction(CriteriaRestriction::lower_or_equals_than('f.fecha', "'{$parameters['end_date']}'"))
+			->add_restriction(CriteriaRestriction::not_equal('pdl.codigo', "'NC'"))
+			->add_grouping('f.id_factura');
+
+		if (!empty($parameters['client_code'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::equals('cl.codigo_cliente', "'{$parameters['client_code']}'"));
+		}
+
+		if (!empty($parameters['include_trade_manager'])) {
+			$CriteriaInvoice->add_select('CONCAT(usuario.nombre,\' \', usuario.apellido1)','encargado_comercial');
+			$CriteriaInvoice->add_left_join_with('usuario', 'contrato.id_usuario_responsable = usuario.id_usuario');
+		}
+
+		if (!empty($parameters['trade_manager_id'])) {
+			$CriteriaInvoice->add_restriction(CriteriaRestriction::equals('contrato.id_usuario_responsable', $parameters['trade_manager_id']));
+		}
+
+		if (!empty($parameters['matter_code'])) {
+			$CriteriaInvoice
+				->add_left_join_with(array('cobro_asunto', 'ca'), 'ca.id_cobro = c.id_cobro')
+				->add_left_join_with(array('asunto', 'a'), 'a.codigo_asunto = ca.codigo_asunto')
+				->add_restriction(CriteriaRestriction::equals('a.codigo_asunto', "'{$parameters['matter_code']}'"));
+		}
+
+		$Criteria = new Criteria($this->Session);
+		$Criteria
+			->add_select('v.glosa_cliente')
+			->add_select('CONCAT("{", GROUP_CONCAT(DISTINCT v.identificador ORDER BY 1), "}")', 'facturas')
+			->add_select('SUM(IF(v.dias_desde_facturacion <= 30, v.total_facturado - v.total_pagado, 0))', "'rango1'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 30 AND v.dias_desde_facturacion <= 60, v.total_facturado - v.total_pagado, 0))', "'rango2'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 60 AND v.dias_desde_facturacion <= 90, v.total_facturado - v.total_pagado, 0))', "'rango3'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 90, v.total_facturado - v.total_pagado, 0))', "'rango4'")
+			->add_select('SUM(v.total_facturado - v.total_pagado)', "'total'")
+			->add_from_criteria($CriteriaInvoice, 'v')
+			->add_grouping('v.codigo_cliente');
+		if (!empty($parameters['include_trade_manager'])) {
+			$Criteria->add_select('v.encargado_comercial');
+		}
+
+		$debts = $Criteria->run();
+
+		$this->loadReport('ClientOldDebtAccountingConcepts', 'Report');
+		$this->Report->setOutputType('SR');
+		$this->Report->setData($debts);
+		$this->Report->setParameters($parameters);
+		$this->Report->setConfiguration('sesion', $this->Session);
+
+		return $this->Report;
+	}
 }
