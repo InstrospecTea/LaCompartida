@@ -912,61 +912,6 @@ $Form->defaultLabel = false;
 		?>
 		</tbody>
 	</table>
-	<div id="TipoCambioFactura" style="display:none" title="<?php echo __('Tipo de Cambio Documento de Pago') ?>">
-		<div id="contenedor_tipo_cambio">
-			<table cellpadding="3" width="100%">
-				<?php
-				if ($factura->fields['id_factura']) {
-					$query = "SELECT count(*)
-							FROM cta_cte_fact_mvto_moneda
-							LEFT JOIN cta_cte_fact_mvto AS ccfm ON ccfm.id_cta_cte_mvto=cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto
-							WHERE ccfm.id_factura = '" . $factura->fields['id_factura'] . "'";
-					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-					list($cont) = mysql_fetch_array($resp);
-				} else {
-					$cont = 0;
-				}
-				if ($cont > 0) {
-					$query = "SELECT prm_moneda.id_moneda, glosa_moneda, cta_cte_fact_mvto_moneda.tipo_cambio
-							FROM cta_cte_fact_mvto_moneda
-							JOIN prm_moneda ON cta_cte_fact_mvto_moneda.id_moneda = prm_moneda.id_moneda
-							LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_cta_cte_mvto = cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto
-							WHERE cta_cte_fact_mvto.id_factura = '" . $factura->fields['id_factura'] . "'";
-					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-				} else {
-					$query = "SELECT prm_moneda.id_moneda, glosa_moneda, cobro_moneda.tipo_cambio
-							FROM cobro_moneda
-							JOIN prm_moneda ON cobro_moneda.id_moneda = prm_moneda.id_moneda
-							WHERE id_cobro = '" . $id_cobro . "'";
-					$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-				}
-				$num_monedas = 0;
-				$ids_monedas = array();
-				$tipo_cambios = array();
-				while (list($id_moneda, $glosa_moneda, $tipo_cambio) = mysql_fetch_array($resp)) {
-					?>
-					<tr>
-						<td class="ar tb">
-							<?php echo $glosa_moneda ?>:
-						</td>
-						<td class="al" style="width: 60%">
-							<?php echo $Form->input("factura_moneda_{$id_moneda}", $tipo_cambio, array('size' => 9)); ?>
-						</td>
-					</tr>
-					<?php
-					++$num_monedas;
-					$ids_monedas[] = $id_moneda;
-					$tipo_cambios[] = $tipo_cambio;
-				}
-				?>
-			</table>
-			<?php
-			echo $Form->hidden('tipo_cambios_factura', implode(',', $tipo_cambios));
-			echo $Form->hidden('ids_monedas_factura', implode(',', $ids_monedas));
-			?>
-			</td>
-		</div>
-	</div>
 	<hr/>
 
 	<table style="border: 0px solid #666;" width='95%'>
@@ -979,7 +924,6 @@ $Form->defaultLabel = false;
 				if ($factura->loaded() && $factura->fields['anulado'] == 1 && !$factura->DTEAnulado() && !$factura->DTEProcesandoAnular()) {
 					echo $Form->icon_button(__('Restaurar'), 'restore', array('onclick' => "Cambiar(jQuery('#form_facturas'), 'restaurar')"));
 				}
-				echo $Form->icon_button(__('Actualizar Tipo de Cambio'), 'ui-icon-money', array('onclick' => 'MostrarTipoCambioPago()', 'title' => 'Tipo de Cambio del Documento de Pago al ser pagado.'));
 				?>
 			</td>
 		</tr>
@@ -1260,30 +1204,6 @@ $Form->defaultLabel = false;
 			monto += '.' + arr_monto[arr_monto.length - 1];
 
 		document.getElementById(id_campo).value = monto;
-	}
-
-	function MostrarTipoCambioPago() {
-		jQuery('#TipoCambioFactura').dialog({
-			width: 'auto',
-			height: 'auto',
-			modal: true,
-			open: function() {
-				jQuery('.ui-dialog-buttonpane').find('button').addClass('btn').removeClass('ui-button ui-state-hover');
-			},
-			buttons: {
-				"<?php echo __('Guardar') ?>": function() {
-					if (ActualizarDocumentoMonedaPago()) {
-						jQuery(this).dialog('close');
-					} else {
-
-					}
-				},
-				"<?php echo __('Cancelar') ?>": function() {
-					jQuery(this).dialog('close');
-				}
-			}
-		});
-		jQuery('#TipoCambioFactura').show();
 	}
 
 	function BuscarFacturas()
@@ -1619,47 +1539,6 @@ $Form->defaultLabel = false;
 			});
 
 		}
-	}
-
-	function ActualizarDocumentoMonedaPago() {
-		var ids_monedas = jQuery('#ids_monedas_factura').val();
-		var arreglo_ids = ids_monedas.split(',');
-		var tipo_cambios_factura = [];
-		for (var i = 0; i < arreglo_ids.length - 1; i++) {
-			tipo_cambios_factura.push(jQuery('#factura_moneda_' + arreglo_ids[i]).val());
-		}
-		i = arreglo_ids.length - 1;
-		tipo_cambios_factura.push(jQuery('#factura_moneda_' + arreglo_ids[i]).val());
-		jQuery('#tipo_cambios_factura').val(tipo_cambios_factura.join(','));
-
-		if (!jQuery('#id_factura').val()) {
-			return true;
-		}
-
-		jQuery('<img/>').attr('src', '<?php echo Conf::ImgDir() ?>/ajax_loader.gif').insertBefore('.ui-dialog-buttonpane button:first');
-		jQuery('.ui-dialog-buttonpane button:first').hide();
-
-		var tc = new Array();
-		for (var i = 0; i < arreglo_ids.length; i++) {
-			tc[i] = jQuery('#factura_moneda_' + arreglo_ids[i]).val();
-		}
-
-		var url = root_dir + '/app/interfaces/ajax.php';
-		var data_get = {accion: 'actualizar_factura_moneda', id_factura: '<?php echo $factura->fields['id_factura'] ?>', ids_monedas: ids_monedas, tcs: tc.join(',')};
-		var actualizado = false;
-		jQuery.ajax(url, {
-			async: false,
-			data: data_get,
-			dataType: 'text',
-			success: function(text) {
-				if (text == 'EXITO') {
-					actualizado = true;
-				}
-				jQuery('.ui-dialog-buttonpane img').remove();
-				jQuery('.ui-dialog-buttonpane button:first').show();
-			}
-		});
-		return actualizado;
 	}
 
 	/*Validador de Rut*/

@@ -462,10 +462,13 @@ class Criteria {
 		}
 	}
 
-	public static function query($query, Sesion $sesion) {
+	public static function query($query, Sesion $sesion, $execute_only = false) {
 		$statement = $sesion->pdodbh->prepare($query);
 		$statement->execute();
-		return $statement->fetchAll(PDO::FETCH_ASSOC);
+
+		if ($execute_only === false) {
+			return $statement->fetchAll(PDO::FETCH_ASSOC);
+		}
 	}
 
 	public function reset_selection() {

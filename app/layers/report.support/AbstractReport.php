@@ -2,10 +2,10 @@
 
 abstract class AbstractReport implements BaseReport {
 
-	var $data;
-	var $reportEngine;
-	var $parameters;
-	var $Session;
+	public $data;
+	public $reportEngine;
+	public $parameters;
+	public $Session;
 	private $loadedClass = array();
 
 	public function __construct(Sesion $Session) {
@@ -35,7 +35,6 @@ abstract class AbstractReport implements BaseReport {
 	 * @throws ReportException
 	 */
 	function setOutputType($type) {
-		$type = strtoupper($type);
 		$classname = "{$type}ReportEngine";
 		try {
 			$class = new ReflectionClass($classname);
