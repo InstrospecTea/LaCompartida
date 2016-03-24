@@ -891,6 +891,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 					$amount = $workedHours * $this->CoiningBusiness->changeCurrency($userFee->get('tarifa'), $scaleCurrency, $chargeCurrency);
 					$work->set('actual_amount', $amount);
 					$scaleAmount += $amount;
+				} else {
+					$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
 				}
 				if ($remainingScaleHours == 0) {
 					// El trabajo se acabó y además se llenó la bolsa del escalón. Hay que cambiar el escalón.
