@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.5.0](https://github.com/LemontechSA/ttb/pull/1338)
+Wednesday, March 23th
+* **Feature** [Reportes conceptos contables] (https://github.com/LemontechSA/ttb/pull/1310)
+
 ## Hotfix 16.4.11
 Monday, March 21th
 * **Fix** [Mejora de mensajes en la generación masiva de cobros] (https://github.com/LemontechSA/ttb/pull/1369)
