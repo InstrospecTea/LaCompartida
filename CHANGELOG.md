@@ -1,6 +1,6 @@
 # Changelog
 
-## [Release 16.5.0](https://github.com/LemontechSA/ttb/pull/1338)
+## [Release 16.5.0](https://github.com/LemontechSA/ttb/pull/1373)
 Wednesday, March 23th
 * **Feature** [Reportes conceptos contables] (https://github.com/LemontechSA/ttb/pull/1310)
 
