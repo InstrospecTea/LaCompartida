@@ -10,7 +10,7 @@ class NotaCobro extends Cobro {
 	protected $template_data;
 	private $detalle_en_asuntos = FALSE;
 	private $hitos = FALSE;
-	private $caps = array();
+	private $resumen_cap = null;
 
 	var $asuntos = array();
 	var $x_resultados = array();
@@ -5424,37 +5424,44 @@ class NotaCobro extends Cobro {
 				break;
 
 			case 'RESUMEN_CAP': //GenerarDocumento2
-				$monto_restante = $this->fields['monto_contrato'] - ( $this->TotalCobrosCap() + ($this->fields['monto_trabajos'] - $this->fields['descuento']) * $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['tipo_cambio'] );
-				$monto_utilizado = number_format($this->fields['monto_contrato'] -  $monto_restante, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-
-				$html = str_replace('%total_utilizado%', __('Total Utilizado'), $html);
-				$html = str_replace('%cap_utilizado%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $this->espacio . $monto_utilizado, $html);
-				$html = str_replace('%glosa_cap%', __('CAP'), $html);
 				$html = str_replace('%desglose_cap%', __('Desglose CAP'), $html);
-				$html = str_replace('%cap%', __('Total CAP'), $html);
-				$html = str_replace('%valor_cap%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $this->espacio . $this->fields['monto_contrato'], $html);
-				$html = str_replace('%restante%', __('Monto restante'), $html);
-				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($monto_restante, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				$html = str_replace('%salto_linea%', '<br>', $html);
-				$html = str_replace('%hr%', '<hr size="2" class="separador">', $html);
-
+				$html = str_replace('%COBROS_DEL_CAP%', $this->GenerarDocumento2($parser, 'COBROS_DEL_CAP', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%texto_numero_cobro%', __('Nº Cobro'), $html);
 				$html = str_replace('%texto_valor_cap_del_cobro%', __('Total Cobro'), $html);
 
-				$html = str_replace('%texto_total_cobros%', __('Total Utilizado'), $html);
-				$html = str_replace('%texto_valor_total_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $this->espacio . $monto_utilizado, $html);
+				$html = str_replace('%glosa_cap%', __('CAP'), $html);
 
-				$html = str_replace('%COBROS_DEL_CAP%', $this->GenerarDocumento2($parser, 'COBROS_DEL_CAP', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%cap%', __('Total CAP'), $html);
+				$html = str_replace('%valor_cap%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($this->fields['monto_contrato'], $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
+				$html = str_replace('%total_utilizado%', __('Total Utilizado'), $html);
+				$html = str_replace('%cap_utilizado%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($this->resumen_cap->monto_utilizado, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
+				$monto_restante = $this->fields['monto_contrato'] - $this->resumen_cap->monto_utilizado;
+				$html = str_replace('%restante%', __('Monto restante'), $html);
+				$html = str_replace('%valor_restante%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($monto_restante, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
+				$html = str_replace('%salto_linea%', '<br>', $html);
+				$html = str_replace('%hr%', '<hr size="2" class="separador">', $html);
+
 				break;
 
 			case 'COBROS_DEL_CAP': //GenerarDocumento2
 				$this->ObtenerCAPsPorContrato($this->fields['id_contrato']);
+				$this->resumen_cap->monto_utilizado = 0;
 				$row_tmpl = $html;
 				$html = '';
-				foreach ($this->caps as $cap) {
+				foreach ($this->resumen_cap->caps as $cap) {
 					$row = $row_tmpl;
 
-					$row = str_replace('%numero_cobro%', __('Cobro') . ' ' . $cap['id_cobro'], $row);
+					$estado = '';
+					if ($cap['estado'] == 'CREADO' || $cap['estado'] == 'EN REVISION') {
+						$estado = __('(NO EMITIDO)');
+					} else {
+						$this->resumen_cap->monto_utilizado += $cap['monto_cap'];
+					}
+
+					$row = str_replace('%numero_cobro%', __('Cobro') . ' ' . $cap['id_cobro'] . ' ' . $estado, $row);
 					$row = str_replace('%valor_cap_del_cobro%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($cap['monto_cap'], $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 
 					$html .= $row;
@@ -11626,6 +11633,7 @@ class NotaCobro extends Cobro {
 		$criteria = new Criteria($this->sesion);
 		$criteria->add_select('C.id_cobro', 'id_cobro')
 				->add_select('((C.monto_trabajos + C.monto_tramites) * CM2.tipo_cambio) / CM1.tipo_cambio', 'monto_cap')
+				->add_select('C.estado')
 				->add_from('cobro C')
 				->add_inner_join_with('contrato CN', CriteriaRestriction::equals('C.id_contrato', 'CN.id_contrato'))
 				->add_inner_join_with('cobro_moneda CM1', CriteriaRestriction::and_clause(array(
@@ -11639,7 +11647,8 @@ class NotaCobro extends Cobro {
 				->add_restriction(CriteriaRestriction::equals('C.id_contrato', $id_contrato))
 				->add_restriction(CriteriaRestriction::equals('C.forma_cobro', "'CAP'"));
 
-		$this->caps = $criteria->run();
+		$this->resumen_cap = new stdClass();
+		$this->resumen_cap->caps = $criteria->run();
 	}
 
 	public function GeneraCobrosMasivos($cobros, $imprimir_cartas, $agrupar_cartas, $id_formato = null, $mostrar_asuntos_cobrables_sin_horas = FALSE) {
