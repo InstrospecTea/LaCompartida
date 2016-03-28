@@ -121,7 +121,7 @@ for ($x = 3; $x < 14; $x++) {
 }
 
 $filas++;
-$glosa_comparacion = __(" Los montos facturados se comparan con el monto THH segun ");
+$glosa_comparacion = __(" Los montos facturados se comparan con el monto THH según ");
 
 if ($tarifa == 'monto_thh') {
 	$glosa_comparacion .= __("tarifa del cliente");

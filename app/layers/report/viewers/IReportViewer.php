@@ -1,5 +1,5 @@
 <?php
 
-interface IReportViewer() {
+interface IReportViewer {
 
 }

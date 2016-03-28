@@ -383,6 +383,9 @@ class Form {
 			if (!isset($attrs['title']) || $attrs['title'] !== false) {
 				$attrs['title'] = $text;
 			}
+			if (empty($attrs['name']) && !empty($attrs['id'])) {
+				$attrs['name'] = $attrs['id'];
+			}
 		}
 		$span_icon = '';
 		if (!empty($attrs['icon'])) {
@@ -405,7 +408,10 @@ class Form {
 	 */
 	public function submit($text, array $attrs = array()) {
 		$attrs['onclick'] = isset($attrs['onclick']) ? $attrs['onclick'] : '';
-		$attrs['onclick'] .= ";jQuery(this).closest('form').submit();";
+		if (!empty($attrs['onclick']) && (substr($attrs['onclick'], -1) != ';')) {
+			$attrs['onclick'] .= ';';
+		}
+		$attrs['onclick'] .= "jQuery(this).closest('form').submit();";
 		return $this->button($text, $attrs);
 	}
 

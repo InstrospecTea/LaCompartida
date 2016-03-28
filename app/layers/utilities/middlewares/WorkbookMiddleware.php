@@ -116,19 +116,15 @@ class WorkbookMiddleware {
 	 * Download the document
 	 */
 	public function close() {
-		header('Content-Type: application/vnd.ms-excel');
-		header('Content-Disposition: attachment;filename="' . $this->filename . '"');
+		$file = pathinfo($this->filename);
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename=' . $file['filename'] . '.xlsx');
 		header('Cache-Control: max-age=0');
-		header('Cache-Control: max-age=1'); // IE 9
-		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-		header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-		header('Cache-Control: cache, must-revalidate');
 		header('Pragma: public');
 
 		$this->phpExcel->setActiveSheetIndex(0);
 
-		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, 'Excel5');
-		$writer->setPreCalculateFormulas(true);
+		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, 'Excel2007');
 
 		$writer->save('php://output');
 
@@ -247,16 +243,6 @@ class WorkbookMiddleware {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Add formats to cells
-	 * @param PHPExcel_Worksheet $workSheet
-	 *
-	 * @todo Implement this method
-	 */
-	private function setPixmap($workSheet) {
-		// TODO: implement
 	}
 
 	/**
@@ -414,6 +400,28 @@ class WorkbookMiddleware {
 					;
 
 		$this->workSheetObj->mergeCells($cellsMerged);
+	}
+
+	/**
+	 * Insert a bitmap
+	 * @param int $row
+	 * @param int $col
+	 * @param string $bitmap
+	 * @param int $x
+	 * @param int $y
+	 * @param int $scale_x
+	 * @param int $scale_y
+	 */
+	public function insertBitmap($row, $col, $bitmap, $x = 0, $y = 0, $scale_x = 1, $scale_y = 1) {
+		$objDrawing = new PHPExcel_Worksheet_Drawing();
+		$objDrawing->setPath($bitmap)
+							->setCoordinates(PHPExcel_Cell::stringFromColumnIndex($col).($row + 1))
+							->setOffsetX($x)
+							->setOffsetY($y)
+							->setWidthAndHeight($objDrawing->getWidth() * $scale_x, $objDrawing->getHeight() * $scale_y)
+							->setWorksheet($this->workSheetObj);
+
+		unset($objDrawing);
 	}
 
 	/**
