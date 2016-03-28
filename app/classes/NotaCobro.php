@@ -1466,9 +1466,13 @@ class NotaCobro extends Cobro {
 					for ($i = 1; $i <= $this->escalonadas['num']; $i++) {
 
 						$detalle_escala = "";
-						$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . " - ";
-						$detalle_escala .=!empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
-						$detalle_escala .=!empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
+
+						if (!empty($this->escalonadas[$i]['tiempo_inicial'])) {
+							$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . ' - ';
+						}
+
+						$detalle_escala .= !empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . ' hrs. ' : ' ' . __('Más hrs') . ' ';
+						$detalle_escala .= !empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
 
 						if (!empty($this->fields['esc' . $i . '_descuento']) && $this->fields['esc' . $i . '_descuento'] != 'NULL') {
 							$detalle_escala .= " " . __('con descuento') . " {$this->fields['esc' . $i . '_descuento']}% ";
@@ -4210,8 +4214,12 @@ class NotaCobro extends Cobro {
 					for ($i = 1; $i <= self::MAX_ESC; $i++) {
 						if ($this->fields['esc' . $i . '_tiempo'] != 0) {
 							$detalle_escala = "";
-							$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . " - ";
-							$detalle_escala .=!empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
+
+							if (!empty($this->escalonadas[$i]['tiempo_inicial'])) {
+								$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . ' - ';
+							}
+
+							$detalle_escala .= !empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . ' hrs. ' : ' ' . __('Más hrs') . ' ';
 							$detalle_escala .=!empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
 							if (!empty($this->fields['esc' . $i . '_descuento']) && $this->fields['esc' . $i . '_descuento'] != 'NULL') {
 								$detalle_escala .= " " . __('con descuento') . " {$this->fields['esc' . $i . '_descuento']}% ";
