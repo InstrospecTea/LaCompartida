@@ -246,16 +246,6 @@ class WorkbookMiddleware {
 	}
 
 	/**
-	 * Add formats to cells
-	 * @param PHPExcel_Worksheet $workSheet
-	 *
-	 * @todo Implement this method
-	 */
-	private function setPixmap($workSheet) {
-		// TODO: implement
-	}
-
-	/**
 	 * Convert a RGB code to hexadecimal
 	 * @param string $rgb
 	 * @return hexadecimal code
@@ -410,6 +400,28 @@ class WorkbookMiddleware {
 					;
 
 		$this->workSheetObj->mergeCells($cellsMerged);
+	}
+
+	/**
+	 * Insert a bitmap
+	 * @param int $row
+	 * @param int $col
+	 * @param string $bitmap
+	 * @param int $x
+	 * @param int $y
+	 * @param int $scale_x
+	 * @param int $scale_y
+	 */
+	public function insertBitmap($row, $col, $bitmap, $x = 0, $y = 0, $scale_x = 1, $scale_y = 1) {
+		$objDrawing = new PHPExcel_Worksheet_Drawing();
+		$objDrawing->setPath($bitmap)
+							->setCoordinates(PHPExcel_Cell::stringFromColumnIndex($col).($row + 1))
+							->setOffsetX($x)
+							->setOffsetY($y)
+							->setWidthAndHeight($objDrawing->getWidth() * $scale_x, $objDrawing->getHeight() * $scale_y)
+							->setWorksheet($this->workSheetObj);
+
+		unset($objDrawing);
 	}
 
 	/**
