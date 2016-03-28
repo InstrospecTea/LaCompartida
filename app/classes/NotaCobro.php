@@ -10649,7 +10649,7 @@ class NotaCobro extends Cobro {
 					$esc = 1;
 					while ($esc <= $cantidad_escalonadas) {
 						if (is_array($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'])) {
-							$html .= '<h4>' . __('Escalon') . " $esc: ";
+							$html .= '<h4>' . __('Escalón') . " $esc: ";
 							if ($cobro_valores['datos_escalonadas'][$esc]['monto'] > 0) {
 								$html .= __('Monto Fijo') . ' ' . $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_valores['datos_escalonadas'][$esc]['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</h4>";
 							} else {
