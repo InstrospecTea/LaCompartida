@@ -1,3 +1,4 @@
+
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 
@@ -106,6 +107,11 @@ if (is_array($areas_usuarioF)) {
 
 $campo_fecha = "trabajo";
 $campos_porcentajes = array();
+
+if ($REQUEST_METHOD == 'GET') {
+	$mp = new \TTB\Mixpanel();
+	$mp->identifyAndTrack($RUT, 'Ingresa Reporte General');
+}
 
 if (isset($_POST['tipo'])) {
 	switch ($_POST['tipo']) {
