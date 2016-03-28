@@ -10641,11 +10641,11 @@ class NotaCobro extends Cobro {
 					$esc = 1;
 					while ($esc <= $cantidad_escalonadas) {
 						if (is_array($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'])) {
-							$html .= "<h4>Escalon $esc: ";
+							$html .= '<h4>' . __('Escalon') . " $esc: ";
 							if ($cobro_valores['datos_escalonadas'][$esc]['monto'] > 0) {
-								$html .= " Monto Fijo " . $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_valores['datos_escalonadas'][$esc]['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</h4>";
+								$html .= __('Monto Fijo') . ' ' . $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_valores['datos_escalonadas'][$esc]['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</h4>";
 							} else {
-								$html .= " Tarifa HH";
+								$html .= __('Tarifa HH');
 								if ($cobro_valores['datos_escalonadas'][$esc]['descuento'] > 0) {
 									$html .= " con " . $cobro_valores['datos_escalonadas'][$esc]['descuento'] . "% de descuento";
 								}
