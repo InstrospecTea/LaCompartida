@@ -263,6 +263,10 @@ if ($opcion == "guardar") {
 					$Pagina->AddInfo(__('Cliente') . ' ' . __('Guardado con exito') . '<br>' . __('Contrato guardado con éxito'));
 					//To S3
 					$archivo->LoadById($contrato->fields['id_contrato']);
+					if ($desde_agrega_cliente == 1) {
+						$mp = new \TTB\Mixpanel();
+						$mp->identifyAndTrack($RUT, "Agregar Cliente");
+					}
 				} else {
 					$Pagina->AddError($contrato->error);
 				}

@@ -337,6 +337,9 @@ if ($opcion == "guardar") {
 		$observacion->Edit('id_usuario', $sesion->usuario->fields['id_usuario']);
 		$observacion->Edit('id_factura', $factura->fields['id_factura']);
 		$observacion->Write();
+		
+		$mp = new \TTB\Mixpanel();
+		$mp->identifyAndTrack($RUT, 'Emitir Factura');
 	}
 }
 

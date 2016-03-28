@@ -2,15 +2,10 @@
 	"require": {
 		"twig/twig": "1.*",
 		"mikehaertl/phpwkhtmltopdf": "2.0.1",
-		"guzzle/guzzle": "~3.3.0",
 		"aws/aws-sdk-php": "2.2.*",
 		"amazonwebservices/aws-sdk-for-php": "1.6.*",
 		"nesbot/carbon": "1.14",
-		"pear/pear": "dev-master",
-		"pear/numbers_words": "dev-master",
-		"pear/ole": "dev-master",
-		"pear/spreadsheet_excel_writer": "dev-master",
-		"dompdf/dompdf": "^0.6.1",
-		"phpmailer/phpmailer": "~5.2"
+		"phpmailer/phpmailer": "~5.2",
+		"mixpanel/mixpanel-php" : "2.*"
 	}
 }

@@ -254,6 +254,9 @@ if ($opcion == 'guardar') {
 
 			$cobro->CambiarEstadoSegunFacturas();
 
+			$mp = new \TTB\Mixpanel();
+			$mp->identifyAndTrack($RUT, 'Agregar Pago');
+
 			//Al llamar desde Webservice, IngresarPago utilizó una $pagina falsa. Se puede ver el contenido mediante:
 			//echo $pagina->Output();
 			if ($desde_webservice) {
