@@ -116,19 +116,15 @@ class WorkbookMiddleware {
 	 * Download the document
 	 */
 	public function close() {
-		header('Content-Type: application/vnd.ms-excel');
-		header('Content-Disposition: attachment;filename="' . $this->filename . '"');
+		$file = pathinfo($this->filename);
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename=' . $file['filename'] . '.xlsx');
 		header('Cache-Control: max-age=0');
-		header('Cache-Control: max-age=1'); // IE 9
-		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-		header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-		header('Cache-Control: cache, must-revalidate');
 		header('Pragma: public');
 
 		$this->phpExcel->setActiveSheetIndex(0);
 
-		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, 'Excel5');
-		$writer->setPreCalculateFormulas(true);
+		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, 'Excel2007');
 
 		$writer->save('php://output');
 
