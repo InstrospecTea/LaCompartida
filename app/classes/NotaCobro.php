@@ -9,6 +9,7 @@ class NotaCobro extends Cobro {
 	protected $twig;
 	protected $template_data;
 	private $detalle_en_asuntos = FALSE;
+	protected $subtotal_calculado_retainer = 0;
 
 	var $asuntos = array();
 	var $x_resultados = array();
@@ -6003,6 +6004,7 @@ class NotaCobro extends Cobro {
 									trabajo.id_trabajo,
 									trabajo.tarifa_hh,
 									IF (trabajo.cobrable, trabajo.tarifa_hh * ( TIME_TO_SEC( duracion_cobrada ) / 3600 ),0) as importe,
+									IF (trabajo.cobrable, trabajo.tarifa_hh * ((TIME_TO_SEC(duracion_cobrada)/3600) - (TIME_TO_SEC(duracion_retainer)/ 3600)),0) AS importe_retainer,
 									trabajo.codigo_asunto,
 									trabajo.solicitante,
 									$query_categoria_lang
@@ -6031,6 +6033,8 @@ class NotaCobro extends Cobro {
 					$trabajo = $lista_trabajos->Get($i);
 
 					$total_trabajo_importe = $trabajo->fields['importe'];
+					$total_trabajo_importe_retainer =  $trabajo->fields['importe_retainer'];
+					$this->subtotal_calculado_retainer = $this->subtotal_calculado_retainer +  $total_trabajo_importe_retainer;
 					$total_trabajo_monto_cobrado = $trabajo->fields['monto_cobrado'];
 					$tarifa_hh = $trabajo->fields['tarifa_hh'];
 					$duracion_cobrada = $trabajo->fields['duracion_cobrada'];
@@ -6130,6 +6134,9 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%importe%', number_format($total_trabajo_monto_cobrado, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					} else {
 						$row = str_replace('%importe%', number_format($total_trabajo_importe, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
+					}
+					if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
+						$row = str_replace('%importe%', number_format($total_trabajo_importe_retainer, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 					}
 					$row = str_replace('%importe_ajustado%', number_format($total_trabajo_importe * $x_factor_ajuste, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 
@@ -6463,8 +6470,13 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%td_importe%', '', $html);
 					$html = str_replace('%td_importe_ajustado%', '', $html);
 				}
-				$html = str_replace('%importe%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_importe'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				$html = str_replace('%importe_ajustado%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_importe'] * $x_factor_ajuste, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
+				if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
+					$html = str_replace('%importe%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->subtotal_calculado_retainer, $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				} else {
+					$html = str_replace('%importe%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_importe'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%importe_ajustado%', $moneda->fields['simbolo'] . $this->espacio . number_format($asunto->fields['trabajos_total_importe'] * $x_factor_ajuste, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				}
 
 				if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 					$html = str_replace('%td_retainer%', '<td align="center">%duracion_retainer%</td>', $html);
