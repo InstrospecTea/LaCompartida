@@ -1,7 +1,5 @@
 <?php
 
-interface IProcessLockService extends BaseService{
-
-
+interface IProcessLockService extends BaseService {
 
 }

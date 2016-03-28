@@ -1,7 +1,15 @@
 # Changelog
 
+## Hotfix 16.5.1
+Thursday, March 24th
+* **Fix** [Tipo Cambio en Adelantos] (https://github.com/LemontechSA/ttb/pull/1374)
+
+## [Release 16.5.0](https://github.com/LemontechSA/ttb/pull/1373)
+Wednesday, March 23rd
+* **Feature** [Reportes conceptos contables] (https://github.com/LemontechSA/ttb/pull/1310)
+
 ## Hotfix 16.4.11
-Monday, March 21th
+Monday, March 21st
 * **Fix** [Mejora de mensajes en la generación masiva de cobros] (https://github.com/LemontechSA/ttb/pull/1369)
 
 ## Hotfix 16.4.10
