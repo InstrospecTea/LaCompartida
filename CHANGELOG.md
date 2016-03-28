@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.6.0](https://github.com/LemontechSA/ttb/pull/1377)
+Monday, March 28rd
+* **Feature** [Mixpanel integration] (https://github.com/LemontechSA/ttb/pull/1371)
+
 ## Hotfix 16.5.1
 Thursday, March 24th
 * **Fix** [Tipo Cambio en Adelantos] (https://github.com/LemontechSA/ttb/pull/1374)
