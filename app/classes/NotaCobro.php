@@ -6060,7 +6060,6 @@ class NotaCobro extends Cobro {
 					if ($horas_retainer - $horas_trabajadas < 0) {
 						$duracion_decimal_descontada = $duracion_decimal_descontada - $duracion_decimal_retainer;
 					}
-					$duracion_decimal_tarificada_retainer = $duracion_cobrada_decimal - $duracion_decimal_retainer;
 					$duracion_decimal_tarificada_retainer = $h - $h_retainer + ($m - $m_retainer) /60;
 					$minutos_decimal = $m / 60;
 					$duracion_decimal = $h + $minutos_decimal + $s / 3600;
