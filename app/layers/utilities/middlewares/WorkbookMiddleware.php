@@ -147,12 +147,18 @@ class WorkbookMiddleware {
 
 	/**
 	 * Add formats to cells
-	 * @param array $formats
+	 * @param FormatMiddleware $format
 	 * @param int $row
 	 * @param int $col
 	 */
 	private function setFormat($format, $row, $col) {
-		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
+		if ($row == -1) {
+			$cellCode = $col;
+		} else if($col == -1) {
+			$cellCode = $row;
+		} else {
+			$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
+		}
 
 		foreach ($format->getElements() as $key => $formatValue) {
 			if (!is_null($formatValue)) {
@@ -350,19 +356,20 @@ class WorkbookMiddleware {
 	 * @param int $lastcol
 	 * @param int $width
 	 * @param FormatMiddleware $format
-	 * @param boolean $hidden
-	 * @param int $level
+	 * @param int $hidden
 	 */
-	public function setColumn($firstcol, $lastcol, $width, $format = null, $hidden = false, $level = 0) {
+	public function setColumn($firstcol, $lastcol, $width, $format = null, $hidden = 0) {
 		$column = PHPExcel_Cell::stringFromColumnIndex($firstcol);
 
 		$this->workSheetObj->getColumnDimension($column)->setWidth($width);
 
-		if ($hidden) {
+		if (is_numeric($hidden) && $hidden == 1) {
 			$this->workSheetObj->getColumnDimension($column)->setVisible(false);
 		}
 
-		//TODO: format and level.
+		if(is_object($format)) {
+			$this->setFormat($format, -1, $column);
+		}
 	}
 
 	/**
@@ -370,19 +377,15 @@ class WorkbookMiddleware {
 	 * @param int $row
 	 * @param int $height
 	 * @param FormatMiddleware $format
-	 * @param boolean $hidden
-	 * @param int $level
 	 */
-	public function setRow($row, $height, $format = null, $hidden = false, $level = 0) {
+	public function setRow($row, $height, $format = null) {
 		$row = $row + 1;
 
 		$this->workSheetObj->getRowDimension($row)->setRowHeight($height);
 
-		if ($hidden) {
-			$this->workSheetObj->getRowDimension($row)->setVisible(false);
+		if(is_object($format)) {
+			$this->setFormat($format, $row, -1);
 		}
-
-		//TODO: format and level.
 	}
 
 	/**
