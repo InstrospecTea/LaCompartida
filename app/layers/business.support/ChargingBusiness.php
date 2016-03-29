@@ -893,6 +893,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 					$scaleAmount += $amount;
 				} else {
 					$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
+					$proration = ($workedHours * 100) / (float) $scale->get('hours');
+					$work->set('actual_amount', ($scaleAmount * $proration) / 100);
 				}
 				if ($remainingScaleHours == 0) {
 					// El trabajo se acabó y además se llenó la bolsa del escalón. Hay que cambiar el escalón.
@@ -917,6 +919,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				$work->set('usedTime', ($remainingScaleHours + $workedHours) * 60);
 				if ($scale->get('fixedAmount') != 0) {
 					$scaleAmount = $this->CoiningBusiness->changeCurrency($scale->get('fixedAmount'), $scaleCurrency, $chargeCurrency);
+					$proration = (($remainingScaleHours + $workedHours) * 100) / (float) $scale->get('hours');
+					$work->set('actual_amount', ($scaleAmount * $proration) / 100);
 				} else {
 					//Obtener la tarifa del usuario en base a la moneda.
 					$userFee = $this->getUserFee($work->get('id_usuario'), $scale->get('feeId'), $scale->get('currencyId'));
