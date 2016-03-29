@@ -6216,7 +6216,11 @@ class NotaCobro extends Cobro {
 					if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 						$row = str_replace('%duracion%', number_format($duracion_decimal, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $row);
 					} else {
-						$row = str_replace('%duracion%', $h . ':' . $m, $row);
+						if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
+							$row = str_replace('%duracion%', Utiles::horaDecimal2HoraMinuto($duracion_decimal_tarificada_retainer), $row);
+						} else {
+							$row = str_replace('%duracion%', $h . ':' . $m, $row);
+						}
 					}
 
 
@@ -6550,7 +6554,12 @@ class NotaCobro extends Cobro {
 				if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 					$html = str_replace('%duracion%', number_format($duracion_cobrada_total, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $html);
 				} else {
-					$html = str_replace('%duracion%', Utiles::Decimal2GlosaHora($duracion_cobrada_total), $html);
+					if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
+						$html = str_replace('%duracion%', Utiles::Decimal2GlosaHora($duracion_tarificada_retainer_total), $html);
+					} else {
+						$html = str_replace('%duracion%', Utiles::Decimal2GlosaHora($duracion_cobrada_total), $html);
+					}
+
 				}
 
 
