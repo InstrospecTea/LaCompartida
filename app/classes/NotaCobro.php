@@ -10680,7 +10680,13 @@ class NotaCobro extends Cobro {
 									$resumen_fila = str_replace('%td_tarifa%', '', $resumen_fila);
 									$resumen_fila = str_replace('%td_tarifa_ajustada%', '', $resumen_fila);
 								}
-								$resumen_fila = str_replace('%tarifa_horas_demo%', number_format($usuarios['tarifa'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_fila);
+
+								if ($cobro_valores['datos_escalonadas'][$esc]['escalonada_tarificada'] != 0) {
+									$resumen_fila = str_replace('%tarifa_horas_demo%', number_format($usuarios['tarifa'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_fila);
+								} else {
+									$resumen_fila = str_replace('%tarifa_horas_demo%', '--', $resumen_fila);
+								}
+
 								if ($this->fields['opc_ver_profesional_importe']) {
 									$resumen_fila = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $resumen_fila);
 									$resumen_fila = str_replace('%td_importe_ajustado%', '<td align="right">%total_horas_demo%</td>', $resumen_fila);
