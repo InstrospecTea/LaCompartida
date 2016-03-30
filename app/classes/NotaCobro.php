@@ -5429,6 +5429,9 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%texto_numero_cobro%', __('Nº Cobro'), $html);
 				$html = str_replace('%texto_valor_cap_del_cobro%', __('Total Cobro'), $html);
 
+				$html = str_replace('%total_utilizado_cobros%', __('Total Utilizado'), $html);
+				$html = str_replace('%cap_utilizado_cobros%', $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['simbolo'] . $this->espacio . number_format($this->resumen_cap->monto_utilizado, $cobro_moneda->moneda[$contrato->fields['id_moneda_monto']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
 				$html = str_replace('%glosa_cap%', __('CAP'), $html);
 
 				$html = str_replace('%cap%', __('Total CAP'), $html);
