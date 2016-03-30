@@ -6154,7 +6154,6 @@ class NotaCobro extends Cobro {
 						$row = str_replace('%td_retainer%', '<td align="center">%duracion_retainer%</td>', $row);
 						$row = str_replace('%td_tarificada_retainer%', '<td align="center">%duracion_tarificada_retainer%</td>', $row);
 						$row = str_replace('%duracion_tarificada_retainer%', Utiles::horaDecimal2HoraMinuto($duracion_decimal_tarificada_retainer), $row);
-						//$row = str_replace('%duracion_tarificada_retainer%', $duracion_decimal_tarificada_retainer, $row);
 						if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 							$row = str_replace('%duracion_retainer%', number_format($duracion_decimal_retainer, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $row);
 						} else {
