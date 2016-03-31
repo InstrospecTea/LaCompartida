@@ -122,14 +122,14 @@ $pagina->PrintTop($popup);
 	}
 	function ActualizarTiempoIngresado() {
 		var url = "ajax_tareas.php?accion=refrescar_tiempo_ingresado";
-		url += "&id_tarea=<?=$id_tarea?>";
+		url += "&id_tarea=<?php echo $id_tarea;?>";
 		new Ajax.Request(url, {asynchronous: true, parameters : '', onComplete:  CambiarTiempo});
 	}
 	function CambiarTiempo(xmlHttpRequest, responseHeader) {
 		var response = xmlHttpRequest.responseText;
 		if(response) {
 			if(response.indexOf('head')!=-1) {
-						alert('<?=__('Sesión Caducada')?>');
+						alert('<?php echo __('Sesión Caducada');?>');
 						top.location.href='<?=Conf::Host()?>';
 			}
 			var tiempo = response;
@@ -158,22 +158,22 @@ $pagina->PrintTop($popup);
 			}
 		?>
 		if(!form_codigo_cliente.value) {
-			alert('<?=__('Debe seleccionar un cliente')?>');
+			alert('<?php echo __('Debe seleccionar un cliente');?>');
 			form_codigo_cliente.focus();
 	    	return false;
 		}
 		if(!form_codigo_asunto.value) {
-			alert('<?=__('Ud. debe seleccionar un').' '.__('asunto')?>');
+			alert('<?php echo __('Ud. debe seleccionar un').' '.__('asunto');?>');
 			form_codigo_asunto.focus();
 			return false;
 		}
 		if(form.nombre.value == '') {
-			alert('<?=__('Debe ingresar un nombre para la Tarea')?>');
+			alert('<?php echo __('Debe ingresar un nombre para la Tarea');?>');
 			form.nombre.focus();
 			return false;
 		}
 		if(form.fecha.value == '') {
-			if(confirm('<?=__('La tarea se ingresará sin Fecha de Entrega')?>')) {
+			if(confirm('<?php echo __('La tarea se ingresará sin Fecha de Entrega');?>')) {
 				return true;
 			}else{
 				form.fecha.focus();
@@ -208,7 +208,7 @@ $pagina->PrintTop($popup);
    	}
 	echo(Autocompletador::CSS());
 ?>
-<form method=post action="<?= $SERVER[PHP_SELF] ?>" onsubmit="return Validar(this);" id="form_gastos" autocomplete='off'>
+<form method=post action="<?php echo $SERVER[PHP_SELF]; ?>" onsubmit="return Validar(this);" id="form_gastos" autocomplete='off'>
 	<input type='hidden' name='opcion' value="guardar" />
 	<input type='hidden' name="gIsMouseDown" id="gIsMouseDown" value='false' />
 	<input type='hidden' name="max_hora" id="max_hora" value='999999999' />
@@ -260,7 +260,7 @@ $pagina->PrintTop($popup);
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto ,"","CargarSelectCliente(this.value);", 320,$codigo_cliente);
 					}
 				?>
-				<?=$req?>
+				<?php echo $req; ?>
 			</td>
 		</tr>
 		<tr>
@@ -268,7 +268,7 @@ $pagina->PrintTop($popup);
 				<?php echo __('Nombre');?>
 			</td>
 			<td align='left' colspan='3'>
-				<input name='nombre' id='nombre' size='40' value="<?=$Tarea->fields['nombre'] ? $Tarea->fields['nombre'] : '' ?>" /> <?=$req?>
+				<input name='nombre' id='nombre' size='40' value="<?=$Tarea->fields['nombre'] ? $Tarea->fields['nombre'] : '' ?>" /> <?php echo $req;?>
 			</td>
 		</tr>
 		<tr id='descripcion_tarea'>
@@ -276,7 +276,7 @@ $pagina->PrintTop($popup);
 				<?php echo __('Detalle');?>
 			</td>
 			<td align='left' colspan='3'>
-				<textarea id='detalle' name='detalle' cols="45" rows="3"><?=$Tarea->fields['detalle']?></textarea>
+				<textarea id='detalle' name='detalle' cols="45" rows="3"><?php echo $Tarea->fields['detalle'];?></textarea>
 			</td>
 		</tr>
 		<tr>
@@ -402,7 +402,7 @@ $pagina->PrintTop($popup);
 				<?php echo __('Duración Ingresada');?>
 			</td>
 			<td align='left'>
-				<input readonly='readonly' value='<?=$Tarea->getTiempoIngresado();?>' id='tiempo_ingresado' size='7' />
+				<input readonly='readonly' value='<?php echo $Tarea->getTiempoIngresado();?>' id='tiempo_ingresado' size='7' />
 			</td>
 		</tr>
 		<tr>
@@ -421,7 +421,7 @@ $pagina->PrintTop($popup);
 			</td>
 			<td align='right' colspan='3'>
 				<?php if($Tarea->loaded()) { ?>
-					<span style="font-size:10px;"><i><?__('Tarea ingresada el').'&nbsp;'.Utiles::sql2fecha($Tarea->fields['fecha_creacion']);?>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span style="font-size:10px;"><i><?php echo __('Tarea ingresada el').'&nbsp;'.Utiles::sql2fecha($Tarea->fields['fecha_creacion']);?>&nbsp;&nbsp;&nbsp;&nbsp;</span>
 				<?php } ?>
 			</td>
 		</tr>
@@ -444,7 +444,7 @@ $pagina->PrintTop($popup);
 			$url_iframe = 'tareas_comentarios.php?id_tarea='.$Tarea->fields['id_tarea'];
 			$alto_iframe = '100';
 		?>
-		<iframe name='bitacora' id='bitacora' src='<?=$url_iframe ?>' frameborder='0' width='95%' height='<?php $alto_iframe ?>px'>
+		<iframe name='bitacora' id='bitacora' src='<?php echo $url_iframe; ?>' frameborder='0' width='95%' height='<?php echo $alto_iframe ?>px'>
 		</iframe>
 	</div>
 <?php }?>
