@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.6.1
+Thursday, March 31th
+* **Fix** [Error SQL: Agregar tarea] (https://github.com/LemontechSA/ttb/pull/1378)
+
 ## [Release 16.6.0](https://github.com/LemontechSA/ttb/pull/1377)
 Monday, March 28rd
 * **Feature** [Mixpanel integration] (https://github.com/LemontechSA/ttb/pull/1371)
