@@ -28,8 +28,8 @@ if($Tarea->loaded() && (!$codigo_cliente || !$codigo_cliente_secundario)) {
 
 if($opcion == "guardar") {
 	$Tarea->Edit("fecha_entrega",Utiles::fecha2sql($fecha));
-	$Tarea->Edit("nombre",TTB\Utiles::escape_variable($nombre));
-	$Tarea->Edit("detalle",TTB\Utiles::escape_variable($detalle));
+	$Tarea->Edit("nombre",$nombre);
+	$Tarea->Edit("detalle",$detalle);
 	$Tarea->Edit("prioridad",$prioridad);
 	$Tarea->Edit("alerta",$alerta);
 
@@ -284,7 +284,7 @@ $pagina->PrintTop($popup);
 				<?php echo __('Fecha de Entrega');?>
 			</td>
 			<td align='left' colspan='1'>
-				<?php echo \TTB\Html::PrintCalendar('fecha', $Tarea->fields['fecha_entrega']); ?>
+				<?php echo \TTB\Html::PrintCalendar('fecha', $Tarea->fields['fecha_entrega'] ? Utiles::sql2date($Tarea->fields['fecha_entrega']) : $fecha); ?>
 			</td>
 			<td align='right'>
 				<?php echo __('Prioridad');?>
