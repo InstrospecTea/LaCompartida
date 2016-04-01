@@ -1,7 +1,7 @@
 # Changelog
 
 ## Hotfix 16.6.1
-Thursday, March 31th
+Thursday, March 31st
 * **Fix** [Error SQL: Agregar tarea] (https://github.com/LemontechSA/ttb/pull/1378)
 
 ## [Release 16.6.0](https://github.com/LemontechSA/ttb/pull/1377)
