@@ -2,7 +2,7 @@
 
 ## Hotfix 16.6.2
 Friday, April 1st
-* **Fix** [Corrige montos en resumen cobro retainer] (https://github.com/LemontechSA/ttb/pull/1379)
+* **Fix** [Corrige montos en resumen cobro retainer] (https://github.com/LemontechSA/ttb/pull/1380)
 
 
 ## Hotfix 16.6.1
