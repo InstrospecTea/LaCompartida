@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix 16.6.2
+Friday, April 1st
+* **Fix** [Corrige montos en resumen cobro retainer] (https://github.com/LemontechSA/ttb/pull/1380)
+
+
 ## Hotfix 16.6.1
 Thursday, March 31st
 * **Fix** [Error SQL: Agregar tarea] (https://github.com/LemontechSA/ttb/pull/1378)
