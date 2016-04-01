@@ -64,9 +64,7 @@ class Ledes extends Objeto {
 		$Cobro->Load($id_cobro);
 		$Contrato = new Contrato($this->sesion);
 		$Contrato->Load($Cobro->fields['id_contrato']);
-		if ($Contrato->fields['usa_impuesto_separado']) {
-			$this->format = 'LEDES98BI V2';
-		}
+		$this->format = $Contrato->fields['tipo_ledes'];
 		$currencyBusiness = new CoiningBusiness($this->sesion);
 		$currency = $currencyBusiness->getCurrency($Cobro->fields['id_moneda']);
 		$this->currency = $currency;
