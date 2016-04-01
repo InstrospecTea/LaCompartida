@@ -31,8 +31,8 @@ class ProjectsAPI extends \AbstractSlimAPI {
 		}
 
 		$Business = new \ClientsBusiness($this->session);
-
 		$client = $Business->getClientById($client_id);
+
 		if (is_null($client)) {
 			$this->halt(__("The client doesn't exist"), 'ClientDoesntExists');
 		}
@@ -47,9 +47,8 @@ class ProjectsAPI extends \AbstractSlimAPI {
 		$Slim = $this->slim;
 		$this->validateAuthTokenSendByHeaders();
 
-		$client_id =  $Slim->request()->params('client_id');
-
-		if (!empty($client_id)) {
+		$client_id = $Slim->request()->params('client_id');
+		if (!is_null($client_id)) {
 			$this->getProjectsOfClient($client_id);
 		} else {
 			$active = $Slim->request()->params('active');
