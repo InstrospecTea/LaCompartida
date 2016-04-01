@@ -4,7 +4,7 @@
 	$sesion = new Sesion();
 	$Criteria = new Criteria($sesion);
 
-	if (!empty($usuarios)) {
+	if (!isset($usuarios) && !empty($usuarios)) {
 		$Criteria->add_restriction(
 			CriteriaRestriction::in('trabajo.id_usuario', $usuarios)
 		);
@@ -16,7 +16,7 @@
 		);
 	}
 
-	if(!empty($clientes)) {
+	if(!isset($clientes) && !empty($clientes)) {
 		$Criteria->add_restriction(
 			CriteriaRestriction::in('cliente.codigo_cliente', $clientes)
 		);
