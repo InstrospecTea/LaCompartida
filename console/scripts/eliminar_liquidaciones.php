@@ -11,6 +11,7 @@ class EliminarLiquidaciones extends AppShell {
 			->run();
 
 		$total_tmp_cobros = count($tmp_cobros);
+
 		for ($x = 0; $x < $total_tmp_cobros; $x++) {
 			$id_cobro = $tmp_cobros[$x]['id_cobro'];
 			$Cobro = new Cobro($this->Session);
@@ -49,14 +50,14 @@ class EliminarLiquidaciones extends AppShell {
 				}
 			}
 
+			// eliminar el historial del cobro
+			$query = "DELETE FROM cobro_historial WHERE id_cobro = '{$id_cobro}'";
+			$this->Session->pdodbh->query($query);
+
 			// eliminar el cobro
 			$Cobro->Edit('estado', 'CREADO');
 			$Cobro->Write();
 			$Cobro->Eliminar();
-
-			// eliminar relación entre la factura y el cobro
-			$query = "DELETE FROM cobro_historial WHERE id_cobro = '{$id_cobro}'";
-			$this->Session->pdodbh->query($query);
 		}
 	}
 }
