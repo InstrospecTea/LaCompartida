@@ -1,4 +1,6 @@
 <?php
+	set_time_limit(300);
+
 	require_once dirname(__FILE__).'/../conf.php';
 
     $sesion = new Sesion( array('REV','ADM') );

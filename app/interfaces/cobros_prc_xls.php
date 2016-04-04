@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('ADM', 'COB'));
+set_time_limit(400);
 ini_set("memory_limit", "256M");
 $where_cobro = ' 1 ';
 

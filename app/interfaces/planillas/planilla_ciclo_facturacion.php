@@ -6,6 +6,8 @@ $pagina = new Pagina($sesion);
 $Html = new \TTB\Html;
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
+set_time_limit(300);
+
 if ($xls) {
 	$moneda = new Moneda($sesion);
 	$id_moneda_referencia = $moneda->GetMonedaTipoCambioReferencia($sesion);

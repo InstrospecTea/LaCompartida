@@ -4,6 +4,8 @@
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
 
+	set_time_limit(300);
+
 	$pagina = new Pagina($sesion);
 	$Form = new Form($sesion);
 	/*Genera Excel*/

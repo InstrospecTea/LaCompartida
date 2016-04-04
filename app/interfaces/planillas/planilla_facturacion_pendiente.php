@@ -22,6 +22,8 @@ if ($AtacheSecundarioSoloAsunto) {
 										WHERE id_encargado IS NULL;");
 }
 
+set_time_limit(3600);
+
 if ($xls) {
 	$mp = new \TTB\Mixpanel();
 	$mp->identifyAndTrack($RUT, 'Reporte Horas x Facturar');

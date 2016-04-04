@@ -5,7 +5,8 @@
 
     $pagina = new Pagina( $sesion );
 
-		ini_set('memory_limit','256M');
+		set_time_limit(500);
+                ini_set('memory_limit','256M');
     #$key = substr(md5(microtime().posix_getpid()), 0, 8);
 
     $wb = new Spreadsheet_Excel_Writer();
