@@ -10,8 +10,6 @@ $sesion = new Sesion(array('REP'));
 $fila_debug = 20;
 $pagina = new Pagina($sesion);
 
-set_time_limit(300);
-
 $moneda = new Moneda($sesion);
 $moneda->Load($id_moneda);
 

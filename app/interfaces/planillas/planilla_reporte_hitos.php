@@ -5,8 +5,6 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
-set_time_limit(3600);
-
 if ($xls) {
 	$criteria = new Criteria($sesion);
 

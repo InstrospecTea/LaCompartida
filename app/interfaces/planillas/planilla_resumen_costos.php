@@ -5,7 +5,6 @@ if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
 	header("location: reportes_especificos.php");
 }
 
-set_time_limit(300);
 /*
   Este archivo debe ser llamado mediante require_once() desde otro archivo (actualmente solo desde app/interfaces/reporte_costos.php)
   Necesita las liguientes variables para funcionar:
