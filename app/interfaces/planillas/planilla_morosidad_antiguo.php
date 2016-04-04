@@ -3,8 +3,6 @@
 
 	$sesion = new Sesion(array('REP'));
 
-	set_time_limit(300);
-
 	$pagina = new Pagina($sesion);
 	if($xls)
 	{

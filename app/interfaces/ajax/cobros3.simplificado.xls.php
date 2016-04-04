@@ -7,7 +7,6 @@ require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 
 $sesion = new Sesion(array('REV', 'ADM', 'PRO'));
 $pagina = new Pagina($sesion);
-set_time_limit(300);
 $currency = array();
 $querycurrency = "select * from prm_moneda";
 $respcurrency = mysql_query($querycurrency, $sesion->dbh) or die('NOO');
@@ -139,8 +138,8 @@ if ($p_profesional->fields['permitido']) {
 }
 
 // Le muestro la tarifa cuando tiene el Conf, es profesional no revisor
-$mostrar_tarifa_al_profesional = 
-	UtilesApp::GetConf($sesion, 'MostrarTarifaAlProfesional') && 
+$mostrar_tarifa_al_profesional =
+	UtilesApp::GetConf($sesion, 'MostrarTarifaAlProfesional') &&
 	$profesionalpermitido && !$revisorpermitido;
 
 
@@ -219,7 +218,7 @@ while ($trabajo = mysql_fetch_array($resptrabajo)) {
 		while ($cifras_decimales--) {
 			$decimales .= '0';
 		}
-	} else { 
+	} else {
 		$decimales = '';
 	}
 
@@ -246,7 +245,7 @@ while ($trabajo = mysql_fetch_array($resptrabajo)) {
 	$text_descripcion = addslashes($trabajo['descripcion']);
 
 	$fila[$col_descripcion] = $text_descripcion;
-	
+
 	if ($UsaUsernameEnTodoElSistema) {
 		$fila[$col_nombre_usuario] = $trabajo['username'];
 	} else {
@@ -259,7 +258,7 @@ while ($trabajo = mysql_fetch_array($resptrabajo)) {
 	$dd = number_format($duracion_decimal, 1, '.', '');
 	$duracionfinal+=$duracion_decimal;
 	$tiempo_excel = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
-	
+
 	if ($TipoIngresoHorasdecimal) {
 		$fila[$col_duracion] = "$dd";
 	} else {
@@ -286,7 +285,7 @@ while ($trabajo = mysql_fetch_array($resptrabajo)) {
 		$fila[$col_duracion_cobrada] = '';
 	}
 	$fila[$col_cobrable] = $trabajo['cobrable'] == 1 ? "SI" : "NO";
-	
+
 	if ($cobranzapermitido || $mostrar_tarifa_al_profesional) {
 		// Tratamos de sacar la tarifa del trabajo, si no está guardada usamos la tarifa estándar.
 		if ($trabajo['tarifa_hh'] > 0 && !empty($trabajo['estado_cobro']) && $trabajo['estado_cobro'] != 'CREADO' && $trabajo['estado_cobro'] != 'EN REVISION') {

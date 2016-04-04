@@ -4,8 +4,6 @@ require_once dirname(__FILE__) . '/../../conf.php';
 $sesion = new Sesion(array('REP'));
 //Revisa el Conf si esta permitido
 
-set_time_limit(300);
-
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 $Form = new Form($sesion);
