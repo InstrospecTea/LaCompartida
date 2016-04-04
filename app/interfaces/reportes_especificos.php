@@ -176,6 +176,20 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_deudas.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Antigüedad Deudas Clientes') ?></a></li>
 														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/planillas/planilla_rentabilidad_profesional.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte Producción por Profesional')?></a></li>
 													</ul>
+													<b><?php echo __('Conceptos Contables'); ?></b>
+													<hr size="1" width="100%">
+													<ul style="list-style-position: outside; text-align: left;">
+														<li>
+															<a href='<?php echo Conf::RootDir() ?>/app/Report/salesAccountingConcepts' style="color:#000;text-decoration: none;">
+																<?php echo __('Reporte de Ventas') ?>
+															</a>
+														</li>
+														<li>
+															<a href='<?php echo Conf::RootDir() ?>/app/Report/clientOldDebtAccountingConcepts' style="color:#000;text-decoration: none;">
+																<?php echo __('Reporte antigüedad deudas clientes') ?>
+															</a>
+														</li>
+													</ul>
 												</td>
 											</tr>
 										</table>

@@ -256,6 +256,10 @@ if ($opc == 'anular_emision') {
 				$cobro->Edit('estado', $cobro->fields['estado_anterior']);
 				$cobro->Write();
 			}
+
+			$mp = new \TTB\Mixpanel();
+			$mp->identifyAndTrack($RUT, 'Emitir Cobro');
+
 			$refrescar = "<script language='javascript' type='text/javascript'>if(window.opener.Refrescar) window.opener.Refrescar(" . $id_foco . ");</script>";
 			$pagina->Redirect("cobros6.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1&contitulo=true&refrescar=1&opc=guardar");
 		}
