@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * console/console eliminar_liquidaciones --domain=demo1 --subdir=time_tracking --debug > /var/www/error_logs/eliminar_liquidaciones.log
+ */
+
 class EliminarLiquidaciones extends AppShell {
 	public function main() {
 		$this->Session->usuario = new UsuarioExt($this->Session, '99511620');
