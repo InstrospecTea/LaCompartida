@@ -4,7 +4,7 @@
 		<script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.20151207051013.js"></script>
 		<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/chosen.min.css" />
 		<script type="text/javascript" src="//static.thetimebilling.com/js/chosen.jquery.min.js"></script>
-		<script type="text/javascript" src="../../public/js/vendors.js?<?php echo UtilesApp::obtenerVersion()?>"></script>
+		<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/public/js/vendors.js?<?php echo UtilesApp::obtenerVersion()?>"></script>
 </div>
 
 <?php
