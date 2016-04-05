@@ -1972,7 +1972,7 @@ if (!class_exists('Cobro')) {
 
 			$where_cobro = '';
 
-			$query = "SELECT (((cobro.monto_trabajos-cobro.descuento)*cobro.tipo_cambio_moneda)/cobro_moneda.tipo_cambio) AS monto_cap
+			$query = "SELECT ((((cobro.monto_trabajos + cobro.monto_tramites) - cobro.descuento)*cobro.tipo_cambio_moneda)/cobro_moneda.tipo_cambio) AS monto_cap
 							FROM cobro
 							JOIN contrato ON cobro.id_contrato = contrato.id_contrato
 							JOIN cobro_moneda ON cobro_moneda.id_moneda = $id_moneda_cobros_cap
