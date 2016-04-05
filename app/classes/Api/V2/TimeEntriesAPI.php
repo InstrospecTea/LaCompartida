@@ -42,7 +42,7 @@ class TimeEntriesAPI extends \AbstractSlimAPI {
 
 		$works = array();
 
-		$date = $Slim->request()->params('date(format)');
+		$date = $Slim->request()->params('date');
 
 		if (is_null($date)) {
 			$date = date('Y-m-d', time());
