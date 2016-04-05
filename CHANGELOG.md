@@ -1,7 +1,11 @@
 # Changelog
 
+## [Release 16.7.0](https://github.com/LemontechSA/ttb/pull/1377)
+Tuesday, April 5th
+* **Feature** [Nueva sección de hitos y cap detallada] (https://github.com/LemontechSA/ttb/pull/1371)
+
 ## Hotfix 16.6.3
-Monday, April 4st
+Monday, April 4th
 * **Fix** [Rollback del Hotfix 16.6.2] (https://github.com/LemontechSA/ttb/pull/1381)
 
 ## Hotfix 16.6.2
