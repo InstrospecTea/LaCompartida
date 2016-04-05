@@ -6,7 +6,7 @@ namespace Api\V2;
  * Clase con métodos para Trabajos
  *
  */
-class TimeEntriesAPI extends \AbstractSlimAPI {
+class TimeEntriesAPI extends AbstractSlimAPI {
 
 	static $TimeEntryEntity = array(
 		'id',
@@ -43,9 +43,10 @@ class TimeEntriesAPI extends \AbstractSlimAPI {
 		$works = array();
 
 		$date = $Slim->request()->params('date');
-
 		if (is_null($date)) {
 			$date = date('Y-m-d', time());
+		} else {
+			$date = date('Y-m-d', $date);
 		}
 
 		$fromDate = date("Y-m-d", strtotime('monday this week', strtotime($date)));

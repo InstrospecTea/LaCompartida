@@ -7,7 +7,7 @@ namespace Api\V2;
  * Clase con métodos para Tareas
  *
  */
-class TasksAPI extends \AbstractSlimAPI {
+class TasksAPI extends AbstractSlimAPI {
 
 	static $TasksEntity = array(
 		array('id' => 'id_tarea'),

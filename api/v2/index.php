@@ -18,8 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 $Slim = new \Slim();
 $Session = new \Sesion();
-$zona_horaria = Conf::GetConf($Sesion,'ZonaHoraria');
-date_default_timezone_set($zona_horaria);
+
 
 $Slim->map(':x+', function($x) {
 	$protocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0');

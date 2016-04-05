@@ -7,7 +7,7 @@ namespace Api\V2;
  * Clase con métodos para Projectos
  *
  */
-class ProjectsAPI extends \AbstractSlimAPI {
+class ProjectsAPI extends AbstractSlimAPI {
 
 	static $ProjectsEntity = array(
 		array('id' => 'id_asunto'),

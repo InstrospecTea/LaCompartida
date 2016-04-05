@@ -7,7 +7,7 @@ namespace Api\V2;
  * Clase con métodos para Clientes
  *
  */
-class ClientsAPI extends \AbstractSlimAPI {
+class ClientsAPI extends AbstractSlimAPI {
 
 	static $CilientEntity = array(
 		array('id' => 'id_cliente'),

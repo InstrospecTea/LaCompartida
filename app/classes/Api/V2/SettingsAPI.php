@@ -7,7 +7,7 @@ namespace Api\V2;
  * Clase con métodos para Settings
  *
  */
-class SettingsAPI extends \AbstractSlimAPI {
+class SettingsAPI extends AbstractSlimAPI {
 
 	static $SettingEntity = array(
 		'id',

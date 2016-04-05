@@ -7,7 +7,7 @@ namespace Api\V2;
  * Clase con métodos para Actividades
  *
  */
-class ActivitiesAPI extends \AbstractSlimAPI {
+class ActivitiesAPI extends AbstractSlimAPI {
 
 	static $ActivityWithProjectEntity = array(
 		array('id' => 'id_actividad'),

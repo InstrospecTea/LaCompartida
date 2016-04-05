@@ -7,7 +7,7 @@ namespace Api\V2;
  * Clase con métodos para Areas
  *
  */
-class AreasAPI extends \AbstractSlimAPI {
+class AreasAPI extends AbstractSlimAPI {
 
 	static $AreasEntity = array(
 		array('id' => 'id_area_trabajo'),

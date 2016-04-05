@@ -1,4 +1,5 @@
 <?php
+namespace Api\V2;
 
 class AbstractSlimAPI  {
 
@@ -11,6 +12,70 @@ class AbstractSlimAPI  {
 	public function __construct($session, $slim) {
 		$this->session = $session;
 		$this->slim = $slim;
+
+		$zona_horaria = \Conf::GetConf($session,'ZonaHoraria');
+		date_default_timezone_set($zona_horaria);
+	}
+
+	/**
+	 * Present a list of objects or arrays
+	 * @param  [type] $arrayObj [description]
+	 * @param  [type] $entity   [description]
+	 * @return [type]           [description]
+	 */
+	public function present($arrayObj, $entity) {
+		function parse(&$element, $key, $entity) {
+			$newElement = array();
+
+			foreach ($entity as $field) {
+				$key = is_array($field) ? key($field) : $field;
+
+				if (!is_array($field)) {
+					$value = $field;
+
+					if (!is_object($element) && isset($element[$value])) {
+						$newElement[$key] = $element[$value];
+					} else {
+						if (isset($element->fields[$value])) {
+							$newElement[$key] = $element->fields[$value];
+						} else {
+							$newElement[$key] = null;
+						}
+					}
+				} else {
+					$value = $field[$key];
+					if (!is_object($element) && isset($element[$value])) {
+						$newElement[$key] = $element[$value];
+					} else {
+						if (is_object($element) && array_key_exists($value, $element->fields)) {
+							$newElement[$key] = $element->fields[$value];
+						} else {
+							$newElement[$key] = null;
+						}
+					}
+				}
+			}
+
+			$element = $newElement;
+			return $newElement;
+		}
+
+		if (get_class($arrayObj) == 'SplFixedArray') {
+			$results = $arrayObj->toArray();
+		} else {
+			$results = $arrayObj;
+		}
+
+		$keys = array_keys($results);
+
+		if (!empty($results)) {
+			if ($keys[0] === 0) {
+				array_walk($results, 'parse', $entity);
+			} else {
+				parse($results, 'parse',  $entity);
+			}
+		}
+		return $this->outputJson($results);
 	}
 
 	/**
@@ -31,7 +96,7 @@ class AbstractSlimAPI  {
 
 			default:
 				array_push($errors, array('message' => $error_message, 'code' => $error_code));
-				$data = UtilesApp::utf8izar(array('errors' => $errors, 'extra_data' => $data));
+				$data = \UtilesApp::utf8izar(array('errors' => $errors, 'extra_data' => $data));
 				$Slim->halt($halt_code, json_encode($data));
 				break;
 		}
@@ -47,7 +112,7 @@ class AbstractSlimAPI  {
 		header('Cache-Control: no-cache, must-revalidate');
 		header('Pragma: no-cache');
 		header('Content-type: application/json; charset=utf-8');
-		$response = UtilesApp::utf8izar($response);
+		$response = \UtilesApp::utf8izar($response);
 		array_walk_recursive($response, function(&$x) { if (is_string($x)) $x = trim($x); });
 		echo json_encode($response);
 		exit;
@@ -95,7 +160,7 @@ class AbstractSlimAPI  {
 	 */
 	public function getAppIdByAppKey($app_key) {
 		$Session = $this->session;
-		$UserToken = new UserToken($Session);
+		$UserToken = new \UserToken($Session);
 		return $UserToken->getAppIdByAppKey($app_key);
 	}
 
@@ -108,7 +173,7 @@ class AbstractSlimAPI  {
 		$Slim = $this->slim;
 		$Session = $this->session;
 
-		$UserToken = new UserToken($Session);
+		$UserToken = new \UserToken($Session);
 		$Request = $Slim->request();
 		$auth_token = $Request->headers('AUTHTOKEN');
 		$user_token = $UserToken->findByAuthToken($auth_token);
@@ -140,7 +205,7 @@ class AbstractSlimAPI  {
 				$UserToken->save($user_token_data);
 			}
 
-			$Session->usuario = new UsuarioExt($Session);
+			$Session->usuario = new \UsuarioExt($Session);
 			$Session->usuario->LoadId($user_token->user_id);
 			if (!is_null($permission)) {
 				if (!$Session->usuario->Loaded()) {
