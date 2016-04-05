@@ -45,7 +45,6 @@ if ($opc == 'copiar_datos_anteriores') {
 				$query = "DELETE FROM usuario_costo WHERE id_usuario = '" . $id_usuario . "' AND fecha = '" . sprintf("%04d-%02d-01", $fecha_a, $mes) . "' ";
 				mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 				$query = "DELETE FROM usuario_costo_hh WHERE id_usuario = '" . $id_usuario . "' AND yearmonth = '" . sprintf("%04d%02d", $fecha_a, $mes) . "' ";
-				echo $query;
 				mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			} else {
 				$costo = NumberFormatToInt($costo);
