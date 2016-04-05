@@ -44,6 +44,9 @@ if ($opc == 'copiar_datos_anteriores') {
 			if (!$costo) {
 				$query = "DELETE FROM usuario_costo WHERE id_usuario = '" . $id_usuario . "' AND fecha = '" . sprintf("%04d-%02d-01", $fecha_a, $mes) . "' ";
 				mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+				$query = "DELETE FROM usuario_costo_hh WHERE id_usuario = '" . $id_usuario . "' AND yearmonth = '" . sprintf("%04d%02d", $fecha_a, $mes) . "' ";
+				echo $query;
+				mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			} else {
 				$costo = NumberFormatToInt($costo);
 				$query = "REPLACE INTO usuario_costo(id_usuario, fecha, costo) VALUES('" . $id_usuario . "', '" . sprintf("%04d-%02d-01", $fecha_a, $mes) . "', '" . $costo . "')";
@@ -143,7 +146,7 @@ $pagina->PrintTop();
 <?php
 $idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 $idioma->Load('es');
-$query = "SELECT 
+$query = "SELECT
 		usuario.id_usuario,
 		CONCAT(usuario.apellido1,' ',usuario.apellido2,' ',usuario.nombre) AS nombre_usuario,
 		usuario.username
