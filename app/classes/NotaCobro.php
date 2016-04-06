@@ -1468,9 +1468,13 @@ class NotaCobro extends Cobro {
 					for ($i = 1; $i <= $this->escalonadas['num']; $i++) {
 
 						$detalle_escala = "";
-						$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . " - ";
-						$detalle_escala .=!empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
-						$detalle_escala .=!empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
+
+						if (!empty($this->escalonadas[$i]['tiempo_inicial'])) {
+							$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . ' - ';
+						}
+
+						$detalle_escala .= !empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . ' hrs. ' : ' ' . __('Más hrs') . ' ';
+						$detalle_escala .= !empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
 
 						if (!empty($this->fields['esc' . $i . '_descuento']) && $this->fields['esc' . $i . '_descuento'] != 'NULL') {
 							$detalle_escala .= " " . __('con descuento') . " {$this->fields['esc' . $i . '_descuento']}% ";
@@ -4213,8 +4217,12 @@ class NotaCobro extends Cobro {
 					for ($i = 1; $i <= self::MAX_ESC; $i++) {
 						if ($this->fields['esc' . $i . '_tiempo'] != 0) {
 							$detalle_escala = "";
-							$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . " - ";
-							$detalle_escala .=!empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
+
+							if (!empty($this->escalonadas[$i]['tiempo_inicial'])) {
+								$detalle_escala .= $this->escalonadas[$i]['tiempo_inicial'] . ' - ';
+							}
+
+							$detalle_escala .= !empty($this->escalonadas[$i]['tiempo_final']) && $this->escalonadas[$i]['tiempo_final'] != 'NULL' ? $this->escalonadas[$i]['tiempo_final'] . ' hrs. ' : ' ' . __('Más hrs') . ' ';
 							$detalle_escala .=!empty($this->escalonadas[$i]['id_tarifa']) && $this->escalonadas[$i]['id_tarifa'] != 'NULL' ? " " . __('Tarifa HH') . " " : " " . __('monto fijo') . " ";
 							if (!empty($this->fields['esc' . $i . '_descuento']) && $this->fields['esc' . $i . '_descuento'] != 'NULL') {
 								$detalle_escala .= " " . __('con descuento') . " {$this->fields['esc' . $i . '_descuento']}% ";
@@ -10723,11 +10731,11 @@ class NotaCobro extends Cobro {
 					$esc = 1;
 					while ($esc <= $cantidad_escalonadas) {
 						if (is_array($cobro_valores['detalle']['detalle_escalonadas'][$esc]['usuarios'])) {
-							$html .= "<h4>Escalon $esc: ";
+							$html .= '<h4>' . __('Escalón') . " $esc: ";
 							if ($cobro_valores['datos_escalonadas'][$esc]['monto'] > 0) {
-								$html .= " Monto Fijo " . $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_valores['datos_escalonadas'][$esc]['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</h4>";
+								$html .= __('Monto Fijo') . ' ' . $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($cobro_valores['datos_escalonadas'][$esc]['monto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . "</h4>";
 							} else {
-								$html .= " Tarifa HH";
+								$html .= __('Tarifa HH');
 								if ($cobro_valores['datos_escalonadas'][$esc]['descuento'] > 0) {
 									$html .= " con " . $cobro_valores['datos_escalonadas'][$esc]['descuento'] . "% de descuento";
 								}
@@ -10754,7 +10762,13 @@ class NotaCobro extends Cobro {
 									$resumen_fila = str_replace('%td_tarifa%', '', $resumen_fila);
 									$resumen_fila = str_replace('%td_tarifa_ajustada%', '', $resumen_fila);
 								}
-								$resumen_fila = str_replace('%tarifa_horas_demo%', number_format($usuarios['tarifa'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_fila);
+
+								if ($cobro_valores['datos_escalonadas'][$esc]['escalonada_tarificada'] != 0) {
+									$resumen_fila = str_replace('%tarifa_horas_demo%', number_format($usuarios['tarifa'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_fila);
+								} else {
+									$resumen_fila = str_replace('%tarifa_horas_demo%', '--', $resumen_fila);
+								}
+
 								if ($this->fields['opc_ver_profesional_importe']) {
 									$resumen_fila = str_replace('%td_importe%', '<td align="right">%total_horas_demo%</td>', $resumen_fila);
 									$resumen_fila = str_replace('%td_importe_ajustado%', '<td align="right">%total_horas_demo%</td>', $resumen_fila);
