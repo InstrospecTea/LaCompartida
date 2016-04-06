@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.7.1
+Wednesday, April 6th
+* **Fix** [Corregir forma de cálculo de escalonada con montos fijos] (https://github.com/LemontechSA/ttb/pull/1384)
+
 ## [Release 16.7.0](https://github.com/LemontechSA/ttb/pull/1382)
 Tuesday, April 5th
 * **Feature** [Nueva sección de hitos y cap detallada] (https://github.com/LemontechSA/ttb/pull/1372)
