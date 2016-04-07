@@ -24,9 +24,8 @@ class AbstractSlimAPI  {
 	 * @return [type]           [description]
 	 */
 	public function present($arrayObj, $entity) {
-		function parse(&$element, $key, $entity) {
+		$parseFunction = function(&$element, $key, $entity) {
 			$newElement = array();
-
 			foreach ($entity as $field) {
 				$key = is_array($field) ? key($field) : $field;
 
@@ -55,10 +54,9 @@ class AbstractSlimAPI  {
 					}
 				}
 			}
-
 			$element = $newElement;
 			return $newElement;
-		}
+		};
 
 		if (get_class($arrayObj) == 'SplFixedArray') {
 			$results = $arrayObj->toArray();
@@ -70,9 +68,9 @@ class AbstractSlimAPI  {
 
 		if (!empty($results)) {
 			if ($keys[0] === 0) {
-				array_walk($results, 'parse', $entity);
+				array_walk($results, $parseFunction, $entity);
 			} else {
-				parse($results, 'parse',  $entity);
+				parse($results, $parseFunction, $entity);
 			}
 		}
 		return $this->outputJson($results);
