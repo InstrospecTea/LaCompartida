@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.7.3
+Thursday, April 7th
+* **Fix** [Ordenar por cliente y no por factura cuando se agrupa por id_factura] (https://github.com/LemontechSA/ttb/pull/1387)
+
 ## Hotfix 16.7.2
 Wednesday, April 6th
 * **Fix** [Cuadrar resumen cobro] (https://github.com/LemontechSA/ttb/pull/1385)
