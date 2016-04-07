@@ -1,5 +1,16 @@
 <?php
 $lista_menu_permiso = Html::ListaMenuPermiso($sesion);
+
+// Set Mixpanel User
+$usuario_fields = $sesion->usuario->fields;
+$mp = new \TTB\Mixpanel();
+$mp->setUser($usuario_fields['rut'], array(
+	'$first_name' => $usuario_fields['nombre'],
+	'$last_name' => $usuario_fields['apellido1'],
+	'$email' => $usuario_fields['email'],
+	'cliente' => $subdominio
+));
+
 $home_html = '';
 
 // Tipo=1 significa menu principal
