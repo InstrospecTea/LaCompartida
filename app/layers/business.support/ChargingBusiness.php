@@ -1005,11 +1005,19 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$annulled_invoice = $CriteriaAnnulledInvoiced->run();
 		$sales = array_merge($invoice, $annulled_invoice);
 
+		usort($sales, $this->buildSorter('client'));
+
 		$this->loadReport('SalesAccountingConcepts', 'Report');
 		$this->Report->setData($sales);
 		$this->Report->setParameters($parameters);
 
 		return $this->Report;
+	}
+
+	private function buildSorter($key) {
+		return function ($a, $b) use ($key) {
+			return strnatcmp($a[$key], $b[$key]);
+		};
 	}
 
 	private function getInvoiceForSalesReport($parameters, $annulled = false) {
@@ -1092,8 +1100,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		if ($parameters['separated_by_invoice'] == '1') {
 			$CriteriaSale
 				->add_select('ventas.identificador', 'invoice')
-				->add_grouping('ventas.id_factura')
-				->add_ordering('ventas.id_factura');
+				->add_grouping('ventas.id_factura');
 		} else {
 			$CriteriaSale->add_grouping('ventas.RUT_cliente');
 		}
