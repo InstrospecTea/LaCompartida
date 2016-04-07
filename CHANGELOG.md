@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.7.3
+Wednesday, April 7th
+* **Fix** [] (https://github.com/LemontechSA/ttb/pull/1385)
+
 ## Hotfix 16.7.2
 Wednesday, April 6th
 * **Fix** [Cuadrar resumen cobro] (https://github.com/LemontechSA/ttb/pull/1385)
