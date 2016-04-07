@@ -1005,7 +1005,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$annulled_invoice = $CriteriaAnnulledInvoiced->run();
 		$sales = array_merge($invoice, $annulled_invoice);
 
-		usort($sales, $this->build_sorter('client'));
+		usort($sales, $this->buildSorter('client'));
 
 		$this->loadReport('SalesAccountingConcepts', 'Report');
 		$this->Report->setData($sales);
@@ -1014,7 +1014,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $this->Report;
 	}
 
-	private function build_sorter($key) {
+	private function buildSorter($key) {
 		return function ($a, $b) use ($key) {
 			return strnatcmp($a[$key], $b[$key]);
 		};
