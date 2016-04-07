@@ -70,7 +70,7 @@ class AbstractSlimAPI  {
 			if ($keys[0] === 0) {
 				array_walk($results, $parseFunction, $entity);
 			} else {
-				parse($results, $parseFunction, $entity);
+				$parseFunction($results, $parseFunction, $entity);
 			}
 		}
 		return $this->outputJson($results);
