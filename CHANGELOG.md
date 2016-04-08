@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.7.4
+Friday, April 8th
+* **Fix** [Erro al comparar Costos Profesional con Reporte Avanzado] (https://github.com/LemontechSA/ttb/pull/1391)
+
 ## Hotfix 16.7.3
 Thursday, April 7th
 * **Fix** [Ordenar por cliente y no por factura cuando se agrupa por id_factura] (https://github.com/LemontechSA/ttb/pull/1387)
