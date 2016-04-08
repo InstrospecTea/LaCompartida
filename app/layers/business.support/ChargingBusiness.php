@@ -1003,6 +1003,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$CriteriaAnnulledInvoiced = $this->getInvoiceForSalesReport($parameters, true);
 		$annulled_invoice = $CriteriaAnnulledInvoiced->run();
+
+		// echo $CriteriaInvoiced->get_plain_query();
+		// echo "<br><br>";
+		// echo $CriteriaAnnulledInvoiced->get_plain_query();
+		// exit;
+
 		$sales = array_merge($invoice, $annulled_invoice);
 
 		usort($sales, $this->buildSorter('client'));
@@ -1027,7 +1033,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$CriteriaInvoice
 			->add_select('factura.RUT_cliente')
 			->add_select('factura.cliente')
-			->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_factura')
 			->add_from('factura')
 			->add_left_join_with('prm_documento_legal', 'prm_documento_legal.id_documento_legal = factura.id_documento_legal')
 			->add_left_join_with('cobro', 'cobro.id_cobro = factura.id_cobro')
@@ -1045,10 +1050,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		if (!$annulled) {
 			$CriteriaInvoice
 				->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
+				->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_factura')
 				->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_nc')
 				->add_restriction(CriteriaRestriction::between('factura.fecha', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"));
 		} else {
 			$CriteriaInvoice
+				->add_select("({$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))", 'total_factura')
 				->add_select('DATE_FORMAT(factura.fecha_anulacion, "%Y%m")', 'mes_contable')
 				->add_restriction(CriteriaRestriction::between('factura.fecha_anulacion', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"));
 		}
