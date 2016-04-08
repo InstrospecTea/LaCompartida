@@ -1735,6 +1735,50 @@ class Contrato extends Objeto {
 			echo "Error: {$e} {$criteria->__toString()}";
 		}
 	}
+
+	public function ObtenerHitos($id_contrato) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select("DATE_FORMAT(CAST(IFNULL(cp.fecha_cobro,IFNULL(cbr.fecha_emision,'00000000')) AS DATE),'%d/%m/%y')", 'fecha_hito')
+				->add_select('cp.descripcion', 'descripcion')
+				->add_select("IFNULL(cbr.estado,'PENDIENTE')", 'estado')
+				->add_select('cbr.total_minutos', 'total_minutos')
+				->add_select('cp.monto_estimado', 'monto_estimado')
+				->add_select('cbr.monto_thh', 'monto_thh')
+				->add_select('cp.observaciones', 'observaciones')
+				->add_select('pm.simbolo', 'simbolo')
+				->add_from('cobro_pendiente cp')
+				->add_inner_join_with('contrato c', CriteriaRestriction::equals('c.id_contrato', 'cp.id_contrato'))
+				->add_left_join_with('cobro cbr', CriteriaRestriction::and_clause(array(
+						CriteriaRestriction::equals('cbr.id_contrato', 'c.id_contrato'),
+						CriteriaRestriction::equals('cbr.id_cobro', 'cp.id_cobro')
+					)))
+				->add_inner_join_with('prm_moneda pm', CriteriaRestriction::equals('c.id_moneda', 'pm.id_moneda'))
+				->add_restriction(CriteriaRestriction::equals('cp.hito', 1))
+				->add_restriction(CriteriaRestriction::equals('c.id_contrato', $id_contrato));
+
+		$this->hitos = $criteria->run();
+	}
+
+	public function ObtenerCAPs($id_contrato) {
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('C.id_cobro', 'id_cobro')
+				->add_select('((C.monto_trabajos + C.monto_tramites) * CM2.tipo_cambio) / CM1.tipo_cambio', 'monto_cap')
+				->add_select('C.estado')
+				->add_from('cobro C')
+				->add_inner_join_with('contrato CN', CriteriaRestriction::equals('C.id_contrato', 'CN.id_contrato'))
+				->add_inner_join_with('cobro_moneda CM1', CriteriaRestriction::and_clause(array(
+						CriteriaRestriction::equals('CM1.id_cobro', 'C.id_cobro'),
+						CriteriaRestriction::equals('CM1.id_moneda', 'CN.id_moneda_monto')
+					)))
+				->add_inner_join_with('cobro_moneda CM2', CriteriaRestriction::and_clause(array(
+						CriteriaRestriction::equals('CM2.id_cobro', 'C.id_cobro'),
+						CriteriaRestriction::equals('CM2.id_moneda', 'C.id_moneda')
+					)))
+				->add_restriction(CriteriaRestriction::equals('C.id_contrato', $id_contrato))
+				->add_restriction(CriteriaRestriction::equals('C.forma_cobro', "'CAP'"));
+
+		return $criteria->run();
+	}
 }
 
 class ListaContrato extends Lista {
