@@ -54,6 +54,9 @@ class FormatMiddleware {
 			case 'center':
 				$this->align = PHPExcel_Style_Alignment::HORIZONTAL_CENTER;
 				break;
+			case 'justify':
+				$this->align = PHPExcel_Style_Alignment::HORIZONTAL_JUSTIFY;
+				break;
 		}
 	}
 
