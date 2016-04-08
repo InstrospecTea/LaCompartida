@@ -1004,11 +1004,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$CriteriaAnnulledInvoiced = $this->getInvoiceForSalesReport($parameters, true);
 		$annulled_invoice = $CriteriaAnnulledInvoiced->run();
 
-		// echo $CriteriaInvoiced->get_plain_query();
-		// echo "<br><br>";
-		// echo $CriteriaAnnulledInvoiced->get_plain_query();
-		// exit;
-
 		$sales = array_merge($invoice, $annulled_invoice);
 
 		usort($sales, $this->buildSorter('client'));
