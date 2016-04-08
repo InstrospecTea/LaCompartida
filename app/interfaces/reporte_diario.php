@@ -75,25 +75,26 @@ if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
 	$tipos_moneda = array('valor_cobrado','valor_por_cobrar','valor_pagado','valor_por_pagar','valor_hora','valor_incobrable','diferencia_valor_estandar','valor_estandar');
 
 	$hoy = date("Y-m-d");
-	if(!$fecha_anio)
+	if (!$fecha_anio) {
 		$fecha_anio = date('Y');
-	if(!$fecha_mes)
+	}
+	if (!$fecha_mes) {
 		$fecha_mes = date('m');
+	}
 
 	$fecha_ultimo_dia = date('t',mktime(0,0,0,$fecha_mes,5,$fecha_anio));
 
-	if(!isset($numero_agrupadores))
+	if (!isset($numero_agrupadores)) {
 		$numero_agrupadores = 1;
-	if(!$popup)
-	{
+	}
+	if (!$popup) {
 		$pagina->PrintTop($popup);
-		if(!$filtros_check)
-		{
+		if (!$filtros_check) {
 			$fecha_m = ''.$fecha_mes;
 
 			$fecha_fin = $fecha_ultimo_dia."-".$fecha_m."-".$fecha_anio;
 			$fecha_ini = "01-".$fecha_m."-".$fecha_anio;
-	}
+		}
 ?>
 <style>
 
@@ -305,14 +306,13 @@ function TipoDato(valor)
 
 </script>
 <?php
-}
+} // Fin $popup
 ?>
-<form method=post name=formulario action="" id=formulario autocomplete='off'>
-<input type=hidden name=opc id=opc value='print'>
-<input type=hidden name=debug id=debug value='<?=$debug?>'>
+<form method="post" name="formulario" action="" id="formulario" autocomplete="off">
+<input type="hidden" name="opc" id="opc" value="print">
+<input type="hidden" name="debug" id="debug" value='<?php echo $debug; ?>'>
 <?php
-if(!$popup)
-{
+	if (!$popup) {
 ?>
 <!-- Calendario DIV -->
 <div id="calendar-container" style="width:221px; position:absolute; display:none;">
@@ -326,20 +326,20 @@ if(!$popup)
 <fieldset width="100%" class="border_plomo tb_base" align="center">
 <legend onClick="MostrarOculto('filtros')" style="cursor:pointer">
 <span id="filtros_img"><img src= "<?=Conf::ImgDir()?><?=$filtros_check? '/menos.gif':'/mas.gif'?>" border="0" ></span>
-<?=__('Filtros')?>
+<?php echo __('Filtros'); ?>
 </legend>
-<input type="checkbox" name="filtros_check" id="filtros_check" value="1" <?=$filtros_check? 'checked':''?> style="display:none;" />
+<input type="checkbox" name="filtros_check" id="filtros_check" value="1" <?php echo $filtros_check ? 'checked' : ''; ?> style="display:none;" />
 <center>
-<table id="mini_filtros" style="border: 1px solid white; width:90%; <?=$filtros_check? 'display:none':''?> " cellpadding="0" cellspacing="3" >
-	<tr valign=top>
-		<td align=left>
-			<b><?=__('Profesional')?>:</b>
+<table id="mini_filtros" style="border: 1px solid white; width:90%; <?php echo $filtros_check ? 'display:none' : ''; ?> " cellpadding="0" cellspacing="3" >
+	<tr valign="top">
+		<td align="left">
+			<b><?php echo __('Profesional'); ?>:</b>
 		</td>
-		<td align=left>
-			<b><?=__('Cliente')?>:</b>
+		<td align="left">
+			<b><?php echo __('Cliente'); ?>:</b>
 		</td>
-		<td align=left width='80px'>
-			<b><?=__('Periodo de') ?>:</b>
+		<td align="left" width='80px'>
+			<b><?php echo __('Periodo de'); ?>:</b>
 
 			<br>
 		</td>
@@ -348,52 +348,52 @@ if(!$popup)
 				$explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
 				$explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
 				$explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
-			?>
-			<span title="<?=__($explica_periodo_trabajo)?>">
+ 			?>
+			<span title="<?php echo __($explica_periodo_trabajo); ?>">
 			<input type="radio" name="campo_fecha" id="campo_fecha_trabajo" value="trabajo"
 																					 <?php if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?>
-																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_trabajo"><?=__("Trabajo")?></label>
+																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_trabajo"><?php echo __("Trabajo"); ?></label>
 			</span>
-			<span title="<?=__($explica_periodo_cobro)?>"><input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
+			<span title="<?php echo __($explica_periodo_cobro); ?>"><input type="radio" name="campo_fecha" id="campo_fecha_cobro" value="cobro"
 																					<?php if($campo_fecha=='cobro' ) echo 'checked="checked"';
 																					 ?>
-																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_cobro"><?=__("Corte")?></label>
+																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_cobro"><?php echo __("Corte"); ?></label>
 			</span>
-			<span title="<?=__($explica_periodo_emision)?>"><input type="radio" name="campo_fecha" id="campo_fecha_emision" value="emision"
+			<span title="<?php echo __($explica_periodo_emision); ?>"><input type="radio" name="campo_fecha" id="campo_fecha_emision" value="emision"
 																					<?php if($campo_fecha=='emision' ) echo 'checked="checked"';
 																					 ?>
-																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_emision"><?=__("Emisión")?></label>
+																					 onclick ="SincronizarCampoFecha()" />&nbsp;<label for="campo_fecha_emision"><?php echo __("Emisión"); ?></label>
 			</span>
 		</td>
 	</tr>
 	<tr>
-		<td align=left>
+		<td align="left">
 			<!-- Nuevo Select -->
             <?php echo $Form->select('usuarios[]', $sesion->usuario->ListarActivos('', 'PRO'), $usuarios, array('empty' => 'Todos', 'style' => 'width: 200px')); ?>
 		</td>
 		</td>
-		<td align=left>
-			<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientes[]",$clientes,"","Todos","200"); ?>
+		<td align="left">
+			<?php echo Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientes[]",$clientes,"","Todos","200"); ?>
 		</td>
-		<td align=left colspan=2 width='40%'>
-			<div id=periodo style='display:<?=!$rango ? 'inline' : 'none' ?>;'>
-				<select name="fecha_mes" style='width:90px'>
-					<option value='1' <?=$fecha_mes==1 ? 'selected':'' ?>><?=__('Enero') ?></option>
-					<option value='2' <?=$fecha_mes==2 ? 'selected':'' ?>><?=__('Febrero') ?></option>
-					<option value='3' <?=$fecha_mes==3 ? 'selected':'' ?>><?=__('Marzo') ?></option>
-					<option value='4' <?=$fecha_mes==4 ? 'selected':'' ?>><?=__('Abril') ?></option>
-					<option value='5' <?=$fecha_mes==5 ? 'selected':'' ?>><?=__('Mayo') ?></option>
-					<option value='6' <?=$fecha_mes==6 ? 'selected':'' ?>><?=__('Junio') ?></option>
-					<option value='7' <?=$fecha_mes==7 ? 'selected':'' ?>><?=__('Julio') ?></option>
-					<option value='8' <?=$fecha_mes==8 ? 'selected':'' ?>><?=__('Agosto') ?></option>
-					<option value='9' <?=$fecha_mes==9 ? 'selected':'' ?>><?=__('Septiembre') ?></option>
-					<option value='10' <?=$fecha_mes==10 ? 'selected':'' ?>><?=__('Octubre') ?></option>
-					<option value='11' <?=$fecha_mes==11 ? 'selected':'' ?>><?=__('Noviembre') ?></option>
-					<option value='12' <?=$fecha_mes==12 ? 'selected':'' ?>><?=__('Diciembre') ?></option>
+		<td align="left" colspan="2" width="40%">
+			<div id="periodo" style="display:<?php echo !$rango ? 'inline' : 'none'; ?>;">
+				<select name="fecha_mes" style="width:90px">
+					<option value='1' <?php echo $fecha_mes == 1 ? 'selected' : '' ?>><?php echo __('Enero'); ?></option>
+					<option value='2' <?php echo $fecha_mes == 2 ? 'selected' : '' ?>><?php echo __('Febrero'); ?></option>
+					<option value='3' <?php echo $fecha_mes == 3 ? 'selected' : '' ?>><?php echo __('Marzo'); ?></option>
+					<option value='4' <?php echo $fecha_mes == 4 ? 'selected' : '' ?>><?php echo __('Abril'); ?></option>
+					<option value='5' <?php echo $fecha_mes == 5 ? 'selected' : '' ?>><?php echo __('Mayo'); ?></option>
+					<option value='6' <?php echo $fecha_mes == 6 ? 'selected' : '' ?>><?php echo __('Junio'); ?></option>
+					<option value='7' <?php echo $fecha_mes == 7 ? 'selected' : '' ?>><?php echo __('Julio'); ?></option>
+					<option value='8' <?php echo $fecha_mes == 8 ? 'selected' : '' ?>><?php echo __('Agosto'); ?></option>
+					<option value='9' <?php echo $fecha_mes == 9 ? 'selected' : '' ?>><?php echo __('Septiembre'); ?></option>
+					<option value='10' <?php echo $fecha_mes == 10 ? 'selected' : '' ?>><?php echo __('Octubre'); ?></option>
+					<option value='11' <?php echo $fecha_mes == 11 ? 'selected' : '' ?>><?php echo __('Noviembre'); ?></option>
+					<option value='12' <?php echo $fecha_mes == 12 ? 'selected' : '' ?>><?php echo __('Diciembre'); ?></option>
 				</select>
-				<select name="fecha_anio" style='width:55px'>
-					<?php for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
-					<option value='<?=$i?>' <?=$fecha_anio == $i ? 'selected' : '' ?>><?=$i ?></option>
+				<select name="fecha_anio" style="width:55px">
+					<?php for($i=(date('Y')-5); $i < (date('Y')+5); $i++){ ?>
+						<option value='<?php echo $i; ?>' <?php echo $fecha_anio == $i ? 'selected' : ''; ?>><?php echo $i; ?></option>
 					<?php } ?>
 				</select>
 			</div>
@@ -403,32 +403,32 @@ if(!$popup)
 </center>
 
 			<!-- SELECTOR FILTROS EXPANDIDO -->
-<table id="full_filtros" style="border: 0px solid black; width:730px; <?=$filtros_check? '':'display:none;'?> " cellpadding="0" cellspacing="3">
-	<tr valign=top>
-		<td align=left>
-			<b><?=__('Profesionales')?>:</b></td>
-		<td align=left>
-			<b><?=__('Clientes')?>:</b></td>
-		<td align=left width='80px'>
-			<b><?=__('Periodo de') ?>:</b>
+<table id="full_filtros" style="border: 0px solid black; width:730px; <?php echo $filtros_check ? '' : 'display:none;'; ?> " cellpadding="0" cellspacing="3">
+	<tr valign="top">
+		<td align="left">
+			<b><?php echo __('Profesionales'); ?>:</b></td>
+		<td align="left">
+			<b><?php echo __('Clientes'); ?>:</b></td>
+		<td align="left" width='80px'>
+			<b><?php echo __('Periodo de'); ?>:</b>
 		</td>
 		<td>
-			<span title="<?=__($explica_periodo_trabajo)?>">
+			<span title="<?php echo __($explica_periodo_trabajo); ?>">
 			<input type="radio" name="campo_fecha_F" value="trabajo" id = "campo_fecha_F"
 																					<?php if($campo_fecha=='trabajo' || $campo_fecha=='') echo 'checked="checked"'; ?> onclick ="SincronizarCampoFecha()" />
-			<?=__("Trabajo")?>
+			<?php echo __("Trabajo"); ?>
 			</span>
-			<span title="<?=__($explica_periodo_cobro)?>">
+			<span title="<?php echo __($explica_periodo_cobro); ?>">
 			<input type="radio" name="campo_fecha_F" value="cobro" id = "campo_fecha_F"
 																					<?php if($campo_fecha=='cobro') echo 'checked="checked"';
 																					 ?> onclick ="SincronizarCampoFecha()" />
-			<?=__("Corte")?>
+			<?php echo __("Corte"); ?>
 			</span>
-			<span title="<?=__($explica_periodo_emision)?>">
+			<span title="<?php echo __($explica_periodo_emision); ?>">
 			<input type="radio" name="campo_fecha_F" value="emision" id = "campo_fecha_F"
 																					<?php if($campo_fecha=='emision') echo 'checked="checked"';
 																					 ?> onclick ="SincronizarCampoFecha()" />
-			<?=__("Emisión")?>
+			<?php echo __("Emisión"); ?>
 			</span>
 		</td>
 	</tr>
@@ -453,81 +453,82 @@ if(!$popup)
 		}
 	?>
 
-	<tr valign=top>
-		<td rowspan="3" align=left>
-		<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]",$usuariosF,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>		</td>
-		<td rowspan="3" align=left>
-		<?=Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]",$clientesF,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>
+	<tr valign="top">
+		<td rowspan="3" align="left">
+		<?php echo Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuariosF[]",$usuariosF,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>
+		</td>
+		<td rowspan="3" align="left">
+		<?php echo Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE 1 ORDER BY nombre ASC", "clientesF[]",$clientesF,"class=\"selectMultiple\" multiple size=".$largo_select." ","","200"); ?>
 	 	</td>
 	 	<!-- PERIODOS -->
-	 	<td colspan="2" align=center>
-			<div id=periodo_rango>
-				<?=__('Fecha desde')?>:&nbsp;
-					<input type="text" name="fecha_ini" value="<?=$fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy - 1 month")) ?>" id="fecha_ini" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
+	 	<td colspan="2" align="center">
+			<div id="periodo_rango">
+				<?php echo __('Fecha desde'); ?>:&nbsp;
+					<input type="text" name="fecha_ini" value="<?php echo $fecha_ini ? $fecha_ini : date("d-m-Y",strtotime("$hoy - 1 month")); ?>" id="fecha_ini" size="11" maxlength="10" />
+					<img src="<?php echo Conf::ImgDir(); ?>/calendar.gif" id="img_fecha_ini" style="cursor:pointer" />
 				<br />
-				<?=__('Fecha hasta')?>:&nbsp;
-					<input type="text" name="fecha_fin" value="<?=$fecha_fin ? $fecha_fin : date("d-m-Y",strtotime("$hoy")) ?>" id="fecha_fin" size="11" maxlength="10" />
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
+				<?php echo __('Fecha hasta'); ?>:&nbsp;
+					<input type="text" name="fecha_fin" value="<?php echo $fecha_fin ? $fecha_fin : date("d-m-Y",strtotime("$hoy")); ?>" id="fecha_fin" size="11" maxlength="10" />
+					<img src="<?php echo Conf::ImgDir(); ?>/calendar.gif" id="img_fecha_fin" style="cursor:pointer" />
 			</div>
 		</td>
 	</tr>
 	<!-- TIPO DE ASUNTO Y AREA (CONFIGURABLE) !-->
 	<?php
-	if($filtros_extra)
-	{?>
+		if ($filtros_extra) {
+	?>
 	<tr>
-		<td align=center>
-			<b><?=__("Tipo de Asunto")?>:</b>
+		<td align="center">
+			<b><?php echo __("Tipo de Asunto"); ?>:</b>
 
 		</td>
-		<td align=center>
-			<b><?=__("Area")?>:</b>
+		<td align="center">
+			<b><?php echo __("Area"); ?>:</b>
 		</td>
 	</tr>
 	<tr>
-		<td colspan=2>
+		<td colspan="2">
 			<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_tipo_proyecto ORDER BY orden ASC","tipos_asunto[]", $tipos_asunto, "class=\"selectMultiple\" multiple size=5 ", "", "110"); ?>
 		</td>
-		<td colspan=2>
+		<td colspan="2">
 			<?php echo Html::SelectQuery($sesion, "SELECT * FROM prm_area_proyecto ORDER BY orden ASC","areas_asunto[]", $areas_asunto, "class=\"selectMultiple\" multiple size=5 ", "", "140");?>
 		</td>
 	</tr>
-	<?}
-	else
-	{?>
+	<?php
+		} else {
+	?>
 		<tr>
-			<td align=center>
+			<td align="center">
 				&nbsp;
 			</td>
-			<td align=center>
+			<td align="center">
 				&nbsp;
 			</td>
 		</tr>
 		<tr>
-			<td rowspan=2>
+			<td rowspan="2">
 				&nbsp;
 			</td>
-			<td rowspan=2>
+			<td rowspan="2">
 				&nbsp;
 			</td>
 		</tr>
-	<?}?>
+	<?php } ?>
 	<tr>
-		<td align=left colspan=2>
-			<input type="checkbox" name="area_y_categoria" value="1" <?=$area_y_categoria ? 'checked="checked"' : '' ?> onclick="Categorias(this, this.form);" title="Seleccionar área y categoría" />&nbsp;<span style="font-size:9px"><?=__('Seleccionar área y categoría') ?>
+		<td align="left" colspan="2">
+			<input type="checkbox" name="area_y_categoria" value="1" <?php echo $area_y_categoria ? 'checked="checked"' : ''; ?> onclick="Categorias(this, this.form);" title="Seleccionar área y categoría" />&nbsp;<span style="font-size:9px"><?php echo __('Seleccionar área y categoría'); ?>
 		</td>
 	</tr>
 	<tr>
-		<td colspan=4>
-			<div id="area_categoria" style="display:<?=$area_y_categoria ? 'inline' : 'none' ?>;">
+		<td colspan="4">
+			<div id="area_categoria" style="display:<?php echo $area_y_categoria ? 'inline' : 'none'; ?>;">
 				<table>
 					<tr valign="top">
 						<td align="left">
-							<b><?=__('Área')?>:</b>
+							<b><?php echo __('Área'); ?>:</b>
 						</td>
 						<td align="left">
-							<b><?=__('Categoría')?>:</b>
+							<b><?php echo __('Categoría'); ?>:</b>
 						</td>
 						<td align="left" colspan="2" width="40%">&nbsp;</td>
 					</tr>
@@ -536,7 +537,7 @@ if(!$popup)
 							<?php echo AreaUsuario::SelectAreas($sesion, "areas[]", $areas, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 						</td>
 						<td rowspan="2" align="left">
-							<?=Html::SelectQuery($sesion,"SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias[]", $categorias, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
+							<?php echo Html::SelectQuery($sesion,"SELECT id_categoria_usuario, glosa_categoria FROM prm_categoria_usuario ORDER BY glosa_categoria", "categorias[]", $categorias, 'class="selectMultiple" multiple="multiple" size="6" ', "", "200"); ?>
 						</td>
 						<td align="left" colspan="2" width="40%">&nbsp;</td>
 					</tr>
@@ -552,15 +553,15 @@ if(!$popup)
 <br>
 <fieldset align="center" width="90%" class="border_plomo tb_base">
 <legend onClick="MostrarOculto('tipo_dato')" style="cursor:pointer">
-	<span id="tipo_dato_img"><img src= "<?=Conf::ImgDir()?>/mas.gif" border="0" ></span>
-	<?=__('Tipo de Dato')?>
+	<span id="tipo_dato_img"><img src= "<?php echo Conf::ImgDir(); ?>/mas.gif" border="0" ></span>
+	<?php echo __('Tipo de Dato'); ?>
 </legend>
-<input type="checkbox" name="tipo_dato_check" id="tipo_dato_check" value="1" <?=$tipo_dato_check? 'checked':''?> style="display:none;" />
+<input type="checkbox" name="tipo_dato_check" id="tipo_dato_check" value="1" <?php echo $tipo_dato_check ? 'checked' : ''; ?> style="display:none;" />
 <center>
 <table id="mini_tipo_dato" >
 	<tr>
-		<td id = 'td_dato' class='<?=$comparar? 'borde_rojo':'borde_blanco'?>' >
-			<select name='tipo_dato' id='tipo_dato' style='width:180px; ' onchange="TipoDato(this.value)" >
+		<td id="td_dato" class="<?php echo $comparar ? 'borde_rojo' : 'borde_blanco'; ?>" >
+			<select name="tipo_dato" id="tipo_dato" style="width:180px;" onchange="TipoDato(this.value)" >
 			<?php
 				foreach($tipos_de_dato as $tipo)
 				{
@@ -573,13 +574,13 @@ if(!$popup)
 			</select>
 		</td>
 		<td>
-			<span id="vs" style='<?=$comparar? '':'display: none;'?>'>
-				<?=__(" Vs. ")?>
+			<span id="vs" style='<?php echo $comparar ? '' : 'display: none;'; ?>'>
+				<?php echo __(" Vs. "); ?>
 			</span>
 		</td>
-		<td id = 'td_dato_comparado' class='borde_azul' style='<?=$comparar? '':'display: none;'?>' >
+		<td id="td_dato_comparado" class="borde_azul" style="<?php echo $comparar ? '' : 'display: none;'; ?>" >
 
-			<select name='tipo_dato_comparado' id='tipo_dato_comparado' style='width:180px; ' >
+			<select name="tipo_dato_comparado" id="tipo_dato_comparado" style="width:180px;" >
 			<?php
 				foreach($tipos_de_dato as $tipo)
 				{
@@ -698,102 +699,102 @@ if(!$popup)
 		?>
 		<table style="border: 0px solid black; width:730px" cellpadding="0" cellspacing="0">
 			<tr>
-				<?=celda('horas_trabajadas')?>
-				<?=borde_abajo(2)?>
-				<?=celda('horas_cobrables')?>
-				<?=borde_abajo(2)?>
-				<?=celda('horas_visibles')?>
-				<?=borde_abajo(2)?>
-				<?=celda('horas_cobradas')?>
-				<?=borde_abajo(2)?>
-				<?=celda('horas_pagadas')?>
+				<?php echo celda('horas_trabajadas'); ?>
+				<?php echo borde_abajo(2); ?>
+				<?php echo celda('horas_cobrables'); ?>
+				<?php echo borde_abajo(2); ?>
+				<?php echo celda('horas_visibles'); ?>
+				<?php echo borde_abajo(2); ?>
+				<?php echo celda('horas_cobradas'); ?>
+				<?php echo borde_abajo(2); ?>
+				<?php echo celda('horas_pagadas'); ?>
 			</tr>
 			<tr>
-				<?=borde_derecha()?>
-				<?=nada()?>
-				<?=borde_derecha()?>
-				<?=nada()?>
-				<?=borde_derecha()?>
-				<?=nada()?>
-				<?=borde_derecha()?>
-				<?=nada()?>
+				<?php echo borde_derecha(); ?>
+				<?php echo nada(); ?>
+				<?php echo borde_derecha(); ?>
+				<?php echo nada(); ?>
+				<?php echo borde_derecha(); ?>
+				<?php echo nada(); ?>
+				<?php echo borde_derecha(); ?>
+				<?php echo nada(); ?>
 			</tr>
 			<tr>
-				<?=nada(9)?>
+				<?php echo nada(9); ?>
 			</tr>
 			<tr>
-				<?=nada()?>
-				<?=borde_abajo()?>
-				<?=celda("horas_no_cobrables")?>
-				<?=borde_abajo()?>
-				<?=celda("horas_castigadas")?>
-				<?=borde_abajo()?>
-				<?=celda("horas_por_cobrar")?>
-				<?=borde_abajo()?>
-				<?=celda("horas_por_pagar")?>
+				<?php echo nada(); ?>
+				<?php echo borde_abajo(); ?>
+				<?php echo celda("horas_no_cobrables"); ?>
+				<?php echo borde_abajo(); ?>
+				<?php echo celda("horas_castigadas"); ?>
+				<?php echo borde_abajo(); ?>
+				<?php echo celda("horas_por_cobrar"); ?>
+				<?php echo borde_abajo(); ?>
+				<?php echo celda("horas_por_pagar"); ?>
 			</tr>
 			<tr>
-				<?=nada(5)?>
-				<?=borde_derecha()?>
-				<?=nada(3)?>
+				<?php echo nada(5); ?>
+				<?php echo borde_derecha(); ?>
+				<?php echo nada(3); ?>
 			</tr>
 			<tr>
-				<?=nada(12)?>
+				<?php echo nada(12); ?>
 			</tr>
 			<tr>
-				<?=nada(7)?>
-				<?=borde_abajo()?>
-				<?=celda("horas_incobrables")?>
-				<?=nada(3)?>
+				<?php echo nada(7); ?>
+				<?php echo borde_abajo(); ?>
+				<?php echo celda("horas_incobrables"); ?>
+				<?php echo nada(3); ?>
 			</tr>
 			<tr>
-				<?=nada(1)?>
+				<?php echo nada(1); ?>
 			</tr>
 			<tr>
-				<?=nada(13)?>
+				<?php echo nada(13); ?>
 			</tr>
 			<tr>
-				<?=celda("valor_cobrado")?>
-				<?=borde_abajo(2)?>
-				<?=celda("valor_pagado")?>
-				<?=nada(2)?>
-				<?=moneda()?>
-				<?=nada(2)?>
-				<?=celda("valor_hora")?>
-				<?=nada(2)?>
-				<?=celda("diferencia_valor_estandar");?>
+				<?php echo celda("valor_cobrado"); ?>
+				<?php echo borde_abajo(2); ?>
+				<?php echo celda("valor_pagado"); ?>
+				<?php echo nada(2); ?>
+				<?php echo moneda(); ?>
+				<?php echo nada(2); ?>
+				<?php echo celda("valor_hora"); ?>
+				<?php echo nada(2); ?>
+				<?php echo celda("diferencia_valor_estandar");; ?>
 			</tr>
 			<tr>
-				<?=borde_derecha()?>
-				<?=nada(7)?>
+				<?php echo borde_derecha(); ?>
+				<?php echo nada(7); ?>
 			</tr>
 			<tr>
-				<?=nada(12)?>
+				<?php echo nada(12); ?>
 			</tr>
 			<tr>
-				<?=celda("valor_por_cobrar")?>
-				<?=borde_abajo()?>
-				<?=celda("valor_por_pagar")?>
-				<?=nada(2)?>
-				<?=select_moneda()?>
-				<?=nada(2)?>
-				<?=celda("rentabilidad")?>
-				<?=nada(2)?>
-				<?=celda("valor_estandar")?>
+				<?php echo celda("valor_por_cobrar"); ?>
+				<?php echo borde_abajo(); ?>
+				<?php echo celda("valor_por_pagar"); ?>
+				<?php echo nada(2); ?>
+				<?php echo select_moneda(); ?>
+				<?php echo nada(2); ?>
+				<?php echo celda("rentabilidad"); ?>
+				<?php echo nada(2); ?>
+				<?php echo celda("valor_estandar"); ?>
 			</tr>
 			<tr>
-				<?=nada(8)?>
+				<?php echo nada(8); ?>
 			</tr>
 			<tr>
-				<?=nada(12)?>
-				<?=tinta()?>
+				<?php echo nada(12); ?>
+				<?php echo tinta(); ?>
 			</tr>
 			<tr>
-				<?=celda("valor_incobrable")?>
-				<?=nada(11)?>
+				<?php echo celda("valor_incobrable"); ?>
+				<?php echo nada(11); ?>
 			</tr>
 			<tr>
-				<?=nada(11)?>
+				<?php echo nada(11); ?>
 			</tr>
 		</table>
 	 </td>
@@ -803,11 +804,11 @@ if(!$popup)
 			<!-- SELECTOR DE VISTA -->
 <br>
 <fieldset align="center" width="90%" class="border_plomo tb_base">
-<legend><?=__('Vista')?></legend>
+<legend><?php echo __('Vista'); ?></legend>
 	<div style="align:center">
-		<input type=hidden name=numero_agrupadores id=numero_agrupadores value=<?=$numero_agrupadores?> />
-		<input type=hidden name=vista id=vista value='' />
-		<?=__('Agrupar por')?>:&nbsp;
+		<input type="hidden" name="numero_agrupadores" id="numero_agrupadores" value="<?php echo $numero_agrupadores; ?>" />
+		<input type="hidden" name="vista" id="vista" value="" />
+		<?php echo __('Agrupar por'); ?>:&nbsp;
 		<?php
 				$ya_elegidos = array();
 				for($i=0;$i<6;$i++)
@@ -849,7 +850,7 @@ if(!$popup)
 						echo $valor_previo;
 				}
 		?>
-		<input type="button" class="btn" title="<?=__($glosa_boton['tabla'])?>" id="tabla" value="<?=__('Generar Excel')?>" onclick="Generar(this.form,'tabla');">
+		<input type="button" class="btn" title="<?php echo __($glosa_boton['tabla']); ?>" id="tabla" value="<?php echo __('Generar Excel'); ?>" onclick="Generar(this.form,'tabla');">
 	</div>
 </fieldset>
 </td></tr></table>
@@ -859,7 +860,6 @@ if(!$popup)
 		<!-- RESULTADO -->
 <?php
 }
-
 ?>
 </form>
 
@@ -881,4 +881,3 @@ Calendar.setup(
 </script>
 <?php
 	$pagina->PrintBottom($popup);
-?>
