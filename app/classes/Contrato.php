@@ -1756,7 +1756,7 @@ class Contrato extends Objeto {
 				->add_restriction(CriteriaRestriction::equals('cp.hito', 1))
 				->add_restriction(CriteriaRestriction::equals('c.id_contrato', $id_contrato));
 
-		$this->hitos = $criteria->run();
+		return $criteria->run();
 	}
 
 	public function ObtenerCAPs($id_contrato) {
