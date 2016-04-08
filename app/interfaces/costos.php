@@ -1,11 +1,5 @@
-<?
+<?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once 'Spreadsheet/Excel/Writer.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Pagina.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 
 $sesion = new Sesion(array('ADM'));
 $pagina = new Pagina($sesion);
@@ -139,9 +133,9 @@ $pagina->PrintTop();
     top: 190px;
 	}
 </style>
-<form name=formulario id=formulario method=post action='' autocomplete="off">
-	<input type=hidden name='opc' id='opc' value='guardar' />
-	<input type=hidden name='popup' id='popup' value='<?php echo $popup ?>'>
+<form name="formulario" id="formulario" method="post" action="" autocomplete="off">
+	<input type="hidden" name="opc" id="opc" value="guardar" />
+	<input type="hidden" name="popup" id="popup" value="<?php echo $popup ?>">
 <?php
 $idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 $idioma->Load('es');
@@ -184,9 +178,9 @@ $td_contenido = '';
 while (list($id_usuario, $nombre_usuario, $username) = mysql_fetch_array($resp)) {
 	++$tab;
 	if (method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema') && !empty($username)) {
-		$td_contenido .= '<tr><td align=left width="150">' . $username . '</td>';
+		$td_contenido .= '<tr><td align="left" width="150">' . $username . '</td>';
 	} else {
-		$td_contenido .= '<tr><td align=left width="150">' . $nombre_usuario . '</td>';
+		$td_contenido .= '<tr><td align="left" width="150">' . $nombre_usuario . '</td>';
 	}
 	for ($j = ($fecha_m > 6 ? 6 : 0); $j < ($fecha_m > 6 ? 12 : 6); ++$j) { // Mostrar costo de cada mes
 		$tab += 1000;
@@ -210,7 +204,7 @@ if (((method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo
 ?>
 
 	<table width="800px" border="1" style='border-top: 1px solid #BDBDBD; border-right: 1px solid #BDBDBD; border-left:1px solid #BDBDBD;	border-bottom:none' cellpadding="3" cellspacing="3">
-		<tr bgcolor=#A3D55C>
+		<tr bgcolor="#A3D55C">
 			<td colspan="4" align="center">
 	<?php if (((method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo')) || (method_exists('Conf', 'UsaDisenoNuevo') && Conf::UsaDisenoNuevo()))) { ?>
 					<img src='<?php echo Conf::ImgDir() . "/izquierda_nuevo.gif" ?>' <?php echo $tip_anterior ?> class='mano_on' onclick="CambiaFecha('<?php echo $fecha_m > 6 ? $fecha_a : $fecha_a - 1 ?>', '<?php echo $fecha_m > 6 ? $fecha_m - 6 : $fecha_m + 6 ?>')">
@@ -226,12 +220,12 @@ if (((method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsaDisenoNuevo
 
 			</td>
 			<td colspan="3">
-				<input type=button onclick="Guardar('guardar');" value='<?php echo __('Guardar'); ?>' class=btn >
-				<input type=button onclick="Guardar('copiar_datos_anteriores');" value='<?php echo __('Copiar datos de semestre anterior'); ?>' class=btn >
+				<input type="button" onclick="Guardar('guardar');" value='<?php echo __('Guardar'); ?>' class="btn" >
+				<input type="button" onclick="Guardar('copiar_datos_anteriores');" value='<?php echo __('Copiar datos de semestre anterior'); ?>' class="btn" >
 			</td>
 		</tr>
-		<tr bgcolor=#A3D55C>
-			<td align=left width="150"><b><?php echo __("Profesional"); ?></b></td>
+		<tr bgcolor="#A3D55C">
+			<td align="left" width="150"><b><?php echo __("Profesional"); ?></b></td>
 				<?php
 				for ($j = ($fecha_m > 6 ? 6 : 0); $j < ($fecha_m > 6 ? 12 : 6); ++$j)
 					echo '		<td align="center" width="80"><b>' . $meses[$j] . "</b></td>\n";
