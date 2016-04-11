@@ -1003,6 +1003,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$CriteriaAnnulledInvoiced = $this->getInvoiceForSalesReport($parameters, true);
 		$annulled_invoice = $CriteriaAnnulledInvoiced->run();
+
 		$sales = array_merge($invoice, $annulled_invoice);
 
 		usort($sales, $this->buildSorter('client'));
@@ -1027,7 +1028,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$CriteriaInvoice
 			->add_select('factura.RUT_cliente')
 			->add_select('factura.cliente')
-			->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_factura')
 			->add_from('factura')
 			->add_left_join_with('prm_documento_legal', 'prm_documento_legal.id_documento_legal = factura.id_documento_legal')
 			->add_left_join_with('cobro', 'cobro.id_cobro = factura.id_cobro')
@@ -1045,10 +1045,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		if (!$annulled) {
 			$CriteriaInvoice
 				->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
+				->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_factura')
 				->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_nc')
 				->add_restriction(CriteriaRestriction::between('factura.fecha', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"));
 		} else {
 			$CriteriaInvoice
+				->add_select("({$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))", 'total_factura')
 				->add_select('DATE_FORMAT(factura.fecha_anulacion, "%Y%m")', 'mes_contable')
 				->add_restriction(CriteriaRestriction::between('factura.fecha_anulacion', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"));
 		}
@@ -1102,7 +1104,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 				->add_select('ventas.identificador', 'invoice')
 				->add_grouping('ventas.id_factura');
 		} else {
-			$CriteriaSale->add_grouping('ventas.RUT_cliente');
+			$CriteriaSale->add_grouping('ventas.cliente');
 		}
 
 		return $CriteriaSale;
@@ -1117,8 +1119,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_select("DATEDIFF('{$parameters['end_date']}', f.fecha)", 'dias_desde_facturacion')
 			->add_select('SUM(IF(ccfmn.monto_pago IS NULL, 0, ccfmn.monto_pago))', 'total_pagado')
 			->add_select('f.total', 'total_facturado')
-			->add_select('cl.codigo_cliente')
-			->add_select('cl.glosa_cliente')
+			->add_select('f.RUT_cliente', 'codigo_cliente')
+			->add_select('f.cliente', 'glosa_cliente')
 			->add_from('factura', 'f')
 			->add_left_join_with('contrato', 'f.id_contrato = contrato.id_contrato')
 			->add_left_join_with(array('cta_cte_fact_mvto', 'ccfm'), 'ccfm.id_factura = f.id_factura')
@@ -1160,7 +1162,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_select('SUM(IF(v.dias_desde_facturacion > 90, v.total_facturado - v.total_pagado, 0))', "'rango4'")
 			->add_select('SUM(v.total_facturado - v.total_pagado)', "'total'")
 			->add_from_criteria($CriteriaInvoice, 'v')
-			->add_grouping('v.codigo_cliente');
+			->add_grouping('v.glosa_cliente')
+			->add_ordering('v.glosa_cliente');
 		if (!empty($parameters['include_trade_manager'])) {
 			$Criteria->add_select('v.encargado_comercial');
 		}
