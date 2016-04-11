@@ -75,8 +75,6 @@
 	</table>
 <?php $this->Form->end(); ?>
 
-
-
 <script type="text/javascript">
 	var img_dir = '<?php echo Conf::ImgDir(); ?>';
 	var root_dir = '<?php echo Conf::RootDir(); ?>';
