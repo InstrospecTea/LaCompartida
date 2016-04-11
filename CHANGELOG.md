@@ -4,8 +4,12 @@
 Monday, April 11th
 * **Feature** [Formato LEDES98BI V2](https://github.com/LemontechSA/ttb/pull/1379)
 
+## Hotfix 16.7.6
+Monday, April 11th
+* **Fix** [Agrupar por la razon social de la factura] (https://github.com/LemontechSA/ttb/pull/1394)
+
 ## Hotfix 16.7.5
-Friday, April 11th
+Monday, April 11th
 * **Fix** [Set Mixpanel user on home page] (https://github.com/LemontechSA/ttb/pull/1392)
 
 ## Hotfix 16.7.4
