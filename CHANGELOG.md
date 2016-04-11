@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.7.6
+Friday, April 11th
+* **Fix** [Agrupar por la razon social de la factura] (https://github.com/LemontechSA/ttb/pull/1394)
+
 ## Hotfix 16.7.5
 Friday, April 11th
 * **Fix** [Set Mixpanel user on home page] (https://github.com/LemontechSA/ttb/pull/1392)
