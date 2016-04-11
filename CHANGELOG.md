@@ -4,9 +4,13 @@
 Monday, April 11th
 * **Feature** [Formato LEDES98BI V2](https://github.com/LemontechSA/ttb/pull/1379)
 
+## Hotfix 16.7.5
+Friday, April 11th
+* **Fix** [Set Mixpanel user on home page] (https://github.com/LemontechSA/ttb/pull/1392)
+
 ## Hotfix 16.7.4
 Friday, April 8th
-* **Fix** [Erro al comparar Costos Profesional con Reporte Avanzado] (https://github.com/LemontechSA/ttb/pull/1391)
+* **Fix** [Error al comparar Costos Profesional con Reporte Avanzado] (https://github.com/LemontechSA/ttb/pull/1391)
 
 ## Hotfix 16.7.3
 Thursday, April 7th
