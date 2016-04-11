@@ -122,14 +122,14 @@ $pagina->PrintTop($popup);
 	}
 	function ActualizarTiempoIngresado() {
 		var url = "ajax_tareas.php?accion=refrescar_tiempo_ingresado";
-		url += "&id_tarea=<?=$id_tarea?>";
+		url += "&id_tarea=<?php echo $id_tarea;?>";
 		new Ajax.Request(url, {asynchronous: true, parameters : '', onComplete:  CambiarTiempo});
 	}
 	function CambiarTiempo(xmlHttpRequest, responseHeader) {
 		var response = xmlHttpRequest.responseText;
 		if(response) {
 			if(response.indexOf('head')!=-1) {
-						alert('<?=__('Sesión Caducada')?>');
+						alert('<?php echo __('Sesión Caducada');?>');
 						top.location.href='<?=Conf::Host()?>';
 			}
 			var tiempo = response;
@@ -158,22 +158,22 @@ $pagina->PrintTop($popup);
 			}
 		?>
 		if(!form_codigo_cliente.value) {
-			alert('<?=__('Debe seleccionar un cliente')?>');
+			alert('<?php echo __('Debe seleccionar un cliente');?>');
 			form_codigo_cliente.focus();
 	    	return false;
 		}
 		if(!form_codigo_asunto.value) {
-			alert('<?=__('Ud. debe seleccionar un').' '.__('asunto')?>');
+			alert('<?php echo __('Ud. debe seleccionar un').' '.__('asunto');?>');
 			form_codigo_asunto.focus();
 			return false;
 		}
 		if(form.nombre.value == '') {
-			alert('<?=__('Debe ingresar un nombre para la Tarea')?>');
+			alert('<?php echo __('Debe ingresar un nombre para la Tarea');?>');
 			form.nombre.focus();
 			return false;
 		}
 		if(form.fecha.value == '') {
-			if(confirm('<?=__('La tarea se ingresará sin Fecha de Entrega')?>')) {
+			if(confirm('<?php echo __('La tarea se ingresará sin Fecha de Entrega');?>')) {
 				return true;
 			}else{
 				form.fecha.focus();
@@ -208,7 +208,7 @@ $pagina->PrintTop($popup);
    	}
 	echo(Autocompletador::CSS());
 ?>
-<form method=post action="<?= $SERVER[PHP_SELF] ?>" onsubmit="return Validar(this);" id="form_gastos" autocomplete='off'>
+<form method=post action="<?php echo $SERVER[PHP_SELF]; ?>" onsubmit="return Validar(this);" id="form_gastos" autocomplete='off'>
 	<input type='hidden' name='opcion' value="guardar" />
 	<input type='hidden' name="gIsMouseDown" id="gIsMouseDown" value='false' />
 	<input type='hidden' name="max_hora" id="max_hora" value='999999999' />
@@ -220,7 +220,7 @@ $pagina->PrintTop($popup);
 	<table width="100%" border="0" cellspacing="0" cellpadding="2">
 		<tr>
 			<td valign="top" align="left" class="titulo" bgcolor="<?php Conf::GetConf($sesion,'ColorTituloPagina')?>">
-				<?=$txt_pagina?>
+				<?php echo $txt_pagina;?>
 			</td>
 		</tr>
 	</table>
@@ -228,7 +228,7 @@ $pagina->PrintTop($popup);
 	<table width='100%'>
 		<tr>
 			<td align='right'>
-				<?=__('Cliente')?>
+				<?php echo __('Cliente');?>
 			</td>
 			<td align='left' colspan='3'>
 				<?php
@@ -250,7 +250,7 @@ $pagina->PrintTop($popup);
 		</tr>
 		<tr>
 			<td align='right'>
-				<?=__('Asunto')?>
+				<?php echo __('Asunto');?>
 			</td>
 			<td align='left' colspan='3'>
 				<?php
@@ -260,37 +260,34 @@ $pagina->PrintTop($popup);
 						echo InputId::Imprimir($sesion,"asunto","codigo_asunto","glosa_asunto", "codigo_asunto", $codigo_asunto ,"","CargarSelectCliente(this.value);", 320,$codigo_cliente);
 					}
 				?>
-				<?=$req?>
+				<?php echo $req; ?>
 			</td>
 		</tr>
 		<tr>
 			<td align='right'>
-				<?=__('Nombre')?>
+				<?php echo __('Nombre');?>
 			</td>
 			<td align='left' colspan='3'>
-				<input name='nombre' id='nombre' size='40' value="<?=$Tarea->fields['nombre'] ? $Tarea->fields['nombre'] : '' ?>" /> <?=$req?>
+				<input name='nombre' id='nombre' size='40' value="<?=$Tarea->fields['nombre'] ? $Tarea->fields['nombre'] : '' ?>" /> <?php echo $req;?>
 			</td>
 		</tr>
 		<tr id='descripcion_tarea'>
 			<td align='right'>
-				<?=__('Detalle')?>
+				<?php echo __('Detalle');?>
 			</td>
 			<td align='left' colspan='3'>
-				<textarea id='detalle' name='detalle' cols="45" rows="3"><?=$Tarea->fields['detalle']?></textarea>
+				<textarea id='detalle' name='detalle' cols="45" rows="3"><?php echo $Tarea->fields['detalle'];?></textarea>
 			</td>
 		</tr>
 		<tr>
 			<td align='right'>
-				<?=__('Fecha de Entrega')?>
+				<?php echo __('Fecha de Entrega');?>
 			</td>
 			<td align='left' colspan='1'>
-				<input type="text" name="fecha" value="<?=$Tarea->fields['fecha_entrega'] ? Utiles::sql2date($Tarea->fields['fecha_entrega']) : $fecha ?>" id="fecha" size="11" maxlength="10" readonly />
-				<div style="position:absolute; display:inline; margin-left:5px;">
-					<img src="<?=Conf::ImgDir()?>/calendar.gif" id="img_fecha" style="cursor:pointer" />
-				</div>
+				<?php echo \TTB\Html::PrintCalendar('fecha', $Tarea->fields['fecha_entrega'] ? Utiles::sql2date($Tarea->fields['fecha_entrega']) : $fecha); ?>
 			</td>
 			<td align='right'>
-				<?=__('Prioridad')?>
+				<?php echo __('Prioridad');?>
 			</td>
 			<td align='left'>
 				<select name='prioridad' id='prioridad' title="10 mayor prioridad, 1 menor prioridad" >
@@ -315,15 +312,15 @@ $pagina->PrintTop($popup);
 			</td>
 			<tr>
 			  	<td align='right'>
-		    		<?=__('Alerta')?>
+		    		<?php echo __('Alerta');?>
 		      	</td>
 			  	<td align='left'>
 					<select name="alerta" id="alerta">
-						<option value="0"  <?= $Tarea->fields['alerta']==0? 'selected':'' ?> ><?=__("Sin Alerta")?></option>
-						<option value="1"  <?= $Tarea->fields['alerta']==1? 'selected':'' ?> ><?=__("1 día antes")?></option>
-						<option value="2"  <?= $Tarea->fields['alerta']==2? 'selected':'' ?> ><?=__("2 días antes")?></option>
-						<option value="5"  <?= $Tarea->fields['alerta']==5? 'selected':'' ?> ><?=__("5 días antes")?></option>
-						<option value="10" <?= $Tarea->fields['alerta']==10? 'selected':'' ?>><?=__("10 días antes")?></option>
+						<option value="0"  <?php echo $Tarea->fields['alerta']==0? 'selected':''; ?> ><?php echo __("Sin Alerta");?></option>
+						<option value="1"  <?php echo $Tarea->fields['alerta']==1? 'selected':''; ?> ><?php echo __("1 día antes");?></option>
+						<option value="2"  <?php echo $Tarea->fields['alerta']==2? 'selected':''; ?> ><?php echo __("2 días antes");?></option>
+						<option value="5"  <?php echo $Tarea->fields['alerta']==5? 'selected':''; ?> ><?php echo __("5 días antes");?></option>
+						<option value="10" <?php echo $Tarea->fields['alerta']==10? 'selected':''; ?>><?php echo __("10 días antes");?></option>
 					</select>
 			  </td>
 			</tr>
@@ -335,13 +332,13 @@ $pagina->PrintTop($popup);
 		</tr>
 		<tr>
 			<td align='right'>
-				<?=__('Usuario Responsable')?>
+				<?php echo __('Usuario Responsable');?>
 			</td>
 			<td align='left' width='20%'>
-				<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE activo='1' ORDER BY apellido1", "id_usuario_encargado", $Tarea->fields['usuario_encargado']? $Tarea->fields['usuario_encargado']:$id_usuario_actual,"onchange='CambiarEncargado();'", __('Ninguno'),'170'); ?>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE activo='1' ORDER BY apellido1", "id_usuario_encargado", $Tarea->fields['usuario_encargado']? $Tarea->fields['usuario_encargado']:$id_usuario_actual,"onchange='CambiarEncargado();'", __('Ninguno'),'170'); ?>
 			</td>
 			<td align='right' width='24%'>
-				<?=__('Estado')?>
+				<?php echo __('Estado');?>
 			</td>
 			<td align='left'>
 				<select name='estado' id='estado'>
@@ -365,13 +362,13 @@ $pagina->PrintTop($popup);
 		</tr>
 		<tr>
 			<td align='right'>
-				<?=__('Usuario Revisor')?>
+				<?php echo __('Usuario Revisor');?>
 			</td>
 			<td align='left'>
-				<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_revisor", $Tarea->fields['usuario_revisor']? $Tarea->fields['usuario_revisor']:$id_usuario_actual,"", __('Ninguno'),'170'); ?>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_revisor", $Tarea->fields['usuario_revisor']? $Tarea->fields['usuario_revisor']:$id_usuario_actual,"", __('Ninguno'),'170'); ?>
 			</td>
 			<td align='right'>
-				<?=__('Duración Estimada')?>
+				<?php echo __('Duración Estimada');?>
 			</td>
 			<td align='left'>
 				<?php
@@ -396,16 +393,16 @@ $pagina->PrintTop($popup);
 		</tr>
 		<tr>
 			<td align='right' >
-				<?=__('Usuario Mandante')?>
+				<?php echo __('Usuario Mandante');?>
 			</td>
 			<td align='left'>
-				<?= Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_generador", $Tarea->fields['usuario_generador']? $Tarea->fields['usuario_generador']:$id_usuario_actual,"", __('Ninguno'),'170'); ?>
+				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_generador", $Tarea->fields['usuario_generador']? $Tarea->fields['usuario_generador']:$id_usuario_actual,"", __('Ninguno'),'170'); ?>
 			</td>
 			<td align='right'>
-				<?=__('Duración Ingresada')?>
+				<?php echo __('Duración Ingresada');?>
 			</td>
 			<td align='left'>
-				<input readonly='readonly' value='<?=$Tarea->getTiempoIngresado();?>' id='tiempo_ingresado' size='7' />
+				<input readonly='readonly' value='<?php echo $Tarea->getTiempoIngresado();?>' id='tiempo_ingresado' size='7' />
 			</td>
 		</tr>
 		<tr>
@@ -424,14 +421,14 @@ $pagina->PrintTop($popup);
 			</td>
 			<td align='right' colspan='3'>
 				<?php if($Tarea->loaded()) { ?>
-					<span style="font-size:10px;"><i><?=__('Tarea ingresada el').'&nbsp;'.Utiles::sql2fecha($Tarea->fields['fecha_creacion']);?>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span style="font-size:10px;"><i><?php echo __('Tarea ingresada el').'&nbsp;'.Utiles::sql2fecha($Tarea->fields['fecha_creacion']);?>&nbsp;&nbsp;&nbsp;&nbsp;</span>
 				<?php } ?>
 			</td>
 		</tr>
 		<tr>
 			<td align='center' colspan='4'>
-				<input type='submit' class='btn' value="<?=__('Guardar')?>" onclick='return Validar(this.form);' />
-				<input type='button' class='btn' value="<?=__('Cerrar')?>" onclick="Cerrar()" />
+				<input type='submit' class='btn' value="<?php echo __('Guardar');?>" onclick='return Validar(this.form);' />
+				<input type='button' class='btn' value="<?php echo __('Cerrar');?>" onclick="Cerrar()" />
 			</td>
 		</tr>
 	</table>
@@ -447,7 +444,7 @@ $pagina->PrintTop($popup);
 			$url_iframe = 'tareas_comentarios.php?id_tarea='.$Tarea->fields['id_tarea'];
 			$alto_iframe = '100';
 		?>
-		<iframe name='bitacora' id='bitacora' src='<?=$url_iframe ?>' frameborder='0' width='95%' height='<?php $alto_iframe ?>px'>
+		<iframe name='bitacora' id='bitacora' src='<?php echo $url_iframe; ?>' frameborder='0' width='95%' height='<?php echo $alto_iframe ?>px'>
 		</iframe>
 	</div>
 <?php }?>
