@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.8.0](https://github.com/LemontechSA/ttb/pull/1393)
+Monday, April 11th
+* **Feature** [Formato LEDES98BI V2](https://github.com/LemontechSA/ttb/pull/1379)
+
 ## Hotfix 16.7.4
 Friday, April 8th
 * **Fix** [Erro al comparar Costos Profesional con Reporte Avanzado] (https://github.com/LemontechSA/ttb/pull/1391)
