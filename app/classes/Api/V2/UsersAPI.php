@@ -26,13 +26,16 @@ class UsersAPI extends AbstractSlimAPI {
 		}
 
 		$UsersBusiness = new \UsersBusiness($this->session);
-		$includes = array('settings', 'permissions');
+		$includes = array('settings');
 		$user = $UsersBusiness->getUserById($id, $includes);
 
 		if (empty($user)) {
 			$this->halt(__("The user doesn't exist"), 'UserDoesntExist');
 		}
 		// user permissions
+		$roles = $UsersBusiness->getRoles($id);
+		$permissions = ApiAuth::userPermissions($roles);
+		$user->set('permissions', $permissions);
 		$this->present($user, self::$UserEntity);
 	}
 
