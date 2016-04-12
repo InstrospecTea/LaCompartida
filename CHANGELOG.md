@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 16.8.2
+Tuesday, April 12th
+* **Fix** [Corrige problema en creación de asunto](https://github.com/LemontechSA/ttb/pull/1399)
+
+## Hotfix 16.8.1
+Tuesday, April 12th
+* **Fix** [Filtra trabajos no cobrables en reporte TrabajosAsunto] (https://github.com/LemontechSA/ttb/pull/1397)
+
 ## [Release 16.8.0](https://github.com/LemontechSA/ttb/pull/1393)
 Monday, April 11th
 * **Feature** [Formato LEDES98BI V2](https://github.com/LemontechSA/ttb/pull/1379)
