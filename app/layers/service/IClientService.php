@@ -4,6 +4,6 @@
  * Description:
  *
  */
-interface ClientService extends BaseService {
+interface IClientService extends BaseService {
 
 }

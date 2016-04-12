@@ -71,12 +71,11 @@ $Slim->get('/settings', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/users/:id', function ($id) use ($Session, $Slim) {
-	$API = new UsersAPI($Session, $Slim);
+	$API = new Api\V2\UsersAPI($Session, $Slim);
 	$API->getUserById($id);
 });
 
 $Slim->get('/users/:id/time_entries', function ($id) use ($Session, $Slim) {
-	 error_reporting(E_ALL & ~E_WARNING);
 	$API = new Api\V2\TimeEntriesAPI($Session, $Slim);
 	$API->getTimeEntriesByUserId($id);
 });

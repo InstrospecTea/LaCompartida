@@ -4,6 +4,6 @@
  * Description:
  *
  */
-interface TaskService extends BaseService {
+interface ITaskService extends BaseService {
 
 }

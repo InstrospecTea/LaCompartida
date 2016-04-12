@@ -4,6 +4,6 @@
  * Description:
  *
  */
-interface WorkingAreaService extends BaseService {
+interface IWorkingAreaService extends BaseService {
 
 }

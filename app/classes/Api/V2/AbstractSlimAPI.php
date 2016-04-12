@@ -162,6 +162,25 @@ class AbstractSlimAPI  {
 		return $UserToken->getAppIdByAppKey($app_key);
 	}
 
+	public function hasPermission($roles) {
+		$Slim = $this->slim;
+		$Session = $this->session;
+
+		$request = $Slim->request();
+		$method = $request->getMethod();
+
+		$apiNamespace = $this->apiNamespace($request);
+
+		$permission = ApiAuth::methodMap($method);
+
+		return ApiAuth::hasPermission($roles, $apiNamespace, $permission);
+	}
+
+	public function apiNamespace($request) {
+		$uriArray = explode('/', $request->getPathInfo());
+		return $uriArray[1];
+	}
+
 	/**
 	 * Valida auth token medianto los headers
 	 * @param  [type] $permission [description]
@@ -205,17 +224,16 @@ class AbstractSlimAPI  {
 
 			$Session->usuario = new \UsuarioExt($Session);
 			$Session->usuario->LoadId($user_token->user_id);
-			if (!is_null($permission)) {
-				if (!$Session->usuario->Loaded()) {
-					$this->halt(__("The user doesn't exist"), 'UserDoesntExist');
-				} else {
-					$Session->usuario->LoadPermisos($user_token->user_id);
-					$params_array['codigo_permiso'] = $permission;
-					$p = $Session->usuario->permisos->Find('FindPermiso', $params_array);
-					if (!$p->fields['permitido']) {
-						$this->halt(__('Not allowed'), 'SecurityError');
-					}
-				}
+
+			if (!$Session->usuario->Loaded()) {
+				$this->halt(__("The user doesn't exist"), 'UserDoesntExist');
+			}
+
+			$UserBusiness = new \UsersBusiness($Session);
+			$roles = $UserBusiness->getRoles($user_token->user_id);
+
+			if (!$this->hasPermission($roles)) {
+				$this->halt(__('Not allowed'), 'SecurityError');
 			}
 
 			return $user_token;

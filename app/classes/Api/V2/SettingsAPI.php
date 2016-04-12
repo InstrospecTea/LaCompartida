@@ -24,9 +24,7 @@ class SettingsAPI extends AbstractSlimAPI {
 		$Slim = $this->slim;
 		$this->validateAuthTokenSendByHeaders();
 		$Business = new \SettingsBusiness($this->session);
-		 error_reporting(E_ALL & ~E_WARNING);
 		$results = $Business->getTimeTrackingSettings();
-
 		$this->present($results, self::$SettingEntity);
 	}
 

@@ -4,6 +4,6 @@
  * Description:
  *
  */
-interface SettingService extends BaseService {
+interface ISettingService extends BaseService {
 
 }
