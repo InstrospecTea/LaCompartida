@@ -1,7 +1,7 @@
 # Changelog
 
 ## Hotfix 16.8.1
-Monday, April 11th
+Tuesday, April 12th
 * **Fix** [Filtra trabajos no cobrables en reporte TrabajosAsunto] (https://github.com/LemontechSA/ttb/pull/1397)
 
 ## [Release 16.8.0](https://github.com/LemontechSA/ttb/pull/1393)
