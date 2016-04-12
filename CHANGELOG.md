@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.8.0](https://github.com/LemontechSA/ttb/pull/1393)
+Monday, April 11th
+* **Feature** [Formato LEDES98BI V2](https://github.com/LemontechSA/ttb/pull/1379)
+
 ## Hotfix 16.7.6
 Monday, April 11th
 * **Fix** [Agrupar por la razon social de la factura] (https://github.com/LemontechSA/ttb/pull/1394)
