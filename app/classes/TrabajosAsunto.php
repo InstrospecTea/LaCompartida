@@ -45,18 +45,18 @@ class TrabajosAsunto {
 
     $this->Criteria->add_select('CONCAT(cliente.glosa_cliente, " - ", asunto.glosa_asunto)', 'glosa_asunto');
     $this->Criteria->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'duracion');
-    $this->Criteria->add_select('SUM(TIME_TO_SEC(duracion_cobrada))/3600', 'duracion_cobrada');
+    $this->Criteria->add_select('SUM(IF(trabajo.cobrable, TIME_TO_SEC(duracion_cobrada), 0))/3600', 'duracion_cobrada');
     $this->Criteria->add_select('moneda_por_cobrar.codigo', 'moneda');
     $this->Criteria->add_select('moneda_display.codigo', 'moneda_display');
     $this->Criteria->add_select('
-      SUM(TIME_TO_SEC(duracion_cobrada)/3600 * trabajo_tarifa.valor)
+      SUM(IF(trabajo.cobrable, TIME_TO_SEC(duracion_cobrada)/3600 * trabajo_tarifa.valor, 0))
       * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio)
     ', 'total');
 
     foreach ($currencies as $currency) {
       $this->Criteria->add_select(
         "IF(moneda_por_cobrar.id_moneda = {$currency->get('id_moneda')},
-          SUM(TIME_TO_SEC(duracion_cobrada)/3600 * trabajo_tarifa.valor), 0)",
+          SUM(IF(trabajo.cobrable, TIME_TO_SEC(duracion_cobrada)/3600 * trabajo_tarifa.valor, 0)), 0)",
         "total_{$currency->get('id_moneda')}");
     }
 
