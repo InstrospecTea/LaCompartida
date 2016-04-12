@@ -1,14 +1,9 @@
 <?php
 	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/classes/Funciones.php';
 
 	$sesion = new Sesion(array('REV', 'ADM', 'PRO'));
 	$pagina = new Pagina($sesion);
-
-	#$key = substr(md5(microtime().posix_getpid()), 0, 8);
 
 	$wb = new Spreadsheet_Excel_Writer();
 
@@ -135,7 +130,6 @@
 	for($i = 0; $i < $lista->num; $i++)
 	{
 		$tramite = $lista->Get($i);
-//echo '<pre>'; var_dump($tramite->fields); exit;
 		$moneda_total = new Objeto($sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda = $tramite->fields['id_moneda_asunto'] > 0 ? $tramite->fields['id_moneda_asunto'] : 1;
 		if (!empty($tramite->fields['tarifa_tramite_individual'])) {
@@ -200,4 +194,3 @@
 
 	$wb->close();
 	exit;
-?>
