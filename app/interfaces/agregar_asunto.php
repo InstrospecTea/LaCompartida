@@ -1046,10 +1046,10 @@ function CambioEncargadoSegunCliente(idcliente) {
 	jQuery('#id_usuario_responsable').removeAttr('disabled');
 	jQuery.post('../ajax.php', {accion: 'busca_encargado_por_cliente', codigobuscado: idcliente}, function (data) {
 		var ladata = data.split('|');
-		jQuery('#id_usuario_responsable').attr({'disabled': ''}).val(ladata[0]);
+		jQuery('#id_usuario_responsable').removeAttr('disabled').val(ladata[0]);
 		if (ladata[1] && jQuery('#id_usuario_secundario option[value=' + ladata[1] + ']').length > 0) {
 			if (UsuarioSecundario) {
-				jQuery('#id_usuario_secundario').attr({'disabled': ''}).val(ladata[1]);
+				jQuery('#id_usuario_secundario').removeAttr('disabled').val(ladata[1]);
 			}
 		} else {
 			if (ladata[2]) {
