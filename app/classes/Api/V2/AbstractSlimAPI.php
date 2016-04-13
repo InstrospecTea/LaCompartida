@@ -178,7 +178,11 @@ class AbstractSlimAPI  {
 
 	public function apiNamespace($request) {
 		$uriArray = explode('/', $request->getPathInfo());
-		return $uriArray[1];
+		$namespace = array_pop($uriArray);
+		if (is_numeric($namespace)) {
+			$namespace = array_pop($uriArray);
+		}
+		return $namespace;
 	}
 
 	/**
