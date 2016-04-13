@@ -2,6 +2,22 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
+/******************************************
+ * constant definition
+ ******************************************/
+define('One_Cent', 28.35); //1cm = 28.35pt
+//paper sizes in cm
+define('A4_WIDTH', 21.0);
+define('A4_HEIGHT', 29.7);
+define('A5_WIDTH', 14.8);
+define('A5_HEIGHT', 21.0);
+define('LETTER_WIDTH', 21.59);
+define('LETTER_HEIGHT', 27.94);
+define('PRC_WIDTH', 21.59);
+define('PRC_HEIGHT', 15.24);
+define('LEGAL_WIDTH', 21.59);
+define('LEGAL_HEIGHT', 35.56);
+
 class DocGenerator {
 
 	var $appName = 'Lemontech';
@@ -39,22 +55,25 @@ class DocGenerator {
 
 	/**
 	 * constructor DocGenerator(const $pageOrientation = 'PORTRAIT', const $pageType = 'A4',  string $cssData = '', int $topMargin = 3.0, int $rightMargin = 2.5, int $bottomMargin = 3.0, int $leftMargin = 2.5)
-	 * @param $html: HTML code of the document
-	 * @param $pageOrientation: The orientation of the pages of the initial session, 'PORTRAIT' or 'LANDSCAPE'
-	 * @param $pageType: The initial type of the paper of the pages of the session
-	 * @param $cssData: extra file with formating configurations, in css file format
-	 * @param $topMargin: top margin of the document
-	 * @param $rightMargin: right margin of the document
-	 * @param $bottomMargin: bottom margin of the document
-	 * @param $leftMargin: left margin of the document
-	 * @param $estado: ni idea para que sirve este parametro preguntar al que lo agregó
-	 * @param $id_format: ?????????
-	 * @param $configuracion: ????????
-	 * @param $headerMargin: margen del encabezado del documento, en centímetros
-	 * @param $footerMargin: margen del pie de página del documento, en centímetros
+	 * @param string $html : HTML code of the document
+	 * @param string $cssData : extra file with formating configurations, in css file format
+	 * @param string $pageType : The initial type of the paper of the pages of the session
+	 * @param bool $pageNums
+	 * @param string $pageOrientation : The orientation of the pages of the initial session, 'PORTRAIT' or 'LANDSCAPE'
+	 * @param float $topMargin : top margin of the document
+	 * @param float $rightMargin : right margin of the document
+	 * @param float $bottomMargin : bottom margin of the document
+	 * @param float $leftMargin : left margin of the document
+	 * @param string $estado : ni idea para que sirve este parametro preguntar al que lo agregó
+	 * @param string $id_formato
+	 * @param array $configuracion : ????????
+	 * @param float $headerMargin : margen del encabezado del documento, en centímetros
+	 * @param float $footerMargin : margen del pie de página del documento, en centímetros
+	 * @param string $lang
+	 * @param null $sesion
+	 * @return DocGenerator
 	 */
-	function DocGenerator($html = '', $cssData = '', $pageType = 'LETTER', $pageNums = false, $pageOrientation = 'PORTRAIT', $topMargin = 1.5, $rightMargin = 1.5, $bottomMargin = 2.0, $leftMargin = 1.5, $estado = 'EMITIDO', $id_formato = '', $configuracion = array(), $headerMargin = 1.25, $footerMargin = 1.25, $lang = 'es', $sesion = null) {
-		global $desde;
+	public function DocGenerator($html = '', $cssData = '', $pageType = 'LETTER', $pageNums = false, $pageOrientation = 'PORTRAIT', $topMargin = 1.5, $rightMargin = 1.5, $bottomMargin = 2.0, $leftMargin = 1.5, $estado = 'EMITIDO', $id_formato = '', $configuracion = array(), $headerMargin = 1.25, $footerMargin = 1.25, $lang = 'es', $sesion = null) {
 
 		$this->chunkedHeader = '';
 		$this->documentBuffer = '';
@@ -99,13 +118,11 @@ class DocGenerator {
 		$this->newPage();
 	}
 
-//end DocGenerator()
-
 	/**
 	 * public int newPage(void)
 	 * @return int: the number of the new page
 	 */
-	function newPage() {
+	public function newPage() {
 		$this->lastPageNumber++;
 		if ($this->lastPageNumber != 1) {
 			$this->documentBuffer .= "<br clear=\"all\" style=\"page-break-before: always;\">";
@@ -113,23 +130,21 @@ class DocGenerator {
 		return $this->lastPageNumber;
 	}
 
-//end newPage()
-
 	/**
 	 * public int generateStyles(const $pageOrientation = NULL, const $pageType = NULL, int $topMargin = NULL, int $rightMargin = NULL, int $bottomMargin = NULL, int $leftMargin = NULL)
-	 * @param $pageOrientation: The orientation of the pages of the this session, 'PORTRAIT' or 'LANDSCAPE'
-	 * @param $pageType: The type of the paper of the pages of the this session
-	 * @param $topMargin: top margin of the this session
-	 * @param $rightMargin: right margin of the this session
-	 * @param $bottomMargin: bottom margin of the this session
-	 * @param $leftMargin: left margin of the this session
-	 * @param $estado: ni idea quien agregó este parametro y no le puso que era
-	 * @param $id_formato: ni idea quien agregó este parametro y no le puso que era
-	 * @param $headerMargin: margin of the header of the document
-	 * @param $footerMargin: margin of the footer of the document
+	 * @param $pageOrientation : The orientation of the pages of the this session, 'PORTRAIT' or 'LANDSCAPE'
+	 * @param $pageType : The type of the paper of the pages of the this session
+	 * @param $topMargin : top margin of the this session
+	 * @param $rightMargin : right margin of the this session
+	 * @param $bottomMargin : bottom margin of the this session
+	 * @param $leftMargin : left margin of the this session
+	 * @param $estado : ni idea quien agregó este parametro y no le puso que era
+	 * @param $id_formato : ni idea quien agregó este parametro y no le puso que era
+	 * @param $headerMargin : margin of the header of the document
+	 * @param $footerMargin : margin of the footer of the document
 	 * @return int: the number of the new session
 	 */
-	function generateStyles($pageOrientation = NULL, $pageType = NULL, $topMargin = NULL, $rightMargin = NULL, $bottomMargin = NULL, $leftMargin = NULL, $estado = NULL, $id_formato = '', $headerMargin = NULL, $footerMargin = NULL, $sesion = NULL) {
+	public function generateStyles($pageOrientation = NULL, $pageType = NULL, $topMargin = NULL, $rightMargin = NULL, $bottomMargin = NULL, $leftMargin = NULL, $estado = NULL, $id_formato = '', $headerMargin = NULL, $footerMargin = NULL, $sesion = NULL) {
 		setlocale(LC_ALL, 'en_EN');
 
 		$pageOrientation = $pageOrientation === NULL ? $this->pageOrientation : $pageOrientation;
@@ -247,9 +262,10 @@ class DocGenerator {
 
 	/**
 	 * public int newSession(const $pageOrientation = NULL, const $pageType = NULL, int $topMargin = NULL, int $rightMargin = NULL, int $bottomMargin = NULL, int $leftMargin = NULL)
-	 * @param $html: HTML code of the session
+	 * @param $html : HTML code of the session
+	 * @return int
 	 */
-	function newSession($html = '') {
+	public function newSession($html = '') {
 		setlocale(LC_ALL, 'en_EN');
 		$this->lastSessionNumber++;
 		if ($this->lastSessionNumber != 1) {
@@ -262,14 +278,14 @@ class DocGenerator {
 		return $this->lastSessionNumber;
 	}
 
-	//end newSession()
-
 	/**
 	 * public void output(string $fileName = '', string $saveInPath = '')
-	 * @param $fileName: the file name of document
-	 * @param $saveInPath: if not empty will be the path to save document otherwise show
+	 * @param string $fileName : the file name of document
+	 * @param string $saveInPath : if not empty will be the path to save document otherwise show
+	 * @param string $desde
+	 * @return string
 	 */
-	function output($fileName = '', $saveInPath = '', $desde = '') {
+	public function output($fileName = '', $saveInPath = '', $desde = '') {
 		$this->endSession();
 
 		$outputCode = '';
@@ -301,9 +317,7 @@ class DocGenerator {
 		}
 	}
 
-//end output()
-
-	function startChunkedOutput($fileName = '', $desde = '') {
+	public function startChunkedOutput($fileName = '', $desde = '') {
 		$this->chunkedHeader = "<html xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n";
 		$this->chunkedHeader .= "   xmlns:w=\"urn:schemas-microsoft-com:office:word\"\r\n";
 		$this->chunkedHeader .= "   xmlns=\"http://www.w3.org/TR/REC-html40\">\r\n";
@@ -319,7 +333,7 @@ class DocGenerator {
 		echo $this->chunkedHeader;
 	}
 
-	function endChunkedOutput($fileName = '') {
+	public function endChunkedOutput($fileName = '') {
 		$chunkedFooter = $this->getBodyEnd();
 		$chunkedFooter .= "</html>\r\n";
 		echo $chunkedFooter;
@@ -327,9 +341,10 @@ class DocGenerator {
 
 	/**
 	 * public void chunkedOutput(string $fileName = '')
-	 * @param $fileName: the file name of document
+	 * @param string $fileName : the file name of document
+	 * @param string $desde
 	 */
-	function chunkedOutput($fileName = '', $desde = '') {
+	public function chunkedOutput($fileName = '', $desde = '') {
 		$fileName = $fileName != '' ? $fileName : basename($_SERVER['PHP_SELF'], '.php') . '.doc';
 		if ($this->chunkedHeader == '') {
 			$this->startChunkedOutput($fileName, $desde);
@@ -338,76 +353,59 @@ class DocGenerator {
 		$this->documentBuffer = '';
 	}
 
-	//end chunkedOutput()
-
 	/**
 	 * public void setDocumentLang(string $lang)
-	 * @param $lang: document lang
+	 * @param $lang : document lang
 	 */
-	function setDocumentLang($lang) {
+	public function setDocumentLang($lang) {
 		$this->documentLang = $lang;
 	}
 
-//end setDocumentLang()
-
 	/**
 	 * public void setDocumentCharset(string $charset)
-	 * @param $charset: document charset
+	 * @param $charset : document charset
 	 */
-	function setDocumentCharset($charset) {
+	public function setDocumentCharset($charset) {
 		$this->documentCharset = $charset;
 	}
 
-//end setDocumentCharset()
-
 	/**
 	 * public void setFontFamily(string $fontFamily)
-	 * @param $fontFamily: default document font family
+	 * @param $fontFamily : default document font family
 	 */
-	function setFontFamily($fontFamily) {
+	public function setFontFamily($fontFamily) {
 		$this->fontFamily = $fontFamily;
 	}
 
-//end setFontFamily()
-
 	/**
 	 * public void setFontSize(string $fontSize)
-	 * @param $fontSize: default document font Size
+	 * @param $fontSize : default document font Size
 	 */
-	function setFontSize($fontSize) {
+	public function setFontSize($fontSize) {
 		$this->fontSize = $fontSize;
 	}
-
-//end setFontSize()
-
-	/*	 * **************************************************
-	 * begin private functions
-	 * ************************************************* */
 
 	/**
 	 * private void endSession(void)
 	 */
-	function endSession() {
+	private function endSession() {
 		$this->documentBuffer .= "</div>\r\n";
 	}
 
-	//end endSession()
-
 	/**
 	 * private float endSession(int $pixels)
-	 * @param $pixels: number of pixels to convert
+	 * @param $pixels : number of pixels to convert
+	 * @return string
 	 */
-	function pixelsToPoints($pixels) {
+	private function pixelsToPoints($pixels) {
 		$points = 0.75 * floatval($pixels);
 		return number_format($points, 2);
 	}
 
-//end pixelsToPoints()
-
 	/**
 	 * private void prepareDefaultHeader(void)
 	 */
-	function prepareDefaultHeader() {
+	private function prepareDefaultHeader() {
 		$this->formatBuffer .= "p.normalText, li.normalText, div.normalText{\r\n";
 		$this->formatBuffer .= "   mso-style-parent: \"\";\r\n";
 		$this->formatBuffer .= "   margin: 0cm;\r\n";
@@ -465,12 +463,12 @@ class DocGenerator {
 		}
 	}
 
-//end prepareDefaultHeader()
-
 	/**
 	 * private string getHeader(void)
+	 * @param string $desde
+	 * @return string
 	 */
-	function getHeader($desde = '') {
+	private function getHeader($desde = '') {
 		$header = '';
 		$header .= "<head>\r\n";
 		$header .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$this->documentCharset\">\r\n";
@@ -513,12 +511,10 @@ class DocGenerator {
 		return $header;
 	}
 
-//end getHeader()
-
 	/**
 	 * private string getBody(void)
 	 */
-	function getBody() {
+	private function getBody() {
 		$body = '';
 		$body .= "<body lang=\"$this->documentLang\" style=\"tab-interval: 35.4pt\">\r\n";
 
@@ -529,30 +525,24 @@ class DocGenerator {
 		return $body;
 	}
 
-//end getBody()
-
 	/**
 	 * private string getBodyStart(void)
 	 */
-	function getBodyStart() {
+	private function getBodyStart() {
 		$body = "<body lang=\"$this->documentLang\" style=\"tab-interval: 35.4pt\">\r\n";
 		return $body;
 	}
 
-//end get_start_body()
-
 	/**
 	 * private string getBodyEnd(void)
 	 */
-	function getBodyEnd() {
+	private function getBodyEnd() {
 		$body = "</body>\r\n";
 
 		return $body;
 	}
 
-//end get_end_body()
-	//
-	function outputxml($xml, $filename) {
+	private function outputxml($xml, $filename) {
 		$this->endSession();
 		header("Content-Type: application/msword; charset=ISO-8859-1");
 		header("Content-Disposition: attachment; filename=\"$filename\"");
@@ -561,53 +551,4 @@ class DocGenerator {
 
 }
 
-//end class DocGenerator
 
-
-/* * **************************************************
- * constant definition
- * ************************************************* */
-define('One_Cent', 28.35); //1cm = 28.35pt
-//paper sizes in cm
-define('A4_WIDTH', 21.0);
-define('A4_HEIGHT', 29.7);
-define('A5_WIDTH', 14.8);
-define('A5_HEIGHT', 21.0);
-define('LETTER_WIDTH', 21.59);
-define('LETTER_HEIGHT', 27.94);
-define('PRC_WIDTH', 21.59);
-define('PRC_HEIGHT', 15.24);
-define('LEGAL_WIDTH', 21.59);
-define('LEGAL_HEIGHT', 35.56);
-
-
-/* * **************************************************
- * functions definition
- * ************************************************* */
-
-if (!function_exists('file_get_contents')) {
-
-	function file_get_contents($filename, $useIncludePath = '', $context = '') {
-		if (empty($useIncludePath)) {
-			return implode('', file($filename));
-		} else if (empty($content)) {
-			return implode('', file($filename, $useIncludePath));
-		} else {
-			return implode('', file($filename, $useIncludePath, $content));
-		}
-	}
-
-//end file_get_contents()
-}//end if
-
-if (!function_exists('file_put_contents')) {
-
-	function file_put_contents($filename, $data) {
-		$file = fopen($filename, 'wb');
-		$return = fwrite($file, $data);
-		fclose($file);
-		return $return;
-	}
-
-//end file_put_contents()
-}//end if
