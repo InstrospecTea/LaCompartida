@@ -4,8 +4,6 @@
 	$sesion = new Sesion(array('REV', 'ADM', 'PRO'));
 	$pagina = new Pagina($sesion);
 
-	#$key = substr(md5(microtime().posix_getpid()), 0, 8);
-
 	$wb = new WorkbookMiddleware();
 
 	$wb->setVersion(8);
@@ -71,7 +69,8 @@
 		$col_nombre = 4;
 		$col_apellido = 5;
 		$col_duracion = 6;
-		$col_valor_tramite = 7;
+		$col_cobro = 7;
+		$col_valor_tramite = 8;
 
 
 	// Valores para las fórmulas
@@ -87,6 +86,7 @@
 	$ws->setColumn($col_nombre, $col_nombre, 30);
 	$ws->setColumn($col_apellido, $col_apellido, 25);
 	$ws->setColumn($col_duracion, $col_duracion, 15.67);
+	$ws->setColumn($col_cobro, $col_cobro, 15.67);
 	$ws->setColumn($col_valor_tramite, $col_valor_tramite, 20);
 
 	if(method_exists('Conf', 'GetConf'))
@@ -116,6 +116,7 @@
 	$ws->write($fila_inicial, $col_nombre, __('Nombre'), $tit);
 	$ws->write($fila_inicial, $col_apellido, __('Apellido'), $tit);
 	$ws->write($fila_inicial, $col_duracion, __('Duración'), $tit);
+	$ws->write($fila_inicial, $col_cobro, __('Cobro'), $tit);
 	$params_array['codigo_permiso'] = 'COB';
 	$p_cobranza = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
 	if($p_cobranza->fields['permitido'])
@@ -128,7 +129,6 @@
 	for($i = 0; $i < $lista->num; $i++)
 	{
 		$tramite = $lista->Get($i);
-//echo '<pre>'; var_dump($tramite->fields); exit;
 		$moneda_total = new Objeto($sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda = $tramite->fields['id_moneda_asunto'] > 0 ? $tramite->fields['id_moneda_asunto'] : 1;
 		if (!empty($tramite->fields['tarifa_tramite_individual'])) {
@@ -169,9 +169,11 @@
 		$ws->write($fila_inicial + $i, $col_apellido, $tramite->fields['apellido1'], $tex);
 
 		$duracion= $tramite->fields['duracion'];
-		list($h, $m)= explode(':', $duracion);
+		list($h, $m)= split(':', $duracion);
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
 		$ws->writeNumber($fila_inicial + $i, $col_duracion, $tiempo_excel, $time_format);
+
+		$ws->write($fila_inicial + $i, $col_cobro, $tramite->fields['id_cobro'], $tex);
 
 		$params_array['codigo_permiso'] = 'REV';
 		$p_revisor = $sesion->usuario->permisos->Find('FindPermiso', $params_array);
@@ -191,4 +193,3 @@
 
 	$wb->close();
 	exit;
-?>

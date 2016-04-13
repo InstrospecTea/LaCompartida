@@ -1662,11 +1662,20 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					</td>
 				</tr>
 				<tr class="controls controls-row ">
-					<td class="al"><?php echo __('Formato LEDES'); ?></td>
+					<td class="al"><?php echo __('Proveedor LEDES'); ?></td>
 					<td class="al">
 						<?php
 							$SelectorLedes = new SelectorLedes($Sesion);
 							echo $Form->select('formato_ledes', $SelectorLedes->getProveedores(), $contrato->fields['formato_ledes'], array('empty' => false, 'style' => 'width: 200px', 'class' => 'span3'));
+						?>
+					</td>
+				</tr>
+				<tr class="controls controls-row ">
+					<td class="al"><?php echo __('Formato LEDES'); ?></td>
+					<td class="al">
+						<?php
+						$SelectorLedes = new SelectorLedes($Sesion);
+						echo $Form->select('tipo_ledes', $SelectorLedes->getFormatos(), $contrato->fields['tipo_ledes'], array('empty' => false, 'style' => 'width: 200px', 'class' => 'span3'));
 						?>
 					</td>
 				</tr>
@@ -2950,7 +2959,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					$contrato->Edit('opc_ver_solicitante', Conf::GetConf($Sesion, 'OpcVerSolicitante') == 1 ? 1 : 0);
 					$contrato->Edit('opc_ver_tipo_cambio', Conf::GetConf($Sesion, 'OpcVerTipoCambio') == 1 ? 1 : 0);
 					$contrato->Edit('opc_ver_valor_hh_flat_fee', Conf::GetConf($Sesion, 'OpcVerValorHHFlatFee') == 1 ? 1 : 0);
-					$contrato->Edit('opc_mostrar_tramites_no_cobrables', 0);
+					$contrato->Edit('opc_mostrar_tramites_no_cobrables', Conf::GetConf($Sesion, 'OpcMostrarTramitesNoCobrables') == 1 ? 1 : 0);
 				}
 				?>
 
