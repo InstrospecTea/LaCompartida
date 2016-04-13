@@ -22,7 +22,7 @@ class UsersBusiness extends AbstractBusiness implements IUsersBusiness {
 		$user = $users[0];
 
 		if (!empty($user) && in_array('settings', $includes)) {
-			$settings = $this->buildUserSettings($user);
+			$settings = $this->getUserSettings($user);
 			$user->set('settings', $settings);
 		}
 
@@ -50,7 +50,6 @@ class UsersBusiness extends AbstractBusiness implements IUsersBusiness {
 
 	private function getUserSettings($user) {
 		$settings = array(
-			'max_daily_hours' => (1439 / 60.0),
 			'weekly_alert' => (int) $user->get('alerta_semanal'),
 			'daily_alert' => (int) $user->get('alerta_diaria'),
 			'min_daily_hours' => (float) $user->get('restriccion_diario'),
@@ -60,17 +59,6 @@ class UsersBusiness extends AbstractBusiness implements IUsersBusiness {
 			'receive_alerts' => (int) $user->get('receive_alerts'),
 			'alert_hour' => $user->get('alert_seconds')
 		);
-		return $settings;
-	}
-
-	private function buildUserSettings($user) {
-
-		$settings = $this->getUserSettings($user);
-		$maxDailyHours = Conf::GetConf($this->Session, 'CantidadHorasDia');
-
-		if (!empty($maxDailyHours)) {
-			$settings['max_daily_hours'] = $maxDailyHours / 60.0;
-		}
 		return $settings;
 	}
 

@@ -63,7 +63,6 @@ class UsersCest
 		$I->seeResponseContains("\"weekly_alert\":");
 		$I->seeResponseContains("\"daily_alert\":");
 		$I->seeResponseContains("\"min_daily_hours\":");
-		$I->seeResponseContains("\"max_daily_hours\":");
 		$I->seeResponseContains("\"min_weekly_hours\":");
 		$I->seeResponseContains("\"max_weekly_hours\":");
 		$I->seeResponseContains("\"days_track_works\":");

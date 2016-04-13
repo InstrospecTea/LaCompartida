@@ -22,6 +22,7 @@ class ApiAuth {
 		'holdings' => array('read'),
 		'currencies' => array('read'),
 		'countries' => array('read'),
+		'areas' => array('read'),
 		'tasks' => array('read'),
 		'languages' => array('read'),
 		'reports' => array('read')
