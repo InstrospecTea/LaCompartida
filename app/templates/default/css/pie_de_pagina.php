@@ -46,15 +46,15 @@ xmlns="http://www.w3.org/TR/REC-html40">
 
 <div style='mso-element:header' id=h1>
 <?php
-// Busca html de header y pie de pagina 
+// Busca html de header y pie de pagina
 if( $id_formato != '' )
 	$where = " WHERE id_formato = '$id_formato' ";
 else
 	$where = " WHERE 1=2";
-$query = "SELECT html_header, html_pie FROM cobro_rtf $where"; 
+$query = "SELECT html_header, html_pie FROM cobro_rtf $where";
 
-$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
-list($html_header, $html_pie) = mysql_fetch_array($resp); 
+$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+list($html_header, $html_pie) = mysql_fetch_array($resp);
 
 if (empty($lang)) $lang = 'es';
 require_once Conf::ServerDir() . "/lang/$lang.php";
@@ -63,18 +63,18 @@ $html_pie = str_replace('%texto_fono%', __('Fono'), $html_pie);
 $html_pie = str_replace('%texto_piso%', __('Piso'), $html_pie);
 $html_pie = str_replace('%texto_cuarto%', __('4to'), $html_pie);
 
-// reemplacar anchores 
-$html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header); 
+// reemplacar anchores
+$html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header);
 
-?> 
+?>
 
-<p class=MsoHeader align=center style='text-align:center'> 
-	<?php echo $html_header; ?> 
-</p> 
+<p class=MsoHeader align=center style='text-align:center'>
+	<?php echo $html_header; ?>
+</p>
 
-</div> 
+</div>
 
-<div style='mso-element:endnote-separator' id=es> 
+<div style='mso-element:endnote-separator' id=es>
 
 <p class=MsoNormal><span style='mso-special-character:footnote-separator'><![if !supportFootnotes]>
 
@@ -95,6 +95,9 @@ $html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header);
 </div>
 
 <div style='mso-element:footer' id=f1>
+
+	<p class=MsoFooter align=right style='text-align:right'><span style='mso-field-code:
+" PAGE   \\* MERGEFORMAT "'><span style='mso-no-proof:yes'>1</span></span></p>
 
 <?php
 $html_pie = str_replace('%img_dir%', Conf::ImgDir(), $html_pie);
