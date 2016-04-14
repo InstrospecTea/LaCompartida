@@ -2,6 +2,8 @@
 
 class RateController extends AbstractController {
 
+	public $helpers = array(array('\TTB\Html', 'Html'), 'Form');
+
 	/**
 	 * Carga la página principal del módulo
 	 * @return mixed
@@ -27,9 +29,6 @@ class RateController extends AbstractController {
 		$this->set('rates', $rates);
 		$this->set('errands_rate_table', $errands_rate_table);
 		$this->set('coins', $this->CoiningBusiness->currenciesToArray($this->CoiningBusiness->getCurrencies()));
-		$this->set('diseno_nuevo', Conf::GetConf($this->Session,'UsaDisenoNuevo'));
-		$this->set('Html', new \TTB\Html());
-		$this->set('Form', new Form($this->Session));
 	}
 
 	/**

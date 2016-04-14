@@ -171,7 +171,7 @@ jQuery.saveRate = function() {
 	jQuery.ajax({
 		url: dm_root + 'saveErrandRate',
 		data: {
-			params
+			params: params
 		},
 		dataType: 'JSON',
 		method: 'POST',
