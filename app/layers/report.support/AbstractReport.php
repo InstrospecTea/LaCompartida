@@ -6,11 +6,48 @@ abstract class AbstractReport implements BaseReport {
 	public $reportEngine;
 	public $parameters;
 	public $Session;
+	protected $helpers = array();
+	protected $helpersPath = '/view';
 	private $loadedClass = array();
 
 	public function __construct(Sesion $Session) {
 		$this->Session = $Session;
+		$this->loadHelpers();
 		$this->setUp();
+	}
+
+	/**
+	 * Carga una clase Model al vuelo
+	 * @param string $classname
+	 * @param string $alias
+	 */
+	protected function loadModel($classname, $alias = null) {
+		if (empty($alias)) {
+			$alias = $classname;
+		}
+		if (in_array($classname, $this->loadedClass)) {
+			return;
+		}
+		$this->{$alias} = new $classname($this->Session);
+		$this->loadedClass[] = $classname;
+	}
+
+	protected function loadHelpers() {
+		if (!class_exists('Helper')) {
+			$fileHelper = LAYER_PATH . $this->helpersPath . "/helpers/Helper.php";
+			require_once $fileHelper;
+		}
+		foreach ($this->helpers as $helper) {
+			$file = LAYER_PATH . $this->helpersPath . "/helpers/{$helper}.php";
+			if (is_readable($file)) {
+				require_once $file;
+			}
+			if (is_array($helper)) {
+				$this->loadModel($helper[0], $helper[1]);
+			} else {
+				$this->loadModel($helper);
+			}
+		}
 	}
 
 	/**

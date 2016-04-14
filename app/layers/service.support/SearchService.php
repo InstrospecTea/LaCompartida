@@ -244,16 +244,20 @@ class SearchService implements ISearchService {
 
 	private function makeRestrictionName($for, $property) {
 		if (preg_match('/\((.*)\)/i', $property, $match)) { //is a function
-			 return $property; 
-		} 
+			 return $property;
+		}
 		return $for . '.' . $property;
 	}
 
-	private function makeAliasName($field_name) {
-		if (preg_match('/^[a-z][a-z0-9_]+\((.*)\)/i', $field_name, $match)) { //is a function
+	private function makeAliasName(&$field_name) {
+		$name = $field_name;
+		if (preg_match('/^(.+)[\t\s]+as[\t\s]+(.*)$/i', $field_name, $match)) { //has alias
 			$field_name = $match[1];
+			return $match[2];
+		} else if (preg_match('/^[a-z][a-z0-9_]+\((.*)\)/i', $field_name, $match)) { //is a function
+			$name = $match[1];
 		}
-		return str_replace('.', '_', strtolower($field_name));
+		return str_replace('.', '_', strtolower($name));
 	}
 
 	private function prepareGrouping(Criteria $criteria, SearchCriteria $searchCriteria) {
