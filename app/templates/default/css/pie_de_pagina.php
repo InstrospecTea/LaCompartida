@@ -95,10 +95,10 @@ $html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header);
 </div>
 
 <div style='mso-element:footer' id=f1>
-
+<?php if($page_nums) : ?>
 	<p class=MsoFooter align=right style='text-align:right'><span style='mso-field-code:
 " PAGE   \\* MERGEFORMAT "'><span style='mso-no-proof:yes'>1</span></span></p>
-
+<?php endif; ?>
 <?php
 $html_pie = str_replace('%img_dir%', Conf::ImgDir(), $html_pie);
 ?>

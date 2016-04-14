@@ -239,14 +239,14 @@ class DocGenerator {
 		}
 
 		if (( $this->estado == 'CREADO' || $this->estado == 'EN REVISION' ) && ( Conf::dbUser() != 'jjr')) {
-			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina_borrador.php?id_formato=$id_formato') h1;\r\n";
-			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina_borrador.php?id_formato=$id_formato') f1;\r\n";
+			$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina_borrador.php?id_formato={$id_formato}&page_nums={$this->pageNums}') h1;\r\n";
+			$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina_borrador.php?id_formato={$id_formato}&page_nums={$this->pageNums}') f1;\r\n";
 		} else {
 			if ($html_header) {
-				$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato') h1;\r\n";
+				$this->formatBuffer .= "   mso-header: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato={$id_formato}&page_nums={$this->pageNums}') h1;\r\n";
 			}
 			if ($html_pie) {
-				$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato&lang=" . $this->lang . "') f1;\r\n";
+				$this->formatBuffer .= "   mso-footer: url('" . Conf::Host() . "app/templates/default/css/pie_de_pagina.php?id_formato=$id_formato&lang={$this->lang}&page_nums={$this->pageNums}') f1;\r\n";
 			}
 		}
 		$this->formatBuffer .= "}\r\n";
