@@ -2,7 +2,7 @@
 
 class ActivitiesBusiness extends AbstractBusiness implements IActivitiesBusiness {
 
-	public function getActivitesByMatterId($matterId = null, $active = null) {
+	public function getActivitesByMatterId($matterId = null, $active = null, $all = false) {
 		$activities = array();
 		$matter = null;
 
@@ -23,10 +23,12 @@ class ActivitiesBusiness extends AbstractBusiness implements IActivitiesBusiness
 			$matter = $matters[0];
 		}
 
-		$searchCriteria->add_scope(
-			'matterRestrictions',
-			array('args' => array($matter))
-		);
+		if (!$all) {
+			$searchCriteria->add_scope(
+				'matterRestrictions',
+				array('args' => array($matter))
+			);
+		}
 
 		if (!is_null($active)) {
 			$searchCriteria
