@@ -32,8 +32,7 @@ class ApiAuth {
 		'PRO' => 'normalPermissions',
 		'REP' => 'normalPermissions',
 		'REV' => 'reviewerPermissions',
-		'ADM' => 'adminPermissions',
-		'ALL' => 'adminPermissions'
+		'ADM' => 'adminPermissions'
 	);
 
 	public static function normalPermissions() {
