@@ -27,9 +27,10 @@ class ActivitiesAPI extends AbstractSlimAPI {
 
 		$projectId = $Slim->request()->params('project_id');
 		$active = $Slim->request()->params('active');
-		$all = !empty($Slim->request()->params('all'));
+		$all = $Slim->request()->params('all');
+		$allActivities = !empty($all);
 
-		$activities = $ActivitiesBusiness->getActivitesByMatterId($projectId, $active, $all);
+		$activities = $ActivitiesBusiness->getActivitesByMatterId($projectId, $active, $allActivities);
 
 		$this->present($activities, self::$ActivityWithProjectEntity);
 	}
