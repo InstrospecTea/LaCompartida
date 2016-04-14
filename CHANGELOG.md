@@ -1,5 +1,10 @@
 # Changelog
 
+## [Release 16.9.0](https://github.com/LemontechSA/ttb/pull/1403)
+Wednesday, April 13th
+* **Feature** [Agregar configuracion mostrar tramites no cobrables](https://github.com/LemontechSA/ttb/pull/1402)
+* **Feature** [Agrega columna con en numero de cobro del tramite](https://github.com/LemontechSA/ttb/pull/1401)
+
 ## Hotfix 16.8.2
 Tuesday, April 12th
 * **Fix** [Corrige problema en creación de asunto](https://github.com/LemontechSA/ttb/pull/1399)
