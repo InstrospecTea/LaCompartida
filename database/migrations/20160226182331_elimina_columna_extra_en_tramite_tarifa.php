@@ -9,7 +9,7 @@ class EliminaColumnaExtraEnTramiteTarifa extends \Database\Migration implements 
    * @return void
    */
 	function up() {
-		$this->addQueryUp('ALTER TABLE `tramite_tarifa` DROP COLUMN `guardado`');
+		$this->addQueryUp('ALTER TABLE `tramite_tarifa` DROP COLUMN `guardado`;');
 	}
 
 	/**
