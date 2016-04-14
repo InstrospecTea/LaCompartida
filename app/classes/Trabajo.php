@@ -726,7 +726,8 @@ class Trabajo extends Objeto
 			`work`.`revisado` AS `revised`,
 			`matter`.`id_asunto`,
 			`client`.`id_cliente`,
-			`activity`.`id_actividad`
+			`activity`.`id_actividad`,
+			`user`.`retraso_max`
 			FROM `trabajo` AS `work`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
 				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
@@ -750,7 +751,7 @@ class Trabajo extends Objeto
 		$date_now = strtotime('now');
 		while ($work = $Statement->fetch(PDO::FETCH_OBJ)) {
 			$read_only = 0;
-			if (!empty($work->date_read_only)) {
+			if (!empty($work->date_read_only) && ($work->retraso_max > 0)) {
 				if ($date_now >= strtotime($work->date_read_only)) {
 					$read_only = 1;
 				}
