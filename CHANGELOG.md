@@ -2,7 +2,7 @@
 
 ## Hotfix 16.9.1
 Thursday, April 14th
-* **Fix** [Verifica la sesión al instanciar un Controller](https://github.com/LemontechSA/ttb/pull/1398)
+* **Fix** [Verifica la sesión al instanciar un Controller](https://github.com/LemontechSA/ttb/pull/1405)
 
 ## [Release 16.9.0](https://github.com/LemontechSA/ttb/pull/1403)
 Wednesday, April 13th
