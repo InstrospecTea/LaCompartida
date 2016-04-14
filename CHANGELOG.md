@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.9.2
+Thursday, April 14th
+* **Fix** [Muestra el número de página segun opciones de impresión](https://github.com/LemontechSA/ttb/pull/1406)
+
 ## Hotfix 16.9.1
 Thursday, April 14th
 * **Fix** [Verifica la sesión al instanciar un Controller](https://github.com/LemontechSA/ttb/pull/1405)
