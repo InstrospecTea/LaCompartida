@@ -13,9 +13,6 @@ jQuery(function() {
 			for (var i in response) {
 				messages[i] = response[i];
 			};
-		},
-		error: function() {
-			//
 		}
 	});
 
@@ -110,9 +107,6 @@ jQuery.loadData = function(rate_id) {
 				tarifa = response['errands_rate_values'][i];
 				jQuery('[name="tarifa_moneda[' + tarifa['id_moneda'] + '][' + tarifa['id_tramite_tipo'] + ']"]').val(tarifa['tarifa']);
 			};
-		},
-		error: function() {
-			//
 		}
 	});
 };
@@ -134,9 +128,6 @@ jQuery.deleteRate = function(rate_id) {
 			} else {
 				alert(response.message);
 			};
-		},
-		error: function(response) {
-			//
 		}
 	});
 };
@@ -193,9 +184,6 @@ jQuery.saveRate = function() {
 			} else {
 				alert(response.message);
 			};
-		},
-		error: function(response) {
-			//
 		}
 	});
 };
@@ -213,9 +201,6 @@ jQuery.contractsWithRate = function(rate_id) {
 		async: false,
 		success: function(response) {
 			num_contratos = response.num_rows;
-		},
-		error: function() {
-			//
 		}
 	});
 
@@ -237,9 +222,6 @@ jQuery.changeDefaultRateOnContract = function(rate_id) {
 			if (response.success) {
 				jQuery.deleteRate(rate_id);
 			};
-		},
-		error: function() {
-			//
 		}
 	});
 
