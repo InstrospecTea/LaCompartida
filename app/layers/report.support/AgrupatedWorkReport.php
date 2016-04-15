@@ -1,7 +1,5 @@
 <?php
 
-require_once APP_PATH . '/classes/Html.php';
-
 class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport {
 
 	protected $helpers = array(array('\TTB\Html', 'Html'));
