@@ -5,6 +5,7 @@ require_once APP_PATH . '/classes/Html.php';
 class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport {
 
 	protected $helpers = array(array('\TTB\Html', 'Html'));
+	private $timeFormat = 'H:i';
 
 	protected function setUp() {
 		$this->loadBusiness('Coining');
@@ -407,7 +408,7 @@ HTML;
 				}
 				$total_minutos_cliente = round($total_duracion_cliente * 60, 0);
 				if ($this->parameters['time'] == 'horas') {
-					$total_minutos_cliente = Utiles::Decimal2GlosaHora($total_duracion_cliente);
+					$total_minutos_cliente = UtilesApp::Decimal2Time($total_duracion_cliente, $this->timeFormat);
 				}
 
 				if ($with_invoiced) {
@@ -458,7 +459,7 @@ HTML;
 				}
 				$minutos_cliente = round($total_duracion_cliente * 60);
 				if ($this->parameters['time'] == 'horas') {
-					$minutos_cliente = Utiles::Decimal2GlosaHora($total_duracion_cliente);
+					$minutos_cliente = UtilesApp::Decimal2Time($total_duracion_cliente, $this->timeFormat);
 				}
 				if ($with_invoiced) {
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
@@ -479,7 +480,7 @@ HTML;
 			}
 			$total_minutos_abogado = round($total_duracion_abogado * 60, 0);
 			if ($this->parameters['time'] == 'horas') {
-				$total_minutos_abogado = Utiles::Decimal2GlosaHora($total_duracion_abogado);
+				$total_minutos_abogado = UtilesApp::Decimal2Time($total_duracion_abogado, $this->timeFormat);
 			}
 			if ($with_invoiced) {
 				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
@@ -515,7 +516,7 @@ HTML;
 			);
 			$duracion = round($fila['duracion'] * 60, 0);
 			if ($this->parameters['time'] == 'horas') {
-				$duracion = Utiles::Decimal2GlosaHora($fila['duracion']);
+				$duracion = UtilesApp::Decimal2Time($fila['duracion'], $this->timeFormat);
 			}
 			if ($with_invoiced) {
 				$tds .= $this->Html->tag('td', $this->formatDate($fila['fecha'], true), array('class' => 'col1'));
@@ -547,7 +548,7 @@ HTML;
 
 		$total_asuntos = round($total * 60, 0);
 		if ($this->parameters['time'] == 'horas') {
-			$total_asuntos = Utiles::Decimal2GlosaHora($total);
+			$total_asuntos = UtilesApp::Decimal2Time($total, $this->timeFormat);
 		}
 		if ($with_invoiced) {
 			$ths .= $this->Html->tag('th', '', array('class' => 'col1'));
