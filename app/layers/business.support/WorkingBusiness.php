@@ -148,7 +148,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 				'Work.cobrable',
 				'Work.tarifa_hh_estandar',
 				'Work.id_moneda',
-				'time_to_sec(Work.duracion) / 3600  AS work_duracion',
+				'time_to_sec(Work.duracion) / 3600 AS work_duracion',
 				'time_to_sec(Work.duracion_cobrada) / 3600 AS work_duracion_cobrada',
 				'User.id_usuario',
 				'User.nombre',
