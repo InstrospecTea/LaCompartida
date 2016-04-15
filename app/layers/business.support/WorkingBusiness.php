@@ -333,7 +333,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$searchCriteria->filter('id_tramite')->restricted_by('equals')->compare_with($id);
 
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 
 		if (empty($results[0])) {
 			return null;
@@ -350,7 +350,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$searchCriteria->filter('id_trabajo')->restricted_by('equals')->compare_with($id);
 
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria, $fields);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria, $fields);
 
 		if (empty($results[0])) {
 			throw new BusinessException('Work with id ' . $id . ' is not found.');
@@ -382,8 +382,8 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		} else if ($work->fields['tarifa_hh'] > 0 && $work->fields['id_cobro'] > 0) {
 			return $work->fields['tarifa_hh'];
 		} else if ($work->fields['id_tramite']) {
-			$idErrandType = $this->getErrandType($work->fields['id_tramite']);
-			return Funciones::TramiteTarifa($this->Session, $idErrandType, $id_charge_coin, $work->fields['codigo_asunto']);
+			$id_errand_type = $this->getErrandType($work->fields['id_tramite']);
+			return Funciones::TramiteTarifa($this->Session, $id_errand_type, $id_charge_coin, $work->fields['codigo_asunto']);
 		} else {
 			return Funciones::Tarifa($this->Session, $work->fields['id_usuario'], $id_contract_coin, $work->fields['codigo_asunto']);
 		}
