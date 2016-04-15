@@ -266,13 +266,10 @@ class SearchService implements ISearchService {
 		} else if (preg_match('/^[a-z][a-z0-9_]+\((.*)\)/i', $field_name, $match)) {
 			$alias_name = str_replace('.', '_', strtolower($match[1]));
 		} else {
-			$alias_name = $field_name;
+			$alias_name = str_replace('.', '_', strtolower($field_name));
 		}
 
-		return array(
-			'field' => $field_name,
-			'alias' => str_replace('.', '_', strtolower($alias_name))
-		);
+		return array('field' => $field_name, 'alias' => $alias_name);
 	}
 
 	private function prepareGrouping(Criteria $criteria, SearchCriteria $searchCriteria) {
