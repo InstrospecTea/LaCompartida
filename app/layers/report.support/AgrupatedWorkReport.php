@@ -42,25 +42,25 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$lawyer_name = "{$fila->fields['lawyer_apellido1']}, {$fila->fields['lawyer_nombre']}";
 			if (empty($grupos[$id_usuario])) {
 				$grupos[$id_usuario] = array(
-						'nombre' => $lawyer_name,
-						'clientes' => array()
+					'nombre' => $lawyer_name,
+					'clientes' => array()
 				);
 			}
 
 			$codigo_cliente = $fila->fields['client_codigo_cliente'];
 			if (empty($grupos[$id_usuario]['clientes'][$codigo_cliente])) {
 				$grupos[$id_usuario]['clientes'][$codigo_cliente] = array(
-						'nombre' => $fila->fields['client_glosa_cliente'],
-						'asuntos' => array()
+					'nombre' => $fila->fields['client_glosa_cliente'],
+					'asuntos' => array()
 				);
 			}
 
 			$id_asunto = $fila->fields['matter_id_asunto'];
 			if (empty($grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto])) {
 				$grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto] = array(
-						'codigo_cliente' => $codigo_cliente,
-						'nombre' => $fila->fields['matter_glosa_asunto'],
-						'trabajos' => array()
+					'codigo_cliente' => $codigo_cliente,
+					'nombre' => $fila->fields['matter_glosa_asunto'],
+					'trabajos' => array()
 				);
 			}
 
@@ -101,25 +101,25 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 
 			if (empty($grupos[$id_socio])) {
 				$grupos[$id_socio] = array(
-						'nombre' => "{$fila->fields['user_apellido1']}, {$fila->fields['user_nombre']}",
-						'clientes' => array()
+					'nombre' => "{$fila->fields['user_apellido1']}, {$fila->fields['user_nombre']}",
+					'clientes' => array()
 				);
 			}
 
 			$codigo_cliente = $fila->fields['client_codigo_cliente'];
 			if (empty($grupos[$id_socio]['clientes'][$codigo_cliente])) {
 				$grupos[$id_socio]['clientes'][$codigo_cliente] = array(
-						'nombre' => $fila->fields['client_glosa_cliente'],
-						'asuntos' => array()
+					'nombre' => $fila->fields['client_glosa_cliente'],
+					'asuntos' => array()
 				);
 			}
 
 			$id_asunto = $fila->fields['matter_id_asunto'];
 			if (empty($grupos[$id_socio]['clientes'][$codigo_cliente]['asuntos'][$id_asunto])) {
 				$grupos[$id_socio]['clientes'][$codigo_cliente]['asuntos'][$id_asunto] = array(
-						'codigo_cliente' => $codigo_cliente,
-						'nombre' => $fila->fields['matter_glosa_asunto'],
-						'trabajos' => array()
+					'codigo_cliente' => $codigo_cliente,
+					'nombre' => $fila->fields['matter_glosa_asunto'],
+					'trabajos' => array()
 				);
 			}
 
@@ -461,14 +461,14 @@ HTML;
 				}
 				if ($with_invoiced) {
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
-									$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
-									$this->Html->tag('th', $minutos_cliente, array('class' => 'col3')) .
-									$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_cliente, $currency, $this->defaultLanguage), array('class' => 'col3'))
+						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
+						$this->Html->tag('th', $minutos_cliente, array('class' => 'col3')) .
+						$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_cliente, $currency, $this->defaultLanguage), array('class' => 'col3'))
 					);
 				} else {
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
-									$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
-									$this->Html->tag('th', $minutos_cliente, array('class' => 'col3'))
+						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
+						$this->Html->tag('th', $minutos_cliente, array('class' => 'col3'))
 					);
 				}
 				$html_asuntos .= $this->Html->tag('table', $trs, array('class' => 'table'));
@@ -482,14 +482,14 @@ HTML;
 			}
 			if ($with_invoiced) {
 				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
-								$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
-								$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3')) .
-								$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_abogado, $currency, $this->defaultLanguage), array('class' => 'col3'))
+					$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
+					$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3')) .
+					$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_abogado, $currency, $this->defaultLanguage), array('class' => 'col3'))
 				);
 			} else {
 				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
-								$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
-								$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3'))
+					$this->Html->tag('th', __('Total abogado'), array('class' => 'col2')) .
+					$this->Html->tag('th', $total_minutos_abogado, array('class' => 'col3'))
 				);
 			}
 
@@ -573,9 +573,9 @@ HTML;
 		}
 
 		return array(
-				'html' => $this->Html->tag('table', $trs, array('class' => 'table')),
-				'duracion' => $total,
-				'total_facturado' => $total_facturado
+			'html' => $this->Html->tag('table', $trs, array('class' => 'table')),
+			'duracion' => $total,
+			'total_facturado' => $total_facturado
 		);
 	}
 

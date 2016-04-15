@@ -179,7 +179,7 @@ class SearchService implements ISearchService {
 				$criteria->add_select($searchCriteria->entity() . '.' . $entity->getIdentity());
 			}
 			foreach ($filterProperties as $filter_property) {
-				$field_name = $this->makeFieldName($searchCriteria->entity(), $filter_property );
+				$field_name = $this->makeFieldName($searchCriteria->entity(), $filter_property);
 				$criteria = $this->addSelectField($criteria, $field_name, $genericMode);
 			}
 		}
@@ -244,7 +244,7 @@ class SearchService implements ISearchService {
 
 	private function makeRestrictionName($for, $property) {
 		if (preg_match('/\((.*)\)/i', $property, $match)) { //is a function
-			 return $property;
+			return $property;
 		}
 		return $for . '.' . $property;
 	}

@@ -136,26 +136,26 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		}
 
 		$filter_properties = array(
-				'Client.codigo_cliente',
-				'Client.glosa_cliente',
-				'Contract.id_moneda',
-				'Charge.id_moneda',
-				'Matter.id_asunto',
-				'Matter.glosa_asunto',
-				'Work.id_trabajo',
-				'Work.descripcion',
-				'Work.fecha',
-				'Work.cobrable',
-				'Work.tarifa_hh_estandar',
-				'Work.id_moneda',
-				'time_to_sec(Work.duracion) / 3600 AS work_duracion',
-				'time_to_sec(Work.duracion_cobrada) / 3600 AS work_duracion_cobrada',
-				'User.id_usuario',
-				'User.nombre',
-				'User.apellido1',
-				'Lawyer.id_usuario',
-				'Lawyer.nombre',
-				'Lawyer.apellido1'
+			'Client.codigo_cliente',
+			'Client.glosa_cliente',
+			'Contract.id_moneda',
+			'Charge.id_moneda',
+			'Matter.id_asunto',
+			'Matter.glosa_asunto',
+			'Work.id_trabajo',
+			'Work.descripcion',
+			'Work.fecha',
+			'Work.cobrable',
+			'Work.tarifa_hh_estandar',
+			'Work.id_moneda',
+			'time_to_sec(Work.duracion) / 3600 AS work_duracion',
+			'time_to_sec(Work.duracion_cobrada) / 3600 AS work_duracion_cobrada',
+			'User.id_usuario',
+			'User.nombre',
+			'User.apellido1',
+			'Lawyer.id_usuario',
+			'Lawyer.nombre',
+			'Lawyer.apellido1'
 		);
 
 		$reportData = $this->SearchingBusiness->searchByGenericCriteria(
@@ -168,18 +168,18 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
 		$this->loadReport('AgrupatedWork', 'report');
 		$this->report->setParameters(
-						array(
-								'companyName' => Configure::read('NombreEmpresa'),
-								'groupByPartner' => empty($data['groupByPartner']) ? 0 : $data['groupByPartner'],
-								'invoicedValue' => empty($data['invoicedValue']) ? 0 : $data['invoicedValue'],
-								'agrupationType' => $data['agrupationType'],
-								'showHours' => $data['showHours'],
-								'filterCurrency' => $filter_currency,
-								'baseCurrency' => $base_currency,
-								'since' => $data['fecha_ini'],
-								'until' => $data['fecha_fin'],
-								'time' => $data['time']
-						)
+			array(
+				'companyName' => Configure::read('NombreEmpresa'),
+				'groupByPartner' => empty($data['groupByPartner']) ? 0 : $data['groupByPartner'],
+				'invoicedValue' => empty($data['invoicedValue']) ? 0 : $data['invoicedValue'],
+				'agrupationType' => $data['agrupationType'],
+				'showHours' => $data['showHours'],
+				'filterCurrency' => $filter_currency,
+				'baseCurrency' => $base_currency,
+				'since' => $data['fecha_ini'],
+				'until' => $data['fecha_fin'],
+				'time' => $data['time']
+			)
 		);
 		$this->report->setData($reportData);
 		$this->report->setOutputType('WKPDF');
@@ -272,9 +272,9 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		}
 
 		$filter_properties = array(
-				'Lawyer.id_usuario',
-				'Lawyer.nombre',
-				'Lawyer.apellido1'
+			'Lawyer.id_usuario',
+			'Lawyer.nombre',
+			'Lawyer.apellido1'
 		);
 
 		$searchCriteria->grouped_by('id_usuario');
@@ -291,14 +291,14 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$moneda_filtro = $this->CoiningBusiness->getCurrency($data['moneda_filtro']);
 		$moneda_base = $this->CoiningBusiness->getBaseCurrency();
 		$this->report->setParameters(
-						array(
-								'fechaIni' => $data['fecha_ini'],
-								'fechaFin' => $data['fecha_fin'],
-								'mostrarValor' => $data['mostrar_valores'],
-								'format' => $data['opc'],
-								'monedaFiltro' => $moneda_filtro,
-								'monedaBase' => $moneda_base
-						)
+			array(
+				'fechaIni' => $data['fecha_ini'],
+				'fechaFin' => $data['fecha_fin'],
+				'mostrarValor' => $data['mostrar_valores'],
+				'format' => $data['opc'],
+				'monedaFiltro' => $moneda_filtro,
+				'monedaBase' => $moneda_base
+			)
 		);
 		$this->report->setData($reportData);
 		$this->report->setOutputType('SR');

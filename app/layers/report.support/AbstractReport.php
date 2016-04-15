@@ -76,17 +76,17 @@ abstract class AbstractReport implements BaseReport {
 		try {
 			$class = new ReflectionClass($classname);
 			$this->reportEngine = $class->newInstance();
-		} catch(ReflectionException $ex) {
+		} catch (ReflectionException $ex) {
 			throw new ReportException("There is not a ReportEngine defined for the $type output.");
 		}
 	}
 
 	/**
-	* Asigna los datos a la instancia de reporte. Estos datos son los que el reporte utiliza para generar agrupaciones
-	* y totalizaciones.
-	* @param array $data
-	* @return void
-	*/
+	 * Asigna los datos a la instancia de reporte. Estos datos son los que el reporte utiliza para generar agrupaciones
+	 * y totalizaciones.
+	 * @param array $data
+	 * @return void
+	 */
 	function setData($data) {
 		$this->data = $data;
 		$this->doAgrupations();
@@ -105,7 +105,6 @@ abstract class AbstractReport implements BaseReport {
 		} else {
 			throw new ReportException('This report instance does not have an instance of ReportEngine.');
 		}
-
 	}
 
 	/**
@@ -126,10 +125,10 @@ abstract class AbstractReport implements BaseReport {
 	}
 
 	/**
-	* Retorna una instancia que pertenece a la jerarquía de {@link ReportEngine} según el tipo indicado como parametro.
-	* @return mixed
-	* @throws ReportException
-	*/
+	 * Retorna una instancia que pertenece a la jerarquía de {@link ReportEngine} según el tipo indicado como parametro.
+	 * @return mixed
+	 * @throws ReportException
+	 */
 	protected function getReportEngine() {
 		if (!empty($this->reportEngine)) {
 			return $this->reportEngine;
@@ -174,6 +173,4 @@ abstract class AbstractReport implements BaseReport {
 	abstract protected function present();
 
 	abstract protected function setUp();
-
-
 }
