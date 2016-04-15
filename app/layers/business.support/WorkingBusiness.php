@@ -2,8 +2,6 @@
 
 class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
-	private $cachedData = array();
-
 	public function agrupatedWorkReport($data) {
 
 		$this->loadBusiness('Searching');
