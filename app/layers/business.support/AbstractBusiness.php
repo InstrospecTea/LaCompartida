@@ -15,6 +15,8 @@ class AbstractBusiness implements BaseBusiness {
 	public function __construct(Sesion $sesion) {
 		$this->sesion = $sesion;
 		$this->Session = $sesion;
+
+		Configure::setSession($this->Session);
 	}
 
 	/**
