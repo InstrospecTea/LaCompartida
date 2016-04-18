@@ -6,11 +6,48 @@ abstract class AbstractReport implements BaseReport {
 	public $reportEngine;
 	public $parameters;
 	public $Session;
+	protected $helpers = array();
+	protected $helpersPath = '/view';
 	private $loadedClass = array();
 
 	public function __construct(Sesion $Session) {
 		$this->Session = $Session;
+		$this->loadHelpers();
 		$this->setUp();
+	}
+
+	/**
+	 * Carga una clase Model al vuelo
+	 * @param string $classname
+	 * @param string $alias
+	 */
+	protected function loadModel($classname, $alias = null) {
+		if (empty($alias)) {
+			$alias = $classname;
+		}
+		if (in_array($classname, $this->loadedClass)) {
+			return;
+		}
+		$this->{$alias} = new $classname($this->Session);
+		$this->loadedClass[] = $classname;
+	}
+
+	protected function loadHelpers() {
+		if (!class_exists('Helper')) {
+			$fileHelper = LAYER_PATH . $this->helpersPath . "/helpers/Helper.php";
+			require_once $fileHelper;
+		}
+		foreach ($this->helpers as $helper) {
+			$file = LAYER_PATH . $this->helpersPath . "/helpers/{$helper}.php";
+			if (is_readable($file)) {
+				require_once $file;
+			}
+			if (is_array($helper)) {
+				$this->loadModel($helper[0], $helper[1]);
+			} else {
+				$this->loadModel($helper);
+			}
+		}
 	}
 
 	/**
@@ -39,17 +76,17 @@ abstract class AbstractReport implements BaseReport {
 		try {
 			$class = new ReflectionClass($classname);
 			$this->reportEngine = $class->newInstance();
-		} catch(ReflectionException $ex) {
+		} catch (ReflectionException $ex) {
 			throw new ReportException("There is not a ReportEngine defined for the $type output.");
 		}
 	}
 
 	/**
-	* Asigna los datos a la instancia de reporte. Estos datos son los que el reporte utiliza para generar agrupaciones
-	* y totalizaciones.
-	* @param array $data
-	* @return void
-	*/
+	 * Asigna los datos a la instancia de reporte. Estos datos son los que el reporte utiliza para generar agrupaciones
+	 * y totalizaciones.
+	 * @param array $data
+	 * @return void
+	 */
 	function setData($data) {
 		$this->data = $data;
 		$this->doAgrupations();
@@ -68,7 +105,6 @@ abstract class AbstractReport implements BaseReport {
 		} else {
 			throw new ReportException('This report instance does not have an instance of ReportEngine.');
 		}
-
 	}
 
 	/**
@@ -89,10 +125,10 @@ abstract class AbstractReport implements BaseReport {
 	}
 
 	/**
-	* Retorna una instancia que pertenece a la jerarquía de {@link ReportEngine} según el tipo indicado como parametro.
-	* @return mixed
-	* @throws ReportException
-	*/
+	 * Retorna una instancia que pertenece a la jerarquía de {@link ReportEngine} según el tipo indicado como parametro.
+	 * @return mixed
+	 * @throws ReportException
+	 */
 	protected function getReportEngine() {
 		if (!empty($this->reportEngine)) {
 			return $this->reportEngine;
@@ -137,6 +173,4 @@ abstract class AbstractReport implements BaseReport {
 	abstract protected function present();
 
 	abstract protected function setUp();
-
-
 }
