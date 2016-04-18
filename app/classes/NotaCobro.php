@@ -7849,20 +7849,20 @@ class NotaCobro extends Cobro {
 
 			case 'DETALLE_COBRO_EQUIVALENTE': //GenerarDocumentoComun
 				global $x_resultados;
-				$simbolo_moneda = $cobro_moneda->moneda[$this->fields['id_moneda_base']]['simbolo'];
-				$cifras_decimales = $cobro_moneda->moneda[$this->fields['id_moneda_base']]['cifras_decimales'];
-				$separador_decimales = $cobro_moneda->moneda[$this->fields['id_moneda_base']]['simbolo'];
+				$simbolo_moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'];
+				$cifras_decimales = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'];
+				$separador_decimales = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'];
 
 				if ($this->fields['monto_trabajos'] > 0 && $this->fields['monto_tramites'] > 0) {
 					$html = str_replace('%trabajos%', __('Equivalente Trabajos'), $html);
-					$html = str_replace('%valor_trabajos%', $simbolo_moneda . $this->espacio . number_format($x_resultados['monto_trabajos'][$this->fields['id_moneda_base']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor_trabajos%', $simbolo_moneda . $this->espacio . number_format($x_resultados['monto_trabajos'][$this->fields['opc_moneda_total']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 					$html = str_replace('%tramites%', __('Equivalente Trámites'), $html);
-					$html = str_replace('%valor_tramites%', $simbolo_moneda . $this->espacio . number_format($x_resultados['monto_tramites'][$this->fields['id_moneda_base']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+					$html = str_replace('%valor_tramites%', $simbolo_moneda . $this->espacio . number_format($x_resultados['monto_tramites'][$this->fields['opc_moneda_total']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 
 				$html = str_replace('%subtotal_honorarios%', __('Honorarios'), $html);
-				$html = str_replace('%valor_subtotal_honorarios%', $simbolo_moneda . $this->espacio . number_format($x_resultados['monto_subtotal'][$this->fields['id_moneda_base']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_subtotal_honorarios%', $simbolo_moneda . $this->espacio . number_format($x_resultados['monto_subtotal'][$this->fields['opc_moneda_total']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				$html = str_replace('%descuento%', __('Equivalente Descuento'), $html);
 				if ($this->fields['porcentaje_descuento'] > 0) {
@@ -7870,10 +7870,10 @@ class NotaCobro extends Cobro {
 				} else {
 					$html = str_replace('%porcentaje_descuento%', '', $html);
 				}
-				$html = str_replace('%valor_descuento%', $simbolo_moneda . $this->espacio . number_format($x_resultados['descuento'][$this->fields['id_moneda_base']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_descuento%', $simbolo_moneda . $this->espacio . number_format($x_resultados['descuento'][$this->fields['opc_moneda_total']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				$html = str_replace('%monedabase%', __('Equivalente a'), $html);
-				$html = str_replace('%valor_honorarios_monedabase%', $simbolo_moneda . $this->espacio . number_format($x_resultados['monto_honorarios'][$this->fields['id_moneda_base']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_honorarios_monedabase%', $simbolo_moneda . $this->espacio . number_format($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 
 				break;
