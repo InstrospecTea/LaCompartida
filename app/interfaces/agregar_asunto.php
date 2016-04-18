@@ -1086,8 +1086,6 @@ function CambioDatosFacturacion(id_cliente) {
 	}, 'json');
 
 }
-
-	jQuery('#campo_codigo_cliente').val(1804).change();
 </script>
 
 <?php echo InputId::Javascript($Sesion) ?>
