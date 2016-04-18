@@ -75,12 +75,7 @@ class EntitiesCest
 		$I->seeResponseIsJSON();
 
 		$I->seeResponseContains('"code":"IncrementalStep"');
-		$I->seeResponseContains('"code":"UseWorkingAreas"');
 		$I->seeResponseContains('"code":"UseActivities"');
-		$I->seeResponseContains('"code":"UseAreas"');
-		$I->seeResponseContains('"code":"UseWorkRate"');
-		$I->seeResponseContains('"code":"UseRequester"');
-		$I->seeResponseContains('"code":"UseUppercase"');
 		$I->seeResponseContains('"code":"AllowBillable"');
 		$I->seeResponseContains('"code":"MaxWorkDuration"');
 	}

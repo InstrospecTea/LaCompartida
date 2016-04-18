@@ -1,4 +1,7 @@
 <?php
+
+namespace Api\V2;
+
 /**
  *
  * Clase con métodos para login en API
@@ -10,7 +13,7 @@ class LoginAPI extends AbstractSlimAPI {
 		$Session = $this->session;
 		$Slim = $this->slim;
 
-		$UserToken = new UserToken($Session);
+		$UserToken = new \UserToken($Session);
 
 		$params = array();
 		if ($Slim->request()->params('user')) {
@@ -39,7 +42,7 @@ class LoginAPI extends AbstractSlimAPI {
 			$this->halt(__('Invalid application key data'), 'InvalidAppKey');
 		}
 
-		if (strtolower(UtilesApp::Getconf($Session, 'NombreIdentificador')) == 'rut') {
+		if (strtolower(\UtilesApp::Getconf($Session, 'NombreIdentificador')) == 'rut') {
 			$user_array = preg_split('/[-]/', $user);
 			$user = $user_array[0];
 			if (count($user_array) == 2) {
@@ -70,6 +73,5 @@ class LoginAPI extends AbstractSlimAPI {
 			)
 		);
 	}
-
 
 }

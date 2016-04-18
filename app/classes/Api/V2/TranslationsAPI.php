@@ -1,4 +1,6 @@
 <?php
+namespace Api\V2;
+
 /**
  *
  * Clase con métodos para Traducciones

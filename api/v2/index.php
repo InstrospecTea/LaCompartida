@@ -25,7 +25,7 @@ $Slim->map(':x+', function($x) {
 })->via('OPTIONS');
 
 $Slim->post('/login', function () use ($Session, $Slim) {
-	$API = new LoginAPI($Session, $Slim);
+	$API = new Api\V2\LoginAPI($Session, $Slim);
 	$API->login();
 });
 
@@ -60,7 +60,7 @@ $Slim->get('/tasks', function () use ($Session, $Slim) {
 });
 
 $Slim->get('/translations', function () use ($Session, $Slim) {
-	$API = new TranslationsAPI($Session, $Slim);
+	$API = new Api\V2\TranslationsAPI($Session, $Slim);
 	$API->getTranslations();
 });
 
@@ -92,11 +92,6 @@ $Slim->put('/users/:user_id/time_entries/:id', function ($user_id, $id) use ($Se
 $Slim->delete('/users/:user_id/time_entries/:id', function ($user_id, $id)  use ($Session, $Slim) {
 	$API = new Api\V2\TimeEntriesAPI($Session, $Slim);
 	$API->deleteTimeEntryByUserId($user_id, $id);
-});
-
-$Slim->put('/users/:id', function ($id) use ($Session, $Slim) {
-	$API = new UsersAPI($Session, $Slim);
-	$API->updateUserSettings($id);
 });
 
 $Slim->run();
