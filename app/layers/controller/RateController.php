@@ -11,11 +11,11 @@ class RateController extends AbstractController {
 	public function ErrandsRate() {
 		$this->layoutTitle = __('Ingreso de Tarifas de Trámites');
 
-		$this->loadBusiness('Rating');
+		$this->loadBusiness('Rate');
 		$this->loadBusiness('Coining');
 
-		$rates = $this->RatingBusiness->getErrandsRate();
-		$errands_rate_fields = $this->RatingBusiness->getErrandsRateFields();
+		$rates = $this->RateBusiness->getErrandsRate();
+		$errands_rate_fields = $this->RateBusiness->getErrandsRateFields();
 
 		$errands_rate_table = array();
 
@@ -36,9 +36,9 @@ class RateController extends AbstractController {
 	 * @return Object
 	 */
 	public function ErrandsRateValue() {
-		$this->loadBusiness('Rating');
-		$errands_rate_values = $this->RatingBusiness->getErrandsRateValue($this->params['id_tarifa']);
-		$errand_rate_detail = $this->RatingBusiness->getErrandRateDetail($this->params['id_tarifa']);
+		$this->loadBusiness('Rate');
+		$errands_rate_values = $this->RateBusiness->getErrandsRateValue($this->params['id_tarifa']);
+		$errand_rate_detail = $this->RateBusiness->getErrandRateDetail($this->params['id_tarifa']);
 
 		$response = new stdClass();
 		$response->errand_rate_detail = $errand_rate_detail;
@@ -52,8 +52,8 @@ class RateController extends AbstractController {
 	 * @return int
 	 */
 	public function contractsWithErrandRate() {
-		$this->loadBusiness('Rating');
-		$num_contracts = $this->RatingBusiness->getContractsWithErrandRate($this->params['id_tarifa']);
+		$this->loadBusiness('Rate');
+		$num_contracts = $this->RateBusiness->getContractsWithErrandRate($this->params['id_tarifa']);
 
 		$this->renderJSON($num_contracts);
 	}
@@ -63,8 +63,8 @@ class RateController extends AbstractController {
 	 * @return Object
 	 */
 	public function changeDefaultErrandRateOnContracts() {
-		$this->loadBusiness('Rating');
-		$result = $this->RatingBusiness->updateDefaultErrandRateOnContracts($this->params['id_tarifa']);
+		$this->loadBusiness('Rate');
+		$result = $this->RateBusiness->updateDefaultErrandRateOnContracts($this->params['id_tarifa']);
 
 		$response = new stdClass();
 		$response->success = $result;
@@ -77,13 +77,13 @@ class RateController extends AbstractController {
 	 * @return Object
 	 */
 	public function deleteErrandRate() {
-		$this->loadBusiness('Rating');
-		$total_rates = $this->RatingBusiness->countRates();
+		$this->loadBusiness('Rate');
+		$total_rates = $this->RateBusiness->countRates();
 
 		$response = new stdClass();
 
 		if ($total_rates > 1) {
-			$result = $this->RatingBusiness->deleteErrandRate($this->params['id_tarifa']);
+			$result = $this->RateBusiness->deleteErrandRate($this->params['id_tarifa']);
 			if ($result == true) {
 				$response->success = true;
 				$response->message = utf8_encode(__('La tarifa trámite se ha eliminado satisfactoriamente'));
@@ -104,7 +104,7 @@ class RateController extends AbstractController {
 	 * @return Object
 	 */
 	public function saveErrandRate() {
-		$this->loadBusiness('Rating');
+		$this->loadBusiness('Rate');
 		$errand_rate_id = $this->params['params']['rate_id'];
 		$response = new stdClass();
 
@@ -123,7 +123,7 @@ class RateController extends AbstractController {
 				$errand_rate['tarifa_defecto'] = $this->params['params']['tarifa_defecto'];
 			}
 
-			$result = $this->RatingBusiness->updateErrandRate($errand_rate_id, $errand_rate, $rates);
+			$result = $this->RateBusiness->updateErrandRate($errand_rate_id, $errand_rate, $rates);
 
 			$response->success = $result ? true : false;
 			$response->message = $result ? __('La tarifa se ha modificado satisfactoriamente') : __('Ha ocurrido un problema');
@@ -138,7 +138,7 @@ class RateController extends AbstractController {
 				$errand_rate['tarifa_defecto'] = $this->params['params']['tarifa_defecto'];
 			}
 
-			$result = $this->RatingBusiness->insertErrandRate($errand_rate, $rates);
+			$result = $this->RateBusiness->insertErrandRate($errand_rate, $rates);
 
 			$response->success = $result->success ? true : false;
 			$response->message = $result->success ? __('La tarifa se ha creado satisfactoriamente') : __('Ha ocurrido un problema: ' . $result->message);

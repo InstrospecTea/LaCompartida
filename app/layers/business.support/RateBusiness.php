@@ -1,6 +1,6 @@
 <?php
 
-class RatingBusiness extends AbstractBusiness implements IRatingBusiness {
+class RateBusiness extends AbstractBusiness implements IRateBusiness {
 
 	/**
 	 * Elimina una tarifa de trámites

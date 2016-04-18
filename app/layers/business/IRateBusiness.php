@@ -1,6 +1,6 @@
 <?php
 
-interface IRatingBusiness  extends BaseBusiness {
+interface IRateBusiness  extends BaseBusiness {
 
 	/**
 	 * Elimina una tarifa de trámites
