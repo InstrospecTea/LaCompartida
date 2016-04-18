@@ -998,8 +998,6 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 </form>
 
 <script type="text/javascript">
-var form = $('formulario');
-
 jQuery('document').ready(function () {
 	jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function () {
 		CambioEncargadoSegunCliente(jQuery(this).val());
@@ -1067,42 +1065,29 @@ function CambioEncargadoSegunCliente(idcliente) {
 }
 
 function CambioDatosFacturacion(id_cliente) {
-	var url = root_dir + '/app/interfaces/ajax.php';
+	var url = root_dir + '/app/Clients/getContractData/' + id_cliente;
 
-	jQuery.get(url, {accion: 'cargar_datos_contrato', codigo_cliente: id_cliente}, function (response) {
-		if (response.indexOf('|') != -1) {
-				response = response.split('\\n');
-				response = response[0];
-				var campos = response.split('~');
-
-				if (response.indexOf('VACIO') != -1) {
-					//dejamos los campos en blanco.
-				} else {
-					for (i = 0; i < campos.length; i++) {
-						valores = campos[i].split('|');
-						jQuery('[name="factura_razon_social"]').val(valores[0] != '' ? valores[0] : '');
-						jQuery('[name="factura_direccion"]').val(valores[1] != '' ? valores[1] : '');
-						jQuery('[name="factura_rut"]').val(valores[2] != '' ? valores[2] : '');
-						jQuery('[name="factura_comuna"]').val(valores[3] != '' ? valores[3] : '');
-						jQuery('[name="factura_ciudad"]').val(valores[4] != '' ? valores[4] : '');
-						jQuery('[name="factura_giro"]').val(valores[6] != '' ? valores[6] : '');
-						jQuery('[name="factura_codigopostal"]').val(valores[7] != '' ? valores[7] : '');
-						jQuery('[name="id_pais"]').val(valores[8] != '' ? valores[8] : '');
-						jQuery('[name="cod_factura_telefono"]').val(valores[9] != '' ? valores[9] : '');
-						jQuery('[name="factura_telefono"]').val(valores[10] != '' ? valores[10] : '');
-						jQuery('[name="glosa_contrato"]').val(valores[11] != '' ? valores[11] : '');
-					}
-				}
-		} else {
-			if (response.indexOf('head') != -1) {
-				alert('Sesión Caducada');
-				top.location.href = '<?php echo Conf::Host(); ?>';
-			} else {
-				alert(response);
-			}
+	jQuery.get(url, function (response) {
+		if (!response) {
+			return;
 		}
-	}, 'text');
+
+		jQuery.each(response, function (field_name, value) {
+			var $field = jQuery('[name="' + field_name + '"]');
+			if ($field !== undefined) {
+				if ($field.is('[type=radio]')) {
+					$field.removeAttr('checked');
+					$field.filter('[value=' + value + ']').attr('checked', true).change().click();
+				} else {
+					$field.val(value);
+				}
+			}
+		});
+	}, 'json');
+
 }
+
+	jQuery('#campo_codigo_cliente').val(1804).change();
 </script>
 
 <?php echo InputId::Javascript($Sesion) ?>
