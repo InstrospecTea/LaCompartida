@@ -237,18 +237,18 @@ jQuery(document).ready(function() {
                 }
                 ?>
                 <select name="fecha_mes_desde" style='width:100px' id="fecha_mes_desde">
-                    <option value='01' <?php echo $fecha_mes_desde == 01 ? 'selected' : '' ?>><?php echo __('Enero') ?></option>
-                    <option value='02' <?php echo $fecha_mes_desde == 02 ? 'selected' : '' ?>><?php echo __('Febrero') ?></option>
-                    <option value='03' <?php echo $fecha_mes_desde == 03 ? 'selected' : '' ?>><?php echo __('Marzo') ?></option>
-                    <option value='04' <?php echo $fecha_mes_desde == 04 ? 'selected' : '' ?>><?php echo __('Abril') ?></option>
-                    <option value='05' <?php echo $fecha_mes_desde == 05 ? 'selected' : '' ?>><?php echo __('Mayo') ?></option>
-                    <option value='06' <?php echo $fecha_mes_desde == 06 ? 'selected' : '' ?>><?php echo __('Junio') ?></option>
-                    <option value='07' <?php echo $fecha_mes_desde == 07 ? 'selected' : '' ?>><?php echo __('Julio') ?></option>
-                    <option value='08' <?php echo $fecha_mes_desde == 08 ? 'selected' : '' ?>><?php echo __('Agosto') ?></option>
-                    <option value='09' <?php echo $fecha_mes_desde == 09 ? 'selected' : '' ?>><?php echo __('Septiembre') ?></option>
-                    <option value='10' <?php echo $fecha_mes_desde == 10 ? 'selected' : '' ?>><?php echo __('Octubre') ?></option>
-                    <option value='11' <?php echo $fecha_mes_desde == 11 ? 'selected' : '' ?>><?php echo __('Noviembre') ?></option>
-                    <option value='12' <?php echo $fecha_mes_desde == 12 ? 'selected' : '' ?>><?php echo __('Diciembre') ?></option>
+                    <option value='01' <?php echo $fecha_mes_desde == '01' ? 'selected' : '' ?>><?php echo __('Enero') ?></option>
+                    <option value='02' <?php echo $fecha_mes_desde == '02' ? 'selected' : '' ?>><?php echo __('Febrero') ?></option>
+                    <option value='03' <?php echo $fecha_mes_desde == '03' ? 'selected' : '' ?>><?php echo __('Marzo') ?></option>
+                    <option value='04' <?php echo $fecha_mes_desde == '04' ? 'selected' : '' ?>><?php echo __('Abril') ?></option>
+                    <option value='05' <?php echo $fecha_mes_desde == '05' ? 'selected' : '' ?>><?php echo __('Mayo') ?></option>
+                    <option value='06' <?php echo $fecha_mes_desde == '06' ? 'selected' : '' ?>><?php echo __('Junio') ?></option>
+                    <option value='07' <?php echo $fecha_mes_desde == '07' ? 'selected' : '' ?>><?php echo __('Julio') ?></option>
+                    <option value='08' <?php echo $fecha_mes_desde == '08' ? 'selected' : '' ?>><?php echo __('Agosto') ?></option>
+                    <option value='09' <?php echo $fecha_mes_desde == '09' ? 'selected' : '' ?>><?php echo __('Septiembre') ?></option>
+                    <option value='10' <?php echo $fecha_mes_desde == '10' ? 'selected' : '' ?>><?php echo __('Octubre') ?></option>
+                    <option value='11' <?php echo $fecha_mes_desde == '11' ? 'selected' : '' ?>><?php echo __('Noviembre') ?></option>
+                    <option value='12' <?php echo $fecha_mes_desde == '12' ? 'selected' : '' ?>><?php echo __('Diciembre') ?></option>
                 </select>
                 <?php
                 if (!$fecha_anio_desde) {
@@ -272,18 +272,18 @@ jQuery(document).ready(function() {
                 $fecha_mes_hasta = $fecha_mes_hasta != '' ? $fecha_mes_hasta : date('m');
                 ?>
                 <select name="fecha_mes_hasta" style='width:100px' id="fecha_mes_hasta">
-                    <option value='01' <?php echo $fecha_mes_hasta == 01 ? 'selected' : '' ?>><?php echo __('Enero') ?></option>
-                    <option value='02' <?php echo $fecha_mes_hasta == 02 ? 'selected' : '' ?>><?php echo __('Febrero') ?></option>
-                    <option value='03' <?php echo $fecha_mes_hasta == 03 ? 'selected' : '' ?>><?php echo __('Marzo') ?></option>
-                    <option value='04' <?php echo $fecha_mes_hasta == 04 ? 'selected' : '' ?>><?php echo __('Abril') ?></option>
-                    <option value='05' <?php echo $fecha_mes_hasta == 05 ? 'selected' : '' ?>><?php echo __('Mayo') ?></option>
-                    <option value='06' <?php echo $fecha_mes_hasta == 06 ? 'selected' : '' ?>><?php echo __('Junio') ?></option>
-                    <option value='07' <?php echo $fecha_mes_hasta == 07 ? 'selected' : '' ?>><?php echo __('Julio') ?></option>
-                    <option value='08' <?php echo $fecha_mes_hasta == 08 ? 'selected' : '' ?>><?php echo __('Agosto') ?></option>
-                    <option value='09' <?php echo $fecha_mes_hasta == 09 ? 'selected' : '' ?>><?php echo __('Septiembre') ?></option>
-                    <option value='10' <?php echo $fecha_mes_hasta == 10 ? 'selected' : '' ?>><?php echo __('Octubre') ?></option>
-                    <option value='11' <?php echo $fecha_mes_hasta == 11 ? 'selected' : '' ?>><?php echo __('Noviembre') ?></option>
-                    <option value='12' <?php echo $fecha_mes_hasta == 12 ? 'selected' : '' ?>><?php echo __('Diciembre') ?></option>
+                    <option value='01' <?php echo $fecha_mes_hasta == '01' ? 'selected' : '' ?>><?php echo __('Enero') ?></option>
+                    <option value='02' <?php echo $fecha_mes_hasta == '02' ? 'selected' : '' ?>><?php echo __('Febrero') ?></option>
+                    <option value='03' <?php echo $fecha_mes_hasta == '03' ? 'selected' : '' ?>><?php echo __('Marzo') ?></option>
+                    <option value='04' <?php echo $fecha_mes_hasta == '04' ? 'selected' : '' ?>><?php echo __('Abril') ?></option>
+                    <option value='05' <?php echo $fecha_mes_hasta == '05' ? 'selected' : '' ?>><?php echo __('Mayo') ?></option>
+                    <option value='06' <?php echo $fecha_mes_hasta == '06' ? 'selected' : '' ?>><?php echo __('Junio') ?></option>
+                    <option value='07' <?php echo $fecha_mes_hasta == '07' ? 'selected' : '' ?>><?php echo __('Julio') ?></option>
+                    <option value='08' <?php echo $fecha_mes_hasta == '08' ? 'selected' : '' ?>><?php echo __('Agosto') ?></option>
+                    <option value='09' <?php echo $fecha_mes_hasta == '09' ? 'selected' : '' ?>><?php echo __('Septiembre') ?></option>
+                    <option value='10' <?php echo $fecha_mes_hasta == '10' ? 'selected' : '' ?>><?php echo __('Octubre') ?></option>
+                    <option value='11' <?php echo $fecha_mes_hasta == '11' ? 'selected' : '' ?>><?php echo __('Noviembre') ?></option>
+                    <option value='12' <?php echo $fecha_mes_hasta == '12' ? 'selected' : '' ?>><?php echo __('Diciembre') ?></option>
                 </select>
                 <?php
                 if (!$fecha_anio_hasta)
