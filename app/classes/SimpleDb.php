@@ -5,17 +5,21 @@
  *
  * @author Javier
  */
-class SDB {
+use Aws\SimpleDb\SimpleDbClient;
 
-	private $sdb;
+class SimpleDb {
+
+	static private $client;
 	private $cache_time;
 
 	public function __construct($cache_time = 600) {
+
 		try {
-			$this->sdb = new AmazonSDB(Conf::AmazonKey());
+			if (empty(self::$client)) {
+				self::$client = SimpleDbClient::factory(Conf::AmazonKey());
+			}
 			$this->cache_time = $cache_time;
 		} catch (Exception $e) {
-			//algo
 		}
 	}
 
@@ -29,7 +33,7 @@ class SDB {
 
 	public function get($tabla, $llave) {
 		try {
-			$resp = $this->sdb->cache($this->cache_time)->get_attributes($tabla, $llave);
+			$resp = self::$client->cache($this->cache_time)->get_attributes($tabla, $llave);
 			if (!$resp || !$resp->isOK()) {
 				return false;
 			}
@@ -44,8 +48,8 @@ class SDB {
 		try {
 			//se serializa para poder guardar cualquier cosa (SDB solo guarda strings)
 			$data = array('data' => serialize(UtilesApp::utf8izar($valores)));
-			$this->sdb->delete_cache()->get_attributes($tabla, $llave);
-			return $this->sdb->put_attributes($tabla, $llave, $data, true)->isOK();
+			self::$client->delete_cache()->get_attributes($tabla, $llave);
+			return self::$client->put_attributes($tabla, $llave, $data, true)->isOK();
 		} catch (Exception $e) {
 			return false;
 		}
@@ -53,10 +57,11 @@ class SDB {
 
 	public function delete($tabla, $llave) {
 		try {
-			$this->sdb->delete_cache()->get_attributes($tabla, $llave);
-			return $this->sdb->delete_attributes($tabla, $llave)->isOK();
+			self::$client->delete_cache()->get_attributes($tabla, $llave);
+			return self::$client->delete_attributes($tabla, $llave)->isOK();
 		} catch (Exception $e) {
 			return false;
 		}
 	}
+
 }

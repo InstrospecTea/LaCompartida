@@ -13,7 +13,7 @@ class Debug {
 	 * @param $str
 	 * @return string
 	 */
-	function debug_echo(&$sesion, $str) {
+	static public function debug_echo(&$sesion, $str) {
 		return $sesion->usuario->TienePermiso('SADM') ? $str : '';
 	}
 
@@ -22,7 +22,7 @@ class Debug {
 	 * @param $arreglo
 	 * @return bool|void
 	 */
-	function debug_print_r(&$sesion, $arreglo) {
+	static public function debug_print_r(&$sesion, $arreglo) {
 		if ($sesion->usuario->TienePermiso('SADM')) {
 			echo '<pre>';
 			print_r($arreglo);
@@ -37,7 +37,7 @@ class Debug {
 	 * @param $str
 	 * @return bool|void
 	 */
-	function h1(&$sesion, $str) {
+	static public function h1(&$sesion, $str) {
 		if ($sesion->usuario->TienePermiso('SADM')) {
 			echo '<h1>';
 			echo $str;
@@ -50,7 +50,7 @@ class Debug {
 	/**
 	 * @param $variable
 	 */
-	function pr($variable) {
+	static public function pr($variable) {
 		echo '<pre>';
 		print_r($variable);
 		echo '</pre>';

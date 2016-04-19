@@ -1,17 +1,16 @@
 <?php
-require_once dirname(__FILE__).'/../conf.php';
 
 class Aviso {
 
 	private static $mostrar_aviso = false;
-
-	function Aviso($sesion) {
+	
+	public function __construct($sesion) {
 		$this->sesion = $sesion;
 	}
 
 	public static function Obtener() {
-		$sdb = new SDB();
-		return $sdb->get('avisos', Conf::ASDBKey());
+		$SimpleDb = new SimpleDb();
+		return $SimpleDb->get('avisos', Conf::ASDBKey());
 	}
 
 	public static function FlagOcultar(){
@@ -19,21 +18,21 @@ class Aviso {
 	}
 
 	public static function Guardar($data) {
-		$sdb = new SDB();
+		$SimpleDb = new SimpleDb();
 		$data['id'] = uniqid();
-		return $sdb->put('avisos', Conf::ASDBKey(), $data);
+		return $SimpleDb->put('avisos', Conf::ASDBKey(), $data);
 	}
 
 	public static function Eliminar() {
-		$sdb = new SDB();
+		$SimpleDb = new SimpleDb();
 		self::$mostrar_aviso = false;
-		return $sdb->delete('avisos', Conf::ASDBKey());
+		return $SimpleDb->delete('avisos', Conf::ASDBKey());
 	}
 
 	public static function MostrarAviso() {
 		if (!self::$mostrar_aviso) {
-			$sdb = new SDB();
-			$aviso = $sdb->get('avisos', Conf::ASDBKey());
+			$SimpleDb = new SimpleDb();
+			$aviso = $SimpleDb->get('avisos', Conf::ASDBKey());
 			if (!empty($aviso)) {
 				$aviso['mensaje'] = nl2br($aviso['mensaje']);
 				if (isset($aviso['permiso'])) {

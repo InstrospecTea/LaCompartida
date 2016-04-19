@@ -50,11 +50,11 @@ class Utiles {
 		}
 
 		echo $detalle_error;
-		echo "\n<!-- Archivo $error_file" ;
-		echo "\n Linea " . $error_line ;
-		echo "\n Mensaje SQL " . $error_str ;
+		echo "\n<!-- Archivo $error_file";
+		echo "\n Linea " . $error_line;
+		echo "\n Mensaje SQL " . $error_str;
 		echo "\n\n" . $query . "\n";
-		echo "\n Mensaje Adicional " . $mensaje_adicional ;
+		echo "\n Mensaje Adicional " . $mensaje_adicional;
 		echo '\n-->';
 
 		$uri = $_SERVER['REQUEST_URI'];
@@ -315,8 +315,7 @@ HTML;
 			$time = mktime($hor, $min, $seg, $mes, $dia, $ano);
 
 			return(strftime($format, $time));
-		}
-		else
+		} else
 			return null;
 	}
 
@@ -376,16 +375,14 @@ HTML;
 		if ($segundos > 59) {
 			$segundos -= 60;
 			$minutos = 1;
-		}
-		else
+		} else
 			$minutos = 0;
 
 		$minutos += ( ( $m1 - 0 ) + ( $m2 - 0 ) );
 		if ($minutos > 59) {
 			$minutos -= 60;
 			$horas = 1;
-		}
-		else
+		} else
 			$horas = 0;
 
 		$horas += ( ( $h1 - 0 ) + ( $h2 - 0 ) );
@@ -401,16 +398,14 @@ HTML;
 		if ($segundos < 0) {
 			$segundos += 60;
 			$minutos = -1;
-		}
-		else
+		} else
 			$minutos = 0;
 
 		$minutos += ( ( $m1 - 0 ) - ( $m2 - 0 ) );
 		if ($minutos < 0) {
 			$minutos += 60;
 			$horas = -1;
-		}
-		else
+		} else
 			$horas = 0;
 
 		$horas += ( ( $h1 - 0 ) - ( $h2 - 0 ) );
@@ -722,9 +717,9 @@ HTML;
 		# Common Headers
 		$headers .= 'From: ' . $fromname . '<' . $fromaddress . '>' . $eol;
 		$headers .= 'Reply-To: ' . $fromname . '<' . $fromaddress . '>' . $eol;
-		$headers .= 'Return-Path: ' . $fromname . '<' . $fromaddress . '>' . $eol;	// these two to set reply address
+		$headers .= 'Return-Path: ' . $fromname . '<' . $fromaddress . '>' . $eol; // these two to set reply address
 		$headers .= "Message-ID: <" . $now . " TheSystem@" . $_SERVER['SERVER_NAME'] . ">" . $eol;
-		$headers .= "X-Mailer: PHP v" . phpversion() . $eol;		  // These two to help avoid spam-filters
+		$headers .= "X-Mailer: PHP v" . phpversion() . $eol;		// These two to help avoid spam-filters
 		# Boundry for marking the split & Multitype Headers
 		$headers .= 'MIME-Version: 1.0' . $eol;
 		$headers .= "Content-Type: multipart/related; boundary=\"" . $mime_boundary . "\"" . $eol;
@@ -740,7 +735,7 @@ HTML;
 
 					$handle = fopen($attachments[$i]["file"], 'rb');
 					$f_contents = fread($handle, filesize($attachments[$i]["file"]));
-					$f_contents = chunk_split(base64_encode($f_contents));	//Encode The Data For Transition using base64_encode();
+					$f_contents = chunk_split(base64_encode($f_contents)); //Encode The Data For Transition using base64_encode();
 					fclose($handle);
 
 					# Attachment
@@ -771,9 +766,9 @@ HTML;
 		}
 
 		# Finished
-		$msg .= "--" . $mime_boundary . "--" . $eol . $eol;  // finish with two eol's for better security. see Injection.
+		$msg .= "--" . $mime_boundary . "--" . $eol . $eol;	// finish with two eol's for better security. see Injection.
 		# SEND THE EMAIL
-		ini_set(sendmail_from, $fromaddress);  // the INI lines are to force the From Address to be used !
+		ini_set(sendmail_from, $fromaddress);	// the INI lines are to force the From Address to be used !
 		$respuesta = mail($emailaddress, $emailsubject, $msg, $headers);
 		ini_restore(sendmail_from);
 		return $respuesta;
@@ -858,10 +853,10 @@ HTML;
 	 * @param correo: correo['nombre'] y correo['mail']
 	 * @param attachment: array con la siguiente estructura:
 	 * 		 'data_string'	=> str required,
-	 *		 'filename'		=> str required,
-	 *		 'base_encode' 	=> str default: base64
-	 *		 'data_type'	=> str default:text/calendar,
-	 *		 'charset'		=> str default:utf-8,
+	 * 		 'filename'		=> str required,
+	 * 		 'base_encode' 	=> str default: base64
+	 * 		 'data_type'	=> str default:text/calendar,
+	 * 		 'charset'		=> str default:utf-8,
 	 * 		 'method' 		=> str default:request
 	 *
 	 * Para que corra la funcion en el conf del sistema tiene que existir:
@@ -870,10 +865,10 @@ HTML;
 	 * PasswordMail: password del correo de Lemontech
 	 * MailAdmin: correo del administrador de la aplicacion del cliente
 	 */
-	public static function EnviarMail($sesion, $correos, $subject, $body, $envia_admin = true, $id_archivo_anexo = NULL, $attachment= NULL) {
+	public static function EnviarMail($sesion, $correos, $subject, $body, $envia_admin = true, $id_archivo_anexo = NULL, $attachment = NULL) {
 		require_once dirname(__FILE__) . '/../../fw/libs/PHPMailer/class.phpmailer.php';
 
-		if(defined('DEBUG') && defined('FORCE_MAIL')){
+		if (defined('DEBUG') && defined('FORCE_MAIL')) {
 			$correos = array(
 				array(
 					'nombre' => 'nombre',
@@ -912,7 +907,7 @@ HTML;
 			}
 		}
 
-		if (!empty($id_archivo_anexo)) {  // sí un anexo existe
+		if (!empty($id_archivo_anexo)) {	// sí un anexo existe
 			$query2 = "SELECT archivo_nombre, archivo_tipo, archivo_data FROM j_archivo WHERE id_archivo = $id_archivo_anexo";
 			$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
 
@@ -920,30 +915,30 @@ HTML;
 			$mail->AddStringAttachment($archivo_data, $archivo_nombre, '7bit', 'text/calendar; charset=utf-8; method=REQUEST');
 		}
 
-		if(!empty($attachment)){
-			if(empty($attachment['data_string']) && empty($attachment['filename'])){
+		if (!empty($attachment)) {
+			if (empty($attachment['data_string']) && empty($attachment['filename'])) {
 				break;
 			}
 			$data_type = 'text/calendar';
-			if(!empty($attachment['data_type'])){
+			if (!empty($attachment['data_type'])) {
 				$data_type = $attachment['data_type'];
 			}
 			$charset = 'utf-8';
-			if(!empty($attachment['charset'])){
+			if (!empty($attachment['charset'])) {
 				$charset = $attachment['charset'];
 			}
 			$method = 'REQUEST';
-			if(!empty($attachment['method'])){
+			if (!empty($attachment['method'])) {
 				$method = $attachment['method'];
 			}
 			$base_encode = 'base64';
-			if(!empty($attachment['base_encode'])){
+			if (!empty($attachment['base_encode'])) {
 				$base_encode = $attachment['base_encode'];
 			}
 			$mail->AddStringAttachment($attachment['data_string'],
 										$attachment['filename'],
 										$attachment['base_encode'],
-										$data_type.";charset=".$charset.";method=".$method);
+										$data_type . ";charset=" . $charset . ";method=" . $method);
 		}
 
 		if (trim($body) == '') {
@@ -1077,13 +1072,11 @@ HTML;
 	}
 
 	public static function camelize($word) {
-    return preg_replace_callback('/(_)([a-z])/',
-       create_function ('$matches', 'return strtoupper($matches[2]);'), $word);
+		return preg_replace_callback('/(_)([a-z])/', create_function('$matches', 'return strtoupper($matches[2]);'), $word);
 	}
 
 	public static function pascalize($word) {
-    return preg_replace_callback('/(^|_)([a-z])/',
-       create_function ('$matches', 'return strtoupper($matches[2]);'), $word);
+		return preg_replace_callback('/(^|_)([a-z])/', create_function('$matches', 'return strtoupper($matches[2]);'), $word);
 	}
 
 	/**
@@ -1124,6 +1117,26 @@ HTML;
 		$$name = mysql_real_escape_string($value);
 	}
 
+	public static function decrypt($msg, $k) {
+		$msg = base64_decode($msg);
+		$k = substr($k, 0, 32);
+		# open cipher module (do not change cipher/mode)
+		if (!$td = mcrypt_module_open('rijndael-256', '', 'ctr', ''))
+			return false;
+
+		$iv = substr($msg, 0, 32); // extract iv
+		$mo = strlen($msg) - 32; // mac offset
+		$em = substr($msg, $mo); // extract mac
+		$msg = substr($msg, 32, strlen($msg) - 64); // extract ciphertext
+
+		if (@mcrypt_generic_init($td, $k, $iv) !== 0)
+			return false;
+
+		$msg = mdecrypt_generic($td, $msg);
+		$msg = unserialize($msg);
+		mcrypt_generic_deinit($td);
+		mcrypt_module_close($td);
+		return $msg;
+	}
+
 }
-
-

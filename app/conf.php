@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../ttbloader.php';
 
 ini_set('display_errors', 'Off');
 error_reporting(0);
+
 extract($_REQUEST);
 extract($_FILES);
 defined('APPPATH') || define('APPPATH', dirname(dirname(__FILE__)));
@@ -143,6 +144,7 @@ if (!class_exists('Conf')) {
 			return array(
 				'key' => 'AKIAIQYFL5PYVQKORTBA',
 				'secret' => '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',
+				'region' => 'us-east-1',
 				'default_cache_config' => CACHEDIR
 			);
 		}
