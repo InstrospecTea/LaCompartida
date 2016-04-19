@@ -25,6 +25,7 @@ class ApiAuth {
 		'areas' => array('read'),
 		'tasks' => array('read'),
 		'languages' => array('read'),
+		'translations' => array('read'),
 		'reports' => array('read')
 	);
 
