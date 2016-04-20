@@ -27,7 +27,7 @@ abstract class AbstractController {
 	}
 
 	public function _dispatch($method, $args = array()) {
-		$this->loadRequestParameters($method);
+		$this->loadRequestParameters($method, $args);
 		if ($this->Session->has('post_data')) {
 			$this->data = $this->Session->read('post_data');
 			$this->Session->drop('post_data');
@@ -164,9 +164,10 @@ abstract class AbstractController {
 	/**
 	 *
 	 */
-	private function loadRequestParameters($method) {
+	private function loadRequestParameters($method, $args) {
 		$reflector = new ReflectionClass($this);
 		$this->name = $reflector->name;
+		$this->passed_args = $args;
 		$this->params = $_GET;
 		$this->data = $_POST;
 

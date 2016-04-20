@@ -1,18 +1,27 @@
 <?php
 
 use Aws\DynamoDb\DynamoDbClient;
+use Aws\DynamoDb\Exception\DynamoDbException;
 
-class DynamoDB {
+class DynamoDb {
 
 	private $client;
 
 	public function __construct(Array $config = []) {
 		$config += Conf::AmazonKey();
-		$this->client = DynamoDbClient::factory($config);
+		try {
+			$this->client = DynamoDbClient::factory($config);
+		} catch (DynamoDbException $e) {
+			throw new Exception('The item could not be retrieved.');
+		}
 	}
 
 	public function get($request) {
-		$result = $this->client->getItem($request);
+		try {
+			$result = $this->client->getItem($request);
+		} catch (DynamoDbException $e) {
+			throw new Exception('The item could not be retrieved.');
+		}
 		$values = [];
 		foreach ($result['Item'] as $tipo => $valor) {
 			if (is_string($valor)) {

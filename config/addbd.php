@@ -2,16 +2,6 @@
 
 require_once dirname(__FILE__) . '/../ttbloader.php';
 
-if ($_SERVER['DOCUMENT_ROOT'] . $_SERVER['SCRIPT_NAME'] == __FILE__) {
-	header('HTTP/1.0 403 Forbidden');
-	echo '<div style="margin:50px auto;text-align:center;font-family:Arial;">';
-	echo '<h2>Error 403</h2>';
-	echo '<img  src="//static.thetimebilling.com/cartas/img/lemontech_logo400.png" style="margin:auto;width:400px;height:126px;display:block;"  alt="Lemontech"/> ';
-	echo '<h4>No se puede acceder directamente a este script</h4></div>';
-	die();
-}
-
-
 list($subdominio) = explode('.', $_SERVER['HTTP_HOST']);
 ini_set('error_log', "/var/www/html/logs/{$subdominio}_error_log.log");
 
@@ -41,10 +31,8 @@ defined('LLAVE') || define('LLAVE', $llave);
 
 if (!isset($memcache) || !is_object($memcache)) {
 	$memcache = new Memcache;
-	$memcache->connect('ttbcache.tmcxaq.0001.use1.cache.amazonaws.com', 11211);
+	$memcache->connect('localhost', 11211);
 }
-
-use Aws\DynamoDb\Exception\DynamoDbException;
 
 if (!$result = @unserialize($memcache->get('teneninformation_' . $llave))) {
 	try {
@@ -55,14 +43,12 @@ if (!$result = @unserialize($memcache->get('teneninformation_' . $llave))) {
 				]
 			]
 		];
-		$DynamoDB = new DynamoDB($array_config);
-		$result = $DynamoDB->get(array(
+		$DynamoDb = new DynamoDb($array_config);
+		$result = $DynamoDb->get(array(
 			'TableName' => 'thetimebilling',
 			'Key' => array('HashKeyElement' => array('S' => $llave))
 		));
 	} catch (Exception $e) {
-		echo 'The item could not be retrieved.';
-	} catch (DynamoDbException $e) {
 		echo 'The item could not be retrieved.';
 	}
 

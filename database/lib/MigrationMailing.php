@@ -2,7 +2,7 @@
 
 namespace Database;
 
-use \Database\Conf as MigrationConfig;
+use \Database\Config as MigrationConfig;
 use \PHPMailer;
 use \Exception;
 

@@ -74,7 +74,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				echo ' | <a href="' . Conf::RootDir() . '/app/interfaces/nota_cobro.php"/>Notas de cobro</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/phpminiadmin.php"/>MySQL</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/error_log.php"/>Error Log</a>';
-				echo ' | <a href="' . Conf::RootDir() . '/admin/respaldos.php"/>Respaldos</a>';
+				echo ' | <a href="' . Conf::RootDir() . '/app/Admin/backups"/>Respaldos</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/carga_masiva.php"/>Carga Masiva</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/aviso.php"/>Aviso de actualización</a>';
 				echo ' | <a href="' . Conf::RootDir() . '/admin/auditoria/index.php"/>Auditoría</a>';
@@ -90,7 +90,7 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				unset($Session, $Migration);
 
 				echo ' <br/><br/> Este software corre sobre la DB ' . Conf::dbHost() . ' <b>' . Conf::dbName() . '</b> version ' . $last_version_database;
-				echo '. La m&aacute;s actual disponible es la ' . $last_version_file_system;
+				echo '. La más actual disponible es la ' . $last_version_file_system;
 
 				echo '<br>Ruta real del repositorio: <b>' . realpath(dirname(__FILE__) . '/../../../') . '</b><br>';
 				$path_environment = dirname(__FILE__) . '/../../../environment.txt';

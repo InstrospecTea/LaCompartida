@@ -3,7 +3,7 @@
 class Aviso {
 
 	private static $mostrar_aviso = false;
-	
+
 	public function __construct($sesion) {
 		$this->sesion = $sesion;
 	}
@@ -13,7 +13,7 @@ class Aviso {
 		return $SimpleDb->get('avisos', Conf::ASDBKey());
 	}
 
-	public static function FlagOcultar(){
+	public static function FlagOcultar() {
 		return $_COOKIE['esconder_notificacion'];
 	}
 
@@ -55,4 +55,5 @@ class Aviso {
 		}
 		return self::$mostrar_aviso;
 	}
+
 }

@@ -5,6 +5,7 @@
  *
  * @author Javier
  */
+
 use Aws\SimpleDb\SimpleDbClient;
 
 class SimpleDb {
@@ -13,13 +14,13 @@ class SimpleDb {
 	private $cache_time;
 
 	public function __construct($cache_time = 600) {
-
 		try {
 			if (empty(self::$client)) {
 				self::$client = SimpleDbClient::factory(Conf::AmazonKey());
 			}
 			$this->cache_time = $cache_time;
 		} catch (Exception $e) {
+
 		}
 	}
 
