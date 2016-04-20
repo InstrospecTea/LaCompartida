@@ -926,7 +926,6 @@ function funcionTR(& $trabajo) {
 	$html = '';
 	$total_horas = 0;
 
-
 	$moneda_cobro = new Moneda($sesion);
 	if ($trabajo->fields['id_cobro'] > 0) {
 		$moneda_cobro->Load($trabajo->fields['id_moneda_cobro']);
@@ -954,33 +953,14 @@ function funcionTR(& $trabajo) {
 		$color = "#ffffff";
 	}
 
-	if (Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
-		if ($trabajo->fields['id_moneda_cobro'] > 0) {
-			$id_moneda_trabajo = $trabajo->fields['id_moneda_cobro'];
-		} else {
-			$id_moneda_trabajo = $trabajo->fields['id_moneda_contrato'];
-		}
-		$chargingBusiness = new ChargingBusiness($sesion);
-		$tarifa = number_format(
-			$chargingBusiness->getWorkFee($trabajo->fields['id_trabajo'], $id_moneda_trabajo)->get('valor'),
-			$moneda_cobro->fields['cifras_decimales'],
-			$idioma->fields['separador_decimales'],
-			$idioma->fields['separador_miles']
-		);
-	} else if ($trabajo->fields['tarifa_hh'] > 0 && $trabajo->fields['id_cobro'] > 0) {
-		$tarifa = number_format($trabajo->fields['tarifa_hh'], $moneda_cobro->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-	} else if ($trabajo->fields['id_tramite_tipo'] == 0) {
-		$tarifa = number_format(Funciones::Tarifa($sesion, $trabajo->fields['id_usuario'], $trabajo->fields['id_moneda_contrato'], $trabajo->fields['codigo_asunto']), $moneda_cobro->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-	} else {
-		$tarifa = number_format(Funciones::TramiteTarifa($sesion, $trabajo->fields['id_tramite_tipo'], $trabajo->fields['id_moneda_cobro'], $trabajo->fields['codigo_asunto']), $moneda_cobro->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
-	}
-	list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
-	$duracion = $h + ($m > 0 ? ($m / 60) : '0');
-	$total = round($tarifa * $duracion, 2);
-	$total_horas += $duracion;
-	//	if(substr($h,0,1)=='0')
-	//		$h=substr($h,1);
-	$dur_cob = "$h:$m";
+	$workingBusiness = new WorkingBusiness($sesion);
+	$tarifa = number_format(
+					$workingBusiness->getFee($trabajo, $trabajo->fields['id_moneda_cobro'], $trabajo->fields['id_moneda_contrato']),
+					$moneda_cobro->fields['cifras_decimales'],
+					$idioma->fields['separador_decimales'],
+					$idioma->fields['separador_miles']
+	);
+
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
 	if ($trabajo->fields['id_tramite_tipo'] > 0) {

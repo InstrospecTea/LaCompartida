@@ -1,5 +1,26 @@
 # Changelog
 
+## Horfix 16.9.4
+Wednesday, April 20th
+* **Fix** [Problema en excel Reporte Saldo](https://github.com/LemontechSA/ttb/pull/1415)
+
+## Hotfix 16.9.3
+Monday, April 18th
+* **Fix** [Se encapsulan las reglas de obtención de tarifa del trabajo, en el método WorkingBusiness::getFee().](https://github.com/LemontechSA/ttb/pull/1408)
+
+## Hotfix 16.9.2
+Thursday, April 14th
+* **Fix** [Muestra el número de página segun opciones de impresión](https://github.com/LemontechSA/ttb/pull/1406)
+
+## Hotfix 16.9.1
+Thursday, April 14th
+* **Fix** [Verifica la sesión al instanciar un Controller](https://github.com/LemontechSA/ttb/pull/1405)
+
+## [Release 16.9.0](https://github.com/LemontechSA/ttb/pull/1403)
+Wednesday, April 13th
+* **Feature** [Agregar configuracion mostrar tramites no cobrables](https://github.com/LemontechSA/ttb/pull/1402)
+* **Feature** [Agrega columna con en numero de cobro del tramite](https://github.com/LemontechSA/ttb/pull/1401)
+
 ## Hotfix 16.8.2
 Tuesday, April 12th
 * **Fix** [Corrige problema en creación de asunto](https://github.com/LemontechSA/ttb/pull/1399)

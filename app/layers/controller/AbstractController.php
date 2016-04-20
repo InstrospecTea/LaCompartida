@@ -23,7 +23,15 @@ abstract class AbstractController {
 	public function __construct() {
 		$this->Session = new \TTB\Sesion($this->permisions);
 		Configure::setSession($this->Session);
+		$this->verifySession();
 		$this->messageManager = new MessageManager();
+	}
+
+	protected function verifySession() {
+		if (!$this->Session->logged) {
+			$this->Session->logout();
+			$this->redirect(Configure::read('logoutRedirect'));
+		}
 	}
 
 	public function _dispatch($method, $args = array()) {

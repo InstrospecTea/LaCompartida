@@ -328,7 +328,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			return null;
 		}
 		foreach ($arrayResult as $property => $value) {
-			$instance->set($property, $value);
+			$instance->set($property, $value, false);
 		}
 		return $instance;
 	}
