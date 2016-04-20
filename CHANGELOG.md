@@ -1,5 +1,9 @@
 # Changelog
 
+## Horfix 16.9.4
+Wednesday, April 20th
+* **Fix** [Problema en excel Reporte Saldo](https://github.com/LemontechSA/ttb/pull/1415)
+
 ## Hotfix 16.9.3
 Monday, April 18th
 * **Fix** [Se encapsulan las reglas de obtención de tarifa del trabajo, en el método WorkingBusiness::getFee().](https://github.com/LemontechSA/ttb/pull/1408)
