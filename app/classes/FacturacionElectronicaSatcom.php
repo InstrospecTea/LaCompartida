@@ -126,51 +126,22 @@ EOF;
   * @param type $hookArg
 	*/
 	public static function DescargarPdf($hookArg) {
-		$Factura = $hookArg['Factura'];
-		if (!empty($Factura->fields['dte_url_pdf']) && $hookArg['original'] == true) {
-			$hookArg['InvoiceURL'] = $Factura->fields['dte_url_pdf'];
-		} else {
-			$Sesion = new Sesion();
-			$Estudio = new PrmEstudio($Sesion);
-			$Estudio->Load($Factura->fields['id_estudio']);
+		$factura = $hookArg['Factura'];
 
-			$rut = $Estudio->GetMetaData('rut');
-			$usuario = $Estudio->GetMetadata('facturacion_electronica_cl.usuario');
-			$password = $Estudio->GetMetadata('facturacion_electronica_cl.password');
+		$PrmDocumentoLegal = new PrmDocumentoLegal($factura->sesion);
+		$PrmDocumentoLegal->Load($factura->fields['id_documento_legal']);
+		$docName = UtilesApp::slug($PrmDocumentoLegal->fields['glosa']);
+		$name = sprintf('%s_%s.pdf', $docName, $factura->obtenerNumero());
 
-			$WsFacturacionCl = new WsFacturacionCl;
-			$WsFacturacionCl->setLogin($rut, $usuario, $password);
-			if ($WsFacturacionCl->hasError()) {
-				$hookArg['Error'] = self::parseError($WsFacturacionCl, $WsFacturacionCl->getErrorCode());
-			} else {
-				$arrayDocumento = self::FacturaToArray($Sesion, $Factura ,$Estudio);
-				try {
-					$result = $WsFacturacionCl->obtenerLink($arrayDocumento['folio'], $arrayDocumento['tipo_dte'], $hookArg['original']);
-					if (!$WsFacturacionCl->hasError()) {
-						$hookArg['InvoiceURL'] = $result;
-					} else {
-						$hookArg['Error'] = self::parseError($WsFacturacionCl, 'BuildingInvoiceError');
-					}
-				} catch  (Exception $ex) {
-					$hookArg['Error'] = self::parseError($ex, 'BuildingInvoiceError');
-				}
-			}
-		}
+		$WsFacturacionSatcom = new WsFacturacionSatcom;
+		$documento = $WsFacturacionSatcom->obtenerPdf($factura->fields['dte_url_pdf']);
 
-		if (!is_null($hookArg['Error'])) {
-			return $hookArg;
-		} else {
-			$PrmDocumentoLegal = new PrmDocumentoLegal($Factura->sesion);
-			$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
-			$docName = UtilesApp::slug($PrmDocumentoLegal->fields['glosa']);
-			$name = sprintf('%s_%s.pdf', $docName, $Factura->obtenerNumero());
-			header("Content-Transfer-Encoding: binary");
-			header("Content-Type: application/pdf");
-			header('Content-Description: File Transfer');
-			header("Content-Disposition: attachment; filename=$name");
-			echo file_get_contents($hookArg['InvoiceURL']);
-			exit;
-		}
+		header("Content-Transfer-Encoding: binary");
+		header("Content-Type: application/pdf");
+		header('Content-Description: File Transfer');
+		header("Content-Disposition: attachment; filename={$name}");
+		echo $documento;
+		exit;
 	}
 
 	public static function GeneraFacturaElectronica($hookArg) {
@@ -225,53 +196,6 @@ EOF;
 			'Code' => $error_code,
 			'Message' => $error_description
 		);
-	}
-
-	public static function AnulaFacturaElectronica($hookArg) {
-		$Sesion = new Sesion();
-		$Factura = $hookArg['Factura'];
-
-		if (!$Factura->FacturaElectronicaCreada()) {
-			return $hookArg;
-		}
-
-		$Estudio = new PrmEstudio($Sesion);
-		$Estudio->Load($Factura->fields['id_estudio']);
-		$rut = $Estudio->GetMetaData('rut');
-		$usuario = $Estudio->getMetadata('facturacion_electronica_cl.usuario');
-		$password = $Estudio->getMetadata('facturacion_electronica_cl.password');
-		$WsFacturacionCl = new WsFacturacionCl;
-		$WsFacturacionCl->setLogin($rut, $usuario, $password);
-		if ($WsFacturacionCl->hasError()) {
-			$hookArg['Error'] = array(
-				'Code' => $WsFacturacionCl->getErrorCode(),
-				'Message' => $WsFacturacionCl->getErrorMessage()
-			);
-		} else {
-			$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
-			$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
-			$tipoDTE = $PrmDocumentoLegal->fields['codigo_dte'];
-			$WsFacturacionCl->anularFactura($Factura->fields['numero'], $tipoDTE);
-			if (!$WsFacturacionCl->hasError()) {
-				try {
-					$estado_dte = Factura::$estados_dte['Anulado'];
-					$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
-					$Factura->Edit('dte_estado', $estado_dte);
-					$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
-					$Factura->Write();
-				} catch (Exception $ex) {
-					$hookArg['Error'] = self::parseError($ex, 'SaveCanceledInvoiceError');
-				}
-			} else {
-				$hookArg['Error'] = self::parseError($WsFacturacionCl, 'CancelGeneratedInvoiceError');
-				$mensaje = "Usted ha solicitado anular un Documento Tributario. Este proceso puede tardar y mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
-				$estado_dte = Factura::$estados_dte['ProcesoAnular'];
-				$Factura->Edit('dte_estado', $estado_dte);
-				$Factura->Edit('dte_estado_descripcion', $mensaje);
-				$Factura->Write();
-			}
-		}
-		return $hookArg;
 	}
 
 }

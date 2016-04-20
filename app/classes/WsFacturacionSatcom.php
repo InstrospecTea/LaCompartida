@@ -5,7 +5,6 @@ ini_set('soap.wsdl_cache_enabled', 0);
 
 class WsFacturacionSatcom extends WsFacturacion {
 	protected $url = 'http://190.108.68.38:9010/Bridge/WcfBridge.svc';
-	protected $action = 'http://tempuri.org/IBridge/ProcesarComprobante';
 
 	public function __construct() {
 		$this->Client = new SoapClient(
@@ -18,23 +17,25 @@ class WsFacturacionSatcom extends WsFacturacion {
 		);
 	}
 
-	public function emitirFactura($factura) {
-		$documento_xml = $this->crearXML($factura);
-
-		$id_comprobante = 0;
-
+	private function setHeaders($action) {
 		$this->Client->__setSoapHeaders(
 			array(
-				new SoapHeader('http://www.w3.org/2005/08/addressing', 'Action', $this->action),
+				new SoapHeader('http://www.w3.org/2005/08/addressing', 'Action', $action),
 				new SoapHeader('http://www.w3.org/2005/08/addressing', 'To', $this->url)
 			)
 		);
+	}
+
+	public function emitirFactura($factura) {
+		$id_comprobante = 0;
+		$documento_xml = $this->crearXML($factura);
 
 		$ProcesarComprobante = new stdClass();
 		$ProcesarComprobante->strRequerimiento = $documento_xml;
 		$ProcesarComprobante->Comprimido = false;
 
 		try {
+			$this->setHeaders('http://tempuri.org/IBridge/ProcesarComprobante');
 			$respuesta = $this->Client->ProcesarComprobante($ProcesarComprobante);
 
 			if ($respuesta->ProcesarComprobanteResult->EstadoProceso != 'Error') {
@@ -128,8 +129,21 @@ class WsFacturacionSatcom extends WsFacturacion {
 		return $requerimiento->asXML();
 	}
 
-	public function obtenerPdf() {
+	public function obtenerPdf($id_comprobante) {
 		$pdf = '';
+
+		$ConsultaPDFAutorizadoByID = new stdClass();
+		$ConsultaPDFAutorizadoByID->IdComprobante = $id_comprobante;
+
+		try {
+			$this->setHeaders('http://tempuri.org/IBridge/ConsultaPDFAutorizadoByID');
+			$respuesta = $this->Client->ConsultaPDFAutorizadoByID((array) $ConsultaPDFAutorizadoByID);
+			$pdf = $respuesta->ConsultaPDFAutorizadoByIDResult;
+		} catch(Exception $ex) {
+			Log::write($id_comprobante, 'FacturacionElectronicaSatcom');
+			Log::write($ex->getMessage(), 'FacturacionElectronicaSatcom');
+			$this->setError(1, 'Ocurrió un error inesperado con Satcom');
+		}
 
 		return $pdf;
 	}
