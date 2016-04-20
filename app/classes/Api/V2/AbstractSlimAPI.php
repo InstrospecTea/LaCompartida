@@ -140,9 +140,9 @@ class AbstractSlimAPI  {
 	}
 
 	/**
-	 * [getAppIdByAppKey description]
-	 * @param  [type] $app_key [description]
-	 * @return [type]          [description]
+	 * Obtiene el id de la aplicacion a traves de su key
+	 * @param  String $app_key Ej: ttb-mobile, ttb-ios
+	 * @return Integer Id de la aplicacion
 	 */
 	public function getAppIdByAppKey($app_key) {
 		$Session = $this->session;
@@ -150,6 +150,12 @@ class AbstractSlimAPI  {
 		return $UserToken->getAppIdByAppKey($app_key);
 	}
 
+	/**
+	 * Retorna si el rol (o lista de roles) tienen permisos
+	 * para el endpoint visitado
+	 * @param  Array  $roles lista de roles Ej, ["ADM", "PRO"]
+	 * @return boolean
+	 */
 	public function hasPermission($roles) {
 		$Slim = $this->slim;
 		$Session = $this->session;
@@ -164,6 +170,12 @@ class AbstractSlimAPI  {
 		return ApiAuth::hasPermission($roles, $apiNamespace, $permission);
 	}
 
+	/**
+	 * Obtiene el namespace del endpoint
+	 * Ej. /user/1/time_entries/2  retorna  time_entries
+	 * @param  SlimRequestObj $request Request de slim
+	 * @return String
+	 */
 	public function apiNamespace($request) {
 		$uriArray = explode('/', $request->getPathInfo());
 		$namespace = array_pop($uriArray);
