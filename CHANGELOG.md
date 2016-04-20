@@ -1,7 +1,7 @@
 # Changelog
 
 ## Horfix 16.9.4
-Wednesday, April 20yh
+Wednesday, April 20th
 * **Fix** [Problema en excel Reporte Saldo](https://github.com/LemontechSA/ttb/pull/1415)
 
 ## Hotfix 16.9.3
