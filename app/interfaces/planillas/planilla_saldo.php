@@ -370,14 +370,12 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 
 	if ($mostrar_detalle) {
 		$details_query = "($query_liquidaciones) UNION ($query_gastos) UNION ($query_adelantos) ORDER BY fecha";
-		//echo $details_query; exit;
 		$SimpleReportDetails = new SimpleReport($Sesion);
 		$SimpleReportDetails->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($Sesion));
 		$SimpleReportDetails->LoadConfiguration('REPORTE_SALDO_CLIENTES');
 
 
 		$SimpleReportDetails->Config->columns['monto_base']->Title(__('Monto') . " ($simbolo_base)");
-		// $SimpleReportDetails->Config->columns['saldo_base']->Title(__('Saldo') . " ($simbolo_base)");
 
 		if (!Conf::GetConf($Sesion, 'MostrarAsuntoPlanillaSaldo')) {
 			unset($SimpleReportDetails->Config->columns['asunto']);
@@ -396,7 +394,7 @@ if (in_array($_REQUEST['opcion'], array('buscar', 'xls', 'json'))) {
 		$SimpleReport->AddSubReport(array(
 			'SimpleReport' => $SimpleReportDetails,
 			'Keys' => array('codigo_cliente'),
-			'Level' => 1
+			'Level' => 4
 		));
 
 		$SimpleReport->SetCustomFormat(array(
