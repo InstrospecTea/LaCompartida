@@ -30,15 +30,15 @@ class LoginAPI extends AbstractSlimAPI {
 		$auth_token = $UserToken->makeAuthToken($user);
 		$dv = null;
 
-		if (is_null($user) || $user == '') {
+		if (empty($user)) {
 			$this->halt(__('Invalid user data'), 'InvalidUserData');
 		}
 
-		if (is_null($password) || $password == '') {
+		if (empty($password)) {
 			$this->halt(__('Invalid password data'), 'InvalidPasswordData');
 		}
 
-		if (is_null($app_key) || $app_key == '') {
+		if (empty($app_key)) {
 			$this->halt(__('Invalid application key data'), 'InvalidAppKey');
 		}
 
