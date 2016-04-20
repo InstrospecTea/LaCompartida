@@ -26,34 +26,22 @@ class AbstractSlimAPI  {
 	public function present($arrayObj, $entity) {
 		$parseFunction = function(&$element, $key, $entity) {
 			$newElement = array();
+
 			foreach ($entity as $field) {
 				$key = is_array($field) ? key($field) : $field;
+				$value = is_array($field) ? $field[$key] : $value = $field;
 
-				if (!is_array($field)) {
-					$value = $field;
-
-					if (!is_object($element) && isset($element[$value])) {
-						$newElement[$key] = $element[$value];
-					} else {
-						if (isset($element->fields[$value])) {
-							$newElement[$key] = $element->fields[$value];
-						} else {
-							$newElement[$key] = null;
-						}
-					}
+				if (!is_object($element) && isset($element[$value])) {
+					$newElement[$key] = $element[$value];
 				} else {
-					$value = $field[$key];
-					if (!is_object($element) && isset($element[$value])) {
-						$newElement[$key] = $element[$value];
+					if (is_object($element) && array_key_exists($value, $element->fields)) {
+						$newElement[$key] = $element->fields[$value];
 					} else {
-						if (is_object($element) && array_key_exists($value, $element->fields)) {
-							$newElement[$key] = $element->fields[$value];
-						} else {
-							$newElement[$key] = null;
-						}
+						$newElement[$key] = null;
 					}
 				}
 			}
+
 			$element = $newElement;
 			return $newElement;
 		};
