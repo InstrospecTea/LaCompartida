@@ -4,7 +4,7 @@
 Thursday, April 21st
 * **Feature** [API v2](https://github.com/LemontechSA/ttb/pull/1414)
 
-## Horfix 16.9.4
+## Hotfix 16.9.4
 Wednesday, April 20th
 * **Fix** [Problema en excel Reporte Saldo](https://github.com/LemontechSA/ttb/pull/1415)
 
