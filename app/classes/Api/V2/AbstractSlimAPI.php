@@ -5,6 +5,7 @@ class AbstractSlimAPI  {
 
 	protected $session;
 	protected $slim;
+	protected $params;
 
 	const MIN_TIMESTAMP = 315532800;
 	const MAX_TIMESTAMP = 4182191999;
@@ -12,6 +13,18 @@ class AbstractSlimAPI  {
 	public function __construct($session, $slim) {
 		$this->session = $session;
 		$this->slim = $slim;
+		$params = $slim->request()->params();
+
+		if (empty($params)) {
+			$params = json_decode($this->slim->request()->getBody(), true);
+		}
+
+		if (empty($params)) {
+			$environment = $this->slim->environment();
+			$params = json_decode($environment['slim.request.form_hash'], true);
+		}
+
+		$this->params = $params;
 
 		$zona_horaria = \Conf::GetConf($session,'ZonaHoraria');
 		date_default_timezone_set($zona_horaria);

@@ -22,8 +22,6 @@ class ProjectsAPI extends AbstractSlimAPI {
 	);
 
 	public function getProjectsOfClient($client_id) {
-		$Session = $this->session;
-		$Slim = $this->slim;
 		$this->validateAuthTokenSendByHeaders();
 
 		if (empty($client_id)) {
@@ -43,16 +41,14 @@ class ProjectsAPI extends AbstractSlimAPI {
 	}
 
 	public function getUpdatedMatters() {
-		$Session = $this->session;
-		$Slim = $this->slim;
 		$this->validateAuthTokenSendByHeaders();
 
-		$client_id = $Slim->request()->params('client_id');
+		$client_id = $this->params['client_id'];
 		if (!empty($client_id)) {
 			$this->getProjectsOfClient($client_id);
 		} else {
-			$active = $Slim->request()->params('active');
-			$updatedFrom = $Slim->request()->params('updated_from');
+			$active = $this->params['active'];
+			$updatedFrom = $this->params['updated_from'];
 
 			if (!empty($updatedFrom) && !$this->isValidTimeStamp($updatedFrom)) {
 				$this->halt(__('The date format is incorrect'), 'InvalidDate');

@@ -29,7 +29,6 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 	/** Este codigo esta obsoleto, lo ocupé para avanzar pero debe ser pasado a business */
 	public function getTimeEntriesByUserId($user_id) {
 		$Session = $this->session;
-		$Slim = $this->slim;
 
 	 if (is_null($user_id) || empty($user_id)) {
 			$this->halt(__('Invalid user ID'), 'InvalidUserID');
@@ -41,8 +40,8 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 		$Work = new \Trabajo($Session);
 
 		$works = array();
+		$date = $this->params['date'];
 
-		$date = $Slim->request()->params('date');
 		if (is_null($date)) {
 			$date = date('Y-m-d', time());
 		} else {
@@ -84,8 +83,7 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 	/** Este codigo esta obsoleto, lo ocupé para avanzar pero debe ser pasado a business */
 	public function createTimeEntryByUserId($user_id) {
 		$Session = $this->session;
-		$Slim = $this->slim;
-		# error_reporting(E_ALL & ~E_WARNING);
+
 		if (is_null($user_id) || empty($user_id)) {
 			$this->halt(__('Invalid user ID'), 'InvalidUserID');
 		}
@@ -96,25 +94,7 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 		$Work = new \Trabajo($Session);
 
 		$work = array();
-
-		$params = array();
-		if ($Slim->request()->params('date')) {
-			$params['date'] = $Slim->request()->params('date');
-			$params['created_at'] = $Slim->request()->params('created_at');
-			$params['duration'] = $Slim->request()->params('duration');
-			$params['description'] = $Slim->request()->params('description');
-			$params['rate'] = $Slim->request()->params('rate');
-			$params['requester'] = $Slim->request()->params('requester');
-			$params['activity_id'] = $Slim->request()->params('activity_id');
-			$params['area_id'] = $Slim->request()->params('area_id');
-			$params['project_id'] = $Slim->request()->params('project_id');
-			$params['task_id'] = $Slim->request()->params('task_id');
-			$params['user_id'] = $Slim->request()->params('user_id');
-			$params['billable'] = $Slim->request()->params('billable');
-			$params['visible'] = $Slim->request()->params('visible');
-		} else {
-			$params = json_decode($Slim->request()->getBody(), true);
-		}
+		$params = $this->params;
 
 		$work['date'] = $params['date'];
 		$work['created_date'] = $params['created_at'];
@@ -179,7 +159,6 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 	/** Este codigo esta obsoleto, lo ocupé para avanzar pero debe ser pasado a business */
 	public function updateTimeEntryByUserId($user_id, $id) {
 		$Session = $this->session;
-		$Slim = $this->slim;
 
 		if (is_null($user_id) || empty($user_id)) {
 			$this->halt(__('Invalid user ID'), 'InvalidUserID');
@@ -194,30 +173,10 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 		$User = new \Usuario($Session);
 		$Work = new \Trabajo($Session);
 
-		$params = array();
-		if ($Slim->request()->params('date')) {
-			$params['date'] = $Slim->request()->params('date');
-			$params['created_at'] = $Slim->request()->params('created_at');
-			$params['duration'] = $Slim->request()->params('duration');
-			$params['description'] = $Slim->request()->params('description');
-			$params['rate'] = $Slim->request()->params('rate');
-			$params['requester'] = $Slim->request()->params('requester');
-			$params['activity_id'] = $Slim->request()->params('activity_id');
-			$params['area_id'] = $Slim->request()->params('area_id');
-			$params['project_id'] = $Slim->request()->params('project_id');
-			$params['task_id'] = $Slim->request()->params('task_id');
-			$params['user_id'] = $Slim->request()->params('user_id');
-			$params['billable'] = $Slim->request()->params('billable');
-			$params['visible'] = $Slim->request()->params('visible');
-		} else {
-			$params = json_decode($Slim->request()->getBody(), true);
-		}
-
 		$work = array();
-		$work = array();
+		$params = $this->params;
 
 		$work['id'] = $id;
-
 		$work['date'] = $params['date'];
 		$work['created_date'] = $params['created_at'];
 		$work['duration'] = (float) $params['duration'];
@@ -278,7 +237,6 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 
 	public function deleteTimeEntryByUserId($user_id, $id) {
 		$Session = $this->session;
-		$Slim = $this->slim;
 
 		if (is_null($user_id) || empty($user_id)) {
 			$this->halt(__('Invalid user ID'), 'InvalidUserID');

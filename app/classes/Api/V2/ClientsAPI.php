@@ -17,11 +17,10 @@ class ClientsAPI extends AbstractSlimAPI {
 	);
 
 	public function getUpdatedClients() {
-		$Slim = $this->slim;
 		$this->validateAuthTokenSendByHeaders();
 
-		$active = $Slim->request()->params('active');
-		$updatedFrom = $Slim->request()->params('updated_from');
+		$active = $this->params['active'];
+		$updatedFrom = $this->params['updated_from'];
 
 		if (!is_null($updatedFrom) && !$this->isValidTimeStamp($updatedFrom)) {
 			$this->halt(__('The date format is incorrect'), 'InvalidDate');

@@ -18,7 +18,6 @@ class UsersAPI extends AbstractSlimAPI {
 	);
 
 	public function getUserById($id) {
-		$Slim = $this->slim;
 		$this->validateAuthTokenSendByHeaders();
 
 		if (is_null($id) || empty($id)) {
@@ -32,7 +31,7 @@ class UsersAPI extends AbstractSlimAPI {
 		if (empty($user)) {
 			$this->halt(__("The user doesn't exist"), 'UserDoesntExist');
 		}
-		// user permissions
+
 		$roles = $UsersBusiness->getRoles($id);
 		$permissions = ApiAuth::userPermissions($roles);
 		$user->set('permissions', $permissions);

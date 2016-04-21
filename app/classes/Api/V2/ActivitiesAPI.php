@@ -20,14 +20,14 @@ class ActivitiesAPI extends AbstractSlimAPI {
 	);
 
 	public function getAllActivitiesByProjectId() {
-		$Slim = $this->slim;
 		$this->validateAuthTokenSendByHeaders();
 
 		$ActivitiesBusiness = new \ActivitiesBusiness($this->session);
 
-		$projectId = $Slim->request()->params('project_id');
-		$active = $Slim->request()->params('active');
-		$all = $Slim->request()->params('all');
+		$projectId = $this->params['project_id'];
+		$active = $this->params['active'];
+		$all = $this->params['all'];
+
 		$allActivities = !empty($all);
 
 		$activities = $ActivitiesBusiness->getActivitesByMatterId($projectId, $active, $allActivities);

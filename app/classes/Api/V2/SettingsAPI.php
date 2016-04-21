@@ -21,10 +21,11 @@ class SettingsAPI extends AbstractSlimAPI {
 	);
 
 	public function getTimeTrackingSettings() {
-		$Slim = $this->slim;
 		$this->validateAuthTokenSendByHeaders();
+
 		$Business = new \SettingsBusiness($this->session);
 		$results = $Business->getTimeTrackingSettings();
+
 		$this->present($results, self::$SettingEntity);
 	}
 

@@ -11,18 +11,10 @@ class LoginAPI extends AbstractSlimAPI {
 
 	public function login() {
 		$Session = $this->session;
-		$Slim = $this->slim;
 
 		$UserToken = new \UserToken($Session);
 
-		$params = array();
-		if ($Slim->request()->params('user')) {
-			$params['user'] = $Slim->request()->params('user');
-			$params['password'] = $Slim->request()->params('password');
-			$params['app_key'] = $Slim->request()->params('app_key');
-		} else {
-			$params = json_decode($Slim->request()->getBody(), true);
-		}
+		$params = $this->params;
 
 		$user = $params['user'];
 		$password = $params['password'];
