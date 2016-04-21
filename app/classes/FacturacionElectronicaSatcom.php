@@ -48,26 +48,6 @@ class FacturacionElectronicaSatcom extends FacturacionElectronica {
 		return $hookArg;
 	}
 
-	public static function InsertaMetodoPago() {
-		global $factura, $contrato, $buscar_padre;
-		$Sesion = new Sesion();
-		if ($buscar_padre) {
-			echo "<tr>";
-			echo "<td align='right'>Referencia</td>";
-			echo "<td align='left' colspan='3'>";
-			echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_CL_REF' ORDER BY glosa ASC", "dte_codigo_referencia", $factura->fields['dte_codigo_referencia'], "", "Sleccione", "300");
-			echo "</td>";
-			echo "</tr>";
-
-			echo '<tr>';
-			echo '<td align="right" colspan="1">Raz&oacute;n Referencia';
-			echo '<td align="left" colspan="3">';
-			echo "<input type='text' name='dte_razon_referencia' placeholder='Raz&oacute;n Referencia' value='" . $factura->fields['dte_razon_referencia'] . "' id='dte_razon_referencia' size='40' maxlength='90'>";
-			echo '</td>';
-			echo '</tr>';
-		}
-	}
-
 	public static function InsertaJSFacturaElectronica() {
 		$BotonDescargarHTML = self::BotonDescargarHTML('0');
 		echo <<<EOF
@@ -107,17 +87,6 @@ class FacturacionElectronicaSatcom extends FacturacionElectronica {
 				var format = self.data("format") || "pdf";
 				window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format  + "&original=" + original
 			});
-
-			jQuery(document).on("change", "#dte_metodo_pago",  function() {
-				var metodo_pago = jQuery("#dte_metodo_pago option:selected").text();
-				if (metodo_pago != "No Identificado") {
-					jQuery("#dte_metodo_pago_cta").show();
-				} else {
-					jQuery("#dte_metodo_pago_cta").hide();
-				}
-			});
-
-			jQuery("#dte_metodo_pago").trigger("change");
 EOF;
 	}
 
