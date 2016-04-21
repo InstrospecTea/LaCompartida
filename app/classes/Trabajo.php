@@ -723,12 +723,17 @@ class Trabajo extends Objeto
 			`matter`.`codigo_asunto` AS `matter_code`, `matter`.`codigo_asunto_secundario` AS `secondary_matter_code`,
 			`work`.`codigo_tarea` AS `task_code`, `work`.`id_usuario` AS `user_id`,
 			`work`.`cobrable` AS `billable`, `work`.`visible` AS `visible`, (ADDDATE(`work`.`fecha_creacion`, INTERVAL `user`.`retraso_max` DAY)) AS `date_read_only`, `charge`.`estado` AS `charge_status`,
-			`work`.`revisado` AS `revised`
+			`work`.`revisado` AS `revised`,
+			`matter`.`id_asunto`,
+			`client`.`id_cliente`,
+			`activity`.`id_actividad`,
+			`user`.`retraso_max`
 			FROM `trabajo` AS `work`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
 				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
 				LEFT JOIN `cobro` AS `charge` ON `charge`.`id_cobro` = `work`.`id_cobro`
 				INNER JOIN `cliente` AS `client` ON `client`.`codigo_cliente` = `matter`.`codigo_cliente`
+				LEFT JOIN `actividad` AS `activity` ON `activity`.`codigo_actividad` = `work`.`codigo_actividad`
 			WHERE `work`.`id_usuario`=:id AND `work`.`fecha` BETWEEN :after AND :before
 			ORDER BY `work`.`id_trabajo` DESC";
 
@@ -746,7 +751,7 @@ class Trabajo extends Objeto
 		$date_now = strtotime('now');
 		while ($work = $Statement->fetch(PDO::FETCH_OBJ)) {
 			$read_only = 0;
-			if (!empty($work->date_read_only)) {
+			if (!empty($work->date_read_only) && ($work->retraso_max > 0)) {
 				if ($date_now >= strtotime($work->date_read_only)) {
 					$read_only = 1;
 				}
@@ -795,6 +800,24 @@ class Trabajo extends Objeto
 			if (!empty($work->task_code)) {
 				$mapped_work['task_code'] = $work->task_code;
 			}
+
+			// para API V2
+			if (!empty($work->id_asunto)) {
+				$mapped_work['id_asunto'] = (int) $work->id_asunto;
+			}
+			if (!empty($work->id_cliente)) {
+				$mapped_work['id_cliente'] = (int) $work->id_cliente;
+			}
+			if (!empty($work->id_actividad)) {
+				$mapped_work['id_actividad'] = (int) $work->id_actividad;
+			}
+			if (!empty($work->area_code)) {
+				$mapped_work['id_area_trabajo'] = (int) $work->area_code;
+			}
+			if (!empty($work->codigo_tarea)) {
+				$mapped_work['id_tarea'] = (int) $work->codigo_tarea;
+			}
+			// fin para API V2
 
 			array_push($works, $mapped_work);
 		}
@@ -1049,6 +1072,7 @@ class Trabajo extends Objeto
 		$cambio_fecha = strtotime($this->fields['fecha']) != strtotime($data['date']);
 		$this->Edit('fecha', $data['date']);
 		$this->Edit('codigo_tarea', !empty($data['task_code']) ? $data['task_code'] : 'NULL');
+
 		$this->Edit('id_usuario', $data['user_id']);
 		$this->Edit('tarifa_hh', $data['rate']);
 
@@ -1089,12 +1113,17 @@ class Trabajo extends Objeto
 			`matter`.`codigo_asunto` AS `matter_code`, `matter`.`codigo_asunto_secundario` AS `secondary_matter_code`,
 			`work`.`codigo_tarea` AS `task_code`, `work`.`id_usuario` AS `user_id`,
 			`work`.`cobrable` AS `billable`, `work`.`visible` AS `visible`, (ADDDATE(`work`.`fecha_creacion`, INTERVAL `user`.`retraso_max` DAY)) AS `date_read_only`, `charge`.`estado` AS `charge_status`,
-			`work`.`revisado` AS `revised`
+			`work`.`revisado` AS `revised`,
+			`matter`.`id_asunto`,
+			`client`.`id_cliente`,
+			`activity`.`id_actividad`,
+			`user`.`retraso_max`
 			FROM `trabajo` AS `work`
 				INNER JOIN `asunto` AS `matter` ON `matter`.`codigo_asunto` = `work`.`codigo_asunto`
 				INNER JOIN `usuario` AS `user` ON `user`.`id_usuario` = `work`.`id_usuario`
 				LEFT JOIN `cobro` AS `charge` ON `charge`.`id_cobro` = `work`.`id_cobro`
 				INNER JOIN `cliente` AS `client` ON `client`.`codigo_cliente` = `matter`.`codigo_cliente`
+				LEFT JOIN `actividad` AS `activity` ON `activity`.`codigo_actividad` = `work`.`codigo_actividad`
 			WHERE `work`.`id_trabajo`=:id
 			ORDER BY `work`.`id_trabajo` DESC";
 
@@ -1105,7 +1134,7 @@ class Trabajo extends Objeto
 		$date_now = strtotime('now');
 		$work = $Statement->fetch(PDO::FETCH_OBJ);
 		$read_only = 0;
-		if (!empty($work->date_read_only)) {
+		if (!empty($work->date_read_only) && ($work->retraso_max > 0)) {
 			if ($date_now >= strtotime($work->date_read_only)) {
 				$read_only = 1;
 			}
@@ -1137,7 +1166,11 @@ class Trabajo extends Objeto
 			'task_code' => !empty($work->task_code) ? $work->task_code : null,
 			'user_id' => !empty($work->user_id) ? (int) $work->user_id : null,
 			'billable' => !empty($work->billable) ? (int) $work->billable : 0,
-			'visible' => !empty($work->visible) ? (int) $work->visible : 0
+			'visible' => !empty($work->visible) ? (int) $work->visible : 0,
+			'id_asunto' => !empty($work->id_asunto) ? (int) $work->id_asunto : null,
+			'id_cliente' => !empty($work->id_cliente) ? (int) $work->id_cliente : null,
+			'id_actividad' => !empty($work->id_actividad) ? (int) $work->id_actividad : null,
+			'id_tarea' => !empty($work->codigo_tarea) ? (int) $work->codigo_tarea : null
 		);
 
 		return $_work;

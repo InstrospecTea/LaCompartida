@@ -389,4 +389,32 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		}
 	}
 
+	public function getUpdatedWorkingAreas($active = null, $updatedFrom = null) {
+		$results = array();
+		$this->loadBusiness('Searching');
+
+		$searchCriteria = new SearchCriteria('WorkingArea');
+
+		// No existe en la tabla
+		// if (!is_null($active)) {
+		// 	$searchCriteria
+		// 		->filter('activo')
+		// 		->restricted_by('equals')
+		// 		->compare_with($active);
+		// }
+
+		// No existe en la tabla
+		// if (!is_null($updatedFrom)) {
+		// 	$updatedFromDate = date('Y-m-d', $updatedFrom);
+		// 	$searchCriteria->add_scope(
+		// 		'updatedFrom',
+		// 		array('args' => array($updatedFromDate))
+		// 	);
+		// }
+
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
+
+		return $results;
+	}
+
 }
