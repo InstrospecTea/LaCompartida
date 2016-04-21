@@ -3,8 +3,8 @@
 interface ITranslatingBusiness extends BaseBusiness {
 
 	/**
-	 * Obtiene una instancia de {@link Language} en base a un cÃ³digo definido.
-	 * @param  string $languageCode CÃ³digo del idioma, puede ser 'es', 'en' u otro definido.
+	 * Obtiene una instancia de {@link Language} en base a un código definido.
+	 * @param  string $languageCode Código del idioma, puede ser 'es', 'en' u otro definido.
 	 * @return Language
 	 */
 	function getLanguageByCode($languageCode);

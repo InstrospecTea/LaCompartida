@@ -8,7 +8,7 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 	}
 
 	/**
-	* FunciÃ³n que carga con UNA sola query todos los invoices (facturas) de una sola vez
+	* Función que carga con UNA sola query todos los invoices (facturas) de una sola vez
 	* @param array $invoiceIds array de invoices id
 	* @return map list de array, donde cada indice es el id del invoice pedido
 	*/
