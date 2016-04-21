@@ -179,7 +179,7 @@ class SearchService implements ISearchService {
 				$criteria->add_select($searchCriteria->entity() . '.' . $entity->getIdentity());
 			}
 			foreach ($filterProperties as $filter_property) {
-				$field_name = $this->makeFieldName($searchCriteria->entity(), $filter_property );
+				$field_name = $this->makeFieldName($searchCriteria->entity(), $filter_property);
 				$criteria = $this->addSelectField($criteria, $field_name, $genericMode);
 			}
 		}
@@ -196,8 +196,8 @@ class SearchService implements ISearchService {
 	 */
 	private function addSelectField($criteria, $field_name, $genericMode) {
 		if ($genericMode) {
-			$propertyAlias = $this->makeAliasName($field_name);
-			$criteria->add_select($field_name, $propertyAlias);
+			$aliasName = $this->makeAliasName($field_name);
+			$criteria->add_select($aliasName['field'], $aliasName['alias']);
 		} else {
 			$criteria->add_select($field_name);
 		}
@@ -244,16 +244,32 @@ class SearchService implements ISearchService {
 
 	private function makeRestrictionName($for, $property) {
 		if (preg_match('/\((.*)\)/i', $property, $match)) { //is a function
-			 return $property; 
-		} 
+			return $property;
+		}
 		return $for . '.' . $property;
 	}
 
+	/**
+	 * Retorna un arreglo con el nombre del campo y con el alias correspondiente
+	 * @param  [string] $field_name
+	 * @return [array] array('alias' => '', 'field' => '')
+	 */
 	private function makeAliasName($field_name) {
-		if (preg_match('/^[a-z][a-z0-9_]+\((.*)\)/i', $field_name, $match)) { //is a function
+		// Si el $field_name tiene un alias asignado ej:
+		// Table.field AS custom_field
+		// METHOD(Table.field) AS custom_field
+		if (preg_match('/^(.+)[\t\s]+as[\t\s]+(.*)$/i', $field_name, $match)) {
 			$field_name = $match[1];
+			$alias_name = $match[2];
+			// Si el field_name es contiene un método ej:
+			// METHOD(Table.field)
+		} else if (preg_match('/^[a-z][a-z0-9_]+\((.*)\)/i', $field_name, $match)) {
+			$alias_name = str_replace('.', '_', strtolower($match[1]));
+		} else {
+			$alias_name = str_replace('.', '_', strtolower($field_name));
 		}
-		return str_replace('.', '_', strtolower($field_name));
+
+		return array('field' => $field_name, 'alias' => $alias_name);
 	}
 
 	private function prepareGrouping(Criteria $criteria, SearchCriteria $searchCriteria) {

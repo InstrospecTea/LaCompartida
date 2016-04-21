@@ -603,12 +603,14 @@ class UtilesApp extends Utiles {
 	}
 
 	//Funcion que transforma de tiempo x,xx o x.xx en Time mysql
-	function Decimal2Time($duracion) {
-		$duracion = str_replace(',', '.', $duracion);
+	function Decimal2Time($duracion, $format = 'H:i:s') {
+		if (strpos($duracion, ',')) {
+			$duracion = str_replace(',', '.', $duracion);
+		}
 		$minutos = round($duracion * 60);
 		$h = floor($minutos / 60);
 		$m = floor($minutos % 60);
-		return date('H:i:s', mktime($h, $m, 0, 0, 0, 0));
+		return date($format, mktime($h, $m, 0, 0, 0, 0));
 	}
 
 	//Función que revisa contraseñas de web services
