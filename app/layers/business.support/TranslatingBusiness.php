@@ -1,14 +1,14 @@
 <?php
 
 /**
-* 
+*
 */
 class TranslatingBusiness extends AbstractBusiness implements ITranslatingBusiness {
-	
+
 	/**
-	 * Obtiene una instancia de {@link Language} en base a un cÃ³digo definido.
-	 * @param  string $languageCode CÃ³digo del idioma, puede ser 'es', 'en' u otro definido.
-	 * @throws BusinessException Cuando el cÃ³digo del idioma no tiene asociado una entidad en el medio persistente.
+	 * Obtiene una instancia de {@link Language} en base a un código definido.
+	 * @param  string $languageCode Código del idioma, puede ser 'es', 'en' u otro definido.
+	 * @throws BusinessException Cuando el código del idioma no tiene asociado una entidad en el medio persistente.
 	 * @return Language
 	 */
 	function getLanguageByCode($languageCode) {
