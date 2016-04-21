@@ -1944,11 +1944,19 @@ class NotaCobro extends Cobro {
 
 				if ($this->fields['opc_ver_descuento']) {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', $this->GenerarDocumento($parser, 'DETALLE_COBRO_DESCUENTO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_DESCUENTO_NUEVO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				} else {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', '', $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', '', $html);
 				}
 
-				//if(( ( method_exists('Conf','GetConf') && Conf::GetConf($this->sesion,'UsarImpuestoSeparado') ) || ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() ) ) && $contrato->fields['usa_impuesto_separado'])
+				global $x_resultados;
+				$simbolo_moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'];
+				$cifras_decimales = $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'];
+				$separador_decimales = $cobro_moneda->moneda[$this->fields['id_moneda']]['simbolo'];
+				$html = str_replace('%honorarios_nuevo%', __('Honorarios'), $html);
+				$html = str_replace('%valor_honorarios_nuevo%', $simbolo_moneda . $this->espacio . number_format($x_resultados['monto_honorarios'][$this->fields['opc_moneda_total']], $cifras_decimales, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
 				if ($this->fields['porcentaje_impuesto'] > 0 || $this->fields['porcentaje_impuesto_gastos'] > 0) {
 					$html = str_replace('%IMPUESTO%', $this->GenerarDocumento($parser, 'IMPUESTO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				} else {
@@ -2201,8 +2209,10 @@ class NotaCobro extends Cobro {
 
 				if ($this->fields['opc_ver_descuento']) {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', $this->GenerarDocumento($parser, 'DETALLE_COBRO_DESCUENTO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_DESCUENTO_NUEVO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				} else {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', '', $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', '', $html);
 				}
 
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -3392,8 +3402,10 @@ class NotaCobro extends Cobro {
 
 				if ($this->fields['opc_ver_descuento']) {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', $this->GenerarDocumento($parser, 'DETALLE_COBRO_DESCUENTO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_DESCUENTO_NUEVO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				} else {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', '', $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', '', $html);
 				}
 
 				if (count($this->asuntos) > 1) {
@@ -5348,15 +5360,18 @@ class NotaCobro extends Cobro {
 					$html = str_replace('%valor_horas%', $horas_cobrables . ':' . $minutos_cobrables, $html);
 				}
 				$html = str_replace('%honorarios%', __('Honorarios'), $html);
-				if (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') && $contrato->fields['usa_impuesto_separado'])
+				if (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') && $contrato->fields['usa_impuesto_separado']) {
 					$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'] - $this->fields['impuesto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
+				} else {
 					$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				}
 
 				if ($this->fields['opc_ver_descuento']) {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', $this->GenerarDocumento2($parser, 'DETALLE_COBRO_DESCUENTO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_DESCUENTO_NUEVO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				} else {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', '', $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', '', $html);
 				}
 
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -6624,8 +6639,10 @@ class NotaCobro extends Cobro {
 
 				if ($this->fields['opc_ver_descuento']) {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', $this->GenerarDocumento2($parser, 'DETALLE_COBRO_DESCUENTO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_DESCUENTO_NUEVO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				} else {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', '', $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', '', $html);
 				}
 
 				if (count($this->asuntos) > 1) {
@@ -7730,15 +7747,18 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%horas%', __('Total Horas'), $html);
 				$html = str_replace('%valor_horas%', $horas_cobrables . ':' . $minutos_cobrables, $html);
 				$html = str_replace('%honorarios%', __('Honorarios'), $html);
-				if (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') && $contrato->fields['usa_impuesto_separado'])
+				if (Conf::GetConf($this->sesion, 'UsarImpuestoSeparado') && $contrato->fields['usa_impuesto_separado']) {
 					$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'] - $this->fields['impuesto'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
-				else
+				} else {
 					$html = str_replace('%valor_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				}
 
 				if ($this->fields['opc_ver_descuento']) {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_DESCUENTO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_DESCUENTO_NUEVO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				} else {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', '', $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', '', $html);
 				}
 
 				$html = str_replace('%DETALLE_COBRO_MONEDA_TOTAL%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_MONEDA_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
@@ -9384,8 +9404,10 @@ class NotaCobro extends Cobro {
 
 				if ($this->fields['opc_ver_descuento']) {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_DESCUENTO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', $this->GenerarDocumentoComun($parser, 'DETALLE_COBRO_DESCUENTO_NUEVO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				} else {
 					$html = str_replace('%DETALLE_COBRO_DESCUENTO%', '', $html);
+					$html = str_replace('%DETALLE_COBRO_DESCUENTO_NUEVO%', '', $html);
 				}
 
 				if (count($this->asuntos) > 1) {
