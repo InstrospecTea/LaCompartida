@@ -19,7 +19,7 @@ class FacturacionElectronicaSatcom extends FacturacionElectronica {
 		if (empty($giro_cliente)) {
 			$pagina->AddError(__('Debe ingresar ' . __('Giro') . ' del cliente.'));
 		}
-		if ($id_factura_padre  > 0) {
+		if ($id_factura_padre > 0) {
 			if (empty($dte_codigo_referencia)) {
 				$pagina->AddError(__('Debe seleccionar Referencia'));
 			}
@@ -95,6 +95,7 @@ EOF;
   * @param type $hookArg
 	*/
 	public static function DescargarPdf($hookArg) {
+		$Sesion = new Sesion();
 		$factura = $hookArg['Factura'];
 
 		$PrmDocumentoLegal = new PrmDocumentoLegal($factura->sesion);
@@ -102,7 +103,10 @@ EOF;
 		$docName = UtilesApp::slug($PrmDocumentoLegal->fields['glosa']);
 		$name = sprintf('%s_%s.pdf', $docName, $factura->obtenerNumero());
 
-		$WsFacturacionSatcom = new WsFacturacionSatcom;
+		$Estudio = new PrmEstudio($Sesion);
+		$Estudio->Load($factura->fields['id_estudio']);
+
+		$WsFacturacionSatcom = new WsFacturacionSatcom($Estudio->GetMetaData('facturacion_electronica_satcom.Url'));
 		$documento = $WsFacturacionSatcom->obtenerPdf($factura->fields['dte_url_pdf']);
 
 		header("Content-Transfer-Encoding: binary");
@@ -128,7 +132,7 @@ EOF;
 			$factura->fields['Establecimiento'] = $Estudio->GetMetadata('facturacion_electronica_satcom.Establecimiento');
 			$factura->fields['Punto'] = $Estudio->GetMetadata('facturacion_electronica_satcom.Punto');
 
-			$WsFacturacionSatcom = new WsFacturacionSatcom;
+			$WsFacturacionSatcom = new WsFacturacionSatcom($Estudio->GetMetaData('facturacion_electronica_satcom.Url'));
 			$documento = $WsFacturacionSatcom->emitirFactura($factura);
 
 			if ($WsFacturacionSatcom->hasError()) {
