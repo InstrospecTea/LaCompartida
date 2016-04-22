@@ -78,7 +78,7 @@ class RateController extends AbstractController {
 	 */
 	public function deleteErrandRate() {
 		$this->loadBusiness('Rate');
-		$total_rates = $this->RateBusiness->countRates();
+		$total_rates = $this->RateBusiness->countErrandsRates();
 
 		$response = new stdClass();
 

@@ -61,5 +61,5 @@ interface IRateBusiness  extends BaseBusiness {
 	 * Cuenta las tarifas de trámites del sistema
 	 * @return int
 	 */
-	public function countRates();
+	public function countErrandsRates();
 }

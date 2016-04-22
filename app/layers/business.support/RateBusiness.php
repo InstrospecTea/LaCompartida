@@ -214,7 +214,7 @@ class RateBusiness extends AbstractBusiness implements IRateBusiness {
 	 * Cuenta las tarifas de trámites del sistema
 	 * @return int
 	 */
-	public function countRates() {
+	public function countErrandsRates() {
 		$Criteria = new Criteria($this->Session);
 		$num_contratos = $Criteria->add_select('COUNT(*)', 'num_rows')
 			->add_from('tramite_tarifa')
