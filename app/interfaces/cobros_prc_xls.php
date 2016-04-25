@@ -1116,7 +1116,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				// La multiplicación por 24 es para transformarlos a minutos cobrables (es por día)
 				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda);
 
-				$filas += 1;
+				$filas += 2;
 			}
 			subtotal_profesional($ws, $filas, $columna_hora, $col_formula_hora, $fila_inicial_asunto, $formato_tiempo_total_tabla, $Cobro, $columna_hora_tarificada,
 							$col_formula_hora_tarificada, $columna_importe, $col_formula_importe, $formato_moneda_tabla);
