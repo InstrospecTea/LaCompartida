@@ -890,18 +890,22 @@ HTML;
 			);
 		}
 
+		$app_from = (empty($id_archivo_anexo)) ? Conf::AppName() : 'Case Tracking';
+		$from = 'cron_correo@thetimebilling.com';
 		$mail = new PHPMailer();
 		$mail->IsSMTP(); // telling the class to use SMTP
+		$mail->SetFrom($from, $app_from);
 		$mail->SMTPAuth = true; // enable SMTP authentication
-		$mail->SMTPSecure = 'ssl'; // sets the prefix to the servier
-		$mail->Host = 'smtp.gmail.com'; // sets GMAIL as the SMTP server
-		$mail->Port = 465; // set the SMTP port for the GMAIL server
-		$mail->Username = Conf::GetConf($Sesion, 'UsernameMail'); // recordar poner en el conf el correo completo: algo@lemontech.cl
-		$mail->Password = Conf::GetConf($Sesion, 'PasswordMail');
+		$mail->Subject = $subject;
+		$mail->AddBCC($from);
+		$mail->AddReplyTo($from);
+		$mail->Host = "email-smtp.us-east-1.amazonaws.com";
+		$mail->Username = "AKIAIDG2BX4WGJMFC2TA";
+		$mail->Password = "Aqru/Fbu3Yu7gjrYoTUhpYgEA2KFArUHQ7krh1/yjoO4";
+		$mail->SMTPSecure = 'tls';
+		$mail->Port = 587;
+		$mail->CharSet = 'UTF-8';
 
-		$app_from = (empty($id_archivo_anexo)) ? Conf::AppName() : 'Case Tracking';
-
-		$mail->SetFrom(Conf::GetConf($Sesion, 'UsernameMail'), $app_from);
 		self::addEmailAddress($mail, 'AddAddress', $correos);
 
 		if ($envia_admin) {
@@ -944,28 +948,14 @@ HTML;
 			$body = 'Sin información';
 		}
 
-		if (Conf::GetConf($Sesion, 'UsarMailAmazonSES')) {
-			// Agrego el username como BCC para que tenga todos los correos
-			$mail->AddBCC($mail->Username);
-			$mail->AddReplyTo($mail->Username);
+		$body = sprintf('<pre>%s</pre>', utf8_encode($body));
 
-			// Configuracion de AWS SES
-			$mail->Host = "email-smtp.us-east-1.amazonaws.com";
-			$mail->Username = "AKIAIDG2BX4WGJMFC2TA";
-			$mail->Password = "Aqru/Fbu3Yu7gjrYoTUhpYgEA2KFArUHQ7krh1/yjoO4";
-			$mail->SMTPSecure = 'tls';
-			$mail->Port = 587;
-			$mail->CharSet = 'UTF-8';
-			$body = sprintf('<pre>%s</pre>', utf8_encode($body));
-		}
-
-		$mail->Subject = $subject;
 		$mail->AltBody = "Debe utilizar un lector de correos que acepte HTML"; // optional, comment out and test
 		$mail->MsgHTML($body);
 
 		if (!$mail->Send()) {
 			self::$emailError = $mail->ErrorInfo;
-			echo "<!-- Mailer Error: " . $mail->ErrorInfo . "-->";
+			echo "<!-- Mailer Error: {$mail->ErrorInfo}-->";
 			return false;
 		} else {
 			echo "<!-- Message sent! -->";
