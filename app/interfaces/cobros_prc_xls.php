@@ -1,18 +1,11 @@
 <?php
-
 require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Funciones.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
+
 
 $Sesion = new Sesion(array('ADM', 'COB'));
 set_time_limit(400);
-ini_set("memory_limit", "256M");
+ini_set("memory_limit", "1024M");
 $where_cobro = ' 1 ';
 
 if ($id_cobro) {
@@ -513,12 +506,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$filas += 1;
 
 	//Glosa de la razón social en el contrato
-	$ws->write($filas, $col_id_trabajo, strtoupper($Contrato->fields['factura_razon_social']), $letra_chica);
-	$filas += 2;
+	$ws->write($filas, $col_id_trabajo, strtoupper($Contrato->fields['factura_razon_social']), $letra_chica_bold);
+	$filas += 1;
 
 	//Dirección en el contrato
 	$ws->write($filas, $col_id_trabajo, strtoupper($Contrato->fields['factura_direccion']), $letra_chica);
-	$filas += 4;
+	$filas += 3;
 
 	//Lista de asuntos del cobro
 	$Cobro->LoadAsuntos();
@@ -698,6 +691,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		if ($Cobro->fields['fecha_ini'] != '0000-00-00') {
 			$fecha_ini_titulo = $Cobro->fields['fecha_ini'];
 		}
+		$fecha_ini_titulo = $Cobro->fields['fecha_ini'];
 		$ws->mergeCells($filas, 0, $filas, 4);
 		$ws->write($filas, $columna_categoria, $arraylang['titulo_resumen']['Encabezado'][$lang], $formato_encabezado_center);
 		$ws->write($filas, $columna_abogado, '', $formato_encabezado);
@@ -1092,7 +1086,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$tarifa_trabajo *= $factor_proporcional_forma_cobro;
 				}
 
-				$ws->writeNumber($filas, $columna_tarifa, $tarifa_trabajo, $formato_moneda2_centrado);
+				$ws->writeNumber($filas, $columna_tarifa, $tarifa_trabajo, $formato_moneda);
 
 
 				$duracion = $trabajo->fields['duracion_cobrada'];
@@ -1110,7 +1104,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				}
 
 				// La multiplicación por 24 es para transformarlos a minutos cobrables (es por día)
-				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda2_centrado);
+				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda);
 
 				$filas += 1;
 			}
