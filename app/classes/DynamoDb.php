@@ -46,13 +46,13 @@ class DynamoDb {
 
 	public function parseFields($fields) {
 		$values = [];
-		foreach ($fields as $field => $valor) {
-			if (is_string($valor)) {
-				$values[$field] = $valor;
-			} else if (isset($valor['S'])) {
-				$values[$field] = $valor['S'];
-			} else if (isset($valor['N'])) {
-				$values[$field] = $valor['N'];
+		foreach ($fields as $field => $value) {
+			if (is_string($value)) {
+				$values[$field] = $value;
+			} else if (isset($value['S'])) {
+				$values[$field] = $value['S'];
+			} else if (isset($value['N'])) {
+				$values[$field] = $value['N'];
 			}
 		}
 		return $values;
