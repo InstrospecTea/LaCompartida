@@ -60,7 +60,7 @@ class S3 {
 		return $signedUrl;
 	}
 
-	public function putFile($file_name, $body) {
+	public function putFileContents($file_name, $body) {
 		return $this->client->putObject([
 				'Bucket' => $this->bucket,
 				'Key' => $file_name,
