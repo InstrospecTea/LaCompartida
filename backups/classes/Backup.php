@@ -17,7 +17,7 @@ class Backup {
 	}
 
 	/**
-	 * Calcular las fechas de los backups q no se borran
+	 * Calcular las fechas de los backups que no se borran
 	 * @param type $fechaviejo
 	 * @param type $duracion
 	 * @return type

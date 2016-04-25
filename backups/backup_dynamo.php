@@ -13,8 +13,14 @@ $Body->add('leyendo conf');
 require_once dirname(__DIR__) . '/app/conf.php';
 require_once dirname(__FILE__) . '/config.php';
 $dir_temp = Conf::read('dir_temp');
-$fecha = date('Y-m-d');
+if (!file_exists($dir_temp)) {
+	$Body->add("creando directorio temporal $dir_temp");
+	if (!mkdir($dir_temp, 0755, true)) {
+		$errores[] = $Body->add("error al crear directorio $dir_temp");
+	}
+}
 
+$fecha = date('Y-m-d');
 
 $Body->add('limpiando temporales');
 $temps = glob("$dir_temp/*_*.sql*");
@@ -34,7 +40,6 @@ $tenants = Backup::getTenants();
 $Body->add('termina la lectura de DynamoDB');
 
 $db_updater = new DatabaseUpdater(Conf::Hash());
-$backup_mysql_error = Conf::read('backup_mysql_error');
 
 $bucket_name = 'ttbackups';
 $S3 = new S3($bucket_name);
@@ -65,11 +70,6 @@ foreach ($tenants as $tenant) {
 		'weeks' => intval($tenant['weeks']),
 		'day' => $tenant['dia']
 	];
-	if (Backup::fechaBorrable($fecha, $duracion)) {
-		$datos_duracion = "day:{$tenant['days']}, week:{$tenant['weeks']}, day:{$tenant['dia']}";
-		$Body->add("saltandose respaldo de {$tenant['dbname']} por configuracion de duracion de backups ($datos_duracion)", true);
-		continue;
-	}
 
 	$Body->add("respaldando {$tenant['dbname']} en {$tenant['vhost']}");
 
@@ -83,14 +83,6 @@ foreach ($tenants as $tenant) {
 	if ($S3->fileExists($file_bkp)) {
 		$Body->add("respaldo $file_bkp ya existe: omitiendo...");
 	} else {
-		if (!file_exists($dir_temp)) {
-			$Body->add("creando directorio temporal $dir_temp");
-			if (!mkdir($dir_temp, 0755, true)) {
-				$errores[] = $Body->add("error al crear directorio $dir_temp");
-				continue;
-			}
-		}
-
 		$Body->add("dumpeando a $path");
 		Backup::mysqlError('');
 		$out = Backup::makeDump($tenant, $path);
@@ -109,7 +101,6 @@ foreach ($tenants as $tenant) {
 		$Body->add("copiando a S3: $path");
 		try {
 			$S3->uploadFile($file_bkp, $path);
-			$db_updater->update('update_db', $tenant['subdominiosubdir'], $tenant['update_db']);
 		} catch (Exception $e) {
 			print_r($e);
 		}
