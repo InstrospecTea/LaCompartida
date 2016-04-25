@@ -41,12 +41,17 @@ class WsFacturacionSatcom extends WsFacturacion {
 			$this->setHeaders('ProcesarComprobante');
 			$respuesta = $this->Client->ProcesarComprobante($ProcesarComprobante);
 
-			if ($respuesta->ProcesarComprobanteResult->EstadoProceso != 'Error') {
+			$estado_proceso = $respuesta->ProcesarComprobanteResult->EstadoProceso;
+
+			if ($estado_proceso == 'Autorizado') {
 				$id_comprobante = $respuesta->ProcesarComprobanteResult->IdComprobanteSAT;
+			} else if ($estado_proceso == 'DuplicadoSatcom') {
+				$this->setError(1, 'El número de documento se encuentra duplicado en Satcom');
 			} else {
+				// Error, NoAutorizado, ErrorEstructuraXml
 				Log::write($documento_xml, 'FacturacionElectronicaSatcom');
 				Log::write($respuesta->ProcesarComprobanteResult->MensajeError, 'FacturacionElectronicaSatcom');
-				$this->setError(1, 'Ocurrió un error inesperado en la generación del documento con Satcom');
+				$this->setError(1, "Ocurrió un error inesperado con Satcom [$estado_proceso]");
 			}
 		} catch(SoapFault $fault) {
 			Log::write($documento_xml, 'FacturacionElectronicaSatcom');
@@ -62,7 +67,10 @@ class WsFacturacionSatcom extends WsFacturacion {
 
 		$requerimiento->addChild('Codigo', '01');
 		$requerimiento->addChild('Descripcion', 'FACTURA');
+
+		// NumeroDocumento debe contener al menos 9 dígitos
 		$requerimiento->addChild('NumeroDocumento', $factura->fields['numero']);
+
 		$requerimiento->addChild('FechaEmision', str_replace(' ', 'T', $factura->fields['fecha_creacion']));
 		// $requerimiento->addChild('PeridodoFiscal');
 
@@ -102,7 +110,17 @@ class WsFacturacionSatcom extends WsFacturacion {
 
 		$cliente = $requerimiento->addChild('Cliente');
 		$cliente->addChild('RazonSocial', $factura->fields['cliente']);
-		$cliente->addChild('TipoIdentificacion', '07');
+
+		/**
+		 * TipoIdentificacion
+		 * 04 - RUC (Ej. 1790011062001)
+		 * 05 - Cedula (Ej. 1715625198)
+		 * 06 - Pasaporte (Ej. ECU12345)
+		 * 07 - Consumidor Final (9999999999999)
+		 * 08 - Identificación del Exterior (COL-A1234565-2563245)
+		 */
+		$cliente->addChild('TipoIdentificacion', '04');
+
 		$cliente->addChild('NumeroIdentificacion', $factura->fields['RUT_cliente']);
 		// $cliente->addChild('email', '');
 		// $cliente->addChild('Telefono', '');

@@ -3,7 +3,12 @@
 class FacturacionElectronicaSatcom extends FacturacionElectronica {
 
 	public static function ValidarFactura() {
-		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente, $id_factura_padre, $dte_codigo_referencia, $dte_razon_referencia;
+		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente, $id_factura_padre, $dte_codigo_referencia, $dte_razon_referencia, $numero;
+		if (empty($numero)) {
+			$pagina->AddError(__('Debe ingresar el Número del documento.'));
+		} else if (strlen($numero) < 9) {
+			$pagina->AddError(__('El Número del documento debe ser mayor a 9 dígitos.'));
+		}
 		if (empty($RUT_cliente)) {
 			$pagina->AddError(__('Debe ingresar RUT del cliente.'));
 		}
@@ -159,7 +164,7 @@ EOF;
 		if (is_a($result, 'Exception')) {
 			$error_log = $result->__toString();
 		} else {
-			$error_description = utf8_decode($result->getErrorMessage());
+			$error_description = utf8_encode($result->getErrorMessage());
 			$error_log = $error_description;
 		}
 
