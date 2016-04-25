@@ -163,9 +163,8 @@ if ($espacio_disco_local < Conf::read('alerta_disco_temp')) {
 
 if (!empty($errores)) {
 	$Body->add(count($errores) . " errores, mandando mail...");
-	$Sesion = new Sesion();
 	$subject = count($errores) . ' problemas en proceso de backups';
-	if (!Utiles::EnviarMail($Sesion, Conf::read('send_to'), $subject, $Body, false)) {
+	if (!Utiles::EnviarMail(null, Conf::read('send_to'), $subject, $Body, false)) {
 		$Body->add('error mandando mail: ' . Utiles::$emailError);
 	} else {
 		$Body->add('mail ok');
