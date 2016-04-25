@@ -687,11 +687,14 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$columna_importe = $col++;
 		$col_formula_importe = Utiles::NumToColumnaExcel($columna_importe);
 
+		$WorkingBusiness = new WorkingBusiness($Sesion);
+		$works = $WorkingBusiness->getWorksByCharge($Cobro->fields['id_cobro']);
 		$fecha_ini_titulo = '';
 		if ($Cobro->fields['fecha_ini'] != '0000-00-00') {
 			$fecha_ini_titulo = $Cobro->fields['fecha_ini'];
+		} else {
+			$fecha_ini_titulo = $works[0]->fields['fecha'];
 		}
-		$fecha_ini_titulo = $Cobro->fields['fecha_ini'];
 		$ws->mergeCells($filas, 0, $filas, 4);
 		$ws->write($filas, $columna_categoria, $arraylang['titulo_resumen']['Encabezado'][$lang], $formato_encabezado_center);
 		$ws->write($filas, $columna_abogado, '', $formato_encabezado);
@@ -700,7 +703,14 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $columna_importe, '', $formato_encabezado);
 		$filas += 1;
 		$ws->mergeCells($filas, 0, $filas, 4);
-		$ws->write($filas, $columna_categoria, $arraylang['periodo']['Listado de trabajos'][$lang] . ' ' . $fecha_ini_titulo . $arraylang['periodo_al']['Listado de trabajos'][$lang] . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
+
+		$ws->write(
+			$filas,
+			$columna_categoria,
+			"{$arraylang['periodo']['Listado de trabajos'][$lang]} {$fecha_ini_titulo} {$arraylang['periodo_al']['Listado de trabajos'][$lang]} {$Cobro->fields['fecha_fin']}",
+			$formato_encabezado_center
+		);
+
 		$ws->write($filas, $columna_abogado, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_hora, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_tarifa, '', $formato_encabezado_center);
@@ -1168,9 +1178,19 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$columna_gastos_montos = $col++;
 		$col_formula_gastos_montos = Utiles::NumToColumnaExcel($columna_gastos_montos);
 
+		$Criteria = new Criteria($Sesion);
+		$result_fecha_menor_gastos = $Criteria
+			->add_select('fecha_factura')
+			->add_from('cta_corriente')
+			->add_restriction(CriteriaRestriction::equals('id_cobro', $Cobro->fields['id_cobro']))
+			->add_ordering('fecha_factura', 'ASC')
+			->add_limit(1)
+			->run();
 		$fecha_ini_titulo = '';
 		if ($Cobro->fields['fecha_ini'] != '0000-00-00') {
 			$fecha_ini_titulo = $Cobro->fields['fecha_ini'];
+		} else {
+			$fecha_ini_titulo = $result_fecha_menor_gastos[0]['fecha_factura'];
 		}
 
 		$ws->mergeCells($filas, 0, $filas, 3);
