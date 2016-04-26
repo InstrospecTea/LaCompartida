@@ -41,4 +41,4 @@ interface ICoiningBusiness extends BaseBusiness {
 	 */
 	function setCurrencyAmountByCharge(Currency $currency, Charge $charge);
 
-} 
+}
