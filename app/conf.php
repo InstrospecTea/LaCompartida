@@ -25,7 +25,7 @@ Conf::setStatic('MaxLoggedTime', 48800);
 Conf::setStatic('Hash', 'c85ef9997e6a30032a765a20ee69630b');
 Conf::setStatic('RutaGraficos', '/usr/lib64/php/modules/ChartDirector/lib/phpchartdir.php');
 Conf::setStatic('RutaPdf', '/usr/share/php/fpdf/fpdf.php');
-Conf::setStatic('DireccionPdf', "Estudio Lemontech\nTorremolinos 70, Oficina 4\nCP 7550159 Las Condes\nSantiago, Chile\nTf. +56-2 2299243\ninfo@lemontech.cl");
+Conf::setStatic('DireccionPdf', "Estudio Lemontech\nLos Militares 4777,\n Torre 1, Piso 19\nLas Condes, Santiago de Chile\nTf. +56 2 3223 9990\ninfo@lemontech.com");
 Conf::setStatic('Templates', 'default');
 Conf::setStatic('Locale', array('es_CL', 'es_ES'));
 Conf::setStatic('BorrarDatosAdministracion', false);
