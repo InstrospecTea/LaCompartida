@@ -496,7 +496,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$filas = 9;
 
 	// Agregar la imagen del logo
-	if (UtilesApp::GetConf($sesion, 'LogoExcel')) {
+	if (UtilesApp::GetConf($sesion, 'LogoExcel') && file_exists(UtilesApp::GetConf($sesion, 'LogoExcel'))) {
 		$ws->insertBitmap(0, 0, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, 1, 1.2);
 	}
 
