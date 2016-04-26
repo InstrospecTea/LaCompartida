@@ -840,6 +840,9 @@ if (!class_exists('Cobro')) {
 			$cobro_moneda = new CobroMoneda($this->sesion);
 			$cobro_moneda->Load($this->fields['id_cobro']);
 
+			// Horas cobrables asociadas al cobro
+			$total_horas_cobro = $this->TotalHorasCobro($this->fields['id_cobro']);
+
 			$this->escalonadas = array();
 			$this->escalonadas['num'] = 0;
 			$this->escalonadas['monto_fijo'] = 0;
@@ -857,15 +860,26 @@ if (!class_exists('Cobro')) {
 				$this->escalonadas[$i]['tiempo_final'] = $this->fields['esc' . $i . '_tiempo'] + $tiempo_inicial;
 				$this->escalonadas[$i]['id_tarifa'] = $this->fields['esc' . $i . '_id_tarifa'];
 				$this->escalonadas[$i]['id_moneda'] = $this->fields['esc' . $i . '_id_moneda'];
+
 				$this->escalonadas[$i]['monto'] = UtilesApp::CambiarMoneda(
-								$this->fields['esc' . $i . '_monto'], $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
-						) * ( 1 - $this->fields['esc' . $i . '_descuento'] / 100 );
+					$this->fields['esc' . $i . '_monto'],
+					$cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['tipo_cambio'],
+					$cobro_moneda->moneda[$this->escalonadas[$i]['id_moneda']]['cifras_decimales'],
+					$cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
+					$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
+				) * ( 1 - $this->fields['esc' . $i . '_descuento'] / 100 );
 
 				$this->escalonadas[$i]['descuento'] = $this->fields['esc' . $i . '_descuento'];
 
+				// Si el escalon tiene asignado un monto fijo
 				if (!empty($this->escalonadas[$i]['monto'])) {
 					$this->escalonadas[$i]['escalonada_tarificada'] = 0;
-					$this->escalonadas['monto_fijo'] += $this->escalonadas[$i]['monto'];
+
+					// Para aplicar el escalon, las horas del cobro tienen que ser mayor al tiempo inicial
+					if ($total_horas_cobro > $this->escalonadas[$i]['tiempo_inicial']) {
+						// Será sumado el monto fijo del escalon al total de honorarios
+						$this->escalonadas['monto_fijo'] += $this->escalonadas[$i]['monto'];
+					}
 				} else {
 					$this->escalonadas[$i]['escalonada_tarificada'] = 1;
 				}
@@ -883,14 +897,22 @@ if (!class_exists('Cobro')) {
 			$this->escalonadas[$i2]['tiempo_final'] = '';
 			$this->escalonadas[$i2]['id_tarifa'] = $this->fields['esc' . $i . '_id_tarifa'];
 			$this->escalonadas[$i2]['id_moneda'] = $this->fields['esc' . $i . '_id_moneda'];
+
 			$this->escalonadas[$i2]['monto'] = UtilesApp::CambiarMoneda(
-							$this->fields['esc' . $i . '_monto'], $cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'], $cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
-					) * ( 1 - $this->fields['esc' . $i . '_descuento'] / 100 );
+				$this->fields['esc' . $i . '_monto'],
+				$cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['tipo_cambio'],
+				$cobro_moneda->moneda[$this->escalonadas[$i2]['id_moneda']]['cifras_decimales'],
+				$cobro_moneda->moneda[$this->fields['id_moneda']]['tipo_cambio'],
+				$cobro_moneda->moneda[$this->fields['id_moneda']]['cifras_decimales']
+			) * ( 1 - $this->fields['esc' . $i . '_descuento'] / 100 );
+
 			$this->escalonadas[$i2]['descuento'] = $this->fields['esc' . $i . '_descuento'];
 
 			if (!empty($this->escalonadas[$i2]['monto'])) {
 				$this->escalonadas[$i2]['escalonada_tarificada'] = 0;
-				$this->escalonadas['monto_fijo'] += $this->escalonadas[$i2]['monto'];
+				if ($total_horas_cobro > $this->escalonadas[$i2]['tiempo_inicial']) {
+					$this->escalonadas['monto_fijo'] += $this->escalonadas[$i2]['monto'];
+				}
 			} else {
 				$this->escalonadas[$i2]['escalonada_tarificada'] = 1;
 			}
@@ -1054,6 +1076,7 @@ if (!class_exists('Cobro')) {
 					continue;
 				}
 			}
+
 			$total_minutos_tmp = ( $cobro_total_duracion * 60 );
 
 			return array($cobro_total_honorario_cobrable, $total_minutos_tmp, $detalle_trabajos);
@@ -1644,11 +1667,11 @@ if (!class_exists('Cobro')) {
 
 			#DESCUENTOS
 			if ($this->fields['tipo_descuento'] == 'PORCENTAJE') {
-				$cobro_descuento = ($_calcula_monto_tramites + $cobro_total_honorario_cobrable) * $this->fields['porcentaje_descuento'] / 100;
+				$cobro_descuento = ($_calcula_monto_tramites + round($cobro_total_honorario_cobrable, $moneda_del_cobro->fields['cifras_decimales'])) * $this->fields['porcentaje_descuento'] / 100;
 				$cobro_total = ($_calcula_monto_tramites + $cobro_total_honorario_cobrable) - $cobro_descuento;
 				$cobro_total = round($cobro_total, $moneda_del_cobro->fields['cifras_decimales']);
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - $cobro_descuento;
-				$this->Edit('descuento', number_format($cobro_descuento, 6, ".", ""));
+				$this->Edit('descuento', number_format($cobro_descuento, $moneda_del_cobro->fields['cifras_decimales'], ".", ""));
 			} else {
 				$cobro_honorarios_menos_descuento = $cobro_total_honorario_cobrable - ($this->fields['descuento']);
 				$cobro_total = ($_calcula_monto_tramites + $cobro_total_honorario_cobrable) - ($this->fields['descuento']);
@@ -1972,7 +1995,7 @@ if (!class_exists('Cobro')) {
 
 			$where_cobro = '';
 
-			$query = "SELECT (((cobro.monto_trabajos-cobro.descuento)*cobro.tipo_cambio_moneda)/cobro_moneda.tipo_cambio) AS monto_cap
+			$query = "SELECT ((((cobro.monto_trabajos + cobro.monto_tramites) - cobro.descuento)*cobro.tipo_cambio_moneda)/cobro_moneda.tipo_cambio) AS monto_cap
 							FROM cobro
 							JOIN contrato ON cobro.id_contrato = contrato.id_contrato
 							JOIN cobro_moneda ON cobro_moneda.id_moneda = $id_moneda_cobros_cap

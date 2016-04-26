@@ -27,6 +27,7 @@ jQuery(function () {
 			href: 'javascript:void(0)',
 			onclick: "showDetails('" + uuid + "');"
 		}));
+		td.append(jQuery('<br>'));
 		var span = jQuery('<span id="' + uuid + '"></span>').hide();
 		jQuery.each(jQuery.parseJSON(contenido), function(invoce, charge_id) {
 			span.append(jQuery('<a/>', {
