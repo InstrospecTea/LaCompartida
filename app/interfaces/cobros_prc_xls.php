@@ -586,6 +586,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $col_id_trabajo, $arraylang['honorarios']['Resumen'][$lang], $letra_chica_underline);
 		$ws->write($filas, 3, $simbolo_moneda_total, $letra_chica_derecha);
 		$ws->writeNumber($filas, 4, $x_resultados['monto_subtotal'][$Cobro->fields['opc_moneda_total']], $formato_total);
+		$filas ++;
+		$monto_flat_fee = $Cobro->fields['forma_cobro'] == 'FLAT FEE' ? $simbolo_moneda_total .' '. $Cobro->fields['monto_contrato'] : '';
+		$ws->write($filas, $col_id_trabajo, "{$Cobro->fields['forma_cobro']} $monto_flat_fee", $letra_chica );
 	}
 	$fila_honorario = $filas + 1;
 	$filas += 3;
@@ -693,7 +696,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		if ($Cobro->fields['fecha_ini'] != '0000-00-00') {
 			$fecha_ini_titulo = $Cobro->fields['fecha_ini'];
 		} else {
-			$fecha_ini_titulo = $works[0]->fields['fecha'];
+			$fecha_ini_titulo = !empty($works[0]) ? $works[0]->fields['fecha'] : '';
 		}
 		$ws->mergeCells($filas, 0, $filas, 4);
 		$ws->write($filas, $columna_categoria, $arraylang['titulo_resumen']['Encabezado'][$lang], $formato_encabezado_center);
