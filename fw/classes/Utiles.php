@@ -876,8 +876,6 @@ HTML;
 	 *
 	 * Para que corra la funcion en el conf del sistema tiene que existir:
 	 * AppName: nombre de la aplicación
-	 * UsernameMail: correo de Lemontech de la aplicación
-	 * PasswordMail: password del correo de Lemontech
 	 * MailAdmin: correo del administrador de la aplicacion del cliente
 	 */
 	public static function EnviarMail($Sesion, $correos, $subject, $body, $envia_admin = true, $id_archivo_anexo = NULL, $attachment = NULL) {
@@ -891,7 +889,7 @@ HTML;
 		}
 
 		$app_from = (empty($id_archivo_anexo)) ? Conf::AppName() : 'Case Tracking';
-		$from = 'cron_correo@thetimebilling.com';
+		$from = Conf::emailSender();
 		$mail = new PHPMailer();
 		$mail->IsSMTP(); // telling the class to use SMTP
 		$mail->SetFrom($from, $app_from);

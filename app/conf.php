@@ -18,6 +18,7 @@ if (!function_exists('apache_setenv')) {
 	}
 }
 
+Conf::setStatic('emailSender', 'cron_correo@thetimebilling.com');
 Conf::setStatic('ServerDir', dirname(__FILE__));
 Conf::setStatic('ASDBKey', 'avisos-ttbc');
 Conf::setStatic('ImgDir', '//static.thetimebilling.com/templates/default/img');
