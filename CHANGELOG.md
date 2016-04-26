@@ -1,5 +1,10 @@
 # Changelog
 
+## [Release 16.11.0](https://github.com/LemontechSA/ttb/pull/1420)
+Tuesday, April 26th
+* **Feature** [Nuevo Diseño Detalle Cobro](https://github.com/LemontechSA/ttb/pull/1411)
+* **Feature** [Eliminar liquidaciones](https://github.com/LemontechSA/ttb/pull/1419)
+
 ## [Release 16.10.0](https://github.com/LemontechSA/ttb/pull/1416)
 Thursday, April 21st
 * **Feature** [API v2](https://github.com/LemontechSA/ttb/pull/1414)
