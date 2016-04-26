@@ -1,0 +1,11 @@
+class_name: ApiTester
+modules:
+  enabled: [PhpBrowser, REST, ApiTesterHelper, Db]
+  config:
+    Db:
+      cleanup: false
+      populate: true
+    PhpBrowser:
+      url: http://localhost/ttb/
+    REST:
+      url: http://localhost/ttb/api/

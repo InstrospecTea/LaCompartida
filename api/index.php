@@ -127,7 +127,7 @@ $Slim->get('/activities', function () use ($Session, $Slim) {
 	$include = $Slim->request()->params('include');
 	$include_all = (!is_null($include) && $include == 'all');
 
-	// TODO: hay que corregir la aplicación del iPhone para que no envíe el parámetro include
+	// TODO: hay que corregir la aplicaciï¿½n del iPhone para que no envï¿½e el parï¿½metro include
 	$include_all = false;
 
 	$Activity = new Actividad($Session);
