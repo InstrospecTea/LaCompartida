@@ -22,8 +22,6 @@ if ($AtacheSecundarioSoloAsunto) {
 										WHERE id_encargado IS NULL;");
 }
 
-set_time_limit(3600);
-
 if ($xls) {
 	$mp = new \TTB\Mixpanel();
 	$mp->identifyAndTrack($RUT, 'Reporte Horas x Facturar');
@@ -37,7 +35,7 @@ if ($xls) {
 
 	$moneda_base = Utiles::MonedaBase($sesion);
 	#ARMANDO XLS
-	$wb = new Spreadsheet_Excel_Writer();
+	$wb = new WorkbookMiddleware();
 
 	$wb->setCustomColor(35, 220, 255, 220);
 	$wb->setCustomColor(36, 255, 255, 220);

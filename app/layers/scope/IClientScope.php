@@ -1,10 +1,16 @@
 <?php
 /**
- * Class IClientScope
+ * Class IActiIClientScopevityScope
  */
 interface IClientScope {
 	/**
-	 * Order by client gloss
+	 * Filter by updated
+	 * @param Criteria $criteria
+	 * @return mixed
+	 */
+	function updatedFrom(Criteria $criteria, $updatedFrom);
+
+	/* Order by client gloss
 	 * @param Criteria $criteria
 	 * @return mixed
 	 */

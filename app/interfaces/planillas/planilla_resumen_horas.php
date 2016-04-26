@@ -27,7 +27,7 @@ $Moneda->Load($id_moneda);
 $simbolo_moneda = $Moneda->fields['simbolo'];
 $cifras_decimales = $Moneda->fields['cifras_decimales'];
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 $wb->setCustomColor(35, 220, 255, 220);
 $wb->setCustomColor(36, 255, 255, 220);

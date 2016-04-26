@@ -29,7 +29,7 @@ if ($p_profesional->fields['permitido']) {
 // Le muestro la tarifa cuando tiene el Conf, es profesional no revisor
 $mostrar_tarifa_al_profesional = Conf::GetConf($sesion, 'MostrarTarifaAlProfesional') && $profesionalpermitido && !$revisorpermitido;
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 $wb->setVersion(8);
 $wb->send('Revisión de horas.xls');

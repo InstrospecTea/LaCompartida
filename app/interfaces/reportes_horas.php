@@ -28,6 +28,11 @@ jQuery(function() {
 		var fecha_hasta = jQuery("#fecha_anio_hasta").val() + '-' + jQuery("#fecha_mes_hasta").val() + '-31';
 
 		if(jQuery("#tipo_reporte").val() == 'trabajos_por_empleado') {
+			if (usuarios == null) {
+				alert('Debe seleccionar un profesional.');
+				return false;
+			}
+
 			jQuery("#contenedor_graficos").empty();
 
 			jQuery("#usuarios option:selected").each(function() {
@@ -69,6 +74,11 @@ jQuery(function() {
 				});
 			});
 		} else if(jQuery("#tipo_reporte").val() == 'trabajos_por_cliente') {
+			if (clientes == null) {
+				alert('Debe seleccionar un cliente.');
+				return false;
+			}
+
 			jQuery("#contenedor_graficos").empty();
 
 			jQuery("#clientes option:selected").each(function() {

@@ -5,8 +5,6 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
-set_time_limit(3600);
-
 if ($xls) {
 	$criteria = new Criteria($sesion);
 
@@ -90,7 +88,7 @@ if ($xls) {
 	$resultado = $criteria->run();
 
 	// Creating a workbook
-	$workbook = new Spreadsheet_Excel_Writer();
+	$workbook = new WorkbookMiddleware();
 
 	// sending HTTP headers
 	$workbook->send("planilla_reporte_hitos.xls");

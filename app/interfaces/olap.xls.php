@@ -6,7 +6,7 @@
 
 	#$key = substr(md5(microtime().posix_getpid()), 0, 8);
 
-	$wb = new Spreadsheet_Excel_Writer();
+	$wb = new WorkbookMiddleware();
 
 	$wb->send("Planilla $dimension1 vs $dimension2.xls");
 

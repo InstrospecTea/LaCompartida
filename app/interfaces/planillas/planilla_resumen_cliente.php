@@ -10,8 +10,6 @@ $sesion = new Sesion(array('REP'));
 $fila_debug = 20;
 $pagina = new Pagina($sesion);
 
-set_time_limit(300);
-
 $moneda = new Moneda($sesion);
 $moneda->Load($id_moneda);
 
@@ -25,7 +23,7 @@ if ($moneda->fields['cifras_decimales'] == 0) {
 $simbolo_moneda = $moneda->fields['simbolo'];
 
 // ARMANDO XLS
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 $wb->send("Planilla montos facturados.xls");
 
@@ -121,7 +119,7 @@ for ($x = 3; $x < 14; $x++) {
 }
 
 $filas++;
-$glosa_comparacion = __(" Los montos facturados se comparan con el monto THH segun ");
+$glosa_comparacion = __(" Los montos facturados se comparan con el monto THH según ");
 
 if ($tarifa == 'monto_thh') {
 	$glosa_comparacion .= __("tarifa del cliente");

@@ -8,7 +8,7 @@ $gasto =new Gasto($sesion);
 
 #$key = substr(md5(microtime().posix_getpid()), 0, 8);
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 
 $query = "SELECT id_moneda, simbolo, cifras_decimales FROM prm_moneda WHERE moneda_base=1";

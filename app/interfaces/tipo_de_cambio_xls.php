@@ -6,7 +6,7 @@
 	$pagina = new Pagina( $sesion );
 
 	#$key = substr(md5(microtime().posix_getpid()), 0, 8);
-	$wb = new Spreadsheet_Excel_Writer();
+	$wb = new WorkbookMiddleware();
 	$wb->setCustomColor ( 35, 220, 255, 220 );
 	$wb->setCustomColor ( 36, 255, 255, 220 );
 	$encabezado =& $wb->addFormat(array('Size' => 12,

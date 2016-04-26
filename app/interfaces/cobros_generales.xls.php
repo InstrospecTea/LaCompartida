@@ -4,7 +4,7 @@
 	$sesion = new Sesion(array('ADM', 'COB'));
 	$pagina = new Pagina($sesion);
 
-	$wb = new Spreadsheet_Excel_Writer();
+	$wb = new WorkbookMiddleware();
 	$wb->setVersion(8);
 	$wb->send('Revisión de cobros.xls');
 	$wb->setCustomColor(35, 220, 255, 220);
@@ -201,6 +201,9 @@
 		}
 		$contrato=$trabajo->fields['id_contrato'];
 		//se escriben las filas
+		if (!isset($ws1)) {
+			$ws1 =& $wb->addWorksheet($paginas.' '.substr($trabajo->fields['glosa_cliente'], 0, 20));
+		}
 		$ws1->write($fila_inicial, $col_fecha, Utiles::sql2date($trabajo->fields[fecha], "%d-%m-%Y"), $tex);
 		$ws1->write($fila_inicial, $col_asunto, $trabajo->fields['glosa_asunto'], $tex);
 		$ws1->write($fila_inicial, $col_id_cobro, $trabajo->fields['id_cobro']?$trabajo->fields['id_cobro']:'', $tex);
