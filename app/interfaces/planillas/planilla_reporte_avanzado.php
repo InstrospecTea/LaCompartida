@@ -63,7 +63,7 @@ foreach ($datos as $dato) {
 	$reporte[$dato]->Query();
 	$resultado[$dato] = $reporte[$dato]->toArray();
 }
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 $wb->send('Planilla Horas por Cliente.xls');
 
@@ -230,7 +230,7 @@ function extender($fila, $columna, $filas, $valor = '') {
 }
 
 function fila_col($fila, $col) {
-	return Spreadsheet_Excel_Writer::rowcolToCell($fila, $col);
+	return PHPExcel_Cell::stringFromColumnIndex($col).($fila + 1);
 }
 
 function total($fila, $columna, $valor) {

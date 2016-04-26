@@ -5,7 +5,7 @@
 
     $sesion = new Sesion( array('REV','ADM') );
 
-    $wb = new Spreadsheet_Excel_Writer();
+    $wb = new WorkbookMiddleware();
 
     $wb->send('Planilla_Asuntos_Factura.xls');
 

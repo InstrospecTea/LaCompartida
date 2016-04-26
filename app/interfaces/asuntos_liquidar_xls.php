@@ -3,7 +3,6 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
-set_time_limit(400);
 ini_set("memory_limit", "256M");
 $where_cobro = ' 1 ';
 
@@ -142,7 +141,7 @@ $fecha_actual = date('Y-m-d');
 
 // Crear y preparar planilla
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 // Enviar headers a la pagina
 

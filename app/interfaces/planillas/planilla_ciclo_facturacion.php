@@ -6,8 +6,6 @@ $pagina = new Pagina($sesion);
 $Html = new \TTB\Html;
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 
-set_time_limit(300);
-
 if ($xls) {
 	$moneda = new Moneda($sesion);
 	$id_moneda_referencia = $moneda->GetMonedaTipoCambioReferencia($sesion);
@@ -17,7 +15,7 @@ if ($xls) {
 
 	$moneda_base = Utiles::MonedaBase($sesion);
 	#ARMANDO XLS
-	$wb = new Spreadsheet_Excel_Writer();
+	$wb = new WorkbookMiddleware();
 
 	$wb->setCustomColor(35, 220, 255, 220);
 	$wb->setCustomColor(36, 255, 255, 220);

@@ -8,7 +8,7 @@ set_time_limit(0);
 $moneda_base = Utiles::MonedaBase($Sesion);
 
 // ARMANDO XLS
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 $wb->send("Planilla_resumen_profesionales.xls");
 
 if ($moneda_base['cifras_decimales'] == 0) {

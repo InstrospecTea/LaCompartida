@@ -23,7 +23,7 @@ $query = 'SELECT simbolo, cifras_decimales FROM prm_moneda WHERE moneda_base = 1
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 list($simbolo_moneda, $cifras_decimales) = mysql_fetch_array($resp);
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 $wb->send("Planilla resumen costos.xls");
 $wb->setCustomColor(35, 220, 255, 220);
 $wb->setCustomColor(36, 255, 255, 220);

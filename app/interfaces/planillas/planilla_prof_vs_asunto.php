@@ -89,7 +89,7 @@ $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__
 	$usuarios = array_values(array_unique($usuarios));
 	$clientes = array_values(array_unique($clientes));
 
-	$wb = new Spreadsheet_Excel_Writer();
+	$wb = new WorkbookMiddleware();
 
 	$wb->setCustomColor(35, 220, 255, 220);
 	$wb->setCustomColor(36, 255, 255, 220);

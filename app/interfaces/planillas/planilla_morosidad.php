@@ -4,8 +4,6 @@
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
 
-	set_time_limit(300);
-
 	$pagina = new Pagina($sesion);
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 	$Form = new Form($sesion);
@@ -19,7 +17,7 @@
 		$filas = 1;
 		$moneda_base = Utiles::MonedaBase($sesion);
 		#ARMANDO XLS
-		$wb = new Spreadsheet_Excel_Writer();
+		$wb = new WorkbookMiddleware();
 
 		$wb->setCustomColor(35, 220, 255, 220);
 		$wb->setCustomColor(36, 255, 255, 220);

@@ -67,7 +67,7 @@ class BuscadorExcel {
 
 		$this->lista = new Lista($this->sesion, $clase, $params, $query);
 
-		$excel = new Spreadsheet_Excel_Writer();
+		$excel = new WorkbookMiddleware();
 		$excel->send($archivo . ".xls");
 
 		$hoja = & $excel->addWorksheet(__('Reporte'));
@@ -154,7 +154,7 @@ class BuscadorExcel {
 					$this->hoja->write($this->fila, $this->col, $this->dentro_td[$key] . $fields[$key2]);
 				$this->col++;
 			} else { // Funcion
-				$texto = call_user_func($this->funcion[$key], & $fila);
+				$texto = call_user_func($this->funcion[$key], $fila);
 				$this->hoja->write($this->fila, $this->col, $texto);
 				$this->col++;
 			}
@@ -172,7 +172,7 @@ class BuscadorExcel {
 			if ($this->funcionTR == "")
 				$html .= $this->PrintRow($obj);
 			else
-				$html .= call_user_func($this->funcionTR, & $obj);
+				$html .= call_user_func($this->funcionTR, $obj);
 		}
 		$this->ultima_fila_lista = $this->fila;
 		return $html;
