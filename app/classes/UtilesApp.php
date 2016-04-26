@@ -2401,4 +2401,25 @@ HTML;
 
 		return $_LANG;
 	}
+
+	/**
+	 * Override del metodo de FW/Utiles para no escribir lo que desaparecerá en PHP 5.6
+	 * @param type $horaDecimal
+	 * @param type $digitos_hora
+	 * @return type
+	 */
+	function Decimal2GlosaHora($horaDecimal, $digitos_hora = 1) {
+
+		$horaDecimalAbsoluto = abs($horaDecimal);
+		$h = (int) ($horaDecimalAbsoluto);
+		$m = round(($horaDecimalAbsoluto - $h) * 60);
+
+		if ($m == 60) {
+			$h++;
+			$m-=60;
+		}
+		$hm = sprintf("%0{$digitos_hora}d", $h) . ':' . sprintf('%02d', $m);
+		return ($horaDecimal < 0 ? '-' : '') . $hm;
+	}
+
 }
