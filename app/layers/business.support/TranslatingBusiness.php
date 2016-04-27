@@ -15,7 +15,7 @@ class TranslatingBusiness extends AbstractBusiness implements ITranslatingBusine
 		$searchCriteria = new SearchCriteria('Language');
 		$searchCriteria->filter('codigo_idioma')->restricted_by('equals')->compare_with("'".$languageCode."'");
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		if (empty($results)) {
 			throw new BusinessException("There is not a defined language with provided code '$languageCode'.");
 		}
