@@ -1,6 +1,6 @@
 # Changelog
 
-## Hotfix 16.11.23
+## Hotfix 16.11.3
 Wednesday, April 27th
 * **Fix** [Elimina caracter maligno](https://github.com/LemontechSA/ttb/pull/1425)
 
