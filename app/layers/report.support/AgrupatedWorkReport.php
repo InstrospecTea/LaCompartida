@@ -414,7 +414,7 @@ HTML;
 						'tr',
 						$this->Html->tag('th', '', array('class' => 'col1')) .
 						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
-						$this->Html->tag('th', $total_minutos_cliente.'-', array('class' => 'col3')) .
+						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3')) .
 						$this->Html->tag('th', "{$currency->get('simbolo')} " . $this->CoiningBusiness->formatAmount($total_facturado_cliente, $currency, $this->defaultLanguage), array('class' => 'col3'))
 					);
 				} else {
