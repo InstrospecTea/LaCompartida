@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.11.1
+Wednesday, April 27th
+* **Fix** [Obtiene datos de tarificación del contrato principal](https://github.com/LemontechSA/ttb/pull/1423)
+
 ## [Release 16.11.0](https://github.com/LemontechSA/ttb/pull/1420)
 Tuesday, April 26th
 * **Feature** [Nuevo Diseño Detalle Cobro](https://github.com/LemontechSA/ttb/pull/1411)
