@@ -95,9 +95,10 @@ class Backup {
 	}
 
 	public static function createDumpCommand($tenant) {
-		return Command::create('mysqldump')
+		return Command::create('mysqldump', false)
 				->param($tenant['dbname'])
 				->opt('disable-keys')
+				->opt('hex-blob')
 				->opt('skip-add-locks')
 				->opt('extended-insert')
 				->opt('delayed-insert')
@@ -105,6 +106,7 @@ class Backup {
 				->opt('quick')
 				->opt('single-transaction')
 				->opt('add-drop-table')
+				->opt('default-character-set', 'latin1')
 				->opt('lock-tables', 'false')
 				->opt('net_buffer_length', 50000)
 				->opt('host', $tenant['dbhost'])

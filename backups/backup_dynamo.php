@@ -3,6 +3,16 @@
 
 require_once dirname(__FILE__) . '/autoload.php';
 
+$force = isset($argv[1]);
+if ($force) {
+	echo utf8_encode("Se reeampazará el respaldo actual si existe.\n");
+	$response = readline(utf8_encode('¿Desea continuar? [s/N]: '));
+	if (strtolower($response) !=='s') {
+		exit;
+	}
+}
+$forced_tenant = $force ? $argv[1] : null;
+
 $errores = [];
 
 $Body = new Body();
@@ -45,11 +55,11 @@ $bucket_name = 'ttbackups';
 $S3 = new S3($bucket_name);
 foreach ($tenants as $tenant) {
 
-	if (isset($argv[1]) && $argv[1] != $tenant['dbname']) {
+	if ($force && $forced_tenant != $tenant['dbname']) {
 		continue;
 	}
 
-	if ($tenant['backup'] != 1) {
+	if (!$force && $tenant['backup'] != 1) {
 		$Body->add("Respaldo apagado para {$tenant['dominio']}", true);
 		continue;
 	}
@@ -80,7 +90,7 @@ foreach ($tenants as $tenant) {
 		$tenant['dbpass'] = Utiles::decrypt($tenant['dbpass'], $tenant['backupdir']);
 	}
 
-	if ($S3->fileExists($file_bkp)) {
+	if (!$force && $S3->fileExists($file_bkp)) {
 		$Body->add("respaldo $file_bkp ya existe: omitiendo...");
 	} else {
 		$Body->add("dumpeando a $path");
@@ -100,12 +110,12 @@ foreach ($tenants as $tenant) {
 
 		$Body->add("copiando a S3: $path");
 		try {
-			$S3->uploadFile($file_bkp, $path);
+			$file = $S3->uploadFile($file_bkp, $path);
 		} catch (Exception $e) {
 			print_r($e);
 		}
 
-		if ($ret) {
+		if (empty($file['ObjectURL'])) {
 			$errores[] = $Body->add("error copiando a S3, retornado: {$ret}\noutput: " . implode("\n", $out));
 		}
 
