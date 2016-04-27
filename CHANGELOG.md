@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.11.2
+Wednesday, April 27th
+* **Fix** [Reemplaza UtilesApp::Decimal2Time() por UtilesApp::Decimal2GlosaHora()](https://github.com/LemontechSA/ttb/pull/1424)
+
 ## Hotfix 16.11.1
 Wednesday, April 27th
 * **Fix** [Obtiene datos de tarificación del contrato principal](https://github.com/LemontechSA/ttb/pull/1423)

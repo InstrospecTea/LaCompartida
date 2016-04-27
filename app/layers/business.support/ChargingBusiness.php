@@ -440,7 +440,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$this->loadBusiness('Searching');
 		$searchCriteria = new SearchCriteria('Document');
 		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($charge->get($charge->getIdentity()));
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		return $results && count($results) > 0 ? $results[0] : null;
 	}
 
@@ -457,7 +457,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
 		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		if (empty($results[0])) {
 			return null;
 		} else {
@@ -478,7 +478,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->filter('id_trabajo')->restricted_by('equals')->compare_with($workId);
 		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		if (empty($results[0])) {
 			$this->loadBusiness('Working');
 			$work = $this->WorkingBusiness->getWork($workId);
@@ -499,7 +499,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->related_with('Fee');
 		$searchCriteria->filter('tarifa_defecto')->for_entity('Fee')->restricted_by('equals')->compare_with('1');
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		if (empty($results[0])) {
 			$UserFee = new UserFee($this->sesion);
 			return $UserFee->emptyResult();
