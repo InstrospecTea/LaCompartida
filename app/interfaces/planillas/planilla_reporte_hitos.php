@@ -134,7 +134,7 @@ if ($xls) {
 	$worksheet->setColumn(11, 11, 15);
 	$worksheet->setColumn(12, 12, 20);
 
-	$worksheet->writeString(1, 0, _('Reporte Hitos'), $titulo);
+	$worksheet->writeString(1, 0, __('Reporte Hitos'), $titulo);
 
 	$celda_fecha_creacion = 2;
 	$celda_periodo_reporte = 3;
