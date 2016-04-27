@@ -68,12 +68,12 @@ class S3 {
 		]);
 	}
 
-	public function uploadFile($file_name, $file_path) {
+	public function uploadFile($file_name, $file_path, Array $attrs = []) {
 		return  $this->client->putObject([
 			'Bucket' => $this->bucket,
 			'Key' => $file_name,
 			'SourceFile' => $file_path
-		]);
+		] + $attrs);
 	}
 
 	public function deleteFile($file_name) {

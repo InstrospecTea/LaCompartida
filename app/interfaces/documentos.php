@@ -29,11 +29,11 @@ if (!empty($archivo_data['name']) && $accion == "guardar") {
 		$archivo->Edit('descripcion', $descripcion);
 
 		// Write to S3 Server
-		$s3url = $archivo->Upload($contrato->fields['codigo_cliente'], $contrato->fields['id_contrato'], $archivo_data);
-		if ($s3url === false) {
+		$url_s3 = $archivo->Upload($contrato->fields['codigo_cliente'], $contrato->fields['id_contrato'], $archivo_data);
+		if ($url_s3 === false) {
 			$pagina->AddInfo(__('Ya existe un documento con ese nombre.'));
 		} else {
-			$archivo->Edit('archivo_s3', $s3url);
+			$archivo->Edit('archivo_s3', $url_s3);
 
 			if ($archivo->Write()) {
 				$pagina->AddInfo(__('Documento guardado con éxito'));
