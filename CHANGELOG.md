@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.11.4
+Thursday, April 28th
+* **Fix** [Condiciona la consulta del id_usuarioa que no esté vacío. Llama a errorSQL() en caso de error.](https://github.com/LemontechSA/ttb/pull/1427)
+
 ## Hotfix 16.11.3
 Wednesday, April 27th
 * **Fix** [Elimina caracter maligno](https://github.com/LemontechSA/ttb/pull/1425)
