@@ -131,7 +131,12 @@ class WsFacturacionSatcom extends WsFacturacion {
 		 * 07 - Consumidor Final (9999999999999)
 		 * 08 - Identificación del Exterior (COL-A1234565-2563245)
 		 */
-		$cliente->addChild('TipoIdentificacion', '04');
+		$tipo_identificacion = '04';
+		$ValidarIdentificacionEcuador = new ValidarIdentificacionEcuador();
+		if ($ValidarIdentificacionEcuador->validarCedula($factura->fields['RUT_cliente'])) {
+			$tipo_identificacion = '05';
+		}
+		$cliente->addChild('TipoIdentificacion', $tipo_identificacion);
 
 		$cliente->addChild('NumeroIdentificacion', $factura->fields['RUT_cliente']);
 		// $cliente->addChild('email', '');
@@ -153,7 +158,7 @@ class WsFacturacionSatcom extends WsFacturacion {
 			$motivo = $motivos->addChild('Motivo');
 			$motivo->addAttribute('id', 1);
 			$motivo->addChild('Descripcion', $factura->fields['descripcion']);
-			$motivo->addChild('Valor', $factura->fields['total']);
+			$motivo->addChild('Valor', $factura->fields['subtotal']);
 		}
 
 		$detalles = $requerimiento->addChild('Detalles');
