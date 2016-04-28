@@ -82,6 +82,7 @@ $tipos_de_dato = array(
 	'valor_cobrable',
 	'valor_por_cobrar',
 	'valor_cobrado',
+	'valor_facturado',
 	'valor_por_pagar',
 	'valor_pagado',
 	'valor_pagado_parcial',
@@ -216,6 +217,7 @@ $ReporteAvanzado->glosa_dato['horas_spot'] = __("Horas cobrables de profesionale
 
 $ReporteAvanzado->glosa_dato['valor_cobrable'] = __("Valor monetario que corresponde a cada Profesional (por horas o trámites)");
 $ReporteAvanzado->glosa_dato['valor_cobrado'] = __("Valor monetario que corresponde a cada Profesional (por horas o trámites), en un Cobro ya Emitido");
+$ReporteAvanzado->glosa_dato['valor_facturado'] = __("Monto total Facturado de la liquidación");
 $ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario que corresponde a cada Profesional por concepto de trámites, en un Cobro ya Emitido");
 
 $ReporteAvanzado->glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado totalmente");
@@ -1034,7 +1036,18 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(11) ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->nada(1) ?>
+								<?php echo $ReporteAvanzado->nada(12) ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->select_proporcionalidad() ?>
+								<?php echo $ReporteAvanzado->nada(2) ?>
+								<?php echo $ReporteAvanzado->select_moneda() ?>
+								<?php echo $ReporteAvanzado->nada(5) ?>
+								<?php echo $ReporteAvanzado->celda('valor_facturado') ?>
+
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(12) ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(12) ?>
