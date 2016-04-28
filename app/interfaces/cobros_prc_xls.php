@@ -696,7 +696,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		if ($Cobro->fields['fecha_ini'] != '0000-00-00') {
 			$fecha_ini_titulo = $Cobro->fields['fecha_ini'];
 		} else {
-			$fecha_ini_titulo = !empty($works[0]) ? $works[0]->fields['fecha'] : '';
+			$fecha_ini_titulo = !empty($works[0]) ? $works[0]->get('fecha') : '';
 		}
 		$ws->mergeCells($filas, 0, $filas, 4);
 		$ws->write($filas, $columna_categoria, $arraylang['titulo_resumen']['Encabezado'][$lang], $formato_encabezado_center);
