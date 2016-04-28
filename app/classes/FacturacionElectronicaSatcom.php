@@ -3,33 +3,26 @@
 class FacturacionElectronicaSatcom extends FacturacionElectronica {
 
 	public static function ValidarFactura() {
-		global $pagina, $RUT_cliente, $direccion_cliente, $ciudad_cliente, $comuna_cliente, $giro_cliente, $id_factura_padre, $dte_codigo_referencia, $dte_razon_referencia, $numero;
+		$Sesion = new Sesion();
+		global $pagina, $numero, $RUT_cliente, $cliente, $id_documento_legal, $id_factura_padre;
+
 		if (empty($numero)) {
-			$pagina->AddError(__('Debe ingresar el Número del documento.'));
+			$pagina->AddError(__('Debe ingresar') . ' ' . __('Número'));
 		} else if (strlen($numero) < 9) {
 			$pagina->AddError(__('El Número del documento debe ser mayor a 9 dígitos.'));
 		}
 		if (empty($RUT_cliente)) {
-			$pagina->AddError(__('Debe ingresar RUT del cliente.'));
+			$pagina->AddError(__('Debe ingresar') . ' ' . __('ROL/RUT'));
 		}
-		if (empty($direccion_cliente)) {
-			$pagina->AddError(__('Debe ingresar Dirección del cliente.'));
+		if (empty($cliente)) {
+			$pagina->AddError(__('Debe ingresar') . ' ' . __('Raz&oacute;n Social Cliente'));
 		}
-		if (empty($comuna_cliente)) {
-			$pagina->AddError(__('Debe ingresar Comuna del cliente.'));
-		}
-		if (empty($ciudad_cliente)) {
-			$pagina->AddError(__('Debe ingresar Ciudad del cliente.'));
-		}
-		if (empty($giro_cliente)) {
-			$pagina->AddError(__('Debe ingresar ' . __('Giro') . ' del cliente.'));
-		}
-		if ($id_factura_padre > 0) {
-			if (empty($dte_codigo_referencia)) {
-				$pagina->AddError(__('Debe seleccionar Referencia'));
-			}
-			if (empty($dte_razon_referencia)) {
-				$pagina->AddError(__('Debe ingresar razón de la Referencia'));
+		if (!empty($id_documento_legal)) {
+			$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
+			$PrmDocumentoLegal->Load($id_documento_legal);
+
+			if (in_array($PrmDocumentoLegal->fields['codigo'], array('NC', 'ND')) && empty($id_factura_padre)) {
+				$pagina->AddError(__('Debe ingresar') . ' ' . __('Documento Tributario'));
 			}
 		}
 	}
@@ -132,10 +125,21 @@ EOF;
 			$Estudio = new PrmEstudio($Sesion);
 			$Estudio->Load($factura->fields['id_estudio']);
 
-			$factura->fields['RucEmisor'] = $Estudio->GetMetaData('facturacion_electronica_satcom.RucEmisor');
-			$factura->fields['ClaveAcceso'] = $Estudio->GetMetadata('facturacion_electronica_satcom.ClaveAcceso');
-			$factura->fields['Establecimiento'] = $Estudio->GetMetadata('facturacion_electronica_satcom.Establecimiento');
-			$factura->fields['Punto'] = $Estudio->GetMetadata('facturacion_electronica_satcom.Punto');
+			$factura->fields['Estudio']['RucEmisor'] = $Estudio->GetMetaData('facturacion_electronica_satcom.RucEmisor');
+			$factura->fields['Estudio']['ClaveAcceso'] = $Estudio->GetMetadata('facturacion_electronica_satcom.ClaveAcceso');
+			$factura->fields['Estudio']['Establecimiento'] = $Estudio->GetMetadata('facturacion_electronica_satcom.Establecimiento');
+			$factura->fields['Estudio']['Punto'] = $Estudio->GetMetadata('facturacion_electronica_satcom.Punto');
+
+			$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
+			$PrmDocumentoLegal->Load($factura->fields['id_documento_legal']);
+			$factura->fields['PrmDocumentoLegal']['codigo_dte'] = $PrmDocumentoLegal->fields['codigo_dte'];
+			$factura->fields['PrmDocumentoLegal']['glosa'] = $PrmDocumentoLegal->fields['glosa'];
+
+			if (!empty($factura->fields['id_factura_padre'])) {
+				$FacturaPadre = new Factura($Sesion);
+				$FacturaPadre->Load($factura->fields['id_factura_padre']);
+				$factura->fields['FacturaPadre'] = $FacturaPadre->fields;
+			}
 
 			$WsFacturacionSatcom = new WsFacturacionSatcom($Estudio->GetMetaData('facturacion_electronica_satcom.Url'));
 			$documento = $WsFacturacionSatcom->emitirFactura($factura);
