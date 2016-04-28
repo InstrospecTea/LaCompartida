@@ -118,7 +118,7 @@ class WorkbookMiddleware {
 	public function close() {
 		$file = pathinfo($this->filename);
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-		header('Content-Disposition: attachment;filename=' . $file['filename'] . '.xlsx');
+		header('Content-Disposition: attachment;filename="' . $file['filename'] . '.xlsx"');
 		header('Cache-Control: max-age=0');
 		header('Pragma: public');
 
