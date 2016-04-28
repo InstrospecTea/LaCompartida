@@ -1,10 +1,9 @@
 <?php
 
 /**
-*
-*/
-class HtmlBuilder
-{
+ *
+ */
+class HtmlBuilder {
 
 	public $childs;
 	private $attributes;
@@ -13,8 +12,7 @@ class HtmlBuilder
 	private $tag;
 	private $value;
 
-
-	function __construct($tag = 'div'){
+	function __construct($tag = 'div') {
 		$this->childs = array();
 		$this->attributes = array();
 		$this->plain_attributes = array();
@@ -23,17 +21,16 @@ class HtmlBuilder
 		$this->value = null;
 	}
 
-	public function __toString()
-	{
-	    return $this->render();
+	public function __toString() {
+		return $this->render();
 	}
 
-	public function add_child($child){
+	public function add_child($child) {
 		$this->childs[] = $child;
 		return $this;
 	}
 
-	public function add_attribute($key, $value){
+	public function add_attribute($key, $value) {
 		$this->attributes[$key] = $value;
 		return $this;
 	}
@@ -42,32 +39,32 @@ class HtmlBuilder
 		$this->plain_attributes[] = $attribute;
 	}
 
-	public function set_closure($is_closed){
+	public function set_closure($is_closed) {
 		$this->closure = $is_closed;
 		return $this;
 	}
 
-	public function set_tag($tag){
+	public function set_tag($tag) {
 		$this->tag = $tag;
 		return $this;
 	}
 
-	public function set_html($value){
+	public function set_html($value) {
 		$this->value = $value;
 		return $this;
 	}
 
-	public function render(){
+	public function render() {
 		$html = '';
 		//añade el comienzo del tag
-		$html .= '<'.$this->tag;
+		$html .= '<' . $this->tag;
 		//añade los atributos
 		foreach ($this->attributes as $key => $value) {
-			$html .= ' '.$key.'="'.$value.'"';
+			$html .= ' ' . $key . '="' . $value . '"';
 		}
 		//añade los atributos de tipo plain
 		foreach ($this->plain_attributes as $plain_attribute) {
-			$html .= ' '.$plain_attribute;
+			$html .= ' ' . $plain_attribute;
 		}
 		//verifica si cierra, entonces puede tener valor e hijos.
 		if ($this->closure) {
@@ -80,17 +77,17 @@ class HtmlBuilder
 			//Agrega el valor
 			$html .= $this->value;
 			//Cierra el tag
-			$html .= '</'.$this->tag.'>';
+			$html .= '</' . $this->tag . '>';
 		} else {
 			$html .= ' />';
 		}
 
 		return $html;
-
 	}
 
 	public function debug() {
 		print_r($this);
 		exit;
 	}
+
 }

@@ -1,9 +1,9 @@
 <?php
 
-defined('DBHOST') || define('DBHOST', 'localhost');
-defined('DBUSER') || define('DBUSER', 'root');
-defined('DBPASS') || define('DBPASS', 'lapass');
-defined('DBNAME') || define('DBNAME', 'timetracking');
+Conf::setStatic('dbHost', 'localhost');
+Conf::setStatic('dbUser', 'root');
+Conf::setStatic('dbPass', 'lapass');
+Conf::setStatic('dbName', 'timetracking');
 
 list($nada,$subdir)=explode('/',$_SERVER['REQUEST_URI']);
 defined('ROOTDIR') || define('ROOTDIR',$subdir);
@@ -18,9 +18,6 @@ defined('SUBDOMAIN') || define('SUBDOMAIN',$subdominio);
 defined('DOCROOT') || define('DOCROOT',dirname(__FILE__));
 
 defined('APPPATH') || define('APPPATH',$_SERVER['DOCUMENT_ROOT'].'/'.ROOTDIR);
-
-//AmazonWS SDK: https://github.com/amazonwebservices/aws-sdk-for-php.git
-include DOCROOT . '/../backups/AWSSDKforPHP/sdk.class.php';
 
 ini_set('display_errors', 'On');
 set_time_limit(0);

@@ -16,20 +16,43 @@ class DynamoDb {
 		}
 	}
 
-	public function get($request) {
+	public function get($request, $parsed = true) {
 		try {
 			$result = $this->client->getItem($request);
 		} catch (DynamoDbException $e) {
 			throw new Exception('The item could not be retrieved.');
 		}
+		return $parsed ? $this->parseFields($result['Item']) : $result['Item'];
+	}
+
+	public function update($table, $key, $values) {
+		$this->client->updateItem(array(
+			'TableName' => $table,
+			'Key' => $key,
+			'AttributeUpdates' => $values
+		));
+	}
+
+	public function listTable($table) {
+		$iterator = $this->client->getIterator('Scan', array(
+			'TableName' => $table
+		));
+		$collection = [];
+		foreach ($iterator as $item) {
+			$collection[] = $this->parseFields($item);
+		}
+		return $collection;
+	}
+
+	public function parseFields($fields) {
 		$values = [];
-		foreach ($result['Item'] as $tipo => $valor) {
-			if (is_string($valor)) {
-				$values[$tipo] = $valor;
-			} else if (isset($valor['S'])) {
-				$values[$tipo] = $valor['S'];
-			} else if (isset($valor['N'])) {
-				$values[$tipo] = $valor['N'];
+		foreach ($fields as $field => $value) {
+			if (is_string($value)) {
+				$values[$field] = $value;
+			} else if (isset($value['S'])) {
+				$values[$field] = $value['S'];
+			} else if (isset($value['N'])) {
+				$values[$field] = $value['N'];
 			}
 		}
 		return $values;

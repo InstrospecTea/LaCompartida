@@ -46,11 +46,6 @@ class Archivo extends Objeto {
 	}
 
 	function Upload($codigo_cliente, $id_contrato, $archivo_anexo = '') {
-		$archivo_subir = $archivo_anexo['tmp_name'];
-		$subir = fopen($archivo_subir, 'r');
-		$contenido = fread($subir, filesize($archivo_subir));
-		fclose($subir);
-
 		$nombre = $archivo_anexo['name'];
 		$archivoname = UtilesApp::slug(substr($nombre, 0, strpos($nombre, '.')));
 		$archivoext = substr($nombre, stripos($nombre, '.'));
@@ -62,7 +57,7 @@ class Archivo extends Objeto {
 			return false;
 		}
 
-		$url_s3 = UtilesApp::UploadToS3($name, $contenido, $archivo_anexo['type']);
+		$url_s3 = UtilesApp::UploadToS3($name, $archivo_anexo['tmp_name'], $archivo_anexo['type']);
 		$this->Edit('archivo_nombre', $archivo_anexo['name']);
 		$this->Edit('data_tipo', $archivo_anexo['type']);
 

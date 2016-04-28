@@ -12,6 +12,18 @@ class S3 {
 		$this->bucket = $bucket;
 	}
 
+	public function listBuckets() {
+		$result = $this->client->listBuckets();
+		$bukets = [];
+		foreach ($result['Buckets'] as $bucket) {
+			$bukets[] = [
+				'name' => $bucket['Name'],
+				'created' => new DateTime($bucket['CreationDate'])
+			];
+		}
+		return $bukets;
+	}
+
 	public function listBucket($prefix) {
 		$iterator = $this->client->getIterator('ListObjects', array(
 			'Bucket' => $this->bucket,
@@ -22,7 +34,7 @@ class S3 {
 		foreach ($iterator as $item) {
 			$values[] = [
 				'name' => $item['Key'],
-				'time' => strtotime($item['LastModified']),
+				'time' => new DateTime($item['LastModified']),
 				'size' => (int) $item['Size'],
 				'hash' => substr($item['ETag'], 1, -1)
 			];
@@ -30,12 +42,12 @@ class S3 {
 		return $values;
 	}
 
-	public function getFile($file_name) {
+	public function getFileContent($file_name) {
 		$result = $this->client->getObject(array(
 			'Bucket' => $this->bucket,
 			'Key' => $file_name
 		));
-		return $result;
+		return $result['Body'];
 	}
 
 	public function getURL($prefix, $file_name) {
@@ -46,6 +58,37 @@ class S3 {
 		));
 		$signedUrl = $command->createPresignedUrl('+2 hours');
 		return $signedUrl;
+	}
+
+	public function putFileContents($file_name, $body) {
+		return $this->client->putObject([
+				'Bucket' => $this->bucket,
+				'Key' => $file_name,
+				'Body' => $body
+		]);
+	}
+
+	public function uploadFile($file_name, $file_path, Array $attrs = []) {
+		return  $this->client->putObject([
+			'Bucket' => $this->bucket,
+			'Key' => $file_name,
+			'SourceFile' => $file_path
+		] + $attrs);
+	}
+
+	public function deleteFile($file_name) {
+		return $this->client->deleteObjects([
+				'Bucket' => $this->bucket,
+				'Objects' => [['Key' => $file_name]]
+		]);
+	}
+
+	public function createBucket($bucket_name) {
+		$this->client->waitUntil('BucketExists', array('Bucket' => $bucket_name));
+	}
+
+	public function fileExists($file_name) {
+		return $this->client->doesObjectExist($this->bucket, $file_name);
 	}
 
 }

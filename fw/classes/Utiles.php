@@ -1,8 +1,8 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../app/conf.php';
-
 class Utiles {
+
+	static $emailError = '';
 
 	public static function errorSQL($query, $error_file = '', $error_line = '', $dbh = NULL, $mensaje_adicional = '', $e = null) {
 		global $ROOT_PATH, $IMAGES_PATH, $save_log, $sesion, $Sesion;
@@ -843,31 +843,42 @@ HTML;
 		return $a % 400 == 0 || ($a % 100 != 0 && $a % 4 == 0);
 	}
 
+	private function addEmailAddress($Mailer, $method, $emails, $name = null) {
+		if (!is_array($emails)) {
+			return $Mailer->{$method}(trim($emails), $name);
+		}
+		foreach ($emails as $email) {
+			if (is_array($email)) {
+				self::addEmailAddress($Mailer, $method, $email['mail'], $email['nombre']);
+				continue;
+			}
+			self::addEmailAddress($Mailer, $method, $email, $name);
+		}
+	}
 	/**
 	 * Función que se usa para enviar los correos, utiliza direcciones que deben estar creadas en Lemontech Mail
 	 * Estas direcciones deben estar definidas en el conf
 	 * Los parametros que utiliza son:
-	 * @param body: en formato html
-	 * @param subject:
-	 * @param correos: un array con los correos de las personas, estos correos pueden tener el correo y el nombre
-	 * @param correo: correo['nombre'] y correo['mail']
-	 * @param attachment: array con la siguiente estructura:
+	 * @param type $sesion
+	 * @param array $correos array con los correos de las personas, estos correos pueden tener correo['nombre'] y correo['mail']
+	 * @param type $subject
+	 * @param type $body
+	 * @param type $envia_admin
+	 * @param type $id_archivo_anexo
+	 * @param type $attachment array con la siguiente estructura:
 	 * 		 'data_string'	=> str required,
 	 * 		 'filename'		=> str required,
 	 * 		 'base_encode' 	=> str default: base64
 	 * 		 'data_type'	=> str default:text/calendar,
 	 * 		 'charset'		=> str default:utf-8,
 	 * 		 'method' 		=> str default:request
+	 * @return boolean
 	 *
 	 * Para que corra la funcion en el conf del sistema tiene que existir:
 	 * AppName: nombre de la aplicación
-	 * UsernameMail: correo de Lemontech de la aplicación
-	 * PasswordMail: password del correo de Lemontech
 	 * MailAdmin: correo del administrador de la aplicacion del cliente
 	 */
-	public static function EnviarMail($sesion, $correos, $subject, $body, $envia_admin = true, $id_archivo_anexo = NULL, $attachment = NULL) {
-		require_once dirname(__FILE__) . '/../../fw/libs/PHPMailer/class.phpmailer.php';
-
+	public static function EnviarMail($Sesion, $correos, $subject, $body, $envia_admin = true, $id_archivo_anexo = NULL, $attachment = NULL) {
 		if (defined('DEBUG') && defined('FORCE_MAIL')) {
 			$correos = array(
 				array(
@@ -876,49 +887,39 @@ HTML;
 				)
 			);
 		}
-		$mail = new PHPMailer();
-		$mail->IsSMTP(); // telling the class to use SMTP
-		$mail->SMTPAuth = true; // enable SMTP authentication
-		$mail->SMTPSecure = 'ssl'; // sets the prefix to the servier
-		$mail->Host = 'smtp.gmail.com'; // sets GMAIL as the SMTP server
-		$mail->Port = 465; // set the SMTP port for the GMAIL server
-		$mail->Username = Conf::GetConf($sesion, 'UsernameMail'); // recordar poner en el conf el correo completo: algo@lemontech.cl
-		$mail->Password = Conf::GetConf($sesion, 'PasswordMail');
 
 		$app_from = (empty($id_archivo_anexo)) ? Conf::AppName() : 'Case Tracking';
+		$from = Conf::emailSender();
+		$mail = new PHPMailer();
+		$mail->IsSMTP(); // telling the class to use SMTP
+		$mail->SetFrom($from, $app_from);
+		$mail->SMTPAuth = true; // enable SMTP authentication
+		$mail->Subject = $subject;
+		$mail->AddBCC($from);
+		$mail->AddReplyTo($from);
+		$mail->Host = "email-smtp.us-east-1.amazonaws.com";
+		$mail->Username = "AKIAIDG2BX4WGJMFC2TA";
+		$mail->Password = "Aqru/Fbu3Yu7gjrYoTUhpYgEA2KFArUHQ7krh1/yjoO4";
+		$mail->SMTPSecure = 'tls';
+		$mail->Port = 587;
+		$mail->CharSet = 'UTF-8';
 
-		$mail->SetFrom(Conf::GetConf($sesion, 'UsernameMail'), $app_from);
-
-		if (is_array($correos)) {
-			foreach ($correos as $correo) {
-				$mail->AddAddress(trim($correo['mail']), $correo['nombre']);
-			}
-		} else {
-			$mail->AddAddress(trim($correos));
-		}
+		self::addEmailAddress($mail, 'AddAddress', $correos);
 
 		if ($envia_admin) {
-			$Mail_Admin = explode(',', Conf::GetConf($sesion, 'MailAdmin'));
-
-			foreach ($Mail_Admin as $mailadmin) {
-				if (!empty($mailadmin)) {
-					$mail->AddCC(trim($mailadmin), 'Administrador');
-				}
-			}
+			$mail_admin = explode(',', Conf::GetConf($Sesion, 'MailAdmin'));
+			self::addEmailAddress($mail, 'AddCC', $mail_admin, 'Administrador');
 		}
 
 		if (!empty($id_archivo_anexo)) {	// sí un anexo existe
 			$query2 = "SELECT archivo_nombre, archivo_tipo, archivo_data FROM j_archivo WHERE id_archivo = $id_archivo_anexo";
-			$resp2 = mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
+			$resp2 = mysql_query($query2, $Sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $Sesion->dbh);
 
 			list($archivo_nombre, $archivo_tipo, $archivo_data) = mysql_fetch_array($resp2);
 			$mail->AddStringAttachment($archivo_data, $archivo_nombre, '7bit', 'text/calendar; charset=utf-8; method=REQUEST');
 		}
 
-		if (!empty($attachment)) {
-			if (empty($attachment['data_string']) && empty($attachment['filename'])) {
-				break;
-			}
+		if (!empty($attachment) && !empty($attachment['data_string']) && !empty($attachment['filename'])) {
 			$data_type = 'text/calendar';
 			if (!empty($attachment['data_type'])) {
 				$data_type = $attachment['data_type'];
@@ -945,27 +946,14 @@ HTML;
 			$body = 'Sin información';
 		}
 
-		if (Conf::GetConf($sesion, 'UsarMailAmazonSES')) {
-			// Agrego el username como BCC para que tenga todos los correos
-			$mail->AddBCC($mail->Username);
-			$mail->AddReplyTo($mail->Username);
+		$body = sprintf('<pre>%s</pre>', utf8_encode($body));
 
-			// Configuracion de AWS SES
-			$mail->Host = "email-smtp.us-east-1.amazonaws.com";
-			$mail->Username = "AKIAIDG2BX4WGJMFC2TA";
-			$mail->Password = "Aqru/Fbu3Yu7gjrYoTUhpYgEA2KFArUHQ7krh1/yjoO4";
-			$mail->SMTPSecure = 'tls';
-			$mail->Port = 587;
-			$mail->CharSet = 'UTF-8';
-			$body = sprintf('<pre>%s</pre>', utf8_encode($body));
-		}
-
-		$mail->Subject = $subject;
 		$mail->AltBody = "Debe utilizar un lector de correos que acepte HTML"; // optional, comment out and test
 		$mail->MsgHTML($body);
 
 		if (!$mail->Send()) {
-			echo "<!-- Mailer Error: " . $mail->ErrorInfo . "-->";
+			self::$emailError = $mail->ErrorInfo;
+			echo "<!-- Mailer Error: {$mail->ErrorInfo}-->";
 			return false;
 		} else {
 			echo "<!-- Message sent! -->";

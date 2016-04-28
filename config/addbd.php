@@ -35,19 +35,20 @@ if (!isset($memcache) || !is_object($memcache)) {
 }
 
 if (!$result = @unserialize($memcache->get('teneninformation_' . $llave))) {
-	try {
-		$array_config = ['default_cache_config' => [
-				[
-					'host' => 'ttbcache.tmcxaq.0001.use1.cache.amazonaws.com',
-					'port' => '11211'
-				]
+	$array_config = [
+		'default_cache_config' => [
+			[
+				'host' => 'localhost',
+				'port' => '11211'
 			]
-		];
+		]
+	];
+	try {
 		$DynamoDb = new DynamoDb($array_config);
-		$result = $DynamoDb->get(array(
+		$result = $DynamoDb->get([
 			'TableName' => 'thetimebilling',
 			'Key' => array('HashKeyElement' => array('S' => $llave))
-		));
+		]);
 	} catch (Exception $e) {
 		echo 'The item could not be retrieved.';
 	}
@@ -56,8 +57,16 @@ if (!$result = @unserialize($memcache->get('teneninformation_' . $llave))) {
 }
 
 $result['dbpass'] = Utiles::decrypt($result['dbpass'], $result['backupdir']);
+
+Conf::setStatic('dbHost', $result['dbhost']);
+Conf::setStatic('dbName', $result['dbname']);
+Conf::setStatic('dbUser', $result['dbuser']);
+Conf::setStatic('dbPass', $result['dbpass']);
+
+
 foreach ($result as $tipo => $valor) {
-	defined(strtoupper($tipo)) || define(strtoupper($tipo), $valor);
+	$static = strtoupper($tipo);
+	defined($static) || define($static, $valor);
 }
 
 if (defined('BACKUP') && (BACKUP == 3 || BACKUP == '3')) {

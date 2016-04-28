@@ -89,6 +89,9 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				$last_version_file_system = $Migration->getLastVersionOnFileSystem();
 				unset($Session, $Migration);
 
+				if ($last_version_database < $last_version_file_system) {
+					$last_version_database = sprintf('<span style="color:#CC0000">%s</span>', $last_version_database);
+				}
 				echo ' <br/><br/> Este software corre sobre la DB ' . Conf::dbHost() . ' <b>' . Conf::dbName() . '</b> version ' . $last_version_database;
 				echo '. La más actual disponible es la ' . $last_version_file_system;
 

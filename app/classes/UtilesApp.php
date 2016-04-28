@@ -2301,38 +2301,35 @@ HTML;
 		}
 	}
 
-	public static function UploadToS3($name, $file, $contentType = 'application/octet-stream') {
-		$s3 = new AmazonS3(array(
-			'key' => 'AKIAIQYFL5PYVQKORTBA',
-			'secret' => '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'
-		));
-
+	/**
+	 * Sube un archivo a S3, en el bucket de uploads,
+	 * relativo al subdominio (S3_UPLOAD_BUCKET/sub_domain/...)
+	 * @param string $name nombre del archivo junto con su ruta relativa <i>(/ruta/relativa/al/archivo.txt)</i>
+	 * @param string $file ruta absoluta del archivo
+	 * @param string $content_type
+	 * @return string URL del archivo en S3
+	 */
+	public static function UploadToS3($name, $file, $content_type = 'application/octet-stream') {
+		$S3 = new S3(S3_UPLOAD_BUCKET);
 		$name = SUBDOMAIN . $name;
-
-		$response = $s3->create_object(S3_UPLOAD_BUCKET, $name, array(
-			'body' => $file,
-			'acl' => AmazonS3::ACL_PUBLIC,
-			'contentType' => $contentType,
-			'headers' => array('content-disposition' => 'attachment')
+		$response = $S3->uploadFile($name, $file, array(
+			'ACL' => 'public-read',
+			'ContentType' => $content_type,
+			'ContentDisposition' => 'attachment'
 		));
-
-		if ($response->isOK()) {
-			return $s3->get_object_url(S3_UPLOAD_BUCKET, $name);
-		}
-
-		return '';
+		return empty($response['ObjectURL']) ? '' : $response['ObjectURL'];
 	}
 
-	public static function FileExistS3($name) {
-
-		$s3 = new AmazonS3(array(
-			'key' => 'AKIAIQYFL5PYVQKORTBA',
-			'secret' => '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'
-		));
-
-		$name = SUBDOMAIN . $name;
-
-		return $s3->if_object_exists(S3_UPLOAD_BUCKET, $name);
+	/**
+	 * Verifica la existencia de un archivo en S3, en el bucket de uploads,
+	 * relativo al subdominio (S3_UPLOAD_BUCKET/sub_domain/...)
+	 * @param string $relative_file_path Ruta relativa del archivo
+	 * @return type
+	 */
+	public static function FileExistS3($relative_file_path) {
+		$name = SUBDOMAIN . $relative_file_path;
+		$S3 = new S3(S3_UPLOAD_BUCKET);
+		return $S3->fileExists($name);
 	}
 
 	public static function slug($string, $replacement = '_', $map = array()) {
