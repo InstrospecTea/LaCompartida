@@ -35,26 +35,26 @@ $_LANG['Monto cobrable'] = 'Monto facturable';
 $_LANG['Horas a cobrar'] = 'Horas por facturar';
 
 // Reportes
-$_LANG['Hrs. Cobradas'] = 'Hrs. Facturadas';
-$_LANG['Horas cobrables'] = 'Horas facturables';
+$_LANG['Hrs. Cobradas'] = 'Hrs. Liquidadas';
+$_LANG['Horas cobrables'] = 'Horas Cobrables';
 $_LANG['Horas cobrables corregidas'] = 'Horas facturables corregidas';
-$_LANG['Horas cobradas'] = 'Horas facturadas';
-$_LANG['Valor cobrado'] = 'Valor facturado';
-$_LANG['Valor cobrado por hora'] = 'Valor facturado por hora';
-$_LANG['Cobrado'] = "Facturado";
-$_LANG['% Cobrado'] = "% Facturado";
-$_LANG['Valor cobrado'] = "Valor Facturado";
+$_LANG['Horas cobradas'] = 'Horas Liquidadas';
+$_LANG['Valor cobrado'] = 'Valor Liquidado';
+$_LANG['Valor cobrado por hora'] = 'Valor Liquidado por hora';
+$_LANG['Cobrado'] = "Liquidado";
+$_LANG['% Cobrado'] = "% Liquidado";
+$_LANG['Valor cobrado'] = "Valor Liquidado";
 $_LANG['cobrabilidad'] = 'Facturabilidad';
-$_LANG['horas_incobrables'] = "Horas no Facturables";
-$_LANG['valor_cobrado'] = "Valor Facturado";
-$_LANG['valor_tramites'] = "Valor Facturado Trámites";
-$_LANG['valor_estandar'] = "Valor Facturado Estándar";
-$_LANG['valor_por_cobrar'] = "Valor por Facturar";
+$_LANG['horas_incobrables'] = "Horas no Cobrables";
+$_LANG['valor_cobrado'] = "Valor Liquidado";
+$_LANG['valor_tramites'] = "Valor Liquidado Trámites";
+$_LANG['valor_estandar'] = "Valor Liquidado Estándar";
+$_LANG['valor_por_cobrar'] = "Valor por Liquidar";
 
-$_LANG['valor_incobrable'] = "Valor no Facturable";
-$_LANG['horas_cobrables'] = "Horas Facturables";
-$_LANG['horas_no_cobrables'] = "Horas no Facturables";
-$_LANG['horas_visibles'] = "Horas Facturables Corregidas";
+$_LANG['valor_incobrable'] = "Valor no Cobrable";
+$_LANG['horas_cobrables'] = "Horas Cobrables";
+$_LANG['horas_no_cobrables'] = "Horas no Cobrables";
+$_LANG['horas_visibles'] = "Horas Cobrables Corregidas";
 
 $_LANG['UsarImpuestoSeparado'] = "Facturar impuestos por separado";
 $_LANG['UsarImpuestoPorGastos'] = "Facturar impuestos por separado a los gastos";
@@ -67,11 +67,11 @@ $_LANG['Valor cobrado + p/cobrar'] = "Valor cobrado + p/facturar";
 
 $_LANG['hr_cobrable'] = 'Horas Facturables';
 $_LANG['horas_trabajadas_cobrables'] = 'Horas Trabajadas/Facturables';
-$_LANG['hr_no_cobrables'] = 'Horas no facturables';
+$_LANG['hr_no_cobrables'] = 'Horas no cobrables';
 
 #algunos que faltaron
 $_LANG['El valor cobrado es menor al valor según tasa de horas hombres. Cobrado/THH :'] = "El valor facturado es menor al valor según tasa de horas hombres. Cobrado/THH :";
-$_LANG['Ultimo periodo cobrado'] = "Ultimo periodo facturado";
+$_LANG['Ultimo periodo cobrado'] = "Ultimo periodo cobrado";
 
 
 

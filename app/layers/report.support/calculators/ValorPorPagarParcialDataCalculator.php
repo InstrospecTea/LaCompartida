@@ -1,20 +1,20 @@
 <?php
 /**
  * El valor por pagar parcial corresponde a lo que queda por ser pagado del monto correspondiente
- * al valor de la liquidaci√≥n antes de impuestos.
+ * al valor de la liquidaciÛn antes de impuestos.
  *
  * Condiciones para obtener un valor por pagar:
  *  * Que exista un cobro en estado: EMITIDO, FACTURADO, ENVIADO AL CLIENTE o PAGO PARCIAL
- *  * Que lo que se est√© cobrando sea Cobrable
+ *  * Que lo que se estÈ cobrando sea Cobrable
  *
- * M√°s info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Por-Pagar-Parcial
+ * M·s info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Por-Pagar-Parcial
  */
 class ValorPorPagarParcialDataCalculator extends AbstractProportionalDataCalculator {
 
 	/**
 	 * Obtiene la query de trabajos correspondiente a Valor Por Cobrar
 	 * Se obtiene desde el monto de trabajos del cobro
-	 * @param  Criteria $Criteria Query a la que se agregar√° el c√°lculo
+	 * @param  Criteria $Criteria Query a la que se agregar· el c·lculo
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
@@ -30,7 +30,8 @@ class ValorPorPagarParcialDataCalculator extends AbstractProportionalDataCalcula
 		);
 
 		$factor = $this->getWorksProportionalFactor();
-		$amount = "((documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
+		$worksContribution = $this->getWorksDocumentAmountContribution();
+		$amount = "({$worksContribution} * documento.subtotal_sin_descuento)";
 		$valor_por_pagar = "SUM({$factor} * ({$amount}) * ((documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)))";
 
 		$Criteria->add_select(
@@ -40,9 +41,9 @@ class ValorPorPagarParcialDataCalculator extends AbstractProportionalDataCalcula
 
 
 	/**
-	 * Obtiene la query de tr√°tmies correspondiente a Valor Por Cobrar
-	 * Se obtiene desde el monto de tr√°mites del cobro
-	 * @param  Criteria $Criteria Query a la que se agregar√° el c√°lculo
+	 * Obtiene la query de tr·tmies correspondiente a Valor Por Cobrar
+	 * Se obtiene desde el monto de tr·mites del cobro
+	 * @param  Criteria $Criteria Query a la que se agregar· el c·lculo
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
@@ -58,7 +59,8 @@ class ValorPorPagarParcialDataCalculator extends AbstractProportionalDataCalcula
 		);
 
 		$factor = $this->getErrandsProportionalFactor();
-		$amount = "((documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites)) * documento.subtotal_sin_descuento)";
+		$errandsContribution = $this->getErrandsDocumentAmountContribution();
+		$amount = "({$errandsContribution} * documento.subtotal_sin_descuento)";
 		$valor_por_pagar = "SUM({$factor} * ({$amount}) * ((documento.saldo_honorarios / documento.honorarios) * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)))";
 
 		$Criteria->add_select(
@@ -68,9 +70,9 @@ class ValorPorPagarParcialDataCalculator extends AbstractProportionalDataCalcula
 
 
 	/**
-	 * Obtiene la query de cobros sin trabajos ni tr√°mites correspondiente a Valor Por Cobrar parcial
+	 * Obtiene la query de cobros sin trabajos ni tr·mites correspondiente a Valor Por Cobrar parcial
 	 *
-	 * @param  Criteria $Criteria Query a la que se agregar√° el c√°lculo
+	 * @param  Criteria $Criteria Query a la que se agregar· el c·lculo
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {

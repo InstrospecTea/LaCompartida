@@ -28,15 +28,9 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 			)
 		);
 
-		$factor = $this->getWorksProportionalFactor();
+		$subtotalBase = $this->getWorksProportionalDocumentSubtotal();
 		$billed_amount = "SUM(
-			{$factor}
-			*
-			(
-				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
+			{$subtotalBase}
 			* (documento.saldo_honorarios / documento.honorarios)
 		)
 		*
@@ -65,15 +59,9 @@ class ValorPorPagarDataCalculator extends AbstractProportionalDataCalculator {
 			)
 		);
 
-		$factor = $this->getErrandsProportionalFactor();
+		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
 		$billed_amount =  "SUM(
-			{$factor}
-			*
-			(
-				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
+			{$subtotalBase}
 			* (documento.saldo_honorarios / documento.honorarios)
 		)
 		*

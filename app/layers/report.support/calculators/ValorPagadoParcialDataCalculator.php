@@ -17,17 +17,11 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$factor = $this->getWorksProportionalFactor();
+		$subtotalBase = $this->getWorksProportionalDocumentSubtotal();
 		$billed_amount = "SUM(
-			{$factor}
-			*
-			(
-				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
-				*
+				{$subtotalBase}
+ 				*
 				(1 - documento.saldo_honorarios / documento.honorarios)
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";
@@ -44,21 +38,13 @@ class ValorPagadoParcialDataCalculator extends AbstractProportionalDataCalculato
 	 * @return void
 	 */
 	function getReportErrandQuery(Criteria $Criteria) {
-		$factor = $this->getErrandsProportionalFactor();
-
+		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
 		$billed_amount =  "SUM(
-			{$factor}
+			{$subtotalBase}
 			*
-			(
-				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				(1 - documento.saldo_honorarios / documento.honorarios)
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
+			(1 - documento.saldo_honorarios / documento.honorarios)
 		)
-		*
-		(1 / cobro_moneda.tipo_cambio)";
+		* (1 / cobro_moneda.tipo_cambio)";
 
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado_parcial')

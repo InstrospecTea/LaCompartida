@@ -1,37 +1,28 @@
 <?php
 /**
- * La rentabilidad es Valor Cobrado / Valor Estándar
+ * El valor facturado corresponde ValorCobradoDataCalculator multiplicado por el
+ * aporte del monto total facturado en su Liquidación.
  *
- * Esta información se obtiene de: Trabajos y Trámites
- *
- * Condiciones para obtener un valor cobrado:
- *  * Que exista un cobro en estado: EMITIDO, FACTURADO, ENVIADO AL CLIENTE,
- *    PAGO PARCIAL o PAGADO
- *  * Que lo que se esté cobrando sea Cobrable
- *
- * Más info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Rentabilidad
+ * Más info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Facturado
  */
-class RentabilidadDataCalculator extends AbstractProportionalDataCalculator {
-
+class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalculator {
+	private $fieldName = 'valor_facturado';
 	/**
-	 * Obtiene la query de trabajos correspondiente al valor cobrado
+	 * Obtiene la query de trabajos correspondiente al valor facturado
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
 		$subtotalBase = $this->getWorksProportionalDocumentSubtotal();
-		$billed_amount = "SUM({$subtotalBase})
+		$invoiceFactor = $this->invoiceFactor();
+		$invoiceContrib = $this->getInvoiceContribution();
+
+		$billed_amount = "SUM({$invoiceContrib} * {$subtotalBase} * {$invoiceFactor})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
-		$standard_amount = "
-			SUM(trabajo.tarifa_hh_estandar * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
-			*
-			(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
-
-		$Criteria
-			->add_select($standard_amount, 'valor_divisor')
-			->add_select($billed_amount, 'rentabilidad');
+		 $Criteria
+			->add_select($billed_amount, 'valor_facturado');
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
@@ -39,24 +30,21 @@ class RentabilidadDataCalculator extends AbstractProportionalDataCalculator {
 	}
 
 	/**
-	 * Obtiene la query de trámites correspondiente al valor cobrado
+	 * Obtiene la query de trámites correspondiente al valor facturado
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
 		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
-		$billed_amount =  "SUM(${subtotalBase})
+		$invoiceFactor = $this->invoiceFactor();
+		$invoiceContrib = $this->getInvoiceContribution();
+
+		$billed_amount =  "SUM({$invoiceContrib} * {$subtotalBase} * {$invoiceFactor})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
-		$standard_amount = "
-			SUM(tramite.tarifa_tramite_estandar)
-			*
-			(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
-
-		$Criteria
-			->add_select($standard_amount, 'valor_divisor')
-			->add_select($billed_amount, 'rentabilidad');
+		 $Criteria
+			->add_select($billed_amount, 'valor_facturado');
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
@@ -69,16 +57,19 @@ class RentabilidadDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {
+		$invoiceFactor = $this->invoiceFactor();
+		$invoiceContrib = $this->getInvoiceContribution();
+
 		$billed_amount = '
-			SUM((cobro.monto_subtotal - cobro.descuento)
+			SUM({$invoiceContrib} * {$invoiceFactor}
+				* (cobro.monto_subtotal - cobro.descuento)
 				* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
 		';
 
 		$Criteria
-			->add_select('0', 'valor_divisor')
-			->add_select($billed_amount, 'rentabilidad');
+			->add_select($billed_amount, 'valor_facturado');
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));

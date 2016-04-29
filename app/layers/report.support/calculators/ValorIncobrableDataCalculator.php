@@ -17,17 +17,9 @@ class ValorIncobrableDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$factor = $this->getWorksProportionalFactor();
-		$billed_amount = "SUM(
-			{$factor}
+		$subtotalBase = $this->getWorksProportionalDocumentSubtotal();
+		$billed_amount = "SUM({$subtotalBase})
 			*
-			(
-				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
-		)
-		*
 		(1 / cobro_moneda.tipo_cambio)";
 
 		$Criteria
@@ -44,16 +36,8 @@ class ValorIncobrableDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
-		$factor = $this->getErrandsProportionalFactor();
-		$billed_amount =  "SUM(
-			{$factor}
-			*
-			(
-				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
-		)
+		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
+		$billed_amount =  "SUM({$subtotalBase})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 

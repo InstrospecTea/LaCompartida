@@ -19,17 +19,9 @@ class RentabilidadBaseDataCalculator extends AbstractProportionalDataCalculator 
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$factor = $this->getWorksProportionalFactor();
-		$billed_amount = "SUM(
-			{$factor}
+		$subtotal = $this->getWorksProportionalDocumentSubtotal();
+		$billed_amount = "SUM({$subtotal})
 			*
-			(
-				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
-		)
-		*
 		(1 / cobro_moneda.tipo_cambio)";
 
 		$standard_amount = "
@@ -116,17 +108,9 @@ class RentabilidadBaseDataCalculator extends AbstractProportionalDataCalculator 
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
-		$factor = $this->getErrandsProportionalFactor();
+		$subtotal = $this->getErrandsProportionalDocumentSubtotal();
 
-		$billed_amount =  "SUM(
-			{$factor}
-			*
-			(
-				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
-		)
+		$billed_amount =  "SUM({$subtotal})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 

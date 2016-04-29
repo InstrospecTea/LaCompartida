@@ -26,6 +26,7 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
  * |  +-- valor_cobrable: Valor monetario que corresponde a cada Profesional
  * |  |  +-- valor_visible: (no implementado)
  * |  |  |  +-- valor_cobrado: Valor monetario que corresponde a cada Profesional, en una Liquidación ya Emitida
+ * |  |  |  +-- valor_facturado: El valor facturado de una liquidación
  * |  |  |  +-- valor_tramites: Valor monetario de trámites que corresponde a cada Profesional, en una Liquidación ya Emitida
  * |  |  |  |  +-- valor_pagado: Valor Cobrado que ha sido Pagado
  * |  |  |  |  +-- valor_pagado_parcial: Valor Cobrado que ha sido Pagado parcialmente
@@ -56,6 +57,7 @@ class ReporteCriteria {
 		'horas_spot' => 'HorasSpot',
 		'horas_no_cobrables' => 'HorasNoCobrables',
 		'valor_cobrado' => 'ValorCobrado',
+		'valor_facturado' => 'ValorFacturado',
 		'horas_castigadas' => 'HorasCastigadas',
 		'horas_cobrables' => 'HorasCobrables',
 		'horas_cobradas' => 'HorasCobradas',
@@ -125,7 +127,7 @@ class ReporteCriteria {
 	 * TODO: Refactorizar a Abstractos
 	 */
 	public static function getTiposMoneda() {
-		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base', 'valor_cobrable');
+		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_facturado','valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base', 'valor_cobrable');
 	}
 
 	/**
@@ -320,7 +322,6 @@ class ReporteCriteria {
 		// pr($this->id_moneda);
 
 		$calculator_name = $this->calculationMapping[$this->tipo_dato];
-
 		$reflectedClass = new ReflectionClass("{$calculator_name}DataCalculator");
 		$calculator = $reflectedClass->newInstance(
 			$this->sesion,
@@ -883,6 +884,7 @@ class ReporteCriteria {
 			case "valor_por_cobrar":
 			case "valor_cobrado_no_estandar":
 			case "valor_cobrado":
+			case "valor_facturado":
 			case "valor_tramites":
 			case "valor_pagado":
 			case "valor_cobrable":
@@ -931,6 +933,7 @@ class ReporteCriteria {
 				return "Hr.";
 			case "valor_por_cobrar":
 			case "valor_cobrado":
+			case "valor_facturado":
 			case "valor_cobrable":
 			case "valor_tramites":
 			case "valor_pagado":
@@ -961,6 +964,7 @@ class ReporteCriteria {
 		switch ($tipo_dato) {
 			case "valor_por_cobrar":
 			case "valor_cobrado":
+			case "valor_facturado":
 			case "valor_tramites":
 			case "valor_cobrado_no_estandar":
 			case "valor_pagado":
