@@ -85,6 +85,28 @@ class Gasto extends Objeto {
 			),
 		),
 		array(
+			'field' => 'impuesto_gastos',
+			'format' => 'number',
+			'title' => 'Impuesto',
+			'visible' => false,
+			'extras' =>
+			array(
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			)
+		),
+		array(
+			'field' => 'monto_con_impuesto',
+			'format' => 'number',
+			'title' => 'Total',
+			'visible' => false,
+			'extras' =>
+			array(
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			)
+		),
+		array(
 			'field' => 'monto_facturable',
 			'format' => 'number',
 			'title' => 'Monto Facturable',
@@ -505,12 +527,14 @@ class Gasto extends Objeto {
 						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*if(ifnull(egreso,0)=0,ifnull(ingreso,0), egreso)  as monto_cobrable_moneda_base,  \n \n";
 		}
 
+		$impuestoGastos = Conf::GetConf($sesion, 'ValorImpuestoGastos');
+
 		$query.="\n\n
 				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ) as tipo_cambio_segun_cobro,
 				cta_corriente.con_impuesto,
 				cta_corriente.id_cobro,
 				IFNULL(cobro.estado, 'SIN COBRO') AS estado_cobro,
-				cta_corriente.cobrable,
+				IF(cta_corriente.cobrable = 1, 'Sí', 'No') AS cobrable,
 				cta_corriente.numero_documento,
 				prm_proveedor.rut AS rut_proveedor,
 				prm_proveedor.glosa AS nombre_proveedor,
@@ -526,6 +550,22 @@ class Gasto extends Objeto {
 				prm_idioma.codigo_idioma,
 				contrato.activo AS contrato_activo,
 				1 as opcion,
+				IF(con_impuesto = 'SI',
+					ROUND(
+						IF(cta_corriente.id_cobro IS NULL,
+							(monto_cobrable * ({$impuestoGastos} / 100)),
+							(monto_cobrable * (cobro.porcentaje_impuesto_gastos / 100))),
+					2),
+				0) AS impuesto_gastos,
+
+				(monto_cobrable + IF(con_impuesto = 'SI',
+					ROUND(
+						IF(cta_corriente.id_cobro IS NULL,
+							(monto_cobrable * ({$impuestoGastos} / 100)),
+							(monto_cobrable * (cobro.porcentaje_impuesto_gastos / 100))),
+							2),
+						0)
+					) AS monto_con_impuesto,
 				contrato.id_contrato
 				$col_select
 			FROM " . self::SelectFromQuery($join_extra) . "
