@@ -1,16 +1,13 @@
 <?php
-require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
-require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 
 class Archivo extends Objeto {
 
-	function Archivo($sesion, $fields = "", $params = "") {
+	public function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "archivo";
 		$this->campo_id = "id_archivo";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->setFieldsAllowNull();
 	}
 
 	function Check() {
@@ -39,10 +36,7 @@ class Archivo extends Objeto {
 	}
 
 	function LoadById($id_archivo) {
-		$query = "SELECT id_archivo FROM archivo WHERE id_archivo='$id_archivo' LIMIT 1";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($id) = mysql_fetch_array($resp);
-		return $this->Load($id);
+		return $this->Load($id_archivo);
 	}
 
 	function Upload($codigo_cliente, $id_contrato, $archivo_anexo = '') {

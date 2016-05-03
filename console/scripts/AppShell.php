@@ -20,7 +20,7 @@ abstract class AppShell {
 	 * @param string $text
 	 */
 	public function out($text) {
-		echo "{$text}\n";
+		Debug::pr($text);
 	}
 
 	/**
