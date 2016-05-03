@@ -192,7 +192,7 @@
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 		// Crear la planilla.
-		$wb = new Spreadsheet_Excel_Writer();
+		$wb = new WorkbookMiddleware();
 		$wb->send("cuenta_corriente_cliente.xls");
 		$ws =& $wb->addWorksheet(__('Movimientos'));
 		$ws->setInputEncoding('utf-8');
@@ -303,10 +303,13 @@
 		$col_egreso_para_formula = Utiles::NumToColumnaExcel($col_egreso);
 		$col_ingreso_para_formula = Utiles::NumToColumnaExcel($col_ingreso);
 		$col_balance_para_formula = Utiles::NumToColumnaExcel($col_balance);
-		$ws->setColumn($col_num, $col_fecha, 13);
-		$ws->setColumn($col_nombre, $col_monto_moneda_tarifa, 18);
-		$ws->setColumn($col_descripcion, $col_descripcion, 30);
-		$ws->setColumn($col_egreso, $col_balance, 18);
+		$ws->setColumn($col_num, $col_num, 8);
+		$ws->setColumn($col_fecha, $col_fecha, 14);
+		$ws->setColumn($col_descripcion, $col_descripcion, 26);
+		$ws->setColumn($col_monto_moneda_tarifa, $col_monto_moneda_tarifa, 14);
+		$ws->setColumn($col_egreso, $col_egreso, 18);
+		$ws->setColumn($col_ingreso, $col_ingreso, 13);
+		$ws->setColumn($col_balance, $col_balance, 18);
 
 		// imprimir encabezado
 		$ws->write($filas, $col_num, __('Nº'), $formato_titulo);
@@ -332,7 +335,7 @@
 			$ws->write($filas, $col_monto_moneda_tarifa, $monto, $formatos_monedas[$id_moneda_documento]['xls']);
 			$ws->write($filas, $col_egreso, $egreso_moneda_base, $formatos_monedas[$id_moneda_base]['xls']);
 			$ws->write($filas, $col_ingreso, $ingreso_moneda_base, $formatos_monedas[$id_moneda_base]['xls']);
-			$ws->writeFormula($filas, $col_balance, "=$col_egreso_para_formula".($filas+1)." - $col_ingreso_para_formula".($filas+1).")", $formatos_monedas[$id_moneda_base]['xls']);
+			$ws->writeFormula($filas, $col_balance, "=($col_egreso_para_formula".($filas+1)." - $col_ingreso_para_formula".($filas+1).")", $formatos_monedas[$id_moneda_base]['xls']);
 		}
 
 		// imprimir totales
@@ -343,7 +346,7 @@
 		$ws->write($filas, $col_monto_moneda_tarifa,'', $formatos_monedas[$id_moneda_documento]['xls_total']);
 		$ws->writeFormula($filas, $col_egreso, "=SUM($col_egreso_para_formula".($inicio_datos+2).":$col_egreso_para_formula$filas)", $formatos_monedas[$id_moneda_documento]['xls_total']);
 		$ws->writeFormula($filas, $col_ingreso, "=SUM($col_ingreso_para_formula".($inicio_datos+2).":$col_ingreso_para_formula$filas)", $formatos_monedas[$id_moneda_documento]['xls_total']);
-		$ws->writeFormula($filas, $col_balance, "=$col_egreso_para_formula".($filas+1)." - $col_ingreso_para_formula".($filas+1).")", $formatos_monedas[$id_moneda_documento]['xls_total']);
+		$ws->writeFormula($filas, $col_balance, "=($col_egreso_para_formula".($filas+1)." - $col_ingreso_para_formula".($filas+1).")", $formatos_monedas[$id_moneda_documento]['xls_total']);
 
 		// cerrar archivo
 		$wb->close();
@@ -380,7 +383,7 @@
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 		// Crear la planilla.
-		$wb = new Spreadsheet_Excel_Writer();
+		$wb = new WorkbookMiddleware();
 		$wb->send("cuenta_corriente.xls");
 		$ws =& $wb->addWorksheet(__('Balances'));
 		$ws->setInputEncoding('utf-8');
@@ -482,9 +485,11 @@
 		$col_egreso_para_formula = Utiles::NumToColumnaExcel($col_egreso);
 		$col_ingreso_para_formula = Utiles::NumToColumnaExcel($col_ingreso);
 		$col_balance_para_formula = Utiles::NumToColumnaExcel($col_balance);
-		$ws->setColumn($col_nombre, $col_nombre, 25);
-		$ws->setColumn($col_nombre, $col_monto_moneda_tarifa, 18);
-		$ws->setColumn($col_egreso, $col_balance, 18);
+		$ws->setColumn($col_nombre, $col_nombre, 35);
+		$ws->setColumn($col_monto_moneda_tarifa, $col_monto_moneda_tarifa, 25);
+		$ws->setColumn($col_egreso, $col_egreso, 25);
+		$ws->setColumn($col_ingreso, $col_ingreso, 25);
+		$ws->setColumn($col_balance, $col_balance, 25);
 
 		// imprimir encabezado
 		$ws->write($filas, $col_nombre, __('Cliente'), $formato_titulo);
@@ -509,7 +514,7 @@
 			$ws->write($filas, $col_monto_moneda_tarifa, $monto_base, $formatos_monedas[$id_moneda_documento]['xls']);
 			$ws->write($filas, $col_egreso, $egreso_moneda_base, $formatos_monedas[$id_moneda_base]['xls']);
 			$ws->write($filas, $col_ingreso, $ingreso_moneda_base, $formatos_monedas[$id_moneda_base]['xls']);
-			$ws->writeFormula($filas, $col_balance, "=$col_egreso_para_formula".($filas+1)." - $col_ingreso_para_formula".($filas+1).")", $formatos_monedas[$id_moneda_base]['xls']);
+			$ws->writeFormula($filas, $col_balance, "=($col_egreso_para_formula".($filas+1)." - $col_ingreso_para_formula".($filas+1).")", $formatos_monedas[$id_moneda_base]['xls']);
 		}
 
 		// imprimir totales
@@ -520,7 +525,7 @@
 		$ws->write($filas, $col_monto_moneda_tarifa,'', $formatos_monedas[$id_moneda_documento]['xls_total']);
 		$ws->writeFormula($filas, $col_egreso, "=SUM($col_egreso_para_formula".($inicio_datos+2).":$col_egreso_para_formula$filas)", $formatos_monedas[$id_moneda_documento]['xls_total']);
 		$ws->writeFormula($filas, $col_ingreso, "=SUM($col_ingreso_para_formula".($inicio_datos+2).":$col_ingreso_para_formula$filas)", $formatos_monedas[$id_moneda_documento]['xls_total']);
-		$ws->writeFormula($filas, $col_balance, "=$col_egreso_para_formula".($filas+1)." - $col_ingreso_para_formula".($filas+1).")", $formatos_monedas[$id_moneda_documento]['xls_total']);
+		$ws->writeFormula($filas, $col_balance, "=($col_egreso_para_formula".($filas+1)." - $col_ingreso_para_formula".($filas+1).")", $formatos_monedas[$id_moneda_documento]['xls_total']);
 
 		// cerrar archivo
 		$wb->close();
