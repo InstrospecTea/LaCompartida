@@ -63,7 +63,7 @@ class ArchivosDbS3 extends AppShell {
 			return null;
 		}
 		if ($name) {
-			$file_fields['nombre_archivo'] = "{$file_name}.{$file_ext}";
+			$file_fields['archivo_nombre'] = "{$file_name}.{$file_ext}";
 		}
 		$codigo_cliente = UtilesApp::slug($file->get('codigo_cliente'));
 		$id_contrato = $file->get('id_contrato');

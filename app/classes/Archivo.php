@@ -2,6 +2,8 @@
 
 class Archivo extends Objeto {
 
+	public $editable_fields = ['archivo_nombre', 'archivo_tipo', 'archivo_data', 'archivo_s3'];
+
 	public function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "archivo";
 		$this->campo_id = "id_archivo";
