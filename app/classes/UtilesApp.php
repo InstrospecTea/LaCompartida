@@ -5,31 +5,30 @@ require_once dirname(__FILE__) . '/../conf.php';
 class UtilesApp extends Utiles {
 
 	public static $_transliteration = array(
-		'/Ã¼/' => 'ue',
-		'/Ã„/' => 'Ae',
-		'/Ãœ/' => 'Ue',
-		'/Ã–/' => 'Oe',
-		'/Ã€|Ã|Ã‚|Ãƒ|Ã„|Ã…/' => 'A',
-		'/Ã |Ã¡|Ã¢|Ã£|Ã¥|Âª/' => 'a',
-		'/Ã‡/' => 'C',
-		'/Ã§/' => 'c',
-		'/Ã|Ã/' => 'D',
-		'/Ã°/' => 'd',
-		'/Ãˆ|Ã‰|ÃŠ|Ã‹/' => 'E',
-		'/Ã¨|Ã©|Ãª|Ã«/' => 'e',
-		'/ÃŒ|Ã|ÃŽ|Ã/' => 'I',
-		'/Ã¬|Ã­|Ã®|Ã¯/' => 'i',
-		'/Ã‘/' => 'N',
-		'/Ã±/' => 'n',
-		'/Ã’|Ã“|Ã”|Ã•|Ã˜/' => 'O',
-		'/Ã²|Ã³|Ã´|Ãµ|Ã¸|Âº/' => 'o',
-		'/Ã™|Ãš|Ã›/' => 'U',
-		'/Ã¹|Ãº|Ã»/' => 'u',
-		'/Ã/' => 'Y',
-		'/Ã½|Ã¿/' => 'y',
-		'/Å½/' => 'x',
-		'/Ã†/' => 'AE',
-		'/ÃŸ/'=> 'ss'
+		'/ü/' => 'ue',
+		'/Ä/' => 'Ae',
+		'/Ü/' => 'Ue',
+		'/Ö/' => 'Oe',
+		'/À|Á|Â|Ã|Ä|Å/' => 'A',
+		'/à|á|â|ã|å|ª/' => 'a',
+		'/Ç/' => 'C',
+		'/ç/' => 'c',
+		'/Ð|Ð/' => 'D',
+		'/ð/' => 'd',
+		'/È|É|Ê|Ë/' => 'E',
+		'/è|é|ê|ë/' => 'e',
+		'/Ì|Í|Î|Ï/' => 'I',
+		'/ì|í|î|ï/' => 'i',
+		'/Ñ/' => 'N',
+		'/ñ/' => 'n',
+		'/Ò|Ó|Ô|Õ|Ø/' => 'O',
+		'/ò|ó|ô|õ|ø|º/' => 'o',
+		'/Ù|Ú|Û/' => 'U',
+		'/ù|ú|û/' => 'u',
+		'/Ý/' => 'Y',
+		'/ý|ÿ/' => 'y',
+		'/Æ/' => 'AE',
+		'/ß/'=> 'ss'
 	);
 
 	/**
@@ -2305,14 +2304,14 @@ HTML;
 	 * Sube un archivo a S3, en el bucket de uploads,
 	 * relativo al subdominio (S3_UPLOAD_BUCKET/sub_domain/...)
 	 * @param string $name nombre del archivo junto con su ruta relativa <i>(/ruta/relativa/al/archivo.txt)</i>
-	 * @param string $file ruta absoluta del archivo
+	 * @param string $file_path ruta absoluta del archivo
 	 * @param string $content_type
 	 * @return string URL del archivo en S3
 	 */
-	public static function UploadToS3($name, $file, $content_type = 'application/octet-stream') {
+	public static function UploadToS3($name, $file_path, $content_type = 'application/octet-stream') {
 		$S3 = new S3(S3_UPLOAD_BUCKET);
 		$name = SUBDOMAIN . $name;
-		$response = $S3->uploadFile($name, $file, array(
+		$response = $S3->uploadFile($name, $file_path, array(
 			'ACL' => 'public-read',
 			'ContentType' => $content_type,
 			'ContentDisposition' => 'attachment'
@@ -2332,6 +2331,13 @@ HTML;
 		return $S3->fileExists($name);
 	}
 
+	/**
+	 * Escapa caracteres con tilde
+	 * @param type $string
+	 * @param string $replacement
+	 * @param type $map
+	 * @return type
+	 */
 	public static function slug($string, $replacement = '_', $map = array()) {
 		if (is_array($replacement)) {
 			$map = $replacement;
@@ -2341,16 +2347,16 @@ HTML;
 
 		$merge = array(
 			'/[^\s\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]/mu' => ' ',
-			'/\\s+/' => $replacement,
+			'/[\s \t ]+/' => $replacement,
 			sprintf('/^[%s]+|[%s]+$/', $quotedReplacement, $quotedReplacement) => '',
 		);
 
-		$map = $map + self::$_transliteration + $merge;
-		return preg_replace(array_keys($map), array_values($map), $string);
+		$map += self::$_transliteration + $merge;
+		return self::transliteration($string, $map);
 	}
 
-	public static function transliteration($string) {
-		$map = self::$_transliteration;
+	public static function transliteration($string, array $map = []) {
+		$map += self::$_transliteration;
 		return preg_replace(array_keys($map), array_values($map), $string);
 	}
 
