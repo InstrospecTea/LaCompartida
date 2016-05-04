@@ -1,6 +1,6 @@
 <?php
 	require_once dirname(__FILE__).'/../../conf.php';
-
+	set_time_limit(0);
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
 
