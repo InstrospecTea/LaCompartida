@@ -39,6 +39,7 @@
 		->addData($tiempo);
 
 	$grafico->addDataSets($dataset)
+		->addNameChart('Horas trabajadas' . (!empty($nombre_usuario) ? ' - ' . $nombre_usuario : ''))
 		->addLabels($asunto);
 
 	echo $grafico->getJson();
