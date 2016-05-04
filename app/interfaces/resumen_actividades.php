@@ -578,6 +578,19 @@ $agrupadores = explode('-', $vista);
 			display: none;
 		}
 	}
+	.chart-legend li {
+		list-style-type: none;
+		margin: 5px;
+		display: inline-block;
+		text-align: left;
+		width: 125px;
+	}
+	.chart-legend li span {
+		display: inline-block;
+		width: 12px;
+		height: 12px;
+		margin-right: 5px;
+	}
 </style>
 
 <?php if (!$popup) { ?>
@@ -1380,8 +1393,8 @@ if ($opc == 'grafico') {
 	$grafico = 'grafico_resumen_actividades';
 	if ($tipo_dato_comparado) {
 		$grafico = 'grafico_barras_resumen_actividades';
-		$datosC = '&datos_compara=' . base64_encode(json_encode($datos_grafico_compara));
-		$datosC .= '&labels=' . implode(',', $labels);
+		$datosC = base64_encode(json_encode($datos_grafico_compara));
+		$labels = base64_encode(json_encode($labels));
 	}
 
 	$html_info .= "<div id='contenedor_grafico_resumen_actividad'></div>";
@@ -1390,12 +1403,17 @@ if ($opc == 'grafico') {
 	var graficoResumenActividades;
 
 	var titulo = '<?php echo $titulo_reporte; ?>';
-	var datos = '<?php echo $datos . $datosC; ?>';
+	var datos = '<?php echo $datos; ?>';
+	var datos_compara = '<?php echo $datosC; ?>';
+	var labels = '<?php echo $labels; ?>';
 
 	jQuery.ajax({
 		url: "graficos/<?php echo $grafico; ?>.php",
 		data: {
-			'datos': datos
+			'datos': datos,
+			'titulo': titulo,
+			'datos_compara': datos_compara,
+			'labels': labels
 		},
 		dataType: 'json',
 		type: 'POST',
@@ -1403,18 +1421,38 @@ if ($opc == 'grafico') {
 			if (respuesta != null) {
 				agregarCanvas('resumen_actividad',
 						jQuery('#contenedor_grafico_resumen_actividad'),
-						titulo);
+						titulo,
+						true);
 
-				var canvas = jQuery("#grafico_resumen_actividad")[0];
+				var canvas = jQuery('#grafico_resumen_actividad')[0];
 				var context = canvas.getContext('2d');
 
 				if (graficoResumenActividades) {
 					graficoResumenActividades.destroy();
 				}
 
-				graficoResumenActividades = new Chart(context).Pie(respuesta, {
-					tooltipTemplate:  "<%= label %>: <%= value %>hrs. (<%= Math.round(circumference / 6.283 * 100) %>%)"
-				});
+				if (datos_compara) {
+					graficoResumenActividades = new Chart(context).Bar(respuesta, {
+						multiTooltipTemplate: '<%= datasetLabel %> <%= value %>'
+					});
+				} else {
+					graficoResumenActividades = new Chart(context).Pie(respuesta, {
+
+						tooltipTemplate:  '<%= label %>: <%= value %>hrs. (<%= Math.round(circumference / 6.283 * 100) %>%)',
+						legendTemplate : '<ul>'
+							+ '<% for (var i=0; i<segments.length; i++) { %>'
+							+ '<li>'
+							+ '<span style=\"background-color: <%=segments[i].fillColor%>;\"></span>'
+							+ '<% if (segments[i].label) { %><%= segments[i].label %><% } %>'
+							+ '</li>'
+							+ '<% } %>'
+							+ '</ul>'
+
+					});
+					jQuery('#leyenda').append(graficoResumenActividades.generateLegend());
+				}
+			} else {
+				jQuery('#contenedor_grafico_resumen_actividad').append('<h3>No exiten datos para generar el gráfico</h3>');
 			}
 		},
 		error: function(e) {
@@ -1422,7 +1460,8 @@ if ($opc == 'grafico') {
 		}
 	});
 
-	function agregarCanvas(id, contenedor, titulo) {
+	function agregarCanvas(id, contenedor, titulo, leyenda) {
+		leyenda = leyenda || false;
 		var canvas = document.createElement('canvas');
 		var h3 = document.createElement('h3');
 		canvas.width = 600;
@@ -1433,6 +1472,14 @@ if ($opc == 'grafico') {
 		contenedor.empty();
 		contenedor.append(h3);
 		contenedor.append(canvas);
+
+		if (leyenda) {
+			var divLeyenda = document.createElement('div');
+			divLeyenda.id = 'leyenda';
+			divLeyenda.className = 'chart-legend';
+
+			contenedor.append(divLeyenda);
+		}
 	}
 </script>
 

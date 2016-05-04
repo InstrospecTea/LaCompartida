@@ -72,6 +72,7 @@
 		->addData($tiempo);
 
 	$grafico->addDataSets($dataset)
+		->addNameChart('Horas trabajadas por empleado')
 		->addLabels($empleado);
 
 	echo $grafico->getJson();
