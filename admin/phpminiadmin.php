@@ -14,19 +14,14 @@ require_once dirname(__FILE__).'/../app/conf.php';
  #DEFAULT db connection settings
  # --- WARNING! --- if you set defaults - always recommended to set $ACCESS_PWD to protect your db!
 
-defined('DBUSER') || define('DBUSER',Conf::dbUser());
-defined('DBHOST') || define('DBHOST',Conf::dbHost());
-defined('DBPASS') || define('DBPASS',Conf::dbPass());
-
-
-  $DBDEF=array(
- 'user'=>DBUSER,#required
- 'pwd'=> Conf::dbPass(), #required
- 'db'=>DBNAME,  #optional, default DB
- 'host'=>DBHOST,#optional
- 'port'=>3306,#optional
-'chset'=>"ISO-8859-1",#optional, default charset
- );
+	$DBDEF=array(
+		'user'=>Conf::dbUser(),	//required
+		'pwd'=>Conf::dbPass(),	//required
+		'db'=>Conf::dbName(),	//optional, default DB
+		'host'=>Conf::dbHost(),	//optional
+		'port'=>Conf::dbPort(),	//optional
+		'chset'=>"ISO-8859-1",	//optional, default charset
+	);
 
  date_default_timezone_set('UTC');#required by PHP 5.1+
 

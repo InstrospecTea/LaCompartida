@@ -50,10 +50,10 @@ if ($forma_cobro)
 $mostrar_resumen_de_profesionales = 1;
 
 if ($guardar_respaldo) {
-			$wb = new Spreadsheet_Excel_Writer(Conf::ServerDir().'/respaldos/ResumenCobros'.date('ymdHis').'.xls');
+			$wb = new WorkbookMiddleware(Conf::ServerDir().'/respaldos/ResumenCobros'.date('ymdHis').'.xls');
 			$wb->setVersion(8);
 } else {
-			$wb = new Spreadsheet_Excel_Writer();
+			$wb = new WorkbookMiddleware();
 			$wb->setVersion(8);
 			// No se hace $wb->send() todavía por si acaso no hay horas en el cobro.
 		}
