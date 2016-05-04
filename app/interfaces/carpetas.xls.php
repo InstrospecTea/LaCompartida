@@ -4,7 +4,7 @@
 	$sesion = new Sesion(array('LEE','EDI', 'ADM'));
 	$pagina = new Pagina($sesion);
 
-	$wb = new Spreadsheet_Excel_Writer();
+	$wb = new WorkbookMiddleware();
 
 	$wb->setVersion(8);
 	$wb->send('Carpetas.xls');

@@ -14,7 +14,7 @@
         $string_decimales = ".00";
 
 	#ARMANDO XLS
-    $wb = new Spreadsheet_Excel_Writer();
+    $wb = new WorkbookMiddleware();
 
     $wb->send("Planilla montos facturados.xls");
 
