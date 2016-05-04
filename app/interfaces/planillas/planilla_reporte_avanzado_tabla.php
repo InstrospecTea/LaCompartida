@@ -49,7 +49,7 @@ $reporte->Query();
 
 $r = $reporte->toCross();
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 $wb->send('Planilla Horas por Cliente.xls');
 
