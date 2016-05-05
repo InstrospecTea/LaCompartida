@@ -2258,7 +2258,6 @@ foreach ($chargeResults as $charge) {
 							->add_inner_join_with('prm_proveedor', 'cta_corriente.id_proveedor = prm_proveedor.id_proveedor');
 		}
 
-		$columna_gastos_fecha = $col_descripcion - $offsetcolumna - 1;
 		$columna_gastos_solicitante = $col_solicitante;
 		$columna_gastos_descripcion = $col_descripcion;
 		$columna_gastos_montos = $col_descripcion + 2 + $offsetfactura;
@@ -2358,10 +2357,10 @@ foreach ($chargeResults as $charge) {
 				$filas += 2;
 
 				if ($cobro->fields['opc_ver_solicitante'] == 1) {
-					$ws->write($filas, $columna_gastos_fecha - $offsetcolumna - 1, $gasto->fields['codigo_asunto'], $formato_encabezado);
+					$ws->write($filas, $columna_gastos_descripcion - $offsetcolumna - 3, $gasto->fields['codigo_asunto'], $formato_encabezado);
 					$ws->write($filas, $columna_gastos_descripcion - $offsetcolumna - 1  , $gasto->fields['glosa_asunto'], $formato_encabezado);
 				} else {
-					$ws->write($filas, $columna_gastos_descripcion, $gasto->fields['glosa_asunto'], $formato_encabezado);
+					$ws->write($filas, $columna_gastos_fecha - 2, $gasto->fields['glosa_asunto'], $formato_encabezado);
 					$ws->write($filas, $columna_gastos_fecha, $gasto->fields['codigo_asunto'], $formato_encabezado);
 				}
 
