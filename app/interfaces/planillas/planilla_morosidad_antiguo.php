@@ -9,7 +9,7 @@
 		$filas = 1;
 		$moneda_base = Utiles::MonedaBase($sesion);
 		#ARMANDO XLS
-		$wb = new Spreadsheet_Excel_Writer();
+		$wb = new WorkbookMiddleware();
 		$wb->send("planilla_morosidad.xls");
 
 		$wb->setCustomColor(35, 220, 255, 220);
