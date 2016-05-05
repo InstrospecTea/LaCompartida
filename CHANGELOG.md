@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.11.5
+Thursday, May 5th
+* **Fix** [Corrige encabezado de documento ledes erróneo en caso counselink](https://github.com/LemontechSA/ttb/pull/1432)
+
 ## Hotfix 16.11.4
 Thursday, April 28th
 * **Fix** [Condiciona la consulta del id_usuarioa que no esté vacío. Llama a errorSQL() en caso de error.](https://github.com/LemontechSA/ttb/pull/1427)
