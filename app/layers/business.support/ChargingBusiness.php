@@ -1117,7 +1117,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$CriteriaInvoice
 			->add_select("CONCAT('\"', pdl.codigo , ' ', LPAD(f.serie_documento_legal, '3', '0'), '-', LPAD(f.numero, '7', '0'), '\":\"', c.id_cobro, '\"')", 'identificador')
 			->add_select("DATEDIFF('{$parameters['end_date']}', f.fecha)", 'dias_desde_facturacion')
-			->add_select('SUM(IF(ccfmn.monto_pago IS NULL, 0, ccfmn.monto_pago))', 'total_pagado')
+			->add_select('SUM(IF(ccfmn.monto IS NULL, 0, ccfmn.monto))', 'total_pagado')
 			->add_select('f.total', 'total_facturado')
 			->add_select('f.RUT_cliente', 'codigo_cliente')
 			->add_select('f.cliente', 'glosa_cliente')
