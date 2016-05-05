@@ -328,30 +328,7 @@ class Gasto extends Objeto {
 		$SimpleReport->SetRegionalFormat(UtilesApp::ObtenerFormatoIdioma($this->sesion));
 		$SimpleReport->LoadConfiguration('GASTOS');
 
-		$col_select = array();
-		$join_extra = array();
-
-		if ($SimpleReport->Config->columns['codigo_cuenta_gasto']->Visible() ||
-				$SimpleReport->Config->columns['glosa_cuenta_gasto']->Visible()) {
-			$col_select[] = "cta_corriente.cuenta_gasto AS codigo_cuenta_gasto";
-			$col_select[] = "prm_codigo_cuenta_gasto.glosa AS glosa_cuenta_gasto";
-			$join_extra[] = "LEFT JOIN prm_codigo AS prm_codigo_cuenta_gasto
-												ON cta_corriente.cuenta_gasto = prm_codigo_cuenta_gasto.codigo
-												AND prm_codigo_cuenta_gasto.grupo = 'CUENTA_GASTO'";
-		}
-		if ($SimpleReport->Config->columns['codigo_detraccion']->Visible() ||
-				$SimpleReport->Config->columns['glosa_detraccion']->Visible()) {
-			$col_select[] = "cta_corriente.detraccion AS codigo_detraccion";
-			$col_select[] = "prm_codigo_detraccion.glosa AS glosa_detraccion";
-			$join_extra[] = "LEFT JOIN prm_codigo AS prm_codigo_detraccion
-												ON cta_corriente.detraccion = prm_codigo_detraccion.codigo
-												AND prm_codigo_detraccion.grupo = 'DETRACCION'";
-		}
-
-		$col_select = "," . implode(",", $col_select);
-		$join_extra = implode(" ", $join_extra);
-
-		$search_query = self::SearchQuery($this->sesion, $where, $col_select, $join_extra);
+		$search_query = self::SearchQuery($this->sesion, $where);
 
 		$results = $this->sesion->pdodbh->query($search_query)->fetchAll(PDO::FETCH_ASSOC);
 		$SimpleReport->LoadResults($results);
