@@ -535,6 +535,13 @@ class WorkbookMiddleware {
 	}
 
 	/**
+	 * Set portrait orientation
+	 */
+	public function setPortrait() {
+		$this->workSheetObj->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
+	}
+
+	/**
 	 * Freeze panes
 	 * @param array $panes
 	 */
@@ -561,6 +568,14 @@ class WorkbookMiddleware {
 	 */
 	public function setZoom($scale) {
 		$this->workSheetObj->getSheetView()->setZoomScale($scale);
+	}
+
+	/**
+	 * Set sheet center horizontal
+	 * @param int $value
+	 */
+	public function centerHorizontally($value){
+		$this->workSheetObj->getPageSetup()->setHorizontalCentered($value == 1 ? true : false);
 	}
 
 }
