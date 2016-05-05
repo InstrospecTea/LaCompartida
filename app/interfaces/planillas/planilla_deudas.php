@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../../conf.php';
 require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
-
+set_time_limit(0);
 $sesion = new sesion(array('REP'));
 $Form = new Form($sesion);
 
