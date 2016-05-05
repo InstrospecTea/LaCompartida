@@ -229,7 +229,7 @@ $col = 0;
 $col_tipo = $col++;
 
 // Crear y preparar planilla
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 // Enviar headers a la pagina
 $wb->send(__('Pago de Documentos tributarios') . ' ' . $fecha_actual . '.xls');
 
