@@ -2,7 +2,7 @@
 
 ## Hotfix 16.11.5
 Thursday, May 5th
-* **Fix** [Corrige encabezado de documento ledes erróneo en caso counselink](https://github.com/LemontechSA/ttb/pull/1432)
+* **Fix** [Corrige encabezado de documento ledes erróneo en caso counselink](https://github.com/LemontechSA/ttb/pull/1434)
 
 ## Hotfix 16.11.4
 Thursday, April 28th
