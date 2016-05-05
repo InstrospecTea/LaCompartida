@@ -24,7 +24,7 @@ class EntityTest extends BaseUnitTest
         $work = new Work();
         $workService = new WorkService($this->session);
         $work = $workService->saveOrUpdate($work);
-        $this->assertNotEquals(null, $work->get('cobrable'));
+        $this->assertEquals(null, $work->get('cobrable'));
     }
 
 
