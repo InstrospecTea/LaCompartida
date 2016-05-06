@@ -27,6 +27,4 @@ class EntityTest extends BaseUnitTest
         $this->assertEquals(null, $work->get('cobrable'));
     }
 
-
-
 }
