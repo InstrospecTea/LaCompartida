@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.12.0](https://github.com/LemontechSA/ttb/pull/1420)
+Tuesday, April 26th
+* **Feature** [Nuevo Diseño Detalle Cobro](https://github.com/LemontechSA/ttb/pull/1411)
+
 ## Hotfix 16.11.6
 Thursday, May 5th
 * **Fix** [Corrige asignación monto_pago al utilizar un adelanto](https://github.com/LemontechSA/ttb/pull/1435)
