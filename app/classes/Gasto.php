@@ -331,16 +331,16 @@ class Gasto extends Objeto {
 		$col_select = array();
 		$join_extra = array();
 
-		if ($SimpleReport->Config->columns['codigo_cuenta_gasto']->Visible() ||
-				$SimpleReport->Config->columns['glosa_cuenta_gasto']->Visible()) {
+		if ($SimpleReport->Config->columns['codigo_cuenta_gasto']->isVisible() ||
+				$SimpleReport->Config->columns['glosa_cuenta_gasto']->isVisible()) {
 			$col_select[] = "cta_corriente.cuenta_gasto AS codigo_cuenta_gasto";
 			$col_select[] = "prm_codigo_cuenta_gasto.glosa AS glosa_cuenta_gasto";
 			$join_extra[] = "LEFT JOIN prm_codigo AS prm_codigo_cuenta_gasto
 												ON cta_corriente.cuenta_gasto = prm_codigo_cuenta_gasto.codigo
 												AND prm_codigo_cuenta_gasto.grupo = 'CUENTA_GASTO'";
 		}
-		if ($SimpleReport->Config->columns['codigo_detraccion']->Visible() ||
-				$SimpleReport->Config->columns['glosa_detraccion']->Visible()) {
+		if ($SimpleReport->Config->columns['codigo_detraccion']->isVisible() ||
+				$SimpleReport->Config->columns['glosa_detraccion']->isVisible()) {
 			$col_select[] = "cta_corriente.detraccion AS codigo_detraccion";
 			$col_select[] = "prm_codigo_detraccion.glosa AS glosa_detraccion";
 			$join_extra[] = "LEFT JOIN prm_codigo AS prm_codigo_detraccion
