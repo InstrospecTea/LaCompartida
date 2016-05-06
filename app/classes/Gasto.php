@@ -348,8 +348,8 @@ class Gasto extends Objeto {
 												AND prm_codigo_detraccion.grupo = 'DETRACCION'";
 		}
 
-		$col_select = "," . implode(",", $col_select);
-		$join_extra = implode(" ", $join_extra);
+		$col_select = !empty($col_select) ? "," . implode(",", $col_select) : NULL;
+		$join_extra = !empty($join_extra) ? implode(" ", $join_extra) : NULL;
 
 		$search_query = self::SearchQuery($this->sesion, $where, $col_select, $join_extra);
 
