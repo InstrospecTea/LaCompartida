@@ -6,7 +6,7 @@
 
 	$moneda_base = Utiles::MonedaBase($sesion);
 	#ARMANDO XLS
-	$wb = new Spreadsheet_Excel_Writer();
+	$wb = new WorkbookMiddleware();
 
 	$wb->send("Planilla_resumen_profesionales.xls");
 
