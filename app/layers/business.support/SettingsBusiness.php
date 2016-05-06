@@ -10,7 +10,7 @@ class SettingsBusiness extends AbstractBusiness implements ISettingsBusiness {
 
 		$searchCriteria = new SearchCriteria('Setting');
 		$searchCriteria->filter('glosa_opcion')->restricted_by('equals')->compare_with("'$value'");
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 
 		if (empty($results)) {
 			throw new BusinessException("There is not a defined setting with provided code '$value'.");
@@ -35,7 +35,7 @@ class SettingsBusiness extends AbstractBusiness implements ISettingsBusiness {
 			->restricted_by('in')
 			->compare_with(array_keys($settingCodes));
 
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 
 		foreach ($results as $setting) {
 			$key = $setting->get('glosa_opcion');

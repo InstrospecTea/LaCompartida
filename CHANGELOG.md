@@ -1,5 +1,25 @@
 # Changelog
 
+## Hotfix 16.11.6
+Thursday, May 5th
+* **Fix** [Corrige asignación monto_pago al utilizar un adelanto](https://github.com/LemontechSA/ttb/pull/1435)
+
+## Hotfix 16.11.5
+Thursday, May 5th
+* **Fix** [Corrige encabezado de documento ledes erróneo en caso counselink](https://github.com/LemontechSA/ttb/pull/1434)
+
+## Hotfix 16.11.4
+Thursday, April 28th
+* **Fix** [Condiciona la consulta del id_usuarioa que no esté vacío. Llama a errorSQL() en caso de error.](https://github.com/LemontechSA/ttb/pull/1427)
+
+## Hotfix 16.11.3
+Wednesday, April 27th
+* **Fix** [Elimina caracter maligno](https://github.com/LemontechSA/ttb/pull/1425)
+
+## Hotfix 16.11.2
+Wednesday, April 27th
+* **Fix** [Reemplaza UtilesApp::Decimal2Time() por UtilesApp::Decimal2GlosaHora()](https://github.com/LemontechSA/ttb/pull/1424)
+
 ## Hotfix 16.11.1
 Wednesday, April 27th
 * **Fix** [Obtiene datos de tarificación del contrato principal](https://github.com/LemontechSA/ttb/pull/1423)

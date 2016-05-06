@@ -31,7 +31,7 @@ class ClientsController extends AbstractController {
 		$searchCriteria->filter("{$codigo_cliente_key}")->restricted_by('equals')->compare_with("'{$client_code}'");
 		$searchCriteria->filter('id_contrato')->restricted_by('equals')->compare_with('Client.id_contrato');
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria, $fields);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria, $fields);
 
 		return $this->renderJSON(isset($results[0]) ? $results[0]->fields : false);
 	}
