@@ -1,8 +1,8 @@
 # Changelog
 
-## [Release 16.12.0](https://github.com/LemontechSA/ttb/pull/1420)
-Tuesday, April 26th
-* **Feature** [Nuevo Diseño Detalle Cobro](https://github.com/LemontechSA/ttb/pull/1411)
+## [Release 16.12.0](https://github.com/LemontechSA/ttb/pull/1436)
+Tuesday, May 6th
+* **Feature** [Reporte de Gastos](https://github.com/LemontechSA/ttb/pull/1433)
 
 ## Hotfix 16.11.6
 Thursday, May 5th
