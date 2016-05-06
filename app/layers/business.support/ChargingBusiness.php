@@ -1035,10 +1035,10 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_left_join_with('cliente', 'cliente.codigo_cliente = factura.codigo_cliente')
 			->add_left_join_with('documento', 'documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = "N"')
 			->add_left_join_with(
-				array('documento_moneda', 'meneda_display'),
+				array('documento_moneda', 'moneda_display'),
 				CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('meneda_display.id_documento', 'documento.id_documento'),
-					CriteriaRestriction::equals('meneda_display.id_moneda', $parameters['display_currency']->fields['id_moneda'])
+					CriteriaRestriction::equals('moneda_display.id_documento', 'documento.id_documento'),
+					CriteriaRestriction::equals('moneda_display.id_moneda', $parameters['display_currency']->fields['id_moneda'])
 				)
 			)
 			->add_left_join_with(
@@ -1054,12 +1054,12 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		if (!$annulled) {
 			$CriteriaInvoice
 				->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
-				->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (moneda_factura.tipo_cambio / meneda_display.tipo_cambio), 0)", 'total_factura')
-				->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (moneda_factura.tipo_cambio / meneda_display.tipo_cambio), 0)", 'total_nc')
+				->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio), 0)", 'total_factura')
+				->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio), 0)", 'total_nc')
 				->add_restriction(CriteriaRestriction::between('factura.fecha', $start_date, $end_date));
 		} else {
 			$CriteriaInvoice
-				->add_select("({$total_invoice} * (moneda_factura.tipo_cambio / meneda_display.tipo_cambio))", 'total_factura')
+				->add_select("({$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio))", 'total_factura')
 				->add_select('DATE_FORMAT(factura.fecha_anulacion, "%Y%m")', 'mes_contable')
 				->add_restriction(CriteriaRestriction::between('factura.fecha_anulacion', $start_date, $end_date));
 		}
