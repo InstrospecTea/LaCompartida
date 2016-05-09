@@ -2317,8 +2317,6 @@ foreach ($chargeResults as $charge) {
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 3, __('Total'), $formato_total);
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 2, '', $formato_total);
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $formato_total);
-							$ws->write($filas, $col_descripcion, '', $formato_total);
-							$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
 						} else {
 							if ( $cobro->fields['opc_ver_solicitante'] == 1){
 								$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Total'), $formato_total);
@@ -2326,21 +2324,17 @@ foreach ($chargeResults as $charge) {
 							} else {
 								$ws->write($filas, $col_descripcion - $offsetcolumna - 1, __('Total'), $formato_total);
 							}
-
-							$ws->write($filas, $col_descripcion, '', $formato_total);
-							$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
 						}
+
+						$ws->write($filas, $col_descripcion, '', $formato_total);
+						$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
 
 						if (!empty($rut) && !empty($proveedor)) {
 							$ws->write($filas, $col_descripcion - $offsetcolumna, '', $formato_total);
 							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), '', $formato_total);
 						}
 
-						if ( $cobro->fields['opc_ver_solicitante'] == 1){
-							$ws->writeFormula($filas, $col_descripcion + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $formato_moneda_gastos_total);
-						} else {
-							$ws->writeFormula($filas, $col_descripcion + 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $formato_moneda_gastos_total);
-						}
+						$ws->writeFormula($filas, $col_descripcion + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $formato_moneda_gastos_total);
 
 						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 						$ws->write($filas, $col_descripcion + 2, '', $formato_total);
@@ -2361,8 +2355,9 @@ foreach ($chargeResults as $charge) {
 					$ws->write($filas, $columna_gastos_descripcion - $offsetcolumna, $gasto->fields['glosa_asunto'], $formato_encabezado);
 					$ws->mergeCells($filas, $columna_gastos_descripcion - $offsetcolumna - 2, $filas, $columna_gastos_descripcion - $offsetcolumna - 1);
 				} else {
-					$ws->write($filas, $columna_gastos_descripcion - 2, $gasto->fields['codigo_asunto'], $formato_encabezado);
-					$ws->write($filas, $columna_gastos_descripcion, $gasto->fields['glosa_asunto'], $formato_encabezado);
+					$ws->write($filas, $columna_gastos_descripcion - $offsetcolumna - 1, $gasto->fields['codigo_asunto'], $formato_encabezado);
+					$ws->write($filas, $columna_gastos_descripcion - $offsetcolumna + 1, $gasto->fields['glosa_asunto'], $formato_encabezado);
+					$ws->mergeCells($filas, $columna_gastos_descripcion - $offsetcolumna - 1, $filas, $columna_gastos_descripcion - $offsetcolumna);
 				}
 
 				$filas++;
