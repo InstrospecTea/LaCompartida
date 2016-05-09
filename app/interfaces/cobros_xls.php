@@ -326,6 +326,7 @@ if ($borradores) {
 	/*
 	 *  Encabezado de tabla vacia
 	 */
+
 	$ws->write($filas++, $col_id_trabajo, $PrmExcelCobro->getGlosa('titulo', 'Listado de trabajos', $lang), $CellFormat->get('encabezado'));
 	$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
 	$ws->write($filas, $col_fecha_dia, $PrmExcelCobro->getGlosa('fecha_dia', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
@@ -474,13 +475,12 @@ foreach ($chargeResults as $charge) {
 	$formato_id_moneda_monto = $Moneda->getExcelFormat($contrato->fields['id_moneda_monto']);
 	$formato_id_moneda = $Moneda->getExcelFormat($cobro->fields['id_moneda']);
 
+	$CellFormat->add('moneda_resumen', array('Align' => 'right', 'NumFormat' => '#'));
 	$CellFormat->add('moneda_resumen', array('Size' => 10, 'Align' => 'right', 'Bold' => '1', 'NumFormat' => $formato_opc_moneda_total));
 	$CellFormat->add('moneda_gastos', array('Align' => 'right', 'NumFormat' => $formato_opc_moneda_total));
 	$CellFormat->add('moneda_gastos_total', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'Top' => 1, 'NumFormat' => $formato_opc_moneda_total));
 	$CellFormat->add('moneda_resumen_cobro', array('Align' => 'right', 'Border' => '1', 'NumFormat' => $formato_opc_moneda_total));
-
 	$CellFormat->add('moneda_monto', array('Align' => 'right', 'Border' => 1, 'NumFormat' => $formato_id_moneda_monto));
-
 	$CellFormat->add('moneda', array('Align' => 'right', 'NumFormat' => $formato_id_moneda));
 	$CellFormat->add('moneda_total', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'Top' => 1, 'NumFormat' => $formato_id_moneda));
 	$CellFormat->add('moneda_encabezado', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'NumFormat' => $formato_id_moneda));
@@ -1856,22 +1856,33 @@ foreach ($chargeResults as $charge) {
 
 	$lineas_total_asunto_gasto = array();
 	$formula_total_gg = array();
+	$rut = NULL;
+	$proveedor = NULL;
 
 	if ($cont_gastos_cobro > 0 && $cobro->fields['opc_ver_gastos']) {
 
+		$impuesto = $PrmExcelCobro->getGlosa('impuesto', 'Listado de gastos', $lang);
+		$impuesto = $impuesto == 'No existe información' ? NULL : $impuesto;
 
+		$rut = $PrmExcelCobro->getGlosa('rut', 'Listado de gastos', $lang);
+		if ($rut == 'No existe información') {
+			$rut = NULL;
+		} else {
+			$proveedor = $PrmExcelCobro->getGlosa('proveedor', 'Listado de gastos', $lang);
+			if ($proveedor == 'No existe información') {
+				$proveedor = NULL;
+			} else {
+				$offsetcolumna += 2;
+			}
+		}
 
 		if ($cobro->fields['opc_ver_asuntos_separados'] == 0) {
-
 			/*
 			 *  SECCION ENCABEZADOS GASTOS CUANDO NO ES SEPARADO POR GASTOS
 			 */
-
 			$filas++;
 			if (Conf::GetConf($sesion, 'FacturaAsociada')) {
-
 				if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
-
 					if ($cobro->fields['opc_ver_solicitante'] == 1) {
 						$ws->write($filas++, $col_descripcion - $offsetcolumna - 4, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 4, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
@@ -1879,61 +1890,68 @@ foreach ($chargeResults as $charge) {
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Concepto'), $CellFormat->get('titulo'));
 						$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('titulo'));
+						if (!empty($rut) && !empty($proveedor)) {
+							$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo'));
+							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo'));
+						}
 						$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						$ws->write($filas, $col_descripcion + 1, __('Documento Asociado'), $CellFormat->get('titulo'));
 						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 						$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('titulo'));
 
-						$ws->mergeCells($filas, $col_descripcion + 3, $filas, $col_descripcion + 4);
-						$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('titulo'));
-						$ws->write($filas, $col_descripcion + 4, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 					} else {
 						$ws->write($filas++, $col_descripcion - $offsetcolumna - 3, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 3, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Concepto'), $CellFormat->get('titulo'));
 						$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('titulo'));
+						if (!empty($rut) && !empty($proveedor)) {
+							$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo'));
+							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo'));
+						}
 						$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						$ws->write($filas, $col_descripcion + 1, __('Documento Asociado'), $CellFormat->get('titulo'));
 						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 						$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('titulo'));
 
-						$ws->mergeCells($filas, $col_descripcion + 3, $filas, $col_descripcion + 4);
-						$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('titulo'));
-						$ws->write($filas, $col_descripcion + 4, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 					}
-
 				} else {
 					if ($cobro->fields['opc_ver_solicitante'] == 1) {
 						$ws->write($filas++, $col_descripcion - $offsetcolumna - 2, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 2, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('solicitante', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
+						if (!empty($rut) && !empty($proveedor)) {
+							$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo'));
+							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo'));
+						}
 						$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						$ws->write($filas, $col_descripcion + 1, __('Tipo Documento'), $CellFormat->get('titulo'));
 						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 						$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('titulo'));
-
-						$ws->mergeCells($filas, $col_descripcion + 3, $filas, $col_descripcion + 4);
-						$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('titulo'));
-						$ws->write($filas, $col_descripcion + 4, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 					} else {
 						$ws->write($filas++, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
+						if (!empty($rut) && !empty($proveedor)) {
+							$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo'));
+							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo'));
+						}
 						$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						$ws->write($filas, $col_descripcion + 1, __('Tipo Documento'), $CellFormat->get('titulo'));
 						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 						$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('titulo'));
 
-						$ws->mergeCells($filas, $col_descripcion + 3, $filas, $col_descripcion + 4);
-						$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('titulo'));
-						$ws->write($filas, $col_descripcion + 4, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 					}
 				}
+				$ws->mergeCells($filas, $col_descripcion + 3, $filas, $col_descripcion + 4);
+				$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('titulo'));
+				$ws->write($filas, $col_descripcion + 4, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 
+				if (!empty($impuesto)) {
+					$ws->write($filas, $col_descripcion + 5, $impuesto, $CellFormat->get('titulo'));
+					$ws->write($filas, $col_descripcion + 6, 'Total', $CellFormat->get('titulo'));
+				}
 			} else {
-
 				if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
-
 					if ($cobro->fields['opc_ver_solicitante'] == 1) {
 
 						$ws->write($filas++, $col_descripcion - $offsetcolumna - $offsetfecha, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado'));
@@ -1942,51 +1960,54 @@ foreach ($chargeResults as $charge) {
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Concepto'), $CellFormat->get('titulo'));
 						$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('titulo'));
+						if (!empty($rut) && !empty($proveedor)) {
+							$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo'));
+							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo'));
+						}
 						$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
-
-						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-						$ws->write($filas, $col_descripcion + 1, '', $CellFormat->get('titulo'));
-						$ws->write($filas, $col_descripcion + 2, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
-
 					} else {
-
 						$ws->write($filas++, $col_descripcion - $offsetcolumna - $offsetfecha, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - $offsetfecha, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Concepto'), $CellFormat->get('titulo'));
 						$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('titulo'));
+						if (!empty($rut) && !empty($proveedor)) {
+							$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo'));
+							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo'));
+						}
 						$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
-
-						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-						$ws->write($filas, $col_descripcion + 1, '', $CellFormat->get('titulo'));
-						$ws->write($filas, $col_descripcion + 2, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 
 					}
 				} else {
-
 					if ($cobro->fields['opc_ver_solicitante'] == 1) {
-
 						$ws->write($filas++, $col_descripcion - $offsetcolumna - 2, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 2, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('solicitante', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
+						if (!empty($rut) && !empty($proveedor)) {
+							$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo'));
+							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo'));
+						}
 						$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
-						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-						$ws->write($filas, $col_descripcion + 1, '', $CellFormat->get('titulo'));
-						$ws->write($filas, $col_descripcion + 2, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
-
 					} else {
-
 						$ws->write($filas++, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
+						if (!empty($rut) && !empty($proveedor)) {
+							$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo'));
+							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo'));
+						}
 						$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
-						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-						$ws->write($filas, $col_descripcion + 1, '', $CellFormat->get('titulo'));
-						$ws->write($filas, $col_descripcion + 2, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
-
 					}
 				}
-			}
 
+				$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
+				$ws->write($filas, $col_descripcion + 1, '', $CellFormat->get('titulo'));
+				$ws->write($filas, $col_descripcion + 2, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
+
+				if (!empty($impuesto)) {
+					$ws->write($filas, $col_descripcion + 3, $impuesto, $CellFormat->get('titulo'));
+					$ws->write($filas, $col_descripcion + 4, 'Total', $CellFormat->get('titulo'));
+				}
+			}
 		}
 
 		/*
@@ -1995,61 +2016,68 @@ foreach ($chargeResults as $charge) {
 
 		++$filas;
 		$fila_inicio_gastos = $filas + 1;
-		$_columnas_adicionales = '';
-		$_select_solicitante = '';
-		$_joins = '';
-		$_join_solicitante = '';
 		$offsetfactura = 0;
-		$order = "ORDER BY fecha ASC";
-		if ($cobro->fields['opc_ver_asuntos_separados']) {
-			$order = " ORDER BY asunto.codigo_asunto ASC";
+
+		$gastos = new Criteria($sesion);
+		$gastos->add_select('cta_corriente.ingreso')
+						->add_select('cta_corriente.egreso')
+						->add_select('cta_corriente.monto_cobrable')
+						->add_select("CAST(IF(fecha_factura IS NULL OR cta_corriente.fecha_factura = '' OR cta_corriente.fecha_factura = 00000000, cta_corriente.fecha, cta_corriente.fecha_factura) as DATE) as fecha")
+						->add_select('cta_corriente.id_moneda')
+						->add_select('asunto.codigo_asunto')
+						->add_select('asunto.glosa_asunto')
+						->add_select('cta_corriente.descripcion')
+						->add_select('cta_corriente.con_impuesto')
+						->add_from('cta_corriente')
+						->add_inner_join_with('asunto', 'asunto.codigo_asunto = cta_corriente.codigo_asunto');
+
+		if ($cobro->fields['opc_ver_solicitante'] == 1) {
+			$gastos->add_select("CONCAT_WS(' ', nombre, apellido1, apellido2)", 'solicitante')
+							->add_select('usuario.username', 'iniciales')
+							->add_left_join_with('usuario', 'cta_corriente.id_usuario_orden = usuario.id_usuario');
 		}
+
 		if (Conf::GetConf($sesion, 'FacturaAsociada')) {
-			$_columnas_adicionales .= ', ptda.glosa, codigo_factura_gasto';
-			$_joins .= ' LEFT JOIN prm_tipo_documento_asociado ptda ON ( cta_corriente.id_tipo_documento_asociado = ptda.id_tipo_documento_asociado ) ';
+			$gastos->add_select('ptda.glosa')
+							->add_select('codigo_factura_gasto')
+							->add_left_join_with('prm_glosa_gasto pgg', 'cta_corriente.id_tipo_documento_asociado = ptda.id_tipo_documento_asociado');
 			$offsetfactura = 2;
 		}
 
 		if (Conf::GetConf($sesion, 'PrmGastos') && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
-			$_columnas_adicionales .= ', pgg.glosa_gasto ';
-			$_joins .= ' LEFT JOIN prm_glosa_gasto pgg ON ( cta_corriente.id_glosa_gasto = pgg.id_glosa_gasto ) ';
-		}
-		if ($cobro->fields['opc_ver_solicitante'] == 1) {
-			$_select_solicitante .= "CONCAT_WS(' ', nombre, apellido1, apellido2) as solicitante,
-							usuario.username as iniciales,";
-			$_join_solicitante .= "LEFT JOIN usuario ON ( cta_corriente.id_usuario_orden = usuario.id_usuario)";
+			$gastos->add_select('pgg.glosa_gasto')
+							->add_left_join_with('usuario', 'cta_corriente.id_glosa_gasto = pgg.id_glosa_gasto');
 		}
 
+		if ($cobro->fields['opc_ver_asuntos_separados']) {
+			$gastos->add_ordering('asunto.codigo_asunto');
+		} else {
+			$gastos->add_ordering('fecha');
+		}
 
-		$query = 	"SELECT
-						$_select_solicitante
-						cta_corriente.ingreso,
-						cta_corriente.egreso,
-						cta_corriente.monto_cobrable,
-						CAST( IF( fecha_factura IS NULL OR cta_corriente.fecha_factura = '' OR cta_corriente.fecha_factura = 00000000,
-						cta_corriente.fecha,
-						cta_corriente.fecha_factura) as DATE) as fecha,
-						cta_corriente.id_moneda,
-						asunto.codigo_asunto,
-						asunto.glosa_asunto,
-						cta_corriente.descripcion
-						$_columnas_adicionales
-					FROM cta_corriente
-						JOIN asunto using (codigo_asunto)
-						$_join_solicitante
-						$_joins
-					WHERE id_cobro='" . $cobro->fields['id_cobro'] . "'
-					$order";
+		if (!empty($impuesto)) {
+			$gastos->add_select('cobro.porcentaje_impuesto_gastos')
+							->add_inner_join_with('cobro', 'cobro.id_cobro = cta_corriente.id_cobro')
+							->add_restriction(CriteriaRestriction::equals('cobro.id_cobro', $cobro->fields['id_cobro']));
+		} else {
+			$gastos->add_restriction(CriteriaRestriction::equals('id_cobro', $cobro->fields['id_cobro']));
+		}
 
-		$lista_gastos = new ListaGastos($sesion, '', $query);
-		$columna_gastos_fecha = $col_descripcion - $offsetcolumna - 1;
+		if (!empty($rut) || !empty($proveedor)) {
+			$gastos->add_select('prm_proveedor.rut', 'rut')
+							->add_select('prm_proveedor.glosa', 'glosa_proveedor')
+							->add_inner_join_with('prm_proveedor', 'cta_corriente.id_proveedor = prm_proveedor.id_proveedor');
+		}
+
 		$columna_gastos_solicitante = $col_solicitante;
 		$columna_gastos_descripcion = $col_descripcion;
 		$columna_gastos_montos = $col_descripcion + 2 + $offsetfactura;
 		$col_formula_gastos_montos = Utiles::NumToColumnaExcel($columna_gastos_montos);
+		$result = $gastos->run();
 
-		for ($i = 0; $i < $lista_gastos->num; $i++) {
-			$gasto = $lista_gastos->Get($i);
+		for ($i = 0; $i < sizeof($result); $i++) {
+			$gasto = new stdClass();
+			$gasto->fields = $result[$i];
 
 			// CABECERAS PARA CADA ASUNTO
 			if ($cobro->fields['opc_ver_asuntos_separados'] && ($gasto->fields['codigo_asunto'] != $codigo_asunto_anterior)) {
@@ -2064,10 +2092,9 @@ foreach ($chargeResults as $charge) {
 					if (Conf::GetConf($sesion, 'FacturaAsociada')) {
 						if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 3, __('Total'), $CellFormat->get('total', $i));
-							$ws->write($filas, $col_descripcion, '', $CellFormat->get('total', $i));
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 2, '', $CellFormat->get('total', $i));
+							$ws->write($filas, $col_descripcion, '', $CellFormat->get('total', $i));
 							$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 3);
-							$coltotal = $col_descripcion - $offsetcolumna - 2;
 
 							$ws->writeFormula($filas, $col_descripcion - $offsetcolumna - 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total', $i));
 							$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion + 4);
@@ -2084,42 +2111,67 @@ foreach ($chargeResults as $charge) {
 							$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('total', $i));
 							$ws->write($filas, $col_descripcion + 4, '', $CellFormat->get('total', $i));
 						}
+
+						if (!empty($rut) && !empty($proveedor)) {
+							$ws->write($filas, $col_descripcion - $offsetcolumna, '', $CellFormat->get('total'));
+							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), '', $CellFormat->get('total'));
+						}
+
+						if (!empty($impuesto)) {
+							$col_formula_temp2 = Utiles::NumToColumnaExcel($col_descripcion + 5);
+							$col_formula_temp3 = Utiles::NumToColumnaExcel($col_descripcion + 6);
+							$ws->writeFormula($filas, $col_descripcion + 5, "=SUM($col_formula_temp2$fila_inicio_gastos:$col_formula_temp2$filas)", $CellFormat->get('moneda_gastos_total'));
+							$ws->writeFormula($filas, $col_descripcion + 6, "=SUM($col_formula_temp3$fila_inicio_gastos:$col_formula_temp3$filas)", $CellFormat->get('moneda_gastos_total'));
+						}
 					} else {
 						if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 3, __('Total'), $CellFormat->get('total', $i));
-							$ws->write($filas, $col_descripcion, '', $CellFormat->get('total', $i));
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 2, '', $CellFormat->get('total', $i));
+							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('total', $i));
+							$ws->write($filas, $col_descripcion, '', $CellFormat->get('total', $i));
 							$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
-							$coltotal = $col_descripcion - $offsetcolumna - 2;
 						} else {
 							if ( $cobro->fields['opc_ver_solicitante'] == 1){
 								$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Total'), $CellFormat->get('total', $i));
-								$ws->write($filas, $col_descripcion -1, '', $CellFormat->get('total', $i));
+								$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('total', $i));
 							} else {
 								$ws->write($filas, $col_descripcion - $offsetcolumna - 1, __('Total'), $CellFormat->get('total', $i));
 							}
 
 							$ws->write($filas, $col_descripcion, '', $CellFormat->get('total', $i));
 							$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
-							$coltotal = $col_descripcion + 1;
 						}
+
+						if (!empty($rut) && !empty($proveedor)) {
+							$ws->write($filas, $col_descripcion - $offsetcolumna, '', $CellFormat->get('total', $i));
+							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), '', $CellFormat->get('total', $i));
+						}
+
 						if ( $cobro->fields['opc_ver_solicitante'] == 1){
-							$ws->writeFormula($filas, $col_descripcion - $offsetcolumna + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total', $i));
+							$ws->writeFormula($filas, $col_descripcion + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total', $i));
 						} else {
-							$ws->writeFormula($filas, $col_descripcion - $offsetcolumna + 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total', $i));
+							$ws->writeFormula($filas, $col_descripcion + 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total', $i));
 						}
+
 						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 						$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total', $i));
+
+						if (!empty($impuesto)) {
+							$col_formula_temp2 = Utiles::NumToColumnaExcel($col_descripcion + 3);
+							$col_formula_temp3 = Utiles::NumToColumnaExcel($col_descripcion + 4);
+							$ws->writeFormula($filas, $col_descripcion + 3, "=SUM($col_formula_temp2$fila_inicio_gastos:$col_formula_temp2$filas)", $CellFormat->get('moneda_gastos_total', $i));
+							$ws->writeFormula($filas, $col_descripcion + 4, "=SUM($col_formula_temp3$fila_inicio_gastos:$col_formula_temp3$filas)", $CellFormat->get('moneda_gastos_total', $i));
+						}
 					}
 				}
 
 				$filas += 2;
 
 				if ($cobro->fields['opc_ver_solicitante'] == 1) {
-					$ws->write($filas, $columna_gastos_fecha - $offsetcolumna - 1, $gasto->fields['codigo_asunto'], $CellFormat->get('encabezado', $i));
+					$ws->write($filas, $columna_gastos_descripcion - $offsetcolumna - 3, $gasto->fields['codigo_asunto'], $CellFormat->get('encabezado', $i));
 					$ws->write($filas, $columna_gastos_descripcion - $offsetcolumna - 1  , $gasto->fields['glosa_asunto'], $CellFormat->get('encabezado', $i));
 				} else {
-					$ws->write($filas, $columna_gastos_descripcion, $gasto->fields['glosa_asunto'], $CellFormat->get('encabezado', $i));
+					$ws->write($filas, $columna_gastos_fecha - 2, $gasto->fields['glosa_asunto'], $CellFormat->get('encabezado', $i));
 					$ws->write($filas, $columna_gastos_fecha, $gasto->fields['codigo_asunto'], $CellFormat->get('encabezado', $i));
 				}
 
@@ -2137,14 +2189,14 @@ foreach ($chargeResults as $charge) {
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Concepto'), $CellFormat->get('titulo', $i));
 							$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('titulo', $i));
+							if (!empty($rut) && !empty($proveedor)) {
+								$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo', $i));
+								$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo', $i));
+							}
 							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 							$ws->write($filas, $col_descripcion + 1, __('Documento Asociado'), $CellFormat->get('titulo', $i));
 							$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 							$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('titulo', $i));
-
-							$ws->mergeCells($filas, $col_descripcion + 3, $filas, $col_descripcion + 4);
-							$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('titulo', $i));
-							$ws->write($filas, $col_descripcion + 4, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 						} else {
 							if (!$cobro->fields['opc_ver_asuntos_separados']){
 								$ws->write($filas++, $col_descripcion - $offsetcolumna - 3, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado', $i));
@@ -2153,14 +2205,14 @@ foreach ($chargeResults as $charge) {
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Concepto'), $CellFormat->get('titulo', $i));
 							$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('titulo', $i));
+							if (!empty($rut) && !empty($proveedor)) {
+								$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo', $i));
+								$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo', $i));
+							}
 							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 							$ws->write($filas, $col_descripcion + 1, __('Documento Asociado'), $CellFormat->get('titulo', $i));
 							$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 							$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('titulo', $i));
-
-							$ws->mergeCells($filas, $col_descripcion + 3, $filas, $col_descripcion + 4);
-							$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('titulo', $i));
-							$ws->write($filas, $col_descripcion + 4, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 						}
 					} else {
 						if ($cobro->fields['opc_ver_solicitante'] == 1) {
@@ -2169,28 +2221,37 @@ foreach ($chargeResults as $charge) {
 							}
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('solicitante', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
+							if (!empty($rut) && !empty($proveedor)) {
+								$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo', $i));
+								$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo', $i));
+							}
 							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 							$ws->write($filas, $col_descripcion + 1, __('Tipo Documento'), $CellFormat->get('titulo', $i));
 							$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 							$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('titulo', $i));
-
-							$ws->mergeCells($filas, $col_descripcion + 3, $filas, $col_descripcion + 4);
-							$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('titulo', $i));
-							$ws->write($filas, $col_descripcion + 4, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 						} else {
-							if (!$cobro->fields['opc_ver_asuntos_separados']){
+							if (!$cobro->fields['opc_ver_asuntos_separados']) {
 								$ws->write($filas++, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado', $i));
 							}
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
+							if (!empty($rut) && !empty($proveedor)) {
+								$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo', $i));
+								$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo', $i));
+							}
 							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 							$ws->write($filas, $col_descripcion + 1, __('Tipo Documento'), $CellFormat->get('titulo', $i));
 							$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 							$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('titulo', $i));
-
-							$ws->mergeCells($filas, $col_descripcion + 3, $filas, $col_descripcion + 4);
-							$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('titulo', $i));
-							$ws->write($filas, $col_descripcion + 4, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 						}
+					}
+
+					$ws->mergeCells($filas, $col_descripcion + 3, $filas, $col_descripcion + 2);
+					$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('titulo'));
+					$ws->write($filas, $col_descripcion + 4, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
+
+					if (!empty($impuesto)) {
+						$ws->write($filas, $col_descripcion + 5, $impuesto, $CellFormat->get('titulo'));
+						$ws->write($filas, $col_descripcion + 6, 'Total', $CellFormat->get('titulo'));
 					}
 				} else {
 					if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
@@ -2203,11 +2264,11 @@ foreach ($chargeResults as $charge) {
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Concepto'), $CellFormat->get('titulo', $i));
 							$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('titulo', $i));
+							if (!empty($rut) && !empty($proveedor)) {
+								$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo', $i));
+								$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo', $i));
+							}
 							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
-
-							$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-							$ws->write($filas, $col_descripcion + 1, '', $CellFormat->get('titulo', $i));
-							$ws->write($filas, $col_descripcion + 2, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 						} else {
 							if (!$cobro->fields['opc_ver_asuntos_separados']){
 								$ws->write($filas++, $col_descripcion - $offsetcolumna - $offsetfecha, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado', $i));
@@ -2216,11 +2277,11 @@ foreach ($chargeResults as $charge) {
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Concepto'), $CellFormat->get('titulo', $i));
 							$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('titulo', $i));
+							if (!empty($rut) && !empty($proveedor)) {
+								$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo', $i));
+								$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo', $i));
+							}
 							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
-
-							$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-							$ws->write($filas, $col_descripcion + 1, '', $CellFormat->get('titulo', $i));
-							$ws->write($filas, $col_descripcion + 2, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 						}
 
 					} else {
@@ -2231,21 +2292,32 @@ foreach ($chargeResults as $charge) {
 							}
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 2, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('solicitante', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
+							if (!empty($rut) && !empty($proveedor)) {
+								$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo', $i));
+								$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo', $i));
+							}
 							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
-							$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-							$ws->write($filas, $col_descripcion + 1, '', $CellFormat->get('titulo', $i));
-							$ws->write($filas, $col_descripcion + 2, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 						} else {
 							if (!$cobro->fields['opc_ver_asuntos_separados']){
 								$ws->write($filas++, $col_descripcion - $offsetcolumna - 2, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado', $i));
 							}
-							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
+							$ws->write($filas, $col_descripcion - $offsetcolumna - 1, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo'), $i);
+							if (!empty($rut) && !empty($proveedor)) {
+								$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo', $i));
+								$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo', $i));
+							}
 							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
-							$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-							$ws->write($filas, $col_descripcion + 1, '', $CellFormat->get('titulo', $i));
-							$ws->write($filas, $col_descripcion + 2, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
 						}
 					}
+				}
+
+				$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
+				$ws->write($filas, $col_descripcion + 1, '', $CellFormat->get('titulo'));
+				$ws->write($filas, $col_descripcion + 2, $PrmExcelCobro->getGlosa('monto', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
+
+				if (!empty($impuesto)) {
+					$ws->write($filas, $col_descripcion + 3, $impuesto, $CellFormat->get('titulo'));
+					$ws->write($filas, $col_descripcion + 4, 'Total', $CellFormat->get('titulo'));
 				}
 
 				$filas++;
@@ -2258,25 +2330,25 @@ foreach ($chargeResults as $charge) {
 
 			if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
 				if ($cobro->fields['opc_ver_solicitante'] == 1) {
-					$ws->write($filas, $col_descripcion - $offsetcolumna - 4, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $CellFormat->get('normal'));
+					$ws->write($filas, $col_descripcion - $offsetcolumna - 4, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $CellFormat->get('normal', $i));
 					$solicitante = $cobro->fields['opc_ver_profesional_iniciales'] ? $gasto->fields['iniciales'] : $gasto->fields['solicitante'];
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 3, $solicitante, $CellFormat->get('descripcion', $i));
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, $gasto->fields['glosa_gasto'], $CellFormat->get('descripcion', $i));
 					$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('descripcion', $i));
 				} else {
-					$ws->write($filas, $col_descripcion - $offsetcolumna - 3, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $CellFormat->get('normal'));
+					$ws->write($filas, $col_descripcion - $offsetcolumna - 3, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $CellFormat->get('normal', $i));
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, $gasto->fields['glosa_gasto'], $CellFormat->get('descripcion', $i));
 					$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion - $offsetcolumna - 1);
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('descripcion', $i));
 				}
 			} else {
 				if ($cobro->fields['opc_ver_solicitante'] == 1){
-					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $CellFormat->get('normal'));
+					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $CellFormat->get('normal', $i));
 					$solicitante = $cobro->fields['opc_ver_profesional_iniciales'] ? $gasto->fields['iniciales'] : $gasto->fields['solicitante'];
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, $solicitante, $CellFormat->get('descripcion', $i));
 				} else {
-					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $CellFormat->get('normal'));
+					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, Utiles::sql2fecha($gasto->fields['fecha'], $idioma->fields['formato_fecha']), $CellFormat->get('normal', $i));
 				}
 			}
 
@@ -2292,6 +2364,20 @@ foreach ($chargeResults as $charge) {
 				$ws->writeNumber($filas, $col_descripcion + 1 + $offsetfactura, $gasto->fields['monto_cobrable'] * ($cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']), $CellFormat->get('moneda_gastos', $i));
 			} else {
 				$ws->writeNumber($filas, $col_descripcion + 1 + $offsetfactura, -$gasto->fields['monto_cobrable'] * ($cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']), $CellFormat->get('moneda_gastos', $i));
+			}
+
+			if (!empty($rut) && !empty($proveedor)) {
+				$ws->writeNumber($filas, $col_descripcion - $offsetcolumna, $gasto->fields['rut'], $CellFormat->get('numero', $i));
+				$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $gasto->fields['glosa_proveedor'], $CellFormat->get('descripcion', $i));
+			}
+
+			if (!empty($impuesto)) {
+				$monto = ($gasto->fields['monto_cobrable'] * ($cobro_moneda->moneda[$gasto->fields['id_moneda']]['tipo_cambio'] / $cobro_moneda->moneda[$cobro->fields['opc_moneda_total']]['tipo_cambio']));
+				$impuesto_monto = $monto * ($gasto->fields['porcentaje_impuesto_gastos'] / 100);
+				$impuesto_monto = ($gasto->fields['con_impuesto'] == 'SI') ? $impuesto_monto : 0;
+
+				$ws->writeNumber($filas, $col_descripcion + 3 + $offsetfactura, $impuesto_monto, $CellFormat->get('moneda_gastos', $i));
+				$ws->writeNumber($filas, $col_descripcion + 4 + $offsetfactura, $monto + $impuesto_monto, $CellFormat->get('moneda_gastos', $i));
 			}
 
 			$ws->mergeCells($filas, $col_descripcion + 1 + $offsetfactura, $filas, $col_descripcion + 2 + $offsetfactura);
@@ -2310,78 +2396,81 @@ foreach ($chargeResults as $charge) {
 
 		if (Conf::GetConf($sesion, 'FacturaAsociada')) {
 			if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
-				if ($cobro->fields['opc_ver_solicitante'] == 1){
-					$ws->write($filas, $col_descripcion - $offsetcolumna - 3, __('Total'), $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, '', $CellFormat->get('total'));
-					$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 3);
-					$coltotal = $col_descripcion - $offsetcolumna - 2;
-					$ws->writeFormula($filas, $col_descripcion - $offsetcolumna - 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
-					$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion + 4);
-					$ws->write($filas, $col_descripcion + 4, '', $CellFormat->get('total'));
-				} else {
-					$ws->write($filas, $col_descripcion - $offsetcolumna - 3, __('Total'), $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, '', $CellFormat->get('total'));
-					$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 3);
-					$coltotal = $col_descripcion - $offsetcolumna - 2;
-					$ws->writeFormula($filas, $col_descripcion - $offsetcolumna - 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
-					$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion + 4);
-					$ws->write($filas, $col_descripcion + 4, '', $CellFormat->get('total'));
-				}
+				$ws->write($filas, $col_descripcion - $offsetcolumna - 3, __('Total'), $CellFormat->get('total'));
+				$ws->write($filas, $col_descripcion - $offsetcolumna - 2, '', $CellFormat->get('total'));
+				$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('total'));
+				$ws->write($filas, $col_descripcion - $offsetcolumna, '', $CellFormat->get('total'));
+				$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
+				$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 3);
+				$ws->writeFormula($filas, $col_descripcion - $offsetcolumna - 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
+				$ws->mergeCells($filas, $col_descripcion - $offsetcolumna - 2, $filas, $col_descripcion + 4);
+				$ws->write($filas, $col_descripcion + 4, '', $CellFormat->get('total'));
 			} else {
-					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, __('Total'), $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
-					$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 3);
-					$coltotal = $col_descripcion + 1;
-					$ws->writeFormula($filas, $col_descripcion + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
-					$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 4);
-					$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion + 4, '', $CellFormat->get('total'));
+				$ws->write($filas, $col_descripcion - $offsetcolumna - 1, __('Total'), $CellFormat->get('total'));
+				$ws->write($filas, $col_descripcion - $offsetcolumna, '', $CellFormat->get('total'));
+				$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
+				$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 3);
+				$coltotal = $col_descripcion + 1;
+				$ws->writeFormula($filas, $col_descripcion + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
+				$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 4);
+				$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total'));
+				$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('total'));
+				$ws->write($filas, $col_descripcion + 4, '', $CellFormat->get('total'));
+			}
+
+			if (!empty($rut) && !empty($proveedor)) {
+				$ws->write($filas, $col_descripcion - $offsetcolumna, '', $CellFormat->get('moneda_gastos_total'));
+				$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), '', $CellFormat->get('moneda_gastos_total'));
+			}
+
+			if (!empty($impuesto)) {
+				$col_formula_temp5 = Utiles::NumToColumnaExcel($col_descripcion + 5);
+				$col_formula_temp6 = Utiles::NumToColumnaExcel($col_descripcion + 6);
+				$ws->writeFormula($filas, $col_descripcion + 5, "=SUM($col_formula_temp5$fila_inicio_gastos:$col_formula_temp5$filas)", $CellFormat->get('moneda_gastos_total'));
+				$ws->writeFormula($filas, $col_descripcion + 6, "=SUM($col_formula_temp6$fila_inicio_gastos:$col_formula_temp6$filas)", $CellFormat->get('moneda_gastos_total'));
 			}
 		} else {
 			if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
 				if ($cobro->fields['opc_ver_solicitante'] == 1){
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 4, __('Total'), $CellFormat->get('total'));
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 3, '', $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, '', $CellFormat->get('total'));
-					$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
-					$coltotal = $col_descripcion - $offsetcolumna - 2;
-					$ws->writeFormula($filas, $col_descripcion - $offsetcolumna - 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
-					$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-					$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total'));
 				} else {
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 3, __('Total'), $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, '', $CellFormat->get('total'));
-					$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
-					$coltotal = $col_descripcion - $offsetcolumna - 2;
-					$ws->writeFormula($filas, $col_descripcion - $offsetcolumna - 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
-					$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-					$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total'));
 				}
+
+				$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
+				$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
+				$coltotal = $col_descripcion - $offsetcolumna - 2;
+				$ws->writeFormula($filas, $col_descripcion - $offsetcolumna - 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
+				$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
+				$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total'));
 			} else {
 				if ($cobro->fields['opc_ver_solicitante'] == 1){
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, __('Total'), $CellFormat->get('total'));
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
-					$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
-					$coltotal = $col_descripcion + 1;
-					$ws->writeFormula($filas, $col_descripcion + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
-					$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-					$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total'));
 				} else {
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, __('Total'), $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
-					$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
-					$coltotal = $col_descripcion + 1;
-					$ws->writeFormula($filas, $col_descripcion + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
-					$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
-					$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total'));
 				}
+
+				$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
+				$col_formula_temp = Utiles::NumToColumnaExcel($col_descripcion + 1);
+				$ws->writeFormula($filas, $col_descripcion + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total'));
+				$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
+				$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total'));
+			}
+
+			if (!empty($rut) && !empty($proveedor)) {
+				$ws->write($filas, $col_descripcion - $offsetcolumna, '', $CellFormat->get('moneda_gastos_total'));
+				$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), '', $CellFormat->get('moneda_gastos_total'));
+			}
+
+			if (!empty($impuesto)) {
+				$col_formula_temp2 = Utiles::NumToColumnaExcel($col_descripcion + 3);
+				$col_formula_temp3 = Utiles::NumToColumnaExcel($col_descripcion + 4);
+				$ws->writeFormula($filas, $col_descripcion + 3, "=SUM($col_formula_temp2$fila_inicio_gastos:$col_formula_temp2$filas)", $CellFormat->get('moneda_gastos_total'));
+				$ws->writeFormula($filas, $col_descripcion + 4, "=SUM($col_formula_temp3$fila_inicio_gastos:$col_formula_temp3$filas)", $CellFormat->get('moneda_gastos_total'));
 			}
 		}
 
@@ -2391,8 +2480,9 @@ foreach ($chargeResults as $charge) {
 			if (Conf::GetConf($sesion, 'FacturaAsociada')) {
 				if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 3, __('Total'), $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, '', $CellFormat->get('total'));
+					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, '', $CellFormat->get('total'));
+					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
 
 					$coltotal = $col_descripcion - $offsetcolumna - 2;
 					$col_formula_temp = Utiles::NumToColumnaExcel($coltotal);
@@ -2405,6 +2495,7 @@ foreach ($chargeResults as $charge) {
 					$ws->write($filas, $col_descripcion + 4, '', $CellFormat->get('total'));
 				} else {
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 1, __('Total'), $CellFormat->get('total'));
+					$ws->write($filas, $col_descripcion - $offsetcolumna, '', $CellFormat->get('total'));
 					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
 
 					$coltotal = $col_descripcion + 1;
@@ -2420,11 +2511,24 @@ foreach ($chargeResults as $charge) {
 					$ws->write($filas, $col_descripcion + 3, '', $CellFormat->get('total'));
 					$ws->write($filas, $col_descripcion + 4, '', $CellFormat->get('total'));
 				}
+
+				if (!empty($impuesto)) {
+					$col_formula_temp5 = Utiles::NumToColumnaExcel($col_descripcion + 5);
+					$col_formula_temp6 = Utiles::NumToColumnaExcel($col_descripcion + 6);
+
+					foreach ($lineas_total_asunto_gasto as $label => $numfila) {
+						$formula_total_gg5[] = $col_formula_temp5 . $numfila;
+						$formula_total_gg6[] = $col_formula_temp6 . $numfila;
+					}
+
+					$ws->writeFormula($filas, $col_descripcion + 5, '=' . implode('+', $formula_total_gg5), $CellFormat->get('moneda_gastos_total'));
+					$ws->writeFormula($filas, $col_descripcion + 6, '=' . implode('+', $formula_total_gg6), $CellFormat->get('moneda_gastos_total'));
+				}
 			} else {
 				if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 3, __('Total'), $CellFormat->get('total'));
-					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
 					$ws->write($filas, $col_descripcion - $offsetcolumna - 2, '', $CellFormat->get('total'));
+					$ws->write($filas, $col_descripcion, '', $CellFormat->get('total'));
 					$coltotal = $col_descripcion - $offsetcolumna - 2;
 
 					$col_formula_temp = Utiles::NumToColumnaExcel($coltotal);
@@ -2455,6 +2559,24 @@ foreach ($chargeResults as $charge) {
 
 					$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 					$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total'));
+				}
+
+				if (!empty($rut) && !empty($proveedor)) {
+					$ws->write($filas, $col_descripcion - $offsetcolumna, '', $CellFormat->get('total'));
+					$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), '', $CellFormat->get('total'));
+				}
+
+				if (!empty($impuesto)) {
+					$col_formula_temp3 = Utiles::NumToColumnaExcel($col_descripcion + 3);
+					$col_formula_temp4 = Utiles::NumToColumnaExcel($col_descripcion + 4);
+
+					foreach ($lineas_total_asunto_gasto as $label => $numfila) {
+						$formula_total_gg3[] = $col_formula_temp3 . $numfila;
+						$formula_total_gg4[] = $col_formula_temp4 . $numfila;
+					}
+
+					$ws->writeFormula($filas, $col_descripcion + 3, '=' . implode('+', $formula_total_gg3), $CellFormat->get('moneda_gastos_total'));
+					$ws->writeFormula($filas, $col_descripcion + 4, '=' . implode('+', $formula_total_gg4), $CellFormat->get('moneda_gastos_total'));
 				}
 			}
 		}
