@@ -528,6 +528,7 @@ class Gasto extends Objeto {
 		}
 
 		$impuestoGastos = Conf::GetConf($sesion, 'ValorImpuestoGastos');
+		$impuestoGastos = empty($impuestoGastos) ? 0 : $impuestoGastos;
 
 		$query.="\n\n
 				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ) as tipo_cambio_segun_cobro,
