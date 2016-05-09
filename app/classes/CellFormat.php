@@ -42,6 +42,9 @@ class CellFormat {
 	}
 
 	public function get($alias, $row = null) {
+		if (!$this->has($alias)) {
+			throw new Exception("Alias '{$alias}' no valido!");
+		}
 		if (is_null($row)) {
 			return $this->formats[$alias][self::NORMAL];
 		}

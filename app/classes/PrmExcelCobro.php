@@ -30,8 +30,12 @@ class PrmExcelCobro extends Objeto {
 	 * @param string $lang
 	 * @return type
 	 */
-	public function getGlosa($internal_name, $group, $lang = 'es') {
-		return $this->getFieldValue($group, $internal_name, "glosa_{$lang}");
+	public function getGlosa($internal_name, $group, $lang = 'es', $replace = null, $replace_with = null) {
+		$text = $this->getFieldValue($group, $internal_name, "glosa_{$lang}");
+		if (!is_null($replace) && !is_null($replace_with)) {
+			$text = str_replace($replace, $replace_with, $text);
+		}
+		return $text;
 	}
 
 	private function getFieldValue($group, $internal_name, $field) {

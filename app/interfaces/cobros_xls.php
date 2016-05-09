@@ -255,7 +255,7 @@ if ($borradores) {
 	 *	Seteamas el ancho de las columnas, se definen en la tabla prm_excel_cobro
 	 */
 
-	$ws->setColumn($col_id_trabajo, $col_id_trabajo, Utiles::GlosaMult($sesion, 'id_trabajo', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+	$ws->setColumn($col_id_trabajo, $col_id_trabajo, $PrmExcelCobro->getTamano('id_trabajo', 'Listado de trabajos'));
 	if (Conf::GetConf($sesion, 'UsarResumenExcel')) {
 		$ws->setColumn($col_fecha_ini, $col_fecha_ini, 7);
 		$ws->setColumn($col_fecha_med, $col_fecha_med, 7);
@@ -263,21 +263,21 @@ if ($borradores) {
 
 		$ws->setColumn($col_abogado, $col_abogado, 15);
 	} else {
-		$ws->setColumn($col_fecha_dia, $col_fecha_dia, Utiles::GlosaMult($sesion, 'fecha_dia', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-		$ws->setColumn($col_fecha_mes, $col_fecha_mes, Utiles::GlosaMult($sesion, 'fecha_mes', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-		$ws->setColumn($col_fecha_anyo, $col_fecha_anyo, Utiles::GlosaMult($sesion, 'fecha_anyo', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+		$ws->setColumn($col_fecha_dia, $col_fecha_dia, $PrmExcelCobro->getTamano('fecha_dia', 'Listado de trabajos'));
+		$ws->setColumn($col_fecha_mes, $col_fecha_mes, $PrmExcelCobro->getTamano('fecha_mes', 'Listado de trabajos'));
+		$ws->setColumn($col_fecha_anyo, $col_fecha_anyo, $PrmExcelCobro->getTamano('fecha_anyo', 'Listado de trabajos'));
 
 
-		$ws->setColumn($col_abogado, $col_abogado, Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+		$ws->setColumn($col_abogado, $col_abogado, $PrmExcelCobro->getTamano('abogado', 'Listado de trabajos'));
 	}
 
 	if (!$opc_ver_asuntos_separados) {
-		$ws->setColumn($col_asunto, $col_asunto, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+		$ws->setColumn($col_asunto, $col_asunto, $PrmExcelCobro->getTamano('asunto', 'Listado de trabajos'));
 	}
-	$ws->setColumn($col_descripcion, $col_descripcion, Utiles::GlosaMult($sesion, 'descripcion', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-	$ws->setColumn($col_tarificable_hh, $col_tarificable_hh, Utiles::GlosaMult($sesion, 'duracion_cobrable', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-	$ws->setColumn($col_tarifa_hh, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'tarifa_hh', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-	$ws->setColumn($col_valor_trabajo, $col_valor_trabajo, Utiles::GlosaMult($sesion, 'valor_trabajo', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+	$ws->setColumn($col_descripcion, $col_descripcion, $PrmExcelCobro->getTamano('descripcion', 'Listado de trabajos'));
+	$ws->setColumn($col_tarificable_hh, $col_tarificable_hh, $PrmExcelCobro->getTamano('duracion_cobrable', 'Listado de trabajos'));
+	$ws->setColumn($col_tarifa_hh, $col_tarifa_hh, $PrmExcelCobro->getTamano('tarifa_hh', 'Listado de trabajos'));
+	$ws->setColumn($col_valor_trabajo, $col_valor_trabajo, $PrmExcelCobro->getTamano('valor_trabajo', 'Listado de trabajos'));
 	$ws->setColumn($col_id_abogado, $col_id_abogado, 0, 0, 1);
 
 	/*
@@ -312,11 +312,11 @@ if ($borradores) {
 	$ws->write($filas, $col_fecha_ini, "Se puede modificar la duración cobrable. Debe tener el formato hh:mm:ss (formato de tiempo de Excel). Si se deja en 00:00:00 el trabajo será 'castigado', no aparecerá en el cobro.", $CellFormat->get('normal'));
 	$ws->mergeCells($filas, $col_fecha_ini, $filas, $col_valor_trabajo);
 	++$filas;
-	$ws->write($filas, $col_id_trabajo, str_replace('%glosa_moneda%', $simbolo_moneda, $PrmExcelCobro->getGlosa('tarifa_hh', 'Listado de trabajos', $lang)), $CellFormat->get('normal'));
+	$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('tarifa_hh', 'Listado de trabajos', $lang, '%glosa_moneda%', $simbolo_moneda), $CellFormat->get('normal'));
 	$ws->write($filas, $col_fecha_ini, "No se puede modificar la tarifa. Esto debe ser hecho desde la información del cliente o asunto.", $CellFormat->get('normal'));
 	$ws->mergeCells($filas, $col_fecha_ini, $filas, $col_valor_trabajo);
 	++$filas;
-	$ws->write($filas, $col_id_trabajo, str_replace('%glosa_moneda%', $simbolo_moneda, $PrmExcelCobro->getGlosa('valor_trabajo', 'Listado de trabajos', $lang)), $CellFormat->get('normal'));
+	$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('valor_trabajo', 'Listado de trabajos', $lang, '%glosa_moneda%', $simbolo_moneda), $CellFormat->get('normal'));
 	$ws->write($filas, $col_fecha_ini, "Fórmula que equivale a la multiplicación de la tarifa por la duración cobrable.", $CellFormat->get('normal'));
 	$ws->mergeCells($filas, $col_fecha_ini, $filas, $col_valor_trabajo);
 
@@ -345,8 +345,8 @@ if ($borradores) {
 	}
 
 	$ws->write($filas, $col_tarificable_hh, $PrmExcelCobro->getGlosa('duracion_cobrable', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
-	$ws->write($filas, $col_tarifa_hh, str_replace('%glosa_moneda%', $simbolo_moneda, $PrmExcelCobro->getGlosa('tarifa_hh', 'Listado de trabajos', $lang)), $CellFormat->get('titulo'));
-	$ws->write($filas, $col_valor_trabajo, str_replace('%glosa_moneda%', $simbolo_moneda, $PrmExcelCobro->getGlosa('valor_trabajo', 'Listado de trabajos', $lang)), $CellFormat->get('titulo'));
+	$ws->write($filas, $col_tarifa_hh, $PrmExcelCobro->getGlosa('tarifa_hh', 'Listado de trabajos', $lang, '%glosa_moneda%', $simbolo_moneda), $CellFormat->get('titulo'));
+	$ws->write($filas, $col_valor_trabajo, $PrmExcelCobro->getGlosa('valor_trabajo', 'Listado de trabajos', $lang, '%glosa_moneda%', $simbolo_moneda), $CellFormat->get('titulo'));
 	$ws->write($filas, $col_id_abogado, __('NO MODIFICAR ESTA COLUMNA'));
 
 	/*
@@ -513,7 +513,7 @@ foreach ($chargeResults as $charge) {
 	 *	 Seteamas el ancho de las columnas
 	 */
 
-	$ws->setColumn($col_id_trabajo, $col_id_trabajo, Utiles::GlosaMult($sesion, 'id_trabajo', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+	$ws->setColumn($col_id_trabajo, $col_id_trabajo, $PrmExcelCobro->getTamano('id_trabajo', 'Listado de trabajos'));
 
 	if (Conf::GetConf($sesion, 'UsarResumenExcel')) {
 		$ws->setColumn($col_fecha_ini, $col_fecha_ini, 7);
@@ -521,36 +521,36 @@ foreach ($chargeResults as $charge) {
 		$ws->setColumn($col_fecha_fin, $col_fecha_fin, 7);
 		$ws->setColumn($col_abogado, $col_abogado, 15);
 	} else {
-		$ws->setColumn($col_fecha_dia, $col_fecha_dia, Utiles::GlosaMult($sesion, 'fecha_dia', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-		$ws->setColumn($col_fecha_mes, $col_fecha_mes, Utiles::GlosaMult($sesion, 'fecha_mes', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-		$ws->setColumn($col_fecha_anyo, $col_fecha_anyo, Utiles::GlosaMult($sesion, 'fecha_anyo', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-		$ws->setColumn($col_abogado, $col_abogado, Utiles::GlosaMult($sesion, 'abogado', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+		$ws->setColumn($col_fecha_dia, $col_fecha_dia, $PrmExcelCobro->getTamano('fecha_dia', 'Listado de trabajos'));
+		$ws->setColumn($col_fecha_mes, $col_fecha_mes, $PrmExcelCobro->getTamano('fecha_mes', 'Listado de trabajos'));
+		$ws->setColumn($col_fecha_anyo, $col_fecha_anyo, $PrmExcelCobro->getTamano('fecha_anyo', 'Listado de trabajos'));
+		$ws->setColumn($col_abogado, $col_abogado, $PrmExcelCobro->getTamano('abogado', 'Listado de trabajos'));
 	}
 
 	if (!$opc_ver_asuntos_separados) {
-		$ws->setColumn($col_asunto, $col_asunto, Utiles::GlosaMult($sesion, 'asunto', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+		$ws->setColumn($col_asunto, $col_asunto, $PrmExcelCobro->getTamano('asunto', 'Listado de trabajos'));
 	}
 
-	$ws->setColumn($col_descripcion, $col_descripcion, Utiles::GlosaMult($sesion, 'descripcion', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+	$ws->setColumn($col_descripcion, $col_descripcion, $PrmExcelCobro->getTamano('descripcion', 'Listado de trabajos'));
 
 	if ($opc_ver_horas_trabajadas) {
-		$ws->setColumn($col_duracion_trabajada, $col_duracion_trabajada, Utiles::GlosaMult($sesion, 'duracion_trabajada', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+		$ws->setColumn($col_duracion_trabajada, $col_duracion_trabajada, $PrmExcelCobro->getTamano('duracion_trabajada', 'Listado de trabajos'));
 	}
 
-	$ws->setColumn($col_tarificable_hh, $col_tarificable_hh, Utiles::GlosaMult($sesion, 'duracion_cobrable', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+	$ws->setColumn($col_tarificable_hh, $col_tarificable_hh, $PrmExcelCobro->getTamano('duracion_cobrable', 'Listado de trabajos'));
 
 	if ($col_duracion_retainer) {
-		$ws->setColumn($col_duracion_retainer, $col_duracion_retainer, Utiles::GlosaMult($sesion, 'duracion_retainer', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+		$ws->setColumn($col_duracion_retainer, $col_duracion_retainer, $PrmExcelCobro->getTamano('duracion_retainer', 'Listado de trabajos'));
 	}
 
-	$ws->setColumn($col_tarifa_hh, $col_tarifa_hh, Utiles::GlosaMult($sesion, 'tarifa_hh', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
-	$ws->setColumn($col_valor_trabajo, $col_valor_trabajo, Utiles::GlosaMult($sesion, 'valor_trabajo', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+	$ws->setColumn($col_tarifa_hh, $col_tarifa_hh, $PrmExcelCobro->getTamano('tarifa_hh', 'Listado de trabajos'));
+	$ws->setColumn($col_valor_trabajo, $col_valor_trabajo, $PrmExcelCobro->getTamano('valor_trabajo', 'Listado de trabajos'));
 	$ws->setColumn($col_id_abogado, $col_id_abogado, 0, 0, 1);
 
 	if (Conf::GetConf($sesion, 'OcultarHorasTarificadasExcel')) {
 		$ws->setColumn($col_cobrable, $col_cobrable, 0, 0, 1);
 	} else {
-		$ws->setColumn($col_cobrable, $col_cobrable, Utiles::GlosaMult($sesion, 'cobrable', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+		$ws->setColumn($col_cobrable, $col_cobrable, $PrmExcelCobro->getTamano('cobrable', 'Listado de trabajos'));
 	}
 
 	/*
@@ -690,10 +690,10 @@ foreach ($chargeResults as $charge) {
 			$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('forma_cobro', 'Resumen', $lang), $CellFormat->get('encabezado'));
 			$mje_detalle_forma_cobro = '';
 			if (($cobro->fields['forma_cobro'] == 'PROPORCIONAL') || ($cobro->fields['forma_cobro'] == 'RETAINER')) {
-				//$mje_detalle_forma_cobro = "de " . $cobro->fields['retainer_horas'] . " Hr. por " . $simbolo_moneda_opc_moneda_monto . " " . number_format($cobro->fields['monto_contrato'], $cobro_moneda->moneda[$cobro->fields['id_moneda_monto']]['cifras_decimales'], ',', '.');
-				$mje_detalle_forma_cobro = "de {$cobro->fields['retainer_horas']} Hr. por " . $Moneda->currencyFormat($cobro->fields['monto_contrato'], $contrato->fields['id_moneda_monto']);
+				$mje_detalle_forma_cobro = "de {$cobro->fields['retainer_horas']} Hr. por ";
+				$mje_detalle_forma_cobro .= $Moneda->currencyFormat($cobro->fields['monto_contrato'], $contrato->fields['id_moneda_monto']);
 			}
-			$ws->write($filas++, $col_abogado, __($cobro->fields['forma_cobro']) . " " . $mje_detalle_forma_cobro, $CellFormat->get('encabezado'));
+			$ws->write($filas++, $col_abogado, __($cobro->fields['forma_cobro']) . ' ' . $mje_detalle_forma_cobro, $CellFormat->get('encabezado'));
 		}
 
 		if ($trabajo->fields['forma_cobro'] == 'PROPORCIONAL' || $trabajo->fields['forma_cobro'] == 'RETAINER') {
@@ -915,7 +915,7 @@ foreach ($chargeResults as $charge) {
 				$query_glosa_moneda = "SELECT simbolo FROM prm_moneda WHERE id_moneda='{$cobro->escalonadas[$i]['id_moneda']}' LIMIT 1";
 				$resp = mysql_query($query_glosa_moneda, $cobro->sesion->dbh) or Utiles::errorSQL($query_glosa_moneda, __FILE__, __LINE__, $cobro->sesion->dbh);
 				list( $simbolo_moneda ) = mysql_fetch_array($resp);
-				$monto_escala = number_format($cobro->escalonadas[$i]['monto'], $cobro_moneda->moneda[$cobro->escalonadas[$i]['id_moneda']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']);
+				$monto_escala = $Moneda->currencyFormat($cobro->escalonadas[$i]['monto'], $cobro->escalonadas[$i]['id_moneda']);
 				$detalle_escala .= ": $simbolo_moneda {$monto_escala}";
 			}
 
@@ -973,8 +973,8 @@ foreach ($chargeResults as $charge) {
 						}
 
 						$ws->write($filas, 8, Utiles::Decimal2GlosaHora(round($usuarios['duracion']/60, 2)), $CellFormat->get('moneda'));
-						$ws->write($filas, 9, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['tarifa'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $CellFormat->get('moneda'));
-						$ws->write($filas, 10, $cobro_moneda->moneda[$cobro->fields['id_moneda']]['simbolo'] . ' ' . number_format($usuarios['valor'], $cobro_moneda->moneda[$cobro->fields['id_moneda']]['cifras_decimales'], '.', ''), $CellFormat->get('moneda'));
+						$ws->write($filas, 9, $Moneda->currencyFormat($usuarios['tarifa'], $cobro->fields['id_moneda']), $CellFormat->get('moneda'));
+						$ws->write($filas, 10, $Moneda->currencyFormat($usuarios['valor'], $cobro->fields['id_moneda']), $CellFormat->get('moneda'));
 					}
 				}
 
@@ -1953,6 +1953,7 @@ foreach ($chargeResults as $charge) {
 			} else {
 				if (Conf::GetConf($sesion, 'PrmGastos') && $cobro->fields['opc_ver_concepto_gastos'] && !(Conf::GetConf($sesion, 'PrmGastosActualizarDescripcion'))) {
 					if ($cobro->fields['opc_ver_solicitante'] == 1) {
+
 						$ws->write($filas++, $col_descripcion - $offsetcolumna - $offsetfecha, $PrmExcelCobro->getGlosa('titulo', 'Listado de gastos', $lang), $CellFormat->get('encabezado'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - $offsetfecha, $PrmExcelCobro->getGlosa('fecha', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						$ws->write($filas, $col_descripcion - $offsetcolumna - $offsetfecha, $PrmExcelCobro->getGlosa('solicitante', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
@@ -2663,7 +2664,7 @@ foreach ($chargeResults as $charge) {
 	if (!$cobro->fields['opc_ver_solicitante']) {
 		$ws->setColumn($col_solicitante, $col_solicitante, 10, $CellFormat->get('total'), 1);
 	} else {
-		$ws->setColumn($col_solicitante, $col_solicitante, Utiles::GlosaMult($sesion, 'solicitante', 'Listado de trabajos', "tamano", 'prm_excel_cobro', 'nombre_interno', 'grupo'));
+		$ws->setColumn($col_solicitante, $col_solicitante, $PrmExcelCobro->getTamano('solicitante', 'Listado de trabajos'));
 	}
 }
 
@@ -2732,7 +2733,7 @@ if ($cont_hitos > 0) {
 	 		->add_inner_join_with('prm_moneda pm', 'pm.id_moneda = c.id_moneda_monto')
 			->add_restriction(CriteriaRestriction::equals('cp.hito', 1))
 			->add_restriction(CriteriaRestriction::equals('cp.id_contrato', $cobro->fields['id_contrato']));
-pr("$criteria");exit;
+
 	$moneda_hitos = $criteria->run();
 	$moneda_hitos = $moneda_hitos[0];
 
