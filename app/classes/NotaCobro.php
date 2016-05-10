@@ -7233,6 +7233,7 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%descripcion_gastos%', __('Descripción de Gastos'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
+				$html = str_replace('%ruc_proveedor%', __('RUT (RUC)'), $html);
 				$html = str_replace('%num_doc%', __('N° Documento'), $html);
 				$html = str_replace('%tipo_gasto%', __('Tipo'), $html);
 				$html = str_replace('%monto%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);

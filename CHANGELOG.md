@@ -1,5 +1,21 @@
 # Changelog
 
+## Hotfix 16.12.1
+Monday, May 9th
+* **Fix** [Error al descargar Excel](https://github.com/LemontechSA/ttb/pull/1438)
+
+## [Release 16.12.0](https://github.com/LemontechSA/ttb/pull/1436)
+Friday, May 6th
+* **Feature** [Reporte de Gastos](https://github.com/LemontechSA/ttb/pull/1433)
+
+## Hotfix 16.11.6
+Thursday, May 5th
+* **Fix** [Corrige asignación monto_pago al utilizar un adelanto](https://github.com/LemontechSA/ttb/pull/1435)
+
+## Hotfix 16.11.5
+Thursday, May 5th
+* **Fix** [Corrige encabezado de documento ledes erróneo en caso counselink](https://github.com/LemontechSA/ttb/pull/1434)
+
 ## Hotfix 16.11.4
 Thursday, April 28th
 * **Fix** [Condiciona la consulta del id_usuarioa que no esté vacío. Llama a errorSQL() en caso de error.](https://github.com/LemontechSA/ttb/pull/1427)
