@@ -433,22 +433,14 @@ class WorkbookMiddleware {
 	 * @param FormatMiddleware $format
 	 */
 	public function write($row, $col, $token, $format = null) {
-		$column = PHPExcel_Cell::stringFromColumnIndex($col);
-		$cellCode = $column.($row + 1);
+		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
 
 		$this->workSheetObj->setCellValue(
 				$cellCode,
 				mb_detect_encoding($token, 'UTF-8', true) ? $token : utf8_encode($token)
 		);
 
-		if (!is_null($format)) {
-			$this->setFormat(
-				!is_null($this->formats[$column]) ? $format->merge($this->formats[$column]) : $format,
-				$row,
-				$col);
-		} else if (!is_null($this->formats[$column])) {
-			$this->setFormat($this->formats[$column], $row, $col);
-		}
+		$this->mergeFormat($format, $row, $col);
 	}
 
 	/**
@@ -459,8 +451,7 @@ class WorkbookMiddleware {
 	 * @param FormatMiddleware $format
 	 */
 	public function writeString($row, $col, $token, $format = null) {
-		$column = PHPExcel_Cell::stringFromColumnIndex($col);
-		$cellCode = $column.($row + 1);
+		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
 
 		$this->workSheetObj->setCellValueExplicit(
 				$cellCode,
@@ -468,14 +459,7 @@ class WorkbookMiddleware {
 				PHPExcel_Cell_DataType::TYPE_STRING
 		);
 
-		if (!is_null($format)) {
-			$this->setFormat(
-				!is_null($this->formats[$column]) ? $format->merge($this->formats[$column]) : $format,
-				$row,
-				$col);
-		} else if (!is_null($this->formats[$column])) {
-			$this->setFormat($this->formats[$column], $row, $col);
-		}
+		$this->mergeFormat($format, $row, $col);
 	}
 
 		/**
@@ -486,8 +470,7 @@ class WorkbookMiddleware {
 	 * @param FormatMiddleware $format
 	 */
 	public function writeNumber($row, $col, $num, $format = null) {
-		$column = PHPExcel_Cell::stringFromColumnIndex($col);
-		$cellCode = $column.($row + 1);
+		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
 
 		$this->workSheetObj->setCellValueExplicit(
 				$cellCode,
@@ -495,14 +478,7 @@ class WorkbookMiddleware {
 				PHPExcel_Cell_DataType::TYPE_NUMERIC
 		);
 
-		if (!is_null($format)) {
-			$this->setFormat(
-				!is_null($this->formats[$column]) ? $format->merge($this->formats[$column]) : $format,
-				$row,
-				$col);
-		} else if (!is_null($this->formats[$column])) {
-			$this->setFormat($this->formats[$column], $row, $col);
-		}
+		$this->mergeFormat($format, $row, $col);
 	}
 
 	/**
@@ -513,8 +489,7 @@ class WorkbookMiddleware {
 	 * @param FormatMiddleware $format
 	 */
 	public function writeFormula($row, $col, $formula, $format = null) {
-		$column = PHPExcel_Cell::stringFromColumnIndex($col);
-		$cellCode = $column.($row + 1);
+		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
 
 		$formula = str_replace(';', ',', $formula);
 
@@ -524,14 +499,7 @@ class WorkbookMiddleware {
 				PHPExcel_Cell_DataType::TYPE_FORMULA
 		);
 
-		if (!is_null($format)) {
-			$this->setFormat(
-				!is_null($this->formats[$column]) ? $format->merge($this->formats[$column]) : $format,
-				$row,
-				$col);
-		} else if (!is_null($this->formats[$column])) {
-			$this->setFormat($this->formats[$column], $row, $col);
-		}
+		$this->mergeFormat($format, $row, $col);
 	}
 
 	/**
@@ -598,6 +566,28 @@ class WorkbookMiddleware {
 	 */
 	public function centerHorizontally($value){
 		$this->workSheetObj->getPageSetup()->setHorizontalCentered($value == 1 ? true : false);
+	}
+
+	/**
+	 * Set sheet center horizontal
+	 * @param FormatMiddleware $format
+	 * @param int $row
+	 * @param int $col
+	 */
+	protected function mergeFormat($format, $row, $col) {
+		$column = PHPExcel_Cell::stringFromColumnIndex($col);
+
+		if (!is_null($format)) {
+			if (isset($this->formats[$column])) {
+				var_dump($format, $this->formats[$column]);
+				$format = $format->merge($this->formats[$column]);
+				var_dump($format); exit();
+			}
+
+			$this->setFormat($format, $row, $col);
+		} else if (!is_null($this->formats[$column])) {
+			$this->setFormat($this->formats[$column], $row, $col);
+		}
 	}
 
 }
