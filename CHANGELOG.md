@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.12.1
+Monday, May 9th
+* **Fix** [Error al descargar Excel](https://github.com/LemontechSA/ttb/pull/1438)
+
 ## [Release 16.12.0](https://github.com/LemontechSA/ttb/pull/1436)
 Friday, May 6th
 * **Feature** [Reporte de Gastos](https://github.com/LemontechSA/ttb/pull/1433)
