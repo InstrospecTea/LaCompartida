@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.12.2
+Tuesday, May 10th
+* **Fix** [Username en Excel Opcional](https://github.com/LemontechSA/ttb/pull/1441)
+
 ## Hotfix 16.12.1
 Monday, May 9th
 * **Fix** [Error al descargar Excel](https://github.com/LemontechSA/ttb/pull/1438)

@@ -21,6 +21,7 @@ if ($id_cobro) {
 if (!isset($forzar_username)) {
 	$forzar_username = false;
 }
+$forzar_username = (bool) $forzar_username;
 
 $ingreso_via_decimales = false;
 $formato_duraciones = '[h]:mm';
