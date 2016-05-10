@@ -579,9 +579,7 @@ class WorkbookMiddleware {
 
 		if (!is_null($format)) {
 			if (isset($this->formats[$column])) {
-				var_dump($format, $this->formats[$column]);
 				$format = $format->merge($this->formats[$column]);
-				var_dump($format); exit();
 			}
 
 			$this->setFormat($format, $row, $col);
