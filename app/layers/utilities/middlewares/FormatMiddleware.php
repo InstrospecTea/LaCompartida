@@ -181,10 +181,23 @@ class FormatMiddleware {
 	public function getElements() {
 		$elements = [];
 		foreach ($this as $key => $value) {
-			$elements[$key] = $value;
+			if (!is_null($value)) {
+				$elements[$key] = $value;
+			}
 		}
 
 		return $elements;
+	}
+
+	public function merge($format = null) {
+		$elements = $this->getElements();
+		foreach ($format->getElements() as $key => $formatValue) {
+			if (is_null($elements[$key])) {
+				$this->$key = $formatValue;
+			}
+		}
+
+		return $this;
 	}
 
 	/**
@@ -248,6 +261,8 @@ class FormatMiddleware {
 	 * @return PHPExcel_Style_Color
 	 */
 	private function getColor($color) {
+		$color = strtolower($color);
+
 		if (!ctype_xdigit($color)) {
 			switch ($color) {
 				case 'black':
