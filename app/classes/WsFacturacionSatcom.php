@@ -56,7 +56,7 @@ class WsFacturacionSatcom extends WsFacturacion {
 				Log::write($documento_xml, 'FacturacionElectronicaSatcom');
 				Log::write($respuesta->ProcesarComprobanteResult->MensajeError, 'FacturacionElectronicaSatcom');
 				Log::write('IdComprobanteSAT: ' . $respuesta->ProcesarComprobanteResult->IdComprobanteSAT, 'FacturacionElectronicaSatcom');
-				$this->setError(1, "Ocurrió un error inesperado con Satcom [EstadoProceso: {$estado_proceso}]");
+				$this->setError(1, "Ocurrió un error inesperado con Satcom [EstadoProceso: {$estado_proceso} {$respuesta->ProcesarComprobanteResult->IdComprobanteSAT}]");
 			}
 		} catch(SoapFault $fault) {
 			Log::write($documento_xml, 'FacturacionElectronicaSatcom');

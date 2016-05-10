@@ -24,6 +24,10 @@ class FacturacionElectronicaSatcom extends FacturacionElectronica {
 			if (in_array($PrmDocumentoLegal->fields['codigo'], array('NC', 'ND')) && empty($id_factura_padre)) {
 				$pagina->AddError(__('Debe ingresar') . ' ' . __('Documento Tributario'));
 			}
+
+			if (empty($PrmDocumentoLegal->fields['codigo_dte'])) {
+				$pagina->AddError(__('Debe asignar un código DTE para el documento'));
+			}
 		}
 	}
 
