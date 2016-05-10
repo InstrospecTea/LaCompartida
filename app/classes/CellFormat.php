@@ -14,7 +14,7 @@ class CellFormat {
 		$this->SpreadsheetExcelWriter = $SpreadsheetExcelWriter;
 	}
 
-	public function serDefault(Array $normal, Array $pair = array(), Array $odd = array()) {
+	public function serDefault(array $normal, array $pair = array(), array $odd = array()) {
 		$this->default = array(
 			self::NORMAL => $normal,
 			self::PAIR => $pair,
@@ -22,7 +22,7 @@ class CellFormat {
 		);
 	}
 
-	public function add($alias, Array $normal = array(), Array $pair = array(), Array $odd = array()) {
+	public function add($alias, array $normal = array(), array $pair = array(), array $odd = array()) {
 		if ($this->has($alias)) {
 			return $this->get($alias);
 		}
