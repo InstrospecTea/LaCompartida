@@ -2145,11 +2145,7 @@ foreach ($chargeResults as $charge) {
 							$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), '', $CellFormat->get('total', $i));
 						}
 
-						if ( $cobro->fields['opc_ver_solicitante'] == 1){
-							$ws->writeFormula($filas, $col_descripcion + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total', $i));
-						} else {
-							$ws->writeFormula($filas, $col_descripcion + 2, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total', $i));
-						}
+						$ws->writeFormula($filas, $col_descripcion + 1, "=SUM($col_formula_temp$fila_inicio_gastos:$col_formula_temp$filas)", $CellFormat->get('moneda_gastos_total', $i));
 
 						$ws->mergeCells($filas, $col_descripcion + 1, $filas, $col_descripcion + 2);
 						$ws->write($filas, $col_descripcion + 2, '', $CellFormat->get('total', $i));
