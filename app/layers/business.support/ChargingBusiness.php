@@ -440,7 +440,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$this->loadBusiness('Searching');
 		$searchCriteria = new SearchCriteria('Document');
 		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($charge->get($charge->getIdentity()));
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		return $results && count($results) > 0 ? $results[0] : null;
 	}
 
@@ -457,7 +457,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
 		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		if (empty($results[0])) {
 			return null;
 		} else {
@@ -478,7 +478,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->filter('id_trabajo')->restricted_by('equals')->compare_with($workId);
 		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		if (empty($results[0])) {
 			$this->loadBusiness('Working');
 			$work = $this->WorkingBusiness->getWork($workId);
@@ -499,7 +499,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->related_with('Fee');
 		$searchCriteria->filter('tarifa_defecto')->for_entity('Fee')->restricted_by('equals')->compare_with('1');
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		if (empty($results[0])) {
 			$UserFee = new UserFee($this->sesion);
 			return $UserFee->emptyResult();
@@ -1119,7 +1119,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$CriteriaInvoice
 			->add_select("CONCAT('\"', pdl.codigo , ' ', LPAD(f.serie_documento_legal, '3', '0'), '-', LPAD(f.numero, '7', '0'), '\":\"', c.id_cobro, '\"')", 'identificador')
 			->add_select("DATEDIFF('{$parameters['end_date']}', f.fecha)", 'dias_desde_facturacion')
-			->add_select('SUM(IF(ccfmn.monto_pago IS NULL, 0, ccfmn.monto_pago))', 'total_pagado')
+			->add_select('SUM(IF(ccfmn.monto IS NULL, 0, ccfmn.monto))', 'total_pagado')
 			->add_select('f.total', 'total_facturado')
 			->add_select('f.RUT_cliente', 'codigo_cliente')
 			->add_select('f.cliente', 'glosa_cliente')

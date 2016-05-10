@@ -887,7 +887,9 @@ class UsuarioExt extends Usuario {
 
 		$clauses = array();
 		$clauses[] = CriteriaRestriction::and_clause($clauses_and);
-		$clauses[] = CriteriaRestriction::equals('U.id_usuario', $id_usuario);
+		if (!empty($id_usuario)) {
+			$clauses[] = CriteriaRestriction::equals('U.id_usuario', $id_usuario);
+		}
 
 		$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
 
@@ -944,7 +946,7 @@ class UsuarioExt extends Usuario {
 			return $rows;
 
 		} catch (Exception $e) {
-			echo "Error: {$e} {$criteria->__toString()}";
+			Utiles::errorSQL($criteria->__toString(), null, null, null, '', $e);
 		}
 	}
 
