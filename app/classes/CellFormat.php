@@ -3,7 +3,7 @@
 class CellFormat {
 
 	const NORMAL = 0;
-	const PAIR = 1;
+	const EVEN = 1;
 	const ODD = 2;
 
 	private $SpreadsheetExcelWriter;
@@ -14,24 +14,24 @@ class CellFormat {
 		$this->SpreadsheetExcelWriter = $SpreadsheetExcelWriter;
 	}
 
-	public function serDefault(array $normal, array $pair = array(), array $odd = array()) {
+	public function serDefault(array $normal, array $even = array(), array $odd = array()) {
 		$this->default = array(
 			self::NORMAL => $normal,
-			self::PAIR => $pair,
+			self::EVEN => $even,
 			self::ODD => $odd
 		);
 	}
 
-	public function add($alias, array $normal = array(), array $pair = array(), array $odd = array()) {
+	public function add($alias, array $normal = array(), array $even = array(), array $odd = array()) {
 		if ($this->has($alias)) {
 			return $this->get($alias);
 		}
 		$formats = array();
 		$normal += $this->default[self::NORMAL];
 		$formats[self::NORMAL] = & $this->SpreadsheetExcelWriter->addFormat($normal);
-		if (!empty($pair) || $this->hasDefault(self::PAIR)) {
-			$pair += $this->default[self::PAIR] + $normal;
-			$formats[self::PAIR] = & $this->SpreadsheetExcelWriter->addFormat($pair);
+		if (!empty($even) || $this->hasDefault(self::EVEN)) {
+			$even += $this->default[self::EVEN] + $normal;
+			$formats[self::EVEN] = & $this->SpreadsheetExcelWriter->addFormat($even);
 		}
 		if (!empty($odd) || $this->hasDefault(self::ODD)) {
 			$odd += $this->default[self::ODD] + $normal;
@@ -48,7 +48,7 @@ class CellFormat {
 		if (is_null($row)) {
 			return $this->formats[$alias][self::NORMAL];
 		}
-		$index = ($row % 2 == 0) ? self::ODD : self::PAIR;
+		$index = ($row % 2 == 0) ? self::ODD : self::EVEN;
 		return $this->formats[$alias][$index];
 	}
 
