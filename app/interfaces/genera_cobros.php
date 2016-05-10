@@ -386,7 +386,7 @@ if ($opc == 'buscar') {
 						text_window += '<br><label for="form_horas_visibles" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar trabajos no visibles') ?>:</label><input type="checkbox" name="form_horas_visibles" id="form_horas_visibles" value="1" />';
 						text_window += '<br><label for="form_asuntos_separados" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Ver asuntos por separado') ?>:</label><input type="checkbox" name="form_asuntos_separados" id="form_asuntos_separados" value="1" <?php echo Conf::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?>>';
 						text_window += '<br><label for="form_asuntos_sin_horas" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar Asuntos Cobrables Sin Horas') ?>:</label><input type="checkbox" name="form_asuntos_sin_horas" id="form_asuntos_sin_horas" value="1" />';
-						text_window += '<br><label for="form_forzar_username" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar nombre como') . ' ' . __('Código Usuario') ?>:</label><input type="checkbox" name="form_forzar_username" id="form_forzar_username" value="1" checked />';
+						text_window += '<br><label for="form_forzar_username" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar iniciales profesional') ?>:</label><input type="checkbox" name="form_forzar_username" id="form_forzar_username" value="1" checked />';
 						text_window += '</div>';
 					}
 
