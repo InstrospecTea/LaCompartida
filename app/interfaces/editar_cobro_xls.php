@@ -4,21 +4,23 @@ require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion();
 $pagina = new Pagina($sesion);
 
-$pagina->titulo = __('Editar glosa planilla de') . " " . __('cobros');
+$pagina->titulo = __('Editar glosa planilla de') . ' ' . __('cobros');
 $pagina->PrintTop();
 
 if ($opc == 'guardar') {
 	foreach ($nuevo_valor_es as $id => $valor_es) {
-		if ($valor_es == "")
+		if ($valor_es == '') {
 			continue;
+		}
 		$parametro = new PrmExcelCobro($sesion);
 		$parametro->Load($id);
 		$parametro->Edit('glosa_es', $valor_es);
 		$parametro->Write();
 	}
 	foreach ($nuevo_valor_en as $id => $valor_en) {
-		if ($valor_en == "")
+		if ($valor_en == '') {
 			continue;
+		}
 		$parametro = new PrmExcelCobro($sesion);
 		$parametro->Load($id);
 		$parametro->Edit('glosa_en', $valor_en);
