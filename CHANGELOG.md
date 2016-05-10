@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.12.4
+Tuesday, May 10th
+* **Fix** [Configuración para manejar el uso de clientes](https://github.com/LemontechSA/ttb/pull/1444)
+
 ## Hotfix 16.12.3
 Tuesday, May 10th
 * **Fix** [Realiza la conversión de moneda según la moneda de la factura y no la del cobro](https://github.com/LemontechSA/ttb/pull/1442)
