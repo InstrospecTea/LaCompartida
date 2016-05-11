@@ -199,13 +199,15 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 	function Cancelar(form)
 	{
 		form.opc.value = 'cancelar';
-		form.submit();
+		enviarFormulario(form);
 	}
 
 	function enviarFormulario(form) {
 		ArregloRevisados();
 		ArregloSecretarios();
-		form.submit();
+		if (Validar(form)) {
+			form.submit();
+		}
 	}
 
 	var necesitaConfirmar = false;
@@ -381,7 +383,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 </script>
 
-<form action="usuario_paso2.php" name="form_usuario" id="form_usuario" method="post" enctype="multipart/form-data" onSubmit="return Validar(this);">
+<form action="usuario_paso2.php" name="form_usuario" id="form_usuario" method="post" enctype="multipart/form-data">
 	<input type="hidden" name="opc" id="opc" value="edit" />
 	<input type="hidden" name="rut" value="<?php echo $rut ?>" />
 	<input type="hidden" name="dv_rut" value="<?php echo $dv_rut ?>" />
@@ -799,7 +801,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		<legend><?php echo __('Guardar datos') ?></legend>
 		<?php
 			if ($sesion->usuario->fields['id_visitante'] == 0) {
-				echo $Form->submit(__('Guardar'));
+				echo $Form->button(__('Guardar'), array('onClick' => 'enviarFormulario(jQuery(\'#form_usuario\')[0])'));
 			} else {
 				echo $Form->button(__('Guardar'), array('onclick' => "alert('Usted se encuentra en un sistema demo, no tiene derecho de modificar datos.')"));
 				echo $Form->button(__('Eliminar') . ' ' . ('Usuario'), array('onclick' => "Eliminar()", 'class' => 'btn_rojo'));
@@ -887,7 +889,7 @@ if ($usuario->loaded) {
 
 			<tr>
 				<td align="right" colspan="2">
-					<?php echo $Form->submit(__('Cambiar Contraseña')); ?>
+					<?php echo $Form->button(__('Cambiar Contraseña'), array('onClick' => 'enviarFormulario(this)')); ?>
 				</td>
 			</tr>
 
