@@ -11,24 +11,34 @@ class WorkbookMiddleware {
 	protected $workSheetObj;
 	protected $indexsheet;
 
+	protected $writer = 'Excel2007';
+	protected $extension = 'xlsx';
+	protected $content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+	private $time = 0;
 	/**
 	 * Construct of the class
-	 * @param string $fileName
+	 * @param string $filename
 	 */
 	public function __construct($filename) {
+		$this->time = microtime(1);
 		$this->filename = $filename;
 		$this->indexsheet = 0;
 
 		$this->phpExcel = new PHPExcel();
-		$this->setDocumentProperties($phpExcel);
+		$this->setDocumentProperties($this->phpExcel);
 	}
 
 	/**
 	 *
 	 * @todo implement?
 	 */
-	public function setVersion() {
-
+	public function setVersion($version) {
+		if ($version == 8) {
+			$this->writer = 'Excel5';
+			$this->extension = 'xls';
+			$this->content_type = 'application/vnd.ms-excel';
+		}
 	}
 
 	/**
@@ -117,14 +127,14 @@ class WorkbookMiddleware {
 	 */
 	public function close() {
 		$file = pathinfo($this->filename);
-		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-		header('Content-Disposition: attachment;filename="' . $file['filename'] . '.xlsx"');
+		header("Content-Type: {$this->content_type}");
+		header('Content-Disposition: attachment;filename="' . $file['filename'] . '.' . $this->extension . '"');
 		header('Cache-Control: max-age=0');
 		header('Pragma: public');
 
 		$this->phpExcel->setActiveSheetIndex(0);
 
-		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, 'Excel2007');
+		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, $this->writer);
 
 		$writer->save('php://output');
 
@@ -139,8 +149,8 @@ class WorkbookMiddleware {
 	private function setDocumentProperties($phpExcel) {
 		$this->phpExcel->getProperties()->setCreator('LemonTech')
 							 ->setLastModifiedBy('LemonTech')
-							 ->setTitle($filename)
-							 ->setSubject($filename)
+							 ->setTitle($this->filename)
+							 ->setSubject($this->filename)
 							 ->setDescription('Reporte generado por The TimeBilling, http://thetimebilling.com/.')
 							 ->setKeywords('timebilling lemontech');
 	}
@@ -161,92 +171,90 @@ class WorkbookMiddleware {
 		}
 
 		foreach ($format->getElements() as $key => $formatValue) {
-			if (!is_null($formatValue)) {
-				switch ($key) {
-					case 'size':
-						$this->workSheetObj->getStyle($cellCode)->getFont()->setSize($formatValue);
-						break;
-					case 'align':
-						$this->workSheetObj->getStyle($cellCode)->getAlignment()->setHorizontal($formatValue);
-						break;
-					case 'valign':
-						$this->workSheetObj->getStyle($cellCode)->getAlignment()->setVertical($formatValue);
-						break;
-					case 'bold':
-						$this->workSheetObj->getStyle($cellCode)->getFont()->setBold($formatValue);
-						break;
-					case 'italic':
-						$this->workSheetObj->getStyle($cellCode)->getFont()->setItalic($formatValue);
-						break;
-					case 'color':
-						$this->workSheetObj->getStyle($cellCode)->getFont()->getColor()->setARGB($formatValue);
-						break;
-					case 'locked':
-						$this->workSheetObj->getStyle($cellCode)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
-						break;
-					case 'top':
-						if (strval($formatValue) == '1') {
-							$this->workSheetObj->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-						} else if (strval($formatValue) == '2') {
-							$this->workSheetObj->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
-						}
-						break;
-					case 'bottom':
+			switch ($key) {
+				case 'size':
+					$this->workSheetObj->getStyle($cellCode)->getFont()->setSize($formatValue);
+					break;
+				case 'align':
+					$this->workSheetObj->getStyle($cellCode)->getAlignment()->setHorizontal($formatValue);
+					break;
+				case 'valign':
+					$this->workSheetObj->getStyle($cellCode)->getAlignment()->setVertical($formatValue);
+					break;
+				case 'bold':
+					$this->workSheetObj->getStyle($cellCode)->getFont()->setBold($formatValue);
+					break;
+				case 'italic':
+					$this->workSheetObj->getStyle($cellCode)->getFont()->setItalic($formatValue);
+					break;
+				case 'color':
+					$this->workSheetObj->getStyle($cellCode)->getFont()->getColor()->setARGB($formatValue);
+					break;
+				case 'locked':
+					$this->workSheetObj->getStyle($cellCode)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
+					break;
+				case 'top':
+					if (strval($formatValue) == '1') {
+						$this->workSheetObj->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+					} else if (strval($formatValue) == '2') {
+						$this->workSheetObj->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
+					}
+					break;
+				case 'bottom':
 						if (strval($formatValue) == '1') {
 							$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
 						} else if (strval($formatValue) == '2') {
 							$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
 						}
-						break;
-					case 'fgcolor':
-						if (is_int($formatValue)) {
-							if ($formatValue > 8 && $formatValue < 64) {
-								// the subtraction is for continue the logic of the method setCustomColor
-								$rgb = $this->palette[$formatValue - 8];
+					break;
+				case 'fgcolor':
+					if (is_int($formatValue)) {
+						if ($formatValue > 8 && $formatValue < 64) {
+							// the subtraction is for continue the logic of the method setCustomColor
+							$rgb = $this->palette[$formatValue - 8];
 
-								$this->workSheetObj->getStyle($cellCode)
-											->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
-											->getStartColor()->setRGB($this->rgb2hex($rgb));
-							}
-						} else {
 							$this->workSheetObj->getStyle($cellCode)
-											->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
-											->getStartColor()->setARGB($formatValue);
+										->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
+										->getStartColor()->setRGB($this->rgb2hex($rgb));
 						}
-						break;
-					case 'textwrap':
-						$this->workSheetObj->getStyle($cellCode)->getAlignment()->setWrapText($formatValue);
-						break;
-					case 'numformat':
-						$this->workSheetObj->getStyle($cellCode)->getNumberFormat()->setFormatCode($formatValue);
-						break;
-					case 'border':
-						if (strval($formatValue) == '1') {
-							$this->workSheetObj->getStyle($cellCode)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-						} else if (strval($formatValue) == '2') {
-							$this->workSheetObj->getStyle($cellCode)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
-						}
-						break;
-					case 'underline':
-						if (strval($formatValue) == '1') {
-							$this->workSheetObj->getStyle($cellCode)->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_SINGLE);
-						} else if (strval($formatValue) == '2') {
-							$this->workSheetObj->getStyle($cellCode)->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_DOUBLE);
-						}
-						break;
-					case 'textrotation':
-						switch (intval($formatValue)) {
-							case 90:
-								$this->workSheetObj->getRowDimension($row + 1)->setRowHeight(-1);
-								$this->workSheetObj->getStyle($cellCode)->getAlignment()->setTextRotation(-90);
-								break;
-							case 270:
-								$this->workSheetObj->getRowDimension($row + 1)->setRowHeight(-1);
-								$this->workSheetObj->getStyle($cellCode)->getAlignment()->setTextRotation(90);
-								break;
-						}
-						break;
-				}
+					} else {
+						$this->workSheetObj->getStyle($cellCode)
+										->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
+										->getStartColor()->setARGB($formatValue);
+					}
+					break;
+				case 'textwrap':
+					$this->workSheetObj->getStyle($cellCode)->getAlignment()->setWrapText($formatValue);
+					break;
+				case 'numformat':
+					$this->workSheetObj->getStyle($cellCode)->getNumberFormat()->setFormatCode($formatValue);
+					break;
+				case 'border':
+					if (strval($formatValue) == '1') {
+						$this->workSheetObj->getStyle($cellCode)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+					} else if (strval($formatValue) == '2') {
+						$this->workSheetObj->getStyle($cellCode)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
+					}
+					break;
+				case 'underline':
+					if (strval($formatValue) == '1') {
+						$this->workSheetObj->getStyle($cellCode)->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_SINGLE);
+					} else if (strval($formatValue) == '2') {
+						$this->workSheetObj->getStyle($cellCode)->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_DOUBLE);
+					}
+					break;
+				case 'textrotation':
+					switch (intval($formatValue)) {
+						case 90:
+							$this->workSheetObj->getRowDimension($row + 1)->setRowHeight(-1);
+							$this->workSheetObj->getStyle($cellCode)->getAlignment()->setTextRotation(-90);
+							break;
+						case 270:
+							$this->workSheetObj->getRowDimension($row + 1)->setRowHeight(-1);
+							$this->workSheetObj->getStyle($cellCode)->getAlignment()->setTextRotation(90);
+							break;
+					}
+					break;
 			}
 		}
 	}
@@ -367,9 +375,7 @@ class WorkbookMiddleware {
 			$this->workSheetObj->getColumnDimension($column)->setVisible(false);
 		}
 
-		if(is_object($format)) {
-			$this->setFormat($format, -1, $column);
-		}
+
 	}
 
 	/**
