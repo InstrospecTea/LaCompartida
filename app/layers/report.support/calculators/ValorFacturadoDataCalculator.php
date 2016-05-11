@@ -3,7 +3,7 @@
  * El valor facturado corresponde ValorCobradoDataCalculator multiplicado por el
  * aporte del monto total facturado en su Liquidación.
  *
- * Más info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Facturado
+ * Más info: https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Valor-Factuado
  */
 class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalculator {
 	private $fieldName = 'valor_facturado';

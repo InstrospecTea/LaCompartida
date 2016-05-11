@@ -18,14 +18,18 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
 		$subtotalBase = $this->getWorksProportionalDocumentSubtotal();
-		$billed_amount = "SUM({$subtotalBase})
+		$billed_amount = "SUM(
+				{$subtotalBase}
+ 				*
+				(1 - documento.saldo_honorarios / documento.honorarios)
+		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado')
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL', 'PAGADO')));
 	}
 
 	/**
@@ -33,16 +37,19 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
-	function getReportErrandQuery($Criteria) {
+	function getReportErrandQuery(Criteria $Criteria) {
 		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
-		$billed_amount =  "SUM({$subtotalBase})
-		*
-		(1 / cobro_moneda.tipo_cambio)";
+		$billed_amount =  "SUM(
+			{$subtotalBase}
+			*
+			(1 - documento.saldo_honorarios / documento.honorarios)
+		)
+		* (1 / cobro_moneda.tipo_cambio)";
 
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado')
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL', 'PAGADO')));
 	}
 
 	/**
@@ -50,9 +57,11 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
-	function getReportChargeQuery($Criteria) {
+	function getReportChargeQuery(Criteria $Criteria) {
+
 		$billed_amount = '
 			SUM((cobro.monto_subtotal - cobro.descuento)
+				* (1 - documento.saldo_honorarios / documento.honorarios)
 				* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
@@ -60,7 +69,6 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado')
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL', 'PAGADO')));
 	}
-
 }

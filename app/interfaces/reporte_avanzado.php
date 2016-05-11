@@ -85,7 +85,6 @@ $tipos_de_dato = array(
 	'valor_facturado',
 	'valor_por_pagar',
 	'valor_pagado',
-	'valor_pagado_parcial',
 	'valor_incobrable',
 	'rentabilidad',
 	'rentabilidad_base',
@@ -221,7 +220,6 @@ $ReporteAvanzado->glosa_dato['valor_facturado'] = __("Monto total Facturado de l
 $ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario que corresponde a cada Profesional por concepto de trámites, en un Cobro ya Emitido");
 
 $ReporteAvanzado->glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado totalmente");
-$ReporteAvanzado->glosa_dato['valor_pagado_parcial'] = __("Valor Pagado de un Cobro que ha sido parcialmente pagado");
 $ReporteAvanzado->glosa_dato['valor_por_pagar'] = __("Valor Cobrado que aún no ha sido pagado");
 $ReporteAvanzado->glosa_dato['valor_por_pagar_parcial'] = __("Valor Por Pagar de un Cobro que ha sido pagado parcialmente");
 $ReporteAvanzado->glosa_dato['valor_por_cobrar'] = __("Valor monetario estimado que corresponde a cada Profesional en horas por cobrar");
@@ -953,8 +951,6 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->celda('valor_cobrado') ?>
 								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
 								<?php echo $ReporteAvanzado->celda('valor_pagado') ?>
-								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda('valor_pagado_parcial') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(7) ?>

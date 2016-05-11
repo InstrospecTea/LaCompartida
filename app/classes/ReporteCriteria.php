@@ -29,7 +29,6 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
  * |  |  |  +-- valor_facturado: El valor facturado de una liquidación
  * |  |  |  +-- valor_tramites: Valor monetario de trámites que corresponde a cada Profesional, en una Liquidación ya Emitida
  * |  |  |  |  +-- valor_pagado: Valor Cobrado que ha sido Pagado
- * |  |  |  |  +-- valor_pagado_parcial: Valor Cobrado que ha sido Pagado parcialmente
  * |  |  |  |  +-- valor_por_pagar: Valor Cobrado que aún no ha sido pagado
  * |  |  |  |  \-- valor_por_pagar_parcial: [DEPRECADO] Valor por pagar parcial
  * |  |  |  +-- valor_por_cobrar: Valor monetario estimado que corresponde a cada Profesional en horas por cobrar
@@ -77,7 +76,6 @@ class ReporteCriteria {
 		'valor_estandar' => 'ValorCobradoEstandar',
 		'valor_hora' => 'ValorHora',
 		'valor_pagado' => 'ValorPagado',
-		'valor_pagado_parcial' => 'ValorPagadoParcial',
 		'valor_incobrable' => 'ValorIncobrable',
 		'valor_por_cobrar' => 'ValorPorCobrar',
 		'valor_por_pagar' => 'ValorPorPagar',
@@ -127,7 +125,7 @@ class ReporteCriteria {
 	 * TODO: Refactorizar a Abstractos
 	 */
 	public static function getTiposMoneda() {
-		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_facturado','valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'valor_pagado_parcial', 'rentabilidad', 'rentabilidad_base', 'valor_cobrable');
+		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_facturado','valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'valor_por_pagar_parcial', 'rentabilidad', 'rentabilidad_base', 'valor_cobrable');
 	}
 
 	/**
@@ -892,7 +890,6 @@ class ReporteCriteria {
 			case "valor_incobrable":
 			case "diferencia_valor_estandar":
 			case "valor_estandar":
-			case "valor_pagado_parcial":
 			case "valor_por_pagar_parcial":
 			case "valor_trabajado_estandar":
 			case "costo" :
@@ -941,7 +938,6 @@ class ReporteCriteria {
 			case "valor_incobrable":
 			case "diferencia_valor_estandar":
 			case "valor_estandar":
-			case "valor_pagado_parcial":
 			case "valor_por_pagar_parcial":
 			case "valor_trabajado_estandar":
 			case "costo":
@@ -972,7 +968,6 @@ class ReporteCriteria {
 			case "valor_por_pagar":
 			case "valor_incobrable":
 			case "valor_hora":
-			case "valor_pagado_parcial":
 			case "valor_por_pagar_parcial":
 			case "valor_trabajado_estandar":
 			case "costo":
