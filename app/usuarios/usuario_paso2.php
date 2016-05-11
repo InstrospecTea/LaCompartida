@@ -202,6 +202,12 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		form.submit();
 	}
 
+	function enviarFormulario(form) {
+		ArregloRevisados();
+		ArregloSecretarios();
+		form.submit();
+	}
+
 	var necesitaConfirmar = false;
 
 	function Validar(form)
@@ -222,9 +228,6 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			alert("Debe ingresar el apellido del usuario");
 			return false;
 		}
-
-		ArregloRevisados();
-		ArregloSecretarios();
 		necesitaConfirmar = false;
 		return true;
 	}
@@ -239,7 +242,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 	{
 		if(confirm('¿Desea cambiar todas las tarifas del abogado a esta categoría?'))
 		{
-			document.form_usuario.submit();
+			enviarFormulario(document.form_usuario);
 			var select_origen = document.getElementById(id_origen);
 			var http = getXMLHTTP();
 			var vurl = root_dir + '/app/ajax.php?accion=' + accion + '&id=' + id_usuario + '&id_2=' + select_origen.value ;
@@ -1136,7 +1139,7 @@ function CargarPermisos() {
 				e.stop();
 				return false;
 			}
-			$('form_usuario').submit();
+			enviarFormulario($('form_usuario'));
 		}
 	});
 
@@ -1149,7 +1152,7 @@ function CargarPermisos() {
 				var tmp = ide.split('_');
 				$('opc').value = 'elimina_vacacion';
 				$('vacacion_id_tmp').value = tmp[1];
-				$('form_usuario').submit();
+				enviarFormulario($('form_usuario'));
 			}
 		});
 	});
