@@ -817,8 +817,7 @@ foreach ($chargeResults as $charge) {
 			$mes_concepto = date('F Y', strtotime($cobro->fields['fecha_fin']));
 		}
 
-		$concepto = $PrmExcelCobro->getGlosa('concepto_glosa', 'Encabezado', $lang);
-		$concepto = sprintf($concepto, $mes_concepto);
+		$concepto = $PrmExcelCobro->getGlosa('concepto_glosa', 'Encabezado', $lang, '%s', $mes_concepto);
 
 		$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('concepto', 'Encabezado', $lang), $CellFormat->get('encabezado'));
 		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
@@ -901,7 +900,6 @@ foreach ($chargeResults as $charge) {
 		$ws->mergeCells($filas, 6, $filas++, 10);
 
 		for ($i = 1; $i <= $cantidad_escalonadas; $i++) {
-
 			$detalle_escala = "";
 			$detalle_escala .= $cobro->escalonadas[$i]['tiempo_inicial'] . " - ";
 			$detalle_escala .=!empty($cobro->escalonadas[$i]['tiempo_final']) && $cobro->escalonadas[$i]['tiempo_final'] != 'NULL' ? $cobro->escalonadas[$i]['tiempo_final'] . " hrs. " : " " . __('más hrs') . " ";
@@ -1183,12 +1181,10 @@ foreach ($chargeResults as $charge) {
 				 */
 
 				$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
-
 				$ws->write($filas, $col_fecha_dia, $PrmExcelCobro->getGlosa('fecha_dia', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
 				$ws->write($filas, $col_fecha_mes, $PrmExcelCobro->getGlosa('fecha_mes', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
 				$ws->write($filas, $col_fecha_anyo, $PrmExcelCobro->getGlosa('fecha_anyo', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
-
-				$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
+				$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de trabajos', $lang).'sdfghj', $CellFormat->get('titulo'));
 
 				if (!$opc_ver_asuntos_separados) {
 					$ws->write($filas, $col_asunto, $PrmExcelCobro->getGlosa('asunto', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
@@ -1789,9 +1785,9 @@ foreach ($chargeResults as $charge) {
 
 				$formula_resta = '';
 				if ($col_duracion_retainer) {
-					$formula_resta = ' - $col_formula_duracion_retainer' . ($filas + 1);
+					$formula_resta = " - $col_formula_duracion_retainer" . ($filas + 1);
 				}
-				$ws->writeFormula($filas, $col_cobrable, "=MAX($col_formula_duracion_cobrable" . ($filas + 1) . "{$formula_resta};0)", $CellFormat->get('tiempo', $contador));
+				$ws->writeFormula($filas, $col_cobrable, "=MAX({$col_formula_duracion_cobrable}" . ($filas + 1) . "{$formula_resta};0)", $CellFormat->get('tiempo', $contador));
 				$ws->writeNumber($filas, $col_tarifa_hh, $data['tarifa'], $CellFormat->get('moneda', $contador));
 				if ($col_duracion_retainer) {
 					$ws->writeFormula($filas, $col_valor_trabajo, "=MAX(" . ($ingreso_via_decimales ? "" : "24*" ) . "$col_formula_duracion_cobrable" . ($filas + 1) . "-" . ($ingreso_via_decimales ? "" : "24*" ) . "$col_formula_duracion_retainer" . ($filas + 1) . ";0)*$col_formula_tarifa_hh" . ($filas + 1), $CellFormat->get('moneda', $contador));
@@ -2718,67 +2714,43 @@ if ($cont_hitos > 0) {
 	$totalthh = 0;
 	$totalminutos = 0;
 
-	$criteria = new Criteria($sesion);
-	$criteria->add_select('pm.simbolo', 'simbolo')
-			->add_select('pm.cifras_decimales', 'cifras_decimales')
-			->add_select('pm.glosa_moneda', 'glosa_moneda')
-			->add_from('cobro_pendiente cp')
-	 		->add_inner_join_with('contrato c', 'cp.id_contrato = c.id_contrato')
-	 		->add_inner_join_with('prm_moneda pm', 'pm.id_moneda = c.id_moneda_monto')
-			->add_restriction(CriteriaRestriction::equals('cp.hito', 1))
-			->add_restriction(CriteriaRestriction::equals('cp.id_contrato', $cobro->fields['id_contrato']));
-
-	$moneda_hitos = $criteria->run();
-	$moneda_hitos = $moneda_hitos[0];
-
-	if ($moneda_hitos['glosa_moneda'] == "Euro") {
-		$simbolo_moneda = "EUR";
-	} else {
-		$simbolo_moneda = $moneda_hitos['simbolo'];
-	}
-	$cifras_decimales = $moneda_hitos['cifras_decimales'];
-
-	if ($cifras_decimales) {
-		$decimales = '.';
-		while ($cifras_decimales-- > 0) {
-			$decimales .= '0';
-		}
-	} else {
-		$decimales = '';
-	}
-
 	$CellFormat->add('numeros_amarillo', array('Border' => 1, 'Align' => 'right', 'TextWrap' => '0', 'FgColor' => '37'));
-	$formato_moneda_hito = & $wb->addFormat(array(
-'Align' => 'right',
-'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
-	$formato_moneda_total_hito = & $wb->addFormat(array(
-'Size' => 10,
-'Align' => 'right',
-'Bold' => 1,
-'Top' => 1,
-'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+	$CellFormat->add('moneda_hito', array(
+		'Align' => 'right',
+		'NumFormat' => $Moneda->getExcelFormat($contrato->fields['id_moneda_monto'])
+	));
+	$CellFormat->add('moneda_total_hito', array(
+		'Size' => 10,
+		'Align' => 'right',
+		'Bold' => 1,
+		'Top' => 1,
+		'NumFormat' => $Moneda->getExcelFormat($contrato->fields['id_moneda_monto'])
+	));
 
+	$i = 0;
 	while ($fila_hitos = mysql_fetch_array($resp_hitos)) {
-		$totalhito+=floatval($fila_hitos['monto_estimado']);
-		$totalthh+=floatval($fila_hitos['monto_thh']);
+		$totalhito += floatval($fila_hitos['monto_estimado']);
+		$totalthh += floatval($fila_hitos['monto_thh']);
 		$monto_thh = ($fila_hitos['monto_thh'] == 0) ? '-' : $fila_hitos['monto_thh'];
 		$fecha_hito = ($fila_hitos['fecha_hito'] == '00/00/00') ? '-' : $fila_hitos['fecha_hito'];
 		$filas++;
 
-		$ws->write($filas, $col_descripcion, $fila_hitos['descripcion'], $CellFormat->get('normal'));
-		$ws->write($filas, $col_descripcion + 1, ucwords($fila_hitos['estado']), $CellFormat->get('normal'));
-		$ws->write($filas, $col_descripcion + 2, $fecha_hito, $CellFormat->get('normal'));
+		$ws->write($filas, $col_descripcion, $fila_hitos['descripcion'], $CellFormat->get('normal', $i));
+		$ws->write($filas, $col_descripcion + 1, ucwords($fila_hitos['estado']), $CellFormat->get('normal', $i));
+		$ws->write($filas, $col_descripcion + 2, $fecha_hito, $CellFormat->get('normal', $i));
 
 		$totalminutos += $fila_hitos['total_minutos'];
 		$horas_cobrables = floor($fila_hitos['total_minutos'] / 60);
 		$minutos_cobrables = sprintf("%02d", $fila_hitos['total_minutos'] % 60);
 
-		$ws->write($filas, $col_descripcion + 3, "$horas_cobrables:$minutos_cobrables", $CellFormat->get('normal'));
-		$ws->write($filas, $col_descripcion + 4, $fila_hitos['monto_estimado'], $formato_moneda_hito);
-		$ws->write($filas, $col_descripcion + 5, $monto_thh, $formato_moneda_hito);
+		$ws->write($filas, $col_descripcion + 3, "$horas_cobrables:$minutos_cobrables", $CellFormat->get('normal', $i));
+		$ws->write($filas, $col_descripcion + 4, $fila_hitos['monto_estimado'], $CellFormat->get('moneda_hito', $i));
+		$ws->write($filas, $col_descripcion + 5, $monto_thh, $CellFormat->get('moneda_hito', $i));
 
 		$filas++;
-		$ws->write($filas, $col_descripcion, $fila_hitos['observaciones'], $CellFormat->get('observacion', $fila));
+		$ws->write($filas, $col_descripcion, $fila_hitos['observaciones'].'.', $CellFormat->get('observacion', $i));
+		$ws->mergeCells($filas, $col_descripcion, $filas, $col_descripcion + 5);
+		++$i;
 	}
 
 	$filas++;
@@ -2789,8 +2761,8 @@ if ($cont_hitos > 0) {
 	$minutos_cobrables = sprintf("%02d", $totalminutos % 60);
 
 	$ws->write($filas, $col_descripcion + 3, "$horas_cobrables:$minutos_cobrables", $CellFormat->get('total'));
-	$ws->write($filas, $col_descripcion + 5, intval($totalthh), $formato_moneda_total_hito);
-	$ws->write($filas, $col_descripcion + 4, $totalhito, $formato_moneda_total_hito);
+	$ws->write($filas, $col_descripcion + 5, intval($totalthh), $CellFormat->get('moneda_total_hito', $i));
+	$ws->write($filas, $col_descripcion + 4, $totalhito, $CellFormat->get('moneda_total_hito', $i));
 }
 
 /*
