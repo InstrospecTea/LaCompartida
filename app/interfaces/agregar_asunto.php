@@ -1024,7 +1024,11 @@ jQuery('document').ready(function () {
 	jQuery("#cobro_independiente").trigger("change");
 });
 
-
+/**
+ * Si el usuario no está en la lista se agrega
+ * @param {type} data
+ * @returns {undefined|Boolean}
+ */
 function agregarUsuarioSecundario(data) {
 	var id = data.id_usuario_secundario;
 	if (id === null) {
