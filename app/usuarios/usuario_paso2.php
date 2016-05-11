@@ -889,7 +889,7 @@ if ($usuario->loaded) {
 
 			<tr>
 				<td align="right" colspan="2">
-					<?php echo $Form->button(__('Cambiar Contraseña'), array('onClick' => 'enviarFormulario(jQuery(\'#form_usuario\')[0])')); ?>
+					<?php echo $Form->submit(__('Cambiar Contraseña')); ?>
 				</td>
 			</tr>
 
