@@ -28,6 +28,8 @@ class PrmExcelCobro extends Objeto {
 	 * @param string $internal_name
 	 * @param string $group
 	 * @param string $lang
+	 * @param string $replace
+	 * @param string $replace_with
 	 * @return type
 	 */
 	public function getGlosa($internal_name, $group, $lang = 'es', $replace = null, $replace_with = null) {
