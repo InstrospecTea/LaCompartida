@@ -203,4 +203,34 @@
 	$_LANG['¿Desea eliminar el cobro seleccionado?'] = "¿Desea eliminar la liquidación seleccionada?";
 	$_LANG['No se puede modificar este trabajo.\nEl Cobro que lo incluye ya ha sido Emitido al Cliente.'] = "No se puede modificar este trabajo.\nLa Liquidación que lo incluye ya ha sido Emitida al Cliente.";
 
+	// Reportes - Tipo de Dato
+	$_LANG['horas_trabajadas'] = 'Horas Trabajadas';
+	$_LANG['horas_cobrables'] = 'Horas Facturables';
+	$_LANG['horas_visibles'] = 'Horas Facturables Corregidas';
+	$_LANG['horas_cobradas'] = 'Horas Liquidadas';
+	$_LANG['horas_pagadas'] = 'Horas Pagadas';
+	$_LANG['horas_por_pagar'] = 'Horas por Pagar';
+	$_LANG['horas_por_cobrar'] = 'Horas Pendientes de liquidar';
+	$_LANG['horas_incobrables'] = 'Horas Incobrables';
+	$_LANG['horas_castigadas'] = 'Horas Castigadas';
+	$_LANG['horas_no_cobrables'] = 'Horas no Facturables';
+	$_LANG['horas_convenio'] = 'Horas Convenio';
+	$_LANG['horas_spot'] = 'Horas Spot';
+	$_LANG['valor_cobrable'] = 'Valor Facturable';
+	$_LANG['valor_cobrado'] = 'Valor Liquidado';
+	$_LANG['valor_facturado_contable'] = "Valor Facturado Contable";
+	$_LANG['valor_tramites'] = "Valor Liquidado solo Trámites";
+	$_LANG['valor_pagado'] = 'Valor Pagado';
+	$_LANG['valor_por_pagar'] = 'Valor por Pagar';
+	$_LANG['valor_por_cobrar'] = 'Valor Pendiente de Liquidar';
+	$_LANG['valor_incobrable'] = 'Valor Incobrable';
+	$_LANG['valor_trabajado_estandar'] = 'Valor Trabajado Estándar';
+	$_LANG['valor_estandar'] = 'Valor Liquidado Estándar';
+	$_LANG['diferencia_valor_estandar'] = 'Diferencia Valor Liquidado Estándar';
+	$_LANG['valor_cobrado_no_estandar'] = 'Valor Cobrado Estándar';
+	$_LANG['valor_hora'] = 'Valor Hora';
+	$_LANG['rentabilidad_base'] = "Rentabilidad Base";
+	$_LANG['rentabilidad'] = "Rentabilidad";
+	$_LANG['costo'] = "Costo";
+	$_LANG['costo_hh'] = "Costo HH";
 ?>
