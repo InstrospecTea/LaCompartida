@@ -1,5 +1,29 @@
 # Changelog
 
+## [Release 16.13.0](https://github.com/LemontechSA/ttb/pull/1451)
+Thursday, May 12th
+* **Feature** [Tabla Cebra](https://github.com/LemontechSA/ttb/pull/1440)
+
+## Hotfix 16.12.6
+Thursday, May 12th
+* **Fix** [Área del asunto NULL](https://github.com/LemontechSA/ttb/pull/1452)
+
+## Hotfix 16.12.5
+Thursday, May 12th
+* **Fix** [Problema resumen semanal Lloreda-Camacho](https://github.com/LemontechSA/ttb/pull/1449)
+
+## Hotfix 16.12.4
+Tuesday, May 10th
+* **Fix** [Configuración para manejar el uso de clientes](https://github.com/LemontechSA/ttb/pull/1444)
+
+## Hotfix 16.12.3
+Tuesday, May 10th
+* **Fix** [Realiza la conversión de moneda según la moneda de la factura y no la del cobro](https://github.com/LemontechSA/ttb/pull/1442)
+
+## Hotfix 16.12.2
+Tuesday, May 10th
+* **Fix** [Username en Excel Opcional](https://github.com/LemontechSA/ttb/pull/1441)
+
 ## Hotfix 16.12.1
 Monday, May 9th
 * **Fix** [Error al descargar Excel](https://github.com/LemontechSA/ttb/pull/1438)

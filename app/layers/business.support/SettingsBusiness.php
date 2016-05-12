@@ -81,7 +81,8 @@ class SettingsBusiness extends AbstractBusiness implements ISettingsBusiness {
 			'PermitirCampoCobrableAProfesional' => 'allow_billable',
 			'MaxDuracionTrabajo' => 'max_work_duration',
 			'ZonaHoraria' => 'timezone',
-			'Idioma' => 'language'
+			'Idioma' => 'language',
+			'UsarClientesEnTracker' => 'use_clients'
 		);
 	}
 }
