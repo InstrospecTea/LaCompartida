@@ -1,7 +1,7 @@
 # Changelog
 
 ## [Release 16.13.0](https://github.com/LemontechSA/ttb/pull/1451)
-Wednesday, May 12th
+Thursday, May 12th
 * **Feature** [Tabla Cebra](https://github.com/LemontechSA/ttb/pull/1440)
 
 ## Hotfix 16.12.6
