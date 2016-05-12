@@ -24,7 +24,6 @@ if ($opc == 'excel') {
 	// Es necesaria esta bestialidad para que no se caiga cuando es llamada desde otro lado.
 	$no_activo = !$activo;
 	$multiple = true;
-	$forzar_username = true;
 	require_once Conf::ServerDir() . '/interfaces/cobros_xls.php';
 	exit;
 }
@@ -394,6 +393,7 @@ if ($opc == 'buscar') {
 						text_window += '<br><label for="form_horas_visibles" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar trabajos no visibles') ?>:</label><input type="checkbox" name="form_horas_visibles" id="form_horas_visibles" value="1" />';
 						text_window += '<br><label for="form_asuntos_separados" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Ver asuntos por separado') ?>:</label><input type="checkbox" name="form_asuntos_separados" id="form_asuntos_separados" value="1" <?php echo Conf::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?>>';
 						text_window += '<br><label for="form_asuntos_sin_horas" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar Asuntos Cobrables Sin Horas') ?>:</label><input type="checkbox" name="form_asuntos_sin_horas" id="form_asuntos_sin_horas" value="1" />';
+						text_window += '<br><label for="form_forzar_username" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar iniciales profesional') ?>:</label><input type="checkbox" name="form_forzar_username" id="form_forzar_username" value="1" checked />';
 						text_window += '</div>';
 					}
 
@@ -423,6 +423,7 @@ if ($opc == 'buscar') {
 										jQuery("#opc_ver_cobrable").val(jQuery("#form_horas_visibles").is(":checked") ? '1' : '0');
 										jQuery("#opc_ver_asuntos_separados").val(jQuery("#form_asuntos_separados").is(":checked") ? '1' : '0');
 										jQuery("#opc_mostrar_asuntos_cobrables_sin_horas").val(jQuery("#form_asuntos_sin_horas").is(":checked") ? '1' : '0');
+										jQuery("#forzar_username").val(jQuery("#form_forzar_username").is(":checked") ? 1 : 0);
 
 										form.action = 'genera_cobros.php';
 										form.opc.value = 'excel';
@@ -1139,6 +1140,7 @@ if ($proceso !== false) {
 					<input type="hidden" name="opc_ver_cobrable" id="opc_ver_cobrable" value="1" />
 					<input type="hidden" name="opc_ver_asuntos_separados" id="opc_ver_asuntos_separados" <?php echo Conf::GetConf($sesion, 'CodigoSecundario') ? '' : 'checked' ?> value="1" />
 					<input type="hidden" name="opc_mostrar_asuntos_cobrables_sin_horas" id="opc_mostrar_asuntos_cobrables_sin_horas" value="1" />
+					<input type="hidden" name="forzar_username" id="forzar_username" value="1" />
 					<?php
 					$solicitante = Conf::GetConf($sesion, 'OrdenadoPor');
 

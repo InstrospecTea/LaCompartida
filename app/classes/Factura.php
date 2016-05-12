@@ -3095,4 +3095,21 @@ class Factura extends Objeto {
 		return $tipo_cambio_moneda;
 	}
 
+	public function Eliminar()
+	{
+
+		// eliminar los movimientos y monedas de la factura
+		$CtaCteFactMvto = new CtaCteFactMvto($this->sesion);
+		$CtaCteFactMvto->LoadByFactura($this->fields['id_factura']);
+
+		$CtaCteFactMoneda = new CtaCteFactMoneda($this->sesion);
+		$CtaCteFactMoneda->Load($CtaCteFactMvto->fields['id_cta_cte_fact_mvto']);
+
+		$CtaCteFactMoneda->Delete();
+		$CtaCteFactMvto->Delete();
+		$this->Delete();
+
+		return true;
+	}
+
 }
