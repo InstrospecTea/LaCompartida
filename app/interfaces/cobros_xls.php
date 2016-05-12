@@ -1185,7 +1185,7 @@ foreach ($chargeResults as $charge) {
 				$ws->write($filas, $col_fecha_dia, $PrmExcelCobro->getGlosa('fecha_dia', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
 				$ws->write($filas, $col_fecha_mes, $PrmExcelCobro->getGlosa('fecha_mes', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
 				$ws->write($filas, $col_fecha_anyo, $PrmExcelCobro->getGlosa('fecha_anyo', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
-				$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de trabajos', $lang).'sdfghj', $CellFormat->get('titulo'));
+				$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
 
 				if (!$opc_ver_asuntos_separados) {
 					$ws->write($filas, $col_asunto, $PrmExcelCobro->getGlosa('asunto', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
