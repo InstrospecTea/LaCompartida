@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.13.0](https://github.com/LemontechSA/ttb/pull/1451)
+Thursday, May 12th
+* **Feature** [Tabla Cebra](https://github.com/LemontechSA/ttb/pull/1440)
+
 ## Hotfix 16.12.6
 Thursday, May 12th
 * **Fix** [Área del asunto NULL](https://github.com/LemontechSA/ttb/pull/1452)
