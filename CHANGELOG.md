@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.13.1
+Thursday, May 12th
+* **Fix** [Elimina string sdfghj](https://github.com/LemontechSA/ttb/pull/1453)
+
 ## [Release 16.13.0](https://github.com/LemontechSA/ttb/pull/1451)
 Thursday, May 12th
 * **Feature** [Tabla Cebra](https://github.com/LemontechSA/ttb/pull/1440)
