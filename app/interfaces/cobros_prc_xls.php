@@ -845,7 +845,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$tarifa_abogado *= $factor_proporcional_forma_cobro;
 				}
 
-				$ws->writeNumber($filas, $columna_tarifa, $tarifa_abogado, $formato_moneda2_centrado);
+				$ws->writeNumber($filas, $columna_tarifa, $tarifa_abogado, $formato_moneda);
 
 				$duracion = $trabajo->fields['duracion_cobrada'];
 				list($h, $m) = split(':', $duracion);
@@ -861,7 +861,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2_centrado);
 				}
 
-				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda2_centrado);
+				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda);
 
 				$filas += 1;
 			}
@@ -953,7 +953,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $columna_importe, '', $formato_encabezado);
 		$ws->mergeCells($filas, 0, $filas, 7);
 		$filas += 2;
-		$ws->write($filas, $columna_inicial, $arraylang['cliente']['Encabezado'][$lang] . $Cliente->fields['glosa_cliente'], $formato_encabezado);
+		$ws->write($filas, $columna_inicial, $arraylang['cliente']['Encabezado'][$lang] . ': ' . $Cliente->fields['glosa_cliente'], $formato_encabezado);
 		$filas += 3;
 		$ws->freezePanes(array($filas, 0));
 
