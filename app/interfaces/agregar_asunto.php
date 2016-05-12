@@ -1030,17 +1030,16 @@ jQuery('document').ready(function () {
  * @returns {undefined|Boolean}
  */
 function agregarUsuarioSecundario(data) {
-	var id = data.id_usuario_secundario;
+	var id = data.id_usuario_secundario || null;
 	if (id === null) {
 		return;
 	}
-	if (jQuery('#id_usuario_secundario').find('option[value=' + id + ']').length) {
+	var element_id = '#id_usuario_secundario';
+	if (!jQuery(element_id).length || jQuery(element_id).find('option[value=' + id + ']').length) {
 		return false;
 	}
-	var $option = jQuery('<option/>')
-		.attr('value', id)
-		.text(data.nombre_usuario_secundario);
-	jQuery('#id_usuario_secundario').append($option);
+	var $option = jQuery('<option/>', {value: id, text: data.nombre_usuario_secundario});
+	jQuery(element_id).append($option);
 }
 
 function CambioDatosFacturacion(id_cliente) {
@@ -1050,7 +1049,7 @@ function CambioDatosFacturacion(id_cliente) {
 		if (!response) {
 			return;
 		}
-		agregarUsuarioSecundario(response)
+		agregarUsuarioSecundario(response);
 		jQuery.each(response, function (field_name, value) {
 			var $field = jQuery('[name="' + field_name + '"]');
 			if ($field !== undefined) {
