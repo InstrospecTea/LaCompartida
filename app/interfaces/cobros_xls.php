@@ -820,6 +820,9 @@ foreach ($chargeResults as $charge) {
 
 		$concepto = $PrmExcelCobro->getGlosa('concepto_glosa', 'Encabezado', $lang, '%s', $mes_concepto);
 
+		$concepto = str_replace('%glosa_contrato%', $contrato->fields['glosa_contrato'], $concepto);
+
+
 		$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('concepto', 'Encabezado', $lang), $CellFormat->get('encabezado'));
 		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 		$ws->write($filas, $col_abogado, $concepto, $CellFormat->get('encabezado'));
