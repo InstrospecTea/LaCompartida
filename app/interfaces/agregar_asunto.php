@@ -110,10 +110,8 @@ if ($opcion == 'guardar') {
 		$Pagina->AddError(__('Por favor ingrese el codigo del cliente'));
 	}
 
-	if (Conf::GetConf($Sesion, 'ValidacionesCliente')) {
-		if (empty($id_area_proyecto)) {
-			$Pagina->AddError(__('Por favor ingrese el área del ') . __('asunto'));
-		}
+	if (empty($id_area_proyecto)) {
+		$Pagina->AddError(__('Por favor ingrese el área del ') . __('asunto'));
 	}
 
 	foreach (array_keys($hito_fecha) as $i) {
@@ -185,12 +183,7 @@ if ($opcion == 'guardar') {
 		}
 
 		$Asunto->Edit("id_tipo_asunto", $id_tipo_asunto, true);
-
-		if (!empty($id_area_proyecto)) {
-			$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
-		} else {
-			$Asunto->Edit("id_area_proyecto", "NULL");
-		}
+		$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
 
 		if (!is_null($desglose_area)) {
 			$Asunto->Edit("desglose_area", $desglose_area);
@@ -538,13 +531,11 @@ if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
 					return false;
 			}
 
-<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
-				if (!form.id_area_proyecto.value) {
-						alert("Debe ingresar el área del <?php echo __('asunto'); ?>");
-						form.id_area_proyecto.focus();
-						return false;
-				}
-<?php } ?>
+			if (!form.id_area_proyecto.value) {
+					alert("Debe ingresar el área del <?php echo __('asunto'); ?>");
+					form.id_area_proyecto.focus();
+					return false;
+			}
 
 <?php
 if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
@@ -776,9 +767,7 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 																											FormSelectHelper.reload_id_desglose_area();
 																										}'
 																					)); ?>
-								<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
-									<span style="color:#FF0000; font-size:10px">*</span>
-								<?php } ?>
+								<span style="color:#FF0000; font-size:10px">*</span>
 								<?php echo $SelectHelper->checkboxes(
 																		'id_desglose_area',
 																		array(),
