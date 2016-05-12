@@ -62,7 +62,7 @@ $orden = "cliente.glosa_cliente, contrato.id_contrato, asunto.glosa_asunto, trab
 $b1 = new Buscador($sesion, $query, "Trabajo", $desde, '', $orden);
 $lista = $b1->lista;
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 $wb->setVersion(8);
 $wb->send('Resumen de cobros.xls');
 $wb->setCustomColor(35, 220, 255, 220);

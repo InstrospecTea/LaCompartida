@@ -201,11 +201,11 @@ class WorkbookMiddleware {
 					}
 					break;
 				case 'bottom':
-						if (strval($formatValue) == '1') {
-							$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-						} else if (strval($formatValue) == '2') {
-							$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
-						}
+					if (strval($formatValue) == '1') {
+						$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+					} else if (strval($formatValue) == '2') {
+						$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
+					}
 					break;
 				case 'fgcolor':
 					if (is_int($formatValue)) {
@@ -375,7 +375,9 @@ class WorkbookMiddleware {
 			$this->workSheetObj->getColumnDimension($column)->setVisible(false);
 		}
 
-
+		if(is_object($format)) {
+			$this->formats[$column] = $format;
+		}
 	}
 
 	/**
@@ -448,9 +450,7 @@ class WorkbookMiddleware {
 				mb_detect_encoding($token, 'UTF-8', true) ? $token : utf8_encode($token)
 		);
 
-		if (!is_null($format)) {
-			$this->setFormat($format, $row, $col);
-		}
+		$this->mergeFormat($format, $row, $col);
 	}
 
 	/**
@@ -469,9 +469,7 @@ class WorkbookMiddleware {
 				PHPExcel_Cell_DataType::TYPE_STRING
 		);
 
-		if (!is_null($format)) {
-			$this->setFormat($format, $row, $col);
-		}
+		$this->mergeFormat($format, $row, $col);
 	}
 
 		/**
@@ -490,9 +488,7 @@ class WorkbookMiddleware {
 				PHPExcel_Cell_DataType::TYPE_NUMERIC
 		);
 
-		if (!is_null($format)) {
-			$this->setFormat($format, $row, $col);
-		}
+		$this->mergeFormat($format, $row, $col);
 	}
 
 	/**
@@ -513,9 +509,7 @@ class WorkbookMiddleware {
 				PHPExcel_Cell_DataType::TYPE_FORMULA
 		);
 
-		if (!is_null($format)) {
-			$this->setFormat($format, $row, $col);
-		}
+		$this->mergeFormat($format, $row, $col);
 	}
 
 	/**
@@ -538,6 +532,13 @@ class WorkbookMiddleware {
 	 */
 	public function setLandscape() {
 		$this->workSheetObj->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+	}
+
+	/**
+	 * Set portrait orientation
+	 */
+	public function setPortrait() {
+		$this->workSheetObj->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
 	}
 
 	/**
@@ -567,6 +568,34 @@ class WorkbookMiddleware {
 	 */
 	public function setZoom($scale) {
 		$this->workSheetObj->getSheetView()->setZoomScale($scale);
+	}
+
+	/**
+	 * Set sheet center horizontal
+	 * @param int $value
+	 */
+	public function centerHorizontally($value){
+		$this->workSheetObj->getPageSetup()->setHorizontalCentered($value == 1 ? true : false);
+	}
+
+	/**
+	 * Set sheet center horizontal
+	 * @param FormatMiddleware $format
+	 * @param int $row
+	 * @param int $col
+	 */
+	protected function mergeFormat($format, $row, $col) {
+		$column = PHPExcel_Cell::stringFromColumnIndex($col);
+
+		if (!is_null($format)) {
+			if (isset($this->formats[$column])) {
+				$format = $format->merge($this->formats[$column]);
+			}
+
+			$this->setFormat($format, $row, $col);
+		} else if (!is_null($this->formats[$column])) {
+			$this->setFormat($this->formats[$column], $row, $col);
+		}
 	}
 
 }

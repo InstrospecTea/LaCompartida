@@ -70,6 +70,7 @@ class FormatMiddleware {
 				$this->valign = PHPExcel_Style_Alignment::VERTICAL_TOP;
 				break;
 			case 'middle':
+			case 'center':
 				$this->valign = PHPExcel_Style_Alignment::VERTICAL_CENTER;
 				break;
 			case 'vjustify':
@@ -181,10 +182,18 @@ class FormatMiddleware {
 	public function getElements() {
 		$elements = [];
 		foreach ($this as $key => $value) {
-			$elements[$key] = $value;
+			if (!is_null($value)) {
+				$elements[$key] = $value;
+			}
 		}
 
 		return $elements;
+	}
+
+	public function merge($format = null) {
+		$elements = $this->getElements() + $format->getElements();
+
+		return new self($elements);
 	}
 
 	/**
@@ -249,7 +258,7 @@ class FormatMiddleware {
 	 */
 	private function getColor($color) {
 		if (!ctype_xdigit($color)) {
-			switch ($color) {
+			switch (strtolower($color)) {
 				case 'black':
 					return PHPExcel_Style_Color::COLOR_BLACK;
 					break;

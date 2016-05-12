@@ -121,7 +121,7 @@ jQuery(function() {
 			type: 'POST',
 			success: function(respuesta) {
 				if (respuesta != null) {
-					agregarCanvas('hito', jQuery('#contenedor_grafico_hito'));
+					agregarCanvas('hito', jQuery('#contenedor_grafico_hito'), respuesta['name_chart']);
 					var canvas = jQuery("#grafico_hito")[0];
 					var context = canvas.getContext('2d');
 
@@ -130,6 +130,9 @@ jQuery(function() {
 					}
 
 					graficoBarraHito = new Chart(context).Bar(respuesta);
+				} else {
+					jQuery('#contenedor_grafico_hito').empty();
+					jQuery('#contenedor_grafico_hito').append('<h3>No exiten datos para generar el gráfico</h3>');
 				}
 			},
 			error: function(e) {
@@ -138,13 +141,16 @@ jQuery(function() {
 		});
 	});
 
-	function agregarCanvas(id, contenedor) {
+	function agregarCanvas(id, contenedor, titulo) {
 		var canvas = document.createElement('canvas');
+		var h3 = document.createElement('h3');
 		canvas.width = 600;
 		canvas.height = 400;
 		canvas.id = 'grafico_' + id;
+		h3.innerHTML = titulo;
 
 		contenedor.empty();
+		contenedor.append(h3);
 		contenedor.append(canvas);
 	}
 });
