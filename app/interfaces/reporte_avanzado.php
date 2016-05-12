@@ -221,7 +221,6 @@ $ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario que corresp
 
 $ReporteAvanzado->glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado totalmente");
 $ReporteAvanzado->glosa_dato['valor_por_pagar'] = __("Valor Cobrado que aún no ha sido pagado");
-$ReporteAvanzado->glosa_dato['valor_por_pagar_parcial'] = __("Valor Por Pagar de un Cobro que ha sido pagado parcialmente");
 $ReporteAvanzado->glosa_dato['valor_por_cobrar'] = __("Valor monetario estimado que corresponde a cada Profesional en horas por cobrar");
 $ReporteAvanzado->glosa_dato['valor_incobrable'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable");
 $ReporteAvanzado->glosa_dato['valor_trabajado_estandar'] = __("Horas Trabajadas por THH Estándar, para todo Trabajo");
@@ -246,7 +245,7 @@ $explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
 $explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
 $explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
 $explica_periodo_envio = 'Sólo considera Trabajos en Cobros con fecha de envío en el Periodo';
-$explica_periodo_facturacion = 'Sólo considera Trabajos en Cobros con fecha de facturación en el Periodo';
+$explica_periodo_facturacion = 'Sólo considera Trabajos en Documentos tributarios emitidos en el Periodo';
 
 /* Calculos de fechas */
 $hoy = date("Y-m-d");
@@ -379,6 +378,7 @@ if (!$popup) {
 		var tipos_moneda = <?php echo json_encode(array_values(ReporteCriteria::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
 		var urlAjaxReporteAvanzado = '<?php echo Conf::RootDir(); ?>/app/interfaces/ajax/reporte_avanzado.php';
+		var mapPeriodos = <?php echo json_encode(array_values(ReporteCriteria::mapPeriodos())); ?>;
 		var buttonsReporte = {
 			'<?php echo __('Guardar') ?>': GuardarReporte,
 			'<?php echo __('Cancelar') ?>': function() {
@@ -758,7 +758,7 @@ if (!$popup) {
 													</span>
 												</td>
 												<td align=left>
-													<label for="campo_fecha_cobro" title=""><?php echo __("Corte") ?></label>
+													<label for="campo_fecha_cobro" title=""><?php echo __("Liquidación - Corte") ?></label>
 												</td>
 											</tr>
 											<tr>
@@ -780,7 +780,7 @@ if (!$popup) {
 													</span>
 												</td>
 												<td align=left>
-													<label for="campo_fecha_emision" title="<?php echo __($explica_periodo_emision) ?>"><?php echo __("Emisión") ?></label>
+													<label for="campo_fecha_emision" title="<?php echo __($explica_periodo_emision) ?>"><?php echo __("Liquidación - Emisión") ?></label>
 												</td>
 											</tr>
 											<tr>
@@ -802,7 +802,7 @@ if (!$popup) {
 													</span>
 												</td>
 												<td align="left">
-													<label title="<?php echo __($explica_periodo_envio) ?>" for="campo_fecha_envio"><?php echo __('Envio'); ?></label>
+													<label title="<?php echo __($explica_periodo_envio) ?>" for="campo_fecha_envio"><?php echo __('Liquidación - Envio'); ?></label>
 												</td>
 											</tr>
 											<tr>
@@ -824,7 +824,7 @@ if (!$popup) {
 													</span>
 												</td>
 												<td align="left">
-													<label title="<?php echo __($explica_periodo_facturacion) ?>" for="campo_fecha_facturacion"><?php echo __('Facturación'); ?></label>
+													<label title="<?php echo __($explica_periodo_facturacion) ?>" for="campo_fecha_facturacion"><?php echo __('Documento Tributario'); ?></label>
 												</td>
 											</tr>
 											<tr>
@@ -834,7 +834,7 @@ if (!$popup) {
 												<td align=left colspan=3>
 													<span onclick="jQuery('#fecha_corta_selector').click()">
 														<?php echo Html::SelectArrayDecente($meses, 'fecha_mes', $fecha_mes, 'id="fecha_mes"', '', '90px'); ?>
-														<?php echo Html::SelectArrayDecente($anios, 'fecha_anio', $fecha_anio, 'id="fecha_anio"', '', '55px'); ?>
+														<?php echo Html::SelectArrayDecente($anios, 'fecha_anio', $fecha_anio, 'id="fecha_anio"', '', '65px'); ?>
 													</span>
 												</td>
 											</tr>
