@@ -777,18 +777,53 @@ function SeleccionarAnual() {
 	ActualizarNuevoReporte();
 }
 
+function VerificarBotonesSeleccionados (tipos) {
+	var botonPresionado = jQuery('.boton_presionado.boton_disabled:not(.boton_comparar)');
+	var botonComparar = jQuery('.boton_tipo_dato.boton_comparar.boton_disabled	');
+
+	if (botonPresionado.length > 0) {
+		jQuery('input[name=tinta][value=rojo]').click();
+		jQuery('.boton_tipo_dato[id=' + tipos[0] + ']').click();
+	}
+
+	if (botonComparar.length > 0) {
+		jQuery('input[name=tinta][value=azul]').click();
+		jQuery('.boton_tipo_dato[id=' + tipos[1] + ']').click();
+	}
+}
+
+function VerificarOpcionesSeleccionadas (tipos) {
+	var botonPresionado = jQuery("#tipo_dato option:disabled:checked");
+	var botonComparar = jQuery("#tipo_dato_comparado option:disabled:checked");
+
+	if (botonPresionado.length > 0) {
+		jQuery('input[name=tinta][value=rojo]').click();
+		jQuery("#tipo_dato option[value='" + tipos[0] + "']").click();
+	}
+
+	if (botonComparar.length > 0) {
+		jQuery('input[name=tinta][value=azul]').click();
+		jQuery("#tipo_dato option[value='" + tipos[1] + "']").click();
+	}
+}
+
 function HabilitaTiposDeDatos ()  {
 	var value = jQuery('[name=campo_fecha]:checked').val();
 	var tipos = mapPeriodos[value];
 
 	var selectorEnableOptions = "#tipo_dato option[value='" + tipos.join("'],option[value='") + "']";
+	var selectorEnableComparableOptions = "#tipo_dato_comparado option[value='" + tipos.join("'],option[value='") + "']";
 	var selectorEnableButtons = ".boton_tipo_dato[id='" + tipos.join("'],.boton_tipo_dato[id='") + "']";
 
-	jQuery('#tipo_dato option').prop('disabled', true);
+	jQuery('#tipo_dato option, #tipo_dato_comparado option').prop('disabled', true);
 	jQuery('.boton_tipo_dato').addClass('boton_disabled');
 
 	jQuery(selectorEnableOptions).prop('disabled', false);
 	jQuery(selectorEnableButtons).removeClass('boton_disabled');
+	jQuery(selectorEnableComparableOptions).removeClass('boton_disabled');
+
+	VerificarBotonesSeleccionados(tipos);
+	VerificarOpcionesSeleccionadas(tipos);
 }
 
 jQuery(document).ready(function() {
