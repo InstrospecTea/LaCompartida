@@ -712,17 +712,17 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 								<?php
 								if (!$Asunto->Loaded()) {
 									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioDatosFacturacion(this.value);');
 									} else {
-										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioDatosFacturacion(this.value);');
 									}
 								} else {
 									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-										$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'nuevo_codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' class="nuevo_codigo_cliente secundario" ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
+										$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'nuevo_codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' class="nuevo_codigo_cliente secundario" ', 'SetearLetraCodigoSecundario(); CambioDatosFacturacion(this.value);', 300);
 										$_codigo_cliente = $Cliente->fields['codigo_cliente_secundario'];
 										$_name = 'codigo_cliente_secundario';
 									} else {
-										$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'nuevo_codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' class="nuevo_codigo_cliente" ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
+										$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'nuevo_codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' class="nuevo_codigo_cliente" ', 'CambioDatosFacturacion(this.value);', 300);
 										$_codigo_cliente = ($Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente']);
 										$_name = 'codigo_cliente';
 									}
@@ -988,10 +988,6 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 
 <script type="text/javascript">
 jQuery('document').ready(function () {
-	jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function () {
-		CambioEncargadoSegunCliente(jQuery(this).val());
-	});
-
 	jQuery('#change_client').click(function() {
 		var $ = jQuery;
 		var input_nuevo_codigo = $('input.nuevo_codigo_cliente');
@@ -1017,40 +1013,22 @@ jQuery('document').ready(function () {
 	jQuery("#cobro_independiente").trigger("change");
 });
 
-function CambioEncargadoSegunCliente(idcliente) {
-	var CopiarEncargadoAlAsunto = <?php echo (Conf::GetConf($Sesion, "CopiarEncargadoAlAsunto") ? '1' : '0'); ?>;
-	var UsuarioSecundario = <?php echo (Conf::GetConf($Sesion, 'EncargadoSecundario') ? '1' : '0' ); ?>;
-	var ObligatorioEncargadoSecundarioAsunto = <?php echo (Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioAsunto') ? '1' : '0' ); ?>;
-	jQuery('#id_usuario_secundario').removeAttr('disabled');
-	jQuery('#id_usuario_responsable').removeAttr('disabled');
-	jQuery.post('../ajax.php', {accion: 'busca_encargado_por_cliente', codigobuscado: idcliente}, function (data) {
-		var ladata = data.split('|');
-		jQuery('#id_usuario_responsable').removeAttr('disabled').val(ladata[0]);
-		if (ladata[1] && jQuery('#id_usuario_secundario option[value=' + ladata[1] + ']').length > 0) {
-			if (UsuarioSecundario) {
-				jQuery('#id_usuario_secundario').removeAttr('disabled').val(ladata[1]);
-			}
-		} else {
-			if (ladata[2]) {
-				jQuery('#id_usuario_secundario').append('<option value="' + ladata[1] + '" selected="selected">' + ladata[2] + '</option>').attr({'disabled': ''}).val(ladata[1]);
-			}
-		}
-
-		jQuery('#id_usuario_responsable').removeAttr('disabled');
-		if (CopiarEncargadoAlAsunto) {
-			jQuery('#id_usuario_responsable').attr({'disabled': 'disabled'});
-			if (UsuarioSecundario) {
-				jQuery('#id_usuario_secundario').attr({'disabled': 'disabled'});
-			}
-		} else if (ObligatorioEncargadoSecundarioAsunto) {
-			if (UsuarioSecundario) {
-				jQuery('#id_usuario_secundario').removeAttr('disabled');
-			}
-		}
-
-		jQuery('#id_usuario_responsable, #id_usuario_secundario').removeClass('loadingbar');
-	});
-	jQuery('#id_usuario_responsable, #id_usuario_secundario').addClass('loadingbar');
+/**
+ * Si el usuario no está en la lista se agrega
+ * @param {type} data
+ * @returns {undefined|Boolean}
+ */
+function agregarUsuarioSecundario(data) {
+	var id = data.id_usuario_secundario || null;
+	if (id === null) {
+		return;
+	}
+	var element_id = '#id_usuario_secundario';
+	if (!jQuery(element_id).length || jQuery(element_id).find('option[value=' + id + ']').length) {
+		return false;
+	}
+	var $option = jQuery('<option/>', {value: id, text: data.nombre_usuario_secundario});
+	jQuery(element_id).append($option);
 }
 
 function CambioDatosFacturacion(id_cliente) {
@@ -1060,16 +1038,22 @@ function CambioDatosFacturacion(id_cliente) {
 		if (!response) {
 			return;
 		}
-
+		agregarUsuarioSecundario(response);
 		jQuery.each(response, function (field_name, value) {
 			var $field = jQuery('[name="' + field_name + '"]');
-			if ($field !== undefined) {
-				if ($field.is('[type=radio]')) {
-					$field.removeAttr('checked');
-					$field.filter('[value=' + value + ']').attr('checked', true).change().click();
-				} else {
-					$field.val(value);
-				}
+			if ($field === undefined) {
+				return true;
+			}
+			if ($field.is('[type=radio]')) {
+				$field.removeAttr('checked');
+				$field.filter('[value="' + value + '"]').attr('checked', true).change().click();
+			} else {
+				$field.val(value);
+			}
+			if (field_name === 'id_banco' && response.id_cuenta) {
+				jQuery.ajaxSetup({async: false});
+				$field.change();
+				jQuery.ajaxSetup({async: true});
 			}
 		});
 	}, 'json');
