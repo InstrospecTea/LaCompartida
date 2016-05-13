@@ -20,7 +20,10 @@ class ClientsController extends AbstractController {
 			'monto',
 			'id_moneda_monto',
 			'opc_moneda_total',
-			'id_usuario_responsable'
+			'id_usuario_responsable',
+			'BankAccount.id_banco',
+			'id_cuenta',
+			'id_estudio'
 		);
 
 	public function getContractData($client_code = null) {
@@ -30,6 +33,7 @@ class ClientsController extends AbstractController {
 		$codigo_cliente_key = Configure::read('CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
 		$searchCriteria = new SearchCriteria('Contract');
 		$searchCriteria->related_with('Client')->on_property('codigo_cliente');
+		$searchCriteria->related_with('BankAccount')->on_property('id_cuenta');
 		$searchCriteria->filter("{$codigo_cliente_key}")->for_entity('Client')->compare_with("'{$client_code}'");
 		$searchCriteria->filter('id_contrato')->restricted_by('equals')->compare_with('Client.id_contrato');
 		$fields = $this->contractDataFields;

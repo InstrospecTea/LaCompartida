@@ -1052,13 +1052,19 @@ function CambioDatosFacturacion(id_cliente) {
 		agregarUsuarioSecundario(response);
 		jQuery.each(response, function (field_name, value) {
 			var $field = jQuery('[name="' + field_name + '"]');
-			if ($field !== undefined) {
-				if ($field.is('[type=radio]')) {
-					$field.removeAttr('checked');
-					$field.filter('[value="' + value + '"]').attr('checked', true).change().click();
-				} else {
-					$field.val(value);
-				}
+			if ($field === undefined) {
+				return true;
+			}
+			if ($field.is('[type=radio]')) {
+				$field.removeAttr('checked');
+				$field.filter('[value="' + value + '"]').attr('checked', true).change().click();
+			} else {
+				$field.val(value);
+			}
+			if (field_name === 'id_banco' && response.id_cuenta) {
+				jQuery.ajaxSetup({async: false});
+				$field.change();
+				jQuery.ajaxSetup({async: true});
 			}
 		});
 	}, 'json');
