@@ -60,13 +60,13 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 		$invoiceFactor = $this->invoiceFactor();
 		$invoiceContrib = $this->getInvoiceContribution();
 
-		$billed_amount = '
+		$billed_amount = "
 			SUM({$invoiceContrib} * {$invoiceFactor}
 				* (cobro.monto_subtotal - cobro.descuento)
 				* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
-		';
+		";
 
 		$Criteria
 			->add_select($billed_amount, 'valor_facturado');

@@ -364,6 +364,7 @@ class ReporteCriteria {
 		// pr($this->id_moneda);
 
 		$calculator_name = $this->calculationMapping[$this->tipo_dato];
+
 		$reflectedClass = new ReflectionClass("{$calculator_name}DataCalculator");
 		$calculator = $reflectedClass->newInstance(
 			$this->sesion,
