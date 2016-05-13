@@ -777,6 +777,20 @@ function SeleccionarAnual() {
 	ActualizarNuevoReporte();
 }
 
+function HabilitaTiposDeDatos ()  {
+	var value = jQuery('[name=campo_fecha]:checked').val();
+	var tipos = mapPeriodos[value];
+
+	var selectorEnableOptions = "#tipo_dato option[value='" + tipos.join("'],option[value='") + "']";
+	var selectorEnableButtons = ".boton_tipo_dato[id='" + tipos.join("'],.boton_tipo_dato[id='") + "']";
+
+	jQuery('#tipo_dato option').prop('disabled', true);
+	jQuery('.boton_tipo_dato').addClass('boton_disabled');
+
+	jQuery(selectorEnableOptions).prop('disabled', false);
+	jQuery(selectorEnableButtons).removeClass('boton_disabled');
+}
+
 jQuery(document).ready(function() {
 	if (jQuery('#comparar').is(':checked')) {
 		jQuery('#tabla, #dispersion').css('display', 'inline-block').show();
@@ -852,8 +866,12 @@ jQuery(document).ready(function() {
 
 	});
 
+
+	jQuery('[name=campo_fecha]').click(HabilitaTiposDeDatos);
+
 	CargarReporte();
 	TipoDato();
+	HabilitaTiposDeDatos();
 
 	jQuery('.boton_tipo_dato').click(function() {
 		TipoDato(jQuery(this).attr('id'));

@@ -27,6 +27,7 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
  * |  |  +-- valor_visible: (no implementado)
  * |  |  |  +-- valor_cobrado: Valor monetario que corresponde a cada Profesional, en una Liquidación ya Emitida
  * |  |  |  +-- valor_facturado: El valor facturado de una liquidación
+ * |  |  |  +-- valor_facturado_contable: El valor facturado considerando conceptos contables
  * |  |  |  +-- valor_tramites: Valor monetario de trámites que corresponde a cada Profesional, en una Liquidación ya Emitida
  * |  |  |  |  +-- valor_pagado: Valor Cobrado que ha sido Pagado
  * |  |  |  |  +-- valor_por_pagar: Valor Cobrado que aún no ha sido pagado
@@ -52,34 +53,35 @@ class ReporteCriteria {
 	// Establece el mapping entre el tipo de dato y la Clase que lo calcula
 	private $calculationMapping = array(
 		'horas_trabajadas' => 'HorasTrabajadas',
-		'horas_spot' => 'HorasSpot',
+		'horas_cobrables' => 'HorasCobrables',
+		'horas_visibles' => 'HorasVisibles',
+		'horas_cobradas' => 'HorasCobradas',
+		'horas_pagadas' => 'HorasPagadas',
+		'horas_por_pagar' => 'HorasPorPagar',
+		'horas_por_cobrar' => 'HorasPorCobrar',
+		'horas_incobrables' => 'HorasIncobrables',
+		'horas_castigadas' => 'HorasCastigadas',
 		'horas_no_cobrables' => 'HorasNoCobrables',
+		'horas_convenio' => 'HorasConvenio',
+		'horas_spot' => 'HorasSpot',
+		'valor_cobrable' => 'ValorCobrable',
 		'valor_cobrado' => 'ValorCobrado',
 		'valor_facturado' => 'ValorFacturado',
-		'horas_castigadas' => 'HorasCastigadas',
-		'horas_cobrables' => 'HorasCobrables',
-		'horas_cobradas' => 'HorasCobradas',
-		'horas_convenio' => 'HorasConvenio',
-		'horas_incobrables' => 'HorasIncobrables',
-		'horas_pagadas' => 'HorasPagadas',
-		'horas_por_cobrar' => 'HorasPorCobrar',
-		'horas_por_pagar' => 'HorasPorPagar',
-		'horas_visibles' => 'HorasVisibles',
-		'costo' => 'Costo',
-		'costo_hh' => 'CostoHh',
-		'diferencia_valor_estandar' => 'DiferenciaValorEstandar',
-		'rentabilidad' => 'Rentabilidad',
-		'rentabilidad_base' => 'RentabilidadBase',
-		'valor_cobrable' => 'ValorCobrable',
-		'valor_cobrado_no_estandar' => 'ValorCobradoNoEstandar',
-		'valor_estandar' => 'ValorCobradoEstandar',
-		'valor_hora' => 'ValorHora',
+		'valor_facturado_contable' => 'ValorFacturadoContable',
+		'valor_tramites' => 'ValorCobradoTramites',
 		'valor_pagado' => 'ValorPagado',
-		'valor_incobrable' => 'ValorIncobrable',
-		'valor_por_cobrar' => 'ValorPorCobrar',
 		'valor_por_pagar' => 'ValorPorPagar',
+		'valor_por_cobrar' => 'ValorPorCobrar',
+		'valor_incobrable' => 'ValorIncobrable',
 		'valor_trabajado_estandar' => 'ValorTrabajadoEstandar',
-		'valor_tramites' => 'ValorCobradoTramites'
+		'valor_estandar' => 'ValorCobradoEstandar',
+		'diferencia_valor_estandar' => 'DiferenciaValorEstandar',
+		'valor_cobrado_no_estandar' => 'ValorCobradoNoEstandar',
+		'valor_hora' => 'ValorHora',
+		'rentabilidad_base' => 'RentabilidadBase',
+		'rentabilidad' => 'Rentabilidad',
+		'costo' => 'Costo',
+		'costo_hh' => 'CostoHh'
 	);
 
 	// Arreglos con filtros custom que se piden desde afuera addFiltro()
@@ -123,13 +125,51 @@ class ReporteCriteria {
 	 * TODO: Refactorizar a Abstractos
 	 */
 	public static function getTiposMoneda() {
-		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_facturado','valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'rentabilidad', 'rentabilidad_base', 'valor_cobrable');
+		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_facturado_contable', 'valor_facturado','valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'rentabilidad', 'rentabilidad_base', 'valor_cobrable');
 	}
 
 	public static function mapPeriodos() {
-		return array(
-			'campo_fecha_cobro'
+		$mapping = array(
+			'horas_trabajadas' => array('trabajo'),
+			'horas_cobrables' => array('trabajo'),
+			'horas_visibles' => array('trabajo'),
+			'horas_cobradas' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'horas_pagadas' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'horas_por_pagar' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'horas_por_cobrar' => array('trabajo', 'cobro'),
+			'horas_incobrables' => array('trabajo', 'cobro'),
+			'horas_castigadas' => array('trabajo'),
+			'horas_no_cobrables' => array('trabajo'),
+			'horas_convenio' => array('trabajo', 'cobro'),
+			'horas_spot' => array('trabajo', 'cobro'),
+			'valor_cobrable' => array('trabajo', 'cobro'),
+			'valor_cobrado' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'valor_facturado' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'valor_facturado_contable' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'valor_tramites' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'valor_pagado' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'valor_por_pagar' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'valor_por_cobrar' => array('trabajo', 'cobro'),
+			'valor_incobrable' => array('trabajo', 'cobro'),
+			'valor_trabajado_estandar' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'valor_estandar' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'diferencia_valor_estandar' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'valor_cobrado_no_estandar' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'valor_hora' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'rentabilidad_base' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'rentabilidad' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'costo' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'costo_hh' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion')
 		);
+
+		$result = array();
+		foreach ($mapping as $tipo => $fechas) {
+			foreach ($fechas as $fecha) {
+				$result[$fecha][] = $tipo;
+			}
+		}
+
+		return $result;
 	}
 
 	/**
@@ -887,6 +927,7 @@ class ReporteCriteria {
 			case "valor_cobrado_no_estandar":
 			case "valor_cobrado":
 			case "valor_facturado":
+			case "valor_facturado_contable":
 			case "valor_tramites":
 			case "valor_pagado":
 			case "valor_cobrable":
@@ -934,6 +975,7 @@ class ReporteCriteria {
 			case "valor_por_cobrar":
 			case "valor_cobrado":
 			case "valor_facturado":
+			case "valor_facturado_contable":
 			case "valor_cobrable":
 			case "valor_tramites":
 			case "valor_pagado":
@@ -963,6 +1005,7 @@ class ReporteCriteria {
 			case "valor_por_cobrar":
 			case "valor_cobrado":
 			case "valor_facturado":
+			case "valor_facturado_contable":
 			case "valor_tramites":
 			case "valor_cobrado_no_estandar":
 			case "valor_pagado":

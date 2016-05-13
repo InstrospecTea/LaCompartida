@@ -65,36 +65,38 @@ while ($reporte_encontrado = mysql_fetch_assoc($resp_mis_reportes)) {
 }
 
 /* REPORTE AVANZADO. ESTA PANTALLA SOLO TIENE INPUTS DEL USUARIO. SUBMIT LLAMA AL TIPO DE REPORTE SELECCIONADO */
-$pagina->titulo = __('Resumen actividades profesionales');
+$pagina->titulo = __('Reporte Avanzado');
 
 $tipos_de_dato = array(
 	'horas_trabajadas',
 	'horas_cobrables',
-	'horas_no_cobrables',
-	'horas_castigadas',
 	'horas_visibles',
 	'horas_cobradas',
-	'horas_por_cobrar',
 	'horas_pagadas',
 	'horas_por_pagar',
+	'horas_por_cobrar',
 	'horas_incobrables',
+	'horas_castigadas',
+	'horas_no_cobrables',
+	'horas_convenio',
 	'horas_spot',
 	'valor_cobrable',
-	'valor_por_cobrar',
 	'valor_cobrado',
 	'valor_facturado',
-	'valor_por_pagar',
+	'valor_facturado_contable',
+	'valor_tramites',
 	'valor_pagado',
+	'valor_por_pagar',
+	'valor_por_cobrar',
 	'valor_incobrable',
-	'rentabilidad',
-	'rentabilidad_base',
-	'valor_hora',
-	'diferencia_valor_estandar',
-	'valor_estandar',
 	'valor_trabajado_estandar',
+	'valor_estandar',
+	'diferencia_valor_estandar',
+	'valor_hora',
+	'rentabilidad_base',
+	'rentabilidad',
 	'costo',
-	'costo_hh',
-	'valor_tramites'
+	'costo_hh'
 );
 
 $tipos_de_dato_select = array();
@@ -318,9 +320,9 @@ if (!$popup) {
 			border-color: blue;
 		}
 		td.boton_disabled {
-			border-color: #e5e5e5;
-			background-color: #e5e5e5;
-			color: #444444;
+			border-color: #CCC;
+			background-color: #EEE;
+			color: #888;
 			cursor: default;
 		}
 		td.borde_rojo {
@@ -378,7 +380,7 @@ if (!$popup) {
 		var tipos_moneda = <?php echo json_encode(array_values(ReporteCriteria::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
 		var urlAjaxReporteAvanzado = '<?php echo Conf::RootDir(); ?>/app/interfaces/ajax/reporte_avanzado.php';
-		var mapPeriodos = <?php echo json_encode(array_values(ReporteCriteria::mapPeriodos())); ?>;
+		var mapPeriodos = <?php echo json_encode(ReporteCriteria::mapPeriodos()); ?>;
 		var buttonsReporte = {
 			'<?php echo __('Guardar') ?>': GuardarReporte,
 			'<?php echo __('Cancelar') ?>': function() {
@@ -1040,7 +1042,8 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->select_moneda() ?>
 								<?php echo $ReporteAvanzado->nada(5) ?>
 								<?php echo $ReporteAvanzado->celda('valor_facturado') ?>
-
+								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
+								<?php echo $ReporteAvanzado->celda('valor_facturado_contable') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(12) ?>
