@@ -94,22 +94,21 @@ class ReportController extends AbstractController {
 
 			if (empty($this->data['start_date']) || empty($this->data['end_date'])) {
 				throw new Exception(__('Filtros de fecha sin contenido'));
-			} else {
-				if (!DateTime::createFromFormat('Y-m-d', $this->data['start_date'])) {
-					$this->data['start_date'] = date('Y-m-d', strtotime($this->data['start_date']));
-				}
-				if (!DateTime::createFromFormat('Y-m-d', $this->data['end_date'])) {
-					$this->data['end_date'] = date('Y-m-d', strtotime($this->data['end_date']));
-				}
+			}
+
+			if (!DateTime::createFromFormat('Y-m-d', $this->data['start_date'])) {
+				$this->data['start_date'] = date('Y-m-d', strtotime($this->data['start_date']));
+			}
+			if (!DateTime::createFromFormat('Y-m-d', $this->data['end_date'])) {
+				$this->data['end_date'] = date('Y-m-d', strtotime($this->data['end_date']));
 			}
 
 			$Currency = $this->CoiningBusiness->getCurrency($this->data['display_currency']);
 			if (empty($Currency)) {
 				throw new Exception(__('No existe la moneda seleccionada'));
-			} else {
-				$this->data['display_currency'] = $Currency;
 			}
 
+			$this->data['display_currency'] = $Currency;
 			if (!empty($this->data['company'])) {
 				$Company = $this->ParameterizingBusiness->get('Company', $this->data['company']);
 				$this->data['company_name'] = $Company->fields['glosa_estudio'];

@@ -10,6 +10,7 @@ class Log {
 	public $logFile = 'app';
 	public $logFolder = null;
 	public $debug = false;
+	private static $instance;
 
 	public function __construct() {
 		$this->logFolder = self::getFolder();
@@ -26,7 +27,7 @@ class Log {
 	}
 
 	public static function write($text = '', $file_name = null) {
-		$me = new self;
+		$me = self::getInstance();
 		if (!empty($file_name)) {
 			$me->logFile = $file_name;
 		}
@@ -42,11 +43,13 @@ class Log {
 	}
 
 	private function writeFile($text, $file) {
-		try {
-			$fp = fopen($file, 'a');
-			fwrite($fp, $text);
-			fclose($fp);
-		} catch(Exception $e) {
+		file_put_contents($file, $text, FILE_APPEND);
+	}
+
+	public function getInstance() {
+		if (empty(self::$instance)) {
+			self::$instance = new self;
 		}
+		return self::$instance;
 	}
 }

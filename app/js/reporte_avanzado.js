@@ -883,7 +883,7 @@ jQuery(document).ready(function() {
 			vista[i] = jQuery(this).val();
 		});
 		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="barras" />');
-		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista + '" />');
+		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista.toString().replace(',', '-') + '" />');
 		jQuery('#iframereporte').empty();
 
 		jQuery.ajax({
@@ -923,7 +923,7 @@ jQuery(document).ready(function() {
 			vista[i] = jQuery(this).val();
 		});
 		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="circular" />');
-		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista + '" />');
+		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista.toString().replace(',', '-') + '" />');
 		jQuery('#iframereporte').empty();
 
 		jQuery.ajax({
@@ -974,7 +974,7 @@ jQuery(document).ready(function() {
 			vista[i] = jQuery(this).val();
 		});
 		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="dispersion" />');
-		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista + '" />');
+		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista.toString().replace(',', '-') + '" />');
 		jQuery('#iframereporte').empty();
 
 		jQuery.ajax({

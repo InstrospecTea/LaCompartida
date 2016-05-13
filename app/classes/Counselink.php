@@ -41,9 +41,7 @@ class Counselink extends Ledes{
 		$Cobro->Load($id_cobro);
 		$Contrato = new Contrato($this->sesion);
 		$Contrato->Load($Cobro->fields['id_contrato']);
-		if ($Contrato->fields['usa_impuesto_separado']) {
-			$this->format = 'LEDES98BI V2';
-		}
+		$this->format = $Contrato->fields['tipo_ledes'];
 		$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $id_cobro);
 		$this->x_resultados = $x_resultados;
 		$gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $id_cobro);

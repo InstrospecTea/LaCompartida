@@ -1,5 +1,58 @@
 # Changelog
 
+## Hotfix 16.12.5
+Thursday, May 12th
+* **Fix** [Problema resumen semanal Lloreda-Camacho](https://github.com/LemontechSA/ttb/pull/1449)
+
+## Hotfix 16.12.4
+Tuesday, May 10th
+* **Fix** [Configuración para manejar el uso de clientes](https://github.com/LemontechSA/ttb/pull/1444)
+
+## Hotfix 16.12.3
+Tuesday, May 10th
+* **Fix** [Realiza la conversión de moneda según la moneda de la factura y no la del cobro](https://github.com/LemontechSA/ttb/pull/1442)
+
+## Hotfix 16.12.2
+Tuesday, May 10th
+* **Fix** [Username en Excel Opcional](https://github.com/LemontechSA/ttb/pull/1441)
+
+## Hotfix 16.12.1
+Monday, May 9th
+* **Fix** [Error al descargar Excel](https://github.com/LemontechSA/ttb/pull/1438)
+
+## [Release 16.12.0](https://github.com/LemontechSA/ttb/pull/1436)
+Friday, May 6th
+* **Feature** [Reporte de Gastos](https://github.com/LemontechSA/ttb/pull/1433)
+
+## Hotfix 16.11.6
+Thursday, May 5th
+* **Fix** [Corrige asignación monto_pago al utilizar un adelanto](https://github.com/LemontechSA/ttb/pull/1435)
+
+## Hotfix 16.11.5
+Thursday, May 5th
+* **Fix** [Corrige encabezado de documento ledes erróneo en caso counselink](https://github.com/LemontechSA/ttb/pull/1434)
+
+## Hotfix 16.11.4
+Thursday, April 28th
+* **Fix** [Condiciona la consulta del id_usuarioa que no esté vacío. Llama a errorSQL() en caso de error.](https://github.com/LemontechSA/ttb/pull/1427)
+
+## Hotfix 16.11.3
+Wednesday, April 27th
+* **Fix** [Elimina caracter maligno](https://github.com/LemontechSA/ttb/pull/1425)
+
+## Hotfix 16.11.2
+Wednesday, April 27th
+* **Fix** [Reemplaza UtilesApp::Decimal2Time() por UtilesApp::Decimal2GlosaHora()](https://github.com/LemontechSA/ttb/pull/1424)
+
+## Hotfix 16.11.1
+Wednesday, April 27th
+* **Fix** [Obtiene datos de tarificación del contrato principal](https://github.com/LemontechSA/ttb/pull/1423)
+
+## [Release 16.11.0](https://github.com/LemontechSA/ttb/pull/1420)
+Tuesday, April 26th
+* **Feature** [Nuevo Diseño Detalle Cobro](https://github.com/LemontechSA/ttb/pull/1411)
+* **Feature** [Eliminar liquidaciones](https://github.com/LemontechSA/ttb/pull/1419)
+
 ## [Release 16.10.0](https://github.com/LemontechSA/ttb/pull/1416)
 Thursday, April 21st
 * **Feature** [API v2](https://github.com/LemontechSA/ttb/pull/1414)

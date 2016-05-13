@@ -36,9 +36,9 @@ class UtilesApp extends Utiles {
 	 * @param object $sesion
 	 * @param string $conf
 	 * @return string
-	 *  Ahora comprueba si existe el array $sesion->arrayconf para llenarlo una sola vez y consultar de Ã©l de ahÃ­ en adelante.
+	 *  Ahora comprueba si existe el array $sesion->arrayconf para llenarlo una sola vez y consultar de él de ahí en adelante.
 	 * Si no, intenta usar memcache
-	 * Tiene fallback al cÃ³digo antiguo por si
+	 * Tiene fallback al código antiguo por si
 	 */
 	public static function GetConf(Sesion $Sesion, $conf) {
 		return Conf::GetConf($Sesion, $conf);
@@ -116,7 +116,7 @@ class UtilesApp extends Utiles {
 	}
 
 	/**
-	 * Inserta Campo de Asuntos autocomplete o select segÃºn Conf
+	 * Inserta Campo de Asuntos autocomplete o select según Conf
 	 * @param type $sesion
 	 * @param type $codigo_cliente
 	 * @param type $codigo_cliente_secundario
@@ -176,7 +176,7 @@ class UtilesApp extends Utiles {
 			<td>&nbsp;</td>
 			<td colspan="3">
 				<em>
-					<?php echo __(__('Si Ud. selecciona el') . ' ' . __('asunto') . ', ' . __('se considerarÃ¡n los') . ' ' . __('asuntos') . ' ' . __('que se cobrarÃ¡n en la misma carta.')); ?>
+					<?php echo __(__('Si Ud. selecciona el') . ' ' . __('asunto') . ', ' . __('se considerarán los') . ' ' . __('asuntos') . ' ' . __('que se cobrarán en la misma carta.')); ?>
 				</em>
 			</td>
 		</tr>
@@ -282,7 +282,7 @@ class UtilesApp extends Utiles {
 	#obtener el formato de la fecha segun un query, o el seteado en el idioma por defecto
 
 	public static function ObtenerFormatoFecha($sesion, $query = "") {
-		if (strlen($query) > 0) { //si tiene query para intentar obtener el idioma segÃºn asunto, cobro, u otro ejecutamos query
+		if (strlen($query) > 0) { //si tiene query para intentar obtener el idioma según asunto, cobro, u otro ejecutamos query
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			if (mysql_num_rows($resp) > 0) {
 				list($formato) = mysql_fetch_array($resp);
@@ -485,10 +485,10 @@ class UtilesApp extends Utiles {
 
 		$lista = new ListaTrabajos($sesion, "", $query);
 
-		$dias = array("Lunes", "Martes", "MiÃ©coles", "Jueves", "Viernes", "SÃ¡bado", "Domingo");
+		$dias = array("Lunes", "Martes", "Miécoles", "Jueves", "Viernes", "Sábado", "Domingo");
 
 
-		echo("<br /><br /><strong>Haga clic en algÃºn trabajo para modificarlo</strong><br /><br />");
+		echo("<br /><br /><strong>Haga clic en algún trabajo para modificarlo</strong><br /><br />");
 
 		echo("<table style='width:500px'>");
 		echo("<tr>");
@@ -565,7 +565,7 @@ class UtilesApp extends Utiles {
 	}
 
 	/*
-	  La cuenta corriente funciona sÃ³lo restando de los ingresos para gastos,
+	  La cuenta corriente funciona sólo restando de los ingresos para gastos,
 	  todos los montos_descontados(monto real en pesos) de cada gasto ingresado
 	 */
 
@@ -575,7 +575,7 @@ class UtilesApp extends Utiles {
 	}
 
 	/*
-	  La cuenta del cliente funciona sÃ³lo sumando los montos asociados al cliente
+	  La cuenta del cliente funciona sólo sumando los montos asociados al cliente
 	 */
 
 	public static function TotalCuentaCliente(&$sesion, $codigo_cliente = '') {
@@ -612,7 +612,7 @@ class UtilesApp extends Utiles {
 		return date($format, mktime($h, $m, 0, 0, 0, 0));
 	}
 
-	//FunciÃ³n que revisa contraseÃ±as de web services
+	//Función que revisa contraseñas de web services
 	public static function VerificarPasswordWebServices($usuario, $password) {
 		if ($usuario == Conf::UsuarioWS())
 			if ($password == Conf::PasswordWS())
@@ -631,7 +631,7 @@ class UtilesApp extends Utiles {
 		return sprintf("$h:%02d", $m);
 	}
 
-	// En Excel los tiempos se guardan como nÃºmeros donde 1 equivale a 24 horas.
+	// En Excel los tiempos se guardan como números donde 1 equivale a 24 horas.
 	public static function tiempoExcelASQL($tiempo, $ingresado_via_decimales = false) {
 		$tiempo = str_replace(',', '.', $tiempo);
 		if ($ingresado_via_decimales) {
@@ -642,7 +642,7 @@ class UtilesApp extends Utiles {
 			$m = round(($tiempo * 24 - $h) * 60);
 		}
 
-		// Esta comprobaciÃ³n es necesaria porque la aproximaciÃ³n puede dejar 60 minutos y MySQL no los soporta.
+		// Esta comprobación es necesaria porque la aproximación puede dejar 60 minutos y MySQL no los soporta.
 		if ($m == 60) {
 			$m = 0;
 			++$h;
@@ -688,23 +688,23 @@ class UtilesApp extends Utiles {
 			$pagina->FatalError('Error al cargar el tipo de Documento Legal');
 
 		// P: hoja vertical
-		// mm: todo se mide en milÃ­metros
+		// mm: todo se mide en milímetros
 		// Letter: formato de hoja
 		$pdf = new FPDF('P', 'mm', 'Letter');
 
-		// Dimensiones de una hoja tamaÃ±o carta.
+		// Dimensiones de una hoja tamaño carta.
 		$ancho = 216;
 		$alto = 279;
 
 		$pdf->SetTitle($tipo_documento_legal . " " . $numero_factura);
 
-		// La orientaciÃ³n y formato de la pÃ¡gina son los mismos que del documento
+		// La orientación y formato de la página son los mismos que del documento
 		$pdf->AddPage();
 
 		// Definimos el tipo de letra para todo el documento.
 		$pdf->SetFont('Arial', '', 12);
 
-		// Definir los parÃ¡metros para el formato de moneda
+		// Definir los parámetros para el formato de moneda
 		$simbolo_moneda = Utiles::glosa($sesion, $id_moneda, 'simbolo', 'prm_moneda', 'id_moneda');
 		$cifras_decimales = Utiles::glosa($sesion, $id_moneda, 'cifras_decimales', 'prm_moneda', 'id_moneda');
 
@@ -721,15 +721,15 @@ class UtilesApp extends Utiles {
 		$pdf->SetXY(52, 86);
 		$pdf->Write(4, $RUT_cliente);
 
-		// DirecciÃ³n cliente
-		// Cambia el margen para que aparezca alineado si ocupa mÃ¡s de una lÃ­nea.
+		// Dirección cliente
+		// Cambia el margen para que aparezca alineado si ocupa más de una línea.
 		$pdf->SetLeftMargin(52);
 		$pdf->SetXY(52, 93);
 		$pdf->Write(4, $direccion_cliente);
 
 		$pdf->SetLeftMargin(25);
 
-		// Gastos, estÃ¡n antes que los honorarios porque ocupan solo 1 lÃ­nea, mientras que los honorarios pueden ocupar muchas.
+		// Gastos, están antes que los honorarios porque ocupan solo 1 línea, mientras que los honorarios pueden ocupar muchas.
 		if ($gastos > 0) {
 			$pdf->SetXY(25, 119);
 			$pdf->Write(4, 'Gastos Reembolsables');
@@ -767,7 +767,7 @@ class UtilesApp extends Utiles {
 			$pdf->Write(4, $motivo_documento_legal);
 		}
 
-		// DescripciÃ³n (detalle)
+		// Descripción (detalle)
 		$pdf->SetRightMargin($ancho - 150);
 		$pdf->SetXY(25, 127);
 		$pdf->Write(4, $descripcion);
@@ -776,13 +776,13 @@ class UtilesApp extends Utiles {
 		$pdf->SetXY(165, 127);
 		$pdf->Cell(20, 4, $simbolo_moneda . ' ' . number_format($honorarios, $cifras_decimales, ',', '.'), 0, 0, 'R');
 
-		// InformaciÃ³n bancaria
+		// Información bancaria
 		if (method_exists('Conf', 'GetConf')) {
 			$pdf->SetXY(25, 180);
-			$pdf->Write(4, __('InformaciÃ³n Bancaria') . ":\n" . Conf::GetConf($sesion, 'InformacionBancaria'));
+			$pdf->Write(4, __('Información Bancaria') . ":\n" . Conf::GetConf($sesion, 'InformacionBancaria'));
 		} else if (method_exists('Conf', 'InformacionBancaria')) {
 			$pdf->SetXY(25, 180);
-			$pdf->Write(4, __('InformaciÃ³n Bancaria') . ":\n" . Conf::InformacionBancaria());
+			$pdf->Write(4, __('Información Bancaria') . ":\n" . Conf::InformacionBancaria());
 		}
 
 		// Subtotal
@@ -798,10 +798,10 @@ class UtilesApp extends Utiles {
 		$pdf->Output();
 	}
 
-	// Se asume que no existen feriados, los dÃ­as hÃ¡biles son de lunes a viernes.
-	// Las posibilidades de segundo dÃ­a hÃ¡bil son M2, W2, J2, V2, L4, M4 y M3.
+	// Se asume que no existen feriados, los días hábiles son de lunes a viernes.
+	// Las posibilidades de segundo día hábil son M2, W2, J2, V2, L4, M4 y M3.
 	public static function esSegundoDiaHabilDelMes() {
-		$dia = date('N'); // dÃ­a entre 1 y 7
+		$dia = date('N'); // día entre 1 y 7
 		switch (date('j')) {
 			case 2:
 				if ($dia > 1 && $dia < 6)
@@ -836,11 +836,11 @@ class UtilesApp extends Utiles {
 		return $meses;
 	}
 
-	// Se asume que no existen feriados, los dÃ­as hÃ¡biles son de lunes a viernes.
+	// Se asume que no existen feriados, los días hábiles son de lunes a viernes.
 	public static function esUltimoDiaHabilDelMes($timestamp = '') {
 		if ($timestamp == '') {
-			$dia_semana = date('N'); // dÃ­a entre 1 y 7
-			$dia_mes = date('j');  // dÃ­a entre 1 y 31
+			$dia_semana = date('N'); // día entre 1 y 7
+			$dia_mes = date('j');  // día entre 1 y 31
 			$mes = date('n');   // mes entre 1 y 12
 		} else {
 			$dia_semana = date('N', $timestamp);
@@ -855,14 +855,14 @@ class UtilesApp extends Utiles {
 		return false;
 	}
 
-	// Asumiendo que el logo no cambia durante la ejecuciÃ³n, podemos tener precalculada su altura para no tener que leer el archivo cada vez.
+	// Asumiendo que el logo no cambia durante la ejecución, podemos tener precalculada su altura para no tener que leer el archivo cada vez.
 	var $altura_logo_excel;
 
 	public static function AlturaLogoExcel() {
 		global $sesion;
 		if (isset($altura_logo_excel))
 			return $altura_logo_excel;
-		// Este cÃ³digo estÃ¡ basado en SpreadsheetExcelWriter de PearPHP.
+		// Este código está basado en SpreadsheetExcelWriter de PearPHP.
 		//FFF se pasa el path del logo a la DB $bitmap = Conf::LogoExcel();
 
 		$bitmap = Conf::GetConf($sesion, 'LogoExcel');
@@ -895,7 +895,7 @@ class UtilesApp extends Utiles {
 		return .75 * $altura_logo_excel;
 	}
 
-	//Imprime el menÃº
+	//Imprime el menú
 	public static function PrintMenuDisenoNuevojQuery($sesion, $url_actual) {
 		$actual = explode("?", $url_actual);
 		$url_actual = $actual[0];
@@ -980,7 +980,7 @@ HTML;
 				$glosa_submenu = __($row2['glosa']);
 				$codigo_submenu = $row2['codigo'];
 				if (($codigo_submenu == 'MPDF' && Conf::GetConf($sesion, 'MostrarMenuMantencionPDF') == '0') || ($codigo_submenu == 'SOL_AD' && Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos') == '0')) {
-					//era mas fÃ¡cil escribir el filtro de esta forma
+					//era mas fácil escribir el filtro de esta forma
 					continue;
 				} else {
 					if ($j == 0 && $i == 0) {
@@ -1028,7 +1028,7 @@ HTML;
 			$glosa_submenu = __($row3['glosa']);
 			$codigo_submenu = $row3['codigo'];
 			if (($codigo_submenu == 'MPDF' && Conf::GetConf($sesion, 'MostrarMenuMantencionPDF') == '0') || ($codigo_submenu == 'SOL_AD' && Conf::GetConf($sesion, 'UsarModuloSolicitudAdelantos') == '0')) {
-				//era mas fÃ¡cil escribir el filtro de esta forma
+				//era mas fácil escribir el filtro de esta forma
 				continue;
 			} else {
 				if ($url_actual == $row3['url']) {
@@ -2159,8 +2159,8 @@ HTML;
 	}
 
 	/**
-	 * Convierte cada llave-valor en UTF-8 cuando corresponda, el parÃ¡metro
-	 * $encode permite realizar la acciÃ³n inversa
+	 * Convierte cada llave-valor en UTF-8 cuando corresponda, el parámetro
+	 * $encode permite realizar la acción inversa
 	 * @param mixed $data Arreglo o string a modificar
 	 * @param boolean $encode encode (true) o decode (false)
 	 * @return mixed
@@ -2168,7 +2168,7 @@ HTML;
 	public static function utf8izar($data, $encode = true) {
 		if (is_array($data)) {
 			foreach ($data as $key => $value) {
-				// Previene doble codificaciÃ³n
+				// Previene doble codificación
 				unset($data[$key]);
 				$key = self::utf8izar($key, $encode);
 				$data[$key] = self::utf8izar($value, $encode);
@@ -2244,7 +2244,7 @@ HTML;
 						<br>Empresa:      ' . $userdata['empresa'] . '
 						<br>Telefono:     ' . $userdata['telefono'] . '
 						<br>Mail:         ' . $userdata['email'] . '
-						<br>PaÃ­s:         ' . $userdata['pais'];
+						<br>País:         ' . $userdata['pais'];
 		if ($cant_visitas > 0) {
 			$body.="<br><br>ya ha ingresado $cant_visitas veces al sistema demo.";
 		}
@@ -2289,10 +2289,10 @@ HTML;
 	}
 
 	/**
-	 * Devuelve un botÃ³n para abrir el diÃ¡logo de historial de un elemento (factura, cobro, etc)
-	 * @param object $sesion   la sesiÃ³n con el usuario logueado, para saber si tiene permiso de ver los logs
-	 * @param string $elemento el tipo de elemento que se estÃ¡ revisando: cobro, asunto, factura, factura_pago, etc.
-	 * @param int $id   el id del elemento. Esto no acepta cÃ³digo alfanumÃ©rico, tiene que ser el id de la tabla.
+	 * Devuelve un botón para abrir el diálogo de historial de un elemento (factura, cobro, etc)
+	 * @param object $sesion   la sesión con el usuario logueado, para saber si tiene permiso de ver los logs
+	 * @param string $elemento el tipo de elemento que se está revisando: cobro, asunto, factura, factura_pago, etc.
+	 * @param int $id   el id del elemento. Esto no acepta código alfanumérico, tiene que ser el id de la tabla.
 	 */
 	public static function LogDialog($sesion, $elemento, $id) {
 		if ($sesion->usuario->TienePermiso('SADM')) {
@@ -2374,7 +2374,7 @@ HTML;
 	}
 
 	/**
-	 * Carga el archivo de $_LANG correcto segÃºn las configuraciones del tenant,
+	 * Carga el archivo de $_LANG correcto según las configuraciones del tenant,
 	 * por defecto ocupa el lenguaje 'es' y require_once
 	 *
 	 * @param string $lang Lang a cargar
@@ -2403,11 +2403,31 @@ HTML;
 	}
 
 	/**
-	 * Obtiene la versiÃ³n de la aplicaciÃ³n
+	 * Obtiene la versión de la aplicación
 	 *
-	 * @return string versiÃ³n de la aplicaciÃ³n
+	 * @return string versión de la aplicación
 	 */
 	public static function obtenerVersion() {
 		return file_get_contents(dirname(__FILE__) . '/../../VERSION');
+	}
+
+	/*
+	 * Override del metodo de FW/Utiles para no escribir lo que desaparecer en PHP 5.6
+	 * @param type $horaDecimal
+	 * @param type $digitos_hora
+	 * @return type
+	 */
+	function Decimal2GlosaHora($horaDecimal, $digitos_hora = 1) {
+
+		$horaDecimalAbsoluto = abs($horaDecimal);
+		$h = (int) ($horaDecimalAbsoluto);
+		$m = round(($horaDecimalAbsoluto - $h) * 60);
+
+		if ($m == 60) {
+			$h++;
+			$m-=60;
+		}
+		$hm = sprintf("%0{$digitos_hora}d", $h) . ':' . sprintf('%02d', $m);
+		return ($horaDecimal < 0 ? '-' : '') . $hm;
 	}
 }
