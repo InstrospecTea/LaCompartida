@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.13.3
+Friday, May 13th
+* **Fix** [Corrige formato del resumen del cobro](https://github.com/LemontechSA/ttb/pull/1455)
+
 ## Hotfix 16.13.2
 Friday, May 13th
 * **Fix** [carga los datos de facturacion del contrato principal](https://github.com/LemontechSA/ttb/pull/1454)
