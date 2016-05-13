@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.13.4
+Friday, May 13th
+* **Fix** [Agrupa los datos por rut de factura y nombre de cliente](https://github.com/LemontechSA/ttb/pull/1456)
+
 ## Hotfix 16.13.3
 Friday, May 13th
 * **Fix** [Corrige formato del resumen del cobro](https://github.com/LemontechSA/ttb/pull/1455)
