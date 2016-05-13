@@ -2636,7 +2636,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 											var listIncludedErrands;
 
 											jQuery('document').ready(function () {
-												var contract_id = <?php echo $contrato->fields['id_contrato']; ?>;
+												var contract_id = 0<?php echo $contrato->fields['id_contrato']; ?>;
 												var url_included_errands = root_dir + '/api/index.php/contracts/' + contract_id + '/included_errands';
 
 												addIncludedErrand = function() {

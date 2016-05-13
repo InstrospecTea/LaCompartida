@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.13.2
+Friday, May 13th
+* **Fix** [carga los datos de facturacion del contrato principal](https://github.com/LemontechSA/ttb/pull/1454)
+
 ## Hotfix 16.13.1
 Thursday, May 12th
 * **Fix** [Elimina string sdfghj](https://github.com/LemontechSA/ttb/pull/1453)
