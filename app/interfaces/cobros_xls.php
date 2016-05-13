@@ -476,7 +476,6 @@ foreach ($chargeResults as $charge) {
 	$formato_id_moneda_monto = $Moneda->getExcelFormat($contrato->fields['id_moneda_monto']);
 	$formato_id_moneda = $Moneda->getExcelFormat($cobro->fields['id_moneda']);
 
-	$CellFormat->add('moneda_resumen', array('Align' => 'right', 'NumFormat' => '#'));
 	$CellFormat->add('moneda_resumen', array('Size' => 10, 'Align' => 'right', 'Bold' => '1', 'NumFormat' => $formato_opc_moneda_total));
 	$CellFormat->add('moneda_gastos', array('Align' => 'right', 'NumFormat' => $formato_opc_moneda_total));
 	$CellFormat->add('moneda_gastos_total', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'Top' => 1, 'NumFormat' => $formato_opc_moneda_total));
