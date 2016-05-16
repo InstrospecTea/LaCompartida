@@ -2411,7 +2411,7 @@ HTML;
 	 * @param type $digitos_hora
 	 * @return type
 	 */
-	function Decimal2GlosaHora($horaDecimal, $digitos_hora = 1) {
+	public static function Decimal2GlosaHora($horaDecimal, $digitos_hora = 1) {
 
 		$horaDecimalAbsoluto = abs($horaDecimal);
 		$h = (int) ($horaDecimalAbsoluto);
