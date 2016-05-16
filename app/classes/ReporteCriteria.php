@@ -145,7 +145,7 @@ class ReporteCriteria {
 			'valor_cobrable' => array('trabajo', 'cobro'),
 			'valor_cobrado' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'valor_facturado' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
-			'valor_facturado_contable' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'valor_facturado_contable' => array('facturacion'),
 			'valor_tramites' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'valor_pagado' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'valor_por_pagar' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
