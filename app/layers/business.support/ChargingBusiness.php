@@ -242,9 +242,11 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 				if (!empty($scale->fields['feeId'])) {
 					$tarifa_usuario = $this->getUserFee($work->fields['id_usuario'], $scale->fields['feeId'], $scale->fields['currencyId']);
-				} else {
-					$tarifa_usuario = new GenericModel();
-					$tarifa_usuario->set('tarifa', $work->fields['tarifa_hh']);
+				}
+
+				if (empty($tarifa_usuario)) {
+						$tarifa_usuario = new GenericModel();
+						$tarifa_usuario->set('tarifa', $work->fields['tarifa_hh']);
 				}
 
 				//totales por escalón
