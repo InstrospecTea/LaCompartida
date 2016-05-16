@@ -7,7 +7,9 @@ class WsFacturacionSatcom extends WsFacturacion {
 	protected $url = '';
 	protected $estados_autorizados = array(
 		'Autorizado',
-		'PendienteValidacionSATCOM'
+		'PendienteValidacionSATCOM',
+		'RecibidaSRI',
+		'ErrorEnvioSRI'
 	);
 
 	public function __construct($url) {
