@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.13.6
+Monday, May 16th
+* **Fix** [Si tarifa de usuario está vacía, se asigna la tarifa hh del trabajo](https://github.com/LemontechSA/ttb/pull/1459)
+
 ## Hotfix 16.13.5
 Monday, May 16th
 * **Fix** [Corrección if iframe](https://github.com/LemontechSA/ttb/pull/1457)
