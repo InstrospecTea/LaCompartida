@@ -1052,9 +1052,7 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(12) ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->nada(3) ?>
-								<?php echo $ReporteAvanzado->select_moneda() ?>
-								<?php echo $ReporteAvanzado->nada(5) ?>
+								<?php echo $ReporteAvanzado->nada(9) ?>
 								<?php echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
