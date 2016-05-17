@@ -28,6 +28,8 @@ $directorios = array(
 	'/app/layers/utilities/',
 	'/app/layers/utilities/twig/',
 	'/app/layers/view/helpers/',
+	'/app/layers/manager/',
+	'/app/layers/manager.support/',
 	'/database/lib/',
 	'/fw/classes/'
 );
