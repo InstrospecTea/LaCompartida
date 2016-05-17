@@ -35,7 +35,7 @@
 	$titulo_reporte = __('Resumen - ').' '.__($tipo_dato).' '.__(' en vista por').' '.__($agrupadores[0]);
 
 
-	$reporte = new ReporteCriteria($sesion);
+	$reporte = new Reporte($sesion);
 
 	if($clientes)
 		foreach($clientes as $cliente)

@@ -56,7 +56,7 @@ if ($comparar) {
 }
 
 foreach ($datos as $dato) {
-	$reporte[$dato] = new ReporteCriteria($sesion);
+	$reporte[$dato] = new Reporte($sesion);
 	$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 		'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
 		'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');

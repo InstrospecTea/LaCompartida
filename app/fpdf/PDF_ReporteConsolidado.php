@@ -185,7 +185,7 @@
 
 		function getDatos($tipo_dato, $fecha_desde, $fecha_hasta, $detalles=false, $vista='mes_reporte-glosa_cliente', $campo_fecha='trabajo')
 		{
-			$reporte = new ReporteCriteria($this->sesion);
+			$reporte = new Reporte($this->sesion);
 			$reporte->id_moneda = $this->id_moneda;
 			$reporte->addRangoFecha($fecha_desde, $fecha_hasta);
 			$reporte->setTipoDato($tipo_dato);

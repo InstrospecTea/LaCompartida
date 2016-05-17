@@ -318,7 +318,7 @@ $datos_reporte = array(
 );
 
 foreach ($datos_reporte as $tipo_dato => $config) {
-	$reporte = new ReporteCriteria($Sesion);
+	$reporte = new Reporte($Sesion);
 	$reporte->id_moneda = $id_moneda;
 	if (!empty($proporcionalidad)) {
 		$reporte->setProporcionalidad($proporcionalidad);

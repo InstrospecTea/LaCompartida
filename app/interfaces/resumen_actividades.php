@@ -77,7 +77,7 @@ if ($rango && ($fecha_ini != '' && $fecha_fin != '')) {
 	$periodo_txt = ucfirst(Utiles::sql2fecha($fecha_ini, '%B')) . ' ' . $fecha_anio;
 }
 
-$reporte = new ReporteCriteria($sesion);
+$reporte = new Reporte($sesion);
 
 /* SELECTS MULTIPLES */
 
@@ -851,7 +851,7 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 	$r_c = $r;
 
 	if ($tipo_dato_comparado) {
-		$reporteC = new ReporteCriteria($sesion);
+		$reporteC = new Reporte($sesion);
 		foreach ($users as $usuario) {
 			if ($usuario) {
 				$reporteC->addFiltro('usuario', 'id_usuario', $usuario);

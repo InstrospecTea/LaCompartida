@@ -2,7 +2,7 @@
 
 	echo "Probar aqui";
 
-	$reporte = new ReporteCriteria($this->Session);
+	$reporte = new Reporte($this->Session);
 
 	$filtros = array(
 		'fecha_ini' => '01-01-2014',

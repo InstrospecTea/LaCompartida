@@ -946,7 +946,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 	public function getAreaAgrupatedReport($filters) {
-		$reporte = new ReporteCriteria($this->Session);
+		$reporte = new Reporte($this->Session);
 
 		$filtros = array(
 			'clientes' => array(),

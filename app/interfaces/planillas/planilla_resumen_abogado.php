@@ -213,7 +213,7 @@ if ($lista_usuarios == "") {
 $tipo_dato = array('horas_trabajadas', 'horas_cobradas', 'horas_por_cobrar', 'horas_castigadas', 'horas_no_cobrables', 'valor_cobrado');
 foreach ($usuarios as $usuario) {
 	foreach ($tipo_dato as $td) {
-		$reporte = new ReporteCriteria($Sesion);
+		$reporte = new Reporte($Sesion);
 		if (is_array($forma_cobro)) {
 			foreach ($forma_cobro as $fc) {
 				$reporte->addFiltro('cobro', 'forma_cobro', $fc);

@@ -377,10 +377,10 @@ if (!$popup) {
 
 	<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/reporte_avanzado.js"></script>
 	<script type="text/javascript">
-		var tipos_moneda = <?php echo json_encode(array_values(ReporteCriteria::getTiposMoneda())); ?>;
+		var tipos_moneda = <?php echo json_encode(array_values(Reporte::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
 		var urlAjaxReporteAvanzado = '<?php echo Conf::RootDir(); ?>/app/interfaces/ajax/reporte_avanzado.php';
-		var mapPeriodos = <?php echo json_encode(ReporteCriteria::mapPeriodos()); ?>;
+		var mapPeriodos = <?php echo json_encode(Reporte::mapPeriodos()); ?>;
 		var buttonsReporte = {
 			'<?php echo __('Guardar') ?>': GuardarReporte,
 			'<?php echo __('Cancelar') ?>': function() {

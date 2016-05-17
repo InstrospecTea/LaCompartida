@@ -233,7 +233,7 @@ if (!$filtros_check) {
 }
 
 /* Se crea el reporte según el Input del usuario */
-$reporte = new ReporteCriteria($sesion);
+$reporte = new Reporte($sesion);
 $dato = $tipo_dato;
 
 $filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
@@ -246,7 +246,7 @@ $r = $reporte->toArray();
 
 $r_c = $r;
 if ($tipo_dato_comparado) {
-	$reporte_c = new ReporteCriteria($sesion);
+	$reporte_c = new Reporte($sesion);
 	$dato = $tipo_dato_comparado;
 	$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 		'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
@@ -314,10 +314,10 @@ if (sizeof($r) == 2) {
 							<?php echo __('Total') . ' ' . __($tipo_dato) ?>:
 						</td>
 						<td align="right" style="">
-							<?php echo ReporteCriteria::FormatoValor($sesion, $r['total'], $tipo_dato, '', $formato_valor); ?>
+							<?php echo Reporte::FormatoValor($sesion, $r['total'], $tipo_dato, '', $formato_valor); ?>
 						</td>
 						<td style='' align=right>
-							<?php echo (ReporteCriteria::requiereMoneda($tipo_dato)) ? __(ReporteCriteria::simboloTipoDato($tipo_dato, $sesion, $id_moneda)) : "&nbsp;" ?>
+							<?php echo (Reporte::requiereMoneda($tipo_dato)) ? __(Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda)) : "&nbsp;" ?>
 						</td>
 					</tr>
 					<?php if ($tipo_dato_comparado) { ?>
@@ -326,10 +326,10 @@ if (sizeof($r) == 2) {
 								<?php echo __('Total') . ' ' . __($tipo_dato_comparado) ?>:
 							</td>
 							<td align="right" style='white-space:nowrap;'>
-								<?php echo ReporteCriteria::FormatoValor($sesion, $r_c['total'], $tipo_dato_comparado, '', $formato_valor); ?>
+								<?php echo Reporte::FormatoValor($sesion, $r_c['total'], $tipo_dato_comparado, '', $formato_valor); ?>
 							</td>
 							<td style='' align=right>
-								<?php echo (ReporteCriteria::requiereMoneda($tipo_dato_comparado)) ? __(ReporteCriteria::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda)) : "&nbsp;" ?>
+								<?php echo (Reporte::requiereMoneda($tipo_dato_comparado)) ? __(Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda)) : "&nbsp;" ?>
 							</td>
 						</tr>
 					<?php } ?>
@@ -402,16 +402,16 @@ if (sizeof($r) == 2) {
 					if ($email)
 						$s .= ' ' . $email_style[$orden]['principal'] . ' ';
 					$s .= " > ";
-					$s .= url(ReporteCriteria::FormatoValor($sesion, $valor['valor'], $tipo_dato, '', $formato_valor), $filtros, $email);
+					$s .= url(Reporte::FormatoValor($sesion, $valor['valor'], $tipo_dato, '', $formato_valor), $filtros, $email);
 					$s .= "</td> <tr > <td class=\"valor secundario\" ";
 					if ($email)
 						$s .= ' ' . $email_style[$orden]['secundario'] . ' ';
 					$s .= " > ";
-					$s .= url(ReporteCriteria::FormatoValor($sesion, $valor_comparado['valor'], $comparado, '', $formato_valor), $filtros, $email);
+					$s .= url(Reporte::FormatoValor($sesion, $valor_comparado['valor'], $comparado, '', $formato_valor), $filtros, $email);
 					$s .= "</td> </tr> </table>";
 				}
 				else {
-					$s .= url(ReporteCriteria::FormatoValor($sesion, $valor['valor'], $tipo_dato, '', $formato_valor), $filtros, $email);
+					$s .= url(Reporte::FormatoValor($sesion, $valor['valor'], $tipo_dato, '', $formato_valor), $filtros, $email);
 				}
 			}
 
@@ -447,9 +447,9 @@ if (sizeof($r) == 2) {
 			$t .= __($reporte->agrupador[$i]);
 			$t .= '</td>';
 			$t .= "<td class=\"td_header td_h{$i1}\" style=\"width:50px;\" >";
-			$t .= __(ReporteCriteria::simboloTipoDato($tipo_dato, $sesion, $id_moneda));
+			$t .= __(Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda));
 			if ($tipo_dato_comparado) {
-				$t .= __(' vs. ') . __(ReporteCriteria::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda));
+				$t .= __(' vs. ') . __(Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda));
 			}
 			$t .= '</td>';
 		}
