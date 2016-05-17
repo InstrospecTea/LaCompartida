@@ -7,4 +7,11 @@ interface IClientManager extends BaseManager {
 	 * @return 	Contrato
 	 */
 	public function getDefaultContract($client_id = null);
+
+	/**
+	 * Obtiene un cliente mediate su id
+	 * @param 	string $client_id
+	 * @return 	SplFixedArray
+	 */
+	public function getClient($client_id = null);
 }
