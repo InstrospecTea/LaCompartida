@@ -81,7 +81,7 @@ class SearchManager extends AbstractManager implements ISearchManager  {
 
 	private function getCriteria($searchCriteria, $filter_properties, $widthIdentity = true, $genericMode = false) {
 		$this->loadService('Search');
-		$criteria = new Criteria($this->sesion);
+		$criteria = new Criteria($this->Sesion);
 		$criteria = $this->SearchService->translateCriteria(
 			$searchCriteria,
 			$filter_properties,
@@ -112,7 +112,7 @@ class SearchManager extends AbstractManager implements ISearchManager  {
 			$value
 		);
 
-		$criteria = new Criteria($this->sesion);
+		$criteria = new Criteria($this->Sesion);
 		$criteria = $this->SearchService->translateCriteria(
 			$searchCriteria,
 			$filter_properties,

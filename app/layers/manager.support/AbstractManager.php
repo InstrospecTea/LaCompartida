@@ -2,15 +2,13 @@
 
 class AbstractManager implements BaseManager {
 
-	public $Session;
-	public $sesion;
+	public $Sesion;
 	private $loadedClass = array();
 
-	public function __construct(Sesion $sesion) {
-		$this->Session = $sesion;
-		$this->sesion = $sesion;
+	public function __construct(Sesion $Sesion) {
+		$this->Sesion = $Sesion;
 
-		Configure::setSession($this->Session);
+		Configure::setSession($this->Sesion);
 	}
 
 	/**
@@ -27,7 +25,7 @@ class AbstractManager implements BaseManager {
 		if (in_array($alias, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->Session);
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $alias;
 	}
 
@@ -45,7 +43,7 @@ class AbstractManager implements BaseManager {
 		if (in_array($alias, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->Session);
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $alias;
 	}
 
@@ -63,7 +61,7 @@ class AbstractManager implements BaseManager {
 		if (in_array($alias, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->Session);
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $alias;
 	}
 
@@ -74,7 +72,7 @@ class AbstractManager implements BaseManager {
 	 */
 	protected function loadModel($classname, $alias = null, $returned = false) {
 		if ($returned) {
-			return new $classname($this->Session);
+			return new $classname($this->Sesion);
 		}
 		if (empty($alias)) {
 			$alias = $classname;
@@ -82,7 +80,7 @@ class AbstractManager implements BaseManager {
 		if (in_array($classname, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->Session);
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $classname;
 	}
 
@@ -100,7 +98,7 @@ class AbstractManager implements BaseManager {
 		if (in_array($alias, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->Session);
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $alias;
 	}
 }
