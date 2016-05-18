@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.13.8
+Wednesday, May 18th
+* **Fix** [Agrega y aplica nuevo formato numero_rut](https://github.com/LemontechSA/ttb/pull/1466)
+
 ## Hotfix 16.13.7
 Wednesday, May 18th
 * **Fix** [Corregir nombre formato celda número para el excel del cobro](https://github.com/LemontechSA/ttb/pull/1463)
