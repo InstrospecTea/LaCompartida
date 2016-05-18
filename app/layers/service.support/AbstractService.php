@@ -41,7 +41,7 @@ abstract class AbstractService implements BaseService {
 		try {
 			return $dao->get($id, $fields);
 		} catch(CouldNotFindEntityException $ex) {
-			throw new ServiceException($ex);
+			throw new EntityNotFound($ex);
 		}
 	}
 
