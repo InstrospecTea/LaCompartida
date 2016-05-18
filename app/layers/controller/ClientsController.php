@@ -3,11 +3,13 @@
 class ClientsController extends AbstractController {
 
 	protected $contractDataFields = array(
+			'activo',
 			'alerta_hh',
 			'alerta_monto',
 			'BankAccount.id_banco',
 			'cod_factura_telefono',
 			'codigo_idioma',
+			'descuento',
 			'direccion_contacto AS direccion_contacto_contrato',
 			'email_contacto AS email_contacto_contrato',
 			'factura_ciudad',
@@ -31,8 +33,6 @@ class ClientsController extends AbstractController {
 			'id_tarifa',
 			'id_tramite_tarifa',
 			'id_usuario_responsable',
-			'descuento',
-			'porcentaje_descuento',
 			'limite_hh',
 			'limite_monto',
 			'monto',
@@ -68,8 +68,12 @@ class ClientsController extends AbstractController {
 			'opc_ver_solicitante',
 			'opc_ver_tipo_cambio',
 			'opc_ver_valor_hh_flat_fee',
+			'porcentaje_descuento',
 			'rut AS factura_rut',
-			'tipo_descuento'
+			'separar_liquidaciones',
+			'tipo_descuento',
+			'usa_impuesto_gastos',
+			'usa_impuesto_separado'
 		);
 
 	public function getContractData($client_code = null) {
