@@ -7,20 +7,19 @@ class ClientManager extends AbstractManager implements IClientManager {
 	 * @param 	string $client_id
 	 * @return 	Contrato
 	 */
-	public function getDefaultContract($client_id = null) {
-		$emptyContract = new Contract();
-		if (is_null($client_id)) {
-			return $emptyContract;
+	public function getDefaultContract($client_id) {
+		if (empty($client_id) || !is_numeric($client_id)) {
+			throw new InvalidIdentifier;
 		}
 
 		$this->loadService('Client');
 		$this->loadService('Contract');
 
 		try {
-			$Client = $this->ClientService->get(intval($client_id), 'id_contrato');
+			$Client = $this->ClientService->get("'{$client_id}'", 'id_contrato');
 			$Contract = $this->ContractService->get($Client->get('id_contrato'));
-		} catch (ServiceException $e) {
-			return $emptyContract;
+		} catch (EntityNotFound $e) {
+			return null;
 		}
 
 		return $Contract;

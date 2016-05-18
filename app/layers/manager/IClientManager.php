@@ -6,5 +6,5 @@ interface IClientManager extends BaseManager {
 	 * @param 	string $client_id
 	 * @return 	Contrato
 	 */
-	public function getDefaultContract($client_id = null);
+	public function getDefaultContract($client_id);
 }
