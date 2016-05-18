@@ -20,6 +20,7 @@ if ($permisos->fields['permitido']) {
 $cliente = new Cliente($sesion);
 
 if ($excel) {
+	header('Set-Cookie: fileDownload=true; path=/');
 	$cliente->DownloadExcel(compact('glosa_cliente', 'codigo', 'id_grupo_cliente', 'giro', 'fecha1', 'fecha2', 'solo_activos'));
 	exit;
 }
@@ -59,21 +60,49 @@ function Validar(form)
 
 function Listar( form, from )
 {
-	if(from == 'buscar')
+	if(from == 'buscar') {
+		jQuery('#btnBuscar').addClass('ui-state-disabled');
+		jQuery('#btnBuscar').removeAttr('onclick');
 		form.action = 'clientes.php?buscar=1';
-	else if(from == 'xls')
-		form.action = 'clientes.php?excel=1';
-	else
-		return false;
+		form.submit();
+	}	else if(from == 'xls') {
+		var onclick = jQuery('#btnDescargarXLS').attr('onclick');
+		jQuery('#btnDescargarXLS').addClass('ui-state-disabled');
+		jQuery('#btnDescargarXLS').removeAttr('onclick');
+		var url = 'clientes.php?excel=1';
 
-	form.submit();
-	return true;
+		jQuery.fileDownload(url, {
+			successCallback: function (url) {
+				jQuery('#btnDescargarXLS').removeClass('ui-state-disabled');
+				jQuery('#btnDescargarXLS').attr('onclick', onclick);
+			},
+			preparingMessageHtml: "Generando documento, espere...",
+			failMessageHtml: "Se produjo un error generando el documento, por favor intente nuevamente.",
+			httpMethod: 'post',
+			data: jQuery('#form_cliente').serialize()
+		});
+
+	}
+	return false;
 }
 
 function DescargarIncompletos(form)
 {
-	form.action = 'contrato_datos_incompletos_xls.php';
-	form.submit();
+	var url = 'contrato_datos_incompletos_xls.php';
+	var onclick = jQuery('#btnDescargarXLS').attr('onclick');
+	jQuery('#btnDescargarIncompletosXLS').addClass('ui-state-disabled');
+	jQuery('#btnDescargarIncompletosXLS').removeAttr('onclick');
+
+	jQuery.fileDownload(url, {
+		successCallback: function (url) {
+			jQuery('#btnDescargarIncompletosXLS').removeClass('ui-state-disabled');
+			jQuery('#btnDescargarIncompletosXLS').attr('onclick', onclick);
+		},
+		preparingMessageHtml: "Generando documento, espere...",
+		failMessageHtml: "Se produjo un error generando el documento, por favor intente nuevamente.",
+		httpMethod: 'post',
+		data: jQuery('#form_cliente').serialize()
+	});
 	return true;
 }
 //funcion java para eliminar
@@ -161,10 +190,10 @@ echo Autocompletador::Javascript($sesion,false);
 				<td></td>
 				<td class="al">
 					<?php
-					echo $Form->icon_button(__('Buscar'), 'find', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'buscar')"));
-					echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'xls')"));
+					echo $Form->icon_button(__('Buscar'), 'find', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'buscar')", 'id' => 'btnBuscar'));
+					echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'xls')", 'id' => 'btnDescargarXLS'));
 					if (Conf::GetConf($sesion,'ValidacionesCliente')) {
-						echo $Form->icon_button(__('Descargar listado clientes datos incompletos'), 'xls', array('onclick' => "DescargarIncompletos(jQuery('#form_cliente').get(0));"));
+						echo $Form->icon_button(__('Descargar listado clientes datos incompletos'), 'xls', array('onclick' => "DescargarIncompletos(jQuery('#form_cliente').get(0));", 'id' => 'btnDescargarIncompletosXLS'));
 					}
 					?>
 				</td>
