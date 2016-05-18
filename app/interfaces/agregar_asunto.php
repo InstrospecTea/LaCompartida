@@ -6,7 +6,7 @@ $Sesion = new Sesion(array('DAT', 'SASU'));
 $Pagina = new Pagina($Sesion);
 $id_usuario = $Sesion->usuario->fields['id_usuario'];
 $PrmTipoProyecto = new PrmTipoProyecto($Sesion);
-$Form = new Form;
+$Form = new Form();
 $SelectHelper = new FormSelectHelper();
 $AutocompleteHelper = new FormAutocompleteHelper();
 $validacionesCliente = Conf::GetConf($Sesion, 'ValidacionesCliente') && $cobro_independiente;
@@ -18,6 +18,7 @@ $encargado_obligatorio = Conf::GetConf($Sesion, 'AtacheSecundarioSoloAsunto') ==
 $contrato = new Contrato($Sesion);
 $Cliente = new Cliente($Sesion);
 $Asunto = new Asunto($Sesion);
+			$Asunto->saveExtra($_POST['asunto_extra']);
 
 if ($codigo_cliente_secundario != '') {
 	$Cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
@@ -409,6 +410,11 @@ if ($opcion == 'guardar') {
 		}
 	}
 
+	if (!empty($_POST['asunto_extra'])) {
+		$Asunto->saveExtra($_POST['asunto_extra']);
+	}
+
+
 	$errors = $Pagina->GetErrors();
 	if (empty($errors)) {
 		$NuevoCliente = new Cliente($Sesion);
@@ -436,6 +442,11 @@ if ($opcion == 'guardar') {
 
 $id_idioma_default = $contrato->IdIdiomaPorDefecto($Sesion);
 $AreaProyecto = new AreaProyecto($Sesion);
+
+if (Conf::GetConf($Sesion, 'MostrarAsuntoTrabajoConjunto')) {
+	$MatterExtra = $Asunto->loadExtra();
+	$PrmRegionMaestra = new PrmRegionMaestra($Sesion);
+}
 
 $Pagina->titulo = "Ingreso de " . __('asunto');
 $Pagina->PrintTop($popup);
@@ -873,16 +884,64 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 								<input name="email_contacto" value="<?php echo $Asunto->fields['email_contacto'] ?>" />
 							</td>
 						</tr>
+						<?php if (Conf::GetConf($Sesion, 'MostrarAsuntoTrabajoConjunto')) : ?>
+							<?php $trabajo_conjunto = $MatterExtra->get('trabajo_conjunto') == 1; ?>
+							<tr>
+								<td align="right"><?= $Form->label(__('Trabajo en Conjunto'), 'trabajo_conjunto'); ?></td>
+								<td align="left">
+									<?= $Form->checkbox(
+										'asunto_extra[trabajo_conjunto]', 1,
+										$trabajo_conjunto,
+										array('label' => false, 'id' => 'trabajo_conjunto')
+									); ?>
+								</td>
+							</tr>
+							<tr class="fields_trabajo_conjunto" <?= $trabajo_conjunto ? '' : 'style="display:none"' ?>>
+								<td align="right"><?= $Form->label(__('Región Maestra'), 'id_region_maestra'); ?></td>
+								<td align="left">
+									<?= $Form->select(
+										'asunto_extra[id_region_maestra]',
+										$PrmRegionMaestra->Listar(),
+										$MatterExtra->get('id_region_maestra'),
+										array(
+											'empty' => __('Seleccione'),
+											'style' => 'width: 200px',
+											'id' => 'id_region_maestra'
+										)
+									); ?>
+								</td>
+							</tr>
+							<tr class="fields_trabajo_conjunto" <?= $trabajo_conjunto ? '' : 'style="display:none"' ?>>
+								<td align="right"><?= $Form->label(__('Código Asunto Maestro'), 'id_region_maestra'); ?></td>
+								<td align="left">
+									<?= $Form->input(
+										'asunto_extra[codigo_asunto_maestro]',
+										$MatterExtra->get('codigo_asunto_maestro'),
+										array('id' => 'id_region_maestra', 'label' => false)
+									); ?>
+								</td>
+							</tr>
+						<?php endif; ?>
 						<tr>
 							<td align="right"><label for="activo"><?php echo __('Activo') ?></label></td>
 							<td align="left">
-								<input type="checkbox" name="activo" id="activo" value="1" <?php echo $Asunto->fields['activo'] == 1 ? "checked" : "" ?> <?php echo!$Asunto->Loaded() ? 'checked' : '' ?> />
+								<?= $Form->checkbox('activo', 1,
+									$Asunto->fields['activo'] == 1 || !$Asunto->Loaded(),
+									array('label' => false)); ?>
 								&nbsp;&nbsp;&nbsp;
-								<label for="cobrable"><?php echo __('Cobrable') ?></label>
-								<input  type="checkbox" name="cobrable" id="cobrable" value="1" <?php echo $Asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo!$Asunto->Loaded() ? 'checked' : '' ?>  />
+								<?= $Form->checkbox('cobrable', 1,
+									$Asunto->fields['cobrable'] == 1,
+									array('label_first' => true, 'label' => __('Cobrable'))); ?>
 								&nbsp;&nbsp;&nbsp;
-								<label for="actividades_obligatorias"><?php echo __('Actividades obligatorias') ?></label>
-								<input type="checkbox" id="actividades_obligatorias" name="actividades_obligatorias" value="1" <?php echo $Asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
+								<?= $Form->checkbox('actividades_obligatorias', 1,
+									$Asunto->fields['actividades_obligatorias'] == 1,
+									array('label_first' => true, 'label' => __('Actividades obligatorias'))); ?>
+								<?php if (Conf::GetConf($Sesion, 'MostrarAsuntoConfidencial')) : ?>
+									&nbsp;&nbsp;&nbsp;
+									<?= $Form->checkbox('asunto_extra[confidencial]', 1,
+										$MatterExtra->get('confidencial') == 1,
+										array('label_first' => true, 'label' => __('Confidencial'))); ?>
+								<?php endif; ?>
 							</td>
 						</tr>
 					</table>
@@ -988,6 +1047,13 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 
 <script type="text/javascript">
 jQuery('document').ready(function () {
+	jQuery('#trabajo_conjunto').change(function() {
+		if (jQuery(this).is(':checked')) {
+		jQuery('.fields_trabajo_conjunto').show();
+	} else {
+		jQuery('.fields_trabajo_conjunto').hide();
+	}
+	});
 	jQuery('#change_client').click(function() {
 		var $ = jQuery;
 		var input_nuevo_codigo = $('input.nuevo_codigo_cliente');
