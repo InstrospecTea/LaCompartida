@@ -3,14 +3,12 @@
 namespace Api\V2;
 
 /**
- *
  * Clase con métodos para Projectos
- *
  */
 class PaymentsAPI extends AbstractSlimAPI {
 
 	static $PaymentsEntity = array(
-		array('id' => 'id_documento_neteo'),
+		array('id' => 'id_neteo_documento'),
 		array('project_id' => 'id_asunto'),
 		array('project_code' => 'codigo_asunto'),
 		array('name' => 'glosa_documento'),
