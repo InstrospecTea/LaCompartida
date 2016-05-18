@@ -150,6 +150,7 @@ $CellFormat->add('resumen_text_titulo', array('Size' => 9, 'Bold' => 1, 'Border'
 $CellFormat->add('resumen_text_amarillo', array('Border' => 1, 'FgColor' => '37', 'TextWrap' => 1));
 $CellFormat->add('numeros', array('Border' => 1, 'Align' => 'right', 'NumFormat' => '0'));
 $CellFormat->add('numeros_amarillo', array('Border' => 1, 'Align' => 'right', 'TextWrap' => '0', 'FgColor' => '37'));
+$CellFormat->add('numero_rut', array('Align' => 'right', 'NumFormat' => '#'));
 
 /*
  *	FIN FORMATO DE CELDAS PARA EL DOCUMENTO
@@ -2357,7 +2358,7 @@ foreach ($chargeResults as $charge) {
 			}
 
 			if (!empty($rut) && !empty($proveedor)) {
-				$ws->writeNumber($filas, $col_descripcion - $offsetcolumna, $gasto->fields['rut'], $CellFormat->get('numeros', $i));
+				$ws->writeNumber($filas, $col_descripcion - $offsetcolumna, $gasto->fields['rut'], $CellFormat->get('numero_rut', $i));
 				$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $gasto->fields['glosa_proveedor'], $CellFormat->get('descripcion', $i));
 			}
 
