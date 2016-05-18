@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.13.7
+Wednesday, May 18th
+* **Fix** [Corregir nombre formato celda número para el excel del cobro](https://github.com/LemontechSA/ttb/pull/1463)
+
 ## Hotfix 16.13.6
 Monday, May 16th
 * **Fix** [Si tarifa de usuario está vacía, se asigna la tarifa hh del trabajo](https://github.com/LemontechSA/ttb/pull/1459)
