@@ -2998,22 +2998,22 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<tr>
 					<td></td>
 					<td align="left" colspan='5'>
-						<label class="ckechbox inline" for="opc_ver_detalles_por_hora_iniciales">
+						<label class="checkbox inline" for="opc_ver_detalles_por_hora_iniciales">
 							<input type="hidden" name="opc_ver_detalles_por_hora_iniciales" value="0"/>
 							<input type="checkbox" name="opc_ver_detalles_por_hora_iniciales" id="opc_ver_detalles_por_hora_iniciales" value="1" <?php echo ($contrato->fields['opc_ver_detalles_por_hora_iniciales'] == '1' ) ? 'checked' : '' ?>>
 							<?php echo __('Iniciales') ?>
 						</label>
-						<label class="ckechbox inline" for="opc_ver_detalles_por_hora_categoria">
+						<label class="checkbox inline" for="opc_ver_detalles_por_hora_categoria">
 							<input type="hidden" name="opc_ver_detalles_por_hora_categoria" value="0"/>
 							<input type="checkbox" name="opc_ver_detalles_por_hora_categoria" id="opc_ver_detalles_por_hora_categoria" value="1" <?php echo ($contrato->fields['opc_ver_detalles_por_hora_categoria'] == '1' ) ? 'checked' : '' ?>>
 							<?php echo __('Categoría') ?>
 						</label>
-						<label class="ckechbox inline" for="opc_ver_detalles_por_hora_tarifa">
+						<label class="checkbox inline" for="opc_ver_detalles_por_hora_tarifa">
 							<input type="hidden" name="opc_ver_detalles_por_hora_tarifa" value="0"/>
 							<input type="checkbox" name="opc_ver_detalles_por_hora_tarifa" id="opc_ver_detalles_por_hora_tarifa" value="1" <?php echo ($contrato->fields['opc_ver_detalles_por_hora_tarifa'] == '1') ? 'checked' : '' ?>>
 							<?php echo __('Tarifa') ?>
 						</label>
-						<label class="ckechbox inline" for="opc_ver_detalles_por_hora_importe">
+						<label class="checkbox inline" for="opc_ver_detalles_por_hora_importe">
 							<input type="hidden" name="opc_ver_detalles_por_hora_importe" value="0"/>
 							<input type="checkbox" name="opc_ver_detalles_por_hora_importe" id="opc_ver_detalles_por_hora_importe" value="1" <?php echo ($contrato->fields['opc_ver_detalles_por_hora_importe'] == '1') ? 'checked' : '' ?>>
 							<?php echo __('Importe') ?>
@@ -3031,22 +3031,22 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				<tr>
 					<td></td>
 					<td align="left" colspan='5'>
-						<label class="ckechbox inline" for="opc_ver_profesional_iniciales">
+						<label class="checkbox inline" for="opc_ver_profesional_iniciales">
 							<input type="hidden" name="opc_ver_profesional_iniciales" value="0"/>
 							<input type="checkbox" name="opc_ver_profesional_iniciales" id="opc_ver_profesional_iniciales" value="1" <?php echo ($contrato->fields['opc_ver_profesional_iniciales'] == '1') ? 'checked' : '' ?>/>
 							<?php echo __('Iniciales') ?>
 						</label>
-						<label class="ckechbox inline" for="opc_ver_profesional_categoria">
+						<label class="checkbox inline" for="opc_ver_profesional_categoria">
 							<input type="hidden" name="opc_ver_profesional_categoria" value="0"/>
 							<input type="checkbox" name="opc_ver_profesional_categoria" id="opc_ver_profesional_categoria" value="1" <?php echo ($contrato->fields['opc_ver_profesional_categoria'] == '1') ? 'checked' : '' ?>/>
 							<?php echo __('Categoría') ?>
 						</label>
-						<label class="ckechbox inline" for="opc_ver_profesional_tarifa">
+						<label class="checkbox inline" for="opc_ver_profesional_tarifa">
 							<input type="hidden" name="opc_ver_profesional_tarifa" value="0"/>
 							<input type="checkbox" name="opc_ver_profesional_tarifa" id="opc_ver_profesional_tarifa" value="1" <?php echo ($contrato->fields['opc_ver_profesional_tarifa'] == '1') ? 'checked' : '' ?>/>
 							<?php echo __('Tarifa') ?>
 						</label>
-						<label class="ckechbox inline" for="opc_ver_profesional_importe">
+						<label class="checkbox inline" for="opc_ver_profesional_importe">
 							<input type="hidden" name="opc_ver_profesional_importe" value="0"/>
 							<input type="checkbox" name="opc_ver_profesional_importe" id="opc_ver_profesional_importe" value="1" <?php echo ($contrato->fields['opc_ver_profesional_importe'] == '1') ? 'checked' : '' ?>/>
 							<?php echo __('Importe') ?>
