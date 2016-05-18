@@ -13,47 +13,17 @@ class ClientManager extends AbstractManager implements IClientManager {
 			return $emptyContract;
 		}
 
-		$Client = $this->getClient($client_id);
+		$this->loadService('Client');
+		$this->loadService('Contract');
 
-		if (is_null($Client)) {
+		try {
+			$Client = $this->ClientService->get(intval($client_id), 'id_contrato');
+			$Contract = $this->ContractService->get($Client->get('id_contrato'));
+		} catch (ServiceException $e) {
 			return $emptyContract;
 		}
 
-		$ContractManager = new ContractManager($this->Sesion);
-		$Contract = $ContractManager->getContract($Client->fields['id_contrato']);
-
-		if (!is_null($Contract)) {
-			return $Contract;
-		}
-
-		return $emptyContract;
-	}
-
-	/**
-	 * Obtiene un cliente mediate su id
-	 * @param 	string $client_id
-	 * @return 	Client
-	 */
-	public function getClient($client_id = null) {
-		if (is_null($client_id)) {
-			return null;
-		}
-
-		$this->loadManager('Search');
-		$searchCriteriaClient = new SearchCriteria('Client');
-
-		$searchCriteriaClient
-			->filter('id_cliente')
-			->restricted_by('equals')
-			->compare_with(intval($client_id));
-
-		$Client = $this->SearchManager->searchByCriteria($searchCriteriaClient);
-
-		if ($Client->getSize() === 0) {
-			return null;
-		}
-
-		return $Client[0];
+		return $Contract;
 	}
 
 }
