@@ -60,22 +60,21 @@ class SearchManager extends AbstractManager implements ISearchManager  {
 		}
 
 		//Instanciar la clase correspondiente mediante reflection.
-		if (count($entity_scopes)) {
-			foreach ($entity_scopes as $entity => $scopes) {
-				$scopeClass = $entity . 'Scope';
-				$scopeInstance = new $scopeClass();
-				foreach ($scopes as $scope) {
-					$scope_name = $scope;
-					$args = array($criteria);
-					if (is_array($scope)) {
-						$scope_name = $scope[0];
-						$args = array_merge($args, $scope[1]);
-					}
-					$scopeMethod = new ReflectionMethod($scopeClass, $scope_name);
-					$criteria = $scopeMethod->invokeArgs($scopeInstance, $args);
+		foreach ($entity_scopes as $entity => $scopes) {
+			$scopeClass = $entity . 'Scope';
+			$scopeInstance = new $scopeClass();
+			foreach ($scopes as $scope) {
+				$scope_name = $scope;
+				$args = array($criteria);
+				if (is_array($scope)) {
+					$scope_name = $scope[0];
+					$args = array_merge($args, $scope[1]);
 				}
+				$scopeMethod = new ReflectionMethod($scopeClass, $scope_name);
+				$criteria = $scopeMethod->invokeArgs($scopeInstance, $args);
 			}
 		}
+
 		return $criteria;
 	}
 
