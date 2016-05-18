@@ -283,7 +283,9 @@ if ($opcion == "guardar") {
 			if (empty($codigo_cliente_secundario)) {
 				$codigo_cliente_secundario = $codigo_cliente;
 			}
+			$asunto = new Asunto($Sesion);
 			$codigo_asunto_secundario = $asunto->AsignarCodigoAsuntoSecundario($codigo_cliente_secundario);
+			unset($asunto);
 		} else {
 			$codigo_asunto_secundario = null;
 		}
