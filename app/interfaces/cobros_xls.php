@@ -2359,7 +2359,7 @@ foreach ($chargeResults as $charge) {
 			}
 
 			if (!empty($rut) && !empty($proveedor)) {
-				$ws->writeNumber($filas, $col_descripcion - $offsetcolumna, $gasto->fields['rut'], $CellFormat->get('numero_rut', $i));
+				$ws->write($filas, $col_descripcion - $offsetcolumna, $gasto->fields['rut'], $CellFormat->get('numero_rut', $i));
 				$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $gasto->fields['glosa_proveedor'], $CellFormat->get('descripcion', $i));
 			}
 
