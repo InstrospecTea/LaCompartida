@@ -47,7 +47,6 @@ class ClientsController extends AbstractController {
 			'opc_ver_carta',
 			'opc_ver_cobrable',
 			'opc_ver_columna_cobrable',
-			'opc_ver_concepto_gastos',
 			'opc_ver_descuento',
 			'opc_ver_detalle_retainer',
 			'opc_ver_detalles_por_hora',
@@ -78,18 +77,16 @@ class ClientsController extends AbstractController {
 			return $this->renderJSON(false);
 		}
 
+		if (Configure::read('PrmGastos')) {
+			$this->contractDataFields[] = 'opc_ver_concepto_gastos';
+		}
+
 		if (Configure::read('TituloContacto')) {
-			$this->contractDataFields = array_merge($this->contractDataFields, array(
-					'titulo_contacto',
-					'contacto AS nombre_contacto',
-					'apellido_contacto'
-				)
-			);
+			$this->contractDataFields[] = 'titulo_contacto';
+			$this->contractDataFields[] = 'contacto AS nombre_contacto';
+			$this->contractDataFields[] = 'apellido_contacto';
 		} else {
-			$this->contractDataFields = array_merge($this->contractDataFields, array(
-					'contacto'
-				)
-			);
+			$this->contractDataFields[] = 'contacto';
 		}
 
 		$codigo_cliente_key = Configure::read('CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
