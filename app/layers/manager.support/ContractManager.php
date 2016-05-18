@@ -4,13 +4,11 @@ class ContractManager extends AbstractManager implements IContractManager {
 	/**
 	 * Obtiene un contrato mediante su id
 	 * @param 	string $contract_id
-	 * @return 	SplFixedArray
+	 * @return 	Contract
 	 */
 	public function getContract($contract_id = null) {
-		$emptySplFixedArray = new SplFixedArray();
-
 		if (is_null($contract_id)) {
-			return $emptySplFixedArray;
+			return null;
 		}
 
 		$this->loadManager('Search');
@@ -23,9 +21,9 @@ class ContractManager extends AbstractManager implements IContractManager {
 		$Contract = $this->SearchManager->searchByCriteria($searchCriteriaContract);
 
 		if ($Contract->getSize() === 0) {
-			return $emptySplFixedArray;
+			return null;
 		}
 
-		return $Contract;
+		return $Contract[0];
 	}
 }

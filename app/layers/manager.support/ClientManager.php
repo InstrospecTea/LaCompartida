@@ -15,15 +15,15 @@ class ClientManager extends AbstractManager implements IClientManager {
 
 		$Client = $this->getClient($client_id);
 
-		if ($Client->getSize() === 0) {
+		if (is_null($Client)) {
 			return $emptyContract;
 		}
 
 		$ContractManager = new ContractManager($this->Sesion);
-		$Contract = $ContractManager->getContract($Client[0]->fields['id_contrato']);
+		$Contract = $ContractManager->getContract($Client->fields['id_contrato']);
 
-		if ($Contract->getSize() > 0) {
-			return $Contract[0];
+		if (!is_null($Contract)) {
+			return $Contract;
 		}
 
 		return $emptyContract;
@@ -32,13 +32,11 @@ class ClientManager extends AbstractManager implements IClientManager {
 	/**
 	 * Obtiene un cliente mediate su id
 	 * @param 	string $client_id
-	 * @return 	SplFixedArray
+	 * @return 	Client
 	 */
 	public function getClient($client_id = null) {
-		$emptySplFixedArray = new SplFixedArray();
-
 		if (is_null($client_id)) {
-			return $emptySplFixedArray;
+			return null;
 		}
 
 		$this->loadManager('Search');
@@ -52,10 +50,10 @@ class ClientManager extends AbstractManager implements IClientManager {
 		$Client = $this->SearchManager->searchByCriteria($searchCriteriaClient);
 
 		if ($Client->getSize() === 0) {
-			return $emptySplFixedArray;
+			return null;
 		}
 
-		return $Client;
+		return $Client[0];
 	}
 
 }

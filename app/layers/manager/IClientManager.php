@@ -11,7 +11,7 @@ interface IClientManager extends BaseManager {
 	/**
 	 * Obtiene un cliente mediate su id
 	 * @param 	string $client_id
-	 * @return 	SplFixedArray
+	 * @return 	Client
 	 */
 	public function getClient($client_id = null);
 }
