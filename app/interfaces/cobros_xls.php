@@ -150,6 +150,8 @@ $CellFormat->add('resumen_text_titulo', array('Size' => 9, 'Bold' => 1, 'Border'
 $CellFormat->add('resumen_text_amarillo', array('Border' => 1, 'FgColor' => '37', 'TextWrap' => 1));
 $CellFormat->add('numeros', array('Border' => 1, 'Align' => 'right', 'NumFormat' => '0'));
 $CellFormat->add('numeros_amarillo', array('Border' => 1, 'Align' => 'right', 'TextWrap' => '0', 'FgColor' => '37'));
+$CellFormat->add('numero_rut', array('Align' => 'right', 'NumFormat' => '#'));
+$CellFormat->add('encabezado_numero_rut', array('Size' => 10, 'VAlign' => 'middle', 'Bold' => 1, 'NumFormat' => '#'));
 
 /*
  *	FIN FORMATO DE CELDAS PARA EL DOCUMENTO
@@ -597,7 +599,7 @@ foreach ($chargeResults as $charge) {
 
 	$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('rut', 'Encabezado', $lang), $CellFormat->get('encabezado'));
 	$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
-	$ws->write($filas, $col_abogado, $contrato->fields['rut'], $CellFormat->get('encabezado'));
+	$ws->write($filas, $col_abogado, $contrato->fields['rut'], $CellFormat->get('encabezado_numero_rut'));
 	$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
 	++$filas;
 
@@ -2357,7 +2359,7 @@ foreach ($chargeResults as $charge) {
 			}
 
 			if (!empty($rut) && !empty($proveedor)) {
-				$ws->writeNumber($filas, $col_descripcion - $offsetcolumna, $gasto->fields['rut'], $CellFormat->get('numeros', $i));
+				$ws->write($filas, $col_descripcion - $offsetcolumna, $gasto->fields['rut'], $CellFormat->get('numero_rut', $i));
 				$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $gasto->fields['glosa_proveedor'], $CellFormat->get('descripcion', $i));
 			}
 

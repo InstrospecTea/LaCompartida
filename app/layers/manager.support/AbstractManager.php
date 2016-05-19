@@ -5,8 +5,9 @@ class AbstractManager implements BaseManager {
 	public $Sesion;
 	private $loadedClass = array();
 
-	public function __construct(Sesion $sesion) {
-		$this->Sesion = $sesion;
+	public function __construct(Sesion $Sesion) {
+		$this->Sesion = $Sesion;
+
 		Configure::setSession($this->Sesion);
 	}
 
