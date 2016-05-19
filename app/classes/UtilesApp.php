@@ -27,7 +27,6 @@ class UtilesApp extends Utiles {
 		'/ù|ú|û/' => 'u',
 		'/İ/' => 'Y',
 		'/ı|ÿ/' => 'y',
-		'//' => 'x',
 		'/Æ/' => 'AE',
 		'/ß/'=> 'ss'
 	);
@@ -2338,25 +2337,31 @@ HTML;
 		return $s3->if_object_exists(S3_UPLOAD_BUCKET, $name);
 	}
 
-	public static function slug($string, $replacement = '_', $map = array()) {
+	/**
+	 * Escapa caracteres con tilde caracteres especiales y espacios
+	 * @param type $string
+	 * @param string $replacement
+	 * @param type $map
+	 * @return type
+	 */
+	public static function slug($string, $replacement = '_', array $map = array()) {
 		if (is_array($replacement)) {
 			$map = $replacement;
 			$replacement = '_';
 		}
 		$quotedReplacement = preg_quote($replacement, '/');
 
-		$merge = array(
+		$map += array(
 			'/[^\s\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]/mu' => ' ',
-			'/\\s+/' => $replacement,
+			'/[\s \t ]+/' => $replacement,
 			sprintf('/^[%s]+|[%s]+$/', $quotedReplacement, $quotedReplacement) => '',
 		);
 
-		$map = $map + self::$_transliteration + $merge;
-		return preg_replace(array_keys($map), array_values($map), $string);
+		return self::transliteration($string, $map);
 	}
 
-	public static function transliteration($string) {
-		$map = self::$_transliteration;
+	public static function transliteration($string, array $map = array()) {
+		$map += self::$_transliteration;
 		return preg_replace(array_keys($map), array_values($map), $string);
 	}
 
