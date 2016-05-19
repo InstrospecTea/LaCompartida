@@ -44,6 +44,7 @@ class PaymentManager extends AbstractManager implements IPaymentManager {
 				'Matter.id_asunto',
 				'Matter.codigo_asunto',
 				'Payment.fecha_creacion',
+				'Payment.valor_pago_honorarios',
 				'Document.glosa_documento'
 			)
 		);

@@ -12,7 +12,8 @@ class PaymentsAPI extends AbstractSlimAPI {
 		array('project_id' => 'id_asunto'),
 		array('project_code' => 'codigo_asunto'),
 		array('name' => 'glosa_documento'),
-		array('date' => 'fecha_creacion')
+		array('date' => 'fecha_creacion'),
+		array('amount' => 'valor_pago_honorarios')
 	);
 
 	public function getPaymentsOfMatter($matter_id) {
