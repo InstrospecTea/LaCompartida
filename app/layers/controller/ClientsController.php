@@ -71,14 +71,45 @@ class ClientsController extends AbstractController {
 			'porcentaje_descuento',
 			'rut AS factura_rut',
 			'separar_liquidaciones',
-			'tipo_descuento',
-			'usa_impuesto_gastos',
-			'usa_impuesto_separado'
+			'tipo_descuento'
 		);
 
 	public function getContractData($client_code = null) {
 		if (empty($client_code)) {
 			return $this->renderJSON(false);
+		}
+
+		if (Configure::read('SegundaCuentaBancaria')) {
+			$this->contractDataFields[] = 'id_cuenta2';
+		}
+
+		if (Configure::read('RegionCliente')) {
+			$this->contractDataFields[] = 'region_cliente';
+		}
+
+		if (Configure::read('UsarImpuestoSeparado')) {
+			$this->contractDataFields[] = 'usa_impuesto_separado';
+		}
+
+		if (Configure::read('UsarImpuestoPorGastos')) {
+			$this->contractDataFields[] = 'usa_impuesto_gastos';
+		}
+
+		if (Configure::read('UsarModuloRetribuciones')) {
+			$this->contractDataFields[] = 'retribucion_usuario_responsable';
+		}
+
+		if (Configure::read('EncargadoSecundario')) {
+			$this->contractDataFields[] = 'id_usuario_secundario';
+			if (Configure::read('UsarModuloRetribuciones')) {
+				$this->contractDataFields[] = 'retribucion_usuario_secundario';
+			}
+		}
+
+		if (Configure::read('ExportacionLedes')) {
+			$this->contractDataFields[] = 'exportacion_ledes';
+			$this->contractDataFields[] = 'formato_ledes';
+			$this->contractDataFields[] = 'tipo_ledes';
 		}
 
 		if (Configure::read('PrmGastos')) {
