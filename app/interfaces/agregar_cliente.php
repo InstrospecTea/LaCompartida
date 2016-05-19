@@ -172,7 +172,7 @@ if ($opcion == "guardar") {
 		$cliente->Edit("limite_monto", $cliente_limite_monto);
 		$cliente->Edit("desglose_referencia", $desglose_referencia);
 		$cliente->Edit("id_cliente_referencia", (!empty($id_cliente_referencia) && $id_cliente_referencia != '-1' ) ? $id_cliente_referencia : "NULL" );
-
+		$cliente->Edit('fecha_inicio_contrato', Utiles::fecha2sql($fecha_inicio_contrato));
 
 		if ($cliente->Write()) {
 
