@@ -25,9 +25,13 @@ $directorios = array(
 	'/app/layers/scope/',
 	'/app/layers/service.support/',
 	'/app/layers/service/',
+	'/app/layers/service/exceptions/',
 	'/app/layers/utilities/',
 	'/app/layers/utilities/twig/',
 	'/app/layers/view/helpers/',
+	'/app/layers/manager/',
+	'/app/layers/manager.support/',
+	'/app/layers/manager/exceptions/',
 	'/database/lib/',
 	'/fw/classes/'
 );
