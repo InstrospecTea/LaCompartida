@@ -702,6 +702,8 @@ class NotaCobro extends Cobro {
 			'%tarifa_horas%' => 'tarifa_horas',
 			'%total_horas%' => 'total_horas',
 			'%horas_descontadas%' => 'horas_descontadas',
+			'%horas_no_cobrables%' => 'horas_no_cobrables',
+			'%horas_trabajadas_profesional%' => 'horas_trabajadas_profesional',
 		),
 		'PROFESIONAL_TOTAL' => array(
 			'%hrs_retainer%' => 'hrs_retainer',
@@ -724,6 +726,8 @@ class NotaCobro extends Cobro {
 			'%total_honorarios%' => 'total_honorarios',
 			'%horas%' => 'horas',
 			'%horas_descontadas%' => 'horas_descontadas',
+			'%horas_no_cobrables%' => 'horas_no_cobrables',
+			'%horas_trabajadas_profesional%' => 'horas_trabajadas_profesional',
 		),
 		'DETALLE_PROFESIONAL_RETAINER' => array(
 			'%retainer%' => 'retainer',
@@ -897,6 +901,8 @@ class NotaCobro extends Cobro {
 			'%valor_cobrado_hh%' => 'valor_cobrado_hh',
 			'%total%' => 'total',
 			'%horas_descontadas%' => 'horas_descontadas',
+			'%horas_no_cobrables%' => 'horas_no_cobrables',
+			'%horas_trabajadas_profesional%' => 'horas_trabajadas_profesional',
 			'%RESUMEN_PROFESIONAL_ENCABEZADO%' => 'RESUMEN_PROFESIONAL_ENCABEZADO',
 			'%RESUMEN_PROFESIONAL_FILAS%' => 'RESUMEN_PROFESIONAL_FILAS',
 			'%RESUMEN_PROFESIONAL_TOTAL%' => 'RESUMEN_PROFESIONAL_TOTAL',
@@ -924,6 +930,9 @@ class NotaCobro extends Cobro {
 			'%hrs_mins_trabajadas%' => 'hrs_mins_trabajadas',
 			'%hrs_mins_descontadas%' => 'hrs_mins_descontadas',
 			'%horas_descontadas%' => 'horas_descontadas',
+			'%horas_no_cobrables%' => 'horas_no_cobrables',
+			'%horas_trabajadas_profesional%' => 'horas_trabajadas_profesional',
+
 		),
 		'PROFESIONAL_ENCABEZADO' => array(
 			'%horas_trabajadas%' => 'horas_trabajadas',
@@ -984,6 +993,8 @@ class NotaCobro extends Cobro {
 			'%profesional%' => 'profesional',
 			'%hora_tarificada%' => 'hora_tarificada',
 			'%horas_descontadas%' => 'horas_descontadas',
+			'%horas_no_cobrables%' => 'horas_no_cobrables',
+			'%horas_trabajadas_profesional%' => 'horas_trabajadas_profesional',
 		),
 	);
 
@@ -10951,6 +10962,8 @@ class NotaCobro extends Cobro {
 				$resumen_hh = 0;
 				$resumen_valor = 0;
 				$resumen_horas_descontadas = 0;
+				$resumen_horas_no_cobrables = 0;
+				$resumen_horas_trabajadas_profesional = 0;
 
 				foreach ($x_resumen_profesional as $prof => $data) {
 
@@ -10963,6 +10976,9 @@ class NotaCobro extends Cobro {
 					$resumen_hrs_descontadas += $data['duracion_descontada'];
 					$resumen_horas_descontadas += $data['duracion_descontada'];
 					$resumen_hrs_incobrables += $data['duracion_incobrables'];
+					$resumen_horas_no_cobrables += $data['duracion_incobrables'];
+					$resumen_horas_trabajadas_profesional += $data['duracion_trabajada'];
+
 					$resumen_hh += $data['duracion_tarificada'];
 					if ($this->fields['forma_cobro'] == 'ESCALONADA') {
 						$resumen_valor += $data['monto_cobrado_escalonada'];
@@ -10973,6 +10989,8 @@ class NotaCobro extends Cobro {
 					$html3 = $parser->tags['PROFESIONAL_FILAS'];
 					$html3 = str_replace('%username%', $data['username'], $html3);
 					$html3 = str_replace('%horas_descontadas%', $data['glosa_duracion_descontada'], $html3);
+					$html3 = str_replace('%horas_no_cobrables%', $data['glosa_duracion_incobrables'], $html3);
+					$html3 = str_replace('%horas_trabajadas_profesional%', $data['glosa_duracion_trabajada'], $html3);
 					if ($this->fields['opc_ver_profesional_iniciales'] == 1) {
 						$html3 = str_replace('%nombre%', $data['username'], $html3);
 					} else {
@@ -11278,6 +11296,8 @@ class NotaCobro extends Cobro {
 				$html3 = str_replace('%total%', $moneda->fields['simbolo'] . $this->espacio . number_format($this->fields['monto_trabajos'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 
 				$html3 = str_replace('%horas_descontadas%', Utiles::Decimal2GlosaHora(round($resumen_horas_descontadas, 2)), $html3);
+				$html3 = str_replace('%horas_no_cobrables%', Utiles::Decimal2GlosaHora(round($resumen_horas_no_cobrables, 2)), $html3);
+				$html3 = str_replace('%horas_trabajadas_profesional%', Utiles::Decimal2GlosaHora(round($resumen_horas_trabajadas_profesional, 2)), $html3);
 
 				$resumen_fila_total = $html3;
 				$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
@@ -11613,7 +11633,9 @@ class NotaCobro extends Cobro {
 				$html = str_replace('%hrs_mins_trabajadas_previo%', '', $html);
 				$html = str_replace('%abogados%', __('Abogados que trabajaron'), $html);
 
-				$html = str_replace('%horas_descontadas%', __('Hrs. Descontadas'), $html);
+				$html = str_replace('%horas_descontadas%', __('Hrs. Rebajadas'), $html);
+				$html = str_replace('%horas_no_cobrables%', __('Hrs. No Tarificadas'), $html);
+				$html = str_replace('%horas_trabajadas_profesional%', __('Hrs. Trabajadas'), $html);
 
 				if ($this->fields['opc_ver_horas_trabajadas']) {
 					$html = str_replace('%hh_trabajada%', __($this->fields['codigo_idioma'] . '_Hrs Trabajadas'), $html);
