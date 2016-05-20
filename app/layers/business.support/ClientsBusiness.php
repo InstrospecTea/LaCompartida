@@ -31,14 +31,14 @@ class ClientsBusiness extends AbstractBusiness implements IClientsBusiness {
 	public function getClientById($client_id) {
 		$this->loadBusiness('Searching');
 
-		$searchCriteria =  new SearchCriteria('Client');
+		$searchCriteria = new SearchCriteria('Client');
 		$searchCriteria
 			->filter('id_cliente')
 			->restricted_by('equals')
 			->compare_with($client_id);
 
 		$clients = $this->SearchingBusiness->searchByCriteria($searchCriteria);
-		return $clients[0];
+		return !empty($clients[0]) ? $clients[0] : null;
 	}
 
 	public function getMattersOfClient($client) {
@@ -49,15 +49,31 @@ class ClientsBusiness extends AbstractBusiness implements IClientsBusiness {
 		$searchCriteria =  new SearchCriteria('Matter');
 
 		$searchCriteria
-			->related_with('Client')->with_direction('INNER')->on_property('codigo_cliente');
+			->related_with('Client')
+			->with_direction('INNER')
+			->on_property('codigo_cliente');
 
 		$searchCriteria
-			->related_with('Language')->with_direction('LEFT')->on_property('id_idioma');
+			->related_with('Language')
+			->with_direction('LEFT')
+			->on_property('id_idioma');
+
+		$searchCriteria
+			->related_with('Agreement')
+			->with_direction('LEFT')
+			->on_property('id_contrato');
+
+		$searchCriteria
+			->related_with('Currency')
+			->with_direction('LEFT')
+			->joined_with('Agreement')
+			->on_property('id_moneda');
 
 		if (!is_null($clientCode)) {
-			$searchCriteria->filter('codigo_cliente')
-					->restricted_by('equals')
-					->compare_with("'$clientCode'");
+			$searchCriteria
+				->filter('codigo_cliente')
+				->restricted_by('equals')
+				->compare_with("'$clientCode'");
 		}
 
 		$results = $this->SearchingBusiness->searchByCriteria(
@@ -66,12 +82,13 @@ class ClientsBusiness extends AbstractBusiness implements IClientsBusiness {
 				'*',
 				'Client.id_cliente',
 				'Language.codigo_idioma',
-				'Language.glosa_idioma'
+				'Language.glosa_idioma',
+				'Currency.codigo'
 			)
 		);
+
 		return $results;
 	}
-
 
 	public function getUpdatedMatters($active = null, $updatedFrom = null) {
 		$results = array();
