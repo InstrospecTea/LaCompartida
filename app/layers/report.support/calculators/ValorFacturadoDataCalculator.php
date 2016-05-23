@@ -7,6 +7,7 @@
  */
 class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalculator {
 	private $fieldName = 'valor_facturado';
+
 	/**
 	 * Obtiene la query de trabajos correspondiente al valor facturado
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
@@ -14,10 +15,9 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
 		$subtotalBase = $this->getWorksProportionalDocumentSubtotal();
-		$invoiceFactor = $this->invoiceFactor();
 		$invoiceContrib = $this->getInvoiceContribution();
 
-		$billed_amount = "SUM({$invoiceContrib} * {$subtotalBase} * {$invoiceFactor})
+		$billed_amount = "SUM({$subtotalBase} * {$invoiceContrib})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
@@ -36,10 +36,9 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 	 */
 	function getReportErrandQuery($Criteria) {
 		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
-		$invoiceFactor = $this->invoiceFactor();
 		$invoiceContrib = $this->getInvoiceContribution();
 
-		$billed_amount =  "SUM({$invoiceContrib} * {$subtotalBase} * {$invoiceFactor})
+		$billed_amount =  "SUM({$invoiceContrib} * {$subtotalBase})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
@@ -57,11 +56,10 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {
-		$invoiceFactor = $this->invoiceFactor();
 		$invoiceContrib = $this->getInvoiceContribution();
 
 		$billed_amount = "
-			SUM({$invoiceContrib} * {$invoiceFactor}
+			SUM({$invoiceContrib}
 				* (cobro.monto_subtotal - cobro.descuento)
 				* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)

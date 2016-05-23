@@ -9,6 +9,7 @@
  *
  */
 class HorasVisiblesDataCalculator extends AbstractDataCalculator {
+	private $fieldName = 'horas_visibles';
 
 	/**
 	 * Obtiene la query de trabajos correspondiente a Horas Visibles
@@ -17,10 +18,11 @@ class HorasVisiblesDataCalculator extends AbstractDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$horas_visibles = "SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
+		$factor = $this->getFactor();
+		$horas_visibles = "SUM({$factor} * TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
 
 		$Criteria
-			->add_select($horas_visibles, 'horas_visibles')
+			->add_select($horas_visibles, $this->fieldName)
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1));
 	}
 

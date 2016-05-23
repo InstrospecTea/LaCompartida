@@ -17,7 +17,8 @@ class HorasPorPagarDataCalculator extends AbstractDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$horas_por_pagar = "SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
+		$factor = $this->getFactor();
+		$horas_por_pagar = "SUM({$factor} * TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
 
 		$Criteria
 			->add_select($horas_por_pagar, 'horas_por_pagar');

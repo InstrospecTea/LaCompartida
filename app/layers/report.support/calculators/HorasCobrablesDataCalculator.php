@@ -9,6 +9,7 @@
  *
  */
 class HorasCobrablesDataCalculator extends AbstractDataCalculator {
+	private $fieldName = 'horas_cobrables';
 
 	/**
 	 * Obtiene la query de trabajos correspondiente a Horas Cobrables
@@ -17,10 +18,11 @@ class HorasCobrablesDataCalculator extends AbstractDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$horas_cobrables = "SUM(TIME_TO_SEC(trabajo.duracion)) / 3600";
+		$factor = $this->getFactor();
+		$horas_cobrables = "SUM({$factor} * TIME_TO_SEC(trabajo.duracion)) / 3600";
 
 		$Criteria
-			->add_select($horas_cobrables, 'horas_cobrables')
+			->add_select($horas_cobrables, $this->fieldName)
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1));
 	}
 

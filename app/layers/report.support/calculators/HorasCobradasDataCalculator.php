@@ -12,6 +12,7 @@
  *
  */
 class HorasCobradasDataCalculator extends AbstractDataCalculator {
+	private $fieldName = 'horas_cobradas';
 
 	/**
 	 * Obtiene la query de trabajos correspondiente a Horas Cobradas
@@ -20,12 +21,12 @@ class HorasCobradasDataCalculator extends AbstractDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$horas_cobradas = 'SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600';
+		$factor = $this->getFactor();
+		$value = "SUM({$factor}
+			* TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
 
-		$Criteria->add_select(
-			$horas_cobradas,
-			'horas_cobradas'
-		)->add_restriction(
+		$Criteria->add_select($value, $this->fieldName);
+		$Criteria->add_restriction(
 			CriteriaRestriction::equals(
 				'trabajo.cobrable', 1
 			)
@@ -35,7 +36,6 @@ class HorasCobradasDataCalculator extends AbstractDataCalculator {
 				array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')
 			)
 		);
-
 	}
 
 

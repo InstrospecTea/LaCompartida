@@ -25,8 +25,9 @@ class ValorCobradoNoEstandarDataCalculator extends AbstractCurrencyDataCalculato
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
+		$factor = $this->getFactor();
 		$standard_amount = "
-			SUM(trabajo.tarifa_hh * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
+			SUM({$factor} * trabajo.tarifa_hh * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
 			*
 			(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
 
@@ -54,8 +55,9 @@ class ValorCobradoNoEstandarDataCalculator extends AbstractCurrencyDataCalculato
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
+		$factor = $this->getFactor();
 		$standard_amount = "
-			SUM(tramite.tarifa_tramite)
+			SUM({$factor} * tramite.tarifa_tramite)
 			*
 			(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
 

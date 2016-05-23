@@ -288,6 +288,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto','trabajo.codigo_asunto'))
 			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', CriteriaRestriction::ifnull('cobro.id_contrato', 'asunto.id_contrato')));
 
+		$this->addInvoiceToQuery($Criteria);
 		$this->addFiltersToCriteria($Criteria, 'Works');
 		$this->addGroupersToCriteria($Criteria, 'Works');
 	}
@@ -304,6 +305,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto','tramite.codigo_asunto'))
 			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', CriteriaRestriction::ifnull('cobro.id_contrato', 'asunto.id_contrato')));
 
+		$this->addInvoiceToQuery($Criteria);
 		$this->addFiltersToCriteria($Criteria, 'Errands');
 		$this->addGroupersToCriteria($Criteria, 'Errands');
 	}
@@ -329,6 +331,8 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 				'tramite.id_cobro'
 			)
 		);
+
+		$this->addInvoiceToQuery($Criteria);
 
 		$SubCriteria = new Criteria();
 		$SubCriteria->add_from('cobro_asunto')
@@ -365,6 +369,53 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->addFiltersToCriteria($Criteria, 'Charges');
 		$this->addGroupersToCriteria($Criteria, 'Charges');
 	}
+
+	/**
+	 * Agrega Invoice a Criteria
+	 * @param Criteria $Criteria [description]
+	 */
+	function addInvoiceToQuery(Criteria $Criteria) {
+		$Criteria->add_left_join_with('factura',
+			CriteriaRestriction::equals('factura.id_cobro', 'cobro.id_cobro')
+		);
+		$this->addIinvoiceRestrictionsToQuery($Criteria);
+	}
+
+	function addIinvoiceRestrictionsToQuery(Criteria $Criteria) {
+		$Criteria->add_restriction(
+			CriteriaRestriction::equals('IFNULL(factura.anulado, 0)', '0')
+		);
+	}
+ 	/**
+ 	 * Estable un factor para multiplicar los montos
+ 	 * ya que se multiplicarán por el número de facturas
+ 	 * @return [type] [description]
+ 	 */
+	public function invoiceFactor() {
+		$invoiceCriteria = new Criteria($this->Session);
+		$invoiceCriteria->add_from('factura');
+
+		$invoiceCriteria->add_select(
+			'IF(COUNT(IFNULL(factura.id_factura, 0)) = 0, 1, COUNT(factura.id_factura))'
+		);
+
+		$invoiceCriteria->add_restriction(
+			CriteriaRestriction::equals('factura.id_cobro', 'cobro.id_cobro')
+		);
+		$this->addIinvoiceRestrictionsToQuery($invoiceCriteria);
+
+		$query = $invoiceCriteria->get_plain_query();
+
+		return "(1 / IFNULL(({$query}), 1))";
+	}
+
+	/**
+	 * Factor to apply to heach sum element
+	 * @return factor
+	 */
+ 	public function getFactor() {
+ 		return $this->invoiceFactor();
+ 	}
 
 	/**
 	 * Construye la query de trabajos

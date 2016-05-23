@@ -29,7 +29,8 @@ class ValorCobradoTramitesDataCalculator extends AbstractProportionalDataCalcula
 	 */
 	function getReportErrandQuery($Criteria) {
 		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
-		$billed_amount =  "SUM({$subtotalBase})
+		$factor = $this->getFactor();
+		$billed_amount =  "SUM({$factor} * {$subtotalBase})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 

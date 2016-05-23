@@ -24,13 +24,14 @@ class DiferenciaValorEstandarDataCalculator extends AbstractProportionalDataCalc
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
+		$factor = $this->getFactor();
 		$subtotal = $this->getWorksProportionalDocumentSubtotal();
-		$billed_amount = "SUM({$subtotal})
+		$billed_amount = "SUM({$factor} * {$subtotal})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
 		$standard_amount = "
-			SUM(tarifa_hh_estandar * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
+			SUM({$factor} * tarifa_hh_estandar * TIME_TO_SEC(trabajo.duracion_cobrada) / 3600)
 			*
 			(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
 
@@ -58,13 +59,14 @@ class DiferenciaValorEstandarDataCalculator extends AbstractProportionalDataCalc
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
+		$factor = $this->getFactor();
 		$subtotal = $this->getErrandsProportionalDocumentSubtotal();
-		$billed_amount =  "SUM({$subtotal})
+		$billed_amount =  "SUM({$factor} * {$subtotal})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
 		$standard_amount = "
-			SUM(tarifa_tramite_estandar)
+			SUM({$factor} * tarifa_tramite_estandar)
 			*
 			(cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)";
 
@@ -82,12 +84,13 @@ class DiferenciaValorEstandarDataCalculator extends AbstractProportionalDataCalc
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {
-		$billed_amount = '
-			SUM((cobro.monto_subtotal - cobro.descuento)
+		$factor = $this->getFactor();
+		$billed_amount = "
+			SUM({$factor} * (cobro.monto_subtotal - cobro.descuento)
 				* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
-		';
+		";
 
 		$standard_amount = '0';
 

@@ -19,7 +19,8 @@ class ValorCobradoDataCalculator extends AbstractProportionalDataCalculator {
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
 		$subtotalBase = $this->getWorksProportionalDocumentSubtotal();
-		$billed_amount = "SUM({$subtotalBase})
+		$factor = $this->getFactor();
+		$billed_amount = "SUM({$factor} * {$subtotalBase})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
@@ -38,7 +39,8 @@ class ValorCobradoDataCalculator extends AbstractProportionalDataCalculator {
 	 */
 	function getReportErrandQuery($Criteria) {
 		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
-		$billed_amount =  "SUM({$subtotalBase})
+		$factor = $this->getFactor();
+		$billed_amount =  "SUM({$factor} * {$subtotalBase})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
@@ -56,12 +58,14 @@ class ValorCobradoDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {
-		$billed_amount = '
-			SUM((cobro.monto_subtotal - cobro.descuento)
+		$factor = $this->getFactor();
+		$billed_amount = "
+			SUM({$factor}
+				* (cobro.monto_subtotal - cobro.descuento)
 				* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
-		';
+		";
 		$Criteria
 			->add_select(
 				$billed_amount,

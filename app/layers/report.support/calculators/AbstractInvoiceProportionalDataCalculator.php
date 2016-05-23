@@ -8,28 +8,8 @@
 abstract class AbstractInvoiceProportionalDataCalculator
 	extends AbstractProportionalDataCalculator {
 
- 	/**
- 	 * Estable un factor para multiplicar los montos
- 	 * ya que se multiplicarán por el número de facturas
- 	 * @return [type] [description]
- 	 */
-	public function invoiceFactor() {
-		return "(1 /
-			IFNULL((
-				SELECT IF(COUNT(f.id_factura) = 0, 1, COUNT(f.id_factura))
-				  FROM factura f
-				 WHERE f.id_cobro = cobro.id_cobro
-				   AND IFNULL(f.anulado, 0) = 0), 1))";
-	}
-
-
 	public function getInvoiceContribution() {
 		return "(factura.subtotal / documento.subtotal_sin_descuento)";
-	}
-
-	public function addAmountFieldToCriteria(Criteria $Criteria, $fieldValue, $fieldName) {
-		$factor = $this->invoiceFactor();
-		$Criteria->add_select("($factor)*({$fieldValue})", $fieldName);
 	}
 
 	/**

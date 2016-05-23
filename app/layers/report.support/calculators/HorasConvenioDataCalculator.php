@@ -17,7 +17,8 @@ class HorasConvenioDataCalculator extends AbstractDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$horas_convenio = "SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
+		$factor = $this->getFactor();
+		$horas_convenio = "SUM({$factor} * TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
 
 		$Criteria
 			->add_select($horas_convenio, 'horas_convenio');
