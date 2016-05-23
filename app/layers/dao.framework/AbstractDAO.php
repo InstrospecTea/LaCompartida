@@ -275,13 +275,25 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	private function add_ordering($criteria, $order) {
+		if (is_null($order)) {
+			return;
+		}
+
 		if (is_array($order)) {
 			foreach ($order as $field) {
-				$criteria->add_ordering($field);
+				$this->add_ordering($criteria, $field);
 			}
-		} else if (!is_null($order)) {
-			$criteria->add_ordering($order);
+			return;
 		}
+
+		$order_split = explode(' ', $order);
+		if (count($order_split) == 2) {
+			$criteria->add_ordering($order_split[0], $order_split[1]);
+		} else {
+			$criteria->add_ordering($order_split[0]);
+		}
+
+		return;
 	}
 
 	private function add_limits($criteria, $limit) {
