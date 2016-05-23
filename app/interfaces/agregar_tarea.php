@@ -5,7 +5,7 @@ $sesion = new Sesion();
 $pagina = new Pagina($sesion);
 $id_usuario_actual = $sesion->usuario->fields['id_usuario'];
 $Tarea = new Tarea($sesion);
-
+$Form = new Form();
 if($id_tarea) {
 	$Tarea->Load($id_tarea);
 	$id_usuario_registro = $Tarea->fields['usuario_registro'];
@@ -98,6 +98,13 @@ if($id_usuario_generador){
 	$usuario_generador->LoadId($id_usuario_actual);
 }
 
+$dias_alerta = array(
+	1 => __('1 día antes'),
+	2 => __('2 días antes'),
+	5 => __('5 días antes'),
+	10 => __('10 días antes')
+);
+
 $txt_pagina = $Tarea->loaded() ? __('Edición de Tarea').' :: '.$Tarea->fields['nombre'] : __('Ingreso de Tarea');
 $req = '<span style="color:#FF0000; font-size:10px">*</span>';
 
@@ -106,7 +113,9 @@ $pagina->PrintTop($popup);
 ?>
 
 <script type="text/javascript">
-	<?=$js_refrescar?>
+	var campo_cliente = '<?= $conf_codigo_primario ? 'codigo_cliente' : 'codigo_cliente_secundario'; ?>';
+	var campo_asunto = '<?= $conf_codigo_primario ? 'codigo_asunto' : 'codigo_asunto_secundario'; ?>';
+	<?= $js_refrescar; ?>
 	function CambiarEncargado() {
 		if($('id_usuario_encargado').selectedIndex == 0) {
 			if($('estado').selectedIndex == 1)
@@ -139,46 +148,28 @@ $pagina->PrintTop($popup);
 	function ActualizarEstado(indice) {
 		$('estado').selectedIndex = indice;
 	}
-	function Validar(form) {
-		var err = false;
-		<?php
-			if($conf_codigo_primario)
-			{
-		?>
-                var form_codigo_cliente = form.codigo_cliente;
-                var form_codigo_asunto = form.codigo_asunto;
-		<?php
-			}
-			else
-			{
-		?>
-                var form_codigo_cliente = form.codigo_cliente_secundario;
-                var form_codigo_asunto = form.codigo_asunto_secundario;
-		<?php
-			}
-		?>
-		if(!form_codigo_cliente.value) {
-			alert('<?php echo __('Debe seleccionar un cliente');?>');
-			form_codigo_cliente.focus();
+	function Validar() {
+		if(!jQuery('#' + campo_cliente).val()) {
+			alert('<?php echo __('Debe seleccionar un cliente'); ?>');
+			jQuery('#' + campo_cliente).focus();
 	    	return false;
 		}
-		if(!form_codigo_asunto.value) {
-			alert('<?php echo __('Ud. debe seleccionar un').' '.__('asunto');?>');
-			form_codigo_asunto.focus();
+		if(!jQuery('#' + campo_cliente).val()) {
+			alert('<?php echo __('Ud. debe seleccionar un') . ' ' . __('asunto'); ?>');
+			jQuery('#' + campo_cliente).focus();
 			return false;
 		}
-		if(form.nombre.value == '') {
-			alert('<?php echo __('Debe ingresar un nombre para la Tarea');?>');
-			form.nombre.focus();
+		if(jQuery('#nombre').val() == '') {
+			alert('<?php echo __('Debe ingresar un nombre para la Tarea'); ?>');
+			jQuery('#nombre').focus();
 			return false;
 		}
-		if(form.fecha.value == '') {
-			if(confirm('<?php echo __('La tarea se ingresará sin Fecha de Entrega');?>')) {
+		if(jQuery('#fecha').val() == '') {
+			if(confirm('<?php echo __('La tarea se ingresará sin Fecha de Entrega'); ?>')) {
 				return true;
-			}else{
-				form.fecha.focus();
-				return false;
 			}
+			jQuery('#fecha').focus();
+			return false;
 		}
 		return true;
 	}
@@ -208,7 +199,7 @@ $pagina->PrintTop($popup);
    	}
 	echo(Autocompletador::CSS());
 ?>
-<form method=post action="<?php echo $SERVER[PHP_SELF]; ?>" onsubmit="return Validar(this);" id="form_gastos" autocomplete='off'>
+<form method=post action="" id="form_tareas" autocomplete='off'>
 	<input type='hidden' name='opcion' value="guardar" />
 	<input type='hidden' name="gIsMouseDown" id="gIsMouseDown" value='false' />
 	<input type='hidden' name="max_hora" id="max_hora" value='999999999' />
@@ -315,13 +306,7 @@ $pagina->PrintTop($popup);
 		    		<?php echo __('Alerta');?>
 		      	</td>
 			  	<td align='left'>
-					<select name="alerta" id="alerta">
-						<option value="0"  <?php echo $Tarea->fields['alerta']==0? 'selected':''; ?> ><?php echo __("Sin Alerta");?></option>
-						<option value="1"  <?php echo $Tarea->fields['alerta']==1? 'selected':''; ?> ><?php echo __("1 día antes");?></option>
-						<option value="2"  <?php echo $Tarea->fields['alerta']==2? 'selected':''; ?> ><?php echo __("2 días antes");?></option>
-						<option value="5"  <?php echo $Tarea->fields['alerta']==5? 'selected':''; ?> ><?php echo __("5 días antes");?></option>
-						<option value="10" <?php echo $Tarea->fields['alerta']==10? 'selected':''; ?>><?php echo __("10 días antes");?></option>
-					</select>
+						<?= $Form->select('alerta', $dias_alerta, $Tarea->fields['alerta'], array('empty' => __('Sin Alerta')));?>
 			  </td>
 			</tr>
 		</tr>
@@ -335,29 +320,21 @@ $pagina->PrintTop($popup);
 				<?php echo __('Usuario Responsable');?>
 			</td>
 			<td align='left' width='20%'>
-				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario WHERE activo='1' ORDER BY apellido1", "id_usuario_encargado", $Tarea->fields['usuario_encargado']? $Tarea->fields['usuario_encargado']:$id_usuario_actual,"onchange='CambiarEncargado();'", __('Ninguno'),'170'); ?>
+				<?php $id_usuario_encargado = empty($id_tarea) ? $id_usuario_actual : $Tarea->fields['usuario_encargado'];?>
+				<?= $Form->select('id_usuario_encargado',
+					$usuario_generador->ListarActivos(null, false, $id_usuario_encargado),
+					$id_usuario_encargado,
+					array('empty' => __('Ninguno'), 'onclick' => 'CambiarEncargado()')
+				); ?>
 			</td>
 			<td align='right' width='24%'>
 				<?php echo __('Estado');?>
 			</td>
 			<td align='left'>
-				<select name='estado' id='estado'>
-					<?php
-						foreach($Tarea->estados as $e)
-						{
-							$selected = '';
-							if($id_tarea){
-								if($Tarea->fields['estado'] == $e){
-									$selected = 'selected="selected"';
-                                }
-							}
-							else if($e == 'Asignada'){
-								$selected = 'selected="selected"';
-                            }
-							echo "<option value='".$e."' ".$selected.">".$e."</option>";
-						}
-					?>
-				</select>
+				<?= $Form->select('estado',
+					array_combine($Tarea->estados, $Tarea->estados),
+					empty($id_tarea) ? 'Asignada' : $Tarea->fields['estado']
+				); ?>
 			</td>
 		</tr>
 		<tr>
@@ -365,7 +342,11 @@ $pagina->PrintTop($popup);
 				<?php echo __('Usuario Revisor');?>
 			</td>
 			<td align='left'>
-				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_revisor", $Tarea->fields['usuario_revisor']? $Tarea->fields['usuario_revisor']:$id_usuario_actual,"", __('Ninguno'),'170'); ?>
+				<?= $Form->select('id_usuario_revisor',
+					$usuario_generador->ListarActivos(null, false, $Tarea->fields['usuario_revisor']),
+					$Tarea->fields['usuario_revisor'],
+					array('empty' => __('Ninguno'))
+				); ?>
 			</td>
 			<td align='right'>
 				<?php echo __('Duración Estimada');?>
@@ -396,7 +377,11 @@ $pagina->PrintTop($popup);
 				<?php echo __('Usuario Mandante');?>
 			</td>
 			<td align='left'>
-				<?php echo Html::SelectQuery($sesion, "SELECT id_usuario, CONCAT_WS(', ', apellido1, nombre) FROM usuario  WHERE activo='1' ORDER BY apellido1", "id_usuario_generador", $Tarea->fields['usuario_generador']? $Tarea->fields['usuario_generador']:$id_usuario_actual,"", __('Ninguno'),'170'); ?>
+				<?= $Form->select('id_usuario_generador',
+					$usuario_generador->ListarActivos(null, false, $Tarea->fields['usuario_generador']),
+					$Tarea->fields['usuario_generador'],
+					array('empty' => __('Ninguno'))
+				); ?>
 			</td>
 			<td align='right'>
 				<?php echo __('Duración Ingresada');?>
@@ -421,14 +406,16 @@ $pagina->PrintTop($popup);
 			</td>
 			<td align='right' colspan='3'>
 				<?php if($Tarea->loaded()) { ?>
-					<span style="font-size:10px;"><i><?php echo __('Tarea ingresada el').'&nbsp;'.Utiles::sql2fecha($Tarea->fields['fecha_creacion']);?>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+					<span style="font-size:10px;">
+						<?php echo __('Tarea ingresada el').'&nbsp;'.Utiles::sql2fecha($Tarea->fields['fecha_creacion']);?>
+					</span>
 				<?php } ?>
 			</td>
 		</tr>
 		<tr>
 			<td align='center' colspan='4'>
-				<input type='submit' class='btn' value="<?php echo __('Guardar');?>" onclick='return Validar(this.form);' />
-				<input type='button' class='btn' value="<?php echo __('Cerrar');?>" onclick="Cerrar()" />
+				<?= $Form->submit(__('Guardar')); ?>
+				<?= $Form->button(__('Cerrar'), array('id' => 'cerrar')); ?>
 			</td>
 		</tr>
 	</table>
@@ -448,6 +435,19 @@ $pagina->PrintTop($popup);
 		</iframe>
 	</div>
 <?php }?>
+
+<script type="text/javascript">
+(function($) {
+	$('#cerrar').on('click', function (event) {
+		event.preventDefault();
+		window.close();
+	});
+	$('#form_tareas').on('submit', function () {
+		return Validar();
+	});
+})(jQuery);
+
+</script>
 <?php
 	if(Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador') {
 		echo Autocompletador::Javascript($sesion);
@@ -455,4 +455,3 @@ $pagina->PrintTop($popup);
 	echo InputId::Javascript($sesion);
 	echo SelectorHoras::Javascript();
 	$pagina->PrintBottom($popup);
-?>
