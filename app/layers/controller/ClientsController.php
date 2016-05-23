@@ -69,6 +69,7 @@ class ClientsController extends AbstractController {
 			'opc_ver_tipo_cambio',
 			'opc_ver_valor_hh_flat_fee',
 			'porcentaje_descuento',
+			'retainer_horas',
 			'rut AS factura_rut',
 			'separar_liquidaciones',
 			'tipo_descuento',
