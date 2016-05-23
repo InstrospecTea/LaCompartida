@@ -286,11 +286,11 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			return;
 		}
 
-		$order_split = explode(' ', $order);
-		if (count($order_split) == 2) {
-			$criteria->add_ordering($order_split[0], $order_split[1]);
+		$patt = '/(.*) (DESC|ASC)?$/i';
+		if(preg_match($patt, $order, $matches)) {
+			$criteria->add_ordering($matches[1], $matches[2]);
 		} else {
-			$criteria->add_ordering($order_split[0]);
+			$criteria->add_ordering($field);
 		}
 
 		return;
