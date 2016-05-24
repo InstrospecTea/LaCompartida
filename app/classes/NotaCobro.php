@@ -10966,7 +10966,7 @@ class NotaCobro extends Cobro {
 				$resumen_horas_trabajadas_profesional = 0;
 
 				foreach ($x_resumen_profesional as $prof => $data) {
-
+					$horas_descontadas_profesional = $data['duracion_descontada'] - $data['duracion_incobrables'];
 					// Calcular totales
 					$resumen_hrs_trabajadas += $data['duracion_trabajada'];
 					$resumen_hrs_cobradas += $data['duracion_cobrada'];
@@ -10974,8 +10974,8 @@ class NotaCobro extends Cobro {
 					$resumen_hrs_cobradas_cob -= $data['duracion_incobrables'];
 					$resumen_hrs_retainer += $data['duracion_retainer'];
 					$resumen_hrs_descontadas += $data['duracion_descontada'];
-					$resumen_horas_descontadas += $data['duracion_descontada'];
 					$resumen_hrs_incobrables += $data['duracion_incobrables'];
+					$resumen_horas_descontadas += $horas_descontadas_profesional;
 					$resumen_horas_no_cobrables += $data['duracion_incobrables'];
 					$resumen_horas_trabajadas_profesional += $data['duracion_trabajada'];
 
@@ -10988,7 +10988,8 @@ class NotaCobro extends Cobro {
 
 					$html3 = $parser->tags['PROFESIONAL_FILAS'];
 					$html3 = str_replace('%username%', $data['username'], $html3);
-					$html3 = str_replace('%horas_descontadas%', $data['glosa_duracion_descontada'], $html3);
+
+					$html3 = str_replace('%horas_descontadas%', Utiles::Decimal2GlosaHora($horas_descontadas_profesional), $html3);
 					$html3 = str_replace('%horas_no_cobrables%', $data['glosa_duracion_incobrables'], $html3);
 					$html3 = str_replace('%horas_trabajadas_profesional%', $data['glosa_duracion_trabajada'], $html3);
 					if ($this->fields['opc_ver_profesional_iniciales'] == 1) {
