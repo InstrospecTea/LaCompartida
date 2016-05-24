@@ -11,8 +11,6 @@ $directorios = array(
 	'/app/layers/dao/',
 	'/app/layers/dao/exceptions/',
 	'/app/layers/dto/',
-	'/app/layers/manager/',
-	'/app/layers/manager.support/',
 	'/app/layers/report.support/',
 	'/app/layers/report.support/calculators/',
 	'/app/layers/report.support/engine/',
