@@ -48,7 +48,7 @@ class AsuntosCycDenton extends \Database\Migration implements \Database\ITemplat
 	 * @return void
 	 */
 	function down() {
-		$this->addQueryDown('CREATE TABLE `asunto_extra`');
+		$this->addQueryDown('DROP TABLE `asunto_extra`');
 		$this->addQueryDown('DROP TABLE `prm_region_maestra`');
 		$this->addQueryDown('DELETE FROM `configuracion` WHERE `glosa_opcion` = "MostrarAsuntoConfidencial"');
 		$this->addQueryDown('DELETE FROM `configuracion` WHERE `glosa_opcion` = "MostrarAsuntoTrabajoConjunto"');
