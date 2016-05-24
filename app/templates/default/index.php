@@ -87,8 +87,13 @@ for ($i = 0; $row = mysql_fetch_assoc($resp); $i++) {
 				$Migration = new \Database\Migration();
 				$last_version_database = $Migration->getLastVersionOnDatabase();
 				$last_version_file_system = $Migration->getLastVersionOnFileSystem();
-				unset($Session, $Migration);
-
+				$migration_files = $Migration->getUnexecuted();
+				if (!empty($migration_files)) {
+					$Html = new \TTB\Html();
+					$last_version_database = $Html->span($last_version_database, array('style' => 'color: red'));
+					unset($Html);
+				}
+				unset($Session, $Migration, $migration_files);
 				echo ' <br/><br/> Este software corre sobre la DB ' . Conf::dbHost() . ' <b>' . Conf::dbName() . '</b> version ' . $last_version_database;
 				echo '. La m&aacute;s actual disponible es la ' . $last_version_file_system;
 
