@@ -3,34 +3,6 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 class UtilesApp extends Utiles {
-
-	public static $_transliteration = array(
-		'/ü/' => 'ue',
-		'/Ä/' => 'Ae',
-		'/Ü/' => 'Ue',
-		'/Ö/' => 'Oe',
-		'/À|Á|Â|Ã|Ä|Å/' => 'A',
-		'/à|á|â|ã|å|ª/' => 'a',
-		'/Ç/' => 'C',
-		'/ç/' => 'c',
-		'/Ğ|Ğ/' => 'D',
-		'/ğ/' => 'd',
-		'/È|É|Ê|Ë/' => 'E',
-		'/è|é|ê|ë/' => 'e',
-		'/Ì|Í|Î|Ï/' => 'I',
-		'/ì|í|î|ï/' => 'i',
-		'/Ñ/' => 'N',
-		'/ñ/' => 'n',
-		'/Ò|Ó|Ô|Õ|Ø/' => 'O',
-		'/ò|ó|ô|õ|ø|º/' => 'o',
-		'/Ù|Ú|Û/' => 'U',
-		'/ù|ú|û/' => 'u',
-		'/İ/' => 'Y',
-		'/ı|ÿ/' => 'y',
-		'/Æ/' => 'AE',
-		'/ß/'=> 'ss'
-	);
-
 	/**
 	 *
 	 * @param object $sesion
@@ -2361,7 +2333,7 @@ HTML;
 	}
 
 	public static function transliteration($string, array $map = array()) {
-		$map += self::$_transliteration;
+		$map += ForeignCharacters::$transliteration;
 		return preg_replace(array_keys($map), array_values($map), $string);
 	}
 
