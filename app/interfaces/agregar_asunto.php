@@ -18,7 +18,7 @@ $encargado_obligatorio = Conf::GetConf($Sesion, 'AtacheSecundarioSoloAsunto') ==
 $contrato = new Contrato($Sesion);
 $Cliente = new Cliente($Sesion);
 $Asunto = new Asunto($Sesion);
-			$Asunto->saveExtra($_POST['asunto_extra']);
+$Asunto->saveExtra($_POST['asunto_extra']);
 
 if ($codigo_cliente_secundario != '') {
 	$Cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
