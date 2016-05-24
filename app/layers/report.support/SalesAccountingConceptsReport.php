@@ -58,81 +58,80 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 			$this->Ws->setColumn(2, 2, 16);
 		}
 
-		$currency = $this->parameters['display_currency']->fields['id_moneda'];
-		$currency_symbol = $this->parameters['display_currency']->fields['simbolo'];
+		if (empty($this->data)) {
+			$this->row++;
+			$this->writeNewRow(1, 13, __('No se encontraron resultados'), $this->format['header']);
+			return;
+		}
 
-		if (!empty($this->data)) {
-			foreach ($this->data as $sale) {
-				if (!$separated_by_invoice) {
-					if (empty($sales_client[$sale['client_code']]['name'])) {
-						$sales_client[$sale['client_code']]['name'] = $sale['client'];
-					}
-					$sales_client[$sale['client_code']]['periods'][$sale['period']] += $sale['total_period'];
-				} else {
-					$sales_client[] = array(
-						'name' => $sale['client'],
-						'invoice' => $sale['invoice'],
-						'periods' => array(
-							$sale['period'] => $sale['total_period']
-						)
-					);
+		foreach ($this->data as $sale) {
+			if (!$separated_by_invoice) {
+				$key = "{$sale['client_code']}.{$sale['client']}";
+				if (empty($sales_client[$key]['name'])) {
+					$sales_client[$key]['name'] = $sale['client'];
 				}
+				$sales_client[$key]['periods'][$sale['period']] += $sale['total_period'];
+			} else {
+				$sales_client[] = array(
+					'name' => $sale['client'],
+					'invoice' => $sale['invoice'],
+					'periods' => array(
+						$sale['period'] => $sale['total_period']
+					)
+				);
 			}
+		}
 
-			$start_date = new DateTime($this->parameters['start_date']);
-			$end_date = new DateTime($this->parameters['end_date']);
-			$diff_date = $start_date->diff($end_date);
-			$total_months = ($diff_date->y * 12) + $diff_date->m;
-			$periods = array();
-			$next_period = $start_date;
+		$start_date = new DateTime($this->parameters['start_date']);
+		$end_date = new DateTime($this->parameters['end_date']);
+		$diff_date = $start_date->diff($end_date);
+		$total_months = ($diff_date->y * 12) + $diff_date->m;
+		$periods = array();
+		$next_period = $start_date;
 
-			$this->Ws->setColumn($col_periods, $total_months + $col_periods, 16);
+		$this->Ws->setColumn($col_periods, $total_months + $col_periods, 16);
 
-			for ($x = 0; $x <= $total_months ; $x++) {
-				$periods[date_format($next_period, 'Ym')] = date_format($next_period, 'M Y');
-				$next_period->add(new DateInterval('P1M'));
+		for ($x = 0; $x <= $total_months ; $x++) {
+			$periods[date_format($next_period, 'Ym')] = date_format($next_period, 'M Y');
+			$next_period->add(new DateInterval('P1M'));
+		}
+
+		$col = $col_periods;
+		foreach ($periods as $period_key => $period_value) {
+			$this->Ws->write($this->row, $col, $period_value, $this->format['title']);
+			$col++;
+		}
+
+		$this->row++;
+		$start_row = $this->row + 1;
+
+		foreach ($sales_client as $sale_client) {
+			$this->Ws->write($this->row, 1, $sale_client['name'], $this->format['title']);
+
+			if ($this->parameters['separated_by_invoice'] == '1') {
+				$this->Ws->write($this->row, 2, $sale_client['invoice'], $this->format['invoice']);
 			}
 
 			$col = $col_periods;
+
 			foreach ($periods as $period_key => $period_value) {
-				$this->Ws->write($this->row, $col, $period_value, $this->format['title']);
+				$total_period = 0;
+				if (!empty($sale_client['periods'][$period_key])) {
+					$total_period = $sale_client['periods'][$period_key];
+				}
+				$format = $total_period >= 0 ? $this->format['currency'] : $this->format['currency_red'];
+				$this->Ws->write($this->row, $col, $total_period, $format);
 				$col++;
 			}
 
 			$this->row++;
-			$start_row = $this->row + 1;
+		}
 
-			foreach ($sales_client as $sale_client) {
-				$this->Ws->write($this->row, 1, $sale_client['name'], $this->format['title']);
+		$this->Ws->write($this->row, 1, __('Total'), $this->format['title']);
 
-				if ($this->parameters['separated_by_invoice'] == '1') {
-					$this->Ws->write($this->row, 2, $sale_client['invoice'], $this->format['invoice']);
-				}
-
-				$col = $col_periods;
-
-				foreach ($periods as $period_key => $period_value) {
-					$total_period = 0;
-					if (!empty($sale_client['periods'][$period_key])) {
-						$total_period = $sale_client['periods'][$period_key];
-					}
-					$format = $total_period >= 0 ? $this->format['currency'] : $this->format['currency_red'];
-					$this->Ws->write($this->row, $col, $total_period, $format);
-					$col++;
-				}
-
-				$this->row++;
-			}
-
-			$this->Ws->write($this->row, 1, __('Total'), $this->format['title']);
-
-			for ($x = $col_periods; $x <= ($total_months + $col_periods); $x++) {
-				$col = Utiles::NumToColumnaExcel($x);
-				$this->Ws->writeFormula($this->row, $x, "=SUM({$col}{$start_row}:{$col}{$this->row})", $this->format['currency']);
-			}
-		} else {
-			$this->row++;
-			$this->writeNewRow(1, 13, __('No se encontraron resultados'), $this->format['header']);
+		for ($x = $col_periods; $x <= ($total_months + $col_periods); $x++) {
+			$col = Utiles::NumToColumnaExcel($x);
+			$this->Ws->writeFormula($this->row, $x, "=SUM({$col}{$start_row}:{$col}{$this->row})", $this->format['currency']);
 		}
 	}
 
@@ -146,6 +145,7 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 				$currency_decimals .= '0';
 			}
 		}
+		$format_currency = "[\${$currency_symbol}] #,##0{$currency_decimals}";
 
 		$this->format['header'] = $this->reportEngine->engine->addFormat(
 			array(
@@ -192,7 +192,7 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 				'Align' => 'right',
 				'Border' => 1,
 				'Color' => 'black',
-				'NumFormat' => "[\${$currency_symbol}] #,###,0{$currency_decimals}"
+				'NumFormat' => $format_currency
 			)
 		);
 		$this->format['currency_red'] = $this->reportEngine->engine->addFormat(
@@ -203,7 +203,7 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 				'Border' => 1,
 				'Bold' => 1,
 				'Color' => 'red',
-				'NumFormat' => "[\${$currency_symbol}] #,###,0{$currency_decimals}"
+				'NumFormat' => $format_currency
 			)
 		);
 	}

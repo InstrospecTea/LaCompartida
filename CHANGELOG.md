@@ -1,5 +1,82 @@
 # Changelog
 
+## [Release 16.14.0](https://github.com/LemontechSA/ttb/pull/1472)
+Thursday, May 19th
+* **Feature** [Manager Layer](https://github.com/LemontechSA/ttb/pull/1462)
+* **Feature** [Facturación Electronica Satcom](https://github.com/LemontechSA/ttb/pull/1417)
+
+## Hotfix 16.13.8
+Wednesday, May 18th
+* **Fix** [Agrega y aplica nuevo formato numero_rut](https://github.com/LemontechSA/ttb/pull/1466)
+
+## Hotfix 16.13.7
+Wednesday, May 18th
+* **Fix** [Corregir nombre formato celda número para el excel del cobro](https://github.com/LemontechSA/ttb/pull/1463)
+
+## Hotfix 16.13.6
+Monday, May 16th
+* **Fix** [Si tarifa de usuario está vacía, se asigna la tarifa hh del trabajo](https://github.com/LemontechSA/ttb/pull/1459)
+
+## Hotfix 16.13.5
+Monday, May 16th
+* **Fix** [Corrección if iframe](https://github.com/LemontechSA/ttb/pull/1457)
+
+## Hotfix 16.13.4
+Friday, May 13th
+* **Fix** [Agrupa los datos por rut de factura y nombre de cliente](https://github.com/LemontechSA/ttb/pull/1456)
+
+## Hotfix 16.13.3
+Friday, May 13th
+* **Fix** [Corrige formato del resumen del cobro](https://github.com/LemontechSA/ttb/pull/1455)
+
+## Hotfix 16.13.2
+Friday, May 13th
+* **Fix** [carga los datos de facturacion del contrato principal](https://github.com/LemontechSA/ttb/pull/1454)
+
+## Hotfix 16.13.1
+Thursday, May 12th
+* **Fix** [Elimina string sdfghj](https://github.com/LemontechSA/ttb/pull/1453)
+
+## [Release 16.13.0](https://github.com/LemontechSA/ttb/pull/1451)
+Thursday, May 12th
+* **Feature** [Tabla Cebra](https://github.com/LemontechSA/ttb/pull/1440)
+
+## Hotfix 16.12.6
+Thursday, May 12th
+* **Fix** [Área del asunto NULL](https://github.com/LemontechSA/ttb/pull/1452)
+
+## Hotfix 16.12.5
+Thursday, May 12th
+* **Fix** [Problema resumen semanal Lloreda-Camacho](https://github.com/LemontechSA/ttb/pull/1449)
+
+## Hotfix 16.12.4
+Tuesday, May 10th
+* **Fix** [Configuración para manejar el uso de clientes](https://github.com/LemontechSA/ttb/pull/1444)
+
+## Hotfix 16.12.3
+Tuesday, May 10th
+* **Fix** [Realiza la conversión de moneda según la moneda de la factura y no la del cobro](https://github.com/LemontechSA/ttb/pull/1442)
+
+## Hotfix 16.12.2
+Tuesday, May 10th
+* **Fix** [Username en Excel Opcional](https://github.com/LemontechSA/ttb/pull/1441)
+
+## Hotfix 16.12.1
+Monday, May 9th
+* **Fix** [Error al descargar Excel](https://github.com/LemontechSA/ttb/pull/1438)
+
+## [Release 16.12.0](https://github.com/LemontechSA/ttb/pull/1436)
+Friday, May 6th
+* **Feature** [Reporte de Gastos](https://github.com/LemontechSA/ttb/pull/1433)
+
+## Hotfix 16.11.6
+Thursday, May 5th
+* **Fix** [Corrige asignación monto_pago al utilizar un adelanto](https://github.com/LemontechSA/ttb/pull/1435)
+
+## Hotfix 16.11.5
+Thursday, May 5th
+* **Fix** [Corrige encabezado de documento ledes erróneo en caso counselink](https://github.com/LemontechSA/ttb/pull/1434)
+
 ## Hotfix 16.11.4
 Thursday, April 28th
 * **Fix** [Condiciona la consulta del id_usuarioa que no esté vacío. Llama a errorSQL() en caso de error.](https://github.com/LemontechSA/ttb/pull/1427)

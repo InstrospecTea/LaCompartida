@@ -73,4 +73,11 @@ class SimpleReport_Configuration_Column {
 		return $this;
 	}
 
+	/*
+	 * Retorna si la columna está seteada como visible o no
+	 */
+	public function isVisible() {
+		return $this->visible;
+	}
+
 }

@@ -199,7 +199,15 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 	function Cancelar(form)
 	{
 		form.opc.value = 'cancelar';
-		form.submit();
+		enviarFormulario(form);
+	}
+
+	function enviarFormulario(form) {
+		ArregloRevisados();
+		ArregloSecretarios();
+		if (Validar(form)) {
+			form.submit();
+		}
 	}
 
 	var necesitaConfirmar = false;
@@ -222,9 +230,6 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 			alert("Debe ingresar el apellido del usuario");
 			return false;
 		}
-
-		ArregloRevisados();
-		ArregloSecretarios();
 		necesitaConfirmar = false;
 		return true;
 	}
@@ -239,7 +244,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 	{
 		if(confirm('¿Desea cambiar todas las tarifas del abogado a esta categoría?'))
 		{
-			document.form_usuario.submit();
+			enviarFormulario(document.form_usuario);
 			var select_origen = document.getElementById(id_origen);
 			var http = getXMLHTTP();
 			var vurl = root_dir + '/app/ajax.php?accion=' + accion + '&id=' + id_usuario + '&id_2=' + select_origen.value ;
@@ -378,7 +383,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 
 </script>
 
-<form action="usuario_paso2.php" name="form_usuario" id="form_usuario" method="post" enctype="multipart/form-data" onSubmit="return Validar(this);">
+<form action="usuario_paso2.php" name="form_usuario" id="form_usuario" method="post" enctype="multipart/form-data">
 	<input type="hidden" name="opc" id="opc" value="edit" />
 	<input type="hidden" name="rut" value="<?php echo $rut ?>" />
 	<input type="hidden" name="dv_rut" value="<?php echo $dv_rut ?>" />
@@ -796,7 +801,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 		<legend><?php echo __('Guardar datos') ?></legend>
 		<?php
 			if ($sesion->usuario->fields['id_visitante'] == 0) {
-				echo $Form->submit(__('Guardar'));
+				echo $Form->button(__('Guardar'), array('onClick' => 'enviarFormulario(jQuery(\'#form_usuario\')[0])'));
 			} else {
 				echo $Form->button(__('Guardar'), array('onclick' => "alert('Usted se encuentra en un sistema demo, no tiene derecho de modificar datos.')"));
 				echo $Form->button(__('Eliminar') . ' ' . ('Usuario'), array('onclick' => "Eliminar()", 'class' => 'btn_rojo'));
@@ -1136,7 +1141,7 @@ function CargarPermisos() {
 				e.stop();
 				return false;
 			}
-			$('form_usuario').submit();
+			enviarFormulario($('form_usuario'));
 		}
 	});
 
@@ -1149,7 +1154,7 @@ function CargarPermisos() {
 				var tmp = ide.split('_');
 				$('opc').value = 'elimina_vacacion';
 				$('vacacion_id_tmp').value = tmp[1];
-				$('form_usuario').submit();
+				enviarFormulario($('form_usuario'));
 			}
 		});
 	});

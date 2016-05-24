@@ -85,6 +85,28 @@ class Gasto extends Objeto {
 			),
 		),
 		array(
+			'field' => 'impuesto_gastos',
+			'format' => 'number',
+			'title' => 'Impuesto',
+			'visible' => false,
+			'extras' =>
+			array(
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			)
+		),
+		array(
+			'field' => 'monto_con_impuesto',
+			'format' => 'number',
+			'title' => 'Total',
+			'visible' => false,
+			'extras' =>
+			array(
+				'symbol' => 'simbolo',
+				'subtotal' => 'simbolo'
+			)
+		),
+		array(
 			'field' => 'monto_facturable',
 			'format' => 'number',
 			'title' => 'Monto Facturable',
@@ -309,16 +331,16 @@ class Gasto extends Objeto {
 		$col_select = array();
 		$join_extra = array();
 
-		if ($SimpleReport->Config->columns['codigo_cuenta_gasto']->Visible() ||
-				$SimpleReport->Config->columns['glosa_cuenta_gasto']->Visible()) {
+		if ($SimpleReport->Config->columns['codigo_cuenta_gasto']->isVisible() ||
+				$SimpleReport->Config->columns['glosa_cuenta_gasto']->isVisible()) {
 			$col_select[] = "cta_corriente.cuenta_gasto AS codigo_cuenta_gasto";
 			$col_select[] = "prm_codigo_cuenta_gasto.glosa AS glosa_cuenta_gasto";
 			$join_extra[] = "LEFT JOIN prm_codigo AS prm_codigo_cuenta_gasto
 												ON cta_corriente.cuenta_gasto = prm_codigo_cuenta_gasto.codigo
 												AND prm_codigo_cuenta_gasto.grupo = 'CUENTA_GASTO'";
 		}
-		if ($SimpleReport->Config->columns['codigo_detraccion']->Visible() ||
-				$SimpleReport->Config->columns['glosa_detraccion']->Visible()) {
+		if ($SimpleReport->Config->columns['codigo_detraccion']->isVisible() ||
+				$SimpleReport->Config->columns['glosa_detraccion']->isVisible()) {
 			$col_select[] = "cta_corriente.detraccion AS codigo_detraccion";
 			$col_select[] = "prm_codigo_detraccion.glosa AS glosa_detraccion";
 			$join_extra[] = "LEFT JOIN prm_codigo AS prm_codigo_detraccion
@@ -326,8 +348,8 @@ class Gasto extends Objeto {
 												AND prm_codigo_detraccion.grupo = 'DETRACCION'";
 		}
 
-		$col_select = "," . implode(",", $col_select);
-		$join_extra = implode(" ", $join_extra);
+		$col_select = !empty($col_select) ? "," . implode(",", $col_select) : NULL;
+		$join_extra = !empty($join_extra) ? implode(" ", $join_extra) : NULL;
 
 		$search_query = self::SearchQuery($this->sesion, $where, $col_select, $join_extra);
 
@@ -505,12 +527,15 @@ class Gasto extends Objeto {
 						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*if(ifnull(egreso,0)=0,ifnull(ingreso,0), egreso)  as monto_cobrable_moneda_base,  \n \n";
 		}
 
+		$impuestoGastos = Conf::GetConf($sesion, 'ValorImpuestoGastos');
+		$impuestoGastos = empty($impuestoGastos) ? 0 : $impuestoGastos;
+
 		$query.="\n\n
 				IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) ) as tipo_cambio_segun_cobro,
 				cta_corriente.con_impuesto,
 				cta_corriente.id_cobro,
 				IFNULL(cobro.estado, 'SIN COBRO') AS estado_cobro,
-				cta_corriente.cobrable,
+				IF(cta_corriente.cobrable = 1, 'Sí', 'No') AS cobrable,
 				cta_corriente.numero_documento,
 				prm_proveedor.rut AS rut_proveedor,
 				prm_proveedor.glosa AS nombre_proveedor,
@@ -526,6 +551,22 @@ class Gasto extends Objeto {
 				prm_idioma.codigo_idioma,
 				contrato.activo AS contrato_activo,
 				1 as opcion,
+				IF(con_impuesto = 'SI',
+					ROUND(
+						IF(cta_corriente.id_cobro IS NULL,
+							(monto_cobrable * ({$impuestoGastos} / 100)),
+							(monto_cobrable * (cobro.porcentaje_impuesto_gastos / 100))),
+					2),
+				0) AS impuesto_gastos,
+
+				(monto_cobrable + IF(con_impuesto = 'SI',
+					ROUND(
+						IF(cta_corriente.id_cobro IS NULL,
+							(monto_cobrable * ({$impuestoGastos} / 100)),
+							(monto_cobrable * (cobro.porcentaje_impuesto_gastos / 100))),
+							2),
+						0)
+					) AS monto_con_impuesto,
 				contrato.id_contrato
 				$col_select
 			FROM " . self::SelectFromQuery($join_extra) . "

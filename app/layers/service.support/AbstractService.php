@@ -34,14 +34,14 @@ abstract class AbstractService implements BaseService {
 	 * @return mixed
 	 * @throws ServiceException
 	 */
-	public function get($id) {
+	public function get($id, $fields = null) {
 		$this->checkNullity($id);
 		$daoClass = $this->getDaoLayer();
 		$dao = new $daoClass($this->sesion);
 		try {
-			return $dao->get($id);
+			return $dao->get($id, $fields);
 		} catch(CouldNotFindEntityException $ex) {
-			throw new ServiceException($ex);
+			throw new EntityNotFound($ex);
 		}
 	}
 

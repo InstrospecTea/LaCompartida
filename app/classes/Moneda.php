@@ -6,6 +6,8 @@ class Moneda extends Objeto {
 
 	public static $llave_carga_masiva = 'codigo';
 	public static $arreglo_monedas;
+	private static $excel_formats = array();
+	private static $data_for_formats = array();
 
 	function Moneda($sesion, $fields = "", $params = "") {
 		$this->tabla = 'prm_moneda';
@@ -208,6 +210,50 @@ class Moneda extends Objeto {
 		}
 		$v = number_format($valor, $this->fields['cifras_decimales'], '.', '');
 		return $convert ? (float) $v : $v;
+	}
+
+	/**
+	 * Devuelve el string de formato para excel de la moneda indicada
+	 * @param type $id
+	 * @return string
+	 */
+	public function getExcelFormat($id) {
+		if (!empty(self::$excel_formats[$id])) {
+			return self::$excel_formats[$id];
+		}
+		$moneda = $this->getDataForFormat($id);
+		$decimales = '';
+		if ($moneda['cifras_decimales'] > 0) {
+			$decimales = '.' . str_repeat('0', $moneda['cifras_decimales']);
+		}
+		self::$excel_formats[$id] = "[\${$moneda['simbolo']}] #,##0{$decimales}";
+		return self::$excel_formats[$id];
+	}
+
+	/**
+	 * Aplica formato al monto según el id indicado.
+	 * @param type $monto Monto a formatear
+	 * @param type $id Moneda en la que se aplicará el formato
+	 * @return string
+	 */
+	public function currencyFormat($monto, $id) {
+		$moneda = $this->getDataForFormat($id);
+		return "{$moneda['simbolo']} " . number_format($monto, $moneda['cifras_decimales'], ',', '.');
+	}
+
+	private function getDataForFormat($id) {
+		if (!empty(self::$data_for_formats[$id])) {
+			return self::$data_for_formats[$id];
+		}
+		$Moneda = new self($this->sesion);
+		$Moneda->Load($id, array('glosa_moneda', 'simbolo', 'cifras_decimales'));
+		if ($Moneda->fields['glosa_moneda'] == 'Euro') {
+			$Moneda->fields['simbolo'] = 'EUR';
+		}
+		unset($Moneda->fields['glosa_moneda']);
+		self::$data_for_formats[$id] = $Moneda->fields;
+		unset($Moneda);
+		return self::$data_for_formats[$id];
 	}
 
 }

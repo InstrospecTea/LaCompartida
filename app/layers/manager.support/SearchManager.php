@@ -1,10 +1,9 @@
 <?php
 
 /**
- * Class SearchBusiness
- * @deprecated replaced by SearchManager
+ * Class SearchManager
  */
-class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  {
+class SearchManager extends AbstractManager implements ISearchManager  {
 
 	/**
 	 * Realiza una búsqueda considerando los criterios definidos en una instancia de {@link SearchCriteria}.
@@ -41,7 +40,6 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	public function paginateByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array(), $page = 1) {
 		$searchCriteria->Pagination->current_page($page);
 		$searchCriteria->paginate(true);
-		// MUERTE!!!
 		$ret = new GenericModel();
 		$ret->set('data', $this->searchByCriteria($searchCriteria, $filter_properties));
 		$ret->set('Pagination', $searchCriteria->Pagination);
@@ -62,28 +60,27 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 		}
 
 		//Instanciar la clase correspondiente mediante reflection.
-		if (count($entity_scopes)) {
-			foreach ($entity_scopes as $entity => $scopes) {
-				$scopeClass = $entity . 'Scope';
-				$scopeInstance = new $scopeClass();
-				foreach ($scopes as $scope) {
-					$scope_name = $scope;
-					$args = array($criteria);
-					if (is_array($scope)) {
-						$scope_name = $scope[0];
-						$args = array_merge($args, $scope[1]);
-					}
-					$scopeMethod = new ReflectionMethod($scopeClass, $scope_name);
-					$criteria = $scopeMethod->invokeArgs($scopeInstance, $args);
+		foreach ($entity_scopes as $entity => $scopes) {
+			$scopeClass = $entity . 'Scope';
+			$scopeInstance = new $scopeClass();
+			foreach ($scopes as $scope) {
+				$scope_name = $scope;
+				$args = array($criteria);
+				if (is_array($scope)) {
+					$scope_name = $scope[0];
+					$args = array_merge($args, $scope[1]);
 				}
+				$scopeMethod = new ReflectionMethod($scopeClass, $scope_name);
+				$criteria = $scopeMethod->invokeArgs($scopeInstance, $args);
 			}
 		}
+
 		return $criteria;
 	}
 
 	private function getCriteria($searchCriteria, $filter_properties, $widthIdentity = true, $genericMode = false) {
 		$this->loadService('Search');
-		$criteria = new Criteria($this->sesion);
+		$criteria = new Criteria($this->Sesion);
 		$criteria = $this->SearchService->translateCriteria(
 			$searchCriteria,
 			$filter_properties,
@@ -92,7 +89,6 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 			$genericMode
 		);
 		$criteria = $this->addScopes($searchCriteria, $criteria);
-		// pr($criteria->get_plain_query());
 		return $criteria;
 	}
 
@@ -115,7 +111,7 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 			$value
 		);
 
-		$criteria = new Criteria($this->sesion);
+		$criteria = new Criteria($this->Sesion);
 		$criteria = $this->SearchService->translateCriteria(
 			$searchCriteria,
 			$filter_properties,
