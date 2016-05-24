@@ -105,25 +105,35 @@ class Migration {
 	}
 
 	public function runUp() {
-		$this->executeQuery($this->query_up);
+		$this->runTransaction($this->query_up);
 	}
 
 	public function runDown() {
-		$this->executeQuery($this->query_down);
+		$this->runTransaction($this->query_down);
 	}
 
 	private function executeQuery($query) {
 		if (empty($query)) {
 			return;
 		}
-		if (is_array($query)) {
-			array_walk($query, array('self', 'executeQuery'));
+		$Statement = $this->Database->prepare($query);
+		$Statement->execute();
+	}
+
+	private function runTransaction($query) {
+		if (empty($query)) {
 			return;
 		}
 		try {
-			$Statement = $this->Database->prepare($query);
-			$Statement->execute();
+			$this->Database->beginTransaction();
+			if (is_array($query)) {
+				array_walk($query, array($this, 'executeQuery'));
+			} else {
+				$this->executeQuery($query);
+			}
+			$this->Database->commit();
 		} catch (PDOException $e) {
+			$this->Database->rollBack();
 			$separator = ($this->debug) ? "\n" : '<br/>';
 			$message = $this->buildMessage($e, $query, $separator);
 
