@@ -216,11 +216,11 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return $new;
 	}
 
-	public function get($id) {
+	public function get($id, $fields = null) {
 		$criteria = new Criteria($this->sesion);
 		$reflected = new ReflectionClass($this->getClass());
 		$instance = $reflected->newInstance();
-		$criteria->add_select('*');
+		$this->add_fields($criteria, $fields);
 		$criteria->add_from($instance->getPersistenceTarget());
 		$criteria->add_restriction(CriteriaRestriction::equals($instance->getIdentity(), $id));
 		$resultArray = $criteria->run();

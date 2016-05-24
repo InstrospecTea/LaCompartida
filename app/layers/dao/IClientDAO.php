@@ -4,6 +4,6 @@
  * Description:
  *
  */
-interface ClientDAO extends BaseDAO {
+interface IClientDAO extends BaseDAO {
 
 }
