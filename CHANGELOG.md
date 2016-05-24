@@ -1,5 +1,10 @@
 # Changelog
 
+## [Release 16.14.0](https://github.com/LemontechSA/ttb/pull/1472)
+Thursday, May 19th
+* **Feature** [Manager Layer](https://github.com/LemontechSA/ttb/pull/1462)
+* **Feature** [Facturación Electronica Satcom](https://github.com/LemontechSA/ttb/pull/1417)
+
 ## Hotfix 16.13.8
 Wednesday, May 18th
 * **Fix** [Agrega y aplica nuevo formato numero_rut](https://github.com/LemontechSA/ttb/pull/1466)
