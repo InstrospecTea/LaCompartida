@@ -218,6 +218,7 @@
 	$_LANG['horas_spot'] = 'Horas Spot';
 	$_LANG['valor_cobrable'] = 'Valor Facturable';
 	$_LANG['valor_cobrado'] = 'Valor Liquidado';
+	$_LANG['valor_facturado'] = "Valor Facturado";
 	$_LANG['valor_facturado_contable'] = "Valor Facturado Contable";
 	$_LANG['valor_tramites'] = "Valor Liquidado solo Trámites";
 	$_LANG['valor_pagado'] = 'Valor Pagado';
