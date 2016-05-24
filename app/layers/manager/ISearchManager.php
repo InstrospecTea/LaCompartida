@@ -3,7 +3,7 @@
 /**
  * Interface ISearchManager
  */
-interface ISearchManager{
+interface ISearchManager {
 
 	/**
 	 * Realiza una búsqueda considerando los criterios definidos en una instancia de {@link SearchCriteria}.
