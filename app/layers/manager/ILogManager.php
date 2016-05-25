@@ -7,5 +7,5 @@ interface ILogManager extends BaseManager {
 	 * @param 	string $id_field
 	 * @return 	Array humanizado
 	 */
-	public function getLogs($table_title, $id_field)
+	public function getLogs($table_title, $id_field);
 }
