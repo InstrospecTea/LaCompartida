@@ -7,7 +7,7 @@ mysqlCmd = "mysql -u root -padmin1awdx"
 
 set :home_directory, "/mnt/disk1"
 set :base_directory, "#{home_directory}/deploys"
-
+set :keep_releases, 1
 
 # Overwrite of Composer to use one shared folder between releases, not many 'vendor' folders
 namespace :composer do

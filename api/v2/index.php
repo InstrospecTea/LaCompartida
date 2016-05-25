@@ -44,6 +44,11 @@ $Slim->get('/projects', function () use ($Session, $Slim) {
 	$API->getUpdatedMatters();
 });
 
+$Slim->get('/projects/:project_id/payments', function ($project_id) use ($Session, $Slim) {
+	$API = new Api\V2\PaymentsAPI($Session, $Slim);
+	$API->getPaymentsOfMatter($project_id);
+});
+
 $Slim->get('/activities', function () use ($Session, $Slim) {
 	$API = new Api\V2\ActivitiesAPI($Session, $Slim);
 	$API->getAllActivitiesByProjectId();
@@ -95,4 +100,3 @@ $Slim->delete('/users/:user_id/time_entries/:id', function ($user_id, $id)  use 
 });
 
 $Slim->run();
-
