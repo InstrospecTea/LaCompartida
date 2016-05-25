@@ -22,7 +22,7 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 		(1 / cobro_moneda.tipo_cambio)";
 
 		 $Criteria
-			->add_select($billed_amount, 'valor_facturado');
+			->add_select($billed_amount, $this->fieldName);
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
@@ -43,7 +43,7 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 		(1 / cobro_moneda.tipo_cambio)";
 
 		 $Criteria
-			->add_select($billed_amount, 'valor_facturado');
+			->add_select($billed_amount, $this->fieldName);
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
@@ -67,7 +67,7 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 		";
 
 		$Criteria
-			->add_select($billed_amount, 'valor_facturado');
+			->add_select($billed_amount, $this->fieldName);
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));

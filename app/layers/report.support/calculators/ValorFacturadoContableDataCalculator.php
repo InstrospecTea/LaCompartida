@@ -23,9 +23,15 @@ class ValorFacturadoContableDataCalculator extends AbstractInvoiceProportionalDa
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
+		$subtotalBase = $this->getWorksProportionalDocumentSubtotal();
+		$invoiceContrib = $this->getInvoiceContribution();
+
+		$billed_amount = "SUM({$subtotalBase} * {$invoiceContrib})
+		*
+		(1 / cobro_moneda.tipo_cambio)";
 
 		 $Criteria
-			->add_select("0", $this->fieldName);
+			->add_select($billed_amount, $this->fieldName);
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
@@ -38,8 +44,15 @@ class ValorFacturadoContableDataCalculator extends AbstractInvoiceProportionalDa
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
-		$Criteria
-			->add_select("0", $this->fieldName);
+		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
+		$invoiceContrib = $this->getInvoiceContribution();
+
+		$billed_amount =  "SUM({$invoiceContrib} * {$subtotalBase})
+		*
+		(1 / cobro_moneda.tipo_cambio)";
+
+		 $Criteria
+			->add_select($billed_amount, $this->fieldName);
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
@@ -52,8 +65,18 @@ class ValorFacturadoContableDataCalculator extends AbstractInvoiceProportionalDa
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {
+		$invoiceContrib = $this->getInvoiceContribution();
+
+		$billed_amount = "
+			SUM({$invoiceContrib}
+				* (cobro.monto_subtotal - cobro.descuento)
+				* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
+				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
+			)
+		";
+
 		$Criteria
-			->add_select("0", $this->fieldName);
+			->add_select($billed_amount, $this->fieldName);
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
