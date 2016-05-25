@@ -8,6 +8,15 @@
  */
 class ValorFacturadoContableDataCalculator extends AbstractInvoiceProportionalDataCalculator {
 	private $fieldName = 'valor_facturado_contable';
+
+	/**
+	 * By default exclude anulled Invoices
+	 * @return Boolean
+	 */
+	function excludeAnulledInvoicesInQuery() {
+		return false;
+	}
+
 	/**
 	 * Obtiene la query de trabajos correspondiente al valor facturado
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
