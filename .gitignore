@@ -209,3 +209,5 @@ Vagrantfile
 
 tags
 app/tests/_log
+
+bower_components
