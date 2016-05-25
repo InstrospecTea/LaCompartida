@@ -1860,14 +1860,14 @@ foreach ($chargeResults as $charge) {
 	if ($cont_gastos_cobro > 0 && $cobro->fields['opc_ver_gastos']) {
 
 		$impuesto = $PrmExcelCobro->getGlosa('impuesto', 'Listado de gastos', $lang);
-		$impuesto = $impuesto == 'No existe información' ? NULL : $impuesto;
+		$impuesto = empty($impuesto) ? NULL : $impuesto;
 
 		$rut = $PrmExcelCobro->getGlosa('rut', 'Listado de gastos', $lang);
-		if ($rut == 'No existe información') {
+		if (empty($rut)) {
 			$rut = NULL;
 		} else {
 			$proveedor = $PrmExcelCobro->getGlosa('proveedor', 'Listado de gastos', $lang);
-			if ($proveedor == 'No existe información') {
+			if (empty($proveedor)) {
 				$proveedor = NULL;
 			} else {
 				$offsetcolumna += 2;
@@ -2298,7 +2298,7 @@ foreach ($chargeResults as $charge) {
 								$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo', $i));
 								$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo', $i));
 							}
-							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
+							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						}
 					}
 
