@@ -431,7 +431,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	 * @return Boolean
 	 */
 	function excludeAnulledInvoicesInQuery() {
-		return false;
+		return true;
 	}
 
 	function getInvoiceCriterias() {
