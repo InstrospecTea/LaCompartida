@@ -38,7 +38,6 @@ abstract Class AsuntoHumanize {
 		'glosa_asunto' =>  'la glosa',
 		'descripcion_asunto' =>  'la descripción',
 		'codigo_asunto_secundario' =>  'el código secundario',
-		'cobrable' =>  'valueForValue',
 		'contraparte' =>  'la contraparte',
 		'cotizado_con' =>  'el cotizador conjunto',
 		'contacto' =>  'el contacto',
