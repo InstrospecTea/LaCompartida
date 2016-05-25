@@ -140,6 +140,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'estado',
 		'id_cobro',
 		'numero_documento',
+		'razon_social_factura',
 		'glosa_estudio',
 		'forma_cobro',
 		'tipo_asunto',
@@ -153,6 +154,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'dia_reporte',
 		'mes_emision',
 		'mes_facturacion',
+		'mes_documento',
 		'grupo_o_cliente',
 		'solicitante'
 	);
@@ -166,6 +168,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'estado',
 		'id_cobro',
 		'numero_documento',
+		'razon_social_factura',
 		'glosa_estudio',
 		'forma_cobro',
 		'tipo_asunto',
@@ -179,6 +182,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'dia_reporte',
 		'mes_emision',
 		'mes_facturacion',
+		'mes_documento',
 		'grupo_o_cliente',
 		'solicitante'
 	);
