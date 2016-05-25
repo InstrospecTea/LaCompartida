@@ -798,14 +798,14 @@ class ReporteAntiguedadDeudas
 
 		if (!empty($this->datos['id_contrato'])) {
 			$contrato = $this->datos['id_contrato'];
-			$this->and_statements[] = 'cobro.id_contrato = \''."$contrato".'\'';
+			$this->and_statements[] = "cobro.id_contrato = '$contrato'";
 		} else {
 			if (!empty($this->datos['codigo_asunto_secundario'])) {
 				$codigo_asunto_secundario = $this->datos['codigo_asunto_secundario'];
 				$this->criteria
 						->add_left_join_with('cobro_asunto ca', 'ca.id_cobro = cobro.id_cobro')
 						->add_left_join_with('asunto', 'asunto.codigo_asunto = ca.codigo_asunto');
-				$this->and_statements[] = 'asunto.codigo_asunto_secundario = \''."$codigo_asunto_secundario".'\'';
+				$this->and_statements[] = "asunto.codigo_asunto_secundario = '$codigo_asunto_secundario'";
 			}
 		}
 
@@ -836,16 +836,16 @@ class ReporteAntiguedadDeudas
 			->add_select('sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))', 'fgsaldo')
 			->add_select('sum(if(cobro.incluye_honorarios=0,ccfm.saldo,0))* (if(moneda_documento.id_moneda=moneda_base.id_moneda,1, moneda_documento.tipo_cambio / moneda_base.tipo_cambio ))','fgsaldo_base')
 			->add_select("$fecha_atraso", 'fecha_emision')
-			->add_select('cobro.fecha_facturacion')
-			->add_select('factura.fecha_vencimiento')
-			->add_select('NOW()','hoy')
-			->add_select('IF(DATEDIFF(NOW(), factura.fecha_vencimiento) <= 0, 0, DATEDIFF(NOW(), factura.fecha_vencimiento))', 'dias_atraso_pago')
-			->add_select('DATEDIFF(NOW(),'."$fecha_atraso".')','dias_transcurridos')
+			->add_select('DATE(cobro.fecha_facturacion)', 'fecha_facturacion')
+			->add_select($fecha_vencimiento)
+			->add_select('CURDATE()','hoy')
+			->add_select("IF(DATEDIFF(CURDATE(), {$fecha_vencimiento}) <= 0, 0, DATEDIFF(CURDATE(), {$fecha_vencimiento}))", 'dias_atraso_pago')
+			->add_select("DATEDIFF(CURDATE(), '{$fecha_atraso}')", 'dias_transcurridos')
 			->add_select('moneda_documento.id_moneda','codigo_moneda')
 			->add_select('moneda_documento.simbolo','moneda')
 			->add_select('seguimiento.cantidad','cantidad_seguimiento')
 			->add_select('seguimiento.comentario','comentario_seguimiento')
-			->add_select('IF(DATEDIFF(NOW(),cobro.fecha_facturacion) <= 0, 0 , DATEDIFF(NOW(), cobro.fecha_facturacion))', 'dias_desde_facturacion')
+			->add_select('IF(DATEDIFF(CURDATE(),cobro.fecha_facturacion) <= 0, 0 , DATEDIFF(CURDATE(), cobro.fecha_facturacion))', 'dias_desde_facturacion')
 			->add_select('cobro.estado')
 			->add_from('cobro')
 			->add_left_join_with('documento d','cobro.id_cobro = d.id_cobro')
@@ -865,9 +865,8 @@ class ReporteAntiguedadDeudas
 		//
 		//Hacer select del encargado comercial.
 		//
-		if ($this->opciones['encargado_comercial']){
-			$this->criteria
-						->add_select('u.username','encargado_comercial');
+		if ($this->opciones['encargado_comercial']) {
+			$this->criteria->add_select('u.username','encargado_comercial');
 		}
 	}
 
@@ -882,6 +881,7 @@ class ReporteAntiguedadDeudas
 			$campo_hvalor = "fhsaldo";
 			$tipo = " pdl.glosa";
 			$fecha_atraso = "factura.fecha";
+			$fecha_vencimiento = "factura.fecha_vencimiento";
 			$label_decorator = 'Nº';
 			$label = " concat(pdl.codigo,' $label_decorator ',lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
 			$this->opciones['identificadores'] = 'facturas';
@@ -894,6 +894,7 @@ class ReporteAntiguedadDeudas
 			$campo_hvalor = "hsaldo";
 			$tipo = " 'liquidacion'";
 			$fecha_atraso = "cobro.fecha_emision";
+			$fecha_vencimiento = "cobro.fecha_emision";
 			$label = " d.id_cobro ";
 			$this->opciones['identificadores'] = 'cobros';
 			$this->opciones['identificador_detalle'] = 'cobro';
@@ -901,7 +902,7 @@ class ReporteAntiguedadDeudas
 			$linktofile = 'cobros6.php?id_cobro=';
 		}
 
-		return compact('campo_valor','campo_gvalor','campo_hvalor','tipo','fecha_atraso','label','identificadores','identificador','linktofile');
+		return compact('campo_valor','campo_gvalor','campo_hvalor','tipo','fecha_atraso', 'fecha_vencimiento','label','identificadores','identificador','linktofile');
 	}
 
 	/**
