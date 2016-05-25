@@ -11,22 +11,6 @@ abstract class AbstractInvoiceProportionalDataCalculator
 	public function getInvoiceContribution() {
 		return "(factura.subtotal / documento.subtotal_sin_descuento)";
 	}
-
-	/**
-	 * Agrega Invoice a Criteria
-	 * @param Criteria $Criteria [description]
-	 */
-	function addInvoiceToQuery(Criteria $Criteria) {
-		$Criteria->add_left_join_with('factura',
-			CriteriaRestriction::and_clause(
-  			array(
-					CriteriaRestriction::equals('factura.id_cobro', 'cobro.id_cobro'),
-					CriteriaRestriction::equals('IFNULL(factura.anulado, 0)', '0')
-				)
-			)
-		);
-	}
-
 	/**
 	 * Sobrecarga la query de trabajos para agregar los datos de factura
 	 * @param  Criteria $Criteria Criteria a modificar

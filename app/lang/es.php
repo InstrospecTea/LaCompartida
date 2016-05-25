@@ -1027,7 +1027,7 @@ $_LANG['mes_reporte'] = 'Trabajo (mes)';
 $_LANG['dia_reporte'] = 'Trabajo (día)';
 $_LANG['mes_emision'] = 'Emisión (mes)';
 $_LANG['dia_emision'] = 'Fecha Emisión';
-$_LANG['numero_documento'] = 'Número de Documento';
+$_LANG['numero_documento'] = 'Nº Documento';
 $_LANG['estado'] = "Estado";
 
 ### Configuración ###

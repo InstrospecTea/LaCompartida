@@ -175,6 +175,27 @@ class Criteria {
 	}
 
 	/**
+	 * Añade una union de criterias al scope de búsqueda de este criteria.
+	 * @param Array $criterias of Criteria
+	 * @param string   $alias
+	 * @return Criteria
+	 */
+	public function add_from_union_criteria($criterias, $alias) {
+		$queries = array();
+		foreach ($criterias as $criteria) {
+			$queries[] = "(" . $criteria->get_plain_query() . ")";
+		}
+
+		$query = implode(" UNION ALL ", $queries);
+
+		$new_clause = '';
+		$new_clause .= "({$query}) AS " . $alias;
+		$this->from_clauses[] = $new_clause;
+
+		return $this;
+	}
+
+	/**
 	 * Añade un scope de búsqueda mediante un JOIN genérico configurable.
 	 * @param        $join_table
 	 *		Posibles llamadas:
@@ -241,6 +262,30 @@ class Criteria {
 		}
 		return $this;
 	}
+
+	/**
+	 * Añade un criteria al scope de búsqueda a través de un join configurable mediante una unión de queries
+	 * @param Array $criterias
+	 * @param string   $alias
+	 * @param string   $join_condition
+	 * @param string   $join_type
+	 * @return Criteria
+	 */
+	public function add_custom_join_with_union_criteria($criterias, $alias, $join_condition, $join_type = 'LEFT') {
+		$queries = array();
+		foreach ($criterias as $criteria) {
+			$queries[] = "(" . $criteria->get_plain_query() . ")";
+		}
+
+		$query = implode(" UNION ALL ", $queries);
+
+		$new_clause = " $join_type JOIN ({$query}) AS $alias ON $join_condition ";
+		if (!$this->check_if_exists($this->join_clauses, $new_clause)) {
+			$this->join_clauses[] = $new_clause;
+		}
+		return $this;
+	}
+
 
 	/**
 	 * Añade un criteria al scope de búsqueda a través de un left join con este criteria.
