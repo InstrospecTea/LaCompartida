@@ -28,6 +28,7 @@ $directorios = array(
 	'/app/layers/service/exceptions/',
 	'/app/layers/utilities/',
 	'/app/layers/utilities/twig/',
+	'/app/layers/utilities/humanize/',
 	'/app/layers/view/helpers/',
 	'/app/layers/manager/',
 	'/app/layers/manager.support/',
