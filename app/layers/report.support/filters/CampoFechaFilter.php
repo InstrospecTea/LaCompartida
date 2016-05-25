@@ -14,7 +14,7 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 				$field_name = 'cobro.fecha_enviado_cliente';
 				break;
 			case 'facturacion':
-				$field_name = 'cobro.fecha_facturacion';
+				$field_name = 'factura.fecha_contable';
 				break;
 			case 'creacion':
 				$field_name = 'cobro.fecha_creacion';
