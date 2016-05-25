@@ -7,6 +7,10 @@ Tuesday, May 24th
 * **Feature** [API Payments](https://github.com/LemontechSA/ttb/pull/1469)
 * **Feature** [Asuntos extras](https://github.com/LemontechSA/ttb/pull/1467)
 
+## Hotfix 16.14.1
+Wednesday, May 25th
+* **Fix** [Problemas con detalle de gastos](https://github.com/LemontechSA/ttb/pull/1490)
+
 ## [Release 16.14.0](https://github.com/LemontechSA/ttb/pull/1472)
 Thursday, May 19th
 * **Feature** [Manager Layer](https://github.com/LemontechSA/ttb/pull/1462)
