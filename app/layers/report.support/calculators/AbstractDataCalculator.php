@@ -406,8 +406,13 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			->add_select("CONCAT(pdl.codigo , ' ', LPAD(f.serie_documento_legal, '3', '0'), '-', LPAD(f.numero, '7', '0'))", 'numero')
 			->add_select("(IF(pdl.codigo = 'NC', -1, {$factor}) * f.subtotal)", 'subtotal');
 
-		$start_date = null;
-		$end_date = null;
+		$filters = $this->filtersFields;
+
+		if (array_key_exists('campo_fecha', $filters) && $filters['campo_fecha'] == 'facturacion') {
+			$start_date = "'{$filters['fecha_ini']}'";
+			$end_date = "'{$filters['fecha_fin']} 23:59:59'";
+			$invoiceCriteria->add_restriction(CriteriaRestriction::between("f.{$date}", $start_date, $end_date));
+		}
 
 		$invoiceCriteria
 			->add_from('factura', 'f')
@@ -415,10 +420,6 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 				array('prm_documento_legal', 'pdl'),
 				'pdl.id_documento_legal = f.id_documento_legal'
 			);
-
-		if (!empty($start_date) && !empty($end_date)) {
-			$invoiceCriteria->add_restriction(CriteriaRestriction::between("f.{$date}", $start_date, $end_date));
-		}
 
 		if ($this->excludeAnulledInvoicesInQuery()) {
 			$invoiceCriteria->add_restriction(
