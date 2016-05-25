@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.14.1
+Wednesday, May 25th
+* **Fix** [Problemas con detalle de gastos](https://github.com/LemontechSA/ttb/pull/1489)
+
 ## [Release 16.14.0](https://github.com/LemontechSA/ttb/pull/1472)
 Thursday, May 19th
 * **Feature** [Manager Layer](https://github.com/LemontechSA/ttb/pull/1462)
