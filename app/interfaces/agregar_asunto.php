@@ -1110,9 +1110,12 @@ function CambioDatosFacturacion(id_cliente) {
 			if ($field === undefined) {
 				return true;
 			}
-			if ($field.is('[type=radio]')) {
+			if ($field.is('[type="radio"]')) {
 				$field.removeAttr('checked');
 				$field.filter('[value="' + value + '"]').attr('checked', true).change().click();
+			} else if ($field.is('[type="checkbox"]')) {
+				$field.removeAttr('checked');
+				$field.filter('[value="' + value + '"]').attr('checked', true);
 			} else {
 				$field.val(value);
 			}
