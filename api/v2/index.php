@@ -229,6 +229,46 @@ $Slim->get('/projects', function () use ($Session, $Slim) {
 	$API->getUpdatedMatters();
 });
 
+/**
+ * @api {get} /projects/:project_id/payments Get Payments
+ * @apiName Get Payments
+ * @apiVersion 2.0.0
+ * @apiGroup Projects
+ * @apiDescription Gets a list of all payments of one project
+ *
+ * @apiHeader {String} AUTHTOKEN=136b17e3a34db13c98ec404fa9035796b52cbf8c  Login Token
+ *
+ * @apiParam {String} project_id Corresponds to a project id attribute.
+ *
+ * @apiSuccess {Integer} id Payment Id
+ * @apiSuccess {String} project_code Project code
+ * @apiSuccess {String} date Date of payment
+ * @apiSuccess {Numeric} amount Amount of payment
+ * @apiSuccess {String} name Name of payment
+ * @apiSuccess {Integer} project_id Project Id
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [
+ *       {
+ *         "project_code": "000134-0001",
+ *         "id": "238",
+ *         "date": "2015-02-09 11:14:42",
+ *         "amount": "1194414",
+ *         "name": "Pago de Factura # 001-10186",
+ *         "project_id": "205"
+ *       },
+ *       {
+ *         "project_code": "000134-0001",
+ *         "id": "1045",
+ *         "date": "2015-12-17 18:14:01",
+ *         "amount": "11666474",
+ *         "name": "Pago de Factura # 001-11152, 001-11154, 001-11155, 001-11156, 001-11157",
+ *         "project_id": "205"
+ *       }
+ *     ]
+ *
+ */
 $Slim->get('/projects/:project_id/payments', function ($project_id) use ($Session, $Slim) {
 	$API = new Api\V2\PaymentsAPI($Session, $Slim);
 	$API->getPaymentsOfMatter($project_id);
