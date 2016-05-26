@@ -12,7 +12,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 	public function generate() {
 		$this->matters = $this->getMatters();
 
-		$this->start_date = $this->getDate();
+		$this->start_date = $this->getLastWorkDate();
 		$this->end_date = date('Y-m-d');
 
 		$this->generateWorks();
@@ -31,7 +31,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		while (--$days >= 0) {
 			$date = strtotime(date('Y-m-d', $fin) . " -$days day");
 
-			if (date('w', $date) === 0 || date('w', $date) === 6) {
+			if (date('w', $date) == 0 || date('w', $date) == 6) {
 				continue;
 			}
 
@@ -44,7 +44,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 				continue;
 			}
 
-			Debug::pr('Insertando ' . count($values) . ' trabajos para el día ' . date('d-m-Y', $date));
+			Debug::pr('Insertando ' . count($users_data) . ' trabajos para el día ' . date('d-m-Y', $date));
 			foreach ($users_data as $data) {
 				$Work = $this->WorkService->newEntity();
 				$Work->fillFromArray($data);
@@ -198,10 +198,10 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		return $User->ListarActivos("AND usuario.rut != '99511620'", 'PRO');
 	}
 
-	private function getDate() {
+	private function getLastWorkDate() {
 		$this->loadService('Work');
 		$Work = $this->WorkService->findFirst(null, 'fecha', 'id_trabajo DESC');
-		if ($Work === false || true) {
+		if ($Work === false) {
 			$date = strtotime('-1 year');
 		} else {
 			$date = strtotime($Work->get('fecha'));
