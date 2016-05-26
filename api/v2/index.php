@@ -119,6 +119,55 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
 	$API->getUpdatedClients();
 });
 
+/**
+ * @api {get} /clients/:client_id/projects Get Projects of Client
+ * @apiName Get Projects
+ * @apiVersion 2.0.0
+ * @apiGroup Clients
+ * @apiDescription Gets the list of all projects of a client.
+ *
+ * @apiHeader {String} AUTHTOKEN=136b17e3a34db13c98ec404fa9035796b52cbf8c  Login Token
+ *
+ * @apiParam {String} client_id The :client_id corresponds to a client id attribute.
+ *
+ * @apiSuccess {Integer} id Project Id
+ * @apiSuccess {String} code Project code
+ * @apiSuccess {String} name Name of Project
+ * @apiSuccess {Integer} active [0, 1] If client is active
+ * @apiSuccess {Integer} client_id Id of parent client
+ * @apiSuccess {Integer} project_area_id Projects' Area
+ * @apiSuccess {Integer} project_type_id Projects' Type
+ * @apiSuccess {String} language_code Language code of Project
+ * @apiSuccess {String} language_name Language name of Project
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [
+ *      {
+ *         "id": 1,
+ *         "code": "0001-0001",
+ *         "name": "Asesorías Generales",
+ *         "active": 1,
+ *         "client_id": 1,
+ *         "project_area_id": 1,
+ *         "project_type_id": 1,
+ *         "language_code": "es",
+ *         "language_name": "Español"
+ *       }
+ *     ]
+ *
+ * @apiError InvalidClientCode If client id is not provided
+ * @apiError ClientDoesntExists If client does not exists
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Invalid Params
+ *     {
+ *       "errors": [
+ *         "code": "InvalidClientCode",
+ *         "message": "The client doesn't exist"
+ *       ]
+ *     }
+ */
 $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, $Slim) {
 	$API = new Api\V2\ProjectsAPI($Session, $Slim);
 	$API->getProjectsOfClient($client_id);
