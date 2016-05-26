@@ -173,6 +173,57 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
 	$API->getProjectsOfClient($client_id);
 });
 
+/**
+ * @api {get} /projects Get All Projects
+ * @apiName Get Projects
+ * @apiVersion 2.0.0
+ * @apiGroup Projects
+ * @apiDescription Gets a list of all projects.
+ *
+ * @apiHeader {String} AUTHTOKEN=136b17e3a34db13c98ec404fa9035796b52cbf8c  Login Token
+ *
+ * @apiParam {String} client_id Corresponds to a client id attribute.
+ * @apiParam {String} updated_from updated_from=1462310903 (optional): Returns projects that have been updated after the given timestamp
+ * @apiParam {String} active active=1 or active=0 (optional): Will only return projects that have the active attribute set to the value given, the only possible values are 0 or 1. When the parameter is not sent, it won't filter by the active attribute.
+ *
+ * @apiSuccess {Integer} id Project Id
+ * @apiSuccess {String} code Project code
+ * @apiSuccess {String} name Name of Project
+ * @apiSuccess {Integer} active [0, 1] If client is active
+ * @apiSuccess {Integer} client_id Id of parent client
+ * @apiSuccess {Integer} project_area_id Projects' Area
+ * @apiSuccess {Integer} project_type_id Projects' Type
+ * @apiSuccess {String} language_code Language code of Project
+ * @apiSuccess {String} language_name Language name of Project
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [
+ *      {
+ *         "id": 1,
+ *         "code": "0001-0001",
+ *         "name": "Asesorías Generales",
+ *         "active": 1,
+ *         "client_id": 1,
+ *         "project_area_id": 1,
+ *         "project_type_id": 1,
+ *         "language_code": "es",
+ *         "language_name": "Español"
+ *       }
+ *     ]
+ *
+ * @apiError InvalidClientCode If client id is not provided
+ * @apiError ClientDoesntExists If client does not exists
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Invalid Params
+ *     {
+ *       "errors": [
+ *         "code": "InvalidClientCode",
+ *         "message": "The client doesn't exist"
+ *       ]
+ *     }
+ */
 $Slim->get('/projects', function () use ($Session, $Slim) {
 	$API = new Api\V2\ProjectsAPI($Session, $Slim);
 	$API->getUpdatedMatters();
