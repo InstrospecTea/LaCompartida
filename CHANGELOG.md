@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.3
+Thursday, May 26th
+* **Fix** [Corregir saldo de facturas en reporte de antiguedad deuda cliente según periodo contable](https://github.com/LemontechSA/ttb/pull/1500)
+
 ## Hotfix 16.15.2
 Thursday, May 26th
 * **Fix** [Usa fecha de vencimiento de la factura o de emisión del cobro según corresponda en reporte antiguedad deuda](https://github.com/LemontechSA/ttb/pull/1499)
