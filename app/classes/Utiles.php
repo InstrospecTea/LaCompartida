@@ -207,4 +207,17 @@ class Utiles extends \Utiles {
 		global $$name;
 		$$name = mysql_real_escape_string($value);
 	}
+
+	/**
+	 * Busca campos entre {} y los reemplaza por su valor del objeto
+	 * @param object|array $object
+	 * @param string $template '{name} {last_name}'
+	 */
+	public function interpolate($object, $template) {
+		$as_array = (array) $object;
+		return preg_replace_callback('/\{([^\}]+)\}/', function ($matches) use ($as_array) {
+			$key = $matches[1];
+			return isset($as_array[$key]) ? $as_array[$key] : '';
+		}, $template);
+	}
 }

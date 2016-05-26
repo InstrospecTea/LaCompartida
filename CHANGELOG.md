@@ -1,5 +1,12 @@
 # Changelog
 
+## [Release 16.15.0](https://github.com/LemontechSA/ttb/pull/1487)
+Tuesday, May 24th
+* **Feature** [Feature Migrations Corrections](https://github.com/LemontechSA/ttb/pull/1486)
+* **Feature** [Fecha Cliente](https://github.com/LemontechSA/ttb/pull/1470)
+* **Feature** [API Payments](https://github.com/LemontechSA/ttb/pull/1469)
+* **Feature** [Asuntos extras](https://github.com/LemontechSA/ttb/pull/1467)
+
 ## Hotfix 16.14.2
 Wednesday, May 25th
 * **Fix** [Crear nuevo tag para cobro](https://github.com/LemontechSA/ttb/pull/1492)
