@@ -17,7 +17,7 @@ abstract class Humanize {
 
 		foreach ($data as $key => $logs) {
 			if ($black_list[$logs->get('campo_tabla')]) {
-				unset($data[$key]);
+				$data->offsetUnset($key);
 				continue;
 			}
 			$method = $rules[$logs->get('campo_tabla')];
@@ -94,11 +94,11 @@ abstract class Humanize {
 		$field_humanize = $dictionary[$data->fields['campo_tabla']];
 
 		if (!empty($data->fields['valor_antiguo']) && !empty($data->fields['valor_nuevo'])) {
-			$string_humanize .= "{$field_humanize} a cambiado de {$data->fields['valor_antiguo']} a {$data->fields['valor_nuevo']}";
+			$string_humanize .= "{$field_humanize} ha cambiado de {$data->fields['valor_antiguo']} a {$data->fields['valor_nuevo']}";
 		} else if (empty($data->fields['valor_nuevo'])) {
 			$string_humanize .= "el valor ({$data->fields['valor_antiguo']}) de {$field_humanize} a sido eliminado";
 		} else if (empty($data->fields['valor_antiguo'])) {
-			$string_humanize .= "{$field_humanize} a cambiado a {$data->fields['valor_nuevo']}";
+			$string_humanize .= "{$field_humanize} ha cambiado a {$data->fields['valor_nuevo']}";
 		}
 
 		return \TTB\Utiles::pascalize($string_humanize);
@@ -112,7 +112,7 @@ abstract class Humanize {
 	protected static function literalMessage($data) {
 		$tabla_title = \TTB\Utiles::pascalize($data->fields['titulo_tabla']);
 		$value_lower = strtolower($data->fields['valor_nuevo']);
-		return "El {$tabla_title} a sido {$value_lower}";;
+		return "El {$tabla_title} ha sido {$value_lower}";;
 	}
 
 	/**
@@ -123,9 +123,9 @@ abstract class Humanize {
 	protected static function activeInactive($data) {
 		$tabla_title = \TTB\Utiles::pascalize($data->fields['titulo_tabla']);
 		if ($data->fields['valor_nuevo']) {
-			$string_humanize = "El {$tabla_title} a sido activado";
+			$string_humanize = "El {$tabla_title} ha sido activado";
 		} else {
-			$string_humanize = "El {$tabla_title} a sido desactivado";
+			$string_humanize = "El {$tabla_title} ha sido desactivado";
 		}
 
 		return $string_humanize;
