@@ -10,13 +10,22 @@ $sesion = new Sesion(null, true);
 $sesion->usuario = new Usuario($sesion, '99511620');
 
 if (Conf::EsAmbientePrueba()) {
+	$Criteria = new Criteria($sesion);
+	$Criteria->add_select('fecha_creacion')
+		->add_from('trabajo')
+		->add_ordering('id_trabajo', 'DESC')
+		->add_limit(1);
+	$trabajos = $Criteria->run();
+
+	$fecha_ini = !empty($trabajos) ? $trabajos[0]['fecha_creacion'] : date('Y-m-d', strtotime('-1 year'));
+
+
 	$query = "UPDATE contrato
 		SET usa_impuesto_separado = '" . Conf::GetConf($sesion, 'UsarImpuestoSeparado') . "',
 		usa_impuesto_gastos = '" . Conf::GetConf($sesion, 'UsarImpuestoPorGastos') . "'";
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
-	$fecha_fin = date('Y-m-d', time());
-	$fecha_ini = date('Y-m-d', mktime(0, 0, 0, date('m', time()), 1, date('Y', time()) - 1));
+	$fecha_fin = date('Y-m-d');
 	$max_dia = 5;
 
 	Debug::pr("fecha_ini: {$fecha_ini}");
@@ -456,16 +465,16 @@ if (Conf::EsAmbientePrueba()) {
 	Debug::pr('---------------------Gastos ingresados!!---------------------------');
 
 	if (method_exists('Conf', 'EsAmbientePrueba') && Conf::EsAmbientePrueba()) {
-		$fecha_fin = date('Y-m-d', mktime(0, 0, 0, date('m', time()), date('d', time()) - 5, date('Y', time())));
-		$fecha_ini = date('Y-m-d', mktime(0, 0, 0, date('m', time()), 1, date('Y', time()) - 1));
+		$fecha_fin = date('Y-m-d', strtotime('-5 days'));
+		//$fecha_ini = date('Y-m-d', mktime(0, 0, 0, date('m', time()), 1, date('Y', time()) - 1));
 
 		/* Creacion de cobros automaticos */
-
-		if (method_exists('Conf', 'TieneTablaVisitante') && Conf::TieneTablaVisitante()) {
+		$query_usuario = "SELECT id_usuario FROM usuario ORDER BY id_usuario LIMIT 1";
+		/*if (method_exists('Conf', 'TieneTablaVisitante') && Conf::TieneTablaVisitante()) {
 			$query_usuario = "SELECT id_usuario FROM usuario WHERE id_visitante > 0 ORDER BY id_usuario LIMIT 1";
 		} else {
 			$query_usuario = "SELECT id_usuario FROM usuario ORDER BY id_usuario LIMIT 1";
-		}
+		}*/
 
 		$resp_usuario = mysql_query($query_usuario, $sesion->dbh) or Utiles::errorSQL($query_usuario, __FILE__, __LINE__, $sesion->dbh);
 		list($id_usuario_cobro) = mysql_fetch_array($resp_usuario);
