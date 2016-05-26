@@ -2,7 +2,7 @@
 
 namespace Database;
 
-class Corrige_fecha_anulacion_factura extends \Database\Migration implements \Database\ITemplateMigration {
+class CorrigeFechaAnulacionFactura extends \Database\Migration implements \Database\ITemplateMigration {
 
 	/**
    * Run the migrations.
