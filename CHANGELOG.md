@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.1
+Thursday, May 26th
+* **Fix** [Muestra mensaje de error si no tiene formato de carta en solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/1498)
+
 ## [Release 16.15.0](https://github.com/LemontechSA/ttb/pull/1487)
 Tuesday, May 24th
 * **Feature** [Feature Migrations Corrections](https://github.com/LemontechSA/ttb/pull/1486)
