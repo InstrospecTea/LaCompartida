@@ -1,6 +1,6 @@
 # Changelog
 
-## Hotfix 16.15.5
+## Hotfix 16.15.6
 Thursday, May 26th
 * **Fix** [Formato de Fechas en YYYY-MM-DD y Embed de proyectos](https://github.com/LemontechSA/ttb/pull/1504)
 
