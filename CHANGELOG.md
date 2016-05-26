@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.4
+Thursday, May 26th
+* **Fix** [Orden en los inputs del mantenedor de gastos](https://github.com/LemontechSA/ttb/pull/1502)
+
 ## Hotfix 16.15.3
 Thursday, May 26th
 * **Fix** [Corregir saldo de facturas en reporte de antiguedad deuda cliente según periodo contable](https://github.com/LemontechSA/ttb/pull/1500)
