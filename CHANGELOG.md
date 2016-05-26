@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.2
+Thursday, May 26th
+* **Fix** [Usa fecha de vencimiento de la factura o de emisión del cobro según corresponda en reporte antiguedad deuda](https://github.com/LemontechSA/ttb/pull/1499)
+
 ## Hotfix 16.15.1
 Thursday, May 26th
 * **Fix** [Muestra mensaje de error si no tiene formato de carta en solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/1498)
