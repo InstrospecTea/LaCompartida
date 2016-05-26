@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.6
+Thursday, May 26th
+* **Fix** [Formato de Fechas en YYYY-MM-DD y Embed de proyectos](https://github.com/LemontechSA/ttb/pull/1504)
+
 ## Hotfix 16.15.5
 Thursday, May 26th
 * **Fix** [Copiar todos los datos del contrato por defecto del cliente al del asunto que se cobrará de manera independiente](https://github.com/LemontechSA/ttb/pull/1503)
