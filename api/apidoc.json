@@ -1,0 +1,7 @@
+{
+  "name": "TimeBilling API",
+  "version": "2.0.0",
+  "description": "This is documentation for The Time Billing API",
+  "title": "TimeBilling Api Documentation",
+  "url" : "http://<subdomain>.thetimebilling.com/time_tracking/api/v2"
+}

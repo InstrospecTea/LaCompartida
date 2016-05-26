@@ -24,11 +24,96 @@ $Slim->map(':x+', function($x) {
 	header($protocol . ' 200 Ok');
 })->via('OPTIONS');
 
+/**
+ * @api {post} /login User Login
+ * @apiName Login
+ * @apiVersion 2.0.0
+ * @apiGroup Session
+ * @apiDescription Authenticates a users credentials and returns an AUTHENTICATION TOKEN
+ *
+ * @apiParam {String} user Identification (Ex: 99511620-0)
+ * @apiParam {String} password Password of user
+ * @apiParam {String} app_key A key provided for the application that consumes the API.
+ *
+ * @apiParamExample Params-Example:
+ *     {
+ *       "user": "99511620-0",
+ *       "password": "blabla",
+ *       "app_key": "ttb-mobile"
+ *     }
+ *
+ * @apiSuccess {String} auth_token Token for future authorization
+ * @apiSuccess {String} user_id  The id of the user logged in
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "auth_token": "136b17e3a34db13c98ec404fa9035796b52cbf8c",
+ *       "user_id": "1"
+ *     }
+ *
+ * @apiError InvalidUserData user is not provided
+ * @apiError InvalidPasswordData password is not provided
+ * @apiError InvalidAppKey app_key is not provided
+ * @apiError UserDoesntExist user does not exists
+ * @apiError UnexpectedSave an error ocurred saving token data
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Invalid Params
+ *     {
+ *       "errors": [
+ *         "code": "InvalidUserData",
+ *         "message": "You must provide an user identifier"
+ *       ]
+ *     }
+ */
 $Slim->post('/login', function () use ($Session, $Slim) {
 	$API = new Api\V2\LoginAPI($Session, $Slim);
 	$API->login();
 });
 
+/**
+ * @api {get} /clients Get all clients
+ * @apiName Get Clients
+ * @apiVersion 2.0.0
+ * @apiGroup Clients
+ * @apiDescription Gets a list of clients
+ *
+ * @apiHeader {String} AUTHTOKEN=136b17e3a34db13c98ec404fa9035796b52cbf8c  Login Token
+ *
+ * @apiParam {String} updated_from updated_from=1462310903 (optional): Returns clients that have been updated after the given timestamp
+ * @apiParam {String} active active=1 or active=0 (optional): Will only return clientes that have the active attribute set to the value given, the only possible values are 0 or 1. When the parameter is not sent, it won't filter by the active attribute.
+ *
+ * @apiParamExample Params-Example:
+ *     ?updated_from=1462310903&active=1
+ *
+ * @apiSuccess {Integer} id Client Id
+ * @apiSuccess {String} code Client code
+ * @apiSuccess {String} name Name of Client
+ * @apiSuccess {Integer} active [0, 1] If client is active
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [
+ *       {
+ *         "id": 1,
+ *         "code": "00001",
+ *         "name": "Lemontech S.A.",
+ *         "active": 1
+ *       }
+ *     ]
+ *
+ * @apiError InvalidDate If date provided in updated_from is an invalid timestamp
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Invalid Params
+ *     {
+ *       "errors": [
+ *         "code": "InvalidDate",
+ *         "message": "The date format is incorrect"
+ *       ]
+ *     }
+ */
 $Slim->get('/clients', function () use ($Session, $Slim) {
 	$API = new Api\V2\ClientsAPI($Session, $Slim);
 	$API->getUpdatedClients();
