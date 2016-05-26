@@ -111,6 +111,7 @@ class AbstractBusiness implements BaseBusiness {
 	 * Carga una clase Model al vuelo
 	 * @param string $classname
 	 * @param string $alias
+	 * @param bool $returned retorna la instancia
 	 */
 	protected function loadModel($classname, $alias = null, $returned = false) {
 		if ($returned) {
