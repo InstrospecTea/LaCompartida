@@ -11,7 +11,9 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 	static $TimeEntryEntity = array(
 		'id',
 		'date',
+		'string_date',
 		array('created_at' => 'creation_date'),
+		array('string_created_at' => 'string_creation_date'),
 		'duration',
 		array('description' => 'notes'),
 		'user_id',
@@ -23,7 +25,8 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 		array('activity_id' => 'id_actividad'),
 		array('area_id' => 'id_area_trabajo'),
 		array('task_id' => 'id_tarea'),
-		'requester'
+		'requester',
+		'project'
 	);
 
 	/** Este codigo esta obsoleto, lo ocupé para avanzar pero debe ser pasado a business */
@@ -38,23 +41,27 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 
 		$User = new \Usuario($Session);
 		$Work = new \Trabajo($Session);
-
 		$works = array();
-		$date = $this->params['date'];
 
-		if (is_null($date)) {
-			$date = date('Y-m-d', time());
-		} else {
-			$date = date('Y-m-d', $date);
+		$string_date = $this->params['date'];
+
+		if (array_key_exists('string_date', $this->params)) {
+			$string_date = strtotime($this->params['string_date']);
+		}
+		if (empty($string_date)) {
+			$string_date = time();
 		}
 
-		$fromDate = date("Y-m-d", strtotime('monday this week', strtotime($date)));
-		$toDate = date("Y-m-d", strtotime('sunday this week', strtotime($date)));
+		$date = date('Y-m-d', $string_date);
+		$fromDate = date('Y-m-d', strtotime('monday this week', strtotime($date)));
+		$toDate = date('Y-m-d', strtotime('sunday this week', strtotime($date)));
 
 		if (!$User->LoadId($user_id)) {
 			$this->halt(__("The user doesn't exist"), 'UserDoesntExist');
 		} else {
-			$works = $Work->findAllWorksByUserId($user_id, $toDate, $fromDate);
+			$embed = $this->params['embed'];
+			$includeProject = !empty($embed) && ($embed === 'project');
+			$works = $Work->findAllWorksByUserId($user_id, $toDate, $fromDate, $includeProject);
 		}
 
 		$this->present($works, self::$TimeEntryEntity);
@@ -75,7 +82,11 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 		$element = new \Asunto($this->session);
 		$element->Load($id);
 		if ($element->Loaded()) {
-			$code = $element->fields['codigo_asunto'];
+			if (\Conf::GetConf($this->session, 'CodigoSecundario')) {
+				$code = $element->fields['codigo_asunto_secundario'];
+			} else {
+				$code = $element->fields['codigo_asunto'];
+			}
 		}
 		return $code;
 	}
@@ -97,7 +108,7 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 		$params = $this->params;
 
 		$work['date'] = $params['date'];
-		$work['created_date'] = $params['created_at'];
+		$work['created_date'] = empty($params['created_at']) ? $params['created_date'] : $params['created_at'];
 		$work['duration'] = (float) $params['duration'];
 		$work['notes'] = $params['description'];
 		$work['rate'] = (float) $params['rate'];
@@ -116,17 +127,26 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 			$work['matter_code'] = $this->matterCodeById($params['project_id']);
 		}
 
-		if (!is_null($work['date']) && $this->isValidTimeStamp($work['date'])) {
-			$work['date'] = date('Y-m-d H:i:s', $work['date']);
-		} else {
+		// overrides with new attribute
+		if (!empty($params['string_created_at'])) {
+			$work['created_date'] = strtotime($params['string_created_at']);
+		}
+
+		// overrides with new attribute
+		if (!empty($params['string_date'])) {
+			$work['date'] = strtotime($params['string_date']);
+		}
+
+		if (empty($work['date'])) {
 			$this->halt(__('The date format is incorrect'), 'InvalidDate');
 		}
 
-		if (!is_null($work['created_date']) && $this->isValidTimeStamp($work['created_date'])) {
-			$work['created_date'] = date('Y-m-d H:i:s', $work['created_date']);
-		} else {
-			$this->halt(__('The created date format is incorrect'), 'InvalidCreationDate');
+		if (empty($work['created_date'])) {
+			$this->halt(__('The date format is incorrect'), 'InvalidCreationDate');
 		}
+
+		$work['date'] = date('Y-m-d H:i:s', $work['date']);
+		$work['created_date'] = date('Y-m-d H:i:s', $work['created_date']);
 
 		if (!is_null($work['duration'])) {
 			$work['duration'] = date('H:i:s', mktime(0, $work['duration'], 0, 0, 0, 0));
@@ -178,7 +198,7 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 
 		$work['id'] = $id;
 		$work['date'] = $params['date'];
-		$work['created_date'] = $params['created_at'];
+		$work['created_date'] = empty($params['created_at']) ? $params['created_date'] : $params['created_at'];
 		$work['duration'] = (float) $params['duration'];
 		$work['notes'] = $params['description'];
 		$work['rate'] = (float) $params['rate'];
@@ -197,11 +217,18 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 			$work['matter_code'] = $this->matterCodeById($params['project_id']);
 		}
 
-		if (!is_null($work['date']) && $this->isValidTimeStamp($work['date'])) {
-			$work['date'] = date('Y-m-d H:i:s', $work['date']);
-		} else {
-			$this->halt(__('The date format is incorrect'), 'InvalidDate');
+		// overrides with new attribute
+		if (!empty($params['string_created_at'])) {
+			$work['created_date'] = strtotime($params['string_created_at']);
 		}
+
+		// overrides with new attribute
+		if (!empty($params['string_date'])) {
+			$work['date'] = strtotime($params['string_date']);
+		}
+
+		$work['date'] = date('Y-m-d H:i:s', $work['date']);
+		$work['created_date'] = date('Y-m-d H:i:s', $work['created_date']);
 
 		if (!is_null($work['duration'])) {
 			$work['duration'] = date('H:i:s', mktime(0, $work['duration'], 0, 0, 0, 0));

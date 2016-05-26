@@ -139,6 +139,9 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
  * @apiSuccess {Integer} project_type_id Projects' Type
  * @apiSuccess {String} language_code Language code of Project
  * @apiSuccess {String} language_name Language name of Project
+ * @apiSuccess {String} created_at Creation date
+ * @apiSuccess {String} updated_at Date Updated date
+ * @apiSuccess {String} currency_code Currency Code
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
@@ -153,6 +156,9 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
  *         "project_type_id": 1,
  *         "language_code": "es",
  *         "language_name": "Español"
+ *         "created_at": "2014-06-03 11:58:38",
+ *         "updated_at": "2014-06-03 11:58:38",
+ *         "currency_code": "COLP"
  *       }
  *     ]
  *
@@ -195,6 +201,9 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
  * @apiSuccess {Integer} project_type_id Projects' Type
  * @apiSuccess {String} language_code Language code of Project
  * @apiSuccess {String} language_name Language name of Project
+ * @apiSuccess {String} created_at Creation date
+ * @apiSuccess {String} updated_at Date Updated date
+ * @apiSuccess {String} currency_code Currency Code
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
@@ -208,7 +217,10 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
  *         "project_area_id": 1,
  *         "project_type_id": 1,
  *         "language_code": "es",
- *         "language_name": "Español"
+ *         "language_name": "Español",
+ *         "created_at": "2014-06-03 11:58:38",
+ *         "updated_at": "2014-06-03 11:58:38",
+ *         "currency_code": "COLP"
  *       }
  *     ]
  *
@@ -304,6 +316,89 @@ $Slim->get('/users/:id', function ($id) use ($Session, $Slim) {
 	$API->getUserById($id);
 });
 
+/**
+ * @api {get} /users/:id/time_entries Get TimeEntries
+ * @apiName Get TimeEntries
+ * @apiVersion 2.0.0
+ * @apiGroup TimeEntries
+ * @apiDescription Get a list of time entries (works, jobs, etc..whatever you want)
+ *
+ * @apiHeader {String} AUTHTOKEN=136b17e3a34db13c98ec404fa9035796b52cbf8c  Login Token
+ *
+ * @apiParam {String} id Id of an user (view Login Response)
+ * @apiParam {String} date (timestamp, optional) Returns time entries betweeen monday to sunday of date
+ * @apiParam {String} string_date (date YYYY-MM-DD, optional) Returns time entries betweeen monday to sunday of string_date
+ * @apiParam {String} embed (optional) A list of embed relations
+ *
+ * @apiParamExample Params-Example:
+ *     ?string_date=2016-05-10&embed=project
+ *
+ * @apiSuccess {Integer} id Id of a Time Entry
+ * @apiSuccess {Float} date Date of work
+ * @apiSuccess {String} string_date Date of work in string format
+ * @apiSuccess {Float} created_at Creation date of time entry
+ * @apiSuccess {String} string_created_at Creation date of time entry in string format
+ * @apiSuccess {Float} duration Duration in Minutes
+ * @apiSuccess {String} description Notes of a time entry
+ * @apiSuccess {Integer} user_id user that did work
+ * @apiSuccess {Integer} billable [1, 0] determine if a time entry is billable
+ * @apiSuccess {Integer} visible  [1, 0] determine if a time entry is visible and not billable
+ * @apiSuccess {Integer} read_only [1, 0] determine if a time entry is locked by an invoice or in review process
+ * @apiSuccess {Integer} client_id  Id of client
+ * @apiSuccess {Integer} project_id Id of project
+ * @apiSuccess {Integer} activity_id Id of activity
+ * @apiSuccess {Integer} area_id Id of Area
+ * @apiSuccess {Integer} task_id Id of Task
+ * @apiSuccess {String} requester Name of requester
+ * @apiSuccess {Project} project If embed=project is provided, then returns a project entity
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [
+ *       {
+ *         "id": 1,
+ *         "date": "121283477",
+ *         "string_date": "2015-04-10",
+ *         "created_at": "121283477",
+ *         "string_created_at": "2015-04-10",
+ *         "duration": 120,
+ *         "description": "writing a letter",
+ *         "user_id": 1,
+ *         "billable": 1,
+ *         "visible": 1,
+ *         "read_only": 0,
+ *         "client_id": 1,
+ *         "project_id": 2,
+ *         "activity_id": 3,
+ *         "area_id": 4,
+ *         "task_id": 5,
+ *         "requester": "Mario Lavandero",
+ *         "project": {
+ *           "id": 2,
+ *           "code": "0001-0002",
+ *           "name": "Asesorías Financieras",
+ *           "active": 1,
+ *           "client_id": 1,
+ *           "project_area_id": 1,
+ *           "project_type_id": 1,
+ *           "language_code": "es",
+ *           "language_name": "Español"
+ *         }
+ *       }
+ *     ]
+ *
+ * @apiError InvalidUserID If param :id is empty
+ * @apiError UserDoesntExist If User does not exsists
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Invalid Params
+ *     {
+ *       "errors": [
+ *         "code": "InvalidDate",
+ *         "message": "The date format is incorrect"
+ *       ]
+ *     }
+ */
 $Slim->get('/users/:id/time_entries', function ($id) use ($Session, $Slim) {
 	$API = new Api\V2\TimeEntriesAPI($Session, $Slim);
 	$API->getTimeEntriesByUserId($id);
