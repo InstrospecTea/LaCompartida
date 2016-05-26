@@ -883,7 +883,7 @@ class ReporteAntiguedadDeudas
 			$fecha_atraso = "factura.fecha";
 			$fecha_vencimiento = "factura.fecha_vencimiento";
 			$label_decorator = 'Nº';
-			$label = " concat(pdl.codigo,' $label_decorator ',lpad(factura.serie_documento_legal,'3','0'),'-',lpad(factura.numero,'7','0')) ";
+			$label = " concat(pdl.codigo,' $label_decorator ',factura.serie_documento_legal,'-',lpad(factura.numero,'7','0')) ";
 			$this->opciones['identificadores'] = 'facturas';
 			$this->opciones['identificador_detalle'] = 'factura';
 			$identificador = " d.id_cobro";
