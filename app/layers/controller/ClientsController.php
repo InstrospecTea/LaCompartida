@@ -3,7 +3,6 @@
 class ClientsController extends AbstractController {
 
 	protected $contractDataFields = array(
-			'activo',
 			'alerta_hh',
 			'alerta_monto',
 			'BankAccount.id_banco',
