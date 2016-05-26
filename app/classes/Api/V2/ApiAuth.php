@@ -26,7 +26,8 @@ class ApiAuth {
 		'tasks' => array('read'),
 		'languages' => array('read'),
 		'translations' => array('read'),
-		'reports' => array('read')
+		'reports' => array('read'),
+		'logs' => array('read')
 	);
 
 	static $ROLES = array(

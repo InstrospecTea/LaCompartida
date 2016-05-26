@@ -94,5 +94,10 @@ $Slim->delete('/users/:user_id/time_entries/:id', function ($user_id, $id)  use 
 	$API->deleteTimeEntryByUserId($user_id, $id);
 });
 
+$Slim->get('/logs', function () use ($Session, $Slim) {
+	$API = new Api\V2\LogsAPI($Session, $Slim);
+	$API->getLogOfTable();
+});
+
 $Slim->run();
 
