@@ -26,6 +26,24 @@ abstract Class AsuntoHumanize {
 		'limite_monto' =>  'valueForValue'
 	);
 
+	public static $relations = array(
+		'id_idioma' => array(
+										'service_name' => 'Language',
+										'field' => 'glosa_idioma'),
+		'id_area_proyecto' => array(
+										'service_name' => 'ProjectArea',
+										'field' => 'glosa'),
+		'id_encargado' => array(
+										'service_name' => 'User',
+										'field' => "concat(nombre, ' ', apellido1)"),
+		'codigo_cliente' => array(
+										'service_name' => 'Client',
+										'field' => 'glosa_cliente'),
+		'id_tipo_asunto' => array(
+										'service_name' => 'MatterType',
+										'field' => 'glosa_tipo_proyecto')
+	);
+
 	public static $dictionary = array(
 		'id_contrato' =>  'el identificador del Contrato',
 		'id_area_proyecto' =>  'el área del proyecto',

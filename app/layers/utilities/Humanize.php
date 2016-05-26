@@ -28,15 +28,29 @@ abstract class Humanize {
 	}
 
 	/**
+	 * Obtiene las relaciones de una tabla
+	 * @param 	string $table_title
+	 * @return 	Array
+	 */
+	public static function getRelations($tabla_title) {
+		$class_name = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
+
+		if (class_exists($class_name)) {
+			return $class_name::$relations;
+		}
+		return false;
+	}
+
+	/**
 	 * Obtiene las reglas de una tabla
 	 * @param 	string $table_title
 	 * @return 	Array
 	 */
 	protected static function getRules($tabla_title) {
-		$ruleClass = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
+		$class_name = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
 
-		if (class_exists($ruleClass)) {
-			return $ruleClass::$rules;
+		if (class_exists($class_name)) {
+			return $class_name::$rules;
 		}
 		return false;
 	}
@@ -47,10 +61,10 @@ abstract class Humanize {
 	 * @return 	Array
 	 */
 	protected static function getBlackList($tabla_title) {
-		$ruleClass = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
+		$class_name = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
 
-		if (class_exists($ruleClass)) {
-			return $ruleClass::$black_list;
+		if (class_exists($class_name)) {
+			return $class_name::$black_list;
 		}
 		return false;
 	}
@@ -61,10 +75,10 @@ abstract class Humanize {
 	 * @return 	Array
 	 */
 	protected static function getDictionary($tabla_title) {
-		$ruleClass = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
+		$class_name = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
 
-		if (class_exists($ruleClass)) {
-			return $ruleClass::$dictionary;
+		if (class_exists($class_name)) {
+			return $class_name::$dictionary;
 		}
 		return false;
 	}
