@@ -1,5 +1,36 @@
 # Changelog
 
+## Hotfix 16.15.5
+Thursday, May 26th
+* **Fix** [Formato de Fechas en YYYY-MM-DD y Embed de proyectos](https://github.com/LemontechSA/ttb/pull/1504)
+
+## Hotfix 16.15.5
+Thursday, May 26th
+* **Fix** [Copiar todos los datos del contrato por defecto del cliente al del asunto que se cobrará de manera independiente](https://github.com/LemontechSA/ttb/pull/1503)
+
+## Hotfix 16.15.4
+Thursday, May 26th
+* **Fix** [Orden en los inputs del mantenedor de gastos](https://github.com/LemontechSA/ttb/pull/1502)
+
+## Hotfix 16.15.3
+Thursday, May 26th
+* **Fix** [Corregir saldo de facturas en reporte de antiguedad deuda cliente según periodo contable](https://github.com/LemontechSA/ttb/pull/1500)
+
+## Hotfix 16.15.2
+Thursday, May 26th
+* **Fix** [Usa fecha de vencimiento de la factura o de emisión del cobro según corresponda en reporte antiguedad deuda](https://github.com/LemontechSA/ttb/pull/1499)
+
+## Hotfix 16.15.1
+Thursday, May 26th
+* **Fix** [Muestra mensaje de error si no tiene formato de carta en solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/1498)
+
+## [Release 16.15.0](https://github.com/LemontechSA/ttb/pull/1487)
+Tuesday, May 24th
+* **Feature** [Feature Migrations Corrections](https://github.com/LemontechSA/ttb/pull/1486)
+* **Feature** [Fecha Cliente](https://github.com/LemontechSA/ttb/pull/1470)
+* **Feature** [API Payments](https://github.com/LemontechSA/ttb/pull/1469)
+* **Feature** [Asuntos extras](https://github.com/LemontechSA/ttb/pull/1467)
+
 ## Hotfix 16.14.2
 Wednesday, May 25th
 * **Fix** [Crear nuevo tag para cobro](https://github.com/LemontechSA/ttb/pull/1492)
