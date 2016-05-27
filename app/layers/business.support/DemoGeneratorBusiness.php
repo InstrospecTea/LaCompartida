@@ -247,7 +247,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 					}
 				}
 			}
-			$date->addDay();
+			$date->addMonth();
 		}
 	}
 
