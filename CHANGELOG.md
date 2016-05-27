@@ -1,6 +1,10 @@
 # Changelog
 
-## Hotfix 16.15.5
+## Hotfix 16.15.7
+Friday, May 27th
+* **Fix** [Muestra el usuario seleccionado, en el listado aunque no esté activo o no visible.](https://github.com/LemontechSA/ttb/pull/1510)
+
+## Hotfix 16.15.6
 Thursday, May 26th
 * **Fix** [Formato de Fechas en YYYY-MM-DD y Embed de proyectos](https://github.com/LemontechSA/ttb/pull/1504)
 
