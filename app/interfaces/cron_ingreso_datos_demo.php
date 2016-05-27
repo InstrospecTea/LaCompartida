@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
 set_time_limit(0);
+exit('Este script ya no es válido');
 
 if ($argv[1] != 'ambienteprueba' && !isset($_GET['ambienteprueba'])) {
 	exit('Error ' . $argv[1] . $_GET['ambienteprueba']);
