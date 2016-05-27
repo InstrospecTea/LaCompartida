@@ -189,7 +189,12 @@ class InsertCriteria {
 		return $this->getPlainQuery();
 	}
 
-	public function addFromArray($data) {
+	/**
+	 * @param array $data
+	 * @return $this
+	 * @throws Exception
+	 */
+	public function addFromArray(array $data) {
 		foreach ($data as $key => $value) {
 			$this->addPivotWithValue($key, $value);
 		}
