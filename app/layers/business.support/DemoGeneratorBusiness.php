@@ -1,5 +1,10 @@
 <?php
+use Carbon\Carbon;
 
+/**
+ * Class DemoGeneratorBusiness
+ * @property MatterService $MatterService
+ */
 class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBusiness {
 
 	private $id_moneda = 2;
@@ -8,6 +13,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 	private $max_dia = 5;
 	private $defaultFee = array();
 	private $fee = array();
+	private $matters = array();
 
 	public function generate() {
 		$this->matters = $this->getMatters();
@@ -16,6 +22,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		$this->end_date = date('Y-m-d');
 
 		$this->generateWorks();
+		$this->generateExpenses();
 		$this->updateContracts();
 	}
 
@@ -44,7 +51,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 				continue;
 			}
 
-			Debug::pr('Insertando ' . count($users_data) . ' trabajos para el día ' . date('d-m-Y', $date));
+			Debug::pr('Insertando ' . count($users_data) . ' trabajos para el ' . date('d-m-Y', $date));
 			foreach ($users_data as $data) {
 				$Work = $this->WorkService->newEntity();
 				$Work->fillFromArray($data);
@@ -218,52 +225,58 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	}
 
+
+
 	public function generateExpenses() {
-		while ($fecha <= $fecha_mk_fin) {
-			$fecha_para_pasar = date('Y-m-d', $fecha);
-			$values = array();
-
-			$i++;
-			for ($j = 0; $j < count($asuntos); $j++) {
-				$codigo_asunto = $asuntos[$j];
-
-				$query = "SELECT codigo_cliente FROM asunto WHERE codigo_asunto = '{$codigo_asunto}'";
-				$resp = mysql_query($query, $sesion->dbh) or Utiles::erroSQL($query, __FILE__, __LINE__, $sesion->dbh);
-				list($codigo_cliente) = mysql_fetch_array($resp);
-
-				$cont_gastos = 0;
-				$max_mes = rand(0, 8);
-
-				while ($cont_gastos < $max_mes) {
-					$egreso = 5 + 5 * rand(0, 19);
-					$ingreso = 'NULL';
-					$monto_cobrable = $egreso;
-
-					$descripcion_index = array_rand($descripciones_gastos, 1);
-					$descripcion = $descripciones_gastos[$descripcion_index];
-
-					$fecha_gasto = date('Y-m', $fecha) . '-' . sprintf('%02d', rand(1, 28));
-
-					while (date('w', strtotime($fecha_gasto)) == 0 || date('w', strtotime($fecha_gasto)) == 6) {
-						$fecha_gasto = date('Y-m', $fecha) . '-' . rand(1, 28);
+		$date = Carbon::parse($this->start_date);
+		$end_date = Carbon::parse($this->end_date);
+		$expense_data = array();
+		while ($date->lt($end_date)) {
+			for ($x = 0; $x < count($this->matters); $x++) {
+				$matter_code = $this->matters[$x];
+				$expense_data[] = $this->generateExpenseData($matter_code, $date);
+			}
+			if (!empty($expense_data)) {
+				Debug::pr('Insertando ' . count($expense_data) . ' gastos para el ' . $date->toDateString());
+				foreach ($expense_data as $expenses) {
+					foreach ($expenses as $expense) {
+						$Insert = new InsertCriteria($this->Session);
+						$Insert->addFromArray($expense)
+							->setTable('cta_corriente')
+							->run();
 					}
-
-					$fecha_ingreso = $fecha_gasto . ' 00:00:00';
-
-					$values[] = "( '$codigo_cliente', '$codigo_asunto', '$fecha_ingreso', 2, $ingreso, $egreso, $monto_cobrable, '$descripcion' )";
-					$cont_gastos++;
 				}
 			}
-
-			if (count($values) > 0) {
-				Debug::pr('Insertando ' . count($values) . ' gastos para el día ' . date('d-m-Y', $fecha));
-				$query = "INSERT INTO cta_corriente( codigo_cliente, codigo_asunto, fecha, id_moneda, ingreso, egreso, monto_cobrable, descripcion ) VALUES ";
-				$resp = mysql_query($query . implode(',', $values), $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-			}
-
-			list($anio, $mes, $dia) = explode('-', $fecha_para_pasar);
-			$fecha = mktime(0, 0, 0, $mes + 1, $dia, $anio);
+			$date->addDay();
 		}
+	}
+
+	private function generateExpenseData($matter, $date) {
+		include(dirname(dirname(__FILE__)) . '/configurations/carga_masiva.php');
+		$expenses_counter = 0;
+		$month_max = rand(0, 8);
+		$data = array();
+		$Matter = $this->MatterService->findFirst(CriteriaRestriction::equals('codigo_asunto', "'$matter'"), 'codigo_cliente');
+		$client_code = $Matter->get('codigo_cliente');
+		while ($expenses_counter < $month_max) {
+			$ammount = 5 + 5 * rand(0, 19);
+
+			$description_index = array_rand($descripciones_gastos, 1);
+			$description = $descripciones_gastos[$description_index];
+			$expense_date = date('Y-m', $date->timestamp) . '-' . sprintf('%02d', rand(1, 28));
+			$data[] = array(
+				'codigo_cliente' => $client_code,
+				'codigo_asunto' => $matter,
+				'fecha' => date('Y-m-d H:i:s', strtotime($expense_date)),
+				'id_moneda' => $this->id_moneda,
+				'ingreso' => null,
+				'egreso' => $ammount,
+				'monto_cobrable' => $ammount,
+				'descripcion' => $description
+			);
+			$expenses_counter++;
+		}
+		return $data;
 	}
 
 	public function generateCharges() {
