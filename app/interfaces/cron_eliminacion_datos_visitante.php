@@ -103,7 +103,7 @@ if (Conf::GetConf($sesion, 'EsAmbientePrueba')) {
 	mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	Debug::pr('Trámites borrado');
 
-	if (Conf::GetConf($sesion, 'TieneTablaVisitante')) {
+	if (false) {
 		/* Busca cualquier usuario */
 		$query = "SELECT id_usuario FROM usuario WHERE id_visitante = 0 ORDER BY id_usuario LIMIT 1";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
