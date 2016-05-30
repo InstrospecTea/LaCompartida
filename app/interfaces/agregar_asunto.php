@@ -18,7 +18,6 @@ $encargado_obligatorio = Conf::GetConf($Sesion, 'AtacheSecundarioSoloAsunto') ==
 $contrato = new Contrato($Sesion);
 $Cliente = new Cliente($Sesion);
 $Asunto = new Asunto($Sesion);
-$Asunto->saveExtra($_POST['asunto_extra']);
 
 if ($codigo_cliente_secundario != '') {
 	$Cliente->LoadByCodigoSecundario($codigo_cliente_secundario);
@@ -413,7 +412,6 @@ if ($opcion == 'guardar') {
 	if (!empty($_POST['asunto_extra'])) {
 		$Asunto->saveExtra($_POST['asunto_extra']);
 	}
-
 
 	$errors = $Pagina->GetErrors();
 	if (empty($errors)) {
@@ -930,7 +928,7 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 									array('label' => false)); ?>
 								&nbsp;&nbsp;&nbsp;
 								<?= $Form->checkbox('cobrable', 1,
-									$Asunto->fields['cobrable'] == 1,
+									$Asunto->fields['cobrable'] == 1 || !$Asunto->Loaded(),
 									array('label_first' => true, 'label' => __('Cobrable'))); ?>
 								&nbsp;&nbsp;&nbsp;
 								<?= $Form->checkbox('actividades_obligatorias', 1,
@@ -1110,9 +1108,12 @@ function CambioDatosFacturacion(id_cliente) {
 			if ($field === undefined) {
 				return true;
 			}
-			if ($field.is('[type=radio]')) {
+			if ($field.is('[type="radio"]')) {
 				$field.removeAttr('checked');
 				$field.filter('[value="' + value + '"]').attr('checked', true).change().click();
+			} else if ($field.is('[type="checkbox"]')) {
+				$field.removeAttr('checked');
+				$field.filter('[value="' + value + '"]').attr('checked', true);
 			} else {
 				$field.val(value);
 			}

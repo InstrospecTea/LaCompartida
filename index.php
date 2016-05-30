@@ -24,6 +24,7 @@ $Pagina->PrintHeaders();
 		<?php } ?>
 		<div style="padding: 10px">
 			<form action="<?php if(defined('APPDOMAIN')) echo str_replace(array('http:','https:'),'',APPDOMAIN); ?>app/usuarios/login.php" method="post">
+				<?= (!empty($_GET['urlto'])) ? "<input type=\"hidden\" name=\"urlto\" id=\"urlto\" value=\"{$_GET['urlto']}\">" : NULL ?>
 				<table style="width: 100%">
 					<tbody>
 						<tr>

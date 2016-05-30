@@ -1126,10 +1126,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$CriteriaInvoice = new Criteria($this->Session);
 		$CriteriaInvoice
-			->add_select("CONCAT('\"', pdl.codigo , ' ', LPAD(f.serie_documento_legal, '3', '0'), '-', LPAD(f.numero, '7', '0'), '\":\"', c.id_cobro, '\"')", 'identificador')
+			->add_select("CONCAT('\"', pdl.codigo , ' ', f.serie_documento_legal, '-', LPAD(f.numero, '7', '0'), '\":\"', c.id_cobro, '\"')", 'identificador')
 			->add_select("DATEDIFF('{$parameters['end_date']}', f.fecha)", 'dias_desde_facturacion')
-			->add_select('SUM(IF(ccfmn.monto IS NULL, 0, ccfmn.monto))', 'total_pagado')
-			->add_select('f.total', 'total_facturado')
+			->add_select('f.total - SUM(IF(ccfmn.monto IS NULL, 0, ccfmn.monto))', 'saldo')
 			->add_select('f.RUT_cliente', 'codigo_cliente')
 			->add_select('f.cliente', 'glosa_cliente')
 			->add_from('factura', 'f')
@@ -1141,6 +1140,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_left_join_with(array('prm_documento_legal', 'pdl'),'pdl.id_documento_legal = f.id_documento_legal')
 			->add_restriction(CriteriaRestriction::lower_or_equals_than('f.fecha', "'{$parameters['end_date']}'"))
 			->add_restriction(CriteriaRestriction::not_equal('pdl.codigo', "'NC'"))
+			->add_restriction(CriteriaRestriction::or_clause(
+				CriteriaRestriction::equals('f.anulado', '0'),
+				CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals('f.anulado', '1'),
+					CriteriaRestriction::greater_or_equals_than('f.fecha_anulacion', "'{$parameters['end_date']}'")
+				)
+			))
 			->add_grouping('f.id_factura');
 
 		if (!empty($parameters['client_code'])) {
@@ -1167,14 +1173,15 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$Criteria
 			->add_select('v.glosa_cliente')
 			->add_select('CONCAT("{", GROUP_CONCAT(DISTINCT v.identificador ORDER BY 1), "}")', 'facturas')
-			->add_select('SUM(IF(v.dias_desde_facturacion <= 30, v.total_facturado - v.total_pagado, 0))', "'rango1'")
-			->add_select('SUM(IF(v.dias_desde_facturacion > 30 AND v.dias_desde_facturacion <= 60, v.total_facturado - v.total_pagado, 0))', "'rango2'")
-			->add_select('SUM(IF(v.dias_desde_facturacion > 60 AND v.dias_desde_facturacion <= 90, v.total_facturado - v.total_pagado, 0))', "'rango3'")
-			->add_select('SUM(IF(v.dias_desde_facturacion > 90, v.total_facturado - v.total_pagado, 0))', "'rango4'")
-			->add_select('SUM(v.total_facturado - v.total_pagado)', "'total'")
+			->add_select('SUM(IF(v.dias_desde_facturacion <= 30, v.saldo, 0))', "'rango1'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 30 AND v.dias_desde_facturacion <= 60, v.saldo, 0))', "'rango2'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 60 AND v.dias_desde_facturacion <= 90, v.saldo, 0))', "'rango3'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 90, v.saldo, 0))', "'rango4'")
+			->add_select('SUM(v.saldo)', "'total'")
 			->add_from_criteria($CriteriaInvoice, 'v')
 			->add_grouping('v.glosa_cliente')
-			->add_ordering('v.glosa_cliente');
+			->add_ordering('v.glosa_cliente')
+			->add_restriction(CriteriaRestriction::greater_than('v.saldo', 0));
 		if (!empty($parameters['include_trade_manager'])) {
 			$Criteria->add_select('v.encargado_comercial');
 		}
