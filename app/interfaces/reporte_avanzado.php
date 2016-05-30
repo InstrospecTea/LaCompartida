@@ -145,7 +145,6 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'forma_cobro',
 		'tipo_asunto',
 		'area_asunto',
-		'actividad',
 		'categoria_usuario',
 		'area_usuario',
 		'dia_emision',
@@ -174,7 +173,6 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'forma_cobro',
 		'tipo_asunto',
 		'area_asunto',
-		'actividad',
 		'categoria_usuario',
 		'area_usuario',
 		'dia_emision',
@@ -188,6 +186,10 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'grupo_o_cliente',
 		'solicitante'
 	);
+}
+
+if (Conf::GetConf($sesion, 'UsoActividades')) {
+	$agrupadores[] = 'actividad';
 }
 
 if (Conf::GetConf($sesion, 'UsarAreaTrabajos')) {
