@@ -1032,6 +1032,7 @@ $_LANG['numero_documento'] = 'Nº Documento';
 $_LANG['razon_social_factura'] = 'Razón Social Docto.';
 $_LANG['estado'] = "Estado";
 $_LANG['actividad'] = "Actividad";
+$_LANG['estado_documento'] = "Estado Documento";
 
 ### Configuración ###
 $_LANG['MailAdmin'] = "Email administrador";

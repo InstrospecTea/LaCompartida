@@ -188,6 +188,8 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 	);
 }
 
+$agrupadores[] = 'estado_documento';
+
 if (Conf::GetConf($sesion, 'UsoActividades')) {
 	$agrupadores[] = 'actividad';
 }
