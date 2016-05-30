@@ -1031,6 +1031,7 @@ $_LANG['dia_emision'] = 'Fecha Emisión';
 $_LANG['numero_documento'] = 'Nº Documento';
 $_LANG['razon_social_factura'] = 'Razón Social Docto.';
 $_LANG['estado'] = "Estado";
+$_LANG['actividad'] = "Actividad";
 
 ### Configuración ###
 $_LANG['MailAdmin'] = "Email administrador";
