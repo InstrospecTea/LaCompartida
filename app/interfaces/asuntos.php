@@ -55,7 +55,8 @@ $Pagina->PrintTop($popup);
 $Form = new Form;
 
 ?>
-
+<script src="<?= Conf::RootDir() ?>/app/layers/assets/js/JsonToTable.js"></script>
+<link rel="stylesheet" type="text/css" href="<?= Conf::RootDir() ?>/app/layers/assets/css/JsonToTable.css">
 <script type="text/javascript">
 	var usocodigosecundario = '<?php echo $usocodigosecundario; ?>';
 
@@ -72,6 +73,34 @@ $Form = new Form;
  			}
 
 			nuovaFinestra('Agregar_Asunto', 850, 600, 'agregar_asunto.php?codigo_cliente=' + codigo_cliente + '&popup=1&motivo=agregar_proyecto');
+		});
+
+		jQuery('.logdialog_btn').click(function() {
+			var auth_token = "<?= $_SESSION['AUTHTOKEN'] ?>";
+			var url_api = '<?= Conf::RootDir() ?>/api/v2/logs';
+
+			jQuery('#json_to_table').dialog({
+				dialogClass: 'jsonToTable'
+			});
+
+
+			jQuery.ajax({
+				url: url_api,
+				beforeSend: function (request) {
+					request.setRequestHeader("authtoken", auth_token);
+				},
+				data: {
+					table_name: 'asunto',
+					field_id: this.id
+				},
+				type: 'GET',
+				dataType: 'JSON',
+				success: function(response) {
+					var json_to_table = new window.JsonToTable();
+					var html = json_to_table.render(response);
+					jQuery('#json_to_table').html(html);
+				}
+			});
 		});
 	});
 
@@ -242,6 +271,7 @@ $Form = new Form;
 			echo $Form->input('campo_codigo_cliente', $codigo_cliente, array('label' => false, 'id' => 'campo_codigo_cliente', 'type' => 'hidden'));
 		}
 	} ?>
+	<div id="json_to_table" title="Historial de Asuntos"></div>
 </form>
 <?php
 
@@ -446,7 +476,7 @@ function Opciones(& $fila) {
 		$opciones = $Form->image_link('editar_on.gif', "agregar_asunto.php?id_asunto=$id_asunto", array('title' => 'Editar actividad', 'target' => '_parent'));
 		$adb = __('Está seguro de eliminar el') . ' ' . __('asunto');
 		$opciones .= $Form->image_link('cruz_roja_nuevo.gif', false, array('title' => 'Eliminar actividad', 'onclick' => "if  (confirm('¿$adb?')) EliminaAsunto('{$from}', {$id_asunto});"));
-		$opciones .= $Form->image_link('lupa.gif', false, array('title' => 'Ver historial', 'id' => "asunto_{$fila->fields['id_asunto']}", 'class' => 'logdialog', 'rel' => 'asunto'));
+		$opciones .= $Form->image_link('lupa.gif', false, array('title' => 'Ver historial', 'id' => "{$fila->fields['id_asunto']}", 'class' => 'logdialog_btn', 'rel' => 'asunto'));
 		return $opciones;
 	}
 }

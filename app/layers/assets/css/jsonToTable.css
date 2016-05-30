@@ -1,0 +1,9 @@
+.jsonToTable {
+	min-width: 600px !important;
+	min-height: 500px !important;
+}
+
+.jsonToTable table {
+	width: 100%;
+
+}
