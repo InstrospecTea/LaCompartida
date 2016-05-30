@@ -144,6 +144,19 @@ if(isset($sesion->usuario)){
 		'cliente' => $subdominio
 	));
 	$mp->identifyAndTrack($usuario_fields['rut'], 'Login');
+
+	$UserToken = new \UserToken($sesion);
+	$auth_token = $UserToken->makeAuthToken($usuario_fields['rut']);
+
+	$user_token_data = array(
+		'user_id' => $usuario_fields['id_usuario'],
+		'auth_token' => $auth_token,
+		'app_key' => 'ttb'
+	);
+
+	$UserToken->save($user_token_data);
+
+	$_SESSION['AUTHTOKEN'] = $auth_token;
 }
 
 $pagina = new Pagina($sesion);
