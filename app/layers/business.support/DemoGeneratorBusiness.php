@@ -1,7 +1,7 @@
 <?php
 
 use Carbon\Carbon;
-
+use TTB\Configurations\ConfigCargaMasiva;
 /**
  * Class DemoGeneratorBusiness
  * @property MatterService $MatterService
@@ -16,8 +16,10 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 	private $fee = array();
 	private $matters = array();
 	private $first_user_id;
+	private $config;
 
 	public function generate() {
+		$this->config = new ConfigCargaMasiva();
 		$this->matters = $this->getMatters();
 
 		$this->start_date = $this->getLastWorkDate();
@@ -41,7 +43,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		$days = $this->daysBetweenDates($start_date, $end_date);
 
 		while (--$days >= 0) {
-			$date = strtotime(date('Y-m-d', $fin) . " -$days day");
+			$date = strtotime(date('Y-m-d', $end_date) . " -$days day");
 
 			if (date('w', $date) == 0 || date('w', $date) == 6) {
 				continue;
@@ -75,7 +77,6 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 
 	private function generateWorkData($user_id, $matters, $date) {
 		$actions = array();
-		include(dirname(dirname(__FILE__)) . '/configurations/carga_masiva.php');
 
 		$cont_trabajos = 0;
 		$cont_trabajos_total = 0;
@@ -96,10 +97,10 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 				}
 
 
-				$person_index = array_rand($personas, 1);
-				$person = $personas[$person_index];
-				$add_index = array_rand($addicional, 1);
-				$add = $addicional[$add_index];
+				$person_index = array_rand($this->config->personas, 1);
+				$person = $this->config->personas[$person_index];
+				$add_index = array_rand($this->config->adicional, 1);
+				$add = $this->config->adicional[$add_index];
 
 				if (
 					($action_index == 3 && ( $add_index == 1 || $add_index == 2 ) ) ||
@@ -117,14 +118,14 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 				$cont_trabajos++;
 				$cont_trabajos_total++;
 			} else {
-				$descripcion_index = array_rand($descripcion_trabajos_grandes, 1);
-				$descripcion_trabajo = $descripcion_trabajos_grandes[$descripcion_index];
+				$descripcion_index = array_rand($this->config->descripcion_trabajos_grandes, 1);
+				$descripcion_trabajo = $this->config->descripcion_trabajos_grandes[$descripcion_index];
 
-				$duracion_index = array_rand($duraciones_trabajos_grandes, 1);
-				$duracion = $duraciones_trabajos_grandes[$duracion_index];
+				$duracion_index = array_rand($this->config->duraciones_trabajos_grandes, 1);
+				$duracion = $this->config->duraciones_trabajos_grandes[$duracion_index];
 
-				$duracion_subtract_index = array_rand($duracion_subtract, 1);
-				$duracion_cobrada = Utiles::subtract_hora($duracion, $duracion_subtract[$duracion_subtract_index]);
+				$duracion_subtract_index = array_rand($this->config->duracion_subtract, 1);
+				$duracion_cobrada = Utiles::subtract_hora($duracion, $this->config->duracion_subtract[$duracion_subtract_index]);
 
 				$cont_trabajos_total++;
 			}
@@ -227,8 +228,8 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		$InsertCriteria
 			->update()
 			->setTable('contrato')
-			->addPivotWithValue('usa_impuesto_separado', Conf::GetConf($sesion, 'UsarImpuestoSeparado'))
-			->addPivotWithValue('usa_impuesto_gastos', Conf::GetConf($sesion, 'UsarImpuestoPorGastos'));
+			->addPivotWithValue('usa_impuesto_separado', Conf::GetConf($this->Session, 'UsarImpuestoSeparado'))
+			->addPivotWithValue('usa_impuesto_gastos', Conf::GetConf($this->Session, 'UsarImpuestoPorGastos'));
 		$InsertCriteria->run(true);
 	}
 
@@ -257,7 +258,6 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 	}
 
 	private function generateExpenseData($matter, $date) {
-		include(dirname(dirname(__FILE__)) . '/configurations/carga_masiva.php');
 		$expenses_counter = 0;
 		$month_max = rand(0, 8);
 		$data = array();
@@ -266,8 +266,8 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		while ($expenses_counter < $month_max) {
 			$ammount = 5 + 5 * rand(0, 19);
 
-			$description_index = array_rand($descripciones_gastos, 1);
-			$description = $descripciones_gastos[$description_index];
+			$description_index = array_rand($this->config->descripciones_gastos, 1);
+			$description = $this->config->descripciones_gastos[$description_index];
 			$expense_date = date('Y-m', $date->timestamp) . '-' . sprintf('%02d', rand(1, 28));
 			$data[] = array(
 				'codigo_cliente' => $client_code,
@@ -329,7 +329,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		$this->Cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s', $end_date + 172800));
 		$this->Cobro->Edit('fecha_emision', date('Y-m-d H:i:s', $end_date));
 		$this->Cobro->Write();
-new CobroMoneda;
+		new CobroMoneda;
 		$this->loadModel('Documento');
 		$this->Documento->LoadByCobro($id_cobro);
 		$this->Documento->Edit('fecha', date('Y-m-d', $end_date));
