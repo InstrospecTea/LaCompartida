@@ -1,6 +1,5 @@
 <?php
 require_once dirname(dirname(__FILE__)) . '/conf.php';
-require_once dirname(dirname(__FILE__)) . '/classes/Html.php';
 
 $Sesion = new Sesion(array('DAT', 'COB', 'SASU'));
 $Pagina = new Pagina($Sesion);
@@ -80,7 +79,9 @@ $Form = new Form;
 			var url_api = '<?= Conf::RootDir() ?>/api/v2/logs';
 
 			jQuery('#json_to_table').dialog({
-				dialogClass: 'jsonToTable'
+				dialogClass: 'jsonToTable',
+				width: 600,
+				height: 500
 			});
 
 
