@@ -44,7 +44,7 @@ class InsertCriteria {
 			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
 		}
 		$this->forced = $forced;
-		$statement = $this->sesion->pdodbh->prepare($this->get_plain_query());
+		$statement = $this->sesion->pdodbh->prepare($this->getPlainQuery());
 		$statement->execute();
 	}
 
