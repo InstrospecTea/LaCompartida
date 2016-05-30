@@ -288,7 +288,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		if(preg_match($patt, $order, $matches)) {
 			$criteria->add_ordering($matches[1], $matches[2]);
 		} else {
-			$criteria->add_ordering($field);
+			$criteria->add_ordering($order);
 		}
 		return;
 	}
