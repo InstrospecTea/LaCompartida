@@ -1,4 +1,5 @@
 <?php
+
 use Carbon\Carbon;
 
 /**
@@ -14,6 +15,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 	private $defaultFee = array();
 	private $fee = array();
 	private $matters = array();
+	private $first_user_id;
 
 	public function generate() {
 		$this->matters = $this->getMatters();
@@ -24,16 +26,19 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		$this->generateWorks();
 		$this->generateExpenses();
 		$this->updateContracts();
+		$this->generateCharges();
 	}
 
 	public function generateWorks() {
 		$this->loadService('Work');
 		$users = $this->getRamdomizeMatersToUsers($this->getUsers());
 
-		$ini = strtotime($this->start_date);
-		$fin = strtotime($this->end_date);
+		$start_date = strtotime($this->getLastWorkDate());
+		/* Hoy */
+		$end_date = strtotime(date('Y-m-d'));
 
-		$days = (($fin - $ini) / 60 / 60 / 24);
+		/* Días entre la fecha inicial y la fecha final */
+		$days = $this->daysBetweenDates($start_date, $end_date);
 
 		while (--$days >= 0) {
 			$date = strtotime(date('Y-m-d', $fin) . " -$days day");
@@ -65,7 +70,6 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 				$Trabajo->Load($SavedWork->get('id_trabajo'));
 				$Trabajo->InsertarTrabajoTarifa();
 			}
-
 		}
 	}
 
@@ -205,27 +209,28 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		return $User->ListarActivos("AND usuario.rut != '99511620'", 'PRO');
 	}
 
-	private function getLastWorkDate() {
-		$this->loadService('Work');
-		$Work = $this->WorkService->findFirst(null, 'fecha', 'id_trabajo DESC');
-		if ($Work === false) {
-			$date = strtotime('-1 year');
-		} else {
-			$date = strtotime($Work->get('fecha'));
+	private function getFirstUserId() {
+		if (!empty($this->first_user_id)) {
+			return $this->first_user_id;
 		}
-		return date('Y-m-d', $date);
+		$this->loadService('User');
+		$filters = CriteriaRestriction::and_clause(
+				CriteriaRestriction::equals('activo', 1), CriteriaRestriction::equals('visible', 1)
+		);
+		$User = $this->UserService->findFirst($filters, 'id_usuario', 'id_usuario');
+		$this->first_user_id = $User->get('id_usuario');
+		return $this->first_user_id;
 	}
 
 	public function updateContracts() {
-		Debug::pr('Usar InsertCriteria y mejorarlo');
-		return;
-		$query = "UPDATE contrato
-			SET usa_impuesto_separado = '" . Conf::GetConf($sesion, 'UsarImpuestoSeparado') . "',
-			usa_impuesto_gastos = '" . Conf::GetConf($sesion, 'UsarImpuestoPorGastos') . "'";
-		mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		$InsertCriteria = new InsertCriteria($this->Session);
+		$InsertCriteria
+			->update()
+			->setTable('contrato')
+			->addPivotWithValue('usa_impuesto_separado', Conf::GetConf($sesion, 'UsarImpuestoSeparado'))
+			->addPivotWithValue('usa_impuesto_gastos', Conf::GetConf($sesion, 'UsarImpuestoPorGastos'));
+		$InsertCriteria->run(true);
 	}
-
-
 
 	public function generateExpenses() {
 		$date = Carbon::parse($this->start_date);
@@ -280,7 +285,207 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 	}
 
 	public function generateCharges() {
-		// TODO: Implement generateCharges() method.
+		$contracts = $this->getActiveContracts();
+
+		$limit_date = strtotime('-5 days');
+
+		$total_contracts = count($contracts);
+		for ($i = 0; $i < $total_contracts; ++$i) {
+			$contract_id = $contracts[$i];
+			$periods = $this->getChargePeriods($contract_id, $limit_date);
+			$total_periods = count($periods);
+			for ($x = 0; $x < $total_periods; ++$x) {
+				$period = $periods[$x];
+				$total_works = $this->countWorkByContractId($contract_id, $period);
+				if ($total_works === 0) {
+					continue;
+				}
+				$this->createCharge($contract_id, $period['first_day'], $period['last_day'], $limit_date);
+			}
+		}
+	}
+
+	private function createCharge($contract_id, $start_date, $end_date, $limit_date) {
+		Debug::pr('id_contrato: ' . $contract_id);
+		Debug::pr('fecha_periodo_ini: ' . date('Y-m-d', $start_date));
+		Debug::pr('fecha_periodo_fin: ' . date('Y-m-d', $end_date));
+		$this->Cobro = $this->loadModel('Cobro', null, true);
+		$id_proceso_nuevo = $this->Cobro->GeneraProceso();
+		Debug::pr('id_proceso: ' . $id_proceso_nuevo);
+		$id_cobro = $this->Cobro->PrepararCobro(
+			date('Y-m-d', $start_date),
+			date('Y-m-d', $end_date),
+			$contract_id,
+			false,
+			$id_proceso_nuevo
+		);
+
+		$this->Cobro->Load($id_cobro);
+		Debug::pr('id_cobro: ' . $id_cobro);
+		$this->Cobro->GuardarCobro(true);
+		$this->Cobro->Edit('estado', 'EMITIDO');
+		$this->Cobro->Edit('fecha_creacion', date('Y-m-d H:i:s', $end_date));
+		$this->Cobro->Edit('fecha_cobro', date('Y-m-d H:i:s', $end_date + 172800));
+		$this->Cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s', $end_date + 172800));
+		$this->Cobro->Edit('fecha_emision', date('Y-m-d H:i:s', $end_date));
+		$this->Cobro->Write();
+new CobroMoneda;
+		$this->loadModel('Documento');
+		$this->Documento->LoadByCobro($id_cobro);
+		$this->Documento->Edit('fecha', date('Y-m-d', $end_date));
+		$this->Documento->Write();
+
+		$sended = $this->sendChargeToClient($end_date, $limit_date);
+		$this->payCharge($sended, $end_date, $limit_date);
+	}
+
+	private function payCharge($sended, $end_date, $limit_date) {
+		if (!($end_date < $limit_date - 7776000 || ( $sended && rand(0, 100) < 60 ))) {
+			return;
+		}
+		$this->loadModel('CobroMoneda');
+		$this->CobroMoneda->Load($this->Cobro->fields['id_cobro']);
+		$id_moneda = $this->Documento->fields['id_moneda'];
+		$id_moneda_base = $this->Documento->fields['id_moneda_base'];
+		$decimales_moneda = $this->CobroMoneda->moneda[$id_moneda]['cifras_decimales'];
+		$decimales_moneda_base = $this->CobroMoneda->moneda[$id_moneda_base]['cifras_decimales'];
+		$multiplicador = -1.0;
+		$this->loadService('Document');
+		$Document = $this->DocumentService->newEntity();
+		$Document->fillFromArray(array(
+			'monto' => number_format($this->Documento->fields['monto'] * $multiplicador, $decimales_moneda, '.', ''),
+			'monto_base' => number_format($this->Documento->fields['monto_base'] * $multiplicador, $decimales_moneda_base, '.', ''),
+			'saldo_pago' => number_format($this->Documento->fields['monto'] * $multiplicador, $decimales_moneda, '.', ''),
+			'id_cobro' => $this->Cobro->fields['id_cobro'],
+			'tipo_doc' => 'T',
+			'id_moneda' => $this->Documento->fields['id_moneda'],
+			'fecha' => date('Y-m-d', $end_date + 172800),
+			'glosa_documento' => 'Pago de Cobro N°' . $this->Cobro->fields['id_cobro'],
+			'codigo_cliente' => $this->Documento->fields['codigo_cliente']
+		));
+		$this->DocumentService->saveOrUpdate($Document);
+
+		$this->addNetting($Document);
+
+		$this->Cobro->Edit('estado', 'PAGADO');
+		$this->Cobro->Write();
+		Debug::pr('Cobro PAGADO');
+	}
+
+	private function addNetting($Document) {
+		$this->loadService('Payment');
+		$Payment = $this->PaymentService->newEntity();
+		$Payment->fillFromArray(array(
+			'id_documento_cobro' => $this->Documento->fields['id_documento'],
+			'id_documento_pago' => $Document->get('id_documento'),
+			'valor_cobro_honorarios' => $this->Cobro->fields['monto'],
+			'valor_cobro_gastos' => $this->Cobro->fields['monto_gastos'],
+			'valor_pago_honorarios' => $this->Cobro->fields['monto'],
+			'valor_pago_gastos' => $this->Cobro->fields['monto_gastos']
+		));
+		$this->PaymentService->saveOrUpdate($Payment);
+	}
+
+	private function sendChargeToClient($end_date, $limit_date) {
+		if ($end_date < $limit_date - 5184000 || rand(0, 100) < 80) {
+			$this->Cobro->Edit('estado', 'ENVIADO AL CLIENTE');
+			$this->Cobro->Write();
+			return true;
+		}
+	}
+
+	private function getActiveContracts() {
+		$SearchCriteria = new SearchCriteria('Matter');
+		$SearchCriteria->related_with('Contract')->with_direction('inner');
+		$SearchCriteria->related_with('Client')->with_direction('inner')->on_property('codigo_cliente');
+		$SearchCriteria->filter('activo')->restricted_by('equals')->compare_with('1');
+		$SearchCriteria->filter('activo')->for_entity('Contract')->restricted_by('equals')->compare_with("'SI'");
+		$SearchCriteria->filter('activo')->for_entity('Client')->restricted_by('equals')->compare_with('1');
+		$SearchCriteria->grouped_by('id_contrato');
+
+		$this->loadManager('Search');
+		$contracts = (array) $this->SearchManager->searchByCriteria($SearchCriteria, array('id_contrato'));
+		array_walk($contracts, function (&$Contract) {
+			$Contract = $Contract->get('id_contrato');
+		});
+		return $contracts;
+	}
+
+	private function countWorkByContractId($contract_id, $period) {
+		$start_date = date("'Y-m-d'", $period['first_day']);
+		$end_date = date("'Y-m-d'", $period['last_day']);
+		$SearchCriteria = new SearchCriteria('Work');
+		$SearchCriteria->related_with('Matter')->with_direction('inner')->on_property('codigo_asunto');
+		$SearchCriteria->filter('id_contrato')->for_entity('Matter')->compare_with($contract_id);
+		$SearchCriteria->filter('fecha')->for_entity('Work')->restricted_by('between')->compare_with($start_date, $end_date);
+		$SearchCriteria->filter('id_cobro')->for_entity('Work')->restricted_by('is_null');
+		$this->loadManager('Search');
+		$works = $this->SearchManager->searchByCriteria($SearchCriteria, array('COUNT(id_trabajo) AS total'));
+		return isset($works[0]) ? (int) $works[0]->get('total') : 0;
+	}
+
+	private function getChargePeriods($contract_id, $limit_date) {
+		$last_date = $this->getLastChargeDate($contract_id);
+		$one_year = strtotime('-1 year');
+		if ($last_date < $one_year) {
+			$last_date = $one_year;
+		}
+		$last_day = $this->getLastDayOfMonth($last_date);
+
+		if ($limit_date < $last_day) {
+			Debug::pr('Supera la fecha limite');
+			return array();
+		}
+
+		if ($last_date === $last_day) {
+			$last_day = $this->nextMonth($last_day);
+		}
+		$periods = array();
+		while ($last_day <= $limit_date) {
+			$first_day = $this->getFirstDayOfMonth($last_day);
+			$periods[] = compact('first_day', 'last_day');
+			$last_day = $this->nextMonth($last_day);
+		}
+		return $periods;
+	}
+
+	private function getLastWorkDate() {
+		$this->loadService('Work');
+		$Work = $this->WorkService->findFirst(null, 'fecha', 'id_trabajo DESC');
+		if ($Work === false) {
+			$date = strtotime('-1 year');
+		} else {
+			$date = strtotime($Work->get('fecha'));
+		}
+		return date('Y-m-d', $date);
+	}
+
+	private function getLastChargeDate($contract_id) {
+		$date = '-1 year';
+		$this->loadService('Charge');
+		$restriction = CriteriaRestriction::equals('id_contrato', $contract_id);
+		$Charge = $this->ChargeService->findFirst($restriction, 'fecha_fin', 'id_cobro DESC');
+		if ($Charge !== false) {
+			$date = $Charge->get('fecha_fin');
+		}
+		return strtotime($date);
+	}
+
+	private function getLastDayOfMonth($date) {
+		return strtotime(date('Y-m-t', $date));
+	}
+
+	private function getFirstDayOfMonth($date) {
+		return mktime(0, 0, 0, date('m', $date), 1, date('Y', $date));
+	}
+
+	private function nextMonth($date) {
+		$next_month = mktime(0, 0, 0, date('m', $date) + 1, 1, date('Y', $date));
+		return $this->getLastDayOfMonth($next_month);
+	}
+
+	private function daysBetweenDates($start_date, $end_date) {
+		return (($end_date - $start_date) / 60 / 60 / 24);
 	}
 
 }
