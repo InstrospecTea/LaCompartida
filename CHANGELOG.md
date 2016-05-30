@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.8
+Monday, May 30th
+* **Fix** [Utilizar writeNumber para asignar un número a una celda](https://github.com/LemontechSA/ttb/pull/1512)
+
 ## Hotfix 16.15.7
 Friday, May 27th
 * **Fix** [Muestra el usuario seleccionado, en el listado aunque no esté activo o no visible.](https://github.com/LemontechSA/ttb/pull/1510)
