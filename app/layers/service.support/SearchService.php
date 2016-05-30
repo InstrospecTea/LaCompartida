@@ -93,36 +93,37 @@ class SearchService implements ISearchService {
 		$usedEntities = array();
 		foreach ($searchCriteria->relationships() as $relationship) {
 			$relatedEntity = $relationship->entity();
-			if (!in_array($relationship->alias(), $usedEntities)) {
-				$usedEntities[] = $relatedEntity;
-				$relatedCondition = $relationship->condition();
-				if (class_exists($relationship->entity())) {
-					$relatedEntity = new ReflectionClass($relatedEntity);
-					$relatedEntity = $relatedEntity->newInstance();
-					$relatedProperty = $relationship->property();
-					if (empty($relatedProperty)) {
-						$relatedProperty = $relatedEntity->getIdentity();
-					}
-					$relatedTarget = $relatedEntity->getPersistenceTarget();
-				} else {
-					$reflectedEntity = new ReflectionClass($searchCriteria->entity());
-					$reflectedEntity = $reflectedEntity->newInstance();
-					$relatedProperty = $reflectedEntity->getIdentity();
-					$relatedTarget = $relationship->entity();
-				}
-				if ($relationship->with_entity()) {
-					$relatedEntity = $relationship->with_entity();
-				} else {
-					$relatedEntity = $searchCriteria->entity();
-				}
-				if ($relationship->with_property()) {
-					$entityProperty = $relationship->with_property();
-				} else {
-					$entityProperty = $relatedProperty;
-				}
-				$constructedRestriction = CriteriaRestriction::$relatedCondition($relationship->alias() . '.' . $relatedProperty, $relatedEntity . '.' . $entityProperty)->__toString();
-				$criteria->add_custom_join_with("$relatedTarget AS {$relationship->alias()}", $constructedRestriction, strtoupper($relationship->join()));
+			if (in_array($relationship->alias(), $usedEntities)) {
+				continue;
 			}
+			$usedEntities[] = $relatedEntity;
+			$relatedCondition = $relationship->condition();
+			if (class_exists($relationship->entity())) {
+				$relatedEntity = new ReflectionClass($relatedEntity);
+				$relatedEntity = $relatedEntity->newInstance();
+				$relatedProperty = $relationship->property();
+				if (empty($relatedProperty)) {
+					$relatedProperty = $relatedEntity->getIdentity();
+				}
+				$relatedTarget = $relatedEntity->getPersistenceTarget();
+			} else {
+				$reflectedEntity = new ReflectionClass($searchCriteria->entity());
+				$reflectedEntity = $reflectedEntity->newInstance();
+				$relatedProperty = $reflectedEntity->getIdentity();
+				$relatedTarget = $relationship->entity();
+			}
+			if ($relationship->with_entity()) {
+				$relatedEntity = $relationship->with_entity();
+			} else {
+				$relatedEntity = $searchCriteria->entity();
+			}
+			if ($relationship->with_property()) {
+				$entityProperty = $relationship->with_property();
+			} else {
+				$entityProperty = $relatedProperty;
+			}
+			$constructedRestriction = CriteriaRestriction::$relatedCondition($relationship->alias() . '.' . $relatedProperty, $relatedEntity . '.' . $entityProperty)->__toString();
+			$criteria->add_custom_join_with("$relatedTarget AS {$relationship->alias()}", $constructedRestriction, strtoupper($relationship->join()));
 		}
 		return $criteria;
 	}
@@ -145,7 +146,11 @@ class SearchService implements ISearchService {
 			if ($for == '') {
 				$for = $searchCriteria->entity();
 			}
-			$constructedRestriction = CriteriaRestriction::$restriction($this->makeRestrictionName($for, $filter->property()), $filter->value())->__toString();
+			$args = array_merge(
+				array($this->makeRestrictionName($for, $filter->property())),
+				(array) $filter->value()
+			);
+			$constructedRestriction = call_user_func_array(array('CriteriaRestriction', $restriction), $args)->__toString();
 			if ($filter->condition() == 'AND') {
 				$and_filters[] = $constructedRestriction;
 			} else {
