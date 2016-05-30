@@ -35,6 +35,9 @@ class LogsAPI extends AbstractSlimAPI {
 			$this->halt(__("There are no movements for {$table_name} table"), 'NoMovements');
 		}
 
+		$time_zone = \Conf::GetConf($this->session, 'ZonaHoraria');
+		$offset = timezone_offset_get(new \DateTimeZone($time_zone), new \DateTime());
+
 		$rows = array();
 		foreach ($logs as $key => $log) {
 			if (is_null($log)) {
@@ -42,7 +45,7 @@ class LogsAPI extends AbstractSlimAPI {
 			}
 
 			$row = array(
-				'a' => $log->get('fecha'),
+				'a' => date('d-m-Y H:i:s', strtotime($log->get('fecha')) + $offset),
 				'b' => $log->get('username'),
 				'c' => $log->get('humanized')
 			);
