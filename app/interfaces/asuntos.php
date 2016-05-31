@@ -54,8 +54,10 @@ $Pagina->PrintTop($popup);
 $Form = new Form;
 
 ?>
-<script src="<?= Conf::RootDir() ?>/app/layers/assets/js/JsonToTable.js"></script>
-<link rel="stylesheet" type="text/css" href="<?= Conf::RootDir() ?>/app/layers/assets/css/JsonToTable.css">
+
+<?= $Html->script(Conf::RootDir() . '/app/layers/assets/js/JsonToTable.js') ?>
+<?= $Html->css(Conf::RootDir() . '/app/layers/assets/css/JsonToTable.css') ?>
+
 <script type="text/javascript">
 	var usocodigosecundario = '<?php echo $usocodigosecundario; ?>';
 
@@ -78,12 +80,12 @@ $Form = new Form;
 			var auth_token = "<?= $_SESSION['AUTHTOKEN'] ?>";
 			var url_api = '<?= Conf::RootDir() ?>/api/v2/logs';
 
+			jQuery('#json_to_table').empty();
 			jQuery('#json_to_table').dialog({
 				dialogClass: 'jsonToTable',
 				width: 600,
 				height: 500
 			});
-
 
 			jQuery.ajax({
 				url: url_api,
