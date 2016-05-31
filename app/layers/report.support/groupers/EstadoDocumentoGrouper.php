@@ -15,7 +15,7 @@ class EstadoDocumentoGrouper extends AbstractGrouperTranslator {
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
-		return 'IFNULL(factura.anulado, 0)';
+		return 'factura.estado_documento';
 	}
 
 	/**
@@ -23,9 +23,7 @@ class EstadoDocumentoGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		$nulled = __('Anulado');
-		$issued = __('Emitido');
-		return "IF(IFNULL(factura.anulado, 0) = 1, '{$nulled}', '{$issued}')";
+		return "factura.estado_documento";
 	}
 	/**
 	 * Obtiene el campo de grupo por el cual se ordenará la query
@@ -73,7 +71,7 @@ class EstadoDocumentoGrouper extends AbstractGrouperTranslator {
 		$Criteria
 			->add_select($this->getSelectField(), 'estado_documento')
 			->add_grouping($this->getGroupField())
-			->add_ordering($this->getOrderField());
+			->add_ordering($this->getOrderField(), 'DESC');
 
 		return $Criteria;
 	}

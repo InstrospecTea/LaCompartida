@@ -9,7 +9,7 @@ abstract class AbstractInvoiceProportionalDataCalculator
 	extends AbstractProportionalDataCalculator {
 
 	public function getInvoiceContribution() {
-		return "((factura.subtotal * (moneda_factura.tipo_cambio / cobro_moneda.tipo_cambio) ) / documento.subtotal_sin_descuento)";
+		return "((factura.subtotal *  (moneda_factura.tipo_cambio / cobro_moneda_documento.tipo_cambio ) ) / documento.subtotal_sin_descuento)";
 	}
 
 	function addCurrencyToInvoiceQuery($Criteria) {

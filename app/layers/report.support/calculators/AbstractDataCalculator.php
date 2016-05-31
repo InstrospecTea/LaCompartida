@@ -375,18 +375,17 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 
 	function getIssuedInvoicesCriteria() {
 		$invoiceCriteria = $this->getGenericInvoiceCriteria();
+		$issued = __('Emitido');
+		$invoiceCriteria->add_select("'{$issued}'", 'estado_documento');
 		return $invoiceCriteria;
 	}
 
 	function getAnnuledInvoicesCriteria() {
 		$invoiceCriteria = $this->getGenericInvoiceCriteria(-1, 'fecha_anulacion');
-
+		$nulled = __('Anulado');
+		$invoiceCriteria->add_select("'{$nulled}'", 'estado_documento');
 		$invoiceCriteria->add_restriction(
 			CriteriaRestriction::not_equal('IFNULL(f.anulado, 0)', '0') // anulado = 1
-		);
-
-		$invoiceCriteria->add_restriction(
-			CriteriaRestriction::not_equal('pdl.codigo', "'NC'") // sin NC
 		);
 
 		return $invoiceCriteria;
@@ -404,7 +403,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			->add_select('f.anulado', 'anulado')
 			->add_select("f.{$date}", 'fecha_contable')
 			->add_select("CONCAT(pdl.codigo , ' ', LPAD(f.serie_documento_legal, '3', '0'), '-', LPAD(f.numero, '7', '0'))", 'numero')
-			->add_select("(IF(pdl.codigo = 'NC', -1, {$factor}) * f.subtotal)", 'subtotal');
+			->add_select("(IF(pdl.codigo = 'NC', -1, 1) * {$factor} * f.subtotal)", 'subtotal');
 
 		$filters = $this->filtersFields;
 

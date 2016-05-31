@@ -140,6 +140,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'estado',
 		'id_cobro',
 		'numero_documento',
+		'estado_documento',
 		'razon_social_factura',
 		'glosa_estudio',
 		'forma_cobro',
@@ -168,6 +169,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'estado',
 		'id_cobro',
 		'numero_documento',
+		'estado_documento',
 		'razon_social_factura',
 		'glosa_estudio',
 		'forma_cobro',
@@ -187,8 +189,6 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'solicitante'
 	);
 }
-
-$agrupadores[] = 'estado_documento';
 
 if (Conf::GetConf($sesion, 'UsoActividades')) {
 	$agrupadores[] = 'actividad';
@@ -261,8 +261,8 @@ $explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
 $explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
 $explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
 $explica_periodo_envio = 'Sólo considera Trabajos en Cobros con fecha de envío en el Periodo';
+$explica_periodo_pago = 'Sólo considera Trabajos en Cobros con fecha de Pago en el Periodo';
 $explica_periodo_facturacion = 'Sólo considera Trabajos en Documentos tributarios emitidos en el Periodo';
-
 /* Calculos de fechas */
 $hoy = date("Y-m-d");
 if (!$fecha_anio) {
@@ -819,6 +819,28 @@ if (!$popup) {
 												</td>
 												<td align="left">
 													<label title="<?php echo __($explica_periodo_envio) ?>" for="campo_fecha_envio"><?php echo __('Liquidación - Envio'); ?></label>
+												</td>
+											</tr>
+											<tr>
+												<td align="right">
+													&nbsp;
+												</td>
+												<td align="left">
+													&nbsp;
+												</td>
+												<td align="right">
+													<span title="<?php echo __($explica_periodo_pago) ?>">
+														<input type="radio" name="campo_fecha" id="campo_fecha_pago" value="pago"
+														<?php
+														if ($campo_fecha == 'pago') {
+															echo 'checked="checked"';
+														}
+														?>
+															onclick="SincronizarCampoFecha()" />
+													</span>
+												</td>
+												<td align="left">
+													<label title="<?php echo __($explica_periodo_pago) ?>" for="campo_fecha_pago"><?php echo __('Liquidación - Pago'); ?></label>
 												</td>
 											</tr>
 											<tr>
