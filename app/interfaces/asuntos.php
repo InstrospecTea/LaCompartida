@@ -99,21 +99,18 @@ $Form = new Form;
 				type: 'GET',
 				dataType: 'JSON',
 				success: function(response) {
+					if (response.length == 0) {
+						jQuery('#json_to_table').html(
+							jQuery('<center/>').html(
+								jQuery('<h3/>').html('No existen movimientos para este Asunto')
+							)
+						);
+						return false;
+					}
+
 					var json_to_table = new window.JsonToTable();
 					var html = json_to_table.render(response);
 					jQuery('#json_to_table').html(html);
-				},
-				error: function(e) {
-					var errors = JSON.parse(e.responseText).errors;
-					jQuery.each(errors, function (key, value) {
-						if (value.code == 'NoMovements') {
-							jQuery('#json_to_table').html(
-								jQuery('<center/>').html(
-									jQuery('<h3/>').html('No existen movimientos para este Asunto')
-								)
-							);
-						}
-					});
 				}
 			});
 		});

@@ -32,7 +32,7 @@ class LogsAPI extends AbstractSlimAPI {
 		$logs = $LogManager->getLogs($table_name, $field_id);
 
 		if ($logs->getSize() === 0) {
-			$this->halt(__("There are no movements for {$table_name} table"), 'NoMovements');
+			$this->present(array(), self::$LogEntity);
 		}
 
 		$time_zone = \Conf::GetConf($this->session, 'ZonaHoraria');
