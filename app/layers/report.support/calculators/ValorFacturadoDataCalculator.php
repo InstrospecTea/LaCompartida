@@ -26,7 +26,7 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
 	}
 
 	/**
@@ -47,7 +47,7 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 
 		$Criteria
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
 	}
 
 	/**
@@ -70,7 +70,7 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 			->add_select($billed_amount, $this->fieldName);
 
 		$Criteria
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
 	}
 
 }
