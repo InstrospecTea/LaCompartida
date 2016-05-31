@@ -28,14 +28,25 @@ class LogManager extends AbstractManager implements ILogManager {
 				continue;
 			}
 
+			if (strtolower($value->get('valor_nuevo')) == 'null') {
+				$logs[$key]->fields['valor_nuevo'] = '';
+			}
+
 			$service_name = $relations[$campo_tabla]['service_name'];
 			$service_class = "{$service_name}Service";
+			$old_value_field = $value->get('valor_antiguo');
+			$new_value_field = $value->get('valor_nuevo');
 
 			$this->loadService($service_name);
-			$old_value = $this->$service_class->get($value->get('valor_antiguo'), $relations[$campo_tabla]['field']);
-			$new_value = $this->$service_class->get($value->get('valor_nuevo'), $relations[$campo_tabla]['field']);
-			$logs[$key]->fields['valor_antiguo'] = $old_value->get($relations[$campo_tabla]['field']);
-			$logs[$key]->fields['valor_nuevo'] = $new_value->get($relations[$campo_tabla]['field']);
+			if (!empty($old_value_field)) {
+				$old_value = $this->$service_class->get($old_value_field, $relations[$campo_tabla]['field']);
+				$logs[$key]->fields['valor_antiguo'] = $old_value->get($relations[$campo_tabla]['field']);
+			}
+
+			if (!empty($new_value_field)) {
+				$new_value = $this->$service_class->get($new_value_field, $relations[$campo_tabla]['field']);
+				$logs[$key]->fields['valor_nuevo'] = $new_value->get($relations[$campo_tabla]['field']);
+			}
 		}
 
 		return $logs;
