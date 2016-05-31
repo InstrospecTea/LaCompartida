@@ -9,8 +9,19 @@ abstract class AbstractInvoiceProportionalDataCalculator
 	extends AbstractProportionalDataCalculator {
 
 	public function getInvoiceContribution() {
-		return "(factura.subtotal / documento.subtotal_sin_descuento)";
+		return "((factura.subtotal * (moneda_factura.tipo_cambio / cobro_moneda.tipo_cambio) ) / documento.subtotal_sin_descuento)";
 	}
+
+	function addCurrencyToInvoiceQuery($Criteria) {
+		$Criteria->add_left_join_with(
+				array('documento_moneda', 'moneda_factura'),
+				CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals('moneda_factura.id_documento', 'documento.id_documento'),
+					CriteriaRestriction::equals('moneda_factura.id_moneda', 'factura.id_moneda')
+				)
+			);
+	}
+
 	/**
 	 * Sobrecarga la query de trabajos para agregar los datos de factura
 	 * @param  Criteria $Criteria Criteria a modificar
@@ -19,6 +30,7 @@ abstract class AbstractInvoiceProportionalDataCalculator
 	function getBaseWorkQuery(Criteria $Criteria) {
 		parent::getBaseWorkQuery($Criteria);
 		$this->addInvoiceToQuery($Criteria);
+		$this->addCurrencyToInvoiceQuery($Criteria);
 	}
 
 	/**
@@ -29,6 +41,7 @@ abstract class AbstractInvoiceProportionalDataCalculator
 	function getBaseErrandQuery($Criteria) {
 		parent::getBaseErrandQuery($Criteria);
 		$this->addInvoiceToQuery($Criteria);
+		$this->addCurrencyToInvoiceQuery($Criteria);
 	}
 
 	/**
@@ -39,5 +52,6 @@ abstract class AbstractInvoiceProportionalDataCalculator
 	function getBaseChargeQuery($Criteria) {
 		parent::getBaseChargeQuery($Criteria);
 		$this->addInvoiceToQuery($Criteria);
+		$this->addCurrencyToInvoiceQuery($Criteria);
 	}
 }

@@ -377,7 +377,7 @@ class Reporte {
 			$this->id_moneda,
 			$this->proporcionalidad
 		);
-	  // err();
+		// err();
 		// pr($calculator->calculate());
 		$this->row = $calculator->calculate();
 
