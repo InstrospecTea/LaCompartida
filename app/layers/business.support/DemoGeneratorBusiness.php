@@ -5,6 +5,7 @@ use TTB\Configurations\ConfigCargaMasiva;
 /**
  * Class DemoGeneratorBusiness
  * @property MatterService $MatterService
+ * @property Cobro $Cobro
  */
 class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBusiness {
 
@@ -321,22 +322,23 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 		);
 
 		$this->Cobro->Load($id_cobro);
-		Debug::pr('id_cobro: ' . $id_cobro);
-		$this->Cobro->GuardarCobro(true);
-		$this->Cobro->Edit('estado', 'EMITIDO');
-		$this->Cobro->Edit('fecha_creacion', date('Y-m-d H:i:s', $end_date));
-		$this->Cobro->Edit('fecha_cobro', date('Y-m-d H:i:s', $end_date + 172800));
-		$this->Cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s', $end_date + 172800));
-		$this->Cobro->Edit('fecha_emision', date('Y-m-d H:i:s', $end_date));
-		$this->Cobro->Write();
-		new CobroMoneda;
-		$this->loadModel('Documento');
-		$this->Documento->LoadByCobro($id_cobro);
-		$this->Documento->Edit('fecha', date('Y-m-d', $end_date));
-		$this->Documento->Write();
+		if ($this->Cobro->Loaded()) {
+			Debug::pr('id_cobro: ' . $id_cobro);
+			$this->Cobro->GuardarCobro(true);
+			$this->Cobro->Edit('estado', 'EMITIDO');
+			$this->Cobro->Edit('fecha_creacion', date('Y-m-d H:i:s', $end_date));
+			$this->Cobro->Edit('fecha_cobro', date('Y-m-d H:i:s', $end_date + 172800));
+			$this->Cobro->Edit('fecha_facturacion', date('Y-m-d H:i:s', $end_date + 172800));
+			$this->Cobro->Edit('fecha_emision', date('Y-m-d H:i:s', $end_date));
+			$this->Cobro->Write();
+			$this->loadModel('Documento');
+			$this->Documento->LoadByCobro($id_cobro);
+			$this->Documento->Edit('fecha', date('Y-m-d', $end_date));
+			$this->Documento->Write();
 
-		$sended = $this->sendChargeToClient($end_date, $limit_date);
-		$this->payCharge($sended, $end_date, $limit_date);
+			$sended = $this->sendChargeToClient($end_date, $limit_date);
+			$this->payCharge($sended, $end_date, $limit_date);
+		}
 	}
 
 	private function payCharge($sended, $end_date, $limit_date) {
