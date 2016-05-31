@@ -3,9 +3,7 @@
 namespace Api\V2;
 
 /**
- *
  * Clase con métodos para Projectos
- *
  */
 class ProjectsAPI extends AbstractSlimAPI {
 
@@ -18,7 +16,10 @@ class ProjectsAPI extends AbstractSlimAPI {
 		array('project_area_id' => 'id_area_proyecto'),
 		array('project_type_id' => 'id_tipo_asunto'),
 		array('language_code' => 'codigo_idioma'),
-		array('language_name' => 'glosa_idioma')
+		array('language_name' => 'glosa_idioma'),
+		array('created_at' => 'fecha_creacion'),
+		array('updated_at' => 'fecha_modificacion'),
+		array('currency_code' => 'codigo')
 	);
 
 	public function getProjectsOfClient($client_id) {

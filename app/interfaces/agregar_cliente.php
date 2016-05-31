@@ -172,7 +172,7 @@ if ($opcion == "guardar") {
 		$cliente->Edit("limite_monto", $cliente_limite_monto);
 		$cliente->Edit("desglose_referencia", $desglose_referencia);
 		$cliente->Edit("id_cliente_referencia", (!empty($id_cliente_referencia) && $id_cliente_referencia != '-1' ) ? $id_cliente_referencia : "NULL" );
-
+		$cliente->Edit('fecha_inicio_contrato', Utiles::fecha2sql($fecha_inicio_contrato));
 
 		if ($cliente->Write()) {
 
@@ -283,7 +283,9 @@ if ($opcion == "guardar") {
 			if (empty($codigo_cliente_secundario)) {
 				$codigo_cliente_secundario = $codigo_cliente;
 			}
+			$asunto = new Asunto($Sesion);
 			$codigo_asunto_secundario = $asunto->AsignarCodigoAsuntoSecundario($codigo_cliente_secundario);
+			unset($asunto);
 		} else {
 			$codigo_asunto_secundario = null;
 		}
@@ -591,22 +593,18 @@ $Pagina->PrintTop();
 			<!--- FIN SEGMENTO -->
 
 			<tr class="controls controls-row ">
-				<td class="ar">
-					<div class="span2">
-						<?php
-						echo __('Fecha Creación');
-						$intfechacreacion = intval(date('Ymd', strtotime($cliente->fields['fecha_creacion'])));
-						if ($intfechacreacion > 19990101) {
-							$fecha_creacion = date('d-m-Y', strtotime($cliente->fields['fecha_creacion']));
-						} else {
-							$fecha_creacion = date('d-m-Y');
-						}
-						?>
-					</div>
-				</td>
+				<td class="ar"><?= __('Fecha Inicio Contrato'); ?></td>
 				<td class="al">
 					<div class="span3">
-						<input type="text" name="fecha_creacion" class="span2 fechadiff" id="fecha_creacion" readonly="true" size="50" value="<?php echo $fecha_creacion; ?>"  />
+						<?php
+						$intfechacreacion = intval(date('Ymd', strtotime($cliente->fields['fecha_inicio_contrato'])));
+						if ($intfechacreacion > 19990101) {
+							$fecha_inicio_contrato = date('d-m-Y', strtotime($cliente->fields['fecha_inicio_contrato']));
+						} else {
+							$fecha_inicio_contrato = date('d-m-Y');
+						}
+						echo $Form->input('fecha_inicio_contrato', $fecha_inicio_contrato, array('class' => 'span2 fechadiff', 'label' => false));
+						?>
 					</div>
 
 				</td>

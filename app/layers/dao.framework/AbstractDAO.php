@@ -434,4 +434,14 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 
 		return $output;
 	}
+
+	public function newEntity(array $properties = null) {
+		$Reflected = new ReflectionClass($this->getClass());
+		$Instance = $Reflected->newInstance();
+		if (!is_null($properties)) {
+			$Instance->fillFromArray($properties, true);
+		}
+		return $Instance;
+	}
+
 }
