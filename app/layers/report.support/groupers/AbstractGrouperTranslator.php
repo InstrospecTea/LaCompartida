@@ -5,7 +5,7 @@
  */
 abstract class AbstractGrouperTranslator  implements IGrouperTranslator {
 
-	private $Session;
+	protected $Session;
 
 	/**
 	 * Constructor

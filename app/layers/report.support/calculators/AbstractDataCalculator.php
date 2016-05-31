@@ -403,6 +403,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			->add_select('f.anulado', 'anulado')
 			->add_select("f.{$date}", 'fecha_contable')
 			->add_select("CONCAT(pdl.codigo , ' ', LPAD(f.serie_documento_legal, '3', '0'), '-', LPAD(f.numero, '7', '0'))", 'numero')
+			->add_select("CONCAT(pdl.codigo , ' ', LPAD(f.numero, '7', '0'))", 'numero_sin_serie')
 			->add_select("(IF(pdl.codigo = 'NC', -1, 1) * {$factor} * f.subtotal)", 'subtotal');
 
 		$filters = $this->filtersFields;

@@ -23,14 +23,16 @@ class NumeroDocumentoGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return 'factura.numero';
+		$usaSerie = Conf::GetConf($this->Session, 'NumeroFacturaConSerie');
+		return $usaSerie ? 'factura.numero' : 'factura.numero_sin_serie';
 	}
 	/**
 	 * Obtiene el campo de grupo por el cual se ordenará la query
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
-		return 'factura.numero';
+		$usaSerie = Conf::GetConf($this->Session, 'NumeroFacturaConSerie');
+		return $usaSerie ? 'factura.numero' : 'factura.numero_sin_serie';
 	}
 
 	/**
