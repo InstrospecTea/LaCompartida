@@ -56,7 +56,7 @@ $Form = new Form;
 ?>
 
 <?= $Html->script(Conf::RootDir() . '/app/layers/assets/js/JsonToTable.js') ?>
-<?= $Html->css(Conf::RootDir() . '/app/layers/assets/css/JsonToTable.css') ?>
+<?= $Html->css(Conf::RootDir() . '/app/layers/assets/css/jsonToTable.css') ?>
 
 <script type="text/javascript">
 	var usocodigosecundario = '<?php echo $usocodigosecundario; ?>';
