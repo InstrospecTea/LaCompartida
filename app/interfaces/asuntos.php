@@ -283,7 +283,7 @@ $Form = new Form;
 			echo $Form->input('campo_codigo_cliente', $codigo_cliente, array('label' => false, 'id' => 'campo_codigo_cliente', 'type' => 'hidden'));
 		}
 	} ?>
-	<div id="json_to_table" title="Historial de Asuntos"></div>
+	<?= $Html->tag('div', '', array('id' => 'json_to_table', 'title' => __('Historial de Asuntos'))); ?>
 </form>
 <?php
 
