@@ -1453,4 +1453,38 @@ class Asunto extends Objeto {
 
 		return (int) $result['total'];
 	}
+
+	/**
+	 * Carga los datos extra del asunto y devielve el Objeto
+	 * @return \MatterExtra
+	 */
+	public function loadExtra($fields = null) {
+		if (!$this->Loaded()) {
+			return new GenericModel();
+		}
+		$MatterExtraService = new MatterExtraService($this->sesion);
+		$MatterExtra = $MatterExtraService->getByMatterId($this->fields['id_asunto']);
+		return $MatterExtra ? $MatterExtra : $MatterExtraService->MatterExtraDAO->newEntity();
+	}
+
+	/**
+	 * Guarda los datos extra del asunto
+	 * @param array $data
+	 * @return boolean
+	 */
+	public function saveExtra(array $data) {
+		if (!$this->Loaded()) {
+			return false;
+		}
+		$MatterExtraService = new MatterExtraService($this->sesion);
+		$MatterExtra = $MatterExtraService->getByMatterId($this->fields['id_asunto']);
+		if (!$MatterExtra) {
+			$MatterExtra = $MatterExtraService
+				->MatterExtraDAO
+				->newEntity(array('id_asunto' => $this->fields['id_asunto']));
+		}
+		$MatterExtra->fillFromArray($data);
+		return $MatterExtraService->saveOrUpdate($MatterExtra);
+	}
+
 }

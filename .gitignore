@@ -199,8 +199,8 @@ config.ru
 ## Composer
 #############
 composer.lock
-vendor
-vendor/**/
+/vendor
+/vendor/**/
 
 # Vagrant
 vagrant/.vagrant
@@ -218,3 +218,5 @@ tags
 /node_modules
 /bower_components
 app/tests/_log
+
+bower_components

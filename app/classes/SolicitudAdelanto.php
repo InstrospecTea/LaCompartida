@@ -380,8 +380,10 @@ BODY;
 		$this->Load($this->fields['id_solicitud_adelanto']);
 
 		$template = new Template($this->sesion);
-		$template->Load($this->fields['id_template']);
-
+		$loaded = $template->Load($this->fields['id_template']);
+		if (!$loaded) {
+			throw new Exception('No encontrado un template para la solicitud de adelanto.');
+		}
 		$datos = $this->FillTemplate();
 
 		$template->Download("SolicitudAdelanto_{$this->fields['id_solicitud_adelanto']}.docx", $datos);

@@ -2,6 +2,7 @@
 
 /**
  * Class SearchBusiness
+ * @deprecated replaced by SearchManager
  */
 class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  {
 

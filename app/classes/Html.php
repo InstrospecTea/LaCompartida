@@ -13,8 +13,9 @@ class Html extends \Html {
 	protected $jsPath = '//static.thetimebilling.com/js/';
 	protected $cssPath = '//static.thetimebilling.com/css/';
 
-	public function div($text, $attrs = null) {
-		return $this->tag('div', $text, $attrs);
+	public function __call($name, $args) {
+		array_unshift($args, $name);
+		return call_user_func_array(array($this, 'tag'), $args);
 	}
 
 	public function form(array $attrs = array(), $closed = false) {
