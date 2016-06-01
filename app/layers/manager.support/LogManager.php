@@ -57,27 +57,27 @@ class LogManager extends AbstractManager implements ILogManager {
 	private function getLogsWithUsername($table_title, $id_field) {
 		$this->loadManager("Search");
 
-		$chargeSearchCriteria = new SearchCriteria('LogDatabase');
-		$chargeSearchCriteria
+		$logSearchCriteria = new SearchCriteria('LogDatabase');
+		$logSearchCriteria
 			->related_with('User')
 			->with_direction('LEFT')
 			->on_property('id_usuario')
 			->on_entity_property('usuario');
-		$chargeSearchCriteria
+		$logSearchCriteria
 			->filter('titulo_tabla')
 			->restricted_by('equals')
 			->compare_with("'{$table_title}'");
-		$chargeSearchCriteria
+		$logSearchCriteria
 			->filter('id_field')
 			->restricted_by('equals')
 			->compare_with($id_field);
-		$chargeSearchCriteria
+		$logSearchCriteria
 			->add_scope_for('Log', 'orderByDate', array('args' => array('DESC')));
-		$chargeResults = $this->SearchManager->searchByCriteria(
-			$chargeSearchCriteria,
+		$logResults = $this->SearchManager->searchByCriteria(
+			$logSearchCriteria,
 			array('*', "CONCAT(User.nombre, ' ', User.apellido1) as username")
 		);
 
-		return $chargeResults;
+		return $logResults;
 	}
 }
