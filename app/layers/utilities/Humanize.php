@@ -32,8 +32,8 @@ abstract class Humanize {
 	 * @param 	string $table_title
 	 * @return 	Array
 	 */
-	public static function getRelations($tabla_title) {
-		$class_name = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
+	public static function getRelations($table_title) {
+		$class_name = self::getClassName($table_title);
 
 		if (class_exists($class_name)) {
 			return $class_name::$relations;
@@ -46,8 +46,8 @@ abstract class Humanize {
 	 * @param 	string $table_title
 	 * @return 	Array
 	 */
-	protected static function getRules($tabla_title) {
-		$class_name = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
+	protected static function getRules($table_title) {
+		$class_name = self::getClassName($table_title);
 
 		if (class_exists($class_name)) {
 			return $class_name::$rules;
@@ -60,8 +60,8 @@ abstract class Humanize {
 	 * @param 	string $table_title
 	 * @return 	Array
 	 */
-	protected static function getBlackList($tabla_title) {
-		$class_name = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
+	protected static function getBlackList($table_title) {
+		$class_name = self::getClassName($table_title);
 
 		if (class_exists($class_name)) {
 			return $class_name::$black_list;
@@ -74,13 +74,25 @@ abstract class Humanize {
 	 * @param 	string $table_title
 	 * @return 	Array
 	 */
-	protected static function getDictionary($tabla_title) {
-		$class_name = \TTB\Utiles::pascalize("{$tabla_title}Humanize");
+	protected static function getDictionary($table_title) {
+		$class_name = self::getClassName($table_title);
 
 		if (class_exists($class_name)) {
 			return $class_name::$dictionary;
 		}
 		return false;
+	}
+
+	/**
+	 * Obtiene el nombre de una clase
+	 * @param 	string $table_title
+	 * @return 	string
+	 */
+	private static function getClassName($table_title) {
+		if (isset($table_title) && !empty($table_title)) {
+			return \TTB\Utiles::pascalize("{$table_title}Humanize");
+		}
+		return '';
 	}
 
 	/**
