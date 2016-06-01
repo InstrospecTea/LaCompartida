@@ -24,7 +24,7 @@ class LogManager extends AbstractManager implements ILogManager {
 		foreach ($logs as $key => $value) {
 			$campo_tabla = $value->get('campo_tabla');
 
-			if (is_null($relations[$campo_tabla])) {
+			if (!isset($relations[$campo_tabla])) {
 				continue;
 			}
 
