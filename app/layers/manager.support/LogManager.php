@@ -29,7 +29,7 @@ class LogManager extends AbstractManager implements ILogManager {
 			}
 
 			if (strtolower($value->get('valor_nuevo')) == 'null') {
-				$logs[$key]->fields['valor_nuevo'] = '';
+				$logs[$key]->set('valor_nuevo', '');
 			}
 
 			$service_name = $relations[$campo_tabla]['service_name'];
