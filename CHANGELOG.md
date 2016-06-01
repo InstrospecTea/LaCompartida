@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.9
+Wednesday, June 1st
+* **Fix** [Corregir formato LEDES 1998BI](https://github.com/LemontechSA/ttb/pull/1518)
+
 ## Hotfix 16.15.8
 Monday, May 30th
 * **Fix** [Utilizar writeNumber para asignar un número a una celda](https://github.com/LemontechSA/ttb/pull/1512)
