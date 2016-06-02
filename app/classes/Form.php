@@ -181,7 +181,7 @@ class Form {
 	 * @return string
 	 */
 	public function textarea($name, $value, array $attrs = array()) {
-		$attrs = array_merge(array('label' => $this->defaultLabel, 'name' => null, 'rows' => 3), $attrs);
+		$attrs += array('label' => $this->defaultLabel, 'name' => null, 'rows' => 3);
 		$label = null;
 
 		if ($attrs['label'] === true) {
@@ -208,7 +208,7 @@ class Form {
 	 * @param Array $attrs
 	 */
 	public function checkbox($name, $value, $checked = false, array $attrs = array()) {
-		$attrs = $attrs + array('type' => 'checkbox', 'value' => $value, 'label' => $this->defaultLabel);
+		$attrs += array('type' => 'checkbox', 'value' => $value, 'label' => $this->defaultLabel, 'label_first' => false);
 		$label = null;
 
 		if ($attrs['label'] === true) {
@@ -224,9 +224,18 @@ class Form {
 			$attrs['id'] = $name;
 		}
 		$attrs['checked'] = $checked;
-		$radio = $this->hidden($name, '0', array('id' => false))
+		$checkbox = $this->hidden($name, '0', array('id' => false))
 				. $this->Html->tag('input', null, $attrs, true);
-		return empty($label) ? $radio : $this->label($radio . $label);
+		if (empty($label)) {
+			return $checkbox;
+		} else {
+			if ($attrs['label_first']) {
+				$label .= $checkbox;
+			} else {
+				$label = $checkbox . $label;
+			}
+			return $this->label($label);
+		}
 	}
 
 	/**

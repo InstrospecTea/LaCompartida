@@ -66,10 +66,11 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 
 		foreach ($this->data as $sale) {
 			if (!$separated_by_invoice) {
-				if (empty($sales_client[$sale['client_code']]['name'])) {
-					$sales_client[$sale['client_code']]['name'] = $sale['client'];
+				$key = "{$sale['client_code']}.{$sale['client']}";
+				if (empty($sales_client[$key]['name'])) {
+					$sales_client[$key]['name'] = $sale['client'];
 				}
-				$sales_client[$sale['client_code']]['periods'][$sale['period']] += $sale['total_period'];
+				$sales_client[$key]['periods'][$sale['period']] += $sale['total_period'];
 			} else {
 				$sales_client[] = array(
 					'name' => $sale['client'],
@@ -119,7 +120,7 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 					$total_period = $sale_client['periods'][$period_key];
 				}
 				$format = $total_period >= 0 ? $this->format['currency'] : $this->format['currency_red'];
-				$this->Ws->write($this->row, $col, $total_period, $format);
+				$this->Ws->writeNumber($this->row, $col, $total_period, $format);
 				$col++;
 			}
 

@@ -18,7 +18,12 @@ switch ($_REQUEST['accion']) {
 		}
 		break;
 	case 'descargar':
-		$SolicitudAdelanto->DownloadWord();
+		try {
+			$SolicitudAdelanto->DownloadWord();
+		} catch (Exception $e) {
+			$Pagina->AddError($e->getMessage());
+			$_REQUEST['accion'] = 'buscar';
+		}
 		break;
 	case 'xls':
 		$SolicitudAdelanto->DownloadExcel();
@@ -84,7 +89,6 @@ $Pagina->PrintTop();
 							<td colspan=2 align=left>
 								<input name="boton_buscar" id="boton_buscar" type="submit" value="<?php echo __('Buscar') ?>" class="btn"  onclick="javascript:this.form.accion.value = 'buscar'"/>
 								<input name="boton_excel" id="boton_excel" type="submit" value="<?php echo __('Descargar Excel') ?>" class="btn"  onclick="javascript:this.form.accion.value = 'xls'"/>
-								<?php // echo ReporteExcel::DrawDownloadButton($Sesion, 'SOLICITUDES_ADELANTO'); ?>
 							</td>
 							<td width='40%' align="right">
 								<img src="<?php echo Conf::ImgDir() ?>/agregar.gif" border=0> <a href='javascript:void(0)' onclick="AgregarNuevo('solicitud_adelanto')" title="Agregar Solicitud Adelanto"><?php echo __('Agregar') ?> <?php echo __('solicitud adelanto') ?></a>
