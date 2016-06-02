@@ -55,7 +55,7 @@ class ObjetoExt extends Objeto {
 	public static function getList($sesion) {
 		$list = array();
 		$class = get_called_class();
-		$object = new $class;
+		$object = new $class($sesion);
 		$orden = $object->campo_id;
 		if (!empty($object->campo_orden)) {
 			$orden = $object->campo_orden;

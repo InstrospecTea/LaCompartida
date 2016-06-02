@@ -6,8 +6,8 @@ use \PDO;
 use \PDOException;
 use \Database\Config as MigrationConfig;
 use \Database\MigrationMailing;
-use \TTB\Utiles;
 use \UtilesApp;
+use \Utiles;
 
 class Migration {
 
