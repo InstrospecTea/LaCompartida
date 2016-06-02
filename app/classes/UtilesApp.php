@@ -2403,6 +2403,15 @@ HTML;
 	}
 
 	/**
+	 * Obtiene la versión de la aplicación
+	 *
+	 * @return string versión de la aplicación
+	 */
+	public static function obtenerVersion() {
+		return file_get_contents(dirname(__FILE__) . '/../../VERSION');
+	}
+
+	/**
 	 * Override del metodo de FW/Utiles para no escribir lo que desaparecerá en PHP 5.6
 	 * @param type $horaDecimal
 	 * @param type $digitos_hora
