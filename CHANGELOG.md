@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.9
+Thursday, June 2nd
+* **Fix** [Problemas al desactivar contrato](https://github.com/LemontechSA/ttb/pull/1526)
+
 ## Hotfix 16.15.8
 Monday, May 30th
 * **Fix** [Utilizar writeNumber para asignar un número a una celda](https://github.com/LemontechSA/ttb/pull/1512)
