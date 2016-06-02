@@ -6,6 +6,8 @@ $sesion = new Sesion(array('DAT','PRO'));
 $pagina = new Pagina($sesion);
 $id_usuario = $sesion->usuario->fields['id_usuario'];
 
+$Html = new \TTB\Html;
+
 // solo se muestran las opciones al admin de datos
 $params_array['codigo_permiso'] = 'DAT';
 // tiene permiso de admin_datos
@@ -40,6 +42,7 @@ $pagina->titulo = __('Clientes');
 $pagina->PrintTop();
 $Form = new Form();
 ?>
+<?= $Html->script(Conf::RootDir() . '/app/layers/assets/js/LoadingModal.js'); ?>
 <script type="text/javascript">
 function Validar(form)
 {
@@ -66,21 +69,8 @@ function Listar( form, from )
 		form.action = 'clientes.php?buscar=1';
 		form.submit();
 	}	else if(from == 'xls') {
-		var onclick = jQuery('#btnDescargarXLS').attr('onclick');
-		jQuery('#btnDescargarXLS').addClass('ui-state-disabled');
-		jQuery('#btnDescargarXLS').removeAttr('onclick');
-		var url = 'clientes.php?excel=1';
-
-		jQuery.fileDownload(url, {
-			successCallback: function (url) {
-				jQuery('#btnDescargarXLS').removeClass('ui-state-disabled');
-				jQuery('#btnDescargarXLS').attr('onclick', onclick);
-			},
-			preparingMessageHtml: "Generando documento, espere...",
-			failMessageHtml: "Se produjo un error generando el documento, por favor intente nuevamente.",
-			httpMethod: 'post',
-			data: jQuery('#form_cliente').serialize()
-		});
+		var loading_modal = new window.LoadingModal();
+		loading_modal.fileDownload('#btnDescargarXLS', '#form_cliente', 'clientes.php?excel=1');
 
 	}
 	return false;
@@ -88,21 +78,8 @@ function Listar( form, from )
 
 function DescargarIncompletos(form)
 {
-	var url = 'contrato_datos_incompletos_xls.php';
-	var onclick = jQuery('#btnDescargarXLS').attr('onclick');
-	jQuery('#btnDescargarIncompletosXLS').addClass('ui-state-disabled');
-	jQuery('#btnDescargarIncompletosXLS').removeAttr('onclick');
-
-	jQuery.fileDownload(url, {
-		successCallback: function (url) {
-			jQuery('#btnDescargarIncompletosXLS').removeClass('ui-state-disabled');
-			jQuery('#btnDescargarIncompletosXLS').attr('onclick', onclick);
-		},
-		preparingMessageHtml: "Generando documento, espere...",
-		failMessageHtml: "Se produjo un error generando el documento, por favor intente nuevamente.",
-		httpMethod: 'post',
-		data: jQuery('#form_cliente').serialize()
-	});
+	var loading_modal = new window.LoadingModal();
+	loading_modal.fileDownload('#btnDescargarIncompletosXLS', '#form_cliente', 'contrato_datos_incompletos_xls.php');
 	return true;
 }
 //funcion java para eliminar
