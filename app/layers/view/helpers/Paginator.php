@@ -113,7 +113,7 @@ class Paginator extends Helper {
 	}
 
 	public function setQueryParam($param, $value = null) {
-		if (!is_array($param)) {
+		if (is_array($param)) {
 			foreach ($param as $key => $val) {
 				$this->setQueryParam($key, $val);
 			}
