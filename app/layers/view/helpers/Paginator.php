@@ -3,6 +3,7 @@
 class Paginator extends Helper {
 
 	public $helpers = array(array('\TTB\Html', 'Html'), 'Form');
+	private $query_array = array();
 
 	public function pages(Pagination $Pagination, $show_prev_next = true, $show_first_last = false, $show_pages = 10) {
 		$tpl = array(
@@ -11,6 +12,7 @@ class Paginator extends Helper {
 			'prev' => '&#60; %s',
 			'next' => '%s &#62;',
 		);
+		$this->query_array = $Pagination->query_array();
 		$current_page = $Pagination->current_page();
 		$last_page = $Pagination->last_page();
 		$ppn  = array('prev' => '', 'next' => '');
@@ -19,7 +21,7 @@ class Paginator extends Helper {
 			$prev_text = sprintf($tpl['prev'], __('anterior'));
 			if ($Pagination->hasPrev()) {
 				$page = $current_page - 1;
-				$prev_text = $this->Html->link($prev_text, "?page=$page");
+				$prev_text = $this->Html->link($prev_text, $this->getQueryString(compact('page')));
 			} else {
 				$attrs = array('class' => 'disablepage');
 			}
@@ -29,7 +31,7 @@ class Paginator extends Helper {
 			$next_text = sprintf($tpl['next'], __('siguiente'));
 			if ($Pagination->hasNext()) {
 				$page = $current_page + 1;
-				$next_text = $this->Html->link($next_text, "?page=$page");
+				$next_text = $this->Html->link($next_text, $this->getQueryString(compact('page')));
 			} else {
 				$attrs = array('class' => 'disablepage');
 			}
@@ -42,7 +44,7 @@ class Paginator extends Helper {
 			$first_text = sprintf($tpl['first'], __('primera'));
 			if ($Pagination->hasPrev()) {
 				$page = 1;
-				$first_text = $this->Html->link($first_text, "?page=$page");
+				$first_text = $this->Html->link($first_text, $this->getQueryString(compact('page')));
 			} else {
 				$attrs = array('class' => 'disablepage');
 			}
@@ -52,7 +54,7 @@ class Paginator extends Helper {
 			$last_text = sprintf($tpl['last'], __('última'));
 			if ($Pagination->hasNext()) {
 				$page = $last_page;
-				$last_text = $this->Html->link($last_text, "?page=$page");
+				$last_text = $this->Html->link($last_text, $this->getQueryString(compact('page')));
 			} else {
 				$attrs = array('class' => 'disablepage');
 			}
@@ -95,7 +97,7 @@ class Paginator extends Helper {
 			if ($page == $current_page) {
 				$attrs = array('class' => 'currentpage');
 			} else {
-				$text_page = $this->Html->link($page, "?page=$page");
+				$text_page = $this->Html->link($page, $this->getQueryString(compact('page')));
 			}
 			$pages[] = $this->Html->tag('li', $text_page, $attrs);
 		}
@@ -108,6 +110,23 @@ class Paginator extends Helper {
 			$this->Html->tag('ul', implode('', $pages)),
 			array('class' => 'pagination')
 		) . $this->Form->hidden('page_actual', $actual);
+	}
+
+	public function setQueryParam($param, $value = null) {
+		if (!is_array($param)) {
+			foreach ($param as $key => $val) {
+				$this->setQueryParam($key, $val);
+			}
+		}
+		$this->query_array[$param] = $value;
+	}
+
+	private function getQueryString(array $default = array()) {
+		$params = $default + $this->query_array;
+		if (empty($params)) {
+			return '';
+		}
+		return '?' . http_build_query($params);
 	}
 
 }
