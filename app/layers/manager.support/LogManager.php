@@ -41,13 +41,13 @@ class LogManager extends AbstractManager implements ILogManager {
 			$this->loadService($service_name);
 			try {
 				$old_value = $this->$service_class->get($old_value_field, $field);
-				$logs[$key]->fields['valor_antiguo'] = $old_value->get($field);
+				$logs[$key]->set('valor_antiguo', $old_value->get($field));
 			} catch (ServiceException $e) {
 			}
 
 			try {
 				$new_value = $this->$service_class->get($new_value_field, $field);
-				$logs[$key]->fields['valor_nuevo'] = $new_value->get($field);
+				$logs[$key]->set('valor_nuevo', $new_value->get($field));
 			} catch (ServiceException $e) {
 			}
 		}
@@ -55,6 +55,12 @@ class LogManager extends AbstractManager implements ILogManager {
 		return $logs;
 	}
 
+	/**
+	 * Obtiene los logs con el nombre del usuario
+	 * @param 	string $table_title
+	 * @param 	string $id_field
+	 * @return 	SplFixedArray
+	 */
 	private function getLogsWithUsername($table_title, $id_field) {
 		$this->loadManager("Search");
 
