@@ -8,10 +8,11 @@ class Pagination extends AbstractUtility {
 	protected $current_row = 0;
 	protected $last_row = 0;
 	protected $total_rows = 0;
+	protected $query_array = array();
 
 	public function __call($name, $arguments) {
 		if (empty($arguments)) {
-			return parent::__call($name, $arguments);
+			return parent::__call($name);
 		}
 		parent::__call($name, $arguments);
 		$this->calculate();
