@@ -208,6 +208,8 @@ vagrant/machines/
 Vagrantfile
 
 tags
+.tags
+.tags_swap
 app/tests/_log
 
 bower_components
