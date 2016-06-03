@@ -7,7 +7,7 @@ class AdvancingBusiness extends AbstractBusiness {
 	 * @param type $filters
 	 * @return type
 	 */
-	function getList($filters) {
+	function getList($filters, $page = null, $limit = null) {
 		$searchCriteria = new SearchCriteria('Document');
 		$searchCriteria->related_with('Currency')->on_property('id_moneda');
 		$searchCriteria->related_with('Client')->on_property('codigo_cliente');
@@ -60,7 +60,7 @@ class AdvancingBusiness extends AbstractBusiness {
 				'Document.fecha',
 				'Document.id_moneda'
 		);
-		return $this->SearchingBusiness->paginateByCriteria($searchCriteria, $fields, $page);
+		return $this->SearchingBusiness->paginateByCriteria($searchCriteria, $fields, $page, $limit);
 	}
 
 }
