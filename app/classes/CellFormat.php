@@ -10,7 +10,7 @@ class CellFormat {
 	private $formats = array();
 	private $default = array();
 
-	public function __construct(Spreadsheet_Excel_Writer &$SpreadsheetExcelWriter) {
+	public function __construct(WorkbookMiddleware &$SpreadsheetExcelWriter) {
 		$this->SpreadsheetExcelWriter = $SpreadsheetExcelWriter;
 	}
 

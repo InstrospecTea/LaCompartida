@@ -1836,13 +1836,13 @@ class CartaCobro extends NotaCobro {
 				$glosa_moneda_plural_lang = __($cobro_moneda->moneda[$this->fields['opc_moneda_total']]['glosa_moneda_plural']);
 				$cobro_id_moneda = $this->fields['opc_moneda_total'];
 
-				$Numbers_Words = new Numbers_Words();
+				$NumbersWords = new Numbers_Words();
 
 				$total_mta = number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], '.', '');
 				$decimales_monto = number_format(($total_mta - (int) $total_mta), 2);
 				$decimales_monto = number_format(($decimales_monto * 100), 0);
-				$monto_total_palabra = $Numbers_Words->toWords((int) $total_mta, "es") . ' ' . ( ( $total_mta > 1 ) ? __("$glosa_moneda_plural_lang") : __("$glosa_moneda_lang") ) . ( ($decimales_monto > 0 ) ? " con $decimales_monto/100" : '' );
-				$monto_total_palabra_en = $Numbers_Words->toWords((int) $total_mta, "en_US") . ' ' . ( ( $total_mta > 1 ) ? __("$glosa_moneda_plural_lang") : __("$glosa_moneda_lang") ) . ( ($decimales_monto > 0 ) ? " and $decimales_monto/100" : '' );
+				$monto_total_palabra = $NumbersWords->toWords((int) $total_mta, "es") . ' ' . ( ( $total_mta > 1 ) ? __("$glosa_moneda_plural_lang") : __("$glosa_moneda_lang") ) . ( ($decimales_monto > 0 ) ? " con $decimales_monto/100" : '' );
+				$monto_total_palabra_en = $NumbersWords->toWords((int) $total_mta, "en_US") . ' ' . ( ( $total_mta > 1 ) ? __("$glosa_moneda_plural_lang") : __("$glosa_moneda_lang") ) . ( ($decimales_monto > 0 ) ? " and $decimales_monto/100" : '' );
 
 				$cambio_monedas_texto_en = array(
 					'dólar' => 'dollar', 'Dólar' => 'Dolar', 'DÓLAR' => 'DOLLAR',
