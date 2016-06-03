@@ -3,19 +3,17 @@
 (function ($) {
 	window.LoadingModal = function () {
 
-		this.fileDownload = function (id_button, id_data, url) {
-			var onclick = $(id_button).attr('onclick');
-			$(id_button).addClass('ui-state-disabled');
-			$(id_button).removeAttr('onclick');
-
+		this.fileDownload = function (id_data, url) {
 			$.fileDownload(url, {
-				successCallback: function (url) {
-					$(id_button).removeClass('ui-state-disabled');
-					$(id_button).attr('onclick', onclick);
-				},
-				preparingMessageHtml: "Generando documento, espere...",
+				preparingMessageHtml: "<div class='bounce1'></div><div class='bounce2'></div><div class='bounce3'></div>",
 				failMessageHtml: "Se produjo un error generando el documento, por favor intente nuevamente.",
 				httpMethod: 'post',
+				dialogOptions: {
+					modal: true,
+					closeOnEscape: false,
+					resizable: false,
+					dialogClass: 'loadingModal',
+				},
 				data: $(id_data).serialize()
 			});
 		};

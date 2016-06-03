@@ -43,6 +43,7 @@ $pagina->PrintTop();
 $Form = new Form();
 ?>
 <?= $Html->script(Conf::RootDir() . '/app/layers/assets/js/LoadingModal.js'); ?>
+<?= $Html->css(Conf::RootDir() . '/app/layers/assets/css/LoadingModal.css'); ?>
 <script type="text/javascript">
 function Validar(form)
 {
@@ -70,7 +71,7 @@ function Listar( form, from )
 		form.submit();
 	}	else if(from == 'xls') {
 		var loading_modal = new window.LoadingModal();
-		loading_modal.fileDownload('#btnDescargarXLS', '#form_cliente', 'clientes.php?excel=1');
+		loading_modal.fileDownload('#form_cliente', 'clientes.php?excel=1');
 
 	}
 	return false;
@@ -79,7 +80,7 @@ function Listar( form, from )
 function DescargarIncompletos(form)
 {
 	var loading_modal = new window.LoadingModal();
-	loading_modal.fileDownload('#btnDescargarIncompletosXLS', '#form_cliente', 'contrato_datos_incompletos_xls.php');
+	loading_modal.fileDownload('#form_cliente', 'contrato_datos_incompletos_xls.php');
 	return true;
 }
 //funcion java para eliminar
