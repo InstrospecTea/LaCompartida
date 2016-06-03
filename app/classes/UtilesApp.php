@@ -3,35 +3,6 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 class UtilesApp extends Utiles {
-
-	public static $_transliteration = array(
-		'/ü/' => 'ue',
-		'/Ä/' => 'Ae',
-		'/Ü/' => 'Ue',
-		'/Ö/' => 'Oe',
-		'/À|Á|Â|Ã|Ä|Å/' => 'A',
-		'/à|á|â|ã|å|ª/' => 'a',
-		'/Ç/' => 'C',
-		'/ç/' => 'c',
-		'/Ğ|Ğ/' => 'D',
-		'/ğ/' => 'd',
-		'/È|É|Ê|Ë/' => 'E',
-		'/è|é|ê|ë/' => 'e',
-		'/Ì|Í|Î|Ï/' => 'I',
-		'/ì|í|î|ï/' => 'i',
-		'/Ñ/' => 'N',
-		'/ñ/' => 'n',
-		'/Ò|Ó|Ô|Õ|Ø/' => 'O',
-		'/ò|ó|ô|õ|ø|º/' => 'o',
-		'/Ù|Ú|Û/' => 'U',
-		'/ù|ú|û/' => 'u',
-		'/İ/' => 'Y',
-		'/ı|ÿ/' => 'y',
-		'//' => 'x',
-		'/Æ/' => 'AE',
-		'/ß/'=> 'ss'
-	);
-
 	/**
 	 *
 	 * @param object $sesion
@@ -2338,25 +2309,31 @@ HTML;
 		return $s3->if_object_exists(S3_UPLOAD_BUCKET, $name);
 	}
 
-	public static function slug($string, $replacement = '_', $map = array()) {
+	/**
+	 * Escapa caracteres con tilde caracteres especiales y espacios
+	 * @param type $string
+	 * @param string $replacement
+	 * @param type $map
+	 * @return type
+	 */
+	public static function slug($string, $replacement = '_', array $map = array()) {
 		if (is_array($replacement)) {
 			$map = $replacement;
 			$replacement = '_';
 		}
 		$quotedReplacement = preg_quote($replacement, '/');
 
-		$merge = array(
+		$map += array(
 			'/[^\s\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]/mu' => ' ',
-			'/\\s+/' => $replacement,
+			'/[\s \t ]+/' => $replacement,
 			sprintf('/^[%s]+|[%s]+$/', $quotedReplacement, $quotedReplacement) => '',
 		);
 
-		$map = $map + self::$_transliteration + $merge;
-		return preg_replace(array_keys($map), array_values($map), $string);
+		return self::transliteration($string, $map);
 	}
 
-	public static function transliteration($string) {
-		$map = self::$_transliteration;
+	public static function transliteration($string, array $map = array()) {
+		$map += ForeignCharacters::$transliteration;
 		return preg_replace(array_keys($map), array_values($map), $string);
 	}
 

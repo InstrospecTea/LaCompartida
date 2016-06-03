@@ -1,5 +1,69 @@
 # Changelog
 
+## Hotfix 16.15.9
+Thursday, June 2nd
+* **Fix** [Problemas al desactivar contrato](https://github.com/LemontechSA/ttb/pull/1526)
+
+## Hotfix 16.15.8
+Monday, May 30th
+* **Fix** [Utilizar writeNumber para asignar un número a una celda](https://github.com/LemontechSA/ttb/pull/1512)
+
+## Hotfix 16.15.7
+Friday, May 27th
+* **Fix** [Muestra el usuario seleccionado, en el listado aunque no esté activo o no visible.](https://github.com/LemontechSA/ttb/pull/1510)
+
+## Hotfix 16.15.6
+Thursday, May 26th
+* **Fix** [Formato de Fechas en YYYY-MM-DD y Embed de proyectos](https://github.com/LemontechSA/ttb/pull/1504)
+
+## Hotfix 16.15.5
+Thursday, May 26th
+* **Fix** [Copiar todos los datos del contrato por defecto del cliente al del asunto que se cobrará de manera independiente](https://github.com/LemontechSA/ttb/pull/1503)
+
+## Hotfix 16.15.4
+Thursday, May 26th
+* **Fix** [Orden en los inputs del mantenedor de gastos](https://github.com/LemontechSA/ttb/pull/1502)
+
+## Hotfix 16.15.3
+Thursday, May 26th
+* **Fix** [Corregir saldo de facturas en reporte de antiguedad deuda cliente según periodo contable](https://github.com/LemontechSA/ttb/pull/1500)
+
+## Hotfix 16.15.2
+Thursday, May 26th
+* **Fix** [Usa fecha de vencimiento de la factura o de emisión del cobro según corresponda en reporte antiguedad deuda](https://github.com/LemontechSA/ttb/pull/1499)
+
+## Hotfix 16.15.1
+Thursday, May 26th
+* **Fix** [Muestra mensaje de error si no tiene formato de carta en solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/1498)
+
+## [Release 16.15.0](https://github.com/LemontechSA/ttb/pull/1487)
+Tuesday, May 24th
+* **Feature** [Feature Migrations Corrections](https://github.com/LemontechSA/ttb/pull/1486)
+* **Feature** [Fecha Cliente](https://github.com/LemontechSA/ttb/pull/1470)
+* **Feature** [API Payments](https://github.com/LemontechSA/ttb/pull/1469)
+* **Feature** [Asuntos extras](https://github.com/LemontechSA/ttb/pull/1467)
+
+## Hotfix 16.14.2
+Wednesday, May 25th
+* **Fix** [Crear nuevo tag para cobro](https://github.com/LemontechSA/ttb/pull/1492)
+
+## Hotfix 16.14.1
+Wednesday, May 25th
+* **Fix** [Problemas con detalle de gastos](https://github.com/LemontechSA/ttb/pull/1490)
+
+## [Release 16.14.0](https://github.com/LemontechSA/ttb/pull/1472)
+Thursday, May 19th
+* **Feature** [Manager Layer](https://github.com/LemontechSA/ttb/pull/1462)
+* **Feature** [Facturación Electronica Satcom](https://github.com/LemontechSA/ttb/pull/1417)
+
+## Hotfix 16.13.8
+Wednesday, May 18th
+* **Fix** [Agrega y aplica nuevo formato numero_rut](https://github.com/LemontechSA/ttb/pull/1466)
+
+## Hotfix 16.13.7
+Wednesday, May 18th
+* **Fix** [Corregir nombre formato celda número para el excel del cobro](https://github.com/LemontechSA/ttb/pull/1463)
+
 ## Hotfix 16.13.6
 Monday, May 16th
 * **Fix** [Si tarifa de usuario está vacía, se asigna la tarifa hh del trabajo](https://github.com/LemontechSA/ttb/pull/1459)
