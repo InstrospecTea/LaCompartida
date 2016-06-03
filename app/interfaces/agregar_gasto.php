@@ -494,7 +494,7 @@ $Form = new Form;
 			<td align="right">
 				<?php echo __('Código UTBMS'); ?>
 			</td>
-			<td align="left" width="440" nowrap>
+			<td align="left">
 				<?php echo InputId::ImprimirCodigo($sesion, 'UTBMS_EXPENSE', "codigo_gasto", $gasto->fields['codigo_gasto']); ?>
 			</td>
 		</tr>

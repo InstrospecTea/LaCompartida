@@ -7,9 +7,49 @@ $Session = new Sesion();
 define(MIN_TIMESTAMP, 315532800);
 define(MAX_TIMESTAMP, 4182191999);
 
-// header('Access-Control-Allow-Origin: *');
-// header('Access-Control-Allow-Methods: GET, POST, PUT');
-
+/**
+ * @api {post} /login User Login
+ * @apiName Login
+ * @apiVersion 1.0.0
+ * @apiGroup Session
+ * @apiDescription Authenticates a users credentials and returns an AUTHENTICATION TOKEN
+ *
+ * @apiParam {String} user Identification (Ex: 99511620-0)
+ * @apiParam {String} password Password of user
+ * @apiParam {String} app_key A key provided for the application that consumes the API.
+ *
+ * @apiParamExample Params-Example:
+ *     {
+ *       "user": "99511620-0",
+ *       "password": "blabla",
+ *       "app_key": "ttb-mobile"
+ *     }
+ *
+ * @apiSuccess {String} auth_token Token for future authorization
+ * @apiSuccess {String} user_id  The id of the user logged in
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "auth_token": "136b17e3a34db13c98ec404fa9035796b52cbf8c",
+ *       "user_id": "1"
+ *     }
+ *
+ * @apiError InvalidUserData user is not provided
+ * @apiError InvalidPasswordData password is not provided
+ * @apiError InvalidAppKey app_key is not provided
+ * @apiError UserDoesntExist user does not exists
+ * @apiError UnexpectedSave an error ocurred saving token data
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Invalid Params
+ *     {
+ *       "errors": [
+ *         "code": "InvalidUserData",
+ *         "message": "You must provide an user identifier"
+ *       ]
+ *     }
+ */
 $Slim->post('/login', function () use ($Session, $Slim) {
 	$UserToken = new UserToken($Session);
 
@@ -127,7 +167,7 @@ $Slim->get('/activities', function () use ($Session, $Slim) {
 	$include = $Slim->request()->params('include');
 	$include_all = (!is_null($include) && $include == 'all');
 
-	// TODO: hay que corregir la aplicación del iPhone para que no envíe el parámetro include
+	// TODO: hay que corregir la aplicaciï¿½n del iPhone para que no envï¿½e el parï¿½metro include
 	$include_all = false;
 
 	$Activity = new Actividad($Session);

@@ -290,9 +290,6 @@ class NeteoDocumento extends Objeto {
 									break;
 								}
 							}
-							if (is_array($pagar_facturas)) {
-								$factura_pago->Edit('monto', $moneda_pago->getFloat($factura_pago->fields['monto'] + $monto, false));
-							}
 						}
 						$pagina_fake = ''; //la belleza del TT
 						$ccf->IngresarPago($factura_pago, $neteos, $id_cobro, $pagina_fake, '', '', empty($neteos), $rehacer_neteos);

@@ -2,6 +2,7 @@
 
 /**
  * Class SearchBusiness
+ * @deprecated replaced by SearchManager
  */
 class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  {
 
@@ -37,8 +38,11 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 	 * @param type $page
 	 * @return \stdClass
 	 */
-	public function paginateByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array(), $page = 1) {
+	public function paginateByCriteria(SearchCriteria $searchCriteria , array $filter_properties = array(), $page = 1, $limit = null) {
 		$searchCriteria->Pagination->current_page($page);
+		if (!empty($limit)) {
+			$searchCriteria->Pagination->rows_per_page($limit);
+		}
 		$searchCriteria->paginate(true);
 		// MUERTE!!!
 		$ret = new GenericModel();
@@ -91,6 +95,7 @@ class SearchingBusiness extends AbstractBusiness implements ISearchingBusiness  
 			$genericMode
 		);
 		$criteria = $this->addScopes($searchCriteria, $criteria);
+		// pr($criteria->get_plain_query());
 		return $criteria;
 	}
 

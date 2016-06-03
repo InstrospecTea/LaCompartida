@@ -115,8 +115,8 @@ $password = mysql_real_escape_string($password);
 if($desde == 'sitio' && (UtilesApp::GetConf($sesion, 'LoginDesdeSitio'))) {
 	$sesion->Login($rut, '', '12345', $recordar, $desde, $use_ad);
 } else {
-	if(isset($_POST['urlto']) && $_POST['urlto'] != '') {
-		$url = $_POST['urlto'] ;
+	if(!empty($_POST['urlto'])) {
+		$url = $_POST['urlto'];
 	}
 	$_SESSION['lockerbie'] = ($_SERVER['HTTPS'] ? 'https' : 'http') . ';' . $rut . ';' . $password;
 	setcookie('lockerbie', $_SESSION['lockerbie'], 0, ROOTDIR);

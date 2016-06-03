@@ -1,18 +1,17 @@
 <?php
 
-require_once APP_PATH.'/classes/Html.php';
+class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport {
 
-class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport{
-
-	var $Html;
+	protected $helpers = array(array('\TTB\Html', 'Html'));
+	private $decimales_hora = 2;
 
 	protected function setUp() {
-		$this->Html = new \TTB\Html;
 		$this->loadBusiness('Coining');
 		$this->loadBusiness('Charging');
 		$this->baseCurrency = $this->CoiningBusiness->getBaseCurrency();
 		$this->loadBusiness('Translating');
 		$this->defaultLanguage = $this->TranslatingBusiness->getLanguageByCode('es');
+		$this->loadBusiness('Working');
 	}
 
 	/**
@@ -23,8 +22,7 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	protected function agrupateData($data) {
 		if ($this->parameters['agrupationType'] == 'lawyer') {
 			return $this->laywerAgrupation($data);
-		}
-		if ($this->parameters['agrupationType'] == 'client') {
+		} else if ($this->parameters['agrupationType'] == 'client') {
 			return $this->clientAgrupation($data);
 		}
 		return $this->clientAgrupation($data);
@@ -71,17 +69,16 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['fecha'] = $fila->fields['work_fecha'];
 			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
 			$trabajo['id_moneda'] = $fila->fields['contract_id_moneda'];
-			$duration_parts = explode(":", $fila->fields[$show_hours]);
 
 			if ($show_hours == 'work_duracion_cobrada') {
-				$trabajo['duracion_minutos'] = $fila->fields['work_cobrable'] == 1 ? $duration_parts[0] * 60 + $duration_parts[1] : 0;
+				$trabajo['duracion'] = $fila->fields['work_cobrable'] == 1 ? $fila->fields[$show_hours] : 0;
 			} else {
-				$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
+				$trabajo['duracion'] = $fila->fields[$show_hours];
 			}
 			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
-				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['contract_id_moneda'])->get('valor_estandar');
+				$trabajo['valor_facturado'] = $trabajo['duracion'] * $this->WorkingBusiness->getFee($fila->fields['work_id_trabajo'], $fila->fields['charge_id_moneda'], $fila->fields['contract_id_moneda']);
 			} else {
-				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
+				$trabajo['valor_facturado'] = $trabajo['duracion'] * $fila->fields['work_tarifa_hh_estandar'];
 			}
 			$grupos[$id_usuario]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
@@ -131,17 +128,16 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 			$trabajo['fecha'] = $fila->fields['work_fecha'];
 			$trabajo['descripcion'] = $fila->fields['work_descripcion'];
 			$trabajo['id_moneda'] = $fila->fields['contract_id_moneda'];
-			$duration_parts = explode(":", $fila->fields[$show_hours]);
 
 			if ($show_hours == 'work_duracion_cobrada') {
-				$trabajo['duracion_minutos'] = $fila->fields['work_cobrable'] == 1 ? $duration_parts[0] * 60 + $duration_parts[1] : 0;
+				$trabajo['duracion'] = $fila->fields['work_cobrable'] == 1 ? $fila->fields[$show_hours] : 0;
 			} else {
-				$trabajo['duracion_minutos'] = $duration_parts[0] * 60 + $duration_parts[1];
+				$trabajo['duracion'] = $fila->fields[$show_hours];
 			}
 			if ($fila->fields['work_tarifa_hh_estandar'] == 0) {
-				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $this->ChargingBusiness->getWorkFee($fila->fields['work_id_trabajo'], $fila->fields['contract_id_moneda'])->get('valor_estandar');
+				$trabajo['valor_facturado'] = $trabajo['duracion'] * $this->WorkingBusiness->getFee($fila->fields['work_id_trabajo'], $fila->fields['charge_id_moneda'], $fila->fields['contract_id_moneda']);
 			} else {
-				$trabajo['valor_facturado'] = ($trabajo['duracion_minutos'] / 60) * $fila->fields['work_tarifa_hh_estandar'];
+				$trabajo['valor_facturado'] = $trabajo['duracion'] * $fila->fields['work_tarifa_hh_estandar'];
 			}
 			$grupos[$id_socio]['clientes'][$codigo_cliente]['asuntos'][$id_asunto]['trabajos'][] = $trabajo;
 		}
@@ -158,18 +154,18 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 	}
 
 	/**
-   * Devuelve un string con el atributo correspondiente a la forma de visualizacion de los valores del reporte.
-   * @param  number $option opción seleccionada en la interfaz (Mostrar valores en)
-   * @return string corresponde al atributo
-   */
+	 * Devuelve un string con el atributo correspondiente a la forma de visualizacion de los valores del reporte.
+	 * @param  number $option opción seleccionada en la interfaz (Mostrar valores en)
+	 * @return string corresponde al atributo
+	 */
 	private function mapShowOptions($option) {
 		switch ($option) {
-		  case 0:
-			return 'work_duracion';
-		  case 1:
-			return 'work_duracion_cobrada';
-		  default:
-			return 'work_duracion';
+			case 0:
+				return 'work_duracion';
+			case 1:
+				return 'work_duracion_cobrada';
+			default:
+				return 'work_duracion';
 		}
 	}
 
@@ -377,7 +373,7 @@ HTML;
 	private function getFooter() {
 		$date = date('d M Y');
 
-return <<<HTML
+		return <<<HTML
 <table>
 	<tr>
 	<td>{$date}</td>
@@ -399,18 +395,20 @@ HTML;
 			foreach ($socio['clientes'] as $cliente) {
 				$nombre_cliente = $this->Html->tag('h2', $this->Html->tag('u', $cliente['nombre']));
 				$html_asuntos = '';
-				$total_minutos_cliente = 0;
+				$total_duracion_cliente = 0;
 				$total_facturado_cliente = 0;
 				foreach ($cliente['asuntos'] as $asunto) {
 					$nombre_asunto = $this->Html->tag('h4', $asunto['nombre']);
 					$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], $with_invoiced);
 					$html_asuntos .= $this->Html->tag('div', $nombre_asunto . $trabajos['html'], array('class' => 'margin'));
-					$total_minutos_cliente += $trabajos['minutos'];
+					$total_duracion_cliente += $trabajos['duracion'];
 					$total_facturado_cliente += $trabajos['total_facturado'];
 				}
+				$total_minutos_cliente = round($total_duracion_cliente * 60, 0);
 				if ($this->parameters['time'] == 'horas') {
-					$total_minutos_cliente = $this->minutes_to_hours($total_minutos_cliente);
+					$total_minutos_cliente = UtilesApp::Decimal2GlosaHora($total_duracion_cliente, $this->decimales_hora);
 				}
+
 				if ($with_invoiced) {
 					$trs = $this->Html->tag(
 						'tr',
@@ -423,7 +421,7 @@ HTML;
 					$trs = $this->Html->tag(
 						'tr',
 						$this->Html->tag('th', '', array('class' => 'col1')) .
-						$this->Html->tag('th', __('Total cliente'), array('class' => 'col2')) .
+						$this->Html->tag('th', __('Total cliente-'), array('class' => 'col2')) .
 						$this->Html->tag('th', $total_minutos_cliente, array('class' => 'col3'))
 					);
 				}
@@ -443,23 +441,23 @@ HTML;
 		foreach ($this->data as $usuario) {
 			$nombre_usuario = $this->Html->tag('h2', $this->Html->tag('u', $usuario['nombre']));
 			$html_clientes = '';
-			$total_minutos_abogado = 0;
+			$total_duracion_abogado = 0;
 			$total_facturado_abogado = 0;
 			foreach ($usuario['clientes'] as $cliente) {
 				$nombre_cliente = $this->Html->tag('h3', $cliente['nombre']);
 				$html_asuntos = '';
-				$total_minutos_cliente = 0;
+				$total_duracion_cliente = 0;
 				$total_facturado_cliente = 0;
 				foreach ($cliente['asuntos'] as $asunto) {
 					$nombre_asunto = $this->Html->tag('h4', $asunto['nombre']);
 					$trabajos = count($asunto['trabajos']) === 0 ? '' : $this->createWorkTable($asunto['trabajos'], $with_invoiced);
 					$html_asuntos .= $this->Html->tag('div', $nombre_asunto . $trabajos['html'], array('class' => 'margin'));
-					$total_minutos_cliente += $trabajos['minutos'];
+					$total_duracion_cliente += $trabajos['duracion'];
 					$total_facturado_cliente += $trabajos['total_facturado'];
 				}
-				$minutos_cliente = $total_minutos_cliente;
+				$minutos_cliente = round($total_duracion_cliente * 60);
 				if ($this->parameters['time'] == 'horas') {
-					$minutos_cliente = $this->minutes_to_hours($total_minutos_cliente);
+					$minutos_cliente = UtilesApp::Decimal2GlosaHora($total_duracion_cliente, $this->decimales_hora);
 				}
 				if ($with_invoiced) {
 					$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
@@ -475,11 +473,12 @@ HTML;
 				}
 				$html_asuntos .= $this->Html->tag('table', $trs, array('class' => 'table'));
 				$html_clientes .= $this->Html->tag('div', $nombre_cliente . $html_asuntos, array('class' => 'margin'));
-				$total_minutos_abogado += $total_minutos_cliente;
+				$total_duracion_abogado += $total_duracion_cliente;
 				$total_facturado_abogado += $total_facturado_cliente;
 			}
+			$total_minutos_abogado = round($total_duracion_abogado * 60, 0);
 			if ($this->parameters['time'] == 'horas') {
-				$total_minutos_abogado = $this->minutes_to_hours($total_minutos_abogado);
+				$total_minutos_abogado = UtilesApp::Decimal2GlosaHora($total_duracion_abogado, $this->decimales_hora);
 			}
 			if ($with_invoiced) {
 				$trs = $this->Html->tag('tr', $this->Html->tag('th', '', array('class' => 'col1')) .
@@ -513,14 +512,14 @@ HTML;
 				$this->CoiningBusiness->getCurrency($fila['id_moneda']),
 				$moneda_filtro
 			);
-			$duracion_minutos =  $fila['duracion_minutos'];
+			$duracion = round($fila['duracion'] * 60, 0);
 			if ($this->parameters['time'] == 'horas') {
-				$duracion_minutos = $this->minutes_to_hours($fila['duracion_minutos']);
+				$duracion = UtilesApp::Decimal2GlosaHora($fila['duracion'], $this->decimales_hora);
 			}
 			if ($with_invoiced) {
 				$tds .= $this->Html->tag('td', $this->formatDate($fila['fecha'], true), array('class' => 'col1'));
 				$tds .= $this->Html->tag('td', "{$fila['usr_nombre']}<br/>{$fila['descripcion']}");
-				$tds .= $this->Html->tag('td', $duracion_minutos, array('class' => 'col3'));
+				$tds .= $this->Html->tag('td', $duracion, array('class' => 'col3'));
 				$tds .= $this->Html->tag(
 					'td',
 					"{$moneda_filtro->get('simbolo')} " .
@@ -536,18 +535,18 @@ HTML;
 			} else {
 				$tds .= $this->Html->tag('td', $this->formatDate($fila['fecha'], true), array('class' => 'col1'));
 				$tds .= $this->Html->tag('td', "{$fila['usr_nombre']}<br/>{$fila['descripcion']}");
-				$tds .= $this->Html->tag('td', $duracion_minutos, array('class' => 'col3'));
+				$tds .= $this->Html->tag('td', $duracion, array('class' => 'col3'));
 
 				$trs .= $this->Html->tag('tr', $tds);
 			}
 
-			$total += $fila['duracion_minutos'];
+			$total += $fila['duracion'];
 			$total_facturado += $valor_facturado;
 		}
 
-		$total_asuntos = $total;
+		$total_asuntos = round($total * 60, 0);
 		if ($this->parameters['time'] == 'horas') {
-			$total_asuntos = $this->minutes_to_hours($total);
+			$total_asuntos = UtilesApp::Decimal2GlosaHora($total, $this->decimales_hora);
 		}
 		if ($with_invoiced) {
 			$ths .= $this->Html->tag('th', '', array('class' => 'col1'));
@@ -575,24 +574,21 @@ HTML;
 
 		return array(
 			'html' => $this->Html->tag('table', $trs, array('class' => 'table')),
-			'minutos' => $total,
+			'duracion' => $total,
 			'total_facturado' => $total_facturado
 		);
 	}
 
 	private function formatDate($string, $inverse = false) {
 		$date = new DateTime();
-		$splitted = explode('-',$string);
+		$splitted = explode('-', $string);
 		if (!$inverse) {
-			$date->setDate((int)$splitted[2], (int)$splitted[1], (int)$splitted[0]);
+			$date->setDate((int) $splitted[2], (int) $splitted[1], (int) $splitted[0]);
 		} else {
-			$date->setDate((int)$splitted[0], (int)$splitted[1], (int)$splitted[2]);
+			$date->setDate((int) $splitted[0], (int) $splitted[1], (int) $splitted[2]);
 		}
 		setlocale(LC_ALL, 'es_ES');
 		return strftime('%d-%b-%y', $date->getTimestamp());
 	}
 
-	private function minutes_to_hours($minutos) {
-		return str_pad(floor($minutos / 60), 2, '0', STR_PAD_LEFT) . ':' . str_pad(($minutos % 60), 2, '0', STR_PAD_LEFT);
-	}
 }

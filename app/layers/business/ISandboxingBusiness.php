@@ -23,4 +23,4 @@ interface ISandboxingBusiness {
 	 */
 	function generateTemporalFile();
 
-} 
+}

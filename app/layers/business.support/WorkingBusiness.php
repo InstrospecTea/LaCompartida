@@ -2,7 +2,7 @@
 
 class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
-	function agrupatedWorkReport($data) {
+	public function agrupatedWorkReport($data) {
 
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
@@ -16,7 +16,6 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$searchCriteria->related_with('Charge')->on_property('id_cobro')->with_direction('LEFT');
 		$searchCriteria->add_scope('orderByMatterGloss');
 		// Filtros
-
 		//Abogado
 		if ($data['id_usuario']) {
 			$searchCriteria->filter('id_usuario')->restricted_by('equals')->compare_with($data['id_usuario']);
@@ -138,16 +137,17 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			'Client.codigo_cliente',
 			'Client.glosa_cliente',
 			'Contract.id_moneda',
+			'Charge.id_moneda',
 			'Matter.id_asunto',
 			'Matter.glosa_asunto',
 			'Work.id_trabajo',
 			'Work.descripcion',
 			'Work.fecha',
-			'Work.duracion_cobrada',
+			'Work.cobrable',
 			'Work.tarifa_hh_estandar',
 			'Work.id_moneda',
-			'Work.duracion',
-			'Work.cobrable',
+			'time_to_sec(Work.duracion) / 3600 AS work_duracion',
+			'time_to_sec(Work.duracion_cobrada) / 3600 AS work_duracion_cobrada',
 			'User.id_usuario',
 			'User.nombre',
 			'User.apellido1',
@@ -162,12 +162,12 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		);
 
 		$filter_currency = $this->CoiningBusiness->getCurrency($data['filterCurrency']);
- 		$base_currency = $this->CoiningBusiness->getBaseCurrency();
+		$base_currency = $this->CoiningBusiness->getBaseCurrency();
 
 		$this->loadReport('AgrupatedWork', 'report');
 		$this->report->setParameters(
 			array(
-				'companyName' => Conf::GetConf($this->Session, 'NombreEmpresa'),
+				'companyName' => Configure::read('NombreEmpresa'),
 				'groupByPartner' => empty($data['groupByPartner']) ? 0 : $data['groupByPartner'],
 				'invoicedValue' => empty($data['invoicedValue']) ? 0 : $data['invoicedValue'],
 				'agrupationType' => $data['agrupationType'],
@@ -185,7 +185,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		return $this->report;
 	}
 
-	function productionByPeriodReport($data) {
+	public function productionByPeriodReport($data) {
 		$this->loadBusiness('Searching');
 		$this->loadBusiness('Coining');
 
@@ -286,8 +286,8 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 
 		$this->loadReport('TimekeeperProductivity', 'report');
 
- 		$moneda_filtro = $this->CoiningBusiness->getCurrency($data['moneda_filtro']);
- 		$moneda_base = $this->CoiningBusiness->getBaseCurrency();
+		$moneda_filtro = $this->CoiningBusiness->getCurrency($data['moneda_filtro']);
+		$moneda_base = $this->CoiningBusiness->getBaseCurrency();
 		$this->report->setParameters(
 			array(
 				'fechaIni' => $data['fecha_ini'],
@@ -299,8 +299,8 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 			)
 		);
 		$this->report->setData($reportData);
-    	$this->report->setOutputType('SR');
-    	$this->report->setConfiguration('sesion', $this->Session);
+		$this->report->setOutputType('SR');
+		$this->report->setConfiguration('sesion', $this->Session);
 
 		return $this->report;
 	}
@@ -312,7 +312,7 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 	 * @return mixed
 	 * @throws UtilityException
 	 */
-	function getWorksByCharge($chargeId, $chargeable = false) {
+	public function getWorksByCharge($chargeId, $chargeable = false) {
 		$searchCriteria = new SearchCriteria('Work');
 		$searchCriteria->related_with('Charge');
 		$searchCriteria->related_with('User');
@@ -322,10 +322,27 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		}
 		$searchCriteria->add_scope('orderFromOlderToNewer');
 		$this->loadBusiness('Searching');
-		return $this->SearchingBusiness->searchByCriteria($searchCriteria, array('Work.fecha', 'Work.descripcion', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda','User.username', 'User.nombre', 'User.apellido1', 'User.apellido2', 'Work.monto_cobrado'));
+		return $this->SearchingBusiness->searchByCriteria($searchCriteria, array('Work.fecha', 'Work.descripcion', 'Work.duracion_cobrada', 'Work.id_usuario', 'Work.tarifa_hh', 'Work.id_moneda', 'User.username', 'User.nombre', 'User.apellido1', 'User.apellido2', 'Work.monto_cobrado'));
 	}
 
-	function getWork($id) {
+	public function getErrandType($id) {
+		if (empty($id)) {
+			throw new BusinessException('Id can not be null!');
+		}
+		$searchCriteria = new SearchCriteria('Errand');
+		$searchCriteria->filter('id_tramite')->restricted_by('equals')->compare_with($id);
+
+		$this->loadBusiness('Searching');
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
+
+		if (empty($results[0])) {
+			return null;
+		} else {
+			return $results[0];
+		}
+	}
+
+	public function getWork($id, array $fields = array()) {
 		if (empty($id)) {
 			throw new BusinessException('Id can not be null!');
 		}
@@ -333,12 +350,71 @@ class WorkingBusiness extends AbstractBusiness implements IWorkingBusiness {
 		$searchCriteria->filter('id_trabajo')->restricted_by('equals')->compare_with($id);
 
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria, $fields);
 
 		if (empty($results[0])) {
-			throw new BusinessException('Work with id '.$id.' is not found.');
+			throw new BusinessException('Work with id ' . $id . ' is not found.');
 		} else {
 			return $results[0];
 		}
 	}
+
+	/**
+	 * Obtiene la tarifa del trabajo
+	 * @param type $work
+	 * @param type $id_charge_coin
+	 * @param type $id_contract_coin
+	 * @return type
+	 */
+	public function getFee($work, $id_charge_coin, $id_contract_coin) {
+		if (is_numeric($work)) {
+			$work = $this->getWork($work, array('id_cobro', 'id_trabajo', 'id_usuario', 'id_tramite', 'codigo_asunto', 'tarifa_hh'));
+		}
+
+		if (Configure::read('GuardarTarifaAlIngresoDeHora')) {
+			if ($id_charge_coin) {
+				$id_moneda_trabajo = $id_charge_coin;
+			} else {
+				$id_moneda_trabajo = $id_contract_coin;
+			}
+			$this->loadBusiness('Charging');
+			return $this->ChargingBusiness->getWorkFee($work->fields['id_trabajo'], $id_moneda_trabajo)->get('valor');
+		} else if ($work->fields['tarifa_hh'] > 0 && $work->fields['id_cobro'] > 0) {
+			return $work->fields['tarifa_hh'];
+		} else if ($work->fields['id_tramite']) {
+			$id_errand_type = $this->getErrandType($work->fields['id_tramite']);
+			return Funciones::TramiteTarifa($this->Session, $id_errand_type, $id_charge_coin, $work->fields['codigo_asunto']);
+		} else {
+			return Funciones::Tarifa($this->Session, $work->fields['id_usuario'], $id_contract_coin, $work->fields['codigo_asunto']);
+		}
+	}
+
+	public function getUpdatedWorkingAreas($active = null, $updatedFrom = null) {
+		$results = array();
+		$this->loadBusiness('Searching');
+
+		$searchCriteria = new SearchCriteria('WorkingArea');
+
+		// No existe en la tabla
+		// if (!is_null($active)) {
+		// 	$searchCriteria
+		// 		->filter('activo')
+		// 		->restricted_by('equals')
+		// 		->compare_with($active);
+		// }
+
+		// No existe en la tabla
+		// if (!is_null($updatedFrom)) {
+		// 	$updatedFromDate = date('Y-m-d', $updatedFrom);
+		// 	$searchCriteria->add_scope(
+		// 		'updatedFrom',
+		// 		array('args' => array($updatedFromDate))
+		// 	);
+		// }
+
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
+
+		return $results;
+	}
+
 }

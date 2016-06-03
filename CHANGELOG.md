@@ -1,5 +1,182 @@
 # Changelog
 
+## Hotfix 16.15.12
+Friday, Jun 3rd
+* **Fix** [Limita el tamaño del nombre de la hoja a 31 caracteres.](https://github.com/LemontechSA/ttb/pull/1530)
+
+## Hotfix 16.15.11
+Friday, Jun 3rd
+* **Fix** [Corregir formato LEDES 1998BI](https://github.com/LemontechSA/ttb/pull/1528)
+
+## Hotfix 16.15.10
+Friday, Jun 3rd
+* **Fix** [Correción en paginación](https://github.com/LemontechSA/ttb/pull/1527)
+
+## Hotfix 16.15.9
+Thursday, June 2nd
+* **Fix** [Problemas al desactivar contrato](https://github.com/LemontechSA/ttb/pull/1526)
+
+## Hotfix 16.15.8
+Monday, May 30th
+* **Fix** [Utilizar writeNumber para asignar un número a una celda](https://github.com/LemontechSA/ttb/pull/1512)
+
+## Hotfix 16.15.7
+Friday, May 27th
+* **Fix** [Muestra el usuario seleccionado, en el listado aunque no esté activo o no visible.](https://github.com/LemontechSA/ttb/pull/1510)
+
+## Hotfix 16.15.6
+Thursday, May 26th
+* **Fix** [Formato de Fechas en YYYY-MM-DD y Embed de proyectos](https://github.com/LemontechSA/ttb/pull/1504)
+
+## Hotfix 16.15.5
+Thursday, May 26th
+* **Fix** [Copiar todos los datos del contrato por defecto del cliente al del asunto que se cobrará de manera independiente](https://github.com/LemontechSA/ttb/pull/1503)
+
+## Hotfix 16.15.4
+Thursday, May 26th
+* **Fix** [Orden en los inputs del mantenedor de gastos](https://github.com/LemontechSA/ttb/pull/1502)
+
+## Hotfix 16.15.3
+Thursday, May 26th
+* **Fix** [Corregir saldo de facturas en reporte de antiguedad deuda cliente según periodo contable](https://github.com/LemontechSA/ttb/pull/1500)
+
+## Hotfix 16.15.2
+Thursday, May 26th
+* **Fix** [Usa fecha de vencimiento de la factura o de emisión del cobro según corresponda en reporte antiguedad deuda](https://github.com/LemontechSA/ttb/pull/1499)
+
+## Hotfix 16.15.1
+Thursday, May 26th
+* **Fix** [Muestra mensaje de error si no tiene formato de carta en solicitud de adelanto](https://github.com/LemontechSA/ttb/pull/1498)
+
+## [Release 16.15.0](https://github.com/LemontechSA/ttb/pull/1487)
+Tuesday, May 24th
+* **Feature** [Feature Migrations Corrections](https://github.com/LemontechSA/ttb/pull/1486)
+* **Feature** [Fecha Cliente](https://github.com/LemontechSA/ttb/pull/1470)
+* **Feature** [API Payments](https://github.com/LemontechSA/ttb/pull/1469)
+* **Feature** [Asuntos extras](https://github.com/LemontechSA/ttb/pull/1467)
+
+## Hotfix 16.14.2
+Wednesday, May 25th
+* **Fix** [Crear nuevo tag para cobro](https://github.com/LemontechSA/ttb/pull/1492)
+
+## Hotfix 16.14.1
+Wednesday, May 25th
+* **Fix** [Problemas con detalle de gastos](https://github.com/LemontechSA/ttb/pull/1490)
+
+## [Release 16.14.0](https://github.com/LemontechSA/ttb/pull/1472)
+Thursday, May 19th
+* **Feature** [Manager Layer](https://github.com/LemontechSA/ttb/pull/1462)
+* **Feature** [Facturación Electronica Satcom](https://github.com/LemontechSA/ttb/pull/1417)
+
+## Hotfix 16.13.8
+Wednesday, May 18th
+* **Fix** [Agrega y aplica nuevo formato numero_rut](https://github.com/LemontechSA/ttb/pull/1466)
+
+## Hotfix 16.13.7
+Wednesday, May 18th
+* **Fix** [Corregir nombre formato celda número para el excel del cobro](https://github.com/LemontechSA/ttb/pull/1463)
+
+## Hotfix 16.13.6
+Monday, May 16th
+* **Fix** [Si tarifa de usuario está vacía, se asigna la tarifa hh del trabajo](https://github.com/LemontechSA/ttb/pull/1459)
+
+## Hotfix 16.13.5
+Monday, May 16th
+* **Fix** [Corrección if iframe](https://github.com/LemontechSA/ttb/pull/1457)
+
+## Hotfix 16.13.4
+Friday, May 13th
+* **Fix** [Agrupa los datos por rut de factura y nombre de cliente](https://github.com/LemontechSA/ttb/pull/1456)
+
+## Hotfix 16.13.3
+Friday, May 13th
+* **Fix** [Corrige formato del resumen del cobro](https://github.com/LemontechSA/ttb/pull/1455)
+
+## Hotfix 16.13.2
+Friday, May 13th
+* **Fix** [carga los datos de facturacion del contrato principal](https://github.com/LemontechSA/ttb/pull/1454)
+
+## Hotfix 16.13.1
+Thursday, May 12th
+* **Fix** [Elimina string sdfghj](https://github.com/LemontechSA/ttb/pull/1453)
+
+## [Release 16.13.0](https://github.com/LemontechSA/ttb/pull/1451)
+Thursday, May 12th
+* **Feature** [Tabla Cebra](https://github.com/LemontechSA/ttb/pull/1440)
+
+## Hotfix 16.12.6
+Thursday, May 12th
+* **Fix** [Área del asunto NULL](https://github.com/LemontechSA/ttb/pull/1452)
+
+## Hotfix 16.12.5
+Thursday, May 12th
+* **Fix** [Problema resumen semanal Lloreda-Camacho](https://github.com/LemontechSA/ttb/pull/1449)
+
+## Hotfix 16.12.4
+Tuesday, May 10th
+* **Fix** [Configuración para manejar el uso de clientes](https://github.com/LemontechSA/ttb/pull/1444)
+
+## Hotfix 16.12.3
+Tuesday, May 10th
+* **Fix** [Realiza la conversión de moneda según la moneda de la factura y no la del cobro](https://github.com/LemontechSA/ttb/pull/1442)
+
+## Hotfix 16.12.2
+Tuesday, May 10th
+* **Fix** [Username en Excel Opcional](https://github.com/LemontechSA/ttb/pull/1441)
+
+## Hotfix 16.12.1
+Monday, May 9th
+* **Fix** [Error al descargar Excel](https://github.com/LemontechSA/ttb/pull/1438)
+
+## [Release 16.12.0](https://github.com/LemontechSA/ttb/pull/1436)
+Friday, May 6th
+* **Feature** [Reporte de Gastos](https://github.com/LemontechSA/ttb/pull/1433)
+
+## Hotfix 16.11.6
+Thursday, May 5th
+* **Fix** [Corrige asignación monto_pago al utilizar un adelanto](https://github.com/LemontechSA/ttb/pull/1435)
+
+## Hotfix 16.11.5
+Thursday, May 5th
+* **Fix** [Corrige encabezado de documento ledes erróneo en caso counselink](https://github.com/LemontechSA/ttb/pull/1434)
+
+## Hotfix 16.11.4
+Thursday, April 28th
+* **Fix** [Condiciona la consulta del id_usuarioa que no esté vacío. Llama a errorSQL() en caso de error.](https://github.com/LemontechSA/ttb/pull/1427)
+
+## Hotfix 16.11.3
+Wednesday, April 27th
+* **Fix** [Elimina caracter maligno](https://github.com/LemontechSA/ttb/pull/1425)
+
+## Hotfix 16.11.2
+Wednesday, April 27th
+* **Fix** [Reemplaza UtilesApp::Decimal2Time() por UtilesApp::Decimal2GlosaHora()](https://github.com/LemontechSA/ttb/pull/1424)
+
+## Hotfix 16.11.1
+Wednesday, April 27th
+* **Fix** [Obtiene datos de tarificación del contrato principal](https://github.com/LemontechSA/ttb/pull/1423)
+
+## [Release 16.11.0](https://github.com/LemontechSA/ttb/pull/1420)
+Tuesday, April 26th
+* **Feature** [Nuevo Diseño Detalle Cobro](https://github.com/LemontechSA/ttb/pull/1411)
+* **Feature** [Eliminar liquidaciones](https://github.com/LemontechSA/ttb/pull/1419)
+
+## [Release 16.10.0](https://github.com/LemontechSA/ttb/pull/1416)
+Thursday, April 21st
+* **Feature** [API v2](https://github.com/LemontechSA/ttb/pull/1414)
+
+## Hotfix 16.9.4
+Wednesday, April 20th
+* **Fix** [Problema en excel Reporte Saldo](https://github.com/LemontechSA/ttb/pull/1415)
+
+## Hotfix 16.9.3
+Monday, April 18th
+* **Fix** [Se encapsulan las reglas de obtención de tarifa del trabajo, en el método WorkingBusiness::getFee().](https://github.com/LemontechSA/ttb/pull/1408)
+
+## Hotfix 16.9.2
+Thursday, April 14th
+* **Fix** [Muestra el número de página segun opciones de impresión](https://github.com/LemontechSA/ttb/pull/1406)
+
 ## Hotfix 16.9.1
 Thursday, April 14th
 * **Fix** [Verifica la sesión al instanciar un Controller](https://github.com/LemontechSA/ttb/pull/1405)

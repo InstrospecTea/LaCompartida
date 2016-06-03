@@ -887,7 +887,9 @@ class UsuarioExt extends Usuario {
 
 		$clauses = array();
 		$clauses[] = CriteriaRestriction::and_clause($clauses_and);
-		$clauses[] = CriteriaRestriction::equals('U.id_usuario', $id_usuario);
+		if (!empty($id_usuario)) {
+			$clauses[] = CriteriaRestriction::equals('U.id_usuario', $id_usuario);
+		}
 
 		$criteria->add_restriction(CriteriaRestriction::or_clause($clauses));
 
@@ -944,7 +946,7 @@ class UsuarioExt extends Usuario {
 			return $rows;
 
 		} catch (Exception $e) {
-			echo "Error: {$e} {$criteria->__toString()}";
+			Utiles::errorSQL($criteria->__toString(), null, null, null, '', $e);
 		}
 	}
 
@@ -1393,21 +1395,26 @@ class UsuarioExt extends Usuario {
 	 * Crea listado de usuarios activos con llave campo_id y valor campo_glosa
 	 * @param string $where
 	 * @param mixed $con_permisos indica si el usuario debe tener permisos (boolean) o alguno permiso especifico (string), por defecto false (cualquier usuario activo)
+	 * @param integer $agregar_usuario Id del usuario que se listará aunque no esté activo ni visible.
 	 * @return array
 	 */
-	public function ListarActivos($where = '', $con_permisos = false) {
+	public function ListarActivos($where = '', $con_permisos = false, $agregar_usuario = null) {
 		$Objeto = new Objeto($this->sesion, '', '', $this->tabla, $this->campo_id, $this->campo_glosa);
 
 		$permisos = '';
 		if ($con_permisos !== false) {
 			$and_permisos = $con_permisos === true ? '' : "AND usuario_permiso.codigo_permiso = '{$con_permisos}'";
-			$permisos = "INNER JOIN usuario_permiso ON usuario.id_usuario = usuario_permiso.id_usuario {$and_permisos}";
+			$permisos = "INNER JOIN usuario_permiso ON {$this->tabla}.id_usuario = usuario_permiso.id_usuario {$and_permisos}";
+		}
+		$incluir_usuario = '';
+		if (!empty($agregar_usuario)) {
+			$incluir_usuario = " OR {$this->tabla}.id_usuario = '{$agregar_usuario}'";
 		}
 		$query_extra = "$permisos
-						WHERE usuario.activo = 1 AND usuario.visible = 1
+						WHERE (({$this->tabla}.activo = 1 AND {$this->tabla}.visible = 1)$incluir_usuario)
 							$where
 							$and
-						ORDER BY usuario.apellido1";
+						ORDER BY {$this->tabla}.apellido1";
 		return $Objeto->Listar($query_extra);
 	}
 

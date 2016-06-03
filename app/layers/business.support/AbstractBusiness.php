@@ -15,6 +15,8 @@ class AbstractBusiness implements BaseBusiness {
 	public function __construct(Sesion $sesion) {
 		$this->sesion = $sesion;
 		$this->Session = $sesion;
+
+		Configure::setSession($this->Session);
 	}
 
 	/**
@@ -132,6 +134,24 @@ class AbstractBusiness implements BaseBusiness {
 	 */
 	protected function loadReport($name, $alias = null) {
 		$classname = "{$name}Report";
+		if (empty($alias)) {
+			$alias = $classname;
+		}
+		if (in_array($alias, $this->loadedClass)) {
+			return;
+		}
+		$this->{$alias} = new $classname($this->Session);
+		$this->loadedClass[] = $alias;
+	}
+
+	/**
+	 * Carga un Manager al vuelo
+	 * @param string $name
+	 * @param string $alias
+	 * @return type
+	 */
+	protected function loadManager($name, $alias = null) {
+		$classname = "{$name}Manager";
 		if (empty($alias)) {
 			$alias = $classname;
 		}

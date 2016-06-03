@@ -4,6 +4,8 @@
 /app/miconf.php
 /app/test/spec/conf.rb
 /app/tests/_log/
+/app/tests/api.suite.yml
+/app/tests/api.v2.suite.yml
 /app/tests/acceptance.suite.yml
 /app/tests/functional.suite.yml
 /app/tests/unit.suite.yml
@@ -197,8 +199,8 @@ config.ru
 ## Composer
 #############
 composer.lock
-vendor
-vendor/**/
+/vendor
+/vendor/**/
 
 # Vagrant
 vagrant/.vagrant
@@ -206,3 +208,8 @@ vagrant/machines/
 Vagrantfile
 
 tags
+.tags
+.tags_swap
+app/tests/_log
+
+bower_components

@@ -242,9 +242,11 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 				if (!empty($scale->fields['feeId'])) {
 					$tarifa_usuario = $this->getUserFee($work->fields['id_usuario'], $scale->fields['feeId'], $scale->fields['currencyId']);
-				} else {
-					$tarifa_usuario = new GenericModel();
-					$tarifa_usuario->set('tarifa', $work->fields['tarifa_hh']);
+				}
+
+				if (empty($tarifa_usuario)) {
+						$tarifa_usuario = new GenericModel();
+						$tarifa_usuario->set('tarifa', $work->fields['tarifa_hh']);
 				}
 
 				//totales por escalón
@@ -440,7 +442,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$this->loadBusiness('Searching');
 		$searchCriteria = new SearchCriteria('Document');
 		$searchCriteria->filter('id_cobro')->restricted_by('equals')->compare_with($charge->get($charge->getIdentity()));
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		return $results && count($results) > 0 ? $results[0] : null;
 	}
 
@@ -457,7 +459,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
 		$searchCriteria->filter('id_tarifa')->restricted_by('equals')->compare_with($feeId);
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		if (empty($results[0])) {
 			return null;
 		} else {
@@ -478,7 +480,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->filter('id_trabajo')->restricted_by('equals')->compare_with($workId);
 		$searchCriteria->filter('id_moneda')->restricted_by('equals')->compare_with($currencyId);
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		if (empty($results[0])) {
 			$this->loadBusiness('Working');
 			$work = $this->WorkingBusiness->getWork($workId);
@@ -499,7 +501,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$searchCriteria->related_with('Fee');
 		$searchCriteria->filter('tarifa_defecto')->for_entity('Fee')->restricted_by('equals')->compare_with('1');
 		$this->loadBusiness('Searching');
-		$results = $this->SearchingBusiness->searchbyCriteria($searchCriteria);
+		$results = $this->SearchingBusiness->searchByCriteria($searchCriteria);
 		if (empty($results[0])) {
 			$UserFee = new UserFee($this->sesion);
 			return $UserFee->emptyResult();
@@ -1003,7 +1005,6 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$CriteriaAnnulledInvoiced = $this->getInvoiceForSalesReport($parameters, true);
 		$annulled_invoice = $CriteriaAnnulledInvoiced->run();
-
 		$sales = array_merge($invoice, $annulled_invoice);
 
 		usort($sales, $this->buildSorter('client'));
@@ -1028,31 +1029,41 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$CriteriaInvoice
 			->add_select('factura.RUT_cliente')
 			->add_select('factura.cliente')
+			->add_select('factura.numero')
+			->add_select('factura.id_moneda', 'moneda_factura')
 			->add_from('factura')
 			->add_left_join_with('prm_documento_legal', 'prm_documento_legal.id_documento_legal = factura.id_documento_legal')
 			->add_left_join_with('cobro', 'cobro.id_cobro = factura.id_cobro')
 			->add_left_join_with('cliente', 'cliente.codigo_cliente = factura.codigo_cliente')
 			->add_left_join_with('documento', 'documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = "N"')
 			->add_left_join_with(
-				array('documento_moneda', 'cobro_moneda'),
-				"cobro_moneda.id_documento = documento.id_documento AND cobro_moneda.id_moneda = {$parameters['display_currency']->fields['id_moneda']}"
+				array('documento_moneda', 'moneda_display'),
+				CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals('moneda_display.id_documento', 'documento.id_documento'),
+					CriteriaRestriction::equals('moneda_display.id_moneda', $parameters['display_currency']->fields['id_moneda'])
+				)
 			)
 			->add_left_join_with(
-				array('documento_moneda', 'cobro_moneda_cobro'),
-				'cobro_moneda_cobro.id_documento = documento.id_documento AND cobro_moneda_cobro.id_moneda = cobro.opc_moneda_total'
+				array('documento_moneda', 'moneda_factura'),
+				CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals('moneda_factura.id_documento', 'documento.id_documento'),
+					CriteriaRestriction::equals('moneda_factura.id_moneda', 'factura.id_moneda')
+				)
 			);
 
+		$start_date = "'{$parameters['start_date']} 00:00:00'";
+		$end_date = "'{$parameters['end_date']} 23:59:59'";
 		if (!$annulled) {
 			$CriteriaInvoice
 				->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
-				->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_factura')
-				->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio), 0)", 'total_nc')
-				->add_restriction(CriteriaRestriction::between('factura.fecha', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"));
+				->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio), 0)", 'total_factura')
+				->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio), 0)", 'total_nc')
+				->add_restriction(CriteriaRestriction::between('factura.fecha', $start_date, $end_date));
 		} else {
 			$CriteriaInvoice
-				->add_select("({$total_invoice} * (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio))", 'total_factura')
+				->add_select("({$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio))", 'total_factura')
 				->add_select('DATE_FORMAT(factura.fecha_anulacion, "%Y%m")', 'mes_contable')
-				->add_restriction(CriteriaRestriction::between('factura.fecha_anulacion', "'{$parameters['start_date']} 00:00:00'", "'{$parameters['end_date']} 23:59:59'"));
+				->add_restriction(CriteriaRestriction::between('factura.fecha_anulacion', $start_date, $end_date));
 		}
 
 		if (!empty($parameters['clients'])) {
@@ -1078,7 +1089,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		if ($parameters['separated_by_invoice'] == '1') {
 			$CriteriaInvoice
 				->add_select('factura.id_factura')
-				->add_select("CONCAT(prm_documento_legal.codigo , ' ', LPAD(factura.serie_documento_legal, '3', '0'), '-', LPAD(factura.numero, '7', '0'))", 'identificador');
+				->add_select("CONCAT(prm_documento_legal.codigo , ' ', factura.serie_documento_legal, '-', LPAD(factura.numero, '7', '0'))", 'identificador');
 		}
 
 		$Criteria = new Criteria($this->Session);
@@ -1115,10 +1126,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$CriteriaInvoice = new Criteria($this->Session);
 		$CriteriaInvoice
-			->add_select("CONCAT('\"', pdl.codigo , ' ', LPAD(f.serie_documento_legal, '3', '0'), '-', LPAD(f.numero, '7', '0'), '\":\"', c.id_cobro, '\"')", 'identificador')
+			->add_select("CONCAT('\"', pdl.codigo , ' ', f.serie_documento_legal, '-', LPAD(f.numero, '7', '0'), '\":\"', c.id_cobro, '\"')", 'identificador')
 			->add_select("DATEDIFF('{$parameters['end_date']}', f.fecha)", 'dias_desde_facturacion')
-			->add_select('SUM(IF(ccfmn.monto_pago IS NULL, 0, ccfmn.monto_pago))', 'total_pagado')
-			->add_select('f.total', 'total_facturado')
+			->add_select('f.total - SUM(IF(ccfmn.monto IS NULL, 0, ccfmn.monto))', 'saldo')
 			->add_select('f.RUT_cliente', 'codigo_cliente')
 			->add_select('f.cliente', 'glosa_cliente')
 			->add_from('factura', 'f')
@@ -1130,6 +1140,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_left_join_with(array('prm_documento_legal', 'pdl'),'pdl.id_documento_legal = f.id_documento_legal')
 			->add_restriction(CriteriaRestriction::lower_or_equals_than('f.fecha', "'{$parameters['end_date']}'"))
 			->add_restriction(CriteriaRestriction::not_equal('pdl.codigo', "'NC'"))
+			->add_restriction(CriteriaRestriction::or_clause(
+				CriteriaRestriction::equals('f.anulado', '0'),
+				CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals('f.anulado', '1'),
+					CriteriaRestriction::greater_or_equals_than('f.fecha_anulacion', "'{$parameters['end_date']}'")
+				)
+			))
 			->add_grouping('f.id_factura');
 
 		if (!empty($parameters['client_code'])) {
@@ -1156,14 +1173,15 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$Criteria
 			->add_select('v.glosa_cliente')
 			->add_select('CONCAT("{", GROUP_CONCAT(DISTINCT v.identificador ORDER BY 1), "}")', 'facturas')
-			->add_select('SUM(IF(v.dias_desde_facturacion <= 30, v.total_facturado - v.total_pagado, 0))', "'rango1'")
-			->add_select('SUM(IF(v.dias_desde_facturacion > 30 AND v.dias_desde_facturacion <= 60, v.total_facturado - v.total_pagado, 0))', "'rango2'")
-			->add_select('SUM(IF(v.dias_desde_facturacion > 60 AND v.dias_desde_facturacion <= 90, v.total_facturado - v.total_pagado, 0))', "'rango3'")
-			->add_select('SUM(IF(v.dias_desde_facturacion > 90, v.total_facturado - v.total_pagado, 0))', "'rango4'")
-			->add_select('SUM(v.total_facturado - v.total_pagado)', "'total'")
+			->add_select('SUM(IF(v.dias_desde_facturacion <= 30, v.saldo, 0))', "'rango1'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 30 AND v.dias_desde_facturacion <= 60, v.saldo, 0))', "'rango2'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 60 AND v.dias_desde_facturacion <= 90, v.saldo, 0))', "'rango3'")
+			->add_select('SUM(IF(v.dias_desde_facturacion > 90, v.saldo, 0))', "'rango4'")
+			->add_select('SUM(v.saldo)', "'total'")
 			->add_from_criteria($CriteriaInvoice, 'v')
 			->add_grouping('v.glosa_cliente')
-			->add_ordering('v.glosa_cliente');
+			->add_ordering('v.glosa_cliente')
+			->add_restriction(CriteriaRestriction::greater_than('v.saldo', 0));
 		if (!empty($parameters['include_trade_manager'])) {
 			$Criteria->add_select('v.encargado_comercial');
 		}
