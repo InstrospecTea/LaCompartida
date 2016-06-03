@@ -1,5 +1,10 @@
 # Changelog
 
+## Hotfix 16.15.11
+Wednesday, June 1st
+* **Fix** [Corregir formato LEDES 1998BI](https://github.com/LemontechSA/ttb/pull/1528)
+
+
 ## Hotfix 16.15.10
 Friday, Jun 3rd
 * **Fix** [Correción en paginación](https://github.com/LemontechSA/ttb/pull/1527)
