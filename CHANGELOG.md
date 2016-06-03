@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.10
+Friday, Jun 3rd
+* **Fix** [Correción en paginación](https://github.com/LemontechSA/ttb/pull/1527)
+
 ## Hotfix 16.15.9
 Thursday, June 2nd
 * **Fix** [Problemas al desactivar contrato](https://github.com/LemontechSA/ttb/pull/1526)
