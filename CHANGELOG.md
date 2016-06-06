@@ -1,5 +1,25 @@
 # Changelog
 
+## Hotfix 16.15.14
+Monday, Jun 6th
+* **Fix** [Las notas de cobro tienen que ser sumadas si estas fueron fueron anuladas](https://github.com/LemontechSA/ttb/pull/1536)
+
+## Hotfix 16.15.13
+Monday, Jun 6th
+* **Fix** [Corrige escritura decimales cero/cien](https://github.com/LemontechSA/ttb/pull/1535)
+
+## Hotfix 16.15.12
+Friday, Jun 3rd
+* **Fix** [Limita el tamaño del nombre de la hoja a 31 caracteres.](https://github.com/LemontechSA/ttb/pull/1530)
+
+## Hotfix 16.15.11
+Friday, Jun 3rd
+* **Fix** [Corregir formato LEDES 1998BI](https://github.com/LemontechSA/ttb/pull/1528)
+
+## Hotfix 16.15.10
+Friday, Jun 3rd
+* **Fix** [Correción en paginación](https://github.com/LemontechSA/ttb/pull/1527)
+
 ## Hotfix 16.15.9
 Thursday, June 2nd
 * **Fix** [Problemas al desactivar contrato](https://github.com/LemontechSA/ttb/pull/1526)
