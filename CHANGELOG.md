@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.13
+Monday, Jun 6th
+* **Fix** [Corrige escritura decimales cero/cien](https://github.com/LemontechSA/ttb/pull/1535)
+
 ## Hotfix 16.15.12
 Friday, Jun 3rd
 * **Fix** [Limita el tamaño del nombre de la hoja a 31 caracteres.](https://github.com/LemontechSA/ttb/pull/1530)
