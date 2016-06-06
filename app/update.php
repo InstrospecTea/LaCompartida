@@ -15,24 +15,22 @@ if (!$Migration->schemaExists()) {
 
 echo '<p>Start Run Migration</p>';
 
-$files = $Migration->getFilesMigration();
+$files = $Migration->getUnexecuted();
 $batch = $Migration->getNextBatchNumber();
 
-if (!empty($files)) {
-	foreach ($files as $file_name) {
-		if ($Migration->isRunnable($file_name)) {
-			echo "<p>Running {$file_name}</p>";
+foreach ($files as $file_name) {
+	if ($Migration->isRunnable($file_name)) {
+		echo "<p>Running {$file_name}</p>";
 
-			require_once $Migration->getMigrationDirectory() . "/{$file_name}";
-			$class_name = $Migration->getClassNameByFileName($file_name);
+		require_once $Migration->getMigrationDirectory() . "/{$file_name}";
+		$class_name = $Migration->getClassNameByFileName($file_name);
 
-			$ReflectedClass = new ReflectionClass("Database\\$class_name");
-			$CustomMigration = $ReflectedClass->newInstance();
-			$CustomMigration->up();
-			$CustomMigration->runUp();
+		$ReflectedClass = new ReflectionClass("Database\\$class_name");
+		$CustomMigration = $ReflectedClass->newInstance();
+		$CustomMigration->up();
+		$CustomMigration->runUp();
 
-			$Migration->registerMigration($file_name, $batch);
-		}
+		$Migration->registerMigration($file_name, $batch);
 	}
 }
 

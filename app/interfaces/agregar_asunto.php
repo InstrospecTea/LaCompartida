@@ -6,7 +6,7 @@ $Sesion = new Sesion(array('DAT', 'SASU'));
 $Pagina = new Pagina($Sesion);
 $id_usuario = $Sesion->usuario->fields['id_usuario'];
 $PrmTipoProyecto = new PrmTipoProyecto($Sesion);
-$Form = new Form;
+$Form = new Form();
 $SelectHelper = new FormSelectHelper();
 $AutocompleteHelper = new FormAutocompleteHelper();
 $validacionesCliente = Conf::GetConf($Sesion, 'ValidacionesCliente') && $cobro_independiente;
@@ -110,10 +110,8 @@ if ($opcion == 'guardar') {
 		$Pagina->AddError(__('Por favor ingrese el codigo del cliente'));
 	}
 
-	if (Conf::GetConf($Sesion, 'ValidacionesCliente')) {
-		if (empty($id_area_proyecto)) {
-			$Pagina->AddError(__('Por favor ingrese el área del ') . __('asunto'));
-		}
+	if (empty($id_area_proyecto)) {
+		$Pagina->AddError(__('Por favor ingrese el área del ') . __('asunto'));
 	}
 
 	foreach (array_keys($hito_fecha) as $i) {
@@ -185,12 +183,7 @@ if ($opcion == 'guardar') {
 		}
 
 		$Asunto->Edit("id_tipo_asunto", $id_tipo_asunto, true);
-
-		if (!empty($id_area_proyecto)) {
-			$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
-		} else {
-			$Asunto->Edit("id_area_proyecto", "NULL");
-		}
+		$Asunto->Edit("id_area_proyecto", $id_area_proyecto, true);
 
 		if (!is_null($desglose_area)) {
 			$Asunto->Edit("desglose_area", $desglose_area);
@@ -416,6 +409,10 @@ if ($opcion == 'guardar') {
 		}
 	}
 
+	if (!empty($_POST['asunto_extra'])) {
+		$Asunto->saveExtra($_POST['asunto_extra']);
+	}
+
 	$errors = $Pagina->GetErrors();
 	if (empty($errors)) {
 		$NuevoCliente = new Cliente($Sesion);
@@ -443,6 +440,11 @@ if ($opcion == 'guardar') {
 
 $id_idioma_default = $contrato->IdIdiomaPorDefecto($Sesion);
 $AreaProyecto = new AreaProyecto($Sesion);
+
+if (Conf::GetConf($Sesion, 'MostrarAsuntoTrabajoConjunto')) {
+	$MatterExtra = $Asunto->loadExtra();
+	$PrmRegionMaestra = new PrmRegionMaestra($Sesion);
+}
 
 $Pagina->titulo = "Ingreso de " . __('asunto');
 $Pagina->PrintTop($popup);
@@ -546,13 +548,11 @@ if (!$Asunto->Loaded()) {
 					return false;
 			}
 
-<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
-				if (!form.id_area_proyecto.value) {
-						alert("Debe ingresar el área del <?php echo __('asunto'); ?>");
-						form.id_area_proyecto.focus();
-						return false;
-				}
-<?php } ?>
+			if (!form.id_area_proyecto.value) {
+					alert("Debe ingresar el área del <?php echo __('asunto'); ?>");
+					form.id_area_proyecto.focus();
+					return false;
+			}
 
 <?php
 if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
@@ -729,17 +729,17 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 								<?php
 								if (!$Asunto->Loaded()) {
 									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' ', 'SetearLetraCodigoSecundario(); CambioDatosFacturacion(this.value);');
 									} else {
-										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);');
+										echo InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' ', 'CambioDatosFacturacion(this.value);');
 									}
 								} else {
 									if (Conf::GetConf($Sesion, 'CodigoSecundario')) {
-										$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'nuevo_codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' class="nuevo_codigo_cliente secundario" ', 'SetearLetraCodigoSecundario(); CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
+										$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente_secundario', 'glosa_cliente', 'nuevo_codigo_cliente_secundario', $Cliente->fields['codigo_cliente_secundario'], ' class="nuevo_codigo_cliente secundario" ', 'SetearLetraCodigoSecundario(); CambioDatosFacturacion(this.value);', 300);
 										$_codigo_cliente = $Cliente->fields['codigo_cliente_secundario'];
 										$_name = 'codigo_cliente_secundario';
 									} else {
-										$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'nuevo_codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' class="nuevo_codigo_cliente" ', 'CambioEncargadoSegunCliente(this.value); CambioDatosFacturacion(this.value);', 300);
+										$input_cliente = InputId::Imprimir($Sesion, 'cliente', 'codigo_cliente', 'glosa_cliente', 'nuevo_codigo_cliente', $Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente'], ' class="nuevo_codigo_cliente" ', 'CambioDatosFacturacion(this.value);', 300);
 										$_codigo_cliente = ($Asunto->fields['codigo_cliente'] ? $Asunto->fields['codigo_cliente'] : $Cliente->fields['codigo_cliente']);
 										$_name = 'codigo_cliente';
 									}
@@ -784,9 +784,7 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 																											FormSelectHelper.reload_id_desglose_area();
 																										}'
 																					)); ?>
-								<?php if (Conf::GetConf($Sesion, 'ValidacionesCliente')) { ?>
-									<span style="color:#FF0000; font-size:10px">*</span>
-								<?php } ?>
+								<span style="color:#FF0000; font-size:10px">*</span>
 								<?php echo $SelectHelper->checkboxes(
 																		'id_desglose_area',
 																		array(),
@@ -892,16 +890,64 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 								<input name="email_contacto" value="<?php echo $Asunto->fields['email_contacto'] ?>" />
 							</td>
 						</tr>
+						<?php if (Conf::GetConf($Sesion, 'MostrarAsuntoTrabajoConjunto')) : ?>
+							<?php $trabajo_conjunto = $MatterExtra->get('trabajo_conjunto') == 1; ?>
+							<tr>
+								<td align="right"><?= $Form->label(__('Trabajo en Conjunto'), 'trabajo_conjunto'); ?></td>
+								<td align="left">
+									<?= $Form->checkbox(
+										'asunto_extra[trabajo_conjunto]', 1,
+										$trabajo_conjunto,
+										array('label' => false, 'id' => 'trabajo_conjunto')
+									); ?>
+								</td>
+							</tr>
+							<tr class="fields_trabajo_conjunto" <?= $trabajo_conjunto ? '' : 'style="display:none"' ?>>
+								<td align="right"><?= $Form->label(__('Región Maestra'), 'id_region_maestra'); ?></td>
+								<td align="left">
+									<?= $Form->select(
+										'asunto_extra[id_region_maestra]',
+										$PrmRegionMaestra->Listar(),
+										$MatterExtra->get('id_region_maestra'),
+										array(
+											'empty' => __('Seleccione'),
+											'style' => 'width: 200px',
+											'id' => 'id_region_maestra'
+										)
+									); ?>
+								</td>
+							</tr>
+							<tr class="fields_trabajo_conjunto" <?= $trabajo_conjunto ? '' : 'style="display:none"' ?>>
+								<td align="right"><?= $Form->label(__('Código Asunto Maestro'), 'id_region_maestra'); ?></td>
+								<td align="left">
+									<?= $Form->input(
+										'asunto_extra[codigo_asunto_maestro]',
+										$MatterExtra->get('codigo_asunto_maestro'),
+										array('id' => 'id_region_maestra', 'label' => false)
+									); ?>
+								</td>
+							</tr>
+						<?php endif; ?>
 						<tr>
 							<td align="right"><label for="activo"><?php echo __('Activo') ?></label></td>
 							<td align="left">
-								<input type="checkbox" name="activo" id="activo" value="1" <?php echo $Asunto->fields['activo'] == 1 ? "checked" : "" ?> <?php echo!$Asunto->Loaded() ? 'checked' : '' ?> />
+								<?= $Form->checkbox('activo', 1,
+									$Asunto->fields['activo'] == 1 || !$Asunto->Loaded(),
+									array('label' => false)); ?>
 								&nbsp;&nbsp;&nbsp;
-								<label for="cobrable"><?php echo __('Cobrable') ?></label>
-								<input  type="checkbox" name="cobrable" id="cobrable" value="1" <?php echo $Asunto->fields['cobrable'] == 1 ? "checked" : "" ?><?php echo!$Asunto->Loaded() ? 'checked' : '' ?>  />
+								<?= $Form->checkbox('cobrable', 1,
+									$Asunto->fields['cobrable'] == 1 || !$Asunto->Loaded(),
+									array('label_first' => true, 'label' => __('Cobrable'))); ?>
 								&nbsp;&nbsp;&nbsp;
-								<label for="actividades_obligatorias"><?php echo __('Actividades obligatorias') ?></label>
-								<input type="checkbox" id="actividades_obligatorias" name="actividades_obligatorias" value="1" <?php echo $Asunto->fields['actividades_obligatorias'] == 1 ? "checked" : "" ?> />
+								<?= $Form->checkbox('actividades_obligatorias', 1,
+									$Asunto->fields['actividades_obligatorias'] == 1,
+									array('label_first' => true, 'label' => __('Actividades obligatorias'))); ?>
+								<?php if (Conf::GetConf($Sesion, 'MostrarAsuntoConfidencial')) : ?>
+									&nbsp;&nbsp;&nbsp;
+									<?= $Form->checkbox('asunto_extra[confidencial]', 1,
+										$MatterExtra->get('confidencial') == 1,
+										array('label_first' => true, 'label' => __('Confidencial'))); ?>
+								<?php endif; ?>
 							</td>
 						</tr>
 					</table>
@@ -1007,10 +1053,13 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 
 <script type="text/javascript">
 jQuery('document').ready(function () {
-	jQuery('#codigo_cliente, #codigo_cliente, #codigo_cliente, #codigo_cliente').change(function () {
-		CambioEncargadoSegunCliente(jQuery(this).val());
+	jQuery('#trabajo_conjunto').change(function() {
+		if (jQuery(this).is(':checked')) {
+		jQuery('.fields_trabajo_conjunto').show();
+	} else {
+		jQuery('.fields_trabajo_conjunto').hide();
+	}
 	});
-
 	jQuery('#change_client').click(function() {
 		var $ = jQuery;
 		var input_nuevo_codigo = $('input.nuevo_codigo_cliente');
@@ -1036,40 +1085,22 @@ jQuery('document').ready(function () {
 	jQuery("#cobro_independiente").trigger("change");
 });
 
-function CambioEncargadoSegunCliente(idcliente) {
-	var CopiarEncargadoAlAsunto = <?php echo (Conf::GetConf($Sesion, "CopiarEncargadoAlAsunto") ? '1' : '0'); ?>;
-	var UsuarioSecundario = <?php echo (Conf::GetConf($Sesion, 'EncargadoSecundario') ? '1' : '0' ); ?>;
-	var ObligatorioEncargadoSecundarioAsunto = <?php echo (Conf::GetConf($Sesion, 'ObligatorioEncargadoSecundarioAsunto') ? '1' : '0' ); ?>;
-	jQuery('#id_usuario_secundario').removeAttr('disabled');
-	jQuery('#id_usuario_responsable').removeAttr('disabled');
-	jQuery.post('../ajax.php', {accion: 'busca_encargado_por_cliente', codigobuscado: idcliente}, function (data) {
-		var ladata = data.split('|');
-		jQuery('#id_usuario_responsable').removeAttr('disabled').val(ladata[0]);
-		if (ladata[1] && jQuery('#id_usuario_secundario option[value=' + ladata[1] + ']').length > 0) {
-			if (UsuarioSecundario) {
-				jQuery('#id_usuario_secundario').removeAttr('disabled').val(ladata[1]);
-			}
-		} else {
-			if (ladata[2]) {
-				jQuery('#id_usuario_secundario').append('<option value="' + ladata[1] + '" selected="selected">' + ladata[2] + '</option>').attr({'disabled': ''}).val(ladata[1]);
-			}
-		}
-
-		jQuery('#id_usuario_responsable').removeAttr('disabled');
-		if (CopiarEncargadoAlAsunto) {
-			jQuery('#id_usuario_responsable').attr({'disabled': 'disabled'});
-			if (UsuarioSecundario) {
-				jQuery('#id_usuario_secundario').attr({'disabled': 'disabled'});
-			}
-		} else if (ObligatorioEncargadoSecundarioAsunto) {
-			if (UsuarioSecundario) {
-				jQuery('#id_usuario_secundario').removeAttr('disabled');
-			}
-		}
-
-		jQuery('#id_usuario_responsable, #id_usuario_secundario').removeClass('loadingbar');
-	});
-	jQuery('#id_usuario_responsable, #id_usuario_secundario').addClass('loadingbar');
+/**
+ * Si el usuario no está en la lista se agrega
+ * @param {type} data
+ * @returns {undefined|Boolean}
+ */
+function agregarUsuarioSecundario(data) {
+	var id = data.id_usuario_secundario || null;
+	if (id === null) {
+		return;
+	}
+	var element_id = '#id_usuario_secundario';
+	if (!jQuery(element_id).length || jQuery(element_id).find('option[value=' + id + ']').length) {
+		return false;
+	}
+	var $option = jQuery('<option/>', {value: id, text: data.nombre_usuario_secundario});
+	jQuery(element_id).append($option);
 }
 
 function CambioDatosFacturacion(id_cliente) {
@@ -1079,16 +1110,25 @@ function CambioDatosFacturacion(id_cliente) {
 		if (!response) {
 			return;
 		}
-
+		agregarUsuarioSecundario(response);
 		jQuery.each(response, function (field_name, value) {
 			var $field = jQuery('[name="' + field_name + '"]');
-			if ($field !== undefined) {
-				if ($field.is('[type=radio]')) {
-					$field.removeAttr('checked');
-					$field.filter('[value=' + value + ']').attr('checked', true).change().click();
-				} else {
-					$field.val(value);
-				}
+			if ($field === undefined) {
+				return true;
+			}
+			if ($field.is('[type="radio"]')) {
+				$field.removeAttr('checked');
+				$field.filter('[value="' + value + '"]').attr('checked', true).change().click();
+			} else if ($field.is('[type="checkbox"]')) {
+				$field.removeAttr('checked');
+				$field.filter('[value="' + value + '"]').attr('checked', true);
+			} else {
+				$field.val(value);
+			}
+			if (field_name === 'id_banco' && response.id_cuenta) {
+				jQuery.ajaxSetup({async: false});
+				$field.change();
+				jQuery.ajaxSetup({async: true});
 			}
 		});
 	}, 'json');

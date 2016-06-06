@@ -163,6 +163,17 @@ $ sudo a2enmod rewrite
 Reiniciar Apache2 para que tenga en cuenta al módulo recién activado.
 $ sudo service apache2 restart
 
+### Generates Api Documentation
+
+* Install [ApiDoc](http://apidocjs.com/)  ```npm install apidoc -g```
+
+```
+cd api/
+apidoc -o ../apidoc/
+```
+
+* open ```../apidoc/index.html``` and enjoy!
+
 ##Test
 ###Pruebas de Integración
   * Duplica el archivo app/test/spec/conf.rb.default con el nombre app/test/spec/conf.rb y configura tu sitio local

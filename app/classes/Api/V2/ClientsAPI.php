@@ -3,9 +3,7 @@
 namespace Api\V2;
 
 /**
- *
  * Clase con métodos para Clientes
- *
  */
 class ClientsAPI extends AbstractSlimAPI {
 
@@ -13,7 +11,9 @@ class ClientsAPI extends AbstractSlimAPI {
 		array('id' => 'id_cliente'),
 		array('code' => 'codigo_cliente'),
 		array('name' => 'glosa_cliente'),
-		array('active' => 'activo')
+		array('active' => 'activo'),
+		array('created_at' => 'fecha_creacion'),
+		array('updated_at' => 'fecha_modificacion')
 	);
 
 	public function getUpdatedClients() {

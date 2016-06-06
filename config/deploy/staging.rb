@@ -8,7 +8,7 @@ mysqlCmd = 'mysql -uroot -pasdwsx2016'
 
 set :home_directory, "/var/www/html"
 set :base_directory, "#{home_directory}/deploys"
-
+set :keep_releases, 1
 
 # Overwrite of Composer to use one shared folder between releases, not many 'vendor' folders
 namespace :composer do

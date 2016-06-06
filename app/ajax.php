@@ -113,21 +113,6 @@ switch ($accion) {
 		echo '<!--' . $beaconleft . '-->';
 		break;
 
-	case 'busca_encargado_por_cliente':
-
-		$campoacomparar = Conf::GetConf($sesion, 'CodigoSecundario') ? 'codigo_cliente_secundario' : 'codigo_cliente';
-		$codigobuscado = $_POST['codigobuscado'];
-		$query = "select  contrato.id_usuario_responsable, contrato.id_usuario_secundario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) nombre_usuario_secundario from cliente join contrato using (id_contrato) left join usuario on usuario.id_usuario=contrato.id_usuario_secundario where cliente.$campoacomparar='$codigobuscado'";
-		if ($resp = mysql_query($query, $sesion->dbh)) {
-			list($responsable, $encargadosecundario, $nombre_usuario_secundario) = mysql_fetch_array($resp);
-		} else {
-			$responsable = '||';
-		}
-
-		echo $responsable . '|' . $encargadosecundario . '|' . $nombre_usuario_secundario;
-
-		break;
-
 	case "borrar_evento":
 
 		$query = "DELETE FROM events WHERE event_id=" . $id;

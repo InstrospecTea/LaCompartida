@@ -8,7 +8,7 @@ interface BaseBusiness {
 	 * @param $property
 	 * @return bool
 	 */
-	function checkPropertyExistence($properties, $property);
+	public function checkPropertyExistence($properties, $property);
 
 	/**
 	 * Maneja los mensajes de error que arrojan los distintos servicios y negocios, los cuales
@@ -18,7 +18,7 @@ interface BaseBusiness {
 	 * se retorna el arreglo de errores.
 	 * @return mixed
 	 */
-	function errors($message = null);
+	public function errors($message = null);
 
 	/**
 	 * Maneja los mensajes de información que arrojan los distintos servicios y negocios, los cuales
@@ -28,6 +28,6 @@ interface BaseBusiness {
 	 * se retorna el arreglo de informaciones.
 	 * @return mixed
 	 */
-	function infos($message = null);
+	public function infos($message = null);
 
 }

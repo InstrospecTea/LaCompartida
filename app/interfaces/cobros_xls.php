@@ -149,6 +149,8 @@ $CellFormat->add('resumen_text_titulo', array('Size' => 9, 'Bold' => 1, 'Border'
 $CellFormat->add('resumen_text_amarillo', array('Border' => 1, 'FgColor' => '37', 'TextWrap' => 1));
 $CellFormat->add('numeros', array('Border' => 1, 'Align' => 'right', 'NumFormat' => '0'));
 $CellFormat->add('numeros_amarillo', array('Border' => 1, 'Align' => 'right', 'TextWrap' => '0', 'FgColor' => '37'));
+$CellFormat->add('numero_rut', array('Align' => 'right', 'NumFormat' => '#'));
+$CellFormat->add('encabezado_numero_rut', array('Size' => 10, 'VAlign' => 'middle', 'Bold' => 1, 'NumFormat' => '#'));
 
 /*
  *	FIN FORMATO DE CELDAS PARA EL DOCUMENTO
@@ -475,7 +477,6 @@ foreach ($chargeResults as $charge) {
 	$formato_id_moneda_monto = $Moneda->getExcelFormat($contrato->fields['id_moneda_monto']);
 	$formato_id_moneda = $Moneda->getExcelFormat($cobro->fields['id_moneda']);
 
-	$CellFormat->add('moneda_resumen', array('Align' => 'right', 'NumFormat' => '#'));
 	$CellFormat->add('moneda_resumen', array('Size' => 10, 'Align' => 'right', 'Bold' => '1', 'NumFormat' => $formato_opc_moneda_total));
 	$CellFormat->add('moneda_gastos', array('Align' => 'right', 'NumFormat' => $formato_opc_moneda_total));
 	$CellFormat->add('moneda_gastos_total', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'Top' => 1, 'NumFormat' => $formato_opc_moneda_total));
@@ -597,7 +598,7 @@ foreach ($chargeResults as $charge) {
 
 	$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('rut', 'Encabezado', $lang), $CellFormat->get('encabezado'));
 	$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
-	$ws->write($filas, $col_abogado, $contrato->fields['rut'], $CellFormat->get('encabezado'));
+	$ws->write($filas, $col_abogado, $contrato->fields['rut'], $CellFormat->get('encabezado_numero_rut'));
 	$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
 	++$filas;
 
@@ -1184,7 +1185,7 @@ foreach ($chargeResults as $charge) {
 				$ws->write($filas, $col_fecha_dia, $PrmExcelCobro->getGlosa('fecha_dia', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
 				$ws->write($filas, $col_fecha_mes, $PrmExcelCobro->getGlosa('fecha_mes', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
 				$ws->write($filas, $col_fecha_anyo, $PrmExcelCobro->getGlosa('fecha_anyo', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
-				$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de trabajos', $lang).'sdfghj', $CellFormat->get('titulo'));
+				$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
 
 				if (!$opc_ver_asuntos_separados) {
 					$ws->write($filas, $col_asunto, $PrmExcelCobro->getGlosa('asunto', 'Listado de trabajos', $lang), $CellFormat->get('titulo'));
@@ -1858,14 +1859,14 @@ foreach ($chargeResults as $charge) {
 	if ($cont_gastos_cobro > 0 && $cobro->fields['opc_ver_gastos']) {
 
 		$impuesto = $PrmExcelCobro->getGlosa('impuesto', 'Listado de gastos', $lang);
-		$impuesto = $impuesto == 'No existe información' ? NULL : $impuesto;
+		$impuesto = empty($impuesto) ? NULL : $impuesto;
 
 		$rut = $PrmExcelCobro->getGlosa('rut', 'Listado de gastos', $lang);
-		if ($rut == 'No existe información') {
+		if (empty($rut)) {
 			$rut = NULL;
 		} else {
 			$proveedor = $PrmExcelCobro->getGlosa('proveedor', 'Listado de gastos', $lang);
-			if ($proveedor == 'No existe información') {
+			if (empty($proveedor)) {
 				$proveedor = NULL;
 			} else {
 				$offsetcolumna += 2;
@@ -2296,7 +2297,7 @@ foreach ($chargeResults as $charge) {
 								$ws->write($filas, $col_descripcion - $offsetcolumna, $rut, $CellFormat->get('titulo', $i));
 								$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $proveedor, $CellFormat->get('titulo', $i));
 							}
-							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo', $i));
+							$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de gastos', $lang), $CellFormat->get('titulo'));
 						}
 					}
 
@@ -2357,7 +2358,7 @@ foreach ($chargeResults as $charge) {
 			}
 
 			if (!empty($rut) && !empty($proveedor)) {
-				$ws->writeNumber($filas, $col_descripcion - $offsetcolumna, $gasto->fields['rut'], $CellFormat->get('numero', $i));
+				$ws->write($filas, $col_descripcion - $offsetcolumna, $gasto->fields['rut'], $CellFormat->get('numero_rut', $i));
 				$ws->write($filas, $col_descripcion - ($offsetcolumna - 1), $gasto->fields['glosa_proveedor'], $CellFormat->get('descripcion', $i));
 			}
 

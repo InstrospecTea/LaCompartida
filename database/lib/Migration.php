@@ -6,6 +6,8 @@ use \PDO;
 use \PDOException;
 use \Database\Config as MigrationConfig;
 use \Database\MigrationMailing;
+use \UtilesApp;
+use \Utiles;
 
 class Migration {
 
@@ -74,23 +76,13 @@ class Migration {
 	}
 
 	private function sanitizeDescriptionForFileName($description) {
-		$string = strtolower($description);
-		$string = str_replace(' ', '_', $string);
-		return $string;
+		$slugged = UtilesApp::slug($description);
+		return Utiles::underscoreize($slugged);
 	}
 
 	private function sanitizeDescriptionForClassName($description) {
-		$string = ucwords(strtolower($description));
-
-		foreach (array('-', '\'') as $delimiter) {
-			if (strpos($string, $delimiter) !== false) {
-				$string = implode($delimiter, array_map('ucfirst', explode($delimiter, $string)));
-			}
-		}
-
-		$string = str_replace(' ', '', $string);
-
-		return $string;
+		$file_name = $this->sanitizeDescriptionForFileName($description);
+		return Utiles::Pascalize($file_name);
 	}
 
 	private function getTemplate($description) {
@@ -112,34 +104,45 @@ class Migration {
 	}
 
 	public function runUp() {
-		$this->executeQuery($this->query_up);
+		$this->runTransaction($this->query_up);
 	}
 
 	public function runDown() {
-		$this->executeQuery($this->query_down);
+		$this->runTransaction($this->query_down);
 	}
 
 	private function executeQuery($query) {
-		if (!empty($query)) {
+		if (empty($query)) {
+			return;
+		}
+		$Statement = $this->Database->prepare($query);
+		$Statement->execute();
+	}
+
+	private function runTransaction($query) {
+		if (empty($query)) {
+			return;
+		}
+		try {
+			$this->Database->beginTransaction();
 			if (is_array($query)) {
-				array_walk($query, array('self', 'executeQuery'));
+				array_walk($query, array($this, 'executeQuery'));
 			} else {
-				try {
-					$Statement = $this->Database->prepare($query);
-					$Statement->execute();
-				} catch (PDOException $e) {
-					$separator = ($this->debug) ? "\n" : '<br/>';
-					$message = $this->buildMessage($e, $query, $separator);
-
-					if ($this->debug) {
-						echo $message;
-					} else {
-						$this->MigrationMailing->send($message);
-					}
-
-					exit;
-				}
+				$this->executeQuery($query);
 			}
+			$this->Database->commit();
+		} catch (PDOException $e) {
+			$this->Database->rollBack();
+			$separator = ($this->debug) ? "\n" : '<br/>';
+			$message = $this->buildMessage($e, $query, $separator);
+
+			if ($this->debug) {
+				echo $message;
+			} else {
+				$this->MigrationMailing->send($message);
+			}
+
+			exit;
 		}
 	}
 
@@ -155,14 +158,13 @@ class Migration {
 	}
 
 	public function getResultsQuery($query) {
-		$results = null;
-
 		try {
 			$Statement = $this->Database->prepare($query);
 			$Statement->execute();
 			$results = $Statement->fetchAll(PDO::FETCH_ASSOC);
 		} catch (PDOException $e) {
 			// TODO: Registrar errores
+			$results = null;
 		}
 
 		return $results;
@@ -192,13 +194,12 @@ class Migration {
 			'class_name' => ''
 		);
 
-		preg_match('/^([0-9]*)_(.*)/', $file_name, $matches);
+		preg_match('/^([0-9]*)_([^.]+).*/', $file_name, $matches);
 
-		$description = str_replace('_', ' ', $matches[2]);
-		$description = str_replace('.php', '', $description);
+		$description = Utiles::humanize($matches[2]);
 
 		if (!empty($matches)) {
-			$descompose_file_name['version'] = (int) $matches[1];
+			$descompose_file_name['version'] = $matches[1];
 			$descompose_file_name['description'] = $description;
 			$descompose_file_name['class_name'] = $this->sanitizeDescriptionForClassName($description);
 		}
@@ -208,17 +209,17 @@ class Migration {
 
 	/**
 	 * Obtiene un listado ordenado por defecto de forma ascendente
-	 * @param  integer $sorting_order 0: ascendente 1: descendente
 	 * @return array listado de archivos
 	 */
-	public function getFilesMigration($sorting_order = 0) {
-		$files = array_diff(scandir($this->getMigrationDirectory(), $sorting_order), $this->files_ignore);
+	public function getFilesMigration() {
+		$files = array_diff(scandir($this->getMigrationDirectory()), $this->files_ignore);
+		sort($files);
 		return $files;
 	}
 
 	public function getLastFileMigration() {
-		$files = $this->getFilesMigration(1);
-		$file = array_shift($files);
+		$files = $this->getFilesMigration();
+		$file = array_pop($files);
 		return !empty($file) ? $file : '';
 	}
 
@@ -260,10 +261,10 @@ class Migration {
 
 	public function getLastVersionOnDatabase() {
 		$version = 0;
-		$file = $this->getResultsQuery('SELECT `migration` AS file_name FROM `migrations` ORDER BY 1 DESC LIMIT 1');
+		$files = $this->getResultsQuery('SELECT `migration` AS file_name FROM `migrations` ORDER BY 1 DESC LIMIT 1');
 
-		if (!empty($file)) {
-			$file = $this->decomposeFileName($file[0]['file_name']);
+		if (!empty($files)) {
+			$file = $this->decomposeFileName($files[0]['file_name']);
 			$version = $file['version'];
 		}
 
@@ -290,4 +291,22 @@ class Migration {
 			) ENGINE = InnoDB'
 		);
 	}
+
+	public function getUnexecuted() {
+		$migration_in_db = $this->getDatabaseMigrations();
+		$migration_in_fs = $this->getFilesMigration();
+		$files = array_diff($migration_in_fs, $migration_in_db);
+		sort($files);
+		return $files;
+	}
+
+	public function getDatabaseMigrations() {
+		$result = array();
+		$rows = $this->getResultsQuery('SELECT `migration` FROM `migrations` order by 1');
+		foreach ($rows as $row) {
+			$result[] = $row['migration'];
+		}
+		return $result;
+	}
+
 }

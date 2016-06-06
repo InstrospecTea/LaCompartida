@@ -1627,8 +1627,8 @@ class Factura extends Objeto {
 					$NumbersWords = new Numbers_Words();
 
 					list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
-					$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, $code));
-					$monto_palabra_parte_decimal = strtoupper($Numbers_Words->toWords($total_parte_decimal, $code));
+					$monto_palabra_parte_entera = strtoupper($NumbersWords->toWords($total_parte_entera, $code));
+					$monto_palabra_parte_decimal = strtoupper($NumbersWords->toWords($total_parte_decimal, $code));
 					$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' . __('CON') . ' ' . $monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
 					$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' ' . (empty($total_parte_decimal) ? '00' : $total_parte_decimal) . '/100 ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8');
 				} else {
