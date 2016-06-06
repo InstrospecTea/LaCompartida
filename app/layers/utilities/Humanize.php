@@ -3,13 +3,13 @@
 abstract class Humanize {
 	/**
 	 * Agrega el texto humanizado a la data
-	 * @param 	string $table_title
+	 * @param 	string $table_name
 	 * @param 	Array $data
 	 * @return 	Array humanizado
 	 */
-	public static function convert($table_title, $data) {
-		$rules = self::getRules($table_title);
-		$black_list = self::getBlackList($table_title);
+	public static function convert($table_name, $data) {
+		$rules = self::getRules($table_name);
+		$black_list = self::getBlackList($table_name);
 
 		if ($rules === false) {
 			return $data;
@@ -29,11 +29,11 @@ abstract class Humanize {
 
 	/**
 	 * Obtiene las relaciones de una tabla
-	 * @param 	string $table_title
+	 * @param 	string $table_name
 	 * @return 	Array
 	 */
-	public static function getRelations($table_title) {
-		$class_name = self::getClassName($table_title);
+	public static function getRelations($table_name) {
+		$class_name = self::getClassName($table_name);
 
 		if (class_exists($class_name)) {
 			return $class_name::$relations;
@@ -43,11 +43,11 @@ abstract class Humanize {
 
 	/**
 	 * Obtiene las reglas de una tabla
-	 * @param 	string $table_title
+	 * @param 	string $table_name
 	 * @return 	Array
 	 */
-	protected static function getRules($table_title) {
-		$class_name = self::getClassName($table_title);
+	protected static function getRules($table_name) {
+		$class_name = self::getClassName($table_name);
 
 		if (class_exists($class_name)) {
 			return $class_name::$rules;
@@ -57,11 +57,11 @@ abstract class Humanize {
 
 	/**
 	 * Obtiene la lista de campos ignorados
-	 * @param 	string $table_title
+	 * @param 	string $table_name
 	 * @return 	Array
 	 */
-	protected static function getBlackList($table_title) {
-		$class_name = self::getClassName($table_title);
+	protected static function getBlackList($table_name) {
+		$class_name = self::getClassName($table_name);
 
 		if (class_exists($class_name)) {
 			return $class_name::$black_list;
@@ -71,11 +71,11 @@ abstract class Humanize {
 
 	/**
 	 * Obtiene el diccionario de una tabla
-	 * @param 	string $table_title
+	 * @param 	string $table_name
 	 * @return 	Array
 	 */
-	protected static function getDictionary($table_title) {
-		$class_name = self::getClassName($table_title);
+	protected static function getDictionary($table_name) {
+		$class_name = self::getClassName($table_name);
 
 		if (class_exists($class_name)) {
 			return $class_name::$dictionary;
@@ -85,12 +85,24 @@ abstract class Humanize {
 
 	/**
 	 * Obtiene el nombre de una clase
-	 * @param 	string $table_title
+	 * @param 	string $table_name
 	 * @return 	string
 	 */
-	private static function getClassName($table_title) {
-		if (isset($table_title) && !empty($table_title)) {
-			return \TTB\Utiles::pascalize("{$table_title}Humanize");
+	private static function getClassName($table_name) {
+		if (isset($table_name) && !empty($table_name)) {
+			return \TTB\Utiles::pascalize("{$table_name}Humanize");
+		}
+		return '';
+	}
+
+	/**
+	 * Obtiene el nombre de la tabla
+	 * @param 	array $data
+	 * @return 	string
+	 */
+	private static function getTableName($data) {
+		if (isset($data) && !empty($data)) {
+			return \TTB\Utiles::pascalize($data->fields['titulo_tabla']);
 		}
 		return '';
 	}
@@ -122,9 +134,9 @@ abstract class Humanize {
 	 * @return 	String
 	 */
 	protected static function literalMessage($data) {
-		$tabla_title = \TTB\Utiles::pascalize($data->fields['titulo_tabla']);
+		$table_name = self::getTableName($data);
 		$value_lower = strtolower($data->fields['valor_nuevo']);
-		return "El {$tabla_title} ha sido {$value_lower}";;
+		return "El {$table_name} ha sido {$value_lower}";;
 	}
 
 	/**
@@ -133,11 +145,11 @@ abstract class Humanize {
 	 * @return 	String
 	 */
 	protected static function activeInactive($data) {
-		$tabla_title = \TTB\Utiles::pascalize($data->fields['titulo_tabla']);
+		$table_name = self::getTableName($data);
 		if ($data->fields['valor_nuevo']) {
-			$string_humanize = "El {$tabla_title} ha sido activado";
+			$string_humanize = "El {$table_name} ha sido activado";
 		} else {
-			$string_humanize = "El {$tabla_title} ha sido desactivado";
+			$string_humanize = "El {$table_name} ha sido desactivado";
 		}
 
 		return $string_humanize;
@@ -149,11 +161,11 @@ abstract class Humanize {
 	 * @return 	String
 	 */
 	protected static function chargeable($data) {
-		$tabla_title = \TTB\Utiles::pascalize($data->fields['titulo_tabla']);
+		$table_name = self::getTableName($data);
 		if ($data->fields['valor_nuevo']) {
-			$string_humanize = "El {$tabla_title} es cobrable";
+			$string_humanize = "El {$table_name} es cobrable";
 		} else {
-			$string_humanize = "El {$tabla_title} no es cobrable";
+			$string_humanize = "El {$table_name} no es cobrable";
 		}
 
 		return $string_humanize;
@@ -165,11 +177,27 @@ abstract class Humanize {
 	 * @return 	String
 	 */
 	protected static function mandatoryActivities($data) {
-		$tabla_title = \TTB\Utiles::pascalize($data->fields['titulo_tabla']);
+		$table_name = self::getTableName($data);
 		if ($data->fields['valor_nuevo']) {
-			$string_humanize = "El {$tabla_title} utiliza actividades obligatorias";
+			$string_humanize = "El {$table_name} utiliza actividades obligatorias";
 		} else {
-			$string_humanize = "El {$tabla_title} no utiliza actividades obligatorias";
+			$string_humanize = "El {$table_name} no utiliza actividades obligatorias";
+		}
+
+		return $string_humanize;
+	}
+
+	/**
+	 * Genera texto humanizado para el campo contrato independiente
+	 * @param 	Array $data
+	 * @return 	String
+	 */
+	protected static function contractToggle($data) {
+		$table_name = self::getTableName($data);
+		if (!empty($data->fields['valor_nuevo'])) {
+			$string_humanize = "El {$table_name} ha pasado a cobrarse de forma independiente";
+		} else {
+			$string_humanize = "El {$table_name} ha dejado de cobrarse de forma independiente";
 		}
 
 		return $string_humanize;

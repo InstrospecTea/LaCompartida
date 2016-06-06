@@ -4,8 +4,7 @@ abstract Class AsuntoHumanize {
 	public static $rules = array(
 		'id_asunto' =>  'literalMessage',
 		'id_tipo_asunto' =>  'valueForValue',
-		'id_contrato' =>  'valueForValue',
-		'id_contrato_indep' =>  'valueForValue',
+		'id_contrato_indep' =>  'contractToggle',
 		'id_area_proyecto' =>  'valueForValue',
 		'id_encargado' =>  'valueForValue',
 		'id_idioma' =>  'valueForValue',
@@ -70,6 +69,7 @@ abstract Class AsuntoHumanize {
 		'id_usuario' => true,
 		'notificado_hr_excedido' => true,
 		'notificado_monto_excedido' => true,
-		'alerta_monto' => true
+		'alerta_monto' => true,
+		'id_contrato' => true
 	);
 }

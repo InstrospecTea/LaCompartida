@@ -1487,4 +1487,27 @@ class Asunto extends Objeto {
 		return $MatterExtraService->saveOrUpdate($MatterExtra);
 	}
 
+	/**
+	 * Reimplementación de Objeto::Edit
+	 * Edita el valor de un campo
+	 * @param string  $field campo de la tabla
+	 * @param mix  $value valor que se asignará
+	 * @param boolean $log_field si es verdadero entonces se guarda el historial del cambio
+	 */
+	public function Edit($field, $value, $log_field = false) {
+		if ((isset($this->log_update) && $this->log_update == true) || $log_field == true) {
+			if ($this->fields[$field] != $value) {
+				if (($value != 'NULL' || ($this->fields[$field]) != '')) {
+					if ((empty($this->fields[$field])) == false || empty($value) == false) {
+						$this->logear[$field] = true;
+						$this->valor_antiguo[$field] = $this->fields[$field];
+					}
+				}
+			}
+		}
+
+		$this->fields[$field] = $value;
+		$this->changes[$field] = true;
+	}
+
 }

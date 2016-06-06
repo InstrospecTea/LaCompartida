@@ -82,6 +82,7 @@ $Form = new Form;
 
 			jQuery('#json_to_table').empty();
 			jQuery('#json_to_table').dialog({
+				modal: true,
 				dialogClass: 'jsonToTable',
 				width: 600,
 				height: 500
