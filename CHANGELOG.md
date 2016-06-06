@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.14
+Monday, Jun 6th
+* **Fix** [Las notas de cobro tienen que ser sumadas si estas fueron fueron anuladas](https://github.com/LemontechSA/ttb/pull/1536)
+
 ## Hotfix 16.15.13
 Monday, Jun 6th
 * **Fix** [Corrige escritura decimales cero/cien](https://github.com/LemontechSA/ttb/pull/1535)
