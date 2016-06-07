@@ -5,7 +5,8 @@ $sesion = new Sesion(array('COB', 'DAT'));
 $pagina = new Pagina($sesion);
 $contrato = new Contrato($sesion);
 $cobros = new Cobro($sesion);
-$Form = new Form;
+$Form = new Form();
+$Html = new \TTB\Html();
 global $contratofields;
 $series_documento = new DocumentoLegalNumero($sesion);
 
@@ -103,8 +104,8 @@ if ($opc == 'buscar') {
 
 	if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
 		$joinfactura = "left join factura f1 on cobro.id_cobro=f1.id_cobro
-                             left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
-                             left join prm_estado_factura pef on f1.id_estado=pef.id_estado ";
+				left join prm_documento_legal prm on f1.id_documento_legal=prm.id_documento_legal
+				left join prm_estado_factura pef on f1.id_estado=pef.id_estado ";
 		if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
 			$documentof = " GROUP_CONCAT(DISTINCT CONCAT(' ', prm.codigo, ' ', IFNULL(serie_documento_legal, '001'), '-', numero, IF(pef.glosa='Anulado', ' (Anulado)', '')))    ";
 		} else {
@@ -223,6 +224,7 @@ if ($opc == 'buscar') {
 		$agrupar_cartas = $opcion[1] == 'agrupar';
 
 		$NotaCobro = new NotaCobro($sesion);
+		header('Set-Cookie: fileDownload=true; path=/');
 		$NotaCobro->GeneraCobrosMasivos($cobros_result, $imprimir_cartas, $agrupar_cartas);
 		die();
 	}
@@ -635,10 +637,9 @@ $pagina->PrintTop();
 						}
 
 						jQuery("#opc").val('buscar');
-						jQuery('#form_busca').attr('action', 'seguimiento_cobro.php?print=true&opcion=' + opciones);
-						jQuery('#form_busca').submit();
-
 						jQuery(this).dialog("close");
+						var loading_modal = new window.LoadingModal();
+						loading_modal.fileDownload('#form_busca', 'seguimiento_cobro.php?print=true&opcion=' + opciones);
 						return true;
 					},
 					"<?php echo __('Cancelar') ?>": function() {
@@ -842,10 +843,11 @@ $pagina->PrintTop();
 	</fieldset>
 
 </form>
+<?= $Html->script(Conf::RootDir() . '/app/layers/assets/js/LoadingModal.js'); ?>
+<?= $Html->css(Conf::RootDir() . '/app/layers/assets/css/LoadingModal.css'); ?>
 <?php
 echo $Form->script();
 if ($opc == 'buscar') {
 	$b->Imprimir('');
 }
-
 $pagina->PrintBottom($popup);
