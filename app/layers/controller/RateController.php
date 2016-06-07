@@ -87,6 +87,7 @@ class RateController extends AbstractController {
 			if ($result == true) {
 				$response->success = true;
 				$response->message = utf8_encode(__('La tarifa trámite se ha eliminado satisfactoriamente'));
+				$response->default_errand_rate = $this->RateBusiness->getDefaultErrandRate();
 			} else {
 				$response->success = false;
 				$response->message = __('Ha ocurrido un problema');
@@ -127,6 +128,7 @@ class RateController extends AbstractController {
 
 			$response->success = $result ? true : false;
 			$response->message = $result ? __('La tarifa se ha modificado satisfactoriamente') : __('Ha ocurrido un problema');
+			$response->rate_id = null;
 		} else {
 			$rates = $this->params['params']['rates'];
 
@@ -142,6 +144,7 @@ class RateController extends AbstractController {
 
 			$response->success = $result->success ? true : false;
 			$response->message = $result->success ? __('La tarifa se ha creado satisfactoriamente') : __('Ha ocurrido un problema: ' . $result->message);
+			$response->rate_id = $result->rate_id;
 		}
 
 		$this->renderJSON($response);

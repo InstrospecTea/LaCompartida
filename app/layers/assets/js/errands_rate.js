@@ -107,6 +107,7 @@ jQuery.loadData = function(rate_id) {
 				tarifa = response['errands_rate_values'][i];
 				jQuery('[name="tarifa_moneda[' + tarifa['id_moneda'] + '][' + tarifa['id_tramite_tipo'] + ']"]').val(tarifa['tarifa']);
 			};
+			jQuery('#id_tramite_tarifa').val(rate_id);
 		}
 	});
 };
@@ -121,10 +122,9 @@ jQuery.deleteRate = function(rate_id) {
 		method: 'POST',
 		success: function(response) {
 			if (response.success) {
-				setTimeout(function(){
-					alert(response.message);
-					location.reload();
-				}, 1);
+				alert(response.message);
+				jQuery('#id_tramite_tarifa').find('option[value="' + rate_id + '"]').remove();
+				jQuery.loadData(response.default_errand_rate);
 			} else {
 				alert(response.message);
 			};
@@ -177,10 +177,21 @@ jQuery.saveRate = function() {
 		method: 'POST',
 		success: function(response) {
 			if (response.success) {
-				setTimeout(function(){
-					alert(response.message);
-					location.reload();
-				}, 1);
+				alert(response.message);
+				if (response.rate_id) {
+					jQuery('#id_tramite_tarifa').
+						append('<option value="' + response.rate_id + '">' +
+										params.glosa_tramite_tarifa +
+										'</option>');
+					jQuery('input[type="text"]').val(null);
+					jQuery('.edicion_tarifa').show();
+					jQuery('.nueva_tarifa').hide();
+					jQuery.loadData(response.rate_id);
+				} else {
+					jQuery('#id_tramite_tarifa').
+						find('option[value="' + params.rate_id + '"]').
+						html(params.glosa_tramite_tarifa);
+				}
 			} else {
 				alert(response.message);
 			};
