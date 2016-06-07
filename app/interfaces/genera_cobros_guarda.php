@@ -217,13 +217,14 @@ if ($print) {
 		$logdir = dirname($error_logfile);
 
 		if ($totaldecobros > 0) {
+			header('Set-Cookie: fileDownload=true; path=/');
 			$NotaCobro->GeneraCobrosMasivos($cobroRT, $imprimir_cartas, $agrupar_cartas, $id_formato, $mostrar_asuntos_cobrables_sin_horas);
 		} else {
 			$detalle_error = '<div id="sql_error" style="margin: 0px auto  0px; width: 414px; border: 1px solid #00782e; padding: 5px; font-family: Arial, Helvetica, sans_serif;font-size:12px;">
 				<div style="background:#00782e;"><img src="' . Conf::ImgDir() . '/logo_top.png" border="0"></div>
 				<div style="padding:10px;text-align:center"><strong style="font-size:14px">Atención</strong><br/><br/>Error al intentar generar los borradores según periodo, no hay datos para los filtros que Ud. ha seleccionado</div>
-			</div>
-			<script type="text/javascript">setTimeout("window.history.back()", 4000);</script>';
+			</div>';
+			header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
 			exit($detalle_error);
 		}
 	} catch(PDOException $pdoe) {

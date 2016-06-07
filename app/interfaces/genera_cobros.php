@@ -2,9 +2,6 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
-require_once dirname(__FILE__) . '/../../fw/classes/Buscador.php';
-require_once dirname(__FILE__) . '/../classes/Trabajo.php';
-
 $sesion = new Sesion(array('COB', 'DAT'));
 $pagina = new Pagina($sesion);
 $contrato = new Contrato($sesion);
@@ -271,7 +268,7 @@ if ($opc == 'buscar') {
 							}
 						}
 					});
-				return
+				return;
 			}
 			var text_window = '<div style="font-size:11px; text-align:center;font-weight:bold;padding:10px;"><?php echo __('Antes de generar los borradores, asegúrese de haber actualizado los tipos de cambio.') ?>';
 			text_window += '<br><div id="tiposdecambio"><br><?php echo '<a class="btn" style="text-decoration: none;border: 1px solid #AAA;display: block;width: 130px;margin: -10px auto;" href="tipo_cambio.php">' . __('Tipos de Cambio actuales') . '</a>'; ?><br>';
@@ -360,13 +357,13 @@ if ($opc == 'buscar') {
 
 
 		} else if (desde == 'print') {
-			jQuery('#form_busca').attr('action', 'genera_cobros_guarda.php?print=true&generar_silenciosamente=1&id_formato=' + id_formato + '&opcion=' + opcion);
-			jQuery('#form_busca').submit();
+			var url = 'genera_cobros_guarda.php?print=true&generar_silenciosamente=1&id_formato=' + id_formato + '&opcion=' + opcion;
+			var loading_modal = new window.LoadingModal();
+			loading_modal.fileDownload('#form_busca', url);
 		} else if (desde == 'excel') {
 
 			jQuery.get('ajax.php?accion=existen_borradores', function(response) {
-				if (response)
-				{
+				if (response) {
 					// No se pueden descargar los borradores si existe un proceso de generación de cobros pendiente
 					if (ProcessLock()) {
 						return;
@@ -418,9 +415,11 @@ if ($opc == 'buscar') {
 										jQuery("#opc_mostrar_asuntos_cobrables_sin_horas").val(jQuery("#form_asuntos_sin_horas").is(":checked") ? '1' : '0');
 										jQuery("#forzar_username").val(jQuery("#form_forzar_username").is(":checked") ? 1 : 0);
 
-										form.action = 'genera_cobros.php';
-										form.opc.value = 'excel';
-										form.submit();
+										jQuery('#opc').val('excel');
+										var loading_modal = new window.LoadingModal();
+										loading_modal.fileDownload('#form_busca', 'genera_cobros.php');
+										jQuery(this).dialog('close');
+										return false;
 									},
 									"<?php echo __('Cancelar') ?>": function() {
 										jQuery(this).dialog('close');
@@ -433,7 +432,6 @@ if ($opc == 'buscar') {
 					return false;
 				}
 			});
-
 
 		} else if (desde == 'emitir') {
 			if (jQuery('#modal_emitir_cobros').length == 1) {
@@ -607,9 +605,9 @@ if ($opc == 'buscar') {
 					}
 				});
 		} else if (desde == 'asuntos_liquidar') {
-			form.action = 'genera_cobros.php';
-			form.opc.value = 'asuntos_liquidar';
-			form.submit();
+			jQuery('#opc').val('asuntos_liquidar');
+			var loading_modal = new window.LoadingModal();
+			loading_modal.fileDownload('#form_busca', 'genera_cobros.php');
 		} else {
 			form.action = 'genera_cobros.php';
 			form.opc.value = 'buscar';
@@ -1565,5 +1563,9 @@ function url_cobro_individual($id_contrato, $codigo_cliente, $glosa_cliente, $fo
 		$arrayMIXTAS[] = $id_contrato;
 	}
 }
+
+$Html = new \TTB\Html();
+echo $Html->script(Conf::RootDir() . '/app/layers/assets/js/LoadingModal.js');
+echo $Html->css(Conf::RootDir() . '/app/layers/assets/css/LoadingModal.css');
 
 $pagina->PrintBottom($popup);

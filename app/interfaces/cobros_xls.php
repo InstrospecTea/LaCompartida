@@ -2773,6 +2773,7 @@ if ($cont_hitos > 0) {
 if (isset($ws)) {
 	// Se manda el archivo aquí para que no hayan errores de headers al no haber resultados.
 	if (!$guardar_respaldo) {
+		header('Set-Cookie: fileDownload=true; path=/');
 		$wb->send('Resumen de ' . __('cobro') . '_' . $cobro->fields['id_cobro'] . '.xls');
 	}
 }
