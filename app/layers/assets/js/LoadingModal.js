@@ -20,7 +20,22 @@
 						$(this).dialog('destroy').remove();
 					}
 				},
-				data: form ? $(form).serialize() : data
+				data: form ? $(form).serialize() : data,
+				failCallback: function (html, url) {
+					var $el = $('.loadingModal .ui-dialog-content');
+					$el.css({'padding': '.5em', 'text-align': 'center', 'vertical-align': 'middle'});
+					$el.dialog({height:'auto'});
+					$('.ui-dialog-titlebar').text('Error');
+					var $button = $('<button/>').text('Cerrar');
+					var $button_pane = $('<div/>').addClass('ui-dialog-buttonpane ui-widget-content ui-helper-clearfix');
+					$button_pane.append($button);
+					$('.loadingModal').append($button_pane);
+					$('.loadingModal').removeClass('loadingModal');
+					$button.on('click', function() {
+						$el.dialog('close');
+					});
+					return false;
+				}
 			});
 		};
 
