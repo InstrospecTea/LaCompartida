@@ -43,7 +43,7 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
-		return "DATE_FORMAT(%token%, '%m-%Y')";
+		return "DATE_FORMAT(%token%, '%Y-%m')";
 	}
 
 	/**
@@ -51,7 +51,7 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return "DATE_FORMAT(%token%, '%m-%Y')";
+		return "DATE_FORMAT(%token%, '%Y-%m')";
 	}
 
 	/**
@@ -59,7 +59,7 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
-		return "DATE_FORMAT(%token%, '%m-%Y')";
+		return "DATE_FORMAT(%token%, '%Y-%m')";
 	}
 
 	/**
