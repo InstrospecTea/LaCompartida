@@ -6,7 +6,6 @@ $pagina = new Pagina($sesion);
 $contrato = new Contrato($sesion);
 $cobros = new Cobro($sesion);
 $Form = new Form();
-$Html = new \TTB\Html();
 global $contratofields;
 $series_documento = new DocumentoLegalNumero($sesion);
 
@@ -843,8 +842,6 @@ $pagina->PrintTop();
 	</fieldset>
 
 </form>
-<?= $Html->script(Conf::RootDir() . '/app/layers/assets/js/LoadingModal.js'); ?>
-<?= $Html->css(Conf::RootDir() . '/app/layers/assets/css/LoadingModal.css'); ?>
 <?php
 echo $Form->script();
 if ($opc == 'buscar') {

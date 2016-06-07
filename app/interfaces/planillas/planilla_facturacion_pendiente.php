@@ -5,8 +5,6 @@ require_once dirname(__FILE__) . '/../../conf.php';
 $tini = time();
 $fechactual = date('Ymd');
 
-$Html = new \TTB\Html;
-
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
@@ -714,8 +712,6 @@ $pagina->PrintTop();
 <style>
 	.formwidth {width:<?php echo ($AtacheSecundarioSoloAsunto ? 600 : 400); ?>px;}
 </style>
-<?= $Html->script(Conf::RootDir() . '/app/layers/assets/js/LoadingModal.js'); ?>
-<?= $Html->css(Conf::RootDir() . '/app/layers/assets/css/LoadingModal.css'); ?>
 <form method=post name=formulario id="formulario" action="#">
 
 	<input type="hidden" name="reporte" value="generar" />
