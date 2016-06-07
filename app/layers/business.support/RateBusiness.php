@@ -196,13 +196,7 @@ class RateBusiness extends AbstractBusiness implements IRateBusiness {
 	 * @return boolean
 	 */
 	public function updateDefaultErrandRateOnContracts($errand_rate_id) {
-		$Criteria = new Criteria($this->Session);
-		$id_tramite_tarifa = $Criteria->add_select('id_tramite_tarifa', 'id_tramite_tarifa')
-			->add_from('tramite_tarifa')
-			->add_restriction(CriteriaRestriction::equals('tarifa_defecto', 1))
-			->run();
-
-		$id_tramite_tarifa_defecto = $id_tramite_tarifa[0]['id_tramite_tarifa'];
+		$id_tramite_tarifa_defecto = $this->getDefaultErrandRate();
 
 		$query = "UPDATE contrato SET id_tramite_tarifa = {$id_tramite_tarifa_defecto} WHERE id_tramite_tarifa = {$errand_rate_id}";
 		$this->Session->pdodbh->query($query);
@@ -221,5 +215,19 @@ class RateBusiness extends AbstractBusiness implements IRateBusiness {
 			->run();
 
 		return $num_contratos[0]['num_rows'];
+	}
+
+	/**
+	 * Retorna la tarifa trámite por defecto
+	 * @return int
+	 */
+	public function getDefaultErrandRate() {
+		$Criteria = new Criteria($this->Session);
+		$id_tramite_tarifa = $Criteria->add_select('id_tramite_tarifa', 'id_tramite_tarifa')
+			->add_from('tramite_tarifa')
+			->add_restriction(CriteriaRestriction::equals('tarifa_defecto', 1))
+			->run();
+
+		return $id_tramite_tarifa[0]['id_tramite_tarifa'];
 	}
 }
