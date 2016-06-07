@@ -42,8 +42,7 @@ $pagina->titulo = __('Clientes');
 $pagina->PrintTop();
 $Form = new Form();
 ?>
-<?= $Html->script(Conf::RootDir() . '/app/layers/assets/js/LoadingModal.js'); ?>
-<?= $Html->css(Conf::RootDir() . '/app/layers/assets/css/LoadingModal.css'); ?>
+
 <script type="text/javascript">
 function Validar(form)
 {
