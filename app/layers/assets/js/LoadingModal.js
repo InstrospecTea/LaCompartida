@@ -6,7 +6,7 @@
 		$divs.append($('<div/>').addClass('bounce1'));
 		$divs.append($('<div/>').addClass('bounce2'));
 		$divs.append($('<div/>').addClass('bounce3'));
-		this.fileDownload = function (id_data, url) {
+		this.fileDownload = function (form, url, data) {
 			$.fileDownload(url, {
 				preparingMessageHtml: $divs,
 				failMessageHtml: "Se produjo un error generando el documento, por favor intente nuevamente.",
@@ -20,7 +20,7 @@
 						$(this).dialog('destroy').remove();
 					}
 				},
-				data: $(id_data).serialize()
+				data: form ? $(form).serialize() : data
 			});
 		};
 
