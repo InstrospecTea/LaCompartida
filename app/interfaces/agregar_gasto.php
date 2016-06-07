@@ -166,6 +166,9 @@ if ($opcion == "guardar") {
 
 		$gasto->Edit('id_proveedor', $id_proveedor ? $id_proveedor : NULL);
 		$gasto->Edit('estado_pago', !empty($estado_pago) ? $estado_pago : NULL);
+		if (Conf::GetConf($sesion, 'OrdenadoPor')) {
+			$gasto->Edit('solicitante', $solicitante ? addslashes($solicitante) : null);
+		}
 
 		if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) {
 			if (Gasto::VerificaIdentificador($sesion, $autoincrementable, $id_gasto) == "1"){
@@ -199,6 +202,8 @@ $Form = new Form;
 ?>
 
 <script type="text/javascript">
+	<?= UtilesApp::GetConfJS($sesion, 'OrdenadoPor'); ?>
+
 	if (parent.window.Refrescarse) {
 		parent.window.Refrescarse();
 	} else if (window.opener.Refrescar) {
@@ -301,13 +306,22 @@ $Form = new Form;
 			jQuery('#id_usuario').val(<?php echo $id_usuario; ?>);
 		}
 
+		if (OrdenadoPor == 1 && !jQuery('#solicitante').val()) {
+			alert("<?php echo __('Debe ingresar la persona que solicitó el gasto') ?>");
+			jQuery('#solicitante').focus();
+			return false;
+		}
+
 		<?php if (Conf::GetConf($sesion, 'TodoMayuscula')) { ?>
 			if (jQuery('#descripcion').val()) {
 				jQuery('#descripcion').val(jQuery('#descripcion').val().toUpperCase());
 			}
+			if (OrdenadoPor) {
+				jQuery('#solicitante').val(jQuery('#solicitante').val().toUpperCase());
+			}
 		<?php } ?>
 
-		return true
+		return true;
 	}
 
 	function CheckEliminaIngreso(chk) {
@@ -761,6 +775,16 @@ $Form = new Form;
 		<tr>
 			<td align="right" colspan="2">&nbsp;</td>
 		</tr>
+		<?php if (Conf::GetConf($sesion, 'OrdenadoPor')): ?>
+			<tr>
+				<td align="right">
+					<?= $Form->label(__('Solicitado por'), 'solicitante'); ?>
+				</td>
+				<td align="left">
+					<?= $Form->input('solicitante', $gasto->fields['solicitante'], array('size' => '32', 'label' => false)); ?>
+				</td>
+			</tr>
+		<?php endif; ?>
 		<?php
 		$usuario_defecto = empty($gasto->fields['id_movimiento']) ? $sesion->usuario->fields['id_usuario'] : '';
 		if ($prov == 'false') { ?>
