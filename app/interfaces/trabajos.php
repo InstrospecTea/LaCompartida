@@ -1225,7 +1225,10 @@ echo $Form->script();
 						buttons: {
 							"<?php echo __('Entiendo y acepto') ?>": function() {
 								jQuery('#descargapro').removeAttr('disabled');
-								window.location.href = 'trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel=1&simplificado=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>';
+
+								var loading_modal = new window.parent.LoadingModal();
+								loading_modal.fileDownload(null, 'trabajos.php?excel=1', jQuery('#form_trabajos').serialize());
+
 								dialogoconfirma.dialog( "close" );
 
 								return true;
@@ -1242,7 +1245,10 @@ echo $Form->script();
 					});
 				} else {
 					jQuery('#descargapro').removeAttr('disabled');
-					window.location.href='trabajos.php?id_cobro=<?php echo $id_cobro ?>&excel=1&motivo=<?php echo $motivo ?>&where=<?php echo urlencode(base64_encode($where)) ?>';
+
+					var loading_modal = new window.parent.LoadingModal();
+					loading_modal.fileDownload(null, 'trabajos.php?excel=1', jQuery('#form_trabajos').serialize());
+
 					return true;
 				}
 			});

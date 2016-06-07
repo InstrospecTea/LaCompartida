@@ -30,6 +30,7 @@ class HTMLtoXLS {
 		header('Expires: 0');
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('content-disposition: attachment;filename=planillon_trabajos.xls');
+		header('Set-Cookie: fileDownload=true; path=/');
 
 		echo '<HTML LANG="es">
 		<title>Planillon de Trabajos</title>
@@ -139,8 +140,8 @@ if ($p_profesional->fields['permitido']) {
 }
 
 // Le muestro la tarifa cuando tiene el Conf, es profesional no revisor
-$mostrar_tarifa_al_profesional = 
-	UtilesApp::GetConf($sesion, 'MostrarTarifaAlProfesional') && 
+$mostrar_tarifa_al_profesional =
+	UtilesApp::GetConf($sesion, 'MostrarTarifaAlProfesional') &&
 	$profesionalpermitido && !$revisorpermitido;
 
 
@@ -219,7 +220,7 @@ while ($trabajo = mysql_fetch_array($resptrabajo)) {
 		while ($cifras_decimales--) {
 			$decimales .= '0';
 		}
-	} else { 
+	} else {
 		$decimales = '';
 	}
 
@@ -246,7 +247,7 @@ while ($trabajo = mysql_fetch_array($resptrabajo)) {
 	$text_descripcion = addslashes($trabajo['descripcion']);
 
 	$fila[$col_descripcion] = $text_descripcion;
-	
+
 	if ($UsaUsernameEnTodoElSistema) {
 		$fila[$col_nombre_usuario] = $trabajo['username'];
 	} else {
@@ -259,7 +260,7 @@ while ($trabajo = mysql_fetch_array($resptrabajo)) {
 	$dd = number_format($duracion_decimal, 1, '.', '');
 	$duracionfinal+=$duracion_decimal;
 	$tiempo_excel = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
-	
+
 	if ($TipoIngresoHorasdecimal) {
 		$fila[$col_duracion] = "$dd";
 	} else {
@@ -286,7 +287,7 @@ while ($trabajo = mysql_fetch_array($resptrabajo)) {
 		$fila[$col_duracion_cobrada] = '';
 	}
 	$fila[$col_cobrable] = $trabajo['cobrable'] == 1 ? "SI" : "NO";
-	
+
 	if ($cobranzapermitido || $mostrar_tarifa_al_profesional) {
 		// Tratamos de sacar la tarifa del trabajo, si no está guardada usamos la tarifa estándar.
 		if ($trabajo['tarifa_hh'] > 0 && !empty($trabajo['estado_cobro']) && $trabajo['estado_cobro'] != 'CREADO' && $trabajo['estado_cobro'] != 'EN REVISION') {

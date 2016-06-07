@@ -32,6 +32,7 @@ $mostrar_tarifa_al_profesional = Conf::GetConf($sesion, 'MostrarTarifaAlProfesio
 
 $wb = new Spreadsheet_Excel_Writer();
 
+header('Set-Cookie: fileDownload=true; path=/');
 $wb->setVersion(8);
 $wb->send('Revisión de horas.xls');
 $wb->setCustomColor(35, 220, 255, 220);
