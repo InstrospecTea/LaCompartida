@@ -18,7 +18,7 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 		return array('campo_fecha');
 	}
 
-	public function getDateField() {
+	public function getDateField($format = '%m-%Y') {
 		switch ($this->filterValues['campo_fecha']) {
 			case 'cobro':
 				$field_name = 'cobro.fecha_fin';
@@ -36,7 +36,7 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 				$field_name = 'trabajo.fecha';
 				break;
 		}
-		return "DATE_FORMAT({$field_name}, '%m-%Y')";
+		return "DATE_FORMAT({$field_name}, '{$format}')";
 	}
 	/**
 	 * Obtiene el campo por el cual se agrupará la query
@@ -72,9 +72,9 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 			$this->getDateField(),
 			'mes_reporte'
 		)->add_grouping(
-			$this->getGroupField()
+			$this->getDateField()
 		)->add_ordering(
-			$this->getOrderField()
+			$this->getDateField('%Y-%m')
 		);
 	}
 
