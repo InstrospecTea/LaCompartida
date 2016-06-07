@@ -92,6 +92,8 @@ jQuery.loadData = function(rate_id) {
 			var tarifa;
 			jQuery('[name="glosa_tramite_tarifa"]').val(response.errand_rate_detail.glosa_tramite_tarifa);
 			jQuery('[name="tarifa_defecto"]').val(response.errand_rate_detail.tarifa_defecto);
+			jQuery('[name="checkbox_tarifa_defecto"]').
+				attr('checked', response.errand_rate_detail.tarifa_defecto == 1 ? true : false);
 			jQuery('[name="id_tramite_tarifa_edicion"]').val(response.errand_rate_detail.id_tramite_tarifa);
 			jQuery('.tarifas').val(null);
 
@@ -191,6 +193,7 @@ jQuery.saveRate = function() {
 					jQuery('#id_tramite_tarifa').
 						find('option[value="' + params.rate_id + '"]').
 						html(params.glosa_tramite_tarifa);
+					jQuery.loadData(params.rate_id);
 				}
 			} else {
 				alert(response.message);
