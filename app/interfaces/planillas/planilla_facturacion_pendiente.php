@@ -5,6 +5,8 @@ require_once dirname(__FILE__) . '/../../conf.php';
 $tini = time();
 $fechactual = date('Ymd');
 
+$Html = new \TTB\Html;
+
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
@@ -26,6 +28,7 @@ if ($AtacheSecundarioSoloAsunto) {
 set_time_limit(3600);
 
 if ($xls) {
+	header('Set-Cookie: fileDownload=true; path=/');
 	$mp = new \TTB\Mixpanel();
 	$mp->identifyAndTrack($RUT, 'Reporte Horas x Facturar');
 	$fecha1 = date('Y-m-d', strtotime($fecha1));
@@ -711,7 +714,9 @@ $pagina->PrintTop();
 <style>
 	.formwidth {width:<?php echo ($AtacheSecundarioSoloAsunto ? 600 : 400); ?>px;}
 </style>
-<form method=post name=formulario action="planilla_facturacion_pendiente.php?xls=1">
+<?= $Html->script(Conf::RootDir() . '/app/layers/assets/js/LoadingModal.js'); ?>
+<?= $Html->css(Conf::RootDir() . '/app/layers/assets/css/LoadingModal.css'); ?>
+<form method=post name=formulario id="formulario" action="#">
 
 	<input type="hidden" name="reporte" value="generar" />
 	<table  class="border_plomo tb_base" style="width:<?php echo ($AtacheSecundarioSoloAsunto ? 650 : 400); ?>px;">
@@ -798,11 +803,20 @@ $pagina->PrintTop();
 
 			<td align=right colspan="4">
 				<input type="hidden" name="debug" value="<?php echo $debug ?>" />
-				<input type="submit" class=btn value="<?php echo __('Generar reporte') ?>" name="btn_reporte">
+				<input type="button" class=btn value="<?php echo __('Generar reporte') ?>" id="btn_reporte">
 			</td><td>&nbsp;</td>
 		</tr>
 	</table>
 </form>
+<script type="text/javascript">
+	var loading_modal = new window.LoadingModal();
+	jQuery(function() {
+		jQuery('#btn_reporte').click(function(e) {
+			url = 'planilla_facturacion_pendiente.php?xls=1'
+			loading_modal.fileDownload('#formulario', url);
+		});
+	});
+</script>
 <?php
 echo InputId::Javascript($sesion);
 $pagina->PrintBottom();
