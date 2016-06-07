@@ -1,17 +1,18 @@
 .loadingModal .ui-dialog-titlebar {
-	visibility: hidden;
+	display: none;
 }
 
-.ui-dialog {
+.loadingModal.ui-dialog,
+.loadingModal .ui-dialog-content {
 	text-align: center;
 	background-color: rgba(255, 255, 255, 0.0);
 	border: none;
 }
 
-.ui-dialog-content > div {
+.bounces > div {
   width: 18px;
   height: 18px;
-  background-color: #333;
+  background-color: #fff;
 
   border-radius: 100%;
   display: inline-block;
@@ -19,20 +20,17 @@
   animation: sk-bouncedelay 1.4s infinite ease-in-out both;
 }
 
-.ui-dialog-content .bounce1 {
+.bounces .bounce1 {
   -webkit-animation-delay: -0.32s;
   animation-delay: -0.32s;
-  background-color: #FFF; 
 }
 
-.ui-dialog-content .bounce2 {
+.bounces .bounce2 {
   -webkit-animation-delay: -0.16s;
   animation-delay: -0.16s;
-  background-color: #FFF;
 }
 
-.ui-dialog-content .bounce3 {
-  background-color: #FFF;
+.bounces .bounce3 {
 }
 
 @-webkit-keyframes sk-bouncedelay {
