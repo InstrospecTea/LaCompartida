@@ -22,8 +22,8 @@ class CellFormat {
 		);
 	}
 
-	public function add($alias, array $normal = array(), array $even = array(), array $odd = array()) {
-		if ($this->has($alias)) {
+	public function add($alias, array $normal = array(), array $even = array(), array $odd = array(), $replace = false) {
+		if ($this->has($alias) && !$replace) {
 			return $this->get($alias);
 		}
 		$formats = array();
