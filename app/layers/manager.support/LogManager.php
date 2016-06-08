@@ -38,15 +38,18 @@ class LogManager extends AbstractManager implements ILogManager {
 			$old_value_field = $value->get('valor_antiguo');
 			$new_value_field = $value->get('valor_nuevo');
 
+			$special_service_method = $relations[$campo_tabla]['special_service_method'];
+			$service_method = $special_service_method ? $special_service_method : 'get';
+
 			$this->loadService($service_name);
 			try {
-				$old_value = $this->$service_class->get($old_value_field, $field);
+				$old_value = $this->$service_class->$service_method($old_value_field, $field);
 				$logs[$key]->set('valor_antiguo', $old_value->get($field));
 			} catch (ServiceException $e) {
 			}
 
 			try {
-				$new_value = $this->$service_class->get($new_value_field, $field);
+				$new_value = $this->$service_class->$service_method($new_value_field, $field);
 				$logs[$key]->set('valor_nuevo', $new_value->get($field));
 			} catch (ServiceException $e) {
 			}

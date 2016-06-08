@@ -27,20 +27,26 @@ abstract Class AsuntoHumanize {
 
 	public static $relations = array(
 		'id_idioma' => array(
-										'service_name' => 'Language',
-										'field' => 'glosa_idioma'),
+			'service_name' => 'Language',
+			'field' => 'glosa_idioma'
+		),
 		'id_area_proyecto' => array(
-										'service_name' => 'ProjectArea',
-										'field' => 'glosa'),
+			'service_name' => 'ProjectArea',
+			'field' => 'glosa'
+		),
 		'id_encargado' => array(
-										'service_name' => 'User',
-										'field' => "concat(nombre, ' ', apellido1)"),
+			'service_name' => 'User',
+			'field' => "concat(nombre, ' ', apellido1)"
+		),
 		'codigo_cliente' => array(
-										'service_name' => 'Client',
-										'field' => 'glosa_cliente'),
+			'service_name' => 'Client',
+			'field' => 'glosa_cliente',
+			'special_service_method' => 'getByCode'
+		),
 		'id_tipo_asunto' => array(
-										'service_name' => 'MatterType',
-										'field' => 'glosa_tipo_proyecto')
+			'service_name' => 'MatterType',
+			'field' => 'glosa_tipo_proyecto'
+		)
 	);
 
 	public static $dictionary = array(
