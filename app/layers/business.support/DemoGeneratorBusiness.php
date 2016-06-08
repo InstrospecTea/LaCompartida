@@ -342,7 +342,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 	}
 
 	private function payCharge($sended, $end_date, $limit_date) {
-		if (!($end_date < $limit_date - 7776000 || ( $sended && rand(0, 100) < 60 ))) {
+		if (!($end_date < $limit_date - 7776000 && ( $sended && rand(0, 100) < 60 ))) {
 			return;
 		}
 		$this->loadModel('CobroMoneda');
@@ -454,7 +454,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 	private function getLastWorkDate() {
 		$this->loadService('Work');
 		$Work = $this->WorkService->findFirst(null, 'fecha', 'id_trabajo DESC');
-		if ($Work === false) {
+		if ($Work === false || $Work->get('fecha') == '0000-00-00' || $Work->get('fecha') < date('Y-m-d', strtotime('-1 year'))) {
 			$date = strtotime('-1 year');
 		} else {
 			$date = strtotime($Work->get('fecha'));
@@ -487,7 +487,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 	}
 
 	private function daysBetweenDates($start_date, $end_date) {
-		return (($end_date - $start_date) / 60 / 60 / 24);
+		return round(($end_date - $start_date) / 60 / 60 / 24);
 	}
 
 }
