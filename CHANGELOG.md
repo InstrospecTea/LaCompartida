@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.16.0](https://github.com/LemontechSA/ttb/pull/1545)
+Wednesday, Jun 8th
+* **Feature** [Mejorar comportamiento del "Loading" de la aplicación](https://github.com/LemontechSA/ttb/pull/1468)
+
 ## Hotfix 16.15.16
 Wednesday, Jun 8th
 * **Fix** [Problema fecha excel borradores masivos](https://github.com/LemontechSA/ttb/pull/1544)
