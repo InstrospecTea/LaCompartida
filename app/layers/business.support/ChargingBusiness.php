@@ -1031,6 +1031,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_select('factura.cliente')
 			->add_select('factura.numero')
 			->add_select('factura.id_moneda', 'moneda_factura')
+			->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio), 0)", 'total_factura')
+			->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio), 0)", 'total_nc')
 			->add_from('factura')
 			->add_left_join_with('prm_documento_legal', 'prm_documento_legal.id_documento_legal = factura.id_documento_legal')
 			->add_left_join_with('cobro', 'cobro.id_cobro = factura.id_cobro')
@@ -1053,15 +1055,13 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$start_date = "'{$parameters['start_date']} 00:00:00'";
 		$end_date = "'{$parameters['end_date']} 23:59:59'";
+
 		if (!$annulled) {
 			$CriteriaInvoice
 				->add_select('DATE_FORMAT(factura.fecha, "%Y%m")', 'mes_contable')
-				->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio), 0)", 'total_factura')
-				->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio), 0)", 'total_nc')
 				->add_restriction(CriteriaRestriction::between('factura.fecha', $start_date, $end_date));
 		} else {
 			$CriteriaInvoice
-				->add_select("({$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio))", 'total_factura')
 				->add_select('DATE_FORMAT(factura.fecha_anulacion, "%Y%m")', 'mes_contable')
 				->add_restriction(CriteriaRestriction::between('factura.fecha_anulacion', $start_date, $end_date));
 		}
@@ -1102,7 +1102,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		if (!$annulled) {
 			$CriteriaSale->add_select('SUM(ventas.total_factura - ventas.total_nc)', 'total_period');
 		} else {
-			$CriteriaSale->add_select('SUM(ventas.total_factura * -1)', 'total_period');
+			$CriteriaSale->add_select('SUM((ventas.total_factura * -1) + ventas.total_nc)', 'total_period');
 		}
 
 		$CriteriaSale

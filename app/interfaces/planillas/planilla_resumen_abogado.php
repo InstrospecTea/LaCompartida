@@ -262,7 +262,7 @@ foreach ($filas_nombres as $filas) {
 //Recorro el arreglo ingresando los datos
 foreach ($resultado as $u => $tipo_dato) {
 	//Veo el profesional
-	$profesional = $nombres_paginas[$u];
+	$profesional = array_shift(explode("\n", wordwrap($nombres_paginas[$u], 31)));
 	$ws1 = & $wb->addWorksheet($profesional);
 	$ws1->setInputEncoding('utf-8');
 	$ws1->fitToPages(1, 1);

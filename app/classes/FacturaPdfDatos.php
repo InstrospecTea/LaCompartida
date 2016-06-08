@@ -73,7 +73,7 @@ class FacturaPdfDatos extends Objeto {
 		}
 
 		$Cliente = new Cliente($this->sesion);
-    	$Cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
+		$Cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 
 		$chargingBusiness = new ChargingBusiness($this->sesion);
 		$coiningBusiness = new CoiningBusiness($this->sesion);
@@ -83,37 +83,31 @@ class FacturaPdfDatos extends Objeto {
 		$condicion_pago = $factura->ObtieneGlosaCondicionPago();
 		// Segmento Monto en palabra solicitado por @gtigre
 		$arreglo_monedas = Moneda::GetMonedas($this->sesion, null, true);
-		$monto_palabra = new MontoEnPalabra($this->sesion);
 
 		$monto_total_factura = $factura->fields['total'];
 
 		list ($monto_parte_entera, $monto_parte_decimal) = explode('.',$monto_total_factura);
 
-		$glosa_moneda_cero_cien = __($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda']);
-		$glosa_moneda_plural_cero_cien = __($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']);
-
-		$glosa_moneda = __($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda']);
 		$glosa_moneda_plural = __($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']);
 
-		if (strlen($monto_parte_decimal) == '2') {
-			$fix_decimal = '1';
-		} else {
-			$fix_decimal = '10';
-		}
+		$con = __('CON');
+		$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, $codigo));
+		$monto_total_palabra_fix = "{$monto_palabra_parte_entera} {$glosa_moneda_plural}";
 
 		if (empty($monto_parte_decimal)) {
-			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, $codigo));
-			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
-			$monto_en_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' 00/100 ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
+			$monto_parte_decimal_fix = '00';
 		} else {
-			$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, $codigo));
-			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal * $fix_decimal, $codigo));
-			$monto_total_palabra_fix = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1') . ' ' . __('CON') . ' ' . $monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
-			$monto_en_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' ' . ($monto_parte_decimal * $fix_decimal) . '/100 ' . mb_strtoupper($glosa_moneda_plural, 'ISO-8859-1');
+			$centavos = __('CENTAVOS');
+			$fix_decimal = strlen($monto_parte_decimal) == 2 ? 1 : 10;
+			$monto_parte_decimal *= $fix_decimal;
+			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal, $codigo));
+			$monto_total_palabra_fix .= " {$con} {$monto_palabra_parte_decimal} {$centavos}";
+			$monto_parte_decimal_fix = str_pad($monto_parte_decimal, 2, '0', STR_PAD_LEFT);
 		}
 
-		// Segmento Glosa Detraccion Solicitado por @gtigre para Hernandez
+		$monto_en_palabra_cero_cien = "{$monto_palabra_parte_entera} {$con} {$monto_parte_decimal_fix}/100 {$glosa_moneda_plural}";
 
+		// Segmento Glosa Detraccion Solicitado por @gtigre para Hernandez
 		$tipo_cambio_usd = $arreglo_monedas[2]['tipo_cambio'];
 		$cifras_decimales_usd = $arreglo_monedas[2]['cifras_decimales'];
 

@@ -200,7 +200,7 @@ class Serengeti  extends Ledes{
 				'CLIENT_MATTER_ID' => $trabajo['codigo_homologacion'],
 				'MATTER_NAME' => $trabajo['glosa_asunto'],
 				'CLIENT_TAX_ID' => $trabajo['rut'],
-				'LINE_ITEM_TAX_RATE' => $porcentaje_impuesto,
+				'LINE_ITEM_TAX_RATE' => $porcentaje_impuesto / 100,
 				'LINE_ITEM_TAX_TOTAL' => $impuesto,
 				'INVOICE_NET_TOTAL' => $Cobro->fields['monto_subtotal'],
 				'INVOICE_CURRENCY' => $this->currency->fields['codigo'],

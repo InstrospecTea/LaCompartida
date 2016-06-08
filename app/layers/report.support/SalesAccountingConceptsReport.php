@@ -120,7 +120,7 @@ class SalesAccountingConceptsReport extends AbstractReport implements ISalesAcco
 					$total_period = $sale_client['periods'][$period_key];
 				}
 				$format = $total_period >= 0 ? $this->format['currency'] : $this->format['currency_red'];
-				$this->Ws->write($this->row, $col, $total_period, $format);
+				$this->Ws->writeNumber($this->row, $col, $total_period, $format);
 				$col++;
 			}
 
