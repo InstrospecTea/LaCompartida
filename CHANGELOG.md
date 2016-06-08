@@ -1,5 +1,21 @@
 # Changelog
 
+## Hotfix 16.15.16
+Wednesday, Jun 8th
+* **Fix** [Problema fecha excel borradores masivos](https://github.com/LemontechSA/ttb/pull/1544)
+
+## Hotfix 16.15.15
+Tuesday, Jun 7th
+* **Fix** [Problema en el excel de borradores masivos](https://github.com/LemontechSA/ttb/pull/1542)
+
+## Hotfix 16.15.14
+Monday, Jun 6th
+* **Fix** [Las notas de cobro tienen que ser sumadas si estas fueron fueron anuladas](https://github.com/LemontechSA/ttb/pull/1536)
+
+## Hotfix 16.15.13
+Monday, Jun 6th
+* **Fix** [Corrige escritura decimales cero/cien](https://github.com/LemontechSA/ttb/pull/1535)
+
 ## Hotfix 16.15.12
 Friday, Jun 3rd
 * **Fix** [Limita el tamaño del nombre de la hoja a 31 caracteres.](https://github.com/LemontechSA/ttb/pull/1530)
