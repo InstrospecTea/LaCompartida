@@ -1564,8 +1564,4 @@ function url_cobro_individual($id_contrato, $codigo_cliente, $glosa_cliente, $fo
 	}
 }
 
-$Html = new \TTB\Html();
-echo $Html->script(Conf::RootDir() . '/app/layers/assets/js/LoadingModal.js');
-echo $Html->css(Conf::RootDir() . '/app/layers/assets/css/LoadingModal.css');
-
 $pagina->PrintBottom($popup);
