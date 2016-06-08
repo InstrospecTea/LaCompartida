@@ -33,9 +33,11 @@ class AdvancesController extends AbstractController {
 
 		$page = empty($this->params['page']) ? null : $this->params['page'];
 		$this->loadBusiness('Advancing');
-		$searchResult = $this->AdvancingBusiness->getList($this->data, 20, $page);
+		$searchResult = $this->AdvancingBusiness->getList($this->data, $page, 20);
+		$Pagination = $searchResult->get('Pagination');
+		$Pagination->query_array($this->params);
 		$this->set('listResults', $searchResult->get('data'));
-		$this->set('Pagination', $searchResult->get('Pagination'));
+		$this->set(compact('Pagination'));
 	}
 
 	public function isUsedInPay($id_cobro, $id_documento_pago) {

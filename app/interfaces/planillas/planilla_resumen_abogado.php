@@ -213,7 +213,7 @@ if ($lista_usuarios == "") {
 $tipo_dato = array('horas_trabajadas', 'horas_cobradas', 'horas_por_cobrar', 'horas_castigadas', 'horas_no_cobrables', 'valor_cobrado');
 foreach ($usuarios as $usuario) {
 	foreach ($tipo_dato as $td) {
-		$reporte = new Reporte($Sesion);
+		$reporte = new ReporteCriteria($Sesion);
 		if (is_array($forma_cobro)) {
 			foreach ($forma_cobro as $fc) {
 				$reporte->addFiltro('cobro', 'forma_cobro', $fc);
@@ -262,7 +262,7 @@ foreach ($filas_nombres as $filas) {
 //Recorro el arreglo ingresando los datos
 foreach ($resultado as $u => $tipo_dato) {
 	//Veo el profesional
-	$profesional = $nombres_paginas[$u];
+	$profesional = array_shift(explode("\n", wordwrap($nombres_paginas[$u], 31)));
 	$ws1 = & $wb->addWorksheet($profesional);
 	$ws1->setInputEncoding('utf-8');
 	$ws1->fitToPages(1, 1);
