@@ -443,6 +443,9 @@ foreach ($chargeResults as $charge) {
 		}
 	}
 
+	$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
+	$idioma->Load($cobro->fields['codigo_idioma']);
+
 	/*
 	 *	Estas variables son necesario para poder decidir si se imprima una tabla o no,
 	 *	generalmente si no tiene data no se escribe
@@ -470,6 +473,8 @@ foreach ($chargeResults as $charge) {
 	$cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 
 	$simbolo_moneda = Utiles::glosa($sesion, $cobro->fields['opc_moneda_total'], 'simbolo', 'prm_moneda', 'id_moneda');
+	$glosa_moneda = Utiles::glosa($sesion, $cobro->fields['opc_moneda_total'], 'glosa_moneda', 'prm_moneda', 'id_moneda');
+
 	if ($glosa_moneda == "Euro") {
 		$simbolo_moneda = "EUR";
 	}
