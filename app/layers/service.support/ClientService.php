@@ -10,4 +10,7 @@ class ClientService extends AbstractService implements IClientService {
 		return 'Client';
 	}
 
+	public function getByCode($client_code, $fields = null) {
+		return $this->findFirst(CriteriaRestriction::equals('codigo_cliente', $client_code), $fields);
+	}
 }
