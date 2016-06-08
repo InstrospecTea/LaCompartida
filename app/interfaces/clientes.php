@@ -168,9 +168,9 @@ echo Autocompletador::Javascript($sesion,false);
 				<td class="al">
 					<?php
 					echo $Form->icon_button(__('Buscar'), 'find', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'buscar')", 'id' => 'btnBuscar'));
-					echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'xls')", 'id' => 'btnDescargarXLS'));
+					echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'xls')"));
 					if (Conf::GetConf($sesion,'ValidacionesCliente')) {
-						echo $Form->icon_button(__('Descargar listado clientes datos incompletos'), 'xls', array('onclick' => "DescargarIncompletos(jQuery('#form_cliente').get(0));", 'id' => 'btnDescargarIncompletosXLS'));
+						echo $Form->icon_button(__('Descargar listado clientes datos incompletos'), 'xls', array('onclick' => "DescargarIncompletos(jQuery('#form_cliente').get(0));"));
 					}
 					?>
 				</td>
