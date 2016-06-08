@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.16
+Wednesday, Jun 8th
+* **Fix** [Problema fecha excel borradores masivos](https://github.com/LemontechSA/ttb/pull/1543)
+
 ## Hotfix 16.15.15
 Tuesday, Jun 7th
 * **Fix** [Problema en el excel de borradores masivos](https://github.com/LemontechSA/ttb/pull/1542)
