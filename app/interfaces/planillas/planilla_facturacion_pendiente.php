@@ -804,6 +804,10 @@ $pagina->PrintTop();
 		</tr>
 	</table>
 </form>
+<?php
+	echo InputId::Javascript($sesion);
+	$pagina->PrintBottom();
+?>
 <script type="text/javascript">
 	var loading_modal = new window.LoadingModal();
 	jQuery(function() {
@@ -813,6 +817,3 @@ $pagina->PrintTop();
 		});
 	});
 </script>
-<?php
-echo InputId::Javascript($sesion);
-$pagina->PrintBottom();
