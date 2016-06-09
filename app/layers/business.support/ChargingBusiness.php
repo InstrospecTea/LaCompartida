@@ -1028,8 +1028,9 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$CriteriaInvoice = new Criteria($this->Session);
 		$CriteriaInvoice
 			->add_select('factura.RUT_cliente')
-			->add_select('factura.cliente')
+			->add_select('factura.cliente', 'razon_social')
 			->add_select('factura.numero')
+			->add_select('cliente.glosa_cliente', 'cliente')
 			->add_select('factura.id_moneda', 'moneda_factura')
 			->add_select("IF(prm_documento_legal.codigo = 'FA', {$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio), 0)", 'total_factura')
 			->add_select("IF(prm_documento_legal.codigo = 'NC', {$total_invoice} * (moneda_factura.tipo_cambio / moneda_display.tipo_cambio), 0)", 'total_nc')
@@ -1096,6 +1097,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		$CriteriaSale = $Criteria
 			->add_select('ventas.RUT_cliente', 'client_code')
 			->add_select('ventas.cliente', 'client')
+			->add_select('ventas.razon_social', 'business_name')
 			->add_select('ventas.mes_contable', 'period')
 			->add_from_criteria($CriteriaInvoice, 'ventas');
 
@@ -1107,8 +1109,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$CriteriaSale
 			->add_grouping('ventas.mes_contable')
-			->add_ordering('ventas.cliente')
-			->add_ordering('ventas.mes_contable');
+			->add_ordering('ventas.cliente');
 
 		if ($parameters['separated_by_invoice'] == '1') {
 			$CriteriaSale
