@@ -8,6 +8,8 @@
 	$pagina = new Pagina($sesion);
 
 	$wb = new Spreadsheet_Excel_Writer();
+
+	header('Set-Cookie: fileDownload=true; path=/');
 	$wb->setVersion(8);
 	$wb->send('Revisión de cobros.xls');
 	$wb->setCustomColor(35, 220, 255, 220);

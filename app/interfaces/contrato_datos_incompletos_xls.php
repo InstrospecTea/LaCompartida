@@ -11,8 +11,10 @@
 	require_once Conf::ServerDir().'/../app/classes/InputId.php';
 	require_once Conf::ServerDir().'/../fw/classes/Lista.php';
 	require_once Conf::ServerDir().'/classes/Funciones.php';
-    require_once Conf::ServerDir().'/classes/Moneda.php';
+  require_once Conf::ServerDir().'/classes/Moneda.php';
 	require_once 'Spreadsheet/Excel/Writer.php';
+
+	header('Set-Cookie: fileDownload=true; path=/');
 
 	//Parámetros generales para los 2 casos de listas a extraer
 	$sesion = new Sesion( array('REV','ADM') );
@@ -67,9 +69,9 @@
 		$PdfLinea1 = Conf::PdfLinea1();
 		$PdfLinea2 = Conf::PdfLinea2();
 	}
-	
+
 	$where = 1;
-  
+
 	$wb->send('Clientes_datos_incompletos.xls');
 	$ws1->setColumn( 1, 1, 18.14);
 	$ws1->setColumn( 2, 2, 45.00);
@@ -108,15 +110,15 @@
 	$where = "";
 	if( $fecha_ini )
 	{
-		$fecha_ini = Utiles::fecha2sql($fecha_ini);			
-		$where .= ( strlen( $where ) > 0 ? " AND " : " WHERE " );			
+		$fecha_ini = Utiles::fecha2sql($fecha_ini);
+		$where .= ( strlen( $where ) > 0 ? " AND " : " WHERE " );
 		$where .= " DATE_FORMAT(fecha, '%Y-%m-%d') >= '$fecha_ini' ";
 	}
 
 	if( $fecha_fin )
 	{
-		$fecha_fin = Utiles::fecha2sql($fecha_fin);			
-		$where .= ( strlen( $where ) > 0 ? " AND " : " WHERE " );			
+		$fecha_fin = Utiles::fecha2sql($fecha_fin);
+		$where .= ( strlen( $where ) > 0 ? " AND " : " WHERE " );
 		$where .= " DATE_FORMAT(fecha, '%Y-%m-%d') >= '$fecha_fin' ";
 	}
 
@@ -126,13 +128,13 @@
 	$campos_tmp = "";
 	$head = "";
 	$nombre_campos = array(
-		"Nombre", "Attache Secundario", "Código Cliente", 
+		"Nombre", "Attache Secundario", "Código Cliente",
 		"RUC", "Razón Social", "Giro", "Dirección", "Código Teléfono", "Teléfono",
 		"Título", "Nombre", "Apellido", "Teléfono", "E-mail", "Dirección Envío",
 		"Tarifa Horas", "Tarifa en", "Forma de liquidaciones", "Mostrar en", "Detalle de Cobranza",
 		"Asunto"
 	);
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);	
+	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 	while($row = mysql_fetch_array($resp))
 	{
 		for( $i=0; $i<20; $i++)
@@ -145,7 +147,7 @@
 			{
 				$campos_tmp .= ( strlen( $campos_tmp ) > 0 ? ", " : "") . $nombre_campos[$i] ;
 			}
-			
+
 			if( $i >= 3 && $i < 9 )
 			{
 				$head = "Datos Facturacion: ";
@@ -172,7 +174,7 @@
 					$campos .= ( strlen( $campos_tmp ) > 0 ? $head . $campos_tmp . ";" : "" );
 					$campos_tmp = "";
 				}
-			}				
+			}
 			else
 			{
 				$head = "Datos Cliente: ";
@@ -187,7 +189,7 @@
 		if( strlen( $campos ) > 0 )
 		{
 			$ws1->write($fila_inicial, 1, $row["codigo_cliente"], $f5);
-			$ws1->write($fila_inicial, 2, $row["glosa_cliente"], $f4);	
+			$ws1->write($fila_inicial, 2, $row["glosa_cliente"], $f4);
 			$ws1->write($fila_inicial, 3, $row["asunto"], $f4);
 			$ws1->write($fila_inicial, 4, $campos, $f4);
 			$incompletos++;
@@ -203,4 +205,3 @@
 
   $wb->close();
   exit;
-?>
