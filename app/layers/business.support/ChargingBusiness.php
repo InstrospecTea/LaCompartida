@@ -1109,7 +1109,8 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		$CriteriaSale
 			->add_grouping('ventas.mes_contable')
-			->add_ordering('ventas.cliente');
+			->add_ordering('ventas.cliente')
+			->add_ordering('ventas.mes_contable');
 
 		if ($parameters['separated_by_invoice'] == '1') {
 			$CriteriaSale
