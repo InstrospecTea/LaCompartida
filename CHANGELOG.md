@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.15.17
+Thursday, Jun 9th
+* **Fix** [Correcciones a Biblioteca -> Archivos](https://github.com/LemontechSA/ttb/pull/1548)
+
 ## Hotfix 16.15.16
 Wednesday, Jun 8th
 * **Fix** [Problema fecha excel borradores masivos](https://github.com/LemontechSA/ttb/pull/1544)
