@@ -112,6 +112,16 @@ $Form = new Form;
 					var json_to_table = new window.JsonToTable();
 					var html = json_to_table.render(response);
 					jQuery('#json_to_table').html(html);
+				},
+				statusCode: {
+					401: function() {
+						jQuery('#json_to_table').html(
+							jQuery('<center/>').html(
+								jQuery('<h3/>').html('Ha ocurrido un error al consultar el historial. Por favor inície sesión nuevamente.')
+							)
+						);
+						return false;
+					}
 				}
 			});
 		});
