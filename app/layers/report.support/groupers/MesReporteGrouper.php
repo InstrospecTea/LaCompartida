@@ -2,9 +2,9 @@
 /**
  * Agrupador por Mes del reporte
  *
- * * Agrupa por: DATE_FORMAT(fecha, '%m-%Y')
- * * Muestra: DATE_FORMAT(fecha, '%m-%Y')
- * * Ordena por:  DATE_FORMAT(fecha, '%m-%Y')
+ * - Agrupa por: DATE_FORMAT(fecha, '%m-%Y')
+ * - Muestra: DATE_FORMAT(fecha, '%m-%Y')
+ * - Ordena por: DATE_FORMAT(fecha, '%Y-%m')
  *
  * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Mes-Reporte
  */
@@ -18,7 +18,7 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 		return array('campo_fecha');
 	}
 
-	public function getDateField() {
+	public function getDateField($format = '%m-%Y') {
 		switch ($this->filterValues['campo_fecha']) {
 			case 'cobro':
 				$field_name = 'cobro.fecha_fin';
@@ -36,7 +36,7 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 				$field_name = 'trabajo.fecha';
 				break;
 		}
-		return "DATE_FORMAT({$field_name}, '%m-%Y')";
+		return "DATE_FORMAT({$field_name}, '{$format}')";
 	}
 	/**
 	 * Obtiene el campo por el cual se agrupará la query
@@ -59,7 +59,7 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getOrderField() {
-		return "DATE_FORMAT(%token%, '%m-%Y')";
+		return "DATE_FORMAT(%token%, '%Y-%m')";
 	}
 
 	/**
@@ -74,7 +74,7 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 		)->add_grouping(
 			$this->getDateField()
 		)->add_ordering(
-			$this->getDateField()
+			$this->getDateField('%Y-%m')
 		);
 	}
 
@@ -94,13 +94,13 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 			str_replace(
 				"%token%",
 				"tramite.fecha",
-				$this->getSelectField()
+				$this->getGroupField()
 			)
 		)->add_ordering(
 			str_replace(
 				"%token%",
 				"tramite.fecha",
-				$this->getSelectField()
+				$this->getOrderField()
 			)
 		);
 	}
@@ -121,13 +121,13 @@ class MesReporteGrouper extends FilterDependantGrouperTranslator {
 			str_replace(
 				"%token%",
 				"trabajo.fecha",
-				$this->getSelectField()
+				$this->getGroupField()
 			)
 		)->add_ordering(
 			str_replace(
 				"%token%",
 				"trabajo.fecha",
-				$this->getSelectField()
+				$this->getOrderField()
 			)
 		);
 	}
