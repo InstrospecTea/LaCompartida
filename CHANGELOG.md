@@ -1,7 +1,11 @@
 # Changelog
 
+## Hotfix 16.16.1
+Thursday, Jun 9th
+* **Fix** [Ordenar trabajos por fecha en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1549)
+
 ## [Release 16.16.0](https://github.com/LemontechSA/ttb/pull/1545)
-Wednesday, Jun 9th
+Thursday, Jun 9th
 * **Feature** [Mejorar comportamiento del "Loading" de la aplicación](https://github.com/LemontechSA/ttb/pull/1468)
 
 ## Hotfix 16.15.17
