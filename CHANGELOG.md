@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 16.16.1
+Thursday, Jun 9th
+* **Fix** [Ordenar trabajos por fecha en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1549)
+
+## [Release 16.16.0](https://github.com/LemontechSA/ttb/pull/1545)
+Thursday, Jun 9th
+* **Feature** [Mejorar comportamiento del "Loading" de la aplicación](https://github.com/LemontechSA/ttb/pull/1468)
+
+## Hotfix 16.15.17
+Thursday, Jun 9th
+* **Fix** [Correcciones a Biblioteca -> Archivos](https://github.com/LemontechSA/ttb/pull/1548)
+
 ## Hotfix 16.15.16
 Wednesday, Jun 8th
 * **Fix** [Problema fecha excel borradores masivos](https://github.com/LemontechSA/ttb/pull/1544)
