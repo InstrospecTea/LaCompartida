@@ -9,7 +9,7 @@ class CambioUrlMenu extends \Database\Migration implements \Database\ITemplateMi
    * @return void
    */
 	function up() {
-		$this->addQueryUp("UPDATE `menu` SET `url` = '/app/Rate/ErrandsRate' WHERE `codigo` = 'TAR_TRA';");
+		$this->addQueryUp("UPDATE `menu` SET `url` = '/app/ErrandRate/ErrandsRate' WHERE `codigo` = 'TAR_TRA';");
 	}
 
 	/**
