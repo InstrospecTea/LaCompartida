@@ -13,7 +13,8 @@
 						<td align="right" class="edicion_tarifa"><?php echo __('Tarifa'); ?>:</td>
 						<td align="left" class="edicion_tarifa">
 							<select id="id_tramite_tarifa" name="id_tramite_tarifa">
-								<?php foreach ($rates as $rate): ?>
+								<?php foreach ($rates as $rate_field): ?>
+									<?php $rate = $rate_field->fields ?>
 									<option value="<?php echo $rate['id_tramite_tarifa'] ?>" <?php echo $rate['tarifa_defecto'] ? 'selected' : '' ?>>
 										<?php echo utf8_decode($rate['glosa_tramite_tarifa']) ?>
 									</option>

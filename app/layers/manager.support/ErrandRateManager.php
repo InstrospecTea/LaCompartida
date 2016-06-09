@@ -74,24 +74,16 @@ class ErrandRateManager extends AbstractManager implements IRateManager {
 			$this->Sesion->pdodbh->query($query);
 		}
 
-		$errand_rate['fecha_creacion'] = 'NOW()';
-
-		$insertCriteria = new InsertCriteria($this->Sesion);
-		$insertCriteria->set_into('tramite_tarifa');
-
-		foreach ($errand_rate as $key => $value) {
-			$insertCriteria->add_pivot_with_value($key, $value, true);
-		}
-
-		$result = $insertCriteria->run();
+		$this->ErrandRate->fillFromArray($errand_rate);
+		$ErrandRate = $this->ErrandRateService->saveOrUpdate($this->ErrandRate);
 
 		$response = new stdClass();
-		if ($result->success) {
+		if ($ErrandRate) {
 			$response->success = true;
-			$response->rate_id = $insertCriteria->get_last_insert_id();
+			$response->rate_id = $ErrandRate->fields['id_tramite_tarifa'];
 		} else {
 			$response->success = false;
-			$response->message = $result->message;
+			$response->message = __('Ha ocurrido un error');
 		}
 
 		if (!$response->success) {
@@ -118,16 +110,9 @@ class ErrandRateManager extends AbstractManager implements IRateManager {
 	 * @return Array
 	 */
 	public function getErrandsRate() {
-		$Criteria = new Criteria($this->Sesion);
-		$errands_rate = $Criteria
-			->add_select('id_tramite_tarifa')
-			->add_select('glosa_tramite_tarifa')
-			->add_select('tarifa_defecto')
-			->add_from('tramite_tarifa')
-			->add_ordering('glosa_tramite_tarifa')
-			->run();
-
-		return $errands_rate;
+		$searchCriteria = new SearchCriteria('ErrandRate');
+		$this->loadBusiness('Searching');
+		return $this->SearchingBusiness->searchByCriteria($searchCriteria);
 	}
 
 	/**

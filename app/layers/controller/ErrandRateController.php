@@ -132,7 +132,7 @@ class ErrandRateController extends AbstractController {
 			$rates = $this->params['params']['rates'];
 
 			if (isset($this->params['params']['glosa_tramite_tarifa'])) {
-				$errand_rate['glosa_tramite_tarifa'] = "'{$this->params['params']['glosa_tramite_tarifa']}'";
+				$errand_rate['glosa_tramite_tarifa'] = $this->params['params']['glosa_tramite_tarifa'];
 			}
 
 			if (isset($this->params['params']['tarifa_defecto'])) {
