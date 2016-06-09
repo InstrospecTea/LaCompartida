@@ -1,6 +1,6 @@
 # Changelog
 
-## Release 17.0.0
+## Release 16.17.0
 Thursday, Jun 9th
 * **Feature** [Refactor carga trabajos demo](https://github.com/LemontechSA/ttb/pull/1514)
 
