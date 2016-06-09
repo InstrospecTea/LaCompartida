@@ -44,12 +44,12 @@ class ErrandRateManager extends AbstractManager implements IRateManager {
 		$this->ErrandValueService->delete($ErrandValue);
 
 		$insertCriteria = new InsertCriteria($this->Sesion);
-		$insertCriteria->set_into('tramite_valor');
+		$insertCriteria->setTable('tramite_valor');
 		foreach ($rates as $key => $rate) {
 			foreach ($rate as $pivot => $value) {
-				$insertCriteria->add_pivot_with_value($pivot, $value, true);
+				$insertCriteria->addPivotWithValue($pivot, $value, true);
 			}
-			$insertCriteria->add_insert();
+			$insertCriteria->addInsert();
 		}
 		$insertCriteria->run();
 
@@ -91,15 +91,14 @@ class ErrandRateManager extends AbstractManager implements IRateManager {
 		}
 
 		$insertCriteria = new InsertCriteria($this->Sesion);
-		$insertCriteria->set_into('tramite_valor');
+		$insertCriteria->setTable('tramite_valor');
 		foreach ($rates as $key => $rate) {
 			foreach ($rate as $pivot => $value) {
-				$insertCriteria->add_pivot_with_value($pivot, $value, true);
+				$insertCriteria->addPivotWithValue($pivot, $value, true);
 			}
-			$insertCriteria->add_pivot_with_value('id_tramite_tarifa', $response->rate_id);
-			$insertCriteria->add_insert();
+			$insertCriteria->addPivotWithValue('id_tramite_tarifa', $response->rate_id);
+			$insertCriteria->addInsert();
 		}
-
 		$insertCriteria->run();
 
 		return $response;
