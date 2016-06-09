@@ -26,6 +26,7 @@ class ErrandRateController extends AbstractController {
 			$coin_errand = new stdClass();
 			$coin_errand->id_moneda = $errand_rate['id_moneda'];
 			$coin_errand->id_tramite_tipo = $errand_rate['id_tramite_tipo'];
+			$coin_errand->cifras_decimales = $errand_rate['cifras_decimales'];
 			$errands_rate_table[$errand_rate['glosa_tramite']][] = $coin_errand;
 		}
 

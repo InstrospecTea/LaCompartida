@@ -124,6 +124,7 @@ class ErrandRateManager extends AbstractManager implements IRateManager {
 			->add_select('tramite_tipo.id_tramite_tipo')
 			->add_select('tramite_tipo.glosa_tramite')
 			->add_select('prm_moneda.id_moneda')
+			->add_select('prm_moneda.cifras_decimales')
 			->add_from('tramite_tipo')
 			->add_inner_join_with('prm_moneda', 'prm_moneda.id_moneda')
 			->add_ordering('tramite_tipo.glosa_tramite')
