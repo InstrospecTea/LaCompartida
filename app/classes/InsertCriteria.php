@@ -132,7 +132,7 @@ class InsertCriteria
 	}
 
   /**
-   * Add a new row for sql insert statemen
+   * Add a new row for sql insert statement
    * e.g. INSERT INTO table (key1, key2, ..., keyN)
    * 			VALUES (value1, value2, ..., valueN), (value1, value2, ..., valueN), ..., (value1, value2, ..., valueN);
    */
