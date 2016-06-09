@@ -1,4 +1,4 @@
-var dm_root = root_dir + '/app/Rate/';
+var dm_root = root_dir + '/app/ErrandRate/';
 var tarifa_temp = '';
 
 jQuery(function() {
