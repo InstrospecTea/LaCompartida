@@ -1178,3 +1178,4 @@ $_LANG['moneda base'] = 'moeda base';
 $_LANG['Hay '] = 'Há ';
 $_LANG['Forma Envío'] = 'Forma de Envio';
 $_LANG['Monto Total'] = 'Valor Total';
+$_LANG['Se produjo un error generando el documento, por favor intente nuevamente.'] = 'Foi registrado um erro ao gerar o documento, por favor tente novamente.';
