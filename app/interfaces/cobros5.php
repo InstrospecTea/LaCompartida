@@ -1666,9 +1666,9 @@ else
 	$moneda_total = new Moneda($sesion);
 	$moneda_total->Load($cobro->fields['opc_moneda_total']);
 
-	$display_td_moneda_total = '';
+	$hide_montos_moneda_total = '';
 	if ($cobro->fields['opc_moneda_total'] == $cobro->fields['id_moneda']) {
-		$display_td_moneda_total = 'style="display:none"';
+		$hide_montos_moneda_total = 'style="display:none"';
 	}
 	?>
 
@@ -1676,17 +1676,25 @@ else
 		<tr>
 			<td align="left" width="40%">
 
-				<table cellspacing="1" cellpadding="2" style='border:1px dotted #bfbfcf'>
+				<table cellspacing="1" cellpadding="2" style="border:1px dotted #bfbfcf" width="100%">
 					<tr>
 						<td colspan="3" bgcolor="#dfdfdf">
-							<span style="font-weight: bold; font-size: 11px;"><?php echo __('Honorarios') ?></span>
+							<span style="font-weight: bold; font-size: 11px;"><?= __('Honorarios') ?></span>
+						</td>
+					</tr>
+					<tr style="text-align: center">
+						<td colspan="2" bgcolor="#dfdfdf">
+							<span style="font-weight: bold; font-size: 11px;"><?= $moneda_cobro->fields['glosa_moneda'] ?></span>
+						</td>
+						<td bgcolor="#dfdfdf" <?= $hide_montos_moneda_total ?>>
+							<span style="font-weight: bold; font-size: 11px;"><?= $moneda_total->fields['glosa_moneda'] ?></span>
 						</td>
 					</tr>
 					<tr>
-						<td align="right" width="30%" nowrap>
-							<?php echo __('Trabajos') ?> (<span id="divCobroUnidadHonorarios" style='font-size:10px'><?php echo $moneda_cobro->fields['simbolo'] ?></span>):
+						<td align="right" nowrap>
+							<?= __('Trabajos') ?>:
 						</td>
-						<td align="left" width="30%" nowrap>
+						<td align="left" nowrap>
 							<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onkeydown="MontoValido(this.id)" value="<?php echo number_format($cobro->fields['monto_subtotal'] - $cobro->CalculaMontoTramites($cobro), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" <?php echo $deshabilitar ?> style="text-align: right;" onkeydown="MontoValido( this.id );">
 							&nbsp;&nbsp;<img src="<?php echo Conf::ImgDir() ?>/reload_16.png" onclick='GuardaCobro(this.form)' style='cursor:pointer' <?php echo TTip($tip_actualizar) ?>>&nbsp;&nbsp;
 
@@ -1697,14 +1705,14 @@ else
 							<img id="ajustar_monto" <?php echo $display_buton_ajuste ?> src="<?php echo Conf::ImgDir() . '/editar_on.gif' ?>" title="<?php echo __('Ajustar Monto') ?>" border=0 style="cursor:pointer" onclick="AjustarMonto('ajustar');">
 							<img id="cancelar_ajustacion" <?php echo $display_buton_cancelar ?> src="<?php echo Conf::ImgDir() . '/cruz_roja_nuevo.gif' ?>" title="<?php echo __('Usar Monto Original') ?>" border=0 style='cursor:pointer' onclick="AjustarMonto('cancelar')">
 						</td>
-						<td align="right" <?= $display_td_moneda_total ?>>
-							<?= $moneda_total->fields['simbolo'] ?>
+						<td align="right" <?= $hide_montos_moneda_total ?>>
+							<?= __('Trabajos') ?>:
 							<input type="text" name="cobro_monto_honorarios_mt" id="cobro_monto_honorarios_mt" value="<?= $x_resultados['monto_trabajos'][$moneda_total->fields['id_moneda']] ?>" size="12" readonly="readonly" style="text-align: right;">
 						</td>
 					</tr>
 					<tr id="tr_monto_original" <?php echo $display_ajustar ?>>
 						<td>
-							<?php echo __('Monto Original') ?> (<span id="divCobroUnidadHonorarios" style='font-size:10px'><?php echo $moneda_cobro->fields['simbolo'] ?></span>):
+							<?= __('Monto Original') ?>:
 						</td>
 						<td align="left">
 							<input type="text" id="monto_original" name="monto_original" value="<?php echo number_format($cobro->fields['monto_original'], $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" disabled style="text-align: right;">
@@ -1712,31 +1720,31 @@ else
 					</tr>
 					<tr>
 						<td align="right" nowrap>
-							<?php echo __('Trámites') ?> (<span id="divCobroUnidadTramites" style='font-size:10px'><?php echo $moneda_cobro->fields['simbolo'] ?></span>):
+							<?= __('Trámites') ?>:
 						</td>
 						<td align="left" nowrap>
 							<input type="text" id="cobro_monto_tramites" value="<?php echo number_format($cobro->CalculaMontoTramites($cobro), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" readonly="readonly" style="text-align: right;">
 						</td>
-						<td align="right" <?= $display_td_moneda_total ?>>
-							<?= $moneda_total->fields['simbolo'] ?>
+						<td align="right" <?= $hide_montos_moneda_total ?>>
+							<?= __('Trámites') ?>:
 							<input type="text" name="cobro_monto_tramites_mt" id="cobro_monto_tramites_mt" value="<?= $x_resultados['monto_tramites'][$moneda_total->fields['id_moneda']] ?>" size="12" readonly="readonly" style="text-align: right;">
 						</td>
 					</tr>
 					<tr>
 						<td align="right" nowrap>
-							<?php echo __('Subtotal') ?> (<span id="divCobroUnidadSubtotal" style='font-size:10px'><?php echo $moneda_cobro->fields['simbolo'] ?></span>):
+							<?= __('Subtotal') ?>:
 						</td>
 						<td align="left" nowrap>
 							<input type="text" id="cobro_subtotal" value="<?php echo number_format($cobro->fields['monto_subtotal'], $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" readonly="readonly" style="text-align: right;" <?php echo TTip($tip_subtotal) ?>>
 						</td>
-						<td align="right" <?= $display_td_moneda_total ?>>
-							<?= $moneda_total->fields['simbolo'] ?>
+						<td align="right" <?= $hide_montos_moneda_total ?>>
+							<?= __('Subtotal') ?>:
 							<input type="text" name="cobro_subtotal_mt" id="cobro_subtotal_mt" value="<?= $x_resultados['monto_subtotal'][$moneda_total->fields['id_moneda']] ?>" size="12" readonly="readonly" style="text-align: right;">
 						</td>
 					</tr>
 					<tr bgcolor='#F3F3F3'>
 						<td align="right" nowrap>
-							<?php echo __('Descuento') ?> (<span id="divCobroUnidadDescuento" style='font-size:10px'><?php echo $moneda_cobro->fields['simbolo'] ?></span>):
+							<?= __('Descuento') ?>:
 						</td>
 						<td align="left" nowrap>
 
@@ -1749,8 +1757,8 @@ else
 							<input type="text" name="cobro_descuento" style="text-align: right;" id="cobro_descuento" onkeydown="MontoValido( this.id );" size=12 value=<?php echo number_format($cobro->fields['descuento'], $moneda_cobro->fields['cifras_decimales'], '.', '') ?> onchange="RecalcularTotal(this.value);" <?php echo TTip($tip_descuento) ?>>
 							<input type="radio" name="tipo_descuento" id="tipo_descuento" value='VALOR' <?php echo $chk == 'VALOR' ? 'checked' : '' ?> ><?php echo __('Valor') ?>
 						</td>
-						<td align="right" <?= $display_td_moneda_total ?>>
-							<?= $moneda_total->fields['simbolo'] ?>
+						<td align="right" <?= $hide_montos_moneda_total ?>>
+							<?= __('Descuento') ?>:
 							<input type="text" name="cobro_subtotal_mt" id="cobro_subtotal_mt" value="<?= $x_resultados['descuento'][$moneda_total->fields['id_moneda']] ?>" size="12" readonly="readonly" style="text-align: right;">
 						</td>
 					</tr>
@@ -1761,28 +1769,55 @@ else
 							<input type="radio" name="tipo_descuento" id="tipo_descuento" value='PORCENTAJE' <?php echo $chk == 'PORCENTAJE' ? 'checked' : '' ?>><?php echo __('%') ?>
 						</td>
 					</tr>
-							<?php
-							if (( ( method_exists('Conf', 'GetConf') && Conf::GetConf($sesion, 'UsarImpuestoSeparado') ) || ( method_exists('Conf', 'UsarImpuestoSeparado') ) ) && $contrato->fields['usa_impuesto_separado']) {
-								?>
+
+					<?php if (!empty($hide_montos_moneda_total)): ?>
+						<?php if (Conf::GetConf($sesion, 'UsarImpuestoSeparado') && $contrato->fields['usa_impuesto_separado']) { ?>
+							<tr>
+								<td align="right">
+									<?= __('Impuesto') . ' ' . $cobro->fields['porcentaje_impuesto'] ?>%</span>:
+								</td>
+								<td align="left">
+									<input type="text" id="cobro_impuesto" value="<?= $x_resultados['impuesto'][$cobro->fields['id_moneda']] ?>" size="12" readonly="readonly" style="text-align: right;" >
+								</td>
+							</tr>
+						<?php } ?>
+					<?php endif ?>
+
+					<?php if (!empty($hide_montos_moneda_total)): ?>
 						<tr>
-							<td align="right"><?php echo __('Impuesto') ?> (<span id="divCobroImpuestoUnidad" style='font-size:10px'><?php echo $cobro->fields['porcentaje_impuesto'] . '%' ?></span>):</td>
-							<td align="left"><input type="text" id="cobro_impuesto" value="<?php echo number_format(($cobro->fields['monto_subtotal'] - $cobro->fields['descuento']) * $cobro->fields['porcentaje_impuesto'] / 100, $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" readonly="readonly" style="text-align: right;" ></td>
-							<td align="right" <?= $display_td_moneda_total ?>>
-								<?= $moneda_total->fields['simbolo'] ?>
-								<input type="text" name="cobro_impuesto_mt" id="cobro_impuesto_mt" value="<?= $x_resultados['impuesto'][$moneda_total->fields['id_moneda']] ?>" size="12" readonly="readonly" style="text-align: right;">
+							<td align="right">
+								<?php echo __('Total') ?>:
+							</td>
+							<td align="left">
+								<input type="text" id="cobro_total" value="<?= $x_resultados['monto'][$cobro->fields['id_moneda']] ?>" size="12" readonly="readonly" style="text-align: right;" <?php echo TTip($tip_total) ?>>
 							</td>
 						</tr>
-								<?php
-							}
-							?>
-					<tr>
-						<td align="right"><?php echo __('Total') ?> (<span id="divCobroUnidadTotal" style='font-size:10px'><?php echo $moneda_cobro->fields['simbolo'] ?></span>):</td>
-						<td align="left"><input type="text" id="cobro_total" value="<?php echo number_format(round($cobro->fields['monto'], 2), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" readonly="readonly" style="text-align: right;" <?php echo TTip($tip_total) ?>></td>
+					<?php endif ?>
+
+					<tr <?= $hide_montos_moneda_total ?>>
+						<td colspan="3" align="right">
+							<?= __('Neto') ?>:
+							<input type="text" name="cobro_impuesto_mt" id="cobro_impuesto_mt" value="<?= $x_resultados['monto_subtotal'][$moneda_total->fields['id_moneda']] - $x_resultados['descuento'][$moneda_total->fields['id_moneda']]?>" size="12" readonly="readonly" style="text-align: right;">
+						</td>
+					</tr>
+
+					<tr <?= $hide_montos_moneda_total ?>>
+						<td colspan="3" align="right">
+							<?= __('Impuesto') . ' ' . $cobro->fields['porcentaje_impuesto'] ?>%:
+							<input type="text" name="cobro_impuesto_mt" id="cobro_impuesto_mt" value="<?= $x_resultados['impuesto'][$moneda_total->fields['id_moneda']] ?>" size="12" readonly="readonly" style="text-align: right;">
+						</td>
+					</tr>
+
+					<tr <?= $hide_montos_moneda_total ?>>
+						<td colspan="3" align="right">
+							<?php echo __('Total') ?>:
+							<input type="text" name="cobro_total_mt" id="cobro_total_mt" value="<?= $x_resultados['monto'][$moneda_total->fields['id_moneda']] ?>" size="12" readonly="readonly" style="text-align: right;">
+						</td>
 					</tr>
 				</table>
 			</td>
 
-			<td align="center">
+			<td align="center" width="30%">
 
 				<?php
 				$cobro_moneda_tipo_cambio = new CobroMoneda($sesion);
@@ -1794,7 +1829,7 @@ else
 				?>
 
 				<?php if (Conf::GetConf($sesion, 'UsarImpuestoPorGastos') && !empty($cobro->fields['incluye_gastos'])) { ?>
-					<table cellspacing="1" cellpadding="2" style='border:1px dotted #bfbfcf'>
+					<table cellspacing="1" cellpadding="2" style='border:1px dotted #bfbfcf' width="100%">
 						<tr>
 							<td colspan="2" bgcolor="#dfdfdf">
 								<span style="font-weight: bold; font-size: 11px;"><?php echo __('Gastos') ?></span>
@@ -1839,7 +1874,7 @@ else
 
 				<!--Agregar un resumen en moneda total para mejor indicacion de esta,
 						Versiones anteriores quedan comentado por sia caso que volvemos a estas mas tarde-->
-				<table cellspacing="0" cellpadding="3" style='border:1px dotted #bfbfcf'>
+				<table cellspacing="0" cellpadding="3" style='border:1px dotted #bfbfcf' width="100%">
 					<tr>
 						<td colspan="2" bgcolor="#dfdfdf">
 							<span style="font-weight: bold; font-size: 11px;"><?php echo __('Resumen total') ?></span>
@@ -1873,7 +1908,7 @@ else
 
 				<br>
 
-				<table cellspacing="0" cellpadding="3" style='border:1px dotted #bfbfcf'>
+				<table cellspacing="0" cellpadding="3" style='border:1px dotted #bfbfcf' width="100%">
 					<tr>
 						<td bgcolor="#dfdfdf">
 							<span style="font-weight: bold; font-size: 11px;"><?php echo __('Se esta cobrando:') ?></span>
@@ -1903,9 +1938,9 @@ else
 				</table>
 			</td>
 
-			<td align="center">
+			<td align="center" width="30%">
 				<!-- OPCIONES IMPRESION -->
-				<table width="270" border="0" cellspacing="0" cellpadding="3" style="border: 1px dotted #bfbfcf;" align=right>
+				<table width="100%" border="0" cellspacing="0" cellpadding="3" style="border: 1px dotted #bfbfcf;" align=right>
 					<tr>
 						<td align="left" bgcolor="#dfdfdf" style="font-size: 11px; font-weight: bold; vertical-align: middle;">
 							<img src="<?php echo Conf::ImgDir() ?>/imprimir_16.gif" border="0" alt="Imprimir"/> <?php echo __('Versi&oacute;n para imprimir') ?>
