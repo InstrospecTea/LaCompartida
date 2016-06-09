@@ -1,8 +1,13 @@
 <?php
 
-class RateController extends AbstractController {
+class ErrandRateController extends AbstractController {
 
 	public $helpers = array(array('\TTB\Html', 'Html'), 'Form');
+
+	public function __construct() {
+		parent::__construct();
+		$this->loadManager('ErrandRate');
+	}
 
 	/**
 	 * Carga la página principal del módulo
@@ -10,20 +15,18 @@ class RateController extends AbstractController {
 	 */
 	public function ErrandsRate() {
 		$this->layoutTitle = __('Ingreso de Tarifas de Trámites');
-
-		$this->loadBusiness('Rate');
 		$this->loadBusiness('Coining');
 
-		$rates = $this->RateBusiness->getErrandsRate();
-		$errands_rate_fields = $this->RateBusiness->getErrandsRateFields();
+		$rates = $this->ErrandRateManager->getErrandsRate();
+		$errands_rate_fields = $this->ErrandRateManager->getErrandsRateFields();
 
 		$errands_rate_table = array();
 
-		foreach ($errands_rate_fields as $errand) {
+		foreach ($errands_rate_fields as $errand_rate) {
 			$coin_errand = new stdClass();
-			$coin_errand->id_moneda = $errand['id_moneda'];
-			$coin_errand->id_tramite_tipo = $errand['id_tramite_tipo'];
-			$errands_rate_table[$errand['glosa_tramite']][] = $coin_errand;
+			$coin_errand->id_moneda = $errand_rate['id_moneda'];
+			$coin_errand->id_tramite_tipo = $errand_rate['id_tramite_tipo'];
+			$errands_rate_table[$errand_rate['glosa_tramite']][] = $coin_errand;
 		}
 
 		$this->set('rates', $rates);
@@ -36,9 +39,8 @@ class RateController extends AbstractController {
 	 * @return Object
 	 */
 	public function ErrandsRateValue() {
-		$this->loadBusiness('Rate');
-		$errands_rate_values = $this->RateBusiness->getErrandsRateValue($this->params['id_tarifa']);
-		$errand_rate_detail = $this->RateBusiness->getErrandRateDetail($this->params['id_tarifa']);
+		$errands_rate_values = $this->ErrandRateManager->getErrandsRateValue($this->params['id_tarifa']);
+		$errand_rate_detail = $this->ErrandRateManager->getErrandRateDetail($this->params['id_tarifa']);
 
 		$response = new stdClass();
 		$response->errand_rate_detail = $errand_rate_detail;
@@ -52,8 +54,7 @@ class RateController extends AbstractController {
 	 * @return int
 	 */
 	public function contractsWithErrandRate() {
-		$this->loadBusiness('Rate');
-		$num_contracts = $this->RateBusiness->getContractsWithErrandRate($this->params['id_tarifa']);
+		$num_contracts = $this->ErrandRateManager->getContractsWithErrandRate($this->params['id_tarifa']);
 
 		$this->renderJSON($num_contracts);
 	}
@@ -63,8 +64,7 @@ class RateController extends AbstractController {
 	 * @return Object
 	 */
 	public function changeDefaultErrandRateOnContracts() {
-		$this->loadBusiness('Rate');
-		$result = $this->RateBusiness->updateDefaultErrandRateOnContracts($this->params['id_tarifa']);
+		$result = $this->ErrandRateManager->updateDefaultErrandRateOnContracts($this->params['id_tarifa']);
 
 		$response = new stdClass();
 		$response->success = $result;
@@ -77,17 +77,16 @@ class RateController extends AbstractController {
 	 * @return Object
 	 */
 	public function deleteErrandRate() {
-		$this->loadBusiness('Rate');
-		$total_rates = $this->RateBusiness->countErrandsRates();
+		$total_rates = $this->ErrandRateManager->countErrandsRates();
 
 		$response = new stdClass();
 
 		if ($total_rates > 1) {
-			$result = $this->RateBusiness->deleteErrandRate($this->params['id_tarifa']);
+			$result = $this->ErrandRateManager->deleteErrandRate($this->params['id_tarifa']);
 			if ($result == true) {
 				$response->success = true;
 				$response->message = utf8_encode(__('La tarifa trámite se ha eliminado satisfactoriamente'));
-				$response->default_errand_rate = $this->RateBusiness->getDefaultErrandRate();
+				$response->default_errand_rate = $this->ErrandRateManager->getDefaultErrandRate();
 			} else {
 				$response->success = false;
 				$response->message = __('Ha ocurrido un problema');
@@ -105,12 +104,12 @@ class RateController extends AbstractController {
 	 * @return Object
 	 */
 	public function saveErrandRate() {
-		$this->loadBusiness('Rate');
 		$errand_rate_id = $this->params['params']['rate_id'];
 		$response = new stdClass();
 
 		if (!empty($errand_rate_id)) {
 			$rates = $this->params['params']['rates'];
+			$errand_rate['id_tramite_tarifa'] = $errand_rate_id;
 
 			foreach ($rates as $key => $value) {
 				$rates[$key]['id_tramite_tarifa'] = $errand_rate_id;
@@ -124,7 +123,7 @@ class RateController extends AbstractController {
 				$errand_rate['tarifa_defecto'] = $this->params['params']['tarifa_defecto'];
 			}
 
-			$result = $this->RateBusiness->updateErrandRate($errand_rate_id, $errand_rate, $rates);
+			$result = $this->ErrandRateManager->updateErrandRate($errand_rate, $rates);
 
 			$response->success = $result ? true : false;
 			$response->message = $result ? __('La tarifa se ha modificado satisfactoriamente') : __('Ha ocurrido un problema');
@@ -140,7 +139,7 @@ class RateController extends AbstractController {
 				$errand_rate['tarifa_defecto'] = $this->params['params']['tarifa_defecto'];
 			}
 
-			$result = $this->RateBusiness->insertErrandRate($errand_rate, $rates);
+			$result = $this->ErrandRateManager->insertErrandRate($errand_rate, $rates);
 
 			$response->success = $result->success ? true : false;
 			$response->message = $result->success ? __('La tarifa se ha creado satisfactoriamente') : __('Ha ocurrido un problema: ' . $result->message);

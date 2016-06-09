@@ -62,7 +62,7 @@
 						<tr>
 							<td align="left" class="border_plomo"><?php echo $errand ?></td>
 							<?php foreach ($errand_rate as $coin): ?>
-								<td align="right" class="border_plomo"><input type="text" size="6" id="" class="tarifas" name="tarifa_moneda[<?php echo $coin->id_moneda ?>][<?php echo $coin->id_tramite_tipo ?>]" value="" data-errandtype="<?php echo $coin->id_tramite_tipo ?>" data-coin="<?php echo $coin->id_moneda ?>"></td>
+								<td align="right" class="border_plomo"><input type="text" size="12" id="" class="tarifas" name="tarifa_moneda[<?php echo $coin->id_moneda ?>][<?php echo $coin->id_tramite_tipo ?>]" value="" data-errandtype="<?php echo $coin->id_tramite_tipo ?>" data-coin="<?php echo $coin->id_moneda ?>"></td>
 								<?php endforeach; ?>
 						<tr>
 						<?php endforeach; ?>
