@@ -80,11 +80,11 @@ jQuery(function() {
 	});
 });
 
-jQuery.loadData = function(rate_id) {
+jQuery.loadData = function(errand_rate_id) {
 	jQuery.ajax({
 		url: dm_root + 'ErrandsRateValue',
 		data: {
-			'id_tarifa': rate_id
+			'errand_rate_id': errand_rate_id
 		},
 		dataType: 'JSON',
 		method: 'POST',
@@ -109,23 +109,23 @@ jQuery.loadData = function(rate_id) {
 				tarifa = response['errands_rate_values'][i];
 				jQuery('[name="tarifa_moneda[' + tarifa['id_moneda'] + '][' + tarifa['id_tramite_tipo'] + ']"]').val(tarifa['tarifa']);
 			};
-			jQuery('#id_tramite_tarifa').val(rate_id);
+			jQuery('#id_tramite_tarifa').val(errand_rate_id);
 		}
 	});
 };
 
-jQuery.deleteRate = function(rate_id) {
+jQuery.deleteRate = function(errand_rate_id) {
 	jQuery.ajax({
 		url: dm_root + 'deleteErrandRate',
 		data: {
-			'id_tarifa': rate_id
+			'errand_rate_id': errand_rate_id
 		},
 		dataType: 'JSON',
 		method: 'POST',
 		success: function(response) {
 			if (response.success) {
 				alert(response.message);
-				jQuery('#id_tramite_tarifa').find('option[value="' + rate_id + '"]').remove();
+				jQuery('#id_tramite_tarifa').find('option[value="' + errand_rate_id + '"]').remove();
 				jQuery.loadData(response.default_errand_rate);
 			} else {
 				alert(response.message);
@@ -138,7 +138,7 @@ jQuery.saveRate = function() {
 	var params = {};
 
 	if (parseInt(jQuery('#id_tramite_tarifa_edicion').val())) {
-		params.rate_id = jQuery('#id_tramite_tarifa_edicion').val();
+		params.errand_rate_id = jQuery('#id_tramite_tarifa_edicion').val();
 	};
 
 	if (jQuery('#checkbox_tarifa_defecto').is(':checked') || jQuery('[name="tarifa_defecto"]').val() == 1) {
@@ -180,20 +180,20 @@ jQuery.saveRate = function() {
 		success: function(response) {
 			if (response.success) {
 				alert(response.message);
-				if (response.rate_id) {
+				if (response.errand_rate_id) {
 					jQuery('#id_tramite_tarifa').
-						append('<option value="' + response.rate_id + '">' +
+						append('<option value="' + response.errand_rate_id + '">' +
 										params.glosa_tramite_tarifa +
 										'</option>');
 					jQuery('input[type="text"]').val(null);
 					jQuery('.edicion_tarifa').show();
 					jQuery('.nueva_tarifa').hide();
-					jQuery.loadData(response.rate_id);
+					jQuery.loadData(response.errand_rate_id);
 				} else {
 					jQuery('#id_tramite_tarifa').
-						find('option[value="' + params.rate_id + '"]').
+						find('option[value="' + params.errand_rate_id + '"]').
 						html(params.glosa_tramite_tarifa);
-					jQuery.loadData(params.rate_id);
+					jQuery.loadData(params.errand_rate_id);
 				}
 			} else {
 				alert(response.message);
@@ -202,13 +202,13 @@ jQuery.saveRate = function() {
 	});
 };
 
-jQuery.contractsWithRate = function(rate_id) {
+jQuery.contractsWithRate = function(errand_rate_id) {
 	var num_contratos = 0;
 
 	jQuery.ajax({
 		url: dm_root + 'contractsWithErrandRate',
 		data: {
-			'id_tarifa': rate_id
+			'errand_rate_id': errand_rate_id
 		},
 		dataType: 'JSON',
 		method: 'POST',
@@ -221,20 +221,20 @@ jQuery.contractsWithRate = function(rate_id) {
 	return num_contratos;
 };
 
-jQuery.changeDefaultRateOnContract = function(rate_id) {
+jQuery.changeDefaultRateOnContract = function(errand_rate_id) {
 	var num_contratos = 0;
 
 	jQuery.ajax({
 		url: dm_root + 'changeDefaultErrandRateOnContracts',
 		data: {
-			'id_tarifa': rate_id
+			'errand_rate_id': errand_rate_id
 		},
 		dataType: 'JSON',
 		method: 'POST',
 		async: false,
 		success: function(response) {
 			if (response.success) {
-				jQuery.deleteRate(rate_id);
+				jQuery.deleteRate(errand_rate_id);
 			};
 		}
 	});
