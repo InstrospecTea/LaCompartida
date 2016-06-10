@@ -2,7 +2,7 @@
 
 ## Hotfix 16.17.1
 Friday, Jun 10th
-* **Fix** [Modificaciones Excel PRC](https://github.com/LemontechSA/ttb/pull/1550)
+* **Fix** [Modificaciones Excel PRC](https://github.com/LemontechSA/ttb/pull/1552)
 
 ## Release 16.17.0
 Thursday, Jun 9th
