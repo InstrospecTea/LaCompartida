@@ -1279,7 +1279,7 @@ class CartaCobro extends NotaCobro {
 				$table = $chargingBusiness->getSlidingScalesDetailTable($slidingScales, $currency, $language);
 				$html2 = str_replace('%detalle_escalones%', $table, $html2);
 
-                		if (strpos($html2, '%cuenta_banco%')) {
+				if (strpos($html2, '%cuenta_banco%')) {
 
 					if ($contrato->fields['id_cuenta']) {
 						$query_banco = "SELECT glosa FROM cuenta_banco WHERE id_cuenta = '" . $contrato->fields['id_cuenta'] . "'";
