@@ -45,16 +45,16 @@ class LogsAPI extends AbstractSlimAPI {
 			}
 
 			$row = array(
-				'a' => date('d-m-Y H:i:s', strtotime($log->get('fecha')) + $offset),
-				'b' => $log->get('username'),
-				'c' => $log->get('humanized')
+				'date' => date('d-m-Y H:i:s', strtotime($log->get('fecha')) + $offset),
+				'username' => $log->get('username'),
+				'changes' => $log->get('humanized')
 			);
 
 			array_push($rows, $row);
 		}
 
 		$results = array(
-			'headers' => array('a' => 'Fecha', 'b' => 'Usuario', 'c' => 'Cambios'),
+			'headers' => array('date' => 'Fecha', 'username' => 'Usuario', 'changes' => 'Cambios'),
 			'rows' => $rows
 		);
 
