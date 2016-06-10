@@ -33,7 +33,8 @@ $directorios = array(
 	'/app/layers/manager.support/',
 	'/app/layers/manager/exceptions/',
 	'/database/lib/',
-	'/fw/classes/'
+	'/fw/classes/',
+	'/app/layers/configurations/',
 );
 
 $appNamespaces = array('Api\V1', 'Api\V2');
