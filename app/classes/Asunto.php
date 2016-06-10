@@ -1256,7 +1256,7 @@ class Asunto extends Objeto {
 				$this->ActualizaClienteTarea($nuevo_codigo_asunto, $nuevo_codigo_cliente);
 				$this->ActualizaClienteGasto($nuevo_codigo_cliente);
 
-				$this->fields['codigo_cliente'] = $nuevo_codigo_cliente;
+				$this->Edit('codigo_cliente', $nuevo_codigo_cliente, true);
 				$this->fields['codigo_asunto'] = $nuevo_codigo_asunto;
 
 				$this->write();
