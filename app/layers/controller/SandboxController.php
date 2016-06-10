@@ -29,7 +29,6 @@ class SandboxController extends AbstractController {
 		$this->info('Calculator.. woh wo ooo .. calculator!');
 	}
 
-
 	public function report() {
 		$this->loadBusiness('Sandboxing');
 		$report = $this->SandboxingBusiness->report($this->data);
@@ -70,5 +69,35 @@ class SandboxController extends AbstractController {
 		$this->ChargingBusiness->detachAllWorks($charge_id);
 	}
 
-}
+	public function jsonToTable() {
+		$this->layoutTitle = 'Json To Table';
+		$data = json_encode(array(
+			'headers' => array('a' => 'ID', 'b' => 'Name', 'd' => 'Nothing', 'c' => 'Date'),
+			'rows' => array(
+				array(
+					'a' => ++$i,
+					'b' => 'Claudio',
+					'c' => date('Y-m-d', strtotime("+$i day"))
+				),
+				array(
+					'a' => ++$i,
+					'b' => 'Hugo',
+					'c' => date('Y-m-d', strtotime("+$i day"))
+				),
+				array(
+					'a' => ++$i,
+					'b' => 'Diego',
+					'c' => date('Y-m-d', strtotime("+$i day"))
+				),
+				array(
+					'a' => ++$i,
+					'b' => 'Sergio',
+					'c' => date('Y-m-d', strtotime("+$i day"))
+				),
+			)
+		));
 
+		$this->set(compact('data'));
+	}
+
+}
