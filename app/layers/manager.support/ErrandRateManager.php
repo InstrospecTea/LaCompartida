@@ -40,8 +40,14 @@ class ErrandRateManager extends AbstractManager implements IRateManager {
 	 * @param type int, array, array
 	 */
 	public function updateErrandRate($errand_rate, $rates) {
-		$ErrandValue = $this->ErrandValueService->get($errand_rate['id_tramite_tarifa']);
-		$this->ErrandValueService->delete($ErrandValue);
+		try {
+			$ErrandValue = $this->ErrandValueService->get($errand_rate['id_tramite_tarifa']);
+			$this->ErrandValueService->delete($ErrandValue);
+		} catch (PDOException $e) {
+			echo $e->getMessage();
+		} catch (ServiceException $e) {
+			// Se deja pasar esta excepción ya que salta cuando la query no retorna datos.
+		}
 
 		$insertCriteria = new InsertCriteria($this->Sesion);
 		$insertCriteria->setTable('tramite_valor');
@@ -80,7 +86,7 @@ class ErrandRateManager extends AbstractManager implements IRateManager {
 		$response = new stdClass();
 		if ($ErrandRate) {
 			$response->success = true;
-			$response->rate_id = $ErrandRate->fields['id_tramite_tarifa'];
+			$response->errand_rate_id = $ErrandRate->fields['id_tramite_tarifa'];
 		} else {
 			$response->success = false;
 			$response->message = __('Ha ocurrido un error');
@@ -96,7 +102,7 @@ class ErrandRateManager extends AbstractManager implements IRateManager {
 			foreach ($rate as $pivot => $value) {
 				$insertCriteria->addPivotWithValue($pivot, $value, true);
 			}
-			$insertCriteria->addPivotWithValue('id_tramite_tarifa', $response->rate_id);
+			$insertCriteria->addPivotWithValue('id_tramite_tarifa', $response->errand_rate_id);
 			$insertCriteria->addInsert();
 		}
 		$insertCriteria->run();
