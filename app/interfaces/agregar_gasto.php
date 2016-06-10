@@ -782,6 +782,9 @@ $Form = new Form;
 				</td>
 				<td align="left">
 					<?= $Form->input('solicitante', $gasto->fields['solicitante'], array('size' => '32', 'label' => false)); ?>
+					<?php if (Conf::GetConf($sesion, 'OrdenadoPor') == 1): ?>
+						<?= $Form->Html->span('*', array('style' => 'color:#FF0000; font-size:10px')); ?>
+					<?php endif; ?>
 				</td>
 			</tr>
 		<?php endif; ?>
