@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.17.2
+Friday, 10th
+* **Fix** [Corrige suma en excel prc](https://github.com/LemontechSA/ttb/pull/1555)
+
 ## Hotfix 16.17.1
 Friday, Jun 10th
 * **Fix** [Modificaciones Excel PRC](https://github.com/LemontechSA/ttb/pull/1552)
