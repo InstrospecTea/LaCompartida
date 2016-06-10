@@ -103,7 +103,7 @@ $Form = new Form;
 					if (response.length == 0) {
 						jQuery('#json_to_table').html(
 							jQuery('<center/>').html(
-								jQuery('<h3/>').html(<?= __('No existen movimientos para este Asunto') ?>)
+								jQuery('<h3/>').html("<?= __('No existen movimientos para este Asunto') ?>")
 							)
 						);
 						return false;
@@ -117,7 +117,7 @@ $Form = new Form;
 					401: function() {
 						jQuery('#json_to_table').html(
 							jQuery('<center/>').html(
-								jQuery('<h3/>').html(<?= __('Ha ocurrido un error al consultar el historial. Por favor inicie sesión nuevamente.') ?>)
+								jQuery('<h3/>').html("<?= __('Ha ocurrido un error al consultar el historial. Por favor inicie sesión nuevamente.') ?>")
 							)
 						);
 						return false;
