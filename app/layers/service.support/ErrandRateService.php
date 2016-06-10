@@ -1,5 +1,5 @@
 <?php
-class ErrandRateService extends AbstractService {#} implements IErrandService {
+class ErrandRateService extends AbstractService implements IErrandRateService {
 
 	public function getDaoLayer() {
 		return 'ErrandRateDAO';
