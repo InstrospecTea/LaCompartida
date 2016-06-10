@@ -1,5 +1,9 @@
 # Changelog
 
+## Release 16.17.0
+Thursday, Jun 9th
+* **Feature** [Refactor carga trabajos demo](https://github.com/LemontechSA/ttb/pull/1514)
+
 ## Hotfix 16.16.1
 Thursday, Jun 9th
 * **Fix** [Ordenar trabajos por fecha en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1549)
