@@ -36,7 +36,7 @@ abstract Class AsuntoHumanize {
 		),
 		'id_encargado' => array(
 			'service_name' => 'User',
-			'field' => "concat(nombre, ' ', apellido1)"
+			'field' => "CONCAT(nombre, ' ', apellido1)"
 		),
 		'codigo_cliente' => array(
 			'service_name' => 'Client',

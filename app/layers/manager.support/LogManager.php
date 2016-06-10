@@ -65,7 +65,7 @@ class LogManager extends AbstractManager implements ILogManager {
 	 * @return 	SplFixedArray
 	 */
 	private function getLogsWithUsername($table_title, $id_field) {
-		$this->loadManager("Search");
+		$this->loadManager('Search');
 
 		$logSearchCriteria = new SearchCriteria('LogDatabase');
 		$logSearchCriteria
@@ -85,7 +85,7 @@ class LogManager extends AbstractManager implements ILogManager {
 			->add_scope_for('Log', 'orderByDate', array('args' => array('DESC')));
 		$logResults = $this->SearchManager->searchByCriteria(
 			$logSearchCriteria,
-			array('*', "CONCAT(User.nombre, ' ', User.apellido1) as username")
+			array('*', "CONCAT(User.nombre, ' ', User.apellido1) AS username")
 		);
 
 		return $logResults;
