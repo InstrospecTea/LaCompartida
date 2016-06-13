@@ -29,12 +29,14 @@ $directorios = array(
 	'/app/layers/utilities/',
 	'/app/layers/utilities/twig/',
 	'/app/layers/utilities/middlewares/',
+	'/app/layers/utilities/humanize/',
 	'/app/layers/view/helpers/',
 	'/app/layers/manager/',
 	'/app/layers/manager.support/',
 	'/app/layers/manager/exceptions/',
 	'/database/lib/',
-	'/fw/classes/'
+	'/fw/classes/',
+	'/app/layers/configurations/',
 );
 
 $appNamespaces = array('Api\V1', 'Api\V2');

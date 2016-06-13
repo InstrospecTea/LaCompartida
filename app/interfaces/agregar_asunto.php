@@ -176,7 +176,9 @@ if ($opcion == 'guardar') {
 		}
 
 		$Asunto->Edit("glosa_asunto", $glosa_asunto);
-		$Asunto->Edit("codigo_cliente", $codigo_cliente, true);
+
+		$client_code = !is_null($nuevo_codigo_cliente) ? $nuevo_codigo_cliente : $codigo_cliente;
+		$Asunto->Edit("codigo_cliente", $client_code, true);
 
 		if (Conf::GetConf($Sesion, 'ExportacionLedes')) {
 			$Asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');

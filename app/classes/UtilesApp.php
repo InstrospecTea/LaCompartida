@@ -2382,8 +2382,8 @@ HTML;
 		return file_get_contents(dirname(__FILE__) . '/../../VERSION');
 	}
 
-	/*
-	 * Override del metodo de FW/Utiles para no escribir lo que desaparecer en PHP 5.6
+	/**
+	 * Override del metodo de FW/Utiles para no escribir lo que desaparecerá en PHP 5.6
 	 * @param type $horaDecimal
 	 * @param type $digitos_hora
 	 * @return type

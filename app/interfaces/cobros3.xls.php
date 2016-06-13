@@ -30,7 +30,7 @@ if ($p_profesional->fields['permitido']) {
 $mostrar_tarifa_al_profesional = Conf::GetConf($sesion, 'MostrarTarifaAlProfesional') && $profesionalpermitido && !$revisorpermitido;
 
 $wb = new WorkbookMiddleware();
-
+header('Set-Cookie: fileDownload=true; path=/');
 $wb->setVersion(8);
 $wb->send('Revisión de horas.xls');
 $wb->setCustomColor(35, 220, 255, 220);

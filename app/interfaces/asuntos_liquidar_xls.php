@@ -144,7 +144,7 @@ $fecha_actual = date('Y-m-d');
 $wb = new WorkbookMiddleware();
 
 // Enviar headers a la pagina
-
+header('Set-Cookie: fileDownload=true; path=/');
 $wb->send(__('Asuntos por') . ' ' . __('cobrar') . ' ' . $fecha_actual . __('.xls'));
 
 // Definir colores
@@ -324,7 +324,6 @@ unset($col);
 $fila = 0;
 
 // Escribir encabezado reporte
-
 $ws1->write($fila, 0, __('Asuntos por') . ' ' . __('cobrar'), $formato_encabezado);
 $fila++;
 $ws1->write($fila, 0, $fecha_actual, $formato_encabezado);

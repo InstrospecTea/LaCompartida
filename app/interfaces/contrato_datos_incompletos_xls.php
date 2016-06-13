@@ -1,6 +1,6 @@
 <?php
 	require_once dirname(__FILE__).'/../conf.php';
-
+	header('Set-Cookie: fileDownload=true; path=/');
 	//Parámetros generales para los 2 casos de listas a extraer
 	$sesion = new Sesion(array('REV','ADM'));
 	$pagina = new Pagina($sesion);
@@ -55,11 +55,11 @@
 	}
 
 	$wb->send('Clientes_datos_incompletos.xls');
-	$ws1->setColumn( 1, 1, 18);
-	$ws1->setColumn( 2, 2, 45);
-	$ws1->setColumn( 3, 3, 40);
-	$ws1->setColumn( 4, 4, 75);
-	$ws1->setColumn( 5, 5, 20);
+	$ws1->setColumn( 1, 1, 18.14);
+	$ws1->setColumn( 2, 2, 45.00);
+	$ws1->setColumn( 3, 3, 40.00);
+	$ws1->setColumn( 4, 4, 75.00);
+	$ws1->setColumn( 5, 5, 20.00);
 	$ws1->write(0, 0, 'Listado de Clientes con datos incompletos', $encabezado);
 	$ws1->mergeCells (0, 0, 0, 8);
 	$info_usr1 = str_replace('<br>',' - ',$PdfLinea1);

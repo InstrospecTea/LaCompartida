@@ -1,5 +1,53 @@
 # Changelog
 
+## [Release 16.18.0](https://github.com/LemontechSA/ttb/pull/1554)
+Monday, Jun 13th
+* **Feature** [Humanize logs](https://github.com/LemontechSA/ttb/pull/1515)
+
+## Hotfix 16.17.3
+Monday, Jun 13th
+* **Fix** [Agrega columna cliente](https://github.com/LemontechSA/ttb/pull/1556)
+
+## Hotfix 16.17.2
+Friday, Jun 10th
+* **Fix** [Corrige suma en excel prc](https://github.com/LemontechSA/ttb/pull/1555)
+
+## Hotfix 16.17.1
+Friday, Jun 10th
+* **Fix** [Modificaciones Excel PRC](https://github.com/LemontechSA/ttb/pull/1552)
+
+## Release 16.17.0
+Thursday, Jun 9th
+* **Feature** [Refactor carga trabajos demo](https://github.com/LemontechSA/ttb/pull/1514)
+
+## Hotfix 16.16.1
+Thursday, Jun 9th
+* **Fix** [Ordenar trabajos por fecha en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1549)
+
+## [Release 16.16.0](https://github.com/LemontechSA/ttb/pull/1545)
+Thursday, Jun 9th
+* **Feature** [Mejorar comportamiento del "Loading" de la aplicación](https://github.com/LemontechSA/ttb/pull/1468)
+
+## Hotfix 16.15.17
+Thursday, Jun 9th
+* **Fix** [Correcciones a Biblioteca -> Archivos](https://github.com/LemontechSA/ttb/pull/1548)
+
+## Hotfix 16.15.16
+Wednesday, Jun 8th
+* **Fix** [Problema fecha excel borradores masivos](https://github.com/LemontechSA/ttb/pull/1544)
+
+## Hotfix 16.15.15
+Tuesday, Jun 7th
+* **Fix** [Problema en el excel de borradores masivos](https://github.com/LemontechSA/ttb/pull/1542)
+
+## Hotfix 16.15.14
+Monday, Jun 6th
+* **Fix** [Las notas de cobro tienen que ser sumadas si estas fueron fueron anuladas](https://github.com/LemontechSA/ttb/pull/1536)
+
+## Hotfix 16.15.13
+Monday, Jun 6th
+* **Fix** [Corrige escritura decimales cero/cien](https://github.com/LemontechSA/ttb/pull/1535)
+
 ## Hotfix 16.15.12
 Friday, Jun 3rd
 * **Fix** [Limita el tamaño del nombre de la hoja a 31 caracteres.](https://github.com/LemontechSA/ttb/pull/1530)

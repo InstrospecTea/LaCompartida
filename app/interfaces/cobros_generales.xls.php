@@ -5,6 +5,7 @@
 	$pagina = new Pagina($sesion);
 
 	$wb = new WorkbookMiddleware();
+	header('Set-Cookie: fileDownload=true; path=/');
 	$wb->setVersion(8);
 	$wb->send('Revisión de cobros.xls');
 	$wb->setCustomColor(35, 220, 255, 220);
@@ -202,7 +203,7 @@
 		$contrato=$trabajo->fields['id_contrato'];
 		//se escriben las filas
 		if (!isset($ws1)) {
-			$ws1 =& $wb->addWorksheet($paginas.' '.substr($trabajo->fields['glosa_cliente'], 0, 20));
+			$ws1 =& $wb->addWorksheet($paginas . ' ' . substr($trabajo->fields['glosa_cliente'], 0, 20));
 		}
 		$ws1->write($fila_inicial, $col_fecha, Utiles::sql2date($trabajo->fields[fecha], "%d-%m-%Y"), $tex);
 		$ws1->write($fila_inicial, $col_asunto, $trabajo->fields['glosa_asunto'], $tex);
@@ -210,15 +211,16 @@
 		$text_descripcion = addslashes($trabajo->fields['descripcion']);
 
 		$ws1->write($fila_inicial, $col_descripcion, $text_descripcion, $tex);
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
+		if (Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema')) {
 			$ws1->write($fila_inicial, $col_abogado, $trabajo->fields['username'], $tex);
-		else
+		} else {
 			$ws1->write($fila_inicial, $col_abogado, $trabajo->fields['nombre'].' '.$trabajo->fields['apellido1'], $tex);
+		}
 		list($duracion, $duracion_cobrada)= explode('<br>', $trabajo->fields[duracion]);
-		list($h, $m)= explode(':', $duracion);
+		list($h, $m) = explode(':', $duracion);
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
 		$ws1->writeNumber($fila_inicial, $col_duracion_trabajada, $tiempo_excel, $time_format);
-		list($h, $m)= explode(':', $duracion_cobrada);
+		list($h, $m) = explode(':', $duracion_cobrada);
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
 		$ws1->writeNumber($fila_inicial, $col_duracion_cobrable, $tiempo_excel, $time_format);
 

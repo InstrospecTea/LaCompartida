@@ -7,6 +7,7 @@ require_once Conf::ServerDir() . '/classes/UtilesApp.php';
 
 $sesion = new Sesion(array('REV', 'ADM', 'PRO'));
 $pagina = new Pagina($sesion);
+set_time_limit(300);
 $currency = array();
 $querycurrency = "select * from prm_moneda";
 $respcurrency = mysql_query($querycurrency, $sesion->dbh) or die('NOO');
@@ -29,6 +30,7 @@ class HTMLtoXLS {
 		header('Expires: 0');
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('content-disposition: attachment;filename=planillon_trabajos.xls');
+		header('Set-Cookie: fileDownload=true; path=/');
 
 		echo '<HTML LANG="es">
 		<title>Planillon de Trabajos</title>

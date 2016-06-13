@@ -1,8 +1,9 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-
 $Sesion = new Sesion(array('ADM', 'COB'));
-ini_set("memory_limit", "256M");
+set_time_limit(400);
+ini_set("memory_limit", "1024M");
+
 $where_cobro = ' 1 ';
 
 if ($id_cobro) {
@@ -493,7 +494,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$filas = 9;
 
 	// Agregar la imagen del logo
-	if (UtilesApp::GetConf($sesion, 'LogoExcel')) {
+	if (UtilesApp::GetConf($sesion, 'LogoExcel') && file_exists(UtilesApp::GetConf($sesion, 'LogoExcel'))) {
 		$ws->insertBitmap(0, 0, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, 1, 1.2);
 	}
 
@@ -503,12 +504,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$filas += 1;
 
 	//Glosa de la razón social en el contrato
-	$ws->write($filas, $col_id_trabajo, strtoupper($Contrato->fields['factura_razon_social']), $letra_chica);
-	$filas += 2;
+	$ws->write($filas, $col_id_trabajo, strtoupper($Contrato->fields['factura_razon_social']), $letra_chica_bold);
+	$filas += 1;
 
 	//Dirección en el contrato
 	$ws->write($filas, $col_id_trabajo, strtoupper($Contrato->fields['factura_direccion']), $letra_chica);
-	$filas += 4;
+	$filas += 3;
 
 	//Lista de asuntos del cobro
 	$Cobro->LoadAsuntos();
@@ -583,8 +584,11 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $col_id_trabajo, $arraylang['honorarios']['Resumen'][$lang], $letra_chica_underline);
 		$ws->write($filas, 3, $simbolo_moneda_total, $letra_chica_derecha);
 		$ws->writeNumber($filas, 4, $x_resultados['monto_subtotal'][$Cobro->fields['opc_moneda_total']], $formato_total);
+		$filas ++;
+		$monto_flat_fee = $Cobro->fields['forma_cobro'] == 'FLAT FEE' ? $simbolo_moneda_total .' '. $Cobro->fields['monto_contrato'] : '';
+		$ws->write($filas, $col_id_trabajo, "{$Cobro->fields['forma_cobro']} $monto_flat_fee", $letra_chica );
 	}
-	$fila_honorario = $filas + 1;
+	$fila_honorario = $filas;
 	$filas += 3;
 
 	if ($x_gastos['subtotal_gastos_con_impuestos'] > 0) {
@@ -684,9 +688,13 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$columna_importe = $col++;
 		$col_formula_importe = Utiles::NumToColumnaExcel($columna_importe);
 
+		$WorkingBusiness = new WorkingBusiness($Sesion);
+		$works = $WorkingBusiness->getWorksByCharge($Cobro->fields['id_cobro']);
 		$fecha_ini_titulo = '';
 		if ($Cobro->fields['fecha_ini'] != '0000-00-00') {
 			$fecha_ini_titulo = $Cobro->fields['fecha_ini'];
+		} else {
+			$fecha_ini_titulo = !empty($works[0]) ? $works[0]->get('fecha') : '';
 		}
 		$ws->mergeCells($filas, 0, $filas, 4);
 		$ws->write($filas, $columna_categoria, $arraylang['titulo_resumen']['Encabezado'][$lang], $formato_encabezado_center);
@@ -696,7 +704,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $columna_importe, '', $formato_encabezado);
 		$filas += 1;
 		$ws->mergeCells($filas, 0, $filas, 4);
-		$ws->write($filas, $columna_categoria, $arraylang['periodo']['Listado de trabajos'][$lang] . ' ' . $fecha_ini_titulo . $arraylang['periodo_al']['Listado de trabajos'][$lang] . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
+		$ws->write(
+			$filas,
+			$columna_categoria,
+			"{$arraylang['periodo']['Listado de trabajos'][$lang]} {$fecha_ini_titulo} {$arraylang['periodo_al']['Listado de trabajos'][$lang]} {$Cobro->fields['fecha_fin']}",
+			$formato_encabezado_center
+		);
 		$ws->write($filas, $columna_abogado, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_hora, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_tarifa, '', $formato_encabezado_center);
@@ -828,7 +841,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$tarifa_abogado *= $factor_proporcional_forma_cobro;
 				}
 
-				$ws->writeNumber($filas, $columna_tarifa, $tarifa_abogado, $formato_moneda2_centrado);
+				$ws->writeNumber($filas, $columna_tarifa, $tarifa_abogado, $formato_moneda);
 
 				$duracion = $trabajo->fields['duracion_cobrada'];
 				list($h, $m) = explode(':', $duracion);
@@ -844,7 +857,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2_centrado);
 				}
 
-				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda2_centrado);
+				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda);
 
 				$filas += 1;
 			}
@@ -936,7 +949,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $columna_importe, '', $formato_encabezado);
 		$ws->mergeCells($filas, 0, $filas, 7);
 		$filas += 2;
-		$ws->write($filas, $columna_inicial, $arraylang['cliente']['Encabezado'][$lang] . $Cliente->fields['glosa_cliente'], $formato_encabezado);
+		$ws->write($filas, $columna_inicial, $arraylang['cliente']['Encabezado'][$lang] . ': ' . $Cliente->fields['glosa_cliente'], $formato_encabezado);
 		$filas += 3;
 		$ws->freezePanes(array($filas, 0));
 
@@ -1082,7 +1095,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$tarifa_trabajo *= $factor_proporcional_forma_cobro;
 				}
 
-				$ws->writeNumber($filas, $columna_tarifa, $tarifa_trabajo, $formato_moneda2_centrado);
+				$ws->writeNumber($filas, $columna_tarifa, $tarifa_trabajo, $formato_moneda);
 
 
 				$duracion = $trabajo->fields['duracion_cobrada'];
@@ -1100,9 +1113,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				}
 
 				// La multiplicación por 24 es para transformarlos a minutos cobrables (es por día)
-				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda2_centrado);
+				$ws->writeFormula($filas, $columna_importe, "=24*$col_formula_tarifa" . ($filas + 1) . "*$col_formula_hora_importe" . ($filas + 1), $formato_moneda);
 
-				$filas += 1;
+				$filas += 2;
 			}
 			subtotal_profesional($ws, $filas, $columna_hora, $col_formula_hora, $fila_inicial_asunto, $formato_tiempo_total_tabla, $Cobro, $columna_hora_tarificada,
 							$col_formula_hora_tarificada, $columna_importe, $col_formula_importe, $formato_moneda_tabla);
@@ -1164,9 +1177,19 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$columna_gastos_montos = $col++;
 		$col_formula_gastos_montos = Utiles::NumToColumnaExcel($columna_gastos_montos);
 
+		$Criteria = new Criteria($Sesion);
+		$result_fecha_menor_gastos = $Criteria
+			->add_select('fecha_factura')
+			->add_from('cta_corriente')
+			->add_restriction(CriteriaRestriction::equals('id_cobro', $Cobro->fields['id_cobro']))
+			->add_ordering('fecha_factura', 'ASC')
+			->add_limit(1)
+			->run();
 		$fecha_ini_titulo = '';
 		if ($Cobro->fields['fecha_ini'] != '0000-00-00') {
 			$fecha_ini_titulo = $Cobro->fields['fecha_ini'];
+		} else {
+			$fecha_ini_titulo = $result_fecha_menor_gastos[0]['fecha_factura'];
 		}
 
 		$ws->mergeCells($filas, 0, $filas, 3);
