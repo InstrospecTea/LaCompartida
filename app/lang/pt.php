@@ -1179,3 +1179,5 @@ $_LANG['Hay '] = 'Há ';
 $_LANG['Forma Envío'] = 'Forma de Envio';
 $_LANG['Monto Total'] = 'Valor Total';
 $_LANG['Se produjo un error generando el documento, por favor intente nuevamente.'] = 'Foi registrado um erro ao gerar o documento, por favor tente novamente.';
+$_LANG['No existen movimientos para este Asunto'] = 'Não existem movimentos para esse assunto';
+$_LANG['Ha ocurrido un error al consultar el historial. Por favor inicie sesión nuevamente.'] = 'Ocorreu um erro ao consultar o histórico. Por favor inicie a sessão novamente.';
