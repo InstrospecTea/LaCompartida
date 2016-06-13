@@ -590,7 +590,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$monto_flat_fee = $Cobro->fields['forma_cobro'] == 'FLAT FEE' ? $simbolo_moneda_total .' '. $Cobro->fields['monto_contrato'] : '';
 		$ws->write($filas, $col_id_trabajo, "{$Cobro->fields['forma_cobro']} $monto_flat_fee", $letra_chica );
 	}
-	$fila_honorario = $filas + 1;
+	$fila_honorario = $filas;
 	$filas += 3;
 
 	if ($x_gastos['subtotal_gastos_con_impuestos'] > 0) {
