@@ -1,7 +1,7 @@
 # Changelog
 
 ## [Release 16.18.0](https://github.com/LemontechSA/ttb/pull/1554)
-Friday, Jun 10th
+Monday, Jun 13th
 * **Feature** [Humanize logs](https://github.com/LemontechSA/ttb/pull/1515)
 
 ## Hotfix 16.17.3
