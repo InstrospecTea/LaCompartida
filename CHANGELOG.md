@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.18.0](https://github.com/LemontechSA/ttb/pull/1554)
+Monday, Jun 13th
+* **Feature** [Humanize logs](https://github.com/LemontechSA/ttb/pull/1515)
+
 ## Hotfix 16.17.3
 Monday, Jun 13th
 * **Fix** [Agrega columna cliente](https://github.com/LemontechSA/ttb/pull/1556)
