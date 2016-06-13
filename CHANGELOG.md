@@ -1,7 +1,11 @@
 # Changelog
 
+## Hotfix 16.17.3
+Monday, Jun 13th
+* **Fix** [Agrega columna cliente](https://github.com/LemontechSA/ttb/pull/1556)
+
 ## Hotfix 16.17.2
-Friday, 10th
+Friday, Jun 10th
 * **Fix** [Corrige suma en excel prc](https://github.com/LemontechSA/ttb/pull/1555)
 
 ## Hotfix 16.17.1
