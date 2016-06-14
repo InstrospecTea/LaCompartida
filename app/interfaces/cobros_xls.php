@@ -817,7 +817,14 @@ foreach ($chargeResults as $charge) {
 		++$filas;
 	}
 
-	if (in_array($cobro->fields['estado'], array('EMITIDO', 'FACTURADO'))) {
+	$config_estados_mostrar = json_decode(Conf::GetConf($sesion,'EstadoCobroMostrarConceptoExcel'), true);
+	if (empty($config_estados_mostrar)) {
+		$estados_mostrar = array('EMITIDO', 'FACTURADO');
+	} else {
+		$estados_mostrar = $config_estados_mostrar['estados'];
+	}
+
+	if (in_array($cobro->fields['estado'], $estados_mostrar)) {
 		if ($lang == 'es') {
 			$mes_concepto = ucfirst(Utiles::sql3fecha($cobro->fields['fecha_fin'], '%B %Y'));
 		} else {
