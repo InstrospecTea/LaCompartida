@@ -19,6 +19,6 @@ class InsertNuevoPrmPrc extends \Database\Migration implements \Database\ITempla
    * @return void
    */
 	function down() {
-		$this->addQueryDown('');
+		$this->addQueryDown('DELETE FROM `configuracion` WHERE `glosa_opcion` = \'EstadoCobroMostrarConceptoExcel\'');
 	}
 }
