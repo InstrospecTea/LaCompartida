@@ -6,6 +6,8 @@ $sesion = new Sesion(array('DAT','PRO'));
 $pagina = new Pagina($sesion);
 $id_usuario = $sesion->usuario->fields['id_usuario'];
 
+$Html = new \TTB\Html;
+
 // solo se muestran las opciones al admin de datos
 $params_array['codigo_permiso'] = 'DAT';
 // tiene permiso de admin_datos
@@ -20,6 +22,7 @@ if ($permisos->fields['permitido']) {
 $cliente = new Cliente($sesion);
 
 if ($excel) {
+	header('Set-Cookie: fileDownload=true; path=/');
 	$cliente->DownloadExcel(compact('glosa_cliente', 'codigo', 'id_grupo_cliente', 'giro', 'fecha1', 'fecha2', 'solo_activos'));
 	exit;
 }
@@ -39,6 +42,7 @@ $pagina->titulo = __('Clientes');
 $pagina->PrintTop();
 $Form = new Form();
 ?>
+
 <script type="text/javascript">
 function Validar(form)
 {
@@ -59,21 +63,23 @@ function Validar(form)
 
 function Listar( form, from )
 {
-	if(from == 'buscar')
+	if(from == 'buscar') {
+		jQuery('#btnBuscar').addClass('ui-state-disabled');
+		jQuery('#btnBuscar').removeAttr('onclick');
 		form.action = 'clientes.php?buscar=1';
-	else if(from == 'xls')
-		form.action = 'clientes.php?excel=1';
-	else
-		return false;
+		form.submit();
+	}	else if(from == 'xls') {
+		var loading_modal = new window.LoadingModal();
+		loading_modal.fileDownload('#form_cliente', 'clientes.php?excel=1');
 
-	form.submit();
-	return true;
+	}
+	return false;
 }
 
 function DescargarIncompletos(form)
 {
-	form.action = 'contrato_datos_incompletos_xls.php';
-	form.submit();
+	var loading_modal = new window.LoadingModal();
+	loading_modal.fileDownload('#form_cliente', 'contrato_datos_incompletos_xls.php');
 	return true;
 }
 //funcion java para eliminar
@@ -161,7 +167,7 @@ echo Autocompletador::Javascript($sesion,false);
 				<td></td>
 				<td class="al">
 					<?php
-					echo $Form->icon_button(__('Buscar'), 'find', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'buscar')"));
+					echo $Form->icon_button(__('Buscar'), 'find', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'buscar')", 'id' => 'btnBuscar'));
 					echo $Form->icon_button(__('Descargar listado a Excel'), 'xls', array('onclick' => "Listar(jQuery('#form_cliente').get(0), 'xls')"));
 					if (Conf::GetConf($sesion,'ValidacionesCliente')) {
 						echo $Form->icon_button(__('Descargar listado clientes datos incompletos'), 'xls', array('onclick' => "DescargarIncompletos(jQuery('#form_cliente').get(0));"));

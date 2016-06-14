@@ -38,5 +38,8 @@ if (_sf_async_config.pathseguro!==undefined) {
 
 /* ]]> */
 </script>
+<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/public/js/vendors.js?<?php echo UtilesApp::obtenerVersion()?>"></script>
+<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/layers/assets/js/LoadingModal.js"></script>
+<link rel="stylesheet" type="text/css" href="<?php echo Conf::RootDir(); ?>/app/layers/assets/css/LoadingModal.css" />
 </body>
 </html>
