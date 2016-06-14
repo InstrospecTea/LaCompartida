@@ -101,7 +101,7 @@ if ($id_adelanto) {
 		$tipo_cambio_cobro = $moneda_cobro->fields['tipo_cambio'];
 	}
 	$tasa_cambio = $tipo_cambio_adelanto / $tipo_cambio_cobro;
-	if ($monto_pago_adelanto > $documento_adelanto->fields['saldo_pago']) {
+	if ($monto_pago > ($documento_adelanto->fields['saldo_pago'] * -1)) {
 		$monto_pago_adelanto = -$documento_adelanto->fields['saldo_pago'];
 		$monto_pago = $monto_pago_adelanto * $tasa_cambio;
 	}
