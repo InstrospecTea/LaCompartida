@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.18.2
+Wednesday, Jun 15th
+* **Fix**  [Problema al agregar adelantos con decimales](https://github.com/LemontechSA/ttb/pull/1565)
+
 ## Hotfix 16.18.1
 Wednesday, Jun 15th
 * **Fix** [Correcciones Excel PRC](https://github.com/LemontechSA/ttb/pull/1564)
