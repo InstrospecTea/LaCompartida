@@ -9,6 +9,7 @@ class Form {
 	public $Html;
 	public $defaultLabel = true;
 	protected $scripts = array();
+	protected $js_includes = array();
 	protected $image_path = '//static.thetimebilling.com/images/';
 
 	public function __construct() {
@@ -463,10 +464,38 @@ class Form {
 	}
 
 	/**
+	 * Crea un textarea con revisión de ortografía
+	 * @param string $name
+	 * @param string $value
+	 * @param array $attrs
+	 */
+	public function spellCheck($name, $value, array $attrs = array()) {
+		$attrs += array('role' => 'spellcheck');
+		$this->js_includes[] = 'spellcheck';
+		return $this->textarea($name, $value, $attrs);
+	}
+
+	private function spellcheck_include() {
+		return $this->Html->script(Conf::RootDir() . '/app/layers/assets/js/spellcheck.js');
+	}
+
+	public function inludes() {
+		$js_includes = array_unique($this->js_includes);
+		$includes = '';
+		foreach ($js_includes as $script) {
+			if (method_exists($this, "{$script}_include")) {
+				$includes .= call_user_func(array($this, "{$script}_include"));
+			}
+		}
+		return $includes;
+	}
+
+	/**
 	 *
 	 * @return type
 	 */
 	public function script() {
+		$includes = $this->inludes();
 		$scripts = array_unique($this->scripts);
 		$script_block = '';
 		foreach ($scripts as $script) {
@@ -474,7 +503,7 @@ class Form {
 				$script_block .= $this->{"{$script}_script"}() . "\n";
 			}
 		}
-		return $this->Html->script_block($script_block);
+		return $includes . $this->Html->script_block($script_block);
 	}
 
 	private function button_script() {
