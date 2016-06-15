@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.18.1
+Wednesday, Jun 15th
+* **Fix** [Correcciones Excel PRC](https://github.com/LemontechSA/ttb/pull/1564)
+
 ## [Release 16.18.0](https://github.com/LemontechSA/ttb/pull/1554)
 Monday, Jun 13th
 * **Feature** [Humanize logs](https://github.com/LemontechSA/ttb/pull/1515)
