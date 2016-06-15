@@ -530,8 +530,8 @@ $Form->defaultLabel = false;
 			if (change) {
 				jQuery('#monto_moneda_cobro').val(jQuery('#monto').val());
 				jQuery('#monto_moneda_cobro').trigger('keyup');
-			};
-		};
+			}
+		}
 		ActualizarMontosIndividuales('monto_moneda_cobro');
 
 		<?php if (empty($id_neteo_documento_adelanto)) { ?>
@@ -950,7 +950,7 @@ $Form->defaultLabel = false;
 
 				echo $Form->input(
 						'monto',
-						$moneda_pago->getFloat($monto_pago_adelanto, false),
+						$moneda_pago->getFloat($monto_pago_adelanto),
 						array(
 								'size' => 10,
 								'onchange' => 'MontoValido(this.id); ActualizarMontoMonedaCobro();'
