@@ -12,7 +12,7 @@ class InsertNuevoPrmPrc extends \Database\Migration implements \Database\ITempla
 		$this->addQueryUp("INSERT INTO `configuracion` 
 (`glosa_opcion`, `valor_opcion`, `comentario`, `valores_posibles`, `id_configuracion_categoria`, `orden`)
  VALUES 
- ('EstadoCobroMostrarConceptoExcel', '{\"estados\":[\"EMITIDO\",\"FACTURADO\"]}', 'Estados para mostrar concepto en excel cobro', 'string', '4', '-1')
+ ('EstadoCobroMostrarConceptoExcel', '[\"EMITIDO\",\"FACTURADO\"]', 'Estados para mostrar concepto en excel cobro', 'string', '4', '-1')
 ");
 	}
 

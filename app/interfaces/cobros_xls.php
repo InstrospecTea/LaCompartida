@@ -821,7 +821,7 @@ foreach ($chargeResults as $charge) {
 	if (empty($config_estados_mostrar_concepto)) {
 		$estados_mostrar_concepto = array('EMITIDO', 'FACTURADO');
 	} else {
-		$estados_mostrar_concepto = $config_estados_mostrar_concepto['estados'];
+		$estados_mostrar_concepto = $config_estados_mostrar_concepto;
 	}
 
 	if (in_array($cobro->fields['estado'], $estados_mostrar_concepto)) {
