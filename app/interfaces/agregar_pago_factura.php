@@ -950,7 +950,7 @@ $Form->defaultLabel = false;
 
 				echo $Form->input(
 						'monto',
-						$moneda_pago->getFloat($monto_pago_adelanto),
+						$moneda_pago->getFloat($monto_pago_adelanto, false),
 						array(
 								'size' => 10,
 								'onchange' => 'MontoValido(this.id); ActualizarMontoMonedaCobro();'
@@ -1133,6 +1133,7 @@ $Form->defaultLabel = false;
 		global $saldo_pago;
 		global $id_cobro;
 		global $id_adelanto;
+		global $moneda_pago;
 
 		$id_factura = $fila->fields['id_factura'];
 
@@ -1153,7 +1154,7 @@ $Form->defaultLabel = false;
 		}
 
 		$read_only = ($id_adelanto && ($id_cobro != $fila->fields['id_cobro']));
-		$opc_html .= $Form->input("saldo_{$id_factura}", $monto_a_pagar, array('label' => "{$fila->fields['simbolo']}&nbsp;", 'size' => 7, 'class' => 'saldojq', 'readonly' => $read_only));
+		$opc_html .= $Form->input("saldo_{$id_factura}", $moneda_pago->getFloat($monto_a_pagar, false), array('label' => "{$fila->fields['simbolo']}&nbsp;", 'size' => 7, 'class' => 'saldojq', 'readonly' => $read_only));
 		$opc_html .= $Form->hidden("x_saldo_hide_{$id_factura}", $fila->fields['saldo_factura'], array('id' => "x_saldo_hide_{$id_factura}"));
 		$opc_html .= $Form->hidden("tipo_cambio_{$id_factura}", $fila->fields['saldo_factura'], array('id' => "tipo_cambio_{$id_factura}"));
 		$opc_html .= $Form->hidden("cifras_decimales_{$id_factura}", $fila->fields['saldo_factura'], array('id' => "cifras_decimales_{$id_factura}"));
