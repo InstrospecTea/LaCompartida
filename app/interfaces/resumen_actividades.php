@@ -793,7 +793,7 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 
 			$client_results = $ClientService->findAll(CriteriaRestriction::equals('activo', '1'), $client_code);
 			foreach ($client_results as $key => $value) {
-				$clients[] = $value['codigo_cliente'];
+				$clients[] = $value->get($client_code);
 			}
 		} else {
 			$clients = explode(',', $clientes);
