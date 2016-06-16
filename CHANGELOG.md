@@ -1,7 +1,43 @@
 # Changelog
 
+## Hotfix 16.18.3
+Thursday, Jun 16th
+* **Fix**  [Corregir pagos utilizando adelantos](https://github.com/LemontechSA/ttb/pull/1568)
+
+## Hotfix 16.18.2
+Wednesday, Jun 15th
+* **Fix**  [Problema al agregar adelantos con decimales](https://github.com/LemontechSA/ttb/pull/1565)
+
+## Hotfix 16.18.1
+Wednesday, Jun 15th
+* **Fix** [Correcciones Excel PRC](https://github.com/LemontechSA/ttb/pull/1564)
+
+## [Release 16.18.0](https://github.com/LemontechSA/ttb/pull/1554)
+Monday, Jun 13th
+* **Feature** [Humanize logs](https://github.com/LemontechSA/ttb/pull/1515)
+
+## Hotfix 16.17.3
+Monday, Jun 13th
+* **Fix** [Agrega columna cliente](https://github.com/LemontechSA/ttb/pull/1556)
+
+## Hotfix 16.17.2
+Friday, Jun 10th
+* **Fix** [Corrige suma en excel prc](https://github.com/LemontechSA/ttb/pull/1555)
+
+## Hotfix 16.17.1
+Friday, Jun 10th
+* **Fix** [Modificaciones Excel PRC](https://github.com/LemontechSA/ttb/pull/1552)
+
+## Release 16.17.0
+Thursday, Jun 9th
+* **Feature** [Refactor carga trabajos demo](https://github.com/LemontechSA/ttb/pull/1514)
+
+## Hotfix 16.16.1
+Thursday, Jun 9th
+* **Fix** [Ordenar trabajos por fecha en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1549)
+
 ## [Release 16.16.0](https://github.com/LemontechSA/ttb/pull/1545)
-Wednesday, Jun 9th
+Thursday, Jun 9th
 * **Feature** [Mejorar comportamiento del "Loading" de la aplicación](https://github.com/LemontechSA/ttb/pull/1468)
 
 ## Hotfix 16.15.17
