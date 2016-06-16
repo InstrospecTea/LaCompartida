@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.18.3
+Thursday, Jun 16th
+* **Fix**  [Corregir pagos utilizando adelantos](https://github.com/LemontechSA/ttb/pull/1568)
+
 ## Hotfix 16.18.2
 Wednesday, Jun 15th
 * **Fix**  [Problema al agregar adelantos con decimales](https://github.com/LemontechSA/ttb/pull/1565)
