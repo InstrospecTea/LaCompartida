@@ -479,7 +479,7 @@ class Form {
 		return $this->Html->script(Conf::RootDir() . '/app/layers/assets/js/spellcheck.js');
 	}
 
-	public function inludes() {
+	public function includes() {
 		$js_includes = array_unique($this->js_includes);
 		$includes = '';
 		foreach ($js_includes as $script) {
@@ -495,7 +495,7 @@ class Form {
 	 * @return type
 	 */
 	public function script() {
-		$includes = $this->inludes();
+		$includes = $this->includes();
 		$scripts = array_unique($this->scripts);
 		$script_block = '';
 		foreach ($scripts as $script) {
