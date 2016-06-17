@@ -13,7 +13,7 @@ class ErrandRateController extends AbstractController {
 	 * Carga la página principal del módulo
 	 * @return mixed
 	 */
-	public function ErrandsRate() {
+	public function index() {
 		$this->layoutTitle = __('Ingreso de Tarifas de Trámites');
 		$this->loadBusiness('Coining');
 
