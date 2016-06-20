@@ -1781,7 +1781,7 @@ else
 										<span class="moneda"><?= $moneda_cobro->fields['simbolo'] ?></span>
 									</td>
 									<td>
-										<input type="text" name="cobro_descuento" style="text-align: right;" id="cobro_descuento" onblur="MontoValido(this.id);" size="12" value="<?= number_format($cobro->fields['descuento'], $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" onchange="RecalcularTotal(this.value);" <?= TTip($tip_descuento) ?> class="">
+										<input type="text" name="cobro_descuento" style="text-align: right;" id="cobro_descuento" onblur="MontoValido(this.id);" size="12" value="<?= number_format($cobro->fields['descuento'], $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" onchange="RecalcularTotal(this.value);" <?= TTip($tip_descuento) ?> class="<?= ($chk == 'PORCENTAJE') ? 'readonly-input' : '' ?>" <?= ($chk == 'PORCENTAJE') ? 'readonly' : '' ?>>
 									</td>
 									<?php if (!$ocultar_montos_moneda_total) : ?>
 										<td>
@@ -2379,9 +2379,9 @@ else
 				jQuery('#porcentaje_descuento').val(0).addClass('readonly-input');
 				jQuery('#tr_descuento_porcentaje').addClass('hidden');
 				jQuery('#glosa_descuento_valor').removeClass('hidden');
-				jQuery('#cobro_descuento').removeClass('readonly-input').focus();
+				jQuery('#cobro_descuento').removeClass('readonly-input').attr('readonly', false).focus();
 			} else {
-				jQuery('#cobro_descuento').val(0).addClass('readonly-input');
+				jQuery('#cobro_descuento').val(0).addClass('readonly-input').attr('readonly', true);
 				jQuery('#tr_descuento_porcentaje').removeClass('hidden');
 				jQuery('#glosa_descuento_valor').addClass('hidden');
 				jQuery('#porcentaje_descuento').removeClass('readonly-input').focus();
