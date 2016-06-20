@@ -1711,7 +1711,7 @@ else
 										<span class="moneda"><?= $moneda_cobro->fields['simbolo'] ?></span>
 									</td>
 									<td>
-										<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onkeydown="MontoValido(this.id)" value="<?= number_format($cobro->fields['monto_subtotal'] - $cobro->CalculaMontoTramites($cobro), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" <?= $deshabilitar ?> style="text-align: right;">
+										<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onblur="MontoValido(this.id)" value="<?= number_format($cobro->fields['monto_subtotal'] - $cobro->CalculaMontoTramites($cobro), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" <?= $deshabilitar ?> style="text-align: right;">
 									</td>
 									<?php if (!$ocultar_montos_moneda_total) : ?>
 										<td>
@@ -1765,16 +1765,23 @@ else
 										</td>
 									<?php endif ?>
 								</tr>
-								<tr>
+								<?php $chk = ($cobro->fields['tipo_descuento'] == '') ? 'VALOR' : $cobro->fields['tipo_descuento']; ?>
+								<tr id="tr_descuento_porcentaje" class="<?= ($chk == 'VALOR') ? 'hidden' : '' ?>">
 									<td align="right" nowrap>
 										<?= __('Descuento') ?>:
-										<?php $chk = ($cobro->fields['tipo_descuento'] == '') ? 'VALOR' : $cobro->fields['tipo_descuento']; ?>
-										<span id="span_tipo_descuento_valor" class="moneda <?= ($chk == 'PORCENTAJE') ? 'hidden' : '' ?>"><?= $moneda_cobro->fields['simbolo'] ?></span>
-										<span id="span_tipo_descuento_porcentaje" class="moneda <?= ($chk == 'VALOR') ? 'hidden' : '' ?>">&#37;</span>
+										<span class="moneda">&#37;</span>
 									</td>
 									<td>
-										<input type="text" name="cobro_descuento" style="text-align: right;" id="cobro_descuento" onkeydown="MontoValido(this.id);" size="12" value="<?= number_format($cobro->fields['descuento'], $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" onchange="RecalcularTotal(this.value);" <?= TTip($tip_descuento) ?> class="<?= ($chk == 'PORCENTAJE') ? 'hidden' : '' ?>">
-										<input type="text" name="porcentaje_descuento" style="text-align: right;" id="porcentaje_descuento" onkeydown="MontoValido(this.id);" size="12" value="<?= number_format((!empty($cobro->fields['porcentaje_descuento']) ? $cobro->fields['porcentaje_descuento'] : '0'), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" class="<?= ($chk == 'VALOR') ? 'hidden' : '' ?>">
+										<input type="text" name="porcentaje_descuento" style="text-align: right;" id="porcentaje_descuento" onblur="MontoValido(this.id);" size="12" value="<?= number_format((!empty($cobro->fields['porcentaje_descuento']) ? $cobro->fields['porcentaje_descuento'] : '0'), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" class="">
+									</td>
+								</tr>
+								<tr>
+									<td align="right" nowrap>
+										<span id="glosa_descuento_valor" class="<?= ($chk == 'PORCENTAJE') ? 'hidden' : '' ?>"><?= __('Descuento') ?>:</span>
+										<span class="moneda"><?= $moneda_cobro->fields['simbolo'] ?></span>
+									</td>
+									<td>
+										<input type="text" name="cobro_descuento" style="text-align: right;" id="cobro_descuento" onblur="MontoValido(this.id);" size="12" value="<?= number_format($cobro->fields['descuento'], $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" onchange="RecalcularTotal(this.value);" <?= TTip($tip_descuento) ?> class="">
 									</td>
 									<?php if (!$ocultar_montos_moneda_total) : ?>
 										<td>
@@ -2369,22 +2376,17 @@ else
 	jQuery(function() {
 		jQuery('.tipo-descuento').on('click', function() {
 			if (this.value == 'VALOR') {
-				jQuery('#cobro_descuento').removeClass('hidden');
-				jQuery('#porcentaje_descuento').addClass('hidden');
+				jQuery('#porcentaje_descuento').val(0).addClass('readonly-input');
+				jQuery('#tr_descuento_porcentaje').addClass('hidden');
+				jQuery('#glosa_descuento_valor').removeClass('hidden');
+				jQuery('#cobro_descuento').removeClass('readonly-input').focus();
 			} else {
-				jQuery('#cobro_descuento').addClass('hidden');
-				jQuery('#porcentaje_descuento').removeClass('hidden');
+				jQuery('#cobro_descuento').val(0).addClass('readonly-input');
+				jQuery('#tr_descuento_porcentaje').removeClass('hidden');
+				jQuery('#glosa_descuento_valor').addClass('hidden');
+				jQuery('#porcentaje_descuento').removeClass('readonly-input').focus();
 			}
-		});
-		jQuery('#tipo_descuento_porcentaje').on('click', function() {
 			jQuery('#cobro_descuento_mt').val(0);
-			jQuery('#span_tipo_descuento_porcentaje').removeClass('hidden');
-			jQuery('#span_tipo_descuento_valor').addClass('hidden');
-		});
-		jQuery('#tipo_descuento_valor').on('click', function() {
-			jQuery('#cobro_descuento_mt').val(0);
-			jQuery('#span_tipo_descuento_porcentaje').addClass('hidden');
-			jQuery('#span_tipo_descuento_valor').removeClass('hidden');
 		});
 	});
 
