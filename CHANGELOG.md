@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.19.0](https://github.com/LemontechSA/ttb/pull/1573)
+Friday, Jun 17th
+* **Feature** [Subclases Nota de Cobro](https://github.com/LemontechSA/ttb/pull/1570)
+
 ## Hotfix 16.18.4
 Friday, Jun 17th
 * **Fix** [:bug: Corregir generación de pagos en facturas](https://github.com/LemontechSA/ttb/pull/1572)
