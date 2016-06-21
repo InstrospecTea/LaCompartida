@@ -634,7 +634,6 @@ function enviarFila(trs, data, idx) {
 
   tr.addClass('procesando');
   jQuery(window).scrollTop(tr.position().top);
-return post(data + serializar(tr));
   jQuery.ajax('carga_masiva_ajax.php', {
     type: 'POST',
     data: data + serializar(tr),
@@ -838,10 +837,3 @@ jQuery(function() {
     jQuery(this).closest('tr').removeClass('error').removeAttr('title');
   });
 });
-function post(data) {
-  console.log(data);
-  $ = jQuery;
-  $form = $('<form/>', {method: 'post', 'action': 'carga_masiva_ajax.php?' + data});
-  $form.appendTo('body').submit();
-  return false;
-}
