@@ -1714,7 +1714,7 @@ else
 										<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onblur="MontoValido(this.id)" value="<?= number_format($cobro->fields['monto_subtotal'] - $cobro->CalculaMontoTramites($cobro), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" <?= $deshabilitar ?> style="text-align: right;">
 									</td>
 									<?php if (!$ocultar_montos_moneda_total) : ?>
-										<td>
+										<td nowrap>
 											<span class="moneda"><?= $moneda_total->fields['simbolo'] ?></span>
 											<input type="text" name="cobro_monto_honorarios_mt" id="cobro_monto_honorarios_mt" value="<?= $x_resultados['monto_trabajos'][$moneda_total->fields['id_moneda']] ?>" size="12" readonly="readonly" class="readonly-input">
 										</td>
