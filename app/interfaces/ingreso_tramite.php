@@ -1165,18 +1165,11 @@ if ($tramite->fields['tarifa_tramite_individual'] > 0) {
 
 		<tr>
 			<td align="right">
-				<?php $font_size_descripcion = Conf::GetConf($sesion, 'IdiomaGrande') == '1' ? '18px' : '9px'; ?>
-				<?php echo __('Descripción') ?><br/><span id="txt_span" style="background-color: #C6FAAD; font-size:<?php echo $font_size_descripcion; ?>"></span>
+				<?php $size = Conf::GetConf($sesion, 'IdiomaGrande') ? '18px' : '9px'; ?>
+				<?= __('Descripción') ?><br/><span id="txt_span" style="background-color: #C6FAAD; font-size:<?= $size; ?>"></span>
 			</td>
 			<td align="left">
-				<textarea id="descripcion" cols="45" rows="4" name="descripcion"><?php echo $tramite->fields['descripcion'] ? stripslashes($tramite->fields['descripcion']) : $descripcion; ?></textarea>
-				<script type="text/javascript">
-					var googie2 = new GoogieSpell('../../fw/js/googiespell/', 'sendReq.php?lang=');
-					googie2.setLanguages({'es': 'Español', 'en': 'English'});
-					googie2.dontUseCloseButtons();
-					googie2.setSpellContainer('spell_container');
-					googie2.decorateTextarea('descripcion');
-				</script>
+				<?= $Form->spellCheck('descripcion', stripslashes($tramite->fields['descripcion']), array('cols' => 45, 'rows' => 4, 'label' => false));?>
 			</td>
 		</tr>
 
@@ -1230,48 +1223,34 @@ function Substring($string) {
 ?>
 
 <script language="javascript" type="text/javascript">
+<?php
+UtilesApp::GetConfJS($sesion, 'IdiomaGrande');
+?>
 	CargarMonedaContrato();
-	var IdiomaGrande = <?php echo Conf::GetConf($sesion, 'IdiomaGrande') == '1' ? 'true' : 'false'; ?>;
 
-	jQuery('document').ready(function() {
-		jQuery('#codigo_asunto, #codigo_asunto_secundario').change(function() {
-			var codigo = jQuery(this).val();
+	jQuery('#codigo_asunto, #codigo_asunto_secundario').change(function() {
+		var codigo = jQuery(this).val();
 
-			if (!codigo) {
-				jQuery('#txt_span').html('');
-				return false;
-			} else {
-				jQuery.ajax({
-					type: "GET",
-					url: "ajax.php",
-					contentType: "application/x-www-form-urlencoded;charset=ISO-8859-1",
-					data: {accion: 'idioma', codigo_asunto: codigo},
-					beforeSend: function(xhr) {
-						xhr.overrideMimeType("text/html; charset=ISO-8859-1");
-					}
-				}).done(function(response) {
-					var idio = response.split("|");
-					if (idio[1].length == 0)
-						idio[1] = 'Español';
-					if (idio[0].length == 0)
-						idio[0] = 'es';
+		if (!codigo) {
+			jQuery('#txt_span').html('');
+			return false;
+		} else {
+			jQuery.get(root_dir + '/app/Matters/getLanguage/' + codigo, function (language) {
+				if (!language) {
+					return;
+				};
 
-					if (IdiomaGrande) {
-						jQuery('#txt_span').html(idio[1]);
-					} else {
-						jQuery('#txt_span').html('Idioma: ' + idio[1]);
-					}
+				if (IdiomaGrande) {
+					jQuery('#txt_span').html(language.name);
+				} else {
+					jQuery('#txt_span').html('Idioma: ' + language.name);
+				}
 
-					if (idio[0] == 'es') {
-						googie2.setCurrentLanguage('es');
-					} else if (idio[0] == 'en') {
-						googie2.setCurrentLanguage('en');
-					}
-				});
-			}
-		});
-	});
-</script>
+				jQuery('#descripcion').data('googie').setCurrentLanguage(language.code);
+			});
+		}
+	}).change();
+	</script>
 
 <?php
 echo $Form->script();
