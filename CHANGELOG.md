@@ -1,7 +1,7 @@
 # Changelog
 
 ## [Release 16.20.0](https://github.com/LemontechSA/ttb/pull/1575)
-Tuesday, Jun 20th
+Tuesday, Jun 21th
 * **Feature** [Spellcheck](https://github.com/LemontechSA/ttb/pull/1567)
 
 ## [Release 16.19.0](https://github.com/LemontechSA/ttb/pull/1573)
