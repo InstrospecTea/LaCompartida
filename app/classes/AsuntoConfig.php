@@ -3,7 +3,7 @@
 class AsuntoConfig extends Objeto {
 
 	public static $llave_carga_masiva = 'codigo_asunto'; //array('codigo_cliente', 'glosa_asunto');
-	
+
 	public static $campos_carga_masiva = array(
 		'codigo_cliente' => array(
 			'titulo' => 'Nombre Cliente (vacío para ingresarlo a todos los clientes)',
@@ -30,11 +30,13 @@ class AsuntoConfig extends Objeto {
 			'titulo' => 'Socio encargado del asunto (el que maneja la relación con el cliente)',
 			'relacion' => 'UsuarioExt'
 		),
+		'contacto' => 'Nombre solicitante',
 		'fono_contacto' => 'Teléfono Contacto',
 		'email_contacto' => array(
 			'titulo' => 'Email Contacto',
 			'tipo' => 'email'
 		),
+		'direccion_contacto' => 'Dirección envío',
 		'activo' => array(
 			'titulo' => 'Está Activo (SI/NO)',
 			'tipo' => 'bool',

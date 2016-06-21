@@ -56,7 +56,7 @@ class AsuntoCargaMasiva extends AsuntoConfig {
 			);
 			foreach ($datos_clon as $nombre_contrato => $nombre_asunto) {
 				if (isset($data[$nombre_asunto]) &&
-					(!isset($data[$nombre_contrato]) || empty($data[$nombre_contrato]) || $data[$nombre_contrato] == 'NULL')) {
+						(!isset($data[$nombre_contrato]) || empty($data[$nombre_contrato]) || $data[$nombre_contrato] == 'NULL')) {
 					$data[$nombre_contrato] = $data[$nombre_asunto];
 				}
 			}
@@ -65,8 +65,19 @@ class AsuntoCargaMasiva extends AsuntoConfig {
 		unset($data['monto_tarifa_flat']);
 
 		$campos_contrato = array('id_contrato_cliente', 'id_moneda_monto', 'id_tarifa', 'forma_cobro', 'id_moneda_tramite',
-			'id_usuario_responsable', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total', 'id_cuenta');
+			'id_usuario_responsable', 'id_moneda', 'monto', 'retainer_horas', 'opc_moneda_gastos', 'opc_moneda_total', 'id_cuenta',
+			'direccion_contacto');
 		$this->editable_fields = array_diff(array_keys($data), $campos_contrato);
+		if (!empty($data['contacto'])) {
+			$this->extra_fields['contacto'] = $data['contacto'];
+		}
+		if (!empty($data['email_contacto'])) {
+			$this->email_contacto['email_contacto'] = $data['email_contacto'];
+		}
+		if (!empty($data['fono_contacto'])) {
+			$this->extra_fields['fono_contacto'] = $data['fono_contacto'];
+		}
+		pr($data);
 		$this->extra_fields['activo'] = empty($data['activo']) ? 'NO' : 'SI';
 
 		return $data;
