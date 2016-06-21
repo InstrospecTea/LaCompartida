@@ -1710,7 +1710,7 @@ else
 										<?= __('Trabajos') ?>:
 										<span class="moneda"><?= $moneda_cobro->fields['simbolo'] ?></span>
 									</td>
-									<td>
+									<td nowrap>
 										<input type="text" name="cobro_monto_honorarios" id="cobro_monto_honorarios" onblur="MontoValido(this.id)" value="<?= number_format($cobro->fields['monto_subtotal'] - $cobro->CalculaMontoTramites($cobro), $moneda_cobro->fields['cifras_decimales'], '.', '') ?>" size="12" <?= $deshabilitar ?> style="text-align: right;">
 									</td>
 									<?php if (!$ocultar_montos_moneda_total) : ?>
@@ -1719,7 +1719,7 @@ else
 											<input type="text" name="cobro_monto_honorarios_mt" id="cobro_monto_honorarios_mt" value="<?= $x_resultados['monto_trabajos'][$moneda_total->fields['id_moneda']] ?>" size="12" readonly="readonly" class="readonly-input">
 										</td>
 									<?php endif ?>
-									<td>
+									<td nowrap>
 										<img src="<?= Conf::ImgDir() ?>/reload_16.png" onclick='GuardaCobro(this.form)' style='cursor:pointer' <?= TTip($tip_actualizar) ?>>&nbsp;
 										<?php if ($cobro->fields['forma_cobro'] == 'ESCALONADA') { ?>
 											<img src="<?= Conf::ImgDir() ?>/noticia16.png" onclick="DetalleMonto(this.form)" style='cursor:pointer' <?= TTip($tip_detalle) ?>>
@@ -1789,7 +1789,7 @@ else
 											<input type="text" name="cobro_descuento_mt" id="cobro_descuento_mt" value="<?= $x_resultados['descuento'][$moneda_total->fields['id_moneda']] ?>" size="12" readonly="readonly" class="readonly-input">
 										</td>
 									<?php endif ?>
-									<td>
+									<td nowrap>
 										<input type="radio" name="tipo_descuento" class="tipo-descuento" id="tipo_descuento_valor" value='VALOR' <?= ($chk == 'VALOR') ? 'checked' : '' ?>><?= __('Valor') ?>
 										<input type="radio" name="tipo_descuento" class="tipo-descuento" id="tipo_descuento_porcentaje" value='PORCENTAJE' <?= ($chk == 'PORCENTAJE') ? 'checked' : '' ?> <?= TTip('<b>' . __('Atención') . '</b>: ' . __('Si se aplica un porcentaje, el monto desplegado en la moneda de facturación es aproximado')) ?>>&#37;
 									</td>
