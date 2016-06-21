@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.20.0](https://github.com/LemontechSA/ttb/pull/1575)
+Tuesday, Jun 20th
+* **Feature** [Spellcheck](https://github.com/LemontechSA/ttb/pull/1567)
+
 ## [Release 16.19.0](https://github.com/LemontechSA/ttb/pull/1573)
 Friday, Jun 17th
 * **Feature** [Subclases Nota de Cobro](https://github.com/LemontechSA/ttb/pull/1570)
