@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.20.0](https://github.com/LemontechSA/ttb/pull/1579)
+Wednesday, Jun 22nd
+* **Feature** [Refactor Tarifa Tramites](https://github.com/LemontechSA/ttb/pull/1350)
+
 ## [Release 16.20.0](https://github.com/LemontechSA/ttb/pull/1575)
 Tuesday, Jun 21st
 * **Feature** [Spellcheck](https://github.com/LemontechSA/ttb/pull/1567)
