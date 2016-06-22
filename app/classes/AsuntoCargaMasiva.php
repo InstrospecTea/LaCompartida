@@ -60,6 +60,7 @@ class AsuntoCargaMasiva extends AsuntoConfig {
 					$data[$nombre_contrato] = $data[$nombre_asunto];
 				}
 			}
+
 			$this->extra_fields['activo'] = empty($data['activo']) ? 'NO' : 'SI';
 		}
 		unset($data['monto_tarifa_flat']);
@@ -77,7 +78,6 @@ class AsuntoCargaMasiva extends AsuntoConfig {
 		if (!empty($data['fono_contacto'])) {
 			$this->extra_fields['fono_contacto'] = $data['fono_contacto'];
 		}
-		pr($data);
 		$this->extra_fields['activo'] = empty($data['activo']) ? 'NO' : 'SI';
 
 		return $data;
