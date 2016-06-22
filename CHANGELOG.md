@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.21.0](https://github.com/LemontechSA/ttb/pull/1579)
+Wednesday, Jun 22nd
+* **Feature** [Refactor Tarifa Tramites](https://github.com/LemontechSA/ttb/pull/1350)
+
 ## Hotfix 16.20.1
 Wednesday, Jun 22nd
 * **Fix** [Cambiar tamaño de tipografía en excel PRC](https://github.com/LemontechSA/ttb/pull/1581)

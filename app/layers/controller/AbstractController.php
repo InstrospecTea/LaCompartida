@@ -164,6 +164,21 @@ abstract class AbstractController {
 		$this->loadedClass[] = $classname;
 	}
 
+	/**
+	 * Carga una clase manager al vuelo.
+	 * @param $name
+	 */
+	protected function loadManager($name) {
+		$classname = "{$name}Manager";
+		if (in_array($classname, $this->loadedClass)) {
+			return;
+		}
+		$filename = LAYER_PATH . "/manager.support/{$classname}.php";
+		require $filename;
+		$this->{$classname} = new $classname($this->Session);
+		$this->loadedClass[] = $classname;
+	}
+
 	protected function redirect($url, $post_data = null) {
 		if (!empty($post_data)) {
 			$this->Session->write('post_data', $post_data);
