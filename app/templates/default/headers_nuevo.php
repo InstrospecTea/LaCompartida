@@ -74,6 +74,9 @@ define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
 		</script>
 		<script type="text/javascript" src="//static.thetimebilling.com/js/pluginsplus.js"></script>
 		<script type="text/javascript" src="//static.thetimebilling.com/js/vendors.20150603061719.js"></script>
+
+		<script type="text/javascript" src="<?= Conf::RootDir(); ?>/app/layers/assets/googiespell/googiespell.js"></script>
+		<script type="text/javascript" src="<?= Conf::RootDir(); ?>/app/layers/assets/googiespell/AJS.js"></script>
                 <script type="text/javascript">
                     jQuery.xhrPool = [];
                     jQuery.xhrPool.abortAll = function() {
