@@ -322,35 +322,6 @@ $Form = new Form;
 		$('descripcion').value = selected_text;
 	}
 
-	function CargaIdioma(codigo) {
-		if (jQuery('#txt_span').length == 0) {
-			return true;
-		}
-
-		var txt_span = document.getElementById('txt_span');
-
-		if (!codigo) {
-			txt_span.innerHTML = '';
-			return false;
-		} else {
-			var accion = 'idioma';
-			var http = getXMLHTTP();
-			http.open('get','ajax.php?accion=' + accion + '&codigo_asunto=' + codigo, true);
-			http.onreadystatechange = function() {
-				if (http.readyState == 4) {
-					var response = http.responseText;
-					var idio = response.split("|");
-					<?php if (Conf::GetConf($sesion, 'IdiomaGrande')) { ?>
-						txt_span.innerHTML = idio[1];
-					<?php } else { ?>
-						txt_span.innerHTML = 'Idioma: '+idio[1];
-					<?php } ?>
-				}
-			};
-			http.send(null);
-		}
-	}
-
 	<?php
 	$contrato = new Contrato($sesion);
 
@@ -700,21 +671,11 @@ $Form = new Form;
 
 		<tr id='descripcion_gastos'>
 			<td align="right">
-				<?php if (Conf::GetConf($sesion, 'IdiomaGrande')) { ?>
-					<?php echo __('Descripción'); ?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:18px"></span>
-				<?php } else { ?>
-					<?php echo __('Descripción'); ?>
-				<?php } ?>
+				<?php $size = Conf::GetConf($sesion, 'IdiomaGrande') ? '18px' : '9px'; ?>
+				<?= __('Descripción') ?><br/><span id="txt_span" style="background-color: #C6FAAD; font-size:<?= $size; ?>"></span>
 			</td>
 			<td align="left">
-				<textarea id='descripcion' name="descripcion" cols="45" rows="3"><?php echo $gasto->fields['descripcion']; ?></textarea>
-				<script type="text/javascript">
-					var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
-					googie2.setLanguages({'es': 'Español', 'en': 'English'});
-					googie2.dontUseCloseButtons();
-					googie2.setSpellContainer("spell_container");
-					googie2.decorateTextarea("descripcion");
-				</script>
+				<?= $Form->spellCheck('descripcion', stripslashes($gasto->fields['descripcion']), array('cols' => 45, 'rows' => 3, 'label' => false));?>
 			</td>
 		</tr>
 
@@ -796,9 +757,9 @@ $Form = new Form;
 </form>
 <?php echo $Form->script(); ?>
 <script type="text/javascript">
-	<?php if (Conf::GetConf($sesion, 'IdiomaGrande') && $codigo_asunto) { ?>
-		CargaIdioma("<?php echo $codigo_asunto; ?>");
-	<?php } ?>
+<?php
+UtilesApp::GetConfJS($sesion, 'IdiomaGrande');
+?>
 
 	jQuery("#autoincrementable").change(function(){
 		jQuery.post('ajax/ajax_gastos.php',{ opc: "identificador", identificador: jQuery("#autoincrementable").val()})
@@ -822,6 +783,29 @@ $Form = new Form;
 	jQuery('#form_gastos').submit(function() {
 		return Validar();
 	});
+
+	jQuery('#codigo_asunto, #codigo_asunto_secundario').change(function () {
+		var codigo = jQuery(this).val();
+
+		if (!codigo) {
+			jQuery('#txt_span').html('');
+			return false;
+		} else {
+			jQuery.get(root_dir + '/app/Matters/getLanguage/' + codigo, function (language) {
+				if (!language) {
+					return;
+				};
+
+				if (IdiomaGrande) {
+					jQuery('#txt_span').html(language.name);
+				} else {
+					jQuery('#txt_span').html('Idioma: ' + language.name);
+				}
+
+				jQuery('#descripcion').data('googie').setCurrentLanguage(language.code);
+			});
+		}
+	}).change();
 </script>
 
 <?php $pagina->PrintBottom($popup);

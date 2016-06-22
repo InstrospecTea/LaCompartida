@@ -817,7 +817,14 @@ foreach ($chargeResults as $charge) {
 		++$filas;
 	}
 
-	if (in_array($cobro->fields['estado'], array('EMITIDO', 'FACTURADO'))) {
+	$config_estados_mostrar_concepto = json_decode(Conf::GetConf($sesion,'EstadoCobroMostrarConceptoExcel'), true);
+	if (empty($config_estados_mostrar_concepto)) {
+		$estados_mostrar_concepto = array('EMITIDO', 'FACTURADO');
+	} else {
+		$estados_mostrar_concepto = $config_estados_mostrar_concepto;
+	}
+
+	if (in_array($cobro->fields['estado'], $estados_mostrar_concepto)) {
 		if ($lang == 'es') {
 			$mes_concepto = ucfirst(Utiles::sql3fecha($cobro->fields['fecha_fin'], '%B %Y'));
 		} else {
@@ -826,17 +833,25 @@ foreach ($chargeResults as $charge) {
 
 		$concepto = $PrmExcelCobro->getGlosa('concepto_glosa', 'Encabezado', $lang, '%s', $mes_concepto);
 
+		$concepto = str_replace('%glosa_contrato%', $contrato->fields['observaciones'], $concepto);
+
+
 		$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('concepto', 'Encabezado', $lang), $CellFormat->get('encabezado'));
 		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 		$ws->write($filas, $col_abogado, $concepto, $CellFormat->get('encabezado'));
 		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
 		++$filas;
 
-		$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('glosa_factura', 'Encabezado', $lang), $CellFormat->get('encabezado'));
-		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
-		$ws->write($filas, $col_abogado, $contrato->fields['glosa_contrato'], $CellFormat->get('encabezado'));
-		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
-		++$filas;
+		$glosa_factura_valor = $PrmExcelCobro->getGlosa('glosa_factura_valor', 'Encabezado', $lang);
+		if (is_null($glosa_factura_valor)) {
+			$glosa_factura_valor = $contrato->fields['glosa_contrato'];
+			$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('glosa_factura', 'Encabezado', $lang), $CellFormat->get('encabezado'));
+			$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
+			$ws->write($filas, $col_abogado, $glosa_factura_valor, $CellFormat->get('encabezado'));
+			$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+			++$filas;
+		}
+
 	}
 
 	if (in_array($cobro->fields['estado'], array('CREADO', 'EN REVISION'))) {

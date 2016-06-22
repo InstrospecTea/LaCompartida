@@ -283,18 +283,21 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		if (is_null($order)) {
 			return;
 		}
+
 		if (is_array($order)) {
 			foreach ($order as $field) {
 				$this->add_ordering($criteria, $field);
 			}
 			return;
 		}
+
 		$patt = '/(.*) (DESC|ASC)?$/i';
 		if(preg_match($patt, $order, $matches)) {
 			$criteria->add_ordering($matches[1], $matches[2]);
 		} else {
 			$criteria->add_ordering($order);
 		}
+
 		return;
 	}
 

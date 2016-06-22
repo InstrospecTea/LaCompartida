@@ -146,7 +146,10 @@ class CtaCteFact extends Objeto
 				$monto_deuda = $detalles_neteo[1];
 				$monto_pago = isset($detalles_neteo[2]) ? $detalles_neteo[2] : $monto_deuda;
 
-				if(empty($monto_deuda)) continue; //salto los 0
+				//salto los 0
+				if ($monto_deuda <= 0) {
+					continue;
+				}
 
 				//crear un objeto de neteo, ajustando el saldo de su factura asociada
 				$mvto_neteado = new CtaCteFactMvto($this->sesion);
@@ -234,7 +237,10 @@ class CtaCteFact extends Objeto
 		foreach($neteos as $neteo){
 			$id_fac = $neteo[0];
 			$monto_neteo = $neteo[1];
-			if(empty($id_fac) || empty($monto_neteo)) continue;
+
+			if (empty($id_fac) || $monto_neteo <= 0) {
+				continue;
+			}
 
 			$fac = new Factura($this->sesion);
 			$fac->Load($id_fac);
