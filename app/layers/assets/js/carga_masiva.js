@@ -25,19 +25,25 @@ var listados_inversos = {};
  */
 function generarListadosInversos() {
   listados_inversos = {};
-  jQuery.each(listados, function(nombre, listado) {
-    listados_inversos[nombre] = {};
-    jQuery.each(listado, function(id, valor) {
-      if (typeof(valor) !== 'string') {
-        var v = [];
-        jQuery.each(valor, function(campo, valor_campo) {
-          v.push(valor_campo);
-        });
-        valor = v.join(' / ');
-      }
-      listados_inversos[nombre][limpiar(valor)] = id;
-    });
-  });
+	jQuery.each(listados, function(nombre, listado) {
+		try {
+			listados_inversos[nombre] = {};
+			jQuery.each(listado, function(id, valor) {
+				if (typeof(valor) !== 'string') {
+					var v = [];
+					jQuery.each(valor, function(campo, valor_campo) {
+						v.push(valor_campo);
+					});
+					valor = v.join(' / ');
+				}
+				listados_inversos[nombre][limpiar(valor)] = id;
+			});
+		} catch (e) {
+			alert('Error de datos en la lista de ' + nombre + '\nCorrija y vuelva a intentar.');
+			jQuery('button, input, select').prop('disabled', true).addClass('disabled');
+			return false;
+		}
+	});
 }
 generarListadosInversos();
 
