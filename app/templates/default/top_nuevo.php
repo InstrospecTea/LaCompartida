@@ -64,7 +64,7 @@ if (!Conf::GetConf($sesion,'ActualizacionTerminado')) {
 	<div style="display:block;width:980px;margin:10px auto;">
 <?php
 $rootlength = strlen(Conf::RootDir());
-echo UtilesApp::PrintMenuDisenoNuevojQuery($this->sesion, substr($_SERVER['PHP_SELF'], $rootlength));
+echo UtilesApp::PrintMenuDisenoNuevojQuery($this->sesion, substr($_SERVER['REQUEST_URI'], $rootlength));
 ?>
 	</div>
 
