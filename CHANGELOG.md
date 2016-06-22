@@ -2,7 +2,7 @@
 
 ## Hotfix 16.20.1
 Wednesday, Jun 22nd
-* **Fix** [Cambiar tamaño de tipografía en excel PRC](https://github.com/LemontechSA/ttb/pull/1580)
+* **Fix** [Cambiar tamaño de tipografía en excel PRC](https://github.com/LemontechSA/ttb/pull/1581)
 
 ## [Release 16.20.0](https://github.com/LemontechSA/ttb/pull/1575)
 Tuesday, Jun 21st
