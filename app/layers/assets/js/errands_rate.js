@@ -63,10 +63,11 @@ jQuery(function() {
 
 	jQuery('#crear_nueva_tarifa').on('click', function() {
 		if (!jQuery('#usar_tarifa_previa').is(':checked')) {
-			jQuery('input[type="text"], #id_tramite_tarifa_edicion, input[type="checkbox"], [name="tarifa_defecto"]').val(null);
+			jQuery('input[type="text"], #id_tramite_tarifa_edicion, [name="tarifa_defecto"]').val(null);
 		} else {
-			jQuery('input[type="text"][class!="tarifas"], #id_tramite_tarifa_edicion, input[type="checkbox"], [name="tarifa_defecto"]').val(null);
+			jQuery('input[type="text"][class!="tarifas"], #id_tramite_tarifa_edicion, [name="tarifa_defecto"]').val(null);
 		};
+		jQuery('input[type="checkbox"]').attr('checked', false);
 		jQuery('.edicion_tarifa').hide();
 		jQuery('.nueva_tarifa').show();
 		jQuery('#usar_tarifa_previa').attr('checked', false);
