@@ -227,7 +227,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$query = "SELECT COUNT(*) AS nro_adelantos
 								FROM documento
 								LEFT JOIN prm_moneda ON prm_moneda.id_moneda = documento.id_moneda
-								WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto = 1 AND documento.saldo_pago < 0
+								WHERE documento.codigo_cliente = '" . $this->fields['codigo_cliente'] . "' AND documento.es_adelanto = 1
 								AND (documento.id_contrato = " . $this->fields['id_contrato'] . " OR documento.id_contrato IS NULL)";
 
 					$adelantos = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
