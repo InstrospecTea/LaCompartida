@@ -9,7 +9,7 @@
 		this.fileDownload = function (form, url, data) {
 			$.fileDownload(url, {
 				preparingMessageHtml: $divs,
-				failMessageHtml: "Se produjo un error generando el documento, por favor intente nuevamente.",
+				failMessageHtml: this.__("Se produjo un error generando el documento, por favor intente nuevamente."),
 				httpMethod: 'post',
 				dialogOptions: {
 					modal: true,
@@ -37,6 +37,16 @@
 					return false;
 				}
 			});
+		};
+		
+		this.__ = function (t) {
+			return $.ajax({
+        type: 'GET',
+        url: root_dir + '/app/Translator',
+				data: {text: t},
+				dataType: 'html',
+        async: false
+			}).responseText;
 		};
 
 	};
