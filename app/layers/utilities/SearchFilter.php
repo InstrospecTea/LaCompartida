@@ -87,8 +87,8 @@ class SearchFilter extends AbstractUtility {
 	 * @param $value
 	 * @return $this
 	 */
-	function compare_with($value) {
-		$this->value = $value;
+	function compare_with() {
+		$this->value = func_get_args();
 		return $this;
 	}
 }

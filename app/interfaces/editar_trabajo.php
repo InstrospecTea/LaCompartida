@@ -766,20 +766,11 @@ $duracion_cobrada = '';
 		</tr>
 		<tr>
 			<td colspan="2" align=right>
-				<?php
-				if (Conf::GetConf($sesion, 'IdiomaGrande')) {
-					?>
-					<?php echo __('Descripción') ?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:18px"></span>
-					<?php
-				} else {
-					?>
-	<?php echo __('Descripción') ?><br/><span id=txt_span style="background-color: #C6FAAD; font-size:9px"></span>
-	<?php
-}
-?>
+				<?php $size = Conf::GetConf($sesion, 'IdiomaGrande') ? '18px' : '9px'; ?>
+				<?= __('Descripción') ?><br/><span id="txt_span" style="background-color: #C6FAAD; font-size:<?= $size; ?>"></span>
 			</td>
 			<td align=left>
-				<textarea id="descripcion" cols=45 rows=4 name=descripcion><?php echo stripslashes($t->fields[descripcion]) ?></textarea>
+				<?= $Form->spellCheck('descripcion', stripslashes($t->fields['descripcion']), array('cols' => 45, 'rows' => 4, 'label' => false));?>
 			</td>
 		</tr>
 		<tr>
@@ -1538,41 +1529,21 @@ UtilesApp::GetConfJS($sesion, 'PrellenarTrabajoConActividad');
 				jQuery('#txt_span').html('');
 				return false;
 			} else {
-				jQuery.ajax({
-					type: "GET",
-					url: "ajax.php",
-					contentType: "application/x-www-form-urlencoded;charset=ISO-8859-1",
-					data: {accion: 'idioma', codigo_asunto: codigo},
-					beforeSend: function (xhr) {
-						xhr.overrideMimeType("text/html; charset=ISO-8859-1");
-					}
-				}).done(function (response) {
-					if (response == "VACIO") {
+				jQuery.get(root_dir + '/app/Matters/getLanguage/' + codigo, function (language) {
+					if (!language) {
 						return;
 					};
-					var idio = response.split("|");
-					if (idio[1].length == 0) {
-						idio[1] = 'Español';
-					}
-
-					if (idio[0].length == 0) {
-						idio[0] = 'es';
-					}
 
 					if (IdiomaGrande) {
-						jQuery('#txt_span').html(idio[1]);
+						jQuery('#txt_span').html(language.name);
 					} else {
-						jQuery('#txt_span').html('Idioma: ' + idio[1]);
+						jQuery('#txt_span').html('Idioma: ' + language.name);
 					}
 
-					if (idio[0] == 'es') {
-						googie2.setCurrentLanguage('es');
-					} else if (idio[0] == 'en') {
-						googie2.setCurrentLanguage('en');
-					}
+					jQuery('#descripcion').data('googie').setCurrentLanguage(language.code);
 				});
 			}
-		});
+		}).change();
 
 		top.window.jQuery('#versemana').click();
 		top.window.jQuery('.resizableframe').load();
@@ -1594,13 +1565,6 @@ UtilesApp::GetConfJS($sesion, 'PrellenarTrabajoConActividad');
 		} else {
 			jQuery('#divVisible').show();
 		}
-
-		var googie2 = new GoogieSpell("../../fw/js/googiespell/", "sendReq.php?lang=");
-
-		googie2.setLanguages({'es': 'Español', 'en': 'English'});
-		googie2.dontUseCloseButtons();
-		googie2.setSpellContainer("spell_container");
-		googie2.decorateTextarea("descripcion");
 	});
 
 	var formObj = $('form_editar_trabajo');

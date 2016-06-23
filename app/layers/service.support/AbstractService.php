@@ -9,6 +9,11 @@ abstract class AbstractService implements BaseService {
 		$this->loadDAO($this->getDaoLayer());
 	}
 
+	public function newEntity() {
+		$entity_class = $this->getClass();
+		return new $entity_class;
+	}
+
 	/**
 	 * Persiste un objeto. Crea un nuevo registro si el objeto no lleva id. Si lleva id, se actualiza el objeto existente.
 	 * @param Entity $object
