@@ -73,6 +73,7 @@ $tipos_de_dato = array(
 	'horas_visibles',
 	'horas_cobradas',
 	'horas_facturadas',
+	'horas_facturadas_contable',
 	'horas_pagadas',
 	'horas_por_pagar',
 	'horas_por_cobrar',
@@ -222,6 +223,7 @@ $ReporteAvanzado->glosa_dato['horas_cobrables'] = __("Total de Horas Trabajadas 
 $ReporteAvanzado->glosa_dato['horas_visibles'] = __("Horas que ve el Cliente en nota de cobro (tras revisión)");
 $ReporteAvanzado->glosa_dato['horas_cobradas'] = __("Horas Visibles en Cobros que ya fueron Emitidos");
 $ReporteAvanzado->glosa_dato['horas_facturdas'] = __("Horas Visibles que han sido facturadas");
+$ReporteAvanzado->glosa_dato['horas_facturdas_contable'] = __("Prorrateo de horas liquidadas en el monto facturado contable");
 $ReporteAvanzado->glosa_dato['horas_pagadas'] = __("Horas Cobradas en Cobros con estado Pagado");
 $ReporteAvanzado->glosa_dato['horas_por_pagar'] = __("Horas Cobradas que aún no han sido pagadas");
 $ReporteAvanzado->glosa_dato['horas_por_cobrar'] = "Horas Visibles que aún no se Emiten al Cliente";
@@ -983,7 +985,9 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(8) ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('horas_facturadas') ?>
-								<?php echo $ReporteAvanzado->nada(3) ?>
+								<?php // echo $ReporteAvanzado->nada(3) ?>
+								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
+								<?php echo $ReporteAvanzado->celda('horas_facturadas_contable') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(13) ?>

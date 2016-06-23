@@ -1,6 +1,6 @@
 <?php
 /**
- * HorasFacturadasDataCalculator
+ * HorasFacturadasContableDataCalculator
  * key: horas_cobradas
  * Description: Horas que se encuentran cobradas en una liquidación.
  *
@@ -11,8 +11,16 @@
  * https://github.com/LemontechSA/ttb/wiki/Reporte-Calculador:-Horas-Cobradas
  *
  */
-class HorasFacturadasDataCalculator extends AbstractInvoiceProportionalDataCalculator {
-	private $fieldName = 'horas_facturadas';
+class HorasFacturadasContableDataCalculator extends AbstractInvoiceProportionalDataCalculator {
+	private $fieldName = 'horas_facturadas_contable';
+
+	/**
+	 * By default exclude anulled Invoices
+	 * @return Boolean
+	 */
+	function excludeAnulledInvoicesInQuery() {
+		return false;
+	}
 
 	/**
 	 * Obtiene la query de trabajos correspondiente a Horas Cobradas

@@ -16,6 +16,7 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
  * |  |  +-- horas_visibles: Horas que ve el Cliente en nota de liquidación (tras revisión)
  * |  |  |  +-- horas_cobradas: Horas Visibles en Liquidaciones que ya fueron Emitidas
  * |  |  |  +-- horas_facturadas: Horas Visibles en Liquidaciones que ya fueron Facturadas
+ * |  |  |  +-- horas_facturadas_contable: Prorateo de horas liquidadas por el monto facturado contable
  * |  |  |  |  +-- horas_pagadas: Horas Cobradas en Cobros con estado Pagado
  * |  |  |  |  \-- horas_por_pagar: Horas Cobradas que aún no han sido pagadas
  * |  |  |  +-- horas_por_cobrar: Horas Visibles que aún no se Emiten al Cliente
@@ -58,6 +59,7 @@ class Reporte {
 		'horas_visibles' => 'HorasVisibles',
 		'horas_cobradas' => 'HorasCobradas',
 		'horas_facturadas' => 'HorasFacturadas',
+		'horas_facturadas_contable' => 'HorasFacturadasContable',
 		'horas_pagadas' => 'HorasPagadas',
 		'horas_por_pagar' => 'HorasPorPagar',
 		'horas_por_cobrar' => 'HorasPorCobrar',
@@ -137,6 +139,7 @@ class Reporte {
 			'horas_visibles' => array('trabajo'),
 			'horas_cobradas' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'horas_facturadas' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'horas_facturadas_contable' => array('facturacion'),
 			'horas_pagadas' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'horas_por_pagar' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'horas_por_cobrar' => array('trabajo', 'cobro'),
@@ -377,7 +380,7 @@ class Reporte {
 			$this->id_moneda,
 			$this->proporcionalidad
 		);
-		// err();
+
 		// pr($calculator->calculate());
 		$this->row = $calculator->calculate();
 
@@ -920,6 +923,7 @@ class Reporte {
 			case "horas_cobrables":
 			case "horas_cobradas":
 			case "horas_facturadas":
+			case "horas_facturadas_contable":
 			case "horas_visibles":
 			case "horas_spot":
 			case "horas_convenio":
@@ -970,6 +974,7 @@ class Reporte {
 			case "horas_cobrables":
 			case "horas_cobradas":
 			case "horas_facturadas":
+			case "horas_facturadas_contable":
 			case "horas_visibles":
 			case "horas_spot":
 			case "horas_convenio":
