@@ -1053,7 +1053,6 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				break;
 
 			case 'TOTAL_CON_ADELANTOS':
-			var_dump('aca');
 				$html = str_replace('%total%', __('Saldo') . ' ' . __('Cobro'), $html);
 
 				$saldo_total_cobro = $x_resultados['saldo_gastos'][$this->fields['opc_moneda_total']];
