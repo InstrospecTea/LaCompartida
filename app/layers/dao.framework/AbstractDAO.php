@@ -223,13 +223,18 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$this->add_fields($criteria, $fields);
 		$criteria->add_from($instance->getPersistenceTarget());
 		$criteria->add_restriction(CriteriaRestriction::equals($instance->getIdentity(), $id));
-		$resultArray = $criteria->run();
-		$resultArray = $resultArray[0];
-		if (empty($resultArray)) {
-			throw new CouldNotFindEntityException('No se ha podido encontrar la entidad de tipo
-			' . $this->getClass() . ' con identificador primario ' . $id . '.');
+		try {
+			$resultArray = $criteria->run();
+			$resultArray = $resultArray[0];
+			if (empty($resultArray)) {
+				throw new CouldNotFindEntityException('No se ha podido encontrar la entidad de tipo
+				' . $this->getClass() . ' con identificador primario ' . $id . '.');
+			}
+			return $this->encapsulate($resultArray, $instance);
+		} catch (PDOException $e) {
+			throw new PDOException("Ha ocurrido un error al intentar ejecutar la query
+			{$criteria->get_plain_query()}<br>Error {$e->getMessage()}<br>Código {$e->getCode()}");
 		}
-		return $this->encapsulate($resultArray, $instance);
 	}
 
 	/**
@@ -275,13 +280,25 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	private function add_ordering($criteria, $order) {
+		if (is_null($order)) {
+			return;
+		}
+
 		if (is_array($order)) {
 			foreach ($order as $field) {
-				$criteria->add_ordering($field);
+				$this->add_ordering($criteria, $field);
 			}
-		} else if (!is_null($order)) {
+			return;
+		}
+
+		$patt = '/(.*) (DESC|ASC)?$/i';
+		if(preg_match($patt, $order, $matches)) {
+			$criteria->add_ordering($matches[1], $matches[2]);
+		} else {
 			$criteria->add_ordering($order);
 		}
+
+		return;
 	}
 
 	private function add_limits($criteria, $limit) {

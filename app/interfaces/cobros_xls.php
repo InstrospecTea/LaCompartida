@@ -443,6 +443,9 @@ foreach ($chargeResults as $charge) {
 		}
 	}
 
+	$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
+	$idioma->Load($cobro->fields['codigo_idioma']);
+
 	/*
 	 *	Estas variables son necesario para poder decidir si se imprima una tabla o no,
 	 *	generalmente si no tiene data no se escribe
@@ -470,6 +473,8 @@ foreach ($chargeResults as $charge) {
 	$cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 
 	$simbolo_moneda = Utiles::glosa($sesion, $cobro->fields['opc_moneda_total'], 'simbolo', 'prm_moneda', 'id_moneda');
+	$glosa_moneda = Utiles::glosa($sesion, $cobro->fields['opc_moneda_total'], 'glosa_moneda', 'prm_moneda', 'id_moneda');
+
 	if ($glosa_moneda == "Euro") {
 		$simbolo_moneda = "EUR";
 	}
@@ -478,14 +483,14 @@ foreach ($chargeResults as $charge) {
 	$formato_id_moneda_monto = $Moneda->getExcelFormat($contrato->fields['id_moneda_monto']);
 	$formato_id_moneda = $Moneda->getExcelFormat($cobro->fields['id_moneda']);
 
-	$CellFormat->add('moneda_resumen', array('Size' => 10, 'Align' => 'right', 'Bold' => '1', 'NumFormat' => $formato_opc_moneda_total));
-	$CellFormat->add('moneda_gastos', array('Align' => 'right', 'NumFormat' => $formato_opc_moneda_total));
-	$CellFormat->add('moneda_gastos_total', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'Top' => 1, 'NumFormat' => $formato_opc_moneda_total));
-	$CellFormat->add('moneda_resumen_cobro', array('Align' => 'right', 'Border' => '1', 'NumFormat' => $formato_opc_moneda_total));
-	$CellFormat->add('moneda_monto', array('Align' => 'right', 'Border' => 1, 'NumFormat' => $formato_id_moneda_monto));
-	$CellFormat->add('moneda', array('Align' => 'right', 'NumFormat' => $formato_id_moneda));
-	$CellFormat->add('moneda_total', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'Top' => 1, 'NumFormat' => $formato_id_moneda));
-	$CellFormat->add('moneda_encabezado', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'NumFormat' => $formato_id_moneda));
+	$CellFormat->add('moneda_resumen', array('Size' => 10, 'Align' => 'right', 'Bold' => '1', 'NumFormat' => $formato_opc_moneda_total),array(), array(), true);
+	$CellFormat->add('moneda_gastos', array('Align' => 'right', 'NumFormat' => $formato_opc_moneda_total),array(), array(), true);
+	$CellFormat->add('moneda_gastos_total', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'Top' => 1, 'NumFormat' => $formato_opc_moneda_total),array(), array(), true);
+	$CellFormat->add('moneda_resumen_cobro', array('Align' => 'right', 'Border' => '1', 'NumFormat' => $formato_opc_moneda_total),array(), array(), true);
+	$CellFormat->add('moneda_monto', array('Align' => 'right', 'Border' => 1, 'NumFormat' => $formato_id_moneda_monto),array(), array(), true);
+	$CellFormat->add('moneda', array('Align' => 'right', 'NumFormat' => $formato_id_moneda),array(), array(), true);
+	$CellFormat->add('moneda_total', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'Top' => 1, 'NumFormat' => $formato_id_moneda),array(), array(), true);
+	$CellFormat->add('moneda_encabezado', array('Size' => 10, 'Align' => 'right', 'Bold' => 1, 'NumFormat' => $formato_id_moneda),array(), array(), true);
 
 	/*
 	 *	Imprime el encabezado de la hoja
@@ -812,7 +817,14 @@ foreach ($chargeResults as $charge) {
 		++$filas;
 	}
 
-	if (in_array($cobro->fields['estado'], array('EMITIDO', 'FACTURADO'))) {
+	$config_estados_mostrar_concepto = json_decode(Conf::GetConf($sesion,'EstadoCobroMostrarConceptoExcel'), true);
+	if (empty($config_estados_mostrar_concepto)) {
+		$estados_mostrar_concepto = array('EMITIDO', 'FACTURADO');
+	} else {
+		$estados_mostrar_concepto = $config_estados_mostrar_concepto;
+	}
+
+	if (in_array($cobro->fields['estado'], $estados_mostrar_concepto)) {
 		if ($lang == 'es') {
 			$mes_concepto = ucfirst(Utiles::sql3fecha($cobro->fields['fecha_fin'], '%B %Y'));
 		} else {
@@ -821,17 +833,25 @@ foreach ($chargeResults as $charge) {
 
 		$concepto = $PrmExcelCobro->getGlosa('concepto_glosa', 'Encabezado', $lang, '%s', $mes_concepto);
 
+		$concepto = str_replace('%glosa_contrato%', $contrato->fields['observaciones'], $concepto);
+
+
 		$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('concepto', 'Encabezado', $lang), $CellFormat->get('encabezado'));
 		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
 		$ws->write($filas, $col_abogado, $concepto, $CellFormat->get('encabezado'));
 		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
 		++$filas;
 
-		$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('glosa_factura', 'Encabezado', $lang), $CellFormat->get('encabezado'));
-		$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
-		$ws->write($filas, $col_abogado, $contrato->fields['glosa_contrato'], $CellFormat->get('encabezado'));
-		$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
-		++$filas;
+		$glosa_factura_valor = $PrmExcelCobro->getGlosa('glosa_factura_valor', 'Encabezado', $lang);
+		if (is_null($glosa_factura_valor)) {
+			$glosa_factura_valor = $contrato->fields['glosa_contrato'];
+			$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('glosa_factura', 'Encabezado', $lang), $CellFormat->get('encabezado'));
+			$ws->mergeCells($filas, $col_id_trabajo, $filas, $col_fecha_fin);
+			$ws->write($filas, $col_abogado, $glosa_factura_valor, $CellFormat->get('encabezado'));
+			$ws->mergeCells($filas, $col_abogado, $filas, $col_valor_trabajo);
+			++$filas;
+		}
+
 	}
 
 	if (in_array($cobro->fields['estado'], array('CREADO', 'EN REVISION'))) {
@@ -2773,6 +2793,7 @@ if ($cont_hitos > 0) {
 if (isset($ws)) {
 	// Se manda el archivo aquí para que no hayan errores de headers al no haber resultados.
 	if (!$guardar_respaldo) {
+		header('Set-Cookie: fileDownload=true; path=/');
 		$wb->send('Resumen de ' . __('cobro') . '_' . $cobro->fields['id_cobro'] . '.xls');
 	}
 }
