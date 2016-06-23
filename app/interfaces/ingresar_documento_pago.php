@@ -496,7 +496,6 @@ $Form = new Form();
 				'glosa_cliente'
 			];
 			jQuery.each(ids, function (i, id) {
-				console.log(id, jQuery('#' + id));
 				if (jQuery('#' + id).is('select')) {
 					jQuery('#' + id + ' option:not(:selected)').prop('disabled', true)
 				} else {
