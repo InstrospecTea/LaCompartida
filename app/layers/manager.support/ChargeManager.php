@@ -23,16 +23,21 @@ class ChargeManager extends AbstractManager implements IChargeManager {
 		$SearchCriteria = new SearchCriteria('DocumentPaymentsTransactions');
 
 		$SearchCriteria
- 			->related_with('Document')
- 			->with_direction('LEFT')
- 			->on_property('id_documento')
- 			->on_entity_property('id_documento_pago');
+			->related_with('Document')
+			->with_direction('LEFT')
+			->on_property('id_documento')
+			->on_entity_property('id_documento_pago');
 
- 		$SearchCriteria
- 			->filter('es_adelanto')
- 			->for_entity('Document')
- 			->restricted_by('equals')
- 			->compare_with(1);
+		$SearchCriteria
+			->filter('es_adelanto')
+			->for_entity('Document')
+			->restricted_by('equals')
+			->compare_with(1);
+
+		$SearchCriteria
+			->filter('id_documento_cobro')
+			->restricted_by('equals')
+			->compare_with($Documents[0]->fields['id_documento']);
 
  		$DocumentPaymentsTransactions = $this->SearchManager->searchByCriteria($SearchCriteria);
 
