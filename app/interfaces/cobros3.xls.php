@@ -217,7 +217,7 @@ $ws->write($fila_inicial, $col_descripcion, __('Descripción'), $tit);
 $ws->write($fila_inicial, $col_nombre_usuario, __('Nombre Usuario'), $tit);
 
 if ($solicitante == 1 || $solicitante == 2) {
-    $ws->write($fila_inicial, $col_solicitante, __('Ordenado Por '), $tit);
+    $ws->write($fila_inicial, $col_solicitante, __('Solicitado Por '), $tit);
 }
 
 $ws->write($fila_inicial, $col_duracion, __('Duración'), $tit);
