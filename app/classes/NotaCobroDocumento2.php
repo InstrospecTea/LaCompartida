@@ -1,7 +1,7 @@
 <?php
 
 class NotaCobroDocumento2 extends NotaCobroDocumento {
-	
+
 	function GenerarDocumento2($parser, $theTag = 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto, $mostrar_asuntos_cobrables_sin_horas = FALSE) {
 
 		global $contrato;
@@ -331,6 +331,8 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				} else {
 					$html = str_replace('%honorarios_vouga%', __('FEES'), $html);
 				}
+
+				$html = str_replace('%TOTAL_CON_ADELANTOS%', $this->GenerarDocumento2($parser, 'TOTAL_CON_ADELANTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 
 				break;
 
@@ -690,6 +692,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$total_cobro_cyc = $subtotal_en_moneda_cyc + $total_gastos_moneda - $descuento_cyc;
 				$total_cobro_demo = $x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']];
 				$iva_cyc = $impuestos_total_gastos_moneda + $impuestos_cyc;
+				$saldo_total_cobro = $x_resultados['saldo_gastos'][$this->fields['opc_moneda_total']];
 
 				$html = str_replace('%total_cobro%', __('Total Cobro'), $html);
 				$html = str_replace('%totalcobro%', __('total_cobro'), $html);
@@ -702,10 +705,11 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$html = str_replace('%valor_total_cobro_demo%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_cobro_demo, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%valor_total_cobro_cyc%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_cobro_cyc, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%valor_iva_cyc%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($iva_cyc, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idoma->fields['separador_miles']), $html);
-				$html = str_replace('%valor_total_cyc%', $moeda_Total->fields['simbolo'] . $this->espacio . number_format($total_cobro_cyc + $iva_cyc, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+				$html = str_replace('%valor_total_cyc%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_cobro_cyc + $iva_cyc, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%valor_total_cobro%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_cobro, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%valor_total_cobro_sin_simbolo%', number_format($total_cobro, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				$html = str_replace('%valor_uf%', __('Valor UF') . ' ' . date('d.m.Y'), $html);
+				$html = str_replace('%valor_saldo_total_cobro%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_total_cobro, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 
 				if ($this->fields['opc_ver_tipo_cambio'] == 0) {
 					$html = str_replace('%glosa_tipo_cambio_moneda%', '', $html);
@@ -910,6 +914,19 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$html = str_replace('%monto_total_palabra_cero_cien%', $monto_total_palabra_cero_cien, $html);
 				$html = str_replace('%monto_total_palabra%', $monto_total_palabra, $html);
 
+				$html = str_replace('%titulo_adelantos%', __('Adelantos'), $html);
+				$html = str_replace('%saldo_cobro%', __('Saldo') . ' ' . __('Cobro'), $html);
+
+				$Documento = new Documento($this->sesion);
+				$advances_total = $Documento->getTotalAdvanceCharge($this->fields['id_cobro']);
+
+				$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
+				$html = str_replace(
+					'%monto_total_adelanto%',
+					$moneda['simbolo'] . $this->espacio . number_format($advances_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']),
+					$html
+				);
+
 				break;
 
 			case 'RESUMEN_DETALLADO_HITOS':
@@ -943,6 +960,8 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 			case 'ADELANTOS': //GenerarDocumento2
 				$html = str_replace('%titulo_adelantos%', __('Adelantos por asignar'), $html);
 				$html = str_replace('%ADELANTOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'ADELANTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%ADELANTOS_FILAS%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+				$html = str_replace('%ADELANTOS_TOTAL%', $this->GenerarDocumento2($parser, 'ADELANTOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				$html = str_replace('%ADELANTOS_FILAS_TOTAL%', $this->GenerarDocumento2($parser, 'ADELANTOS_FILAS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 
@@ -995,8 +1014,52 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 			case 'ADELANTOS_ENCABEZADO': //GenerarDocumento2
 				$html = str_replace('%fecha%', __('Fecha'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
-				$html = str_replace('%monto%', __('Monto'), $html);
+				$html = str_replace('%monto%', __('Monto') . ' (' . $moneda_total->fields['simbolo'] . ')', $html);
 				$html = str_replace('%saldo%', __('Saldo'), $html);
+				break;
+
+			case 'ADELANTOS_FILAS':
+				$ChargeManager = new ChargeManager($this->sesion);
+				$advances = $ChargeManager->getAdvances($this->fields['id_cobro']);
+
+				$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
+
+				foreach ($advances as $key => $value) {
+					$_html = $html;
+					$_html = str_replace('%fecha%', Utiles::sql2fecha($value['fecha'], $idioma->fields['formato_fecha']), $_html);
+					$_html = str_replace('%descripcion%', $value['glosa'], $_html);
+					$_html = str_replace(
+						'%monto_adelanto%',
+						$moneda['simbolo'] . $this->espacio . number_format($value['monto'], $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']),
+						$_html
+					);
+					$final .= $_html;
+				}
+
+				$html = $final;
+				break;
+
+			case 'ADELANTOS_TOTAL':
+				$html = str_replace('%total%', __('Total'), $html);
+				$Documento = new Documento($this->sesion);
+				$advances_total = $Documento->getTotalAdvanceCharge($this->fields['id_cobro']);
+
+				$moneda = $cobro_moneda->moneda[$this->fields['opc_moneda_total']];
+				$html = str_replace(
+					'%monto_total_adelanto%',
+					$moneda['simbolo'] . $this->espacio . number_format($advances_total, $moneda['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']),
+					$html
+				);
+				break;
+
+			case 'TOTAL_CON_ADELANTOS':
+			var_dump('aca');
+				$html = str_replace('%total%', __('Saldo') . ' ' . __('Cobro'), $html);
+
+				$saldo_total_cobro = $x_resultados['saldo_gastos'][$this->fields['opc_moneda_total']];
+
+				$html = str_replace('%valor_total%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($saldo_total_cobro, $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
+
 				break;
 
 			case 'ADELANTOS_FILAS_TOTAL': //GenerarDocumento2

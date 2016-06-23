@@ -21,6 +21,7 @@ class NotaCobroConfig extends Cobro {
 			'SALTO_PAGINA' => 'SALTO_PAGINA / GenerarDocumentoComun',
 			'DESGLOSE_POR_ASUNTO_DETALLE' => 'DESGLOSE_POR_ASUNTO_DETALLE / GenerarDocumentoComun',
 			'DESGLOSE_POR_ASUNTO_TOTALES' => 'DESGLOSE_POR_ASUNTO_TOTALES / GenerarDocumentoComun',
+			'TOTAL_CON_ADELANTOS' => 'TOTAL_CON_ADELANTOS / GenerarDocumento2',
 		),
 		'DETALLE_COBRO' => array(
 			'FACTURA_NUMERO' => 'FACTURA_NUMERO / GenerarDocumento2',
@@ -262,6 +263,8 @@ class NotaCobroConfig extends Cobro {
 			'%valor_equivalente%' => 'valor_equivalente',
 			'%total_subtotal_cobro%' => 'total_subtotal_cobro',
 			'%nota_disclaimer%' => 'nota_disclaimer',
+			'%titulo_adelantos%' => 'titulo_adelantos',
+			'%saldo_cobro%' => 'saldo_cobro',
 		),
 		'RESTAR_RETAINER' => array(
 			'%retainer%' => 'retainer',
@@ -393,6 +396,15 @@ class NotaCobroConfig extends Cobro {
 		),
 		'ADELANTOS' => array(
 			'%titulo_adelantos%' => 'titulo_adelantos',
+		),
+		'ADELANTOS_FILAS' => array(
+			'%fecha%' => 'fecha',
+			'%descripcion%' => 'descripcion',
+			'%monto%' => 'monto',
+		),
+		'ADELANTOS_TOTAL' => array(
+			'%total%' => 'total',
+			'%monto_total_adelanto%' => 'monto_total_adelanto',
 		),
 		'COBROS_ADEUDADOS' => array(
 			'%titulo_adelantos%' => 'titulo_adelantos',
