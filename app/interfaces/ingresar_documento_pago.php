@@ -489,8 +489,20 @@ $Form = new Form();
 			url += ''<?php if (!empty($cambios_en_saldo_honorarios)) echo "+'&c_hon=" . implode(',', $cambios_en_saldo_honorarios) . "'"; if (!empty($cambios_en_saldo_gastos)) echo "+'&c_gas=" . implode(',', $cambios_en_saldo_gastos) . "'"; ?>;
 		}
 		if (id_documento || id_cobro){
-			jQuery('#codigo_cliente').attr('readonly',true);
-			jQuery('#glosa_cliente').attr('readonly',true);
+			var ids = [
+				'codigo_cliente',
+				'codigo_cliente_secundario',
+				'campo_codigo_cliente',
+				'glosa_cliente'
+			];
+			jQuery.each(ids, function (i, id) {
+				console.log(id, jQuery('#' + id));
+				if (jQuery('#' + id).is('select')) {
+					jQuery('#' + id + ' option:not(:selected)').prop('disabled', true)
+				} else {
+					jQuery('#' + id).prop('readonly', true);
+				}
+			});
 		}
 		if (id_documento){
 			url += '&id_documento='+id_documento;
