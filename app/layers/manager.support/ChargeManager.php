@@ -39,9 +39,10 @@ class ChargeManager extends AbstractManager implements IChargeManager {
 		$result = array();
 		foreach ($DocumentPaymentsTransactions as $key => $value) {
 			$DocumentAdvance = $this->DocumentService->get($value->get('id_documento_pago'), 'glosa_documento');
+			$amount = $value->get('valor_pago_gastos') + $value->get('valor_pago_honorarios');
 			$element = array(
 				'id_neteo_documento' => $value->get('id_neteo_documento'),
-				'monto' => $value->get('valor_pago_gastos'),
+				'monto' => $amount,
 				'glosa' => $DocumentAdvance->get('glosa_documento'),
 				'fecha' => $value->get('fecha_creacion')
 			);
