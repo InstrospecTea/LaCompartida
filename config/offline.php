@@ -62,7 +62,7 @@
 				<tr>
 					<td  class="alert alert-block">
 						<h4 class="alert-heading">Servicio Suspendido</h4>
-						<p>Por favor, cont&aacute;ctese con <a href="mailto:tesoreria@lemontech.cl">tesoreria@lemontech.cl</a> o al n&uacute;mero <b>+56 232239990</b> para regularizar su situaci&oacute;n.</p>
+						<p>Por favor, cont&aacute;ctese con <a href="mailto:contabilidad@lemontech.cl">contabilidad@lemontech.cl</a> o al n&uacute;mero <b>+56 2 3223 9990</b> para regularizar su situaci&oacute;n.</p>
 					</td>
 				</tr>
 			</table>
