@@ -62,6 +62,7 @@ if ($guardar_respaldo) {
 $wb->setCustomColor(35, 220, 255, 220);
 $wb->setCustomColor(36, 255, 255, 220);
 $wb->setCustomColor(37, 255, 255, 0);
+$wb->setCustomColor(55, 150, 150, 150);
 
 
 //--------------- Definamos los formatos generales, los que quedan constante por todo el documento -------------
