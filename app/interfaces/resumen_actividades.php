@@ -826,7 +826,7 @@ if ($opc == 'print' || $opc == 'grafico' || $popup) {
 		$UserManager = new UserManager($sesion);
 
 		foreach ($users as $user) {
-			if ($user) {
+			if ($user && $UserManager->isActive($user)) {
 				$user_hours = $UserManager->getHoursWorkedByFilters(
 					$user,
 					$clients,

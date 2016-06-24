@@ -22,6 +22,27 @@ class UserManager extends AbstractManager implements IUserManager {
 	}
 
 	/**
+	 * Consulta si un usuario es activo
+	 * @param 	string $user_id
+	 * @return 	boolean
+	 */
+	public function isActive($user_id) {
+		if (empty($user_id) || !is_numeric($user_id)) {
+			throw new InvalidIdentifier;
+		}
+
+		$this->loadService('User');
+
+		$User = $this->UserService->get($user_id, 'activo');
+
+		if ($User->get('activo') == 0) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Obtiene el total de horas trabajadas de un usuario con filtros
 	 * @param 	string $user_id
 	 * @param 	string $client_id
