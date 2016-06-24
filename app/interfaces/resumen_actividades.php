@@ -607,8 +607,6 @@ $agrupadores = explode('-', $vista);
 							<b><?php echo __('Clientes') ?>:</b></td>
 						<td align=left>
 							<b><?php echo __('Periodo') ?>:</b>&nbsp;&nbsp;<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;<span style='font-size:9px'><label for="rango"><?php echo __('Otro rango') ?></label></span></td>
-						<td align=left>
-							<b><?php echo __('Sin horas') ?>:</b>&nbsp;<input type="checkbox" name="sin_horas" id="sin_horas" value="1" <?php echo $sin_horas ? 'checked' : '' ?> title='' /></td>
 					</tr>
 					<tr valign=top>
 						<td rowspan="2" align=left><!-- Nuevo Select -->
@@ -773,7 +771,7 @@ $agrupadores = explode('-', $vista);
 }
 
 if ($opc == 'print' || $opc == 'grafico' || $popup) {
-	if ($sin_horas && strcmp(strtolower($tipo), 'profesional') === 0) {
+	if (strcmp(strtolower($tipo), 'profesional') === 0) {
 		if (empty($usuarios)) {
 			foreach ($usuario->get_usuarios_resumen_actividades() as $key => $value) {
 				$users[] = $key;
@@ -1012,7 +1010,7 @@ if ($opc == 'print' || $popup) {
 		$titulo_reporte = __('No se encontraron datos con el tipo específicado en el período.');
 	}
 	?>
-	<?php if ($sin_horas && strcmp(strtolower($agrupadores[0]), 'profesional') === 0): ?>
+	<?php if (strcmp(strtolower($agrupadores[0]), 'profesional') === 0): ?>
 	<table border="1" class="planilla" id ="tabla_usuarios_sin_horas" width="100%" style="margin-bottom: 30px;">
 		<tbody>
 			<tr>

@@ -62,6 +62,12 @@ class UserManager extends AbstractManager implements IUserManager {
 			->restricted_by('equals')
 			->compare_with($user_id);
 
+		$SearchCriteria
+				->filter('activo')
+				->for_entity('User')
+				->restricted_by('equals')
+				->compare_with(1);
+
 		if (!empty($client_id)) {
 			if (Conf::GetConf($this->Sesion, 'CodigoSecundario')) {
 				$client_code = 'codigo_cliente_secundario';
