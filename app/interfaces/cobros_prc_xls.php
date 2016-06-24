@@ -66,22 +66,22 @@ $wb->setCustomColor(37, 255, 255, 0);
 
 //--------------- Definamos los formatos generales, los que quedan constante por todo el documento -------------
 
-$formato_encabezado = & $wb->addFormat(array('Size' => 10,
+$formato_encabezado = & $wb->addFormat(array('Size' => 8,
 						'VAlign' => 'middle',
 						'Align' => 'left',
 						'Bold' => 1,
 						'Color' => 'black'));
-$formato_encabezado_derecha = & $wb->addFormat(array('Size' => 10,
+$formato_encabezado_derecha = & $wb->addFormat(array('Size' => 8,
 						'VAlign' => 'middle',
 						'Align' => 'right',
 						'Bold' => 1,
 						'Color' => 'black'));
-$formato_encabezado_center = & $wb->addFormat(array('Size' => 10,
+$formato_encabezado_center = & $wb->addFormat(array('Size' => 8,
 						'VAlign' => 'middle',
 						'Align' => 'center',
 						'Bold' => 1,
 						'Color' => 'black'));
-$formato_tiempo = & $wb->addFormat(array('Size' => 7,
+$formato_tiempo = & $wb->addFormat(array('Size' => 8,
 						'VAlign' => 'middle',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
@@ -112,7 +112,7 @@ $formato_tiempo_total_tabla_centrado = & $wb->addFormat(array('Size' => 8,
 						'Top' => '1',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_total = & $wb->addFormat(array('Size' => 10,
+$formato_total = & $wb->addFormat(array('Size' => 8,
 						'VAlign' => 'top',
 						'Bold' => 1,
 						'Top' => 1,
@@ -367,12 +367,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$Cliente->LoadByCodigo($Cobro->fields['codigo_cliente']);
 
 	// ----------------- Define formatos specificos dentro del cobro ------------------
-	$formato_moneda_gastos = & $wb->addFormat(array('Size' => 7,
+	$formato_moneda_gastos = & $wb->addFormat(array('Size' => 8,
 							'VAlign' => 'top',
 							'Align' => 'right',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
-	$formato_moneda_gastos_total = & $wb->addFormat(array('Size' => 10,
+	$formato_moneda_gastos_total = & $wb->addFormat(array('Size' => 8,
 							'VAlign' => 'top',
 							'Align' => 'right',
 							'Bold' => 1,
@@ -409,7 +409,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$decimales_total = '';
 	}
 	$formato_moneda = & $wb->addFormat(array(
-							'Size' => 10,
+							'Size' => 8,
 							'VAlign' => 'top',
 							'Align' => 'right',
 							'Color' => 'black',

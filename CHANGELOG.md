@@ -1,5 +1,45 @@
 # Changelog
 
+## Hotfix 16.21.2
+Friday, Jun 24th
+* **Fix** [Agregar nueva sección para mostrar asuntos sin separar](https://github.com/LemontechSA/ttb/pull/1589)
+
+## Hotfix 16.21.1
+Friday, Jun 24th
+* **Fix** [Actualiza correo](https://github.com/LemontechSA/ttb/pull/1587)
+
+## [Release 16.21.0](https://github.com/LemontechSA/ttb/pull/1579)
+Wednesday, Jun 22nd
+* **Feature** [Refactor Tarifa Tramites](https://github.com/LemontechSA/ttb/pull/1350)
+
+## Hotfix 16.20.1
+Wednesday, Jun 22nd
+* **Fix** [Cambiar tamaño de tipografía en excel PRC](https://github.com/LemontechSA/ttb/pull/1581)
+
+## [Release 16.20.0](https://github.com/LemontechSA/ttb/pull/1575)
+Tuesday, Jun 21st
+* **Feature** [Spellcheck](https://github.com/LemontechSA/ttb/pull/1567)
+
+## [Release 16.19.0](https://github.com/LemontechSA/ttb/pull/1573)
+Friday, Jun 17th
+* **Feature** [Subclases Nota de Cobro](https://github.com/LemontechSA/ttb/pull/1570)
+
+## Hotfix 16.18.4
+Friday, Jun 17th
+* **Fix** [:bug: Corregir generación de pagos en facturas](https://github.com/LemontechSA/ttb/pull/1572)
+
+## Hotfix 16.18.3
+Thursday, Jun 16th
+* **Fix** [Corregir pagos utilizando adelantos](https://github.com/LemontechSA/ttb/pull/1568)
+
+## Hotfix 16.18.2
+Wednesday, Jun 15th
+* **Fix** [Problema al agregar adelantos con decimales](https://github.com/LemontechSA/ttb/pull/1565)
+
+## Hotfix 16.18.1
+Wednesday, Jun 15th
+* **Fix** [Correcciones Excel PRC](https://github.com/LemontechSA/ttb/pull/1564)
+
 ## [Release 16.18.0](https://github.com/LemontechSA/ttb/pull/1554)
 Monday, Jun 13th
 * **Feature** [Humanize logs](https://github.com/LemontechSA/ttb/pull/1515)

@@ -223,13 +223,18 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$this->add_fields($criteria, $fields);
 		$criteria->add_from($instance->getPersistenceTarget());
 		$criteria->add_restriction(CriteriaRestriction::equals($instance->getIdentity(), $id));
-		$resultArray = $criteria->run();
-		$resultArray = $resultArray[0];
-		if (empty($resultArray)) {
-			throw new CouldNotFindEntityException('No se ha podido encontrar la entidad de tipo
-			' . $this->getClass() . ' con identificador primario ' . $id . '.');
+		try {
+			$resultArray = $criteria->run();
+			$resultArray = $resultArray[0];
+			if (empty($resultArray)) {
+				throw new CouldNotFindEntityException('No se ha podido encontrar la entidad de tipo
+				' . $this->getClass() . ' con identificador primario ' . $id . '.');
+			}
+			return $this->encapsulate($resultArray, $instance);
+		} catch (PDOException $e) {
+			throw new PDOException("Ha ocurrido un error al intentar ejecutar la query
+			{$criteria->get_plain_query()}<br>Error {$e->getMessage()}<br>Código {$e->getCode()}");
 		}
-		return $this->encapsulate($resultArray, $instance);
 	}
 
 	/**

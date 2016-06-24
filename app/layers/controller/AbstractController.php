@@ -76,7 +76,9 @@ abstract class AbstractController {
 	}
 
 	protected function renderJSON($data = null) {
-		if (!is_null($data)) {
+		if (is_null($data)) {
+			$this->data = null;
+		} else {
 			$this->data = UtilesApp::utf8izar($data);
 		}
 		$this->render('/elements/json', 'ajax');
@@ -157,6 +159,21 @@ abstract class AbstractController {
 			return;
 		}
 		$filename = LAYER_PATH . "/business.support/{$classname}.php";
+		require $filename;
+		$this->{$classname} = new $classname($this->Session);
+		$this->loadedClass[] = $classname;
+	}
+
+	/**
+	 * Carga una clase manager al vuelo.
+	 * @param $name
+	 */
+	protected function loadManager($name) {
+		$classname = "{$name}Manager";
+		if (in_array($classname, $this->loadedClass)) {
+			return;
+		}
+		$filename = LAYER_PATH . "/manager.support/{$classname}.php";
 		require $filename;
 		$this->{$classname} = new $classname($this->Session);
 		$this->loadedClass[] = $classname;

@@ -3,7 +3,8 @@ module.exports = function(grunt) {
 		'./bower_components/Chart.js/Chart.js',
 		'./bower_components/jspdf/dist/jspdf.min.js',
 		'./bower_components/html2canvas/build/html2canvas.js',
-		'./bower_components/jquery-file-download/src/Scripts/jquery.fileDownload.js'
+		'./bower_components/jquery-file-download/src/Scripts/jquery.fileDownload.js',
+		'./bower_components/jquery-mask-plugin/src/jquery.mask.js'
 	];
 
 	grunt.file.defaultEncoding = 'iso-8859-1';

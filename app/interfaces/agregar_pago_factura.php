@@ -101,7 +101,7 @@ if ($id_adelanto) {
 		$tipo_cambio_cobro = $moneda_cobro->fields['tipo_cambio'];
 	}
 	$tasa_cambio = $tipo_cambio_adelanto / $tipo_cambio_cobro;
-	if ($monto_pago_adelanto > $documento_adelanto->fields['saldo_pago']) {
+	if ($monto_pago > ($documento_adelanto->fields['saldo_pago'] * -1)) {
 		$monto_pago_adelanto = -$documento_adelanto->fields['saldo_pago'];
 		$monto_pago = $monto_pago_adelanto * $tasa_cambio;
 	}
@@ -530,8 +530,8 @@ $Form->defaultLabel = false;
 			if (change) {
 				jQuery('#monto_moneda_cobro').val(jQuery('#monto').val());
 				jQuery('#monto_moneda_cobro').trigger('keyup');
-			};
-		};
+			}
+		}
 		ActualizarMontosIndividuales('monto_moneda_cobro');
 
 		<?php if (empty($id_neteo_documento_adelanto)) { ?>
@@ -1133,6 +1133,7 @@ $Form->defaultLabel = false;
 		global $saldo_pago;
 		global $id_cobro;
 		global $id_adelanto;
+		global $moneda_pago;
 
 		$id_factura = $fila->fields['id_factura'];
 
@@ -1153,7 +1154,7 @@ $Form->defaultLabel = false;
 		}
 
 		$read_only = ($id_adelanto && ($id_cobro != $fila->fields['id_cobro']));
-		$opc_html .= $Form->input("saldo_{$id_factura}", $monto_a_pagar, array('label' => "{$fila->fields['simbolo']}&nbsp;", 'size' => 7, 'class' => 'saldojq', 'readonly' => $read_only));
+		$opc_html .= $Form->input("saldo_{$id_factura}", $moneda_pago->getFloat($monto_a_pagar, false), array('label' => "{$fila->fields['simbolo']}&nbsp;", 'size' => 7, 'class' => 'saldojq', 'readonly' => $read_only));
 		$opc_html .= $Form->hidden("x_saldo_hide_{$id_factura}", $fila->fields['saldo_factura'], array('id' => "x_saldo_hide_{$id_factura}"));
 		$opc_html .= $Form->hidden("tipo_cambio_{$id_factura}", $fila->fields['saldo_factura'], array('id' => "tipo_cambio_{$id_factura}"));
 		$opc_html .= $Form->hidden("cifras_decimales_{$id_factura}", $fila->fields['saldo_factura'], array('id' => "cifras_decimales_{$id_factura}"));
