@@ -2,7 +2,7 @@
 
 ## Hotfix 16.21.3
 Friday, Jun 24th
-* **Fix** [Revertir nueva sección para mostrar asuntos sin separar](https://github.com/LemontechSA/ttb/pull/1590)
+* **Fix** [Revertir nueva sección para mostrar asuntos sin separar](https://github.com/LemontechSA/ttb/pull/1592)
 
 ## Hotfix 16.21.2
 Friday, Jun 24th
