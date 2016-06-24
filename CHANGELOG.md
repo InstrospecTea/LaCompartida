@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.2
+Friday, Jun 24th
+* **Fix** [Agregar nueva sección para mostrar asuntos sin separar](https://github.com/LemontechSA/ttb/pull/1589)
+
 ## Hotfix 16.21.1
 Friday, Jun 24th
 * **Fix** [Actualiza correo](https://github.com/LemontechSA/ttb/pull/1587)
