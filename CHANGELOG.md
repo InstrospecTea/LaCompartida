@@ -1,7 +1,7 @@
 # Changelog
 
 ## Hotfix 16.21.1
-Friday, Jun 24nd
+Friday, Jun 24th
 * **Fix** [Actualiza correo](https://github.com/LemontechSA/ttb/pull/1587)
 
 ## [Release 16.21.0](https://github.com/LemontechSA/ttb/pull/1579)
