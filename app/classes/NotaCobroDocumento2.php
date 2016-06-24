@@ -257,14 +257,12 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 
 					if ($cont_trab || $cont_tram || ( $cont_gastos > 0 && Conf::GetConf($this->sesion, 'SepararGastosPorAsunto') )) {
 						$html = str_replace('%ASUNTOS%', $this->GenerarDocumento2($parser, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-						$html = str_replace('%ASUNTOS_NO_SEPARADOS%',$this->GenerarDocumento2($parser, 'ASUNTOS_NO_SEPARADOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);;
 					} else {
 						$html = str_replace('%ASUNTOS%', '', $html);
-						$html = str_replace('%ASUNTOS_NO_SEPARADOS%', '', $html);
 					}
 				} else {
 					$html = str_replace('%ASUNTOS%', $this->GenerarDocumento2($parser, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-					$html = str_replace('%ASUNTOS_NO_SEPARADOS%', $this->GenerarDocumento2($parser, 'ASUNTOS_NO_SEPARADOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+
 				}
 
 				$html = str_replace('%TRAMITES%', '', $html);
@@ -1480,7 +1478,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 			case 'ASUNTOS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
-				if ($this->fields['opc_ver_asuntos_separados']) {
+
 					for ($k = 0; $k < count($this->asuntos); $k++) {
 
 						$asunto = new Asunto($this->sesion);
@@ -1698,7 +1696,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$html = str_replace('%descripcion_servicios%', __('Descripción de Servicios'), $html);
 						$html = str_replace('%para_los_servicios_prestados%', __('Para los servicios profesionales prestados'), $html);
 					}
-				}
+
 				break;
 
 			case 'ASUNTOS_NO_SEPARADOS': //GeneraDocumento2
