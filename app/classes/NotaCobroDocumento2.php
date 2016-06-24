@@ -1480,7 +1480,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 			case 'ASUNTOS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
-				if ($this->fields['opc_ver_asuntos_separados']) {
+
 					for ($k = 0; $k < count($this->asuntos); $k++) {
 
 						$asunto = new Asunto($this->sesion);
@@ -1698,7 +1698,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$html = str_replace('%descripcion_servicios%', __('Descripción de Servicios'), $html);
 						$html = str_replace('%para_los_servicios_prestados%', __('Para los servicios profesionales prestados'), $html);
 					}
-				}
+
 				break;
 
 			case 'ASUNTOS_NO_SEPARADOS': //GeneraDocumento2
