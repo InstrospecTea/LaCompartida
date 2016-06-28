@@ -20,11 +20,14 @@ class InsertCriteria {
 	private $is_update = false;
 	private $restrictions = array();
 	private $forced = false;
+	private $insert_criteria = array();
+	private $pivotes_temp = array();
 
 	/*
 	  CRITERIA SCOPE ENVELOPERS.
 	 */
 	private $insert_value_clause = array();
+	private $insert_id = null;
 
 	/**
 	 * Constructor de la clase.
@@ -38,14 +41,27 @@ class InsertCriteria {
 	 * Ejecuta una query en base a PDO, considerando los criterios definidos en este Criteria.
 	 * @param type $forced Fuerza la ejecución de UPDATE si no tiene restricciones
 	 * @throws Exception
+	 * @return Array asociativo de resultados.
 	 */
 	public function run($forced = false) {
 		if ($this->sesion == null) {
 			throw new Exception('Criteria dice: No hay una sesión definida para Criteria, no es posible ejecutar.');
 		}
-		$this->forced = $forced;
-		$statement = $this->sesion->pdodbh->prepare($this->getPlainQuery());
-		$statement->execute();
+
+		$response = new stdClass();
+		try {
+			$this->forced = $forced;
+			$statement = $this->sesion->pdodbh->prepare($this->getPlainQuery());
+			$statement->execute();
+
+			$response->success = true;
+			$this->setLastInsertId($this->sesion->pdodbh->lastInsertId());
+		} catch (Exception $e) {
+			$response->success = false;
+			$response->message = $e->getMessage();
+		}
+
+		return $response;
 	}
 
 	public function update() {
@@ -105,19 +121,61 @@ class InsertCriteria {
 			return $this->updatePlainQuery();
 		}
 		return $this->action . ' ' . $this->table_name . ' '
-			. $this->getPivotesFragment() . ' VALUES ' . $this->getValuesFragment();
+			. $this->getPivotesFragment() . ' VALUES ' . $this->getInsertsFragment();
 	}
 
 	private function getPivotesFragment() {
 		$pivotes = array_keys($this->insert_value_clause);
 
-		return '(' . implode(',', $pivotes) . ')';
+		if (empty($pivotes)) {
+			$pivotes = $this->pivotes_temp;
+		}
+
+		return '(' . implode(', ', $pivotes) . ')';
 	}
 
 	private function getValuesFragment() {
 		$pivotes = array_values($this->insert_value_clause);
 
 		return '(' . implode(',', $pivotes) . ')';
+	}
+
+	private function getInsertsFragment() {
+		if (!empty($this->insert_criteria)) {
+			return implode(', ', $this->insert_criteria);
+		} else {
+			return $this->getValuesFragment();
+		}
+	}
+
+	/**
+	 * Add a new row for sql insert statement
+	 * e.g. INSERT INTO table (key1, key2, ..., keyN)
+	 * 			VALUES (value1, value2, ..., valueN), (value1, value2, ..., valueN), ..., (value1, value2, ..., valueN);
+	 */
+	public function addInsert() {
+		$insert = $this->getValuesFragment();
+		if (!empty($insert)) {
+			$this->insert_criteria[] = $insert;
+			$this->pivotes_temp = array_keys($this->insert_value_clause);
+			$this->insert_value_clause = array();
+		}
+	}
+
+	/**
+	 * Set $insert_id value
+	 * @param int
+	 */
+	private function setLastInsertId($insert_id) {
+		$this->insert_id = $insert_id;
+	}
+
+	/**
+	 * Get $insert_id value
+	 * @return int
+	 */
+	public function getLastInsertId() {
+		return $this->insert_id;
 	}
 
 	private function updatePlainQuery() {
