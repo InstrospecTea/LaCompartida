@@ -26,7 +26,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 		$this->FillTemplateData($idioma, $moneda);
 		$html = $this->RenderTemplate($parser->tags[$theTag]);
 		if (!$this->tiene_tag_asuntos_no_separados) {
-			$this->tiene_tag_asuntos_no_separados = strstr($html, '%ASUNTOS_NO_SEPARADOS%');
+			$this->tiene_tag_asuntos_no_separados = strpos($html, '%ASUNTOS_NO_SEPARADOS%');
 		}
 		switch ($theTag) {
 
