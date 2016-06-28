@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.5
+Tuesday, Jun 28th
+* **Fix** [Descarga la aplicación de escritorio](https://github.com/LemontechSA/ttb/pull/1599)
+
 ## Hotfix 16.21.4
 Tuesday, Jun 28th
 * **Fix** [:bug: Corregir visibilidad de variables en clase NotaCobro](https://github.com/LemontechSA/ttb/pull/1598)
