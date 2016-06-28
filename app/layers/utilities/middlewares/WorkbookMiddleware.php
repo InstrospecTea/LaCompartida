@@ -11,24 +11,34 @@ class WorkbookMiddleware {
 	protected $workSheetObj;
 	protected $indexsheet;
 
+	protected $writer = 'Excel2007';
+	protected $extension = 'xlsx';
+	protected $content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+	private $time = 0;
 	/**
 	 * Construct of the class
-	 * @param string $fileName
+	 * @param string $filename
 	 */
 	public function __construct($filename) {
+		$this->time = microtime(1);
 		$this->filename = $filename;
 		$this->indexsheet = 0;
 
 		$this->phpExcel = new PHPExcel();
-		$this->setDocumentProperties($phpExcel);
+		$this->setDocumentProperties($this->phpExcel);
 	}
 
 	/**
 	 *
 	 * @todo implement?
 	 */
-	public function setVersion() {
-
+	public function setVersion($version) {
+		if ($version == 8) {
+			$this->writer = 'Excel5';
+			$this->extension = 'xls';
+			$this->content_type = 'application/vnd.ms-excel';
+		}
 	}
 
 	/**
@@ -117,14 +127,14 @@ class WorkbookMiddleware {
 	 */
 	public function close() {
 		$file = pathinfo($this->filename);
-		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-		header('Content-Disposition: attachment;filename="' . $file['filename'] . '.xlsx"');
+		header("Content-Type: {$this->content_type}");
+		header('Content-Disposition: attachment;filename="' . $file['filename'] . '.' . $this->extension . '"');
 		header('Cache-Control: max-age=0');
 		header('Pragma: public');
 
 		$this->phpExcel->setActiveSheetIndex(0);
 
-		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, 'Excel2007');
+		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, $this->writer);
 
 		$writer->save('php://output');
 
@@ -139,8 +149,8 @@ class WorkbookMiddleware {
 	private function setDocumentProperties($phpExcel) {
 		$this->phpExcel->getProperties()->setCreator('LemonTech')
 							 ->setLastModifiedBy('LemonTech')
-							 ->setTitle($filename)
-							 ->setSubject($filename)
+							 ->setTitle($this->filename)
+							 ->setSubject($this->filename)
 							 ->setDescription('Reporte generado por The TimeBilling, http://thetimebilling.com/.')
 							 ->setKeywords('timebilling lemontech');
 	}

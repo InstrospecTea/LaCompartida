@@ -2276,14 +2276,14 @@ HTML;
 	 * Sube un archivo a S3, en el bucket de uploads,
 	 * relativo al subdominio (S3_UPLOAD_BUCKET/sub_domain/...)
 	 * @param string $name nombre del archivo junto con su ruta relativa <i>(/ruta/relativa/al/archivo.txt)</i>
-	 * @param string $file ruta absoluta del archivo
+	 * @param string $file_path ruta absoluta del archivo
 	 * @param string $content_type
 	 * @return string URL del archivo en S3
 	 */
-	public static function UploadToS3($name, $file, $content_type = 'application/octet-stream') {
+	public static function UploadToS3($name, $file_path, $content_type = 'application/octet-stream') {
 		$S3 = new S3(S3_UPLOAD_BUCKET);
 		$name = SUBDOMAIN . $name;
-		$response = $S3->uploadFile($name, $file, array(
+		$response = $S3->uploadFile($name, $file_path, array(
 			'ACL' => 'public-read',
 			'ContentType' => $content_type,
 			'ContentDisposition' => 'attachment'
