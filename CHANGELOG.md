@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 16.21.3
+Friday, Jun 24th
+* **Fix** [Revertir nueva sección para mostrar asuntos sin separar](https://github.com/LemontechSA/ttb/pull/1592)
+
+## Hotfix 16.21.2
+Friday, Jun 24th
+* **Fix** [Agregar nueva sección para mostrar asuntos sin separar](https://github.com/LemontechSA/ttb/pull/1589)
+
+## Hotfix 16.21.1
+Friday, Jun 24th
+* **Fix** [Actualiza correo](https://github.com/LemontechSA/ttb/pull/1587)
+
 ## [Release 16.21.0](https://github.com/LemontechSA/ttb/pull/1579)
 Wednesday, Jun 22nd
 * **Feature** [Refactor Tarifa Tramites](https://github.com/LemontechSA/ttb/pull/1350)
