@@ -8,9 +8,9 @@ class NotaCobro extends NotaCobroDocumento2 {
 	// Twig, the flexible, fast, and secure template language for PHP
 	protected $twig;
 	protected $template_data;
-	private $detalle_en_asuntos = FALSE;
-	private $hitos = FALSE;
-	private $resumen_cap = null;
+	protected $detalle_en_asuntos = FALSE;
+	protected $hitos = FALSE;
+	protected $resumen_cap = null;
 
 	var $asuntos = array();
 	var $x_resultados = array();
