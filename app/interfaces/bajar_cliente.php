@@ -163,7 +163,7 @@ function getDNETVersion(reportError) {
 			result = "<?= __("¡La presencia de .NET <b>NO</b> ha sido reportada por su browser!<br />Descárguelo en el siguiente enlace:"); ?> <a href='http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5'>Framework .NET</a>";
 			if(ie < 0)
 			{
-				result += "<br><?= __('Este browser no es Internet Explorer. La manera más fácil de chequear la presencia del framework .NET es abrir esta página en Internet Explorer.') ?>";
+				result += "<br><?= __('Este browser no es Internet Explorer. La manera más fácil de chequear la presencia del framework .NET es abrir esta página en Internet Explorer.'); ?>";
 			}
 		}
 		else result = null;
@@ -192,7 +192,7 @@ writeDNetReport(document);
 </div>
 
 <div class="chrome" style="background-color:#ff0000; border:1px solid black; font-size:1.3em; display:block; width: 100%">
-	<?= __('En caso de descargar con chrome dar clic derecho a "Instalar y ejecutar" y "guardar enlace como".') ?>
+	<?= __('En caso de descargar con chrome dar clic derecho a "Instalar y ejecutar" y "guardar enlace como".'); ?>
 	<br />
 </div>
 
@@ -203,16 +203,16 @@ writeDNetReport(document);
 
 <div align=left>
 	<ul>
-		<li><?= __('A continuación usted podrá instalar la aplicación que le permitirá utilizar el sistema cuando no cuente con una conexión a Internet.') ?></li>
-		<li><?= __('Esta aplicación requiere el framework .NET de Microsoft. Al comienzo de esta página podrá ver si su computador necesita instalar este componente.') ?></li>
-		<li><?= __('Esta aplicación tiene algunos prerrequisitos que de no estar instalados en su computador, serán descargados desde el sitio web de Microsoft. Esta operación puede tardar varios minutos.') ?></li>
-		<li><?= __('Haga clic en el siguiente botón para instalar o ejecutar la aplicación:') ?></li>
+		<li><?= __('A continuación usted podrá instalar la aplicación que le permitirá utilizar el sistema cuando no cuente con una conexión a Internet.'); ?></li>
+		<li><?= __('Esta aplicación requiere el framework .NET de Microsoft. Al comienzo de esta página podrá ver si su computador necesita instalar este componente.'); ?></li>
+		<li><?= __('Esta aplicación tiene algunos prerrequisitos que de no estar instalados en su computador, serán descargados desde el sitio web de Microsoft. Esta operación puede tardar varios minutos.'); ?></li>
+		<li><?= __('Haga clic en el siguiente botón para instalar o ejecutar la aplicación:'); ?></li>
 	</ul>
 	<br />
 	<center>
 		<span style="border: 1px solid black; padding: 3px; background-color:#A7DF60">
 			<a style="text-decoration: none;" href="../../cliente_windows/TimeTracking.application">
-				<?= __('Instalar y ejecutar') ?>
+				<?= __('Instalar y ejecutar'); ?>
 			</a>
 		</span>
 	</center>
