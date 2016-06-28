@@ -2,6 +2,8 @@
 
 class NotaCobroDocumento2 extends NotaCobroDocumento {
 
+	protected $tiene_tag_asuntos_no_separados;
+
 	function GenerarDocumento2($parser, $theTag = 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto, $mostrar_asuntos_cobrables_sin_horas = FALSE) {
 
 		global $contrato;
@@ -23,7 +25,9 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 
 		$this->FillTemplateData($idioma, $moneda);
 		$html = $this->RenderTemplate($parser->tags[$theTag]);
-
+		if (!$this->tiene_tag_asuntos_no_separados) {
+			$this->tiene_tag_asuntos_no_separados = strstr($html, '%ASUNTOS_NO_SEPARADOS%');
+		}
 		switch ($theTag) {
 
 			case 'INFORME': //GenerarDocumento2
@@ -256,15 +260,17 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				if (Conf::GetConf($this->sesion, 'ParafoAsuntosSoloSiHayTrabajos')) {
 
 					if ($cont_trab || $cont_tram || ( $cont_gastos > 0 && Conf::GetConf($this->sesion, 'SepararGastosPorAsunto') )) {
+						$html = str_replace('%ASUNTOS_NO_SEPARADOS%',$this->GenerarDocumento2($parser, 'ASUNTOS_NO_SEPARADOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 						$html = str_replace('%ASUNTOS%', $this->GenerarDocumento2($parser, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
-						$html = str_replace('%ASUNTOS_NO_SEPARADOS%',$this->GenerarDocumento2($parser, 'ASUNTOS_NO_SEPARADOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);;
+
 					} else {
-						$html = str_replace('%ASUNTOS%', '', $html);
 						$html = str_replace('%ASUNTOS_NO_SEPARADOS%', '', $html);
+						$html = str_replace('%ASUNTOS%', '', $html);
 					}
 				} else {
-					$html = str_replace('%ASUNTOS%', $this->GenerarDocumento2($parser, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 					$html = str_replace('%ASUNTOS_NO_SEPARADOS%', $this->GenerarDocumento2($parser, 'ASUNTOS_NO_SEPARADOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+					$html = str_replace('%ASUNTOS%', $this->GenerarDocumento2($parser, 'ASUNTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+
 				}
 
 				$html = str_replace('%TRAMITES%', '', $html);
@@ -1480,7 +1486,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 			case 'ASUNTOS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
-				if ($this->fields['opc_ver_asuntos_separados']) {
+				if ($this->fields['opc_ver_asuntos_separados'] || !$this->tiene_tag_asuntos_no_separados) {
 					for ($k = 0; $k < count($this->asuntos); $k++) {
 
 						$asunto = new Asunto($this->sesion);
