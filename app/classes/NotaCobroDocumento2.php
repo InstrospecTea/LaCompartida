@@ -1704,7 +1704,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$html = str_replace('%descripcion_servicios%', __('Descripción de Servicios'), $html);
 						$html = str_replace('%para_los_servicios_prestados%', __('Para los servicios profesionales prestados'), $html);
 					}
-
+				}
 				break;
 
 			case 'ASUNTOS_NO_SEPARADOS': //GeneraDocumento2
