@@ -752,16 +752,22 @@ $Html = new \TTB\Html();
 
 	function CreaTramiteTarifa(form, opcion, id_tramite_tarifa)
 	{
-		var form = $('formulario');
-		if(opcion)
-			nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&crear=1', '' );
-		else
-		{
-			//var id_tramite_tarifa = form.id_tramite_tarifa.value;
-			if(!id_tramite_tarifa)
-				var id_tramite_tarifa = jQuery('#id_tramite_tarifa').val();
-			nuovaFinestra( 'Trámite_Tarifas', 600, 600, 'tarifas_tramites.php?popup=1&id_tramite_tarifa_edicion='+id_tramite_tarifa, '' );
-		}
+		$form = jQuery('<form/>', {
+			id: 'tarifa_tramite',
+			method: 'post',
+			action: '../ErrandRate?popup=1',
+			target: 'Trámite_Tarifas'
+		});
+
+		$form.append(jQuery('<input/>', {
+			type: 'hidden',
+			id: 'id_tarifa_tramite',
+			name: 'id_tarifa_tramite',
+			value: opcion ? 'nuevo' : jQuery('#id_tramite_tarifa').val()
+		}));
+
+		window.open('', 'Trámite_Tarifas', ',width=' + 800 + ',height=' + 200);
+		$form.submit();
 	}
 
 	function ActualizarTarifaTramiteDesdePopup() {
