@@ -400,7 +400,7 @@ if ($buscar || $opc == "entregar_asunto") {
 		a1.codigo_asunto,
 		a1.codigo_asunto_secundario,
 		a1.id_moneda,
-		a1.activo,
+		IF(a1.activo = 1, 'SI', 'NO') as activo,
 		a1.fecha_creacion,
 		contrato.codigo_contrato,
 		a1.id_asunto,
