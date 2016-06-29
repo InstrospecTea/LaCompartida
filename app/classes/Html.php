@@ -82,7 +82,7 @@ class Html extends \Html {
 	 * @return string
 	 */
 	public static function SelectSiNo($name, $selected = '', $opciones = '') {
-		$array = array('SI' => __('SI'), 'NO' => __('NO'));
+		$array = array('SI' => __('SÍ'), 'NO' => __('NO'));
 		return parent::SelectArrayDecente($array, $name, $selected, $opciones, 'Todos', '60');
 	}
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.6
+Wednesday, Jun 29th
+* **Fix** [Despliegue campo Activo (SI o NO)](https://github.com/LemontechSA/ttb/pull/1603)
+
 ## Hotfix 16.21.5
 Tuesday, Jun 28th
 * **Fix** [Descarga la aplicación de escritorio](https://github.com/LemontechSA/ttb/pull/1599)
