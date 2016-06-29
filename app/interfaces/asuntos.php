@@ -393,6 +393,8 @@ if ($buscar || $opc == "entregar_asunto") {
 		$cantidad_decimales_ingreso_horas = 1;
 	}
 
+	$SI = __('SÍ');
+	$NO = __('NO');
 	// Este query es mejorable, se podría sacar horas_no_cobradas y horas_trabajadas, pero ya no se podría ordenar por estos campos.
 	$query = "SELECT SQL_CALC_FOUND_ROWS
 		cliente.glosa_cliente,
@@ -400,7 +402,7 @@ if ($buscar || $opc == "entregar_asunto") {
 		a1.codigo_asunto,
 		a1.codigo_asunto_secundario,
 		a1.id_moneda,
-		IF(a1.activo = 1, 'SI', 'NO') as activo,
+		IF(a1.activo = 1, '{$SI}', '{$NO}') as activo,
 		a1.fecha_creacion,
 		contrato.codigo_contrato,
 		a1.id_asunto,
