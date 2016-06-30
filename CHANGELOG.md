@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.10
+Thursday, Jun 30th
+* **Fix** [Usuarios sin horas Reporte General](https://github.com/LemontechSA/ttb/pull/1608)
+
 ## Hotfix 16.21.9
 Thursday, Jun 30th
 * **Fix** [Append Form a Body](https://github.com/LemontechSA/ttb/pull/1607)
