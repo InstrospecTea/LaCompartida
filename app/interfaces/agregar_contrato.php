@@ -766,6 +766,8 @@ $Html = new \TTB\Html();
 			value: opcion ? 'nuevo' : jQuery('#id_tramite_tarifa').val()
 		}));
 
+		jQuery('body').append($form);
+
 		window.open('', 'Trámite_Tarifas', ',width=' + 800 + ',height=' + 200);
 		$form.submit();
 	}
