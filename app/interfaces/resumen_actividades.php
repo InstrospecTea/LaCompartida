@@ -618,7 +618,7 @@ $agrupadores = explode('-', $vista);
 							<b><?php echo __('Profesionales') ?>:</b></td>
 						<td align=left>
 							<b><?php echo __('Clientes') ?>:</b></td>
-						<td align=left colspan=2 width='40%'>
+						<td align=left>
 							<b><?php echo __('Periodo') ?>:</b>&nbsp;&nbsp;<input type="checkbox" name="rango" id="rango" value="1" <?php echo $rango ? 'checked' : '' ?> onclick='Rangos(this, this.form);' title='Otro rango' />&nbsp;<span style='font-size:9px'><label for="rango"><?php echo __('Otro rango') ?></label></span></td>
 					</tr>
 					<tr valign=top>
@@ -784,6 +784,93 @@ $agrupadores = explode('-', $vista);
 }
 
 if ($opc == 'print' || $opc == 'grafico' || $popup) {
+	if (strcmp(strtolower($tipo), 'profesional') === 0) {
+		if (empty($usuarios)) {
+			foreach ($usuario->get_usuarios_resumen_actividades() as $key => $value) {
+				$users[] = $key;
+			}
+		} else {
+			$users = explode(',', $usuarios);
+		}
+
+		if (empty($clientes)) {
+			$ClientService = new ClientService($sesion);
+
+			if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+				$client_code = 'codigo_cliente_secundario';
+			} else {
+				$client_code = 'codigo_cliente';
+			}
+
+			$client_results = $ClientService->findAll(CriteriaRestriction::equals('activo', '1'), $client_code);
+			foreach ($client_results as $key => $value) {
+				$clients[] = $value->get($client_code);
+			}
+		} else {
+			$clients = explode(',', $clientes);
+		}
+
+		if ($area_y_categoria) {
+			$areas = $areasF;
+			if (empty($areas)) {
+				$Criteria = new Criteria($sesion);
+				$Criteria
+					->add_select('id')
+					->add_from('prm_area_usuario');
+
+				foreach ($Criteria->run() as $key => $value) {
+					$areas[] = $value['id'];
+				}
+			}
+
+			$categories = $areas_usuarioF;
+			if (empty($categories)) {
+				$Criteria = new Criteria($sesion);
+				$Criteria
+					->add_select('id_categoria_usuario')
+					->add_from('prm_categoria_usuario');
+
+				foreach ($Criteria->run() as $key => $value) {
+					$categories[] = $value['id_categoria_usuario'];
+				}
+			}
+		}
+
+		$UserManager = new UserManager($sesion);
+
+		foreach ($users as $user) {
+			if ($user && $UserManager->isActive($user)) {
+				$user_hours = $UserManager->getHoursWorkedByFilters(
+					$user,
+					$clients,
+					$areas,
+					$categories,
+					Utiles::fecha2sql($fecha_ini),
+					Utiles::fecha2sql($fecha_fin)
+				);
+
+				if (is_null($user_hours)) {
+					$users_code_without_hours[] = $user;
+				}
+			}
+		}
+
+		$UserService = new UserService($sesion);
+		foreach ($users_code_without_hours as $key => $value) {
+			$user_service = $UserService->get($value, array('username', 'nombre', 'apellido1', 'apellido2'));
+
+			$element = array(
+				'id' => $value,
+				'username' => $user_service->get('username'),
+				'nombre' => $user_service->get('nombre'),
+				'apellido1' => $user_service->get('apellido1'),
+				'apellido2' => $user_service->get('apellido2')
+			);
+
+			$users_without_hours[] = $element;
+		}
+	}
+
 	$reporte->setCampoFecha($campo_fecha);
 	$reporte->setTipoDato($tipo_dato);
 	$reporte->setHiddePenalizedHours($ocultar_horas_castigadas);
@@ -936,6 +1023,29 @@ if ($opc == 'print' || $popup) {
 		$titulo_reporte = __('No se encontraron datos con el tipo específicado en el período.');
 	}
 	?>
+	<?php if (strcmp(strtolower($agrupadores[0]), 'profesional') === 0): ?>
+	<table border="1" class="planilla" id ="tabla_usuarios_sin_horas" width="100%" style="margin-bottom: 30px;">
+		<tbody>
+			<tr>
+				<td colspan="5" style="font-size:90%; font-weight:bold; padding-bottom: 10px;" align="left">
+					<?= __('Profesionales sin trabajos') ?>
+				</td>
+			</tr>
+			<?php foreach($users_without_hours as $user): ?>
+				<tr>
+					<td class="segundo" >
+						<?php if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')): ?>
+							<?= $user['username']; ?>
+						<?php else: ?>
+							<?= $user['nombre'] . ' ' . $user['apellido1'] . ' ' . $user['apellido2']; ?>
+						<?php endif; ?>
+					</td>
+
+				</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+	<?php endif; ?>
 	<table border=1 cellpadding="3" class="planilla" id ="tabla_planilla" width="100%" >
 		<tbody>
 			<tr>

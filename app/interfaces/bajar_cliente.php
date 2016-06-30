@@ -1,24 +1,15 @@
 <?php
-	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Html.php';
-	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
-	require_once Conf::ServerDir().'/../app/classes/Cliente.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	require_once Conf::ServerDir().'/../app/classes/InputId.php';
-	require_once Conf::ServerDir().'/classes/Funciones.php';
+require_once dirname(__FILE__).'/../conf.php';
 
-	$sesion = new Sesion();
-	$pagina = new Pagina($sesion);
-	$id_usuario = $sesion->usuario->fields['id_usuario'];
+$sesion = new Sesion();
+$pagina = new Pagina($sesion);
+$id_usuario = $sesion->usuario->fields['id_usuario'];
 
-	$pagina->titulo = "Descarga de aplicación Windows XP";
-	$pagina->PrintTop();
+$pagina->titulo = 'Descarga de aplicación Windows';
+$pagina->PrintTop();
 ?>
 
-	<!-- Begin Prerequisites -->
+<!-- Begin Prerequisites -->
 <script type="text/javascript">
 var BrowserDetect = {
 	init: function () {
@@ -29,7 +20,7 @@ var BrowserDetect = {
 		this.OS = this.searchString(this.dataOS) || "an unknown OS";
 	},
 	searchString: function (data) {
-		for (var i=0;i<data.length;i++)	{
+		for (var i=0;i<data.length;i++) {
 			var dataString = data[i].string;
 			var dataProp = data[i].prop;
 			this.versionSearchString = data[i].versionSearch || data[i].identity;
@@ -47,7 +38,8 @@ var BrowserDetect = {
 		return parseFloat(dataString.substring(index+this.versionSearchString.length+1));
 	},
 	dataBrowser: [
-		{ 	string: navigator.userAgent,
+		{
+			string: navigator.userAgent,
 			subString: "OmniWeb",
 			versionSearch: "OmniWeb/",
 			identity: "OmniWeb"
@@ -81,7 +73,8 @@ var BrowserDetect = {
 			subString: "Camino",
 			identity: "Camino"
 		},
-		{		// for newer Netscapes (6+)
+		{
+			// for newer Netscapes (6+)
 			string: navigator.userAgent,
 			subString: "Netscape",
 			identity: "Netscape"
@@ -98,14 +91,15 @@ var BrowserDetect = {
 			identity: "Mozilla",
 			versionSearch: "rv"
 		},
-		{ 		// for older Netscapes (4-)
+		{
+			// for older Netscapes (4-)
 			string: navigator.userAgent,
 			subString: "Mozilla",
 			identity: "Netscape",
 			versionSearch: "Mozilla"
 		}
 	],
-	dataOS : [
+	dataOS: [
 		{
 			string: navigator.platform,
 			subString: "Win",
@@ -122,11 +116,9 @@ var BrowserDetect = {
 			identity: "Linux"
 		}
 	]
-
 };
-BrowserDetect.init();
-function MostrarDivs()
-{
+
+function MostrarDivs() {
 	if(BrowserDetect.browser == "Firefox") {
 		$$('.explorer','.chrome').invoke('hide');
 	} else if(BrowserDetect.browser == "Firefox") {
@@ -140,8 +132,8 @@ function MostrarDivs()
 		$$('.chrome','.firefox').invoke('hide');
 	}
 }
-function getDNETVersion(reportError)
-{
+
+function getDNETVersion(reportError) {
 	var result = "";
 	var res = new Array();
 	var ua = navigator.userAgent;
@@ -168,10 +160,10 @@ function getDNETVersion(reportError)
 	{
 		if(reportError)
 		{
-			result = "<?php echo __("¡La presencia de .NET <b>NO</b> ha sido reportada por su browser!<br />Descárguelo en el siguiente enlace:"); ?> <a href='http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5'>Framework .NET</a>";
+			result = "<?= __("¡La presencia de .NET <b>NO</b> ha sido reportada por su browser!<br />Descárguelo en el siguiente enlace:"); ?> <a href='http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5'>Framework .NET</a>";
 			if(ie < 0)
 			{
-				result += "<br><?php echo __('Este browser no es Internet Explorer. La manera más fácil de chequear la presencia del framework .NET es abrir esta página en Internet Explorer.') ?>";
+				result += "<br><?= __('Este browser no es Internet Explorer. La manera más fácil de chequear la presencia del framework .NET es abrir esta página en Internet Explorer.'); ?>";
 			}
 		}
 		else result = null;
@@ -183,61 +175,49 @@ function getDNETVersion(reportError)
 	return res;
 }
 
-function writeDNetReport(doc)
-{
+function writeDNetReport(doc) {
 	var res = getDNETVersion(true);
 	var color = res['conpuntonet'] ? "#92B901" : "#ff0000";
 	doc.write("<div id=net style='background-color:" + color + ";border:1px solid black;font-size:1.3em;'>" + res['texto'] + "</div><br />");
 }
 
-// -->
-		writeDNetReport(document);
+BrowserDetect.init();
+writeDNetReport(document);
 </script>
 
+<div class="firefox" style="background-color:#ff0000; border:1px solid black; font-size:1.3em; display:block; width: 100%">
+	Para poder instalar la aplicación en Mozilla Firefox debe descargar en primer lugar el add-on
+	<a href="https://addons.mozilla.org/firefox/1608/" target="_blank">FFClickOnce</a>
+	<br />
+</div>
 
-		<div class="firefox" style="background-color:#ff0000; border:1px solid black; font-size:1.3em; display:block; width: 100%">
-			Para poder instalar la aplicación en Mozilla Firefox debe descargar en primer lugar el add-on
-			<a href="https://addons.mozilla.org/firefox/1608/" target="_blank">FFClickOnce</a>
-			<br />
-		</div>
+<div class="chrome" style="background-color:#ff0000; border:1px solid black; font-size:1.3em; display:block; width: 100%">
+	<?= __('En caso de descargar con chrome dar clic derecho a "Instalar y ejecutar" y "guardar enlace como".'); ?>
+	<br />
+</div>
 
-		<div class="chrome" style="background-color:#ff0000; border:1px solid black; font-size:1.3em; display:block; width: 100%">
-			<?php echo __('En caso de descargar con chrome dar clic derecho a "Instalar y ejecutar" y "guardar enlace como".') ?>
-			<br />
-		</div>
+<div class="explorer explorer6" align="left">
+	Usted está utilizando Internet Explorer 6. Por su seguridad, Lemontech recomienda actualizar a la última versión de <a target="_blank" href="http://www.microsoft.com/windows/ie/">Internet Explorer</a>
+	<hr style="color:black;" size=1 />
+</div>
 
-		<div class="explorer explorer6" align="left">
-			Usted está utilizando Internet Explorer 6. Por su seguridad, Lemontech recomienda actualizar a la última versión de <a target="_blank" href="http://www.microsoft.com/windows/ie/">Internet Explorer</a>
-			<hr style="color:black;" size=1 />
-		</div>
+<div align=left>
+	<ul>
+		<li><?= __('A continuación usted podrá instalar la aplicación que le permitirá utilizar el sistema cuando no cuente con una conexión a Internet.'); ?></li>
+		<li><?= __('Esta aplicación requiere el framework .NET de Microsoft. Al comienzo de esta página podrá ver si su computador necesita instalar este componente.'); ?></li>
+		<li><?= __('Esta aplicación tiene algunos prerrequisitos que de no estar instalados en su computador, serán descargados desde el sitio web de Microsoft. Esta operación puede tardar varios minutos.'); ?></li>
+		<li><?= __('Haga clic en el siguiente botón para instalar o ejecutar la aplicación:'); ?></li>
+	</ul>
+	<br />
+	<center>
+		<span style="border: 1px solid black; padding: 3px; background-color:#A7DF60">
+			<a style="text-decoration: none;" href="../../cliente_windows/TimeTracking.application">
+				<?= __('Instalar y ejecutar'); ?>
+			</a>
+		</span>
+	</center>
+</div>
 
-		<div align=left>
-			<ul>
-			<li><?php echo __('A continuación usted podrá instalar la aplicación que le permitirá utilizar el sistema cuando no cuente con una conexión a Internet.') ?></li>
-			<li><?php echo __('Esta aplicación requiere el framework .NET de Microsoft. Al comienzo de esta página podrá ver si su computador necesita instalar este componente.') ?></li>
-			<li><?php echo __('Esta aplicación tiene algunos prerrequisitos que de no estar instalados en su computador, serán descargados desde el sitio web de Microsoft. Esta operación puede tardar varios minutos.') ?></li>
-			<li><?php echo __('Haga clic en el siguiente botón para instalar o ejecutar la aplicación:') ?></li>
-			<br /><br />
-			<center>
-			<span style="border: 1px solid black; padding: 3px; background-color:#A7DF60">
-<?
-		if (method_exists('Conf','GetConf'))
-		{
-			$PdfLinea1 = Conf::GetConf($sesion, 'PdfLinea1');
-		}
-		else
-		{
-			$PdfLinea1 = Conf::PdfLinea1();
-		}
-?>
-			<a style="text-decoration: none;" HREF="../../cliente_windows/application.php?titulo=<?= urlencode($PdfLinea1); ?>&host=<?= urlencode(Conf::Host()); ?>&titulo_asunto=<?=__('Asunto')?>"><?php echo __('Instalar y ejecutar') ?></a>
-			</span>
-			</center>
-		</div>
+<script type="text/javascript">MostrarDivs();</script>
 
-<script type="text/javascript">
-MostrarDivs();
-</script>
-<?php
-	$pagina->PrintBottom();
-?>
+<?php $pagina->PrintBottom(); ?>

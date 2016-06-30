@@ -3,7 +3,7 @@
 		<td align="center">
 			<form name="formulario" id="formulario" method="post" action="" autocomplete="off">
 				<input type="hidden" id="id_tramite_tarifa_edicion" name="id_tramite_tarifa_edicion" value="">
-
+				<input type="hidden" id="nueva_tarifa" value="<?= $id_tarifa_tramite ?>">
 				<div style="width:95%; text-align:right; margin-bottom:5px;">
 					<?php echo $this->Form->button(__('Crear nueva tarifa'), array('id' => 'crear_nueva_tarifa')); ?>
 					<?php echo $this->Form->checkbox('usar_tarifa_previa', 1, false, array('label' => __('Copiar Datos'))); ?>
@@ -64,14 +64,14 @@
 							<td align="left" class="border_plomo"><?php echo $errand ?></td>
 							<?php foreach ($errand_rate as $coin): ?>
 								<td align="right" class="border_plomo">
-									<input 	type="text" 
-											size="12" 
-											id="" 
-											class="tarifas" 
-											name="tarifa_moneda[<?php echo $coin->id_moneda ?>][<?php echo $coin->id_tramite_tipo ?>]" 
-											value="" 
+									<input 	type="text"
+											size="12"
+											id=""
+											class="tarifas"
+											name="tarifa_moneda[<?php echo $coin->id_moneda ?>][<?php echo $coin->id_tramite_tipo ?>]"
+											value=""
 											data-errandtype="<?php echo $coin->id_tramite_tipo ?>" data-coin="<?php echo $coin->id_moneda ?>"
-											data-mask="###<?php echo ($coin->cifras_decimales > 0) ? 
+											data-mask="###<?php echo ($coin->cifras_decimales > 0) ?
 																		str_pad('.', $coin->cifras_decimales + 1, '0') :
 																		'' ?>"
 											data-mask-reverse="true" ></td>

@@ -1,5 +1,37 @@
 # Changelog
 
+## Hotfix 16.21.10
+Thursday, Jun 30th
+* **Fix** [Usuarios sin horas Reporte General](https://github.com/LemontechSA/ttb/pull/1608)
+
+## Hotfix 16.21.9
+Thursday, Jun 30th
+* **Fix** [Append Form a Body](https://github.com/LemontechSA/ttb/pull/1607)
+
+## Hotfix 16.21.8
+Thursday, Jun 30th
+* **Fix** [Agregar columna con los montos calculados según tipo de cambio en cuadro resumen](https://github.com/LemontechSA/ttb/pull/1606)
+
+## Hotfix 16.21.7
+Wednesday, Jun 29th
+* **Fix** [Error al editar trámite](https://github.com/LemontechSA/ttb/pull/1605)
+
+## Hotfix 16.21.6
+Wednesday, Jun 29th
+* **Fix** [Despliegue campo Activo (SI o NO)](https://github.com/LemontechSA/ttb/pull/1603)
+
+## Hotfix 16.21.5
+Tuesday, Jun 28th
+* **Fix** [Descarga la aplicación de escritorio](https://github.com/LemontechSA/ttb/pull/1599)
+
+## Hotfix 16.21.4
+Tuesday, Jun 28th
+* **Fix** [:bug: Corregir visibilidad de variables en clase NotaCobro](https://github.com/LemontechSA/ttb/pull/1598)
+
+## Hotfix 16.21.3
+Friday, Jun 24th
+* **Fix** [Revertir nueva sección para mostrar asuntos sin separar](https://github.com/LemontechSA/ttb/pull/1592)
+
 ## Hotfix 16.21.2
 Friday, Jun 24th
 * **Fix** [Agregar nueva sección para mostrar asuntos sin separar](https://github.com/LemontechSA/ttb/pull/1589)
