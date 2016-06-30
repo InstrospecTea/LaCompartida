@@ -1014,13 +1014,8 @@ if ($opc == 'print' || $popup) {
 	<table border="1" class="planilla" id ="tabla_usuarios_sin_horas" width="100%" style="margin-bottom: 30px;">
 		<tbody>
 			<tr>
-				<td colspan="5" style="font-size:90%; font-weight:bold" align="center">
+				<td colspan="5" style="font-size:90%; font-weight:bold; padding-bottom: 10px;" align="left">
 					<?= __('Profesionales sin trabajos') ?>
-				</td>
-			</tr>
-			<tr>
-				<td class="td_header td_h" style="width:80px; border-right: 1px solid #CCCCCC;">
-					<?= __('Profesional') ?>
 				</td>
 			</tr>
 			<?php foreach($users_without_hours as $user): ?>
