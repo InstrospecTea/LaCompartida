@@ -108,7 +108,7 @@ if (empty($data)) {
 <div style="display: none">
 <?php
 foreach ($listados as $tipo => $lista) {
-	echo $Form->select("select-{$tipo}", $lista, null, array('name' => null, 'empty' => 'Select...'));
+	echo $Form->select("select-{$tipo}", $lista, null, array('name' => null, 'empty' => 'Select...', 'escape' => false));
 }
 ?>
 </div>
