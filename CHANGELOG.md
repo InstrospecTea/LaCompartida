@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.7
+Wednesday, Jun 29th
+* **Fix** [Error al editar trámite](https://github.com/LemontechSA/ttb/pull/1605)
+
 ## Hotfix 16.21.6
 Wednesday, Jun 29th
 * **Fix** [Despliegue campo Activo (SI o NO)](https://github.com/LemontechSA/ttb/pull/1603)
