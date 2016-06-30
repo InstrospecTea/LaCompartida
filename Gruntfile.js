@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 		'./bower_components/jspdf/dist/jspdf.min.js',
 		'./bower_components/html2canvas/build/html2canvas.js',
 		'./bower_components/jquery-file-download/src/Scripts/jquery.fileDownload.js',
-		'./bower_components/jquery-mask-plugin/src/jquery.mask.js'
+		'./bower_components/jquery-mask-plugin/dist/jquery.mask.min.js'
 	];
 
 	grunt.file.defaultEncoding = 'iso-8859-1';
