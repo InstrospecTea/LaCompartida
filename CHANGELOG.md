@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.9
+Thursday, Jun 30th
+* **Fix** [Append Form a Body](https://github.com/LemontechSA/ttb/pull/1607)
+
 ## Hotfix 16.21.8
 Thursday, Jun 30th
 * **Fix** [Agregar columna con los montos calculados según tipo de cambio en cuadro resumen](https://github.com/LemontechSA/ttb/pull/1606)
