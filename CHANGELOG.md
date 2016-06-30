@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.8
+Thursday, Jun 30th
+* **Fix** [Agregar columna con los montos calculados según tipo de cambio en cuadro resumen](https://github.com/LemontechSA/ttb/pull/1606)
+
 ## Hotfix 16.21.7
 Wednesday, Jun 29th
 * **Fix** [Error al editar trámite](https://github.com/LemontechSA/ttb/pull/1605)
