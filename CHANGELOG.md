@@ -1,5 +1,25 @@
 # Changelog
 
+## Hotfix 16.21.9
+Thursday, Jun 30th
+* **Fix** [Append Form a Body](https://github.com/LemontechSA/ttb/pull/1607)
+
+## Hotfix 16.21.8
+Thursday, Jun 30th
+* **Fix** [Agregar columna con los montos calculados según tipo de cambio en cuadro resumen](https://github.com/LemontechSA/ttb/pull/1606)
+
+## Hotfix 16.21.7
+Wednesday, Jun 29th
+* **Fix** [Error al editar trámite](https://github.com/LemontechSA/ttb/pull/1605)
+
+## Hotfix 16.21.6
+Wednesday, Jun 29th
+* **Fix** [Despliegue campo Activo (SI o NO)](https://github.com/LemontechSA/ttb/pull/1603)
+
+## Hotfix 16.21.5
+Tuesday, Jun 28th
+* **Fix** [Descarga la aplicación de escritorio](https://github.com/LemontechSA/ttb/pull/1599)
+
 ## Hotfix 16.21.4
 Tuesday, Jun 28th
 * **Fix** [:bug: Corregir visibilidad de variables en clase NotaCobro](https://github.com/LemontechSA/ttb/pull/1598)

@@ -1111,6 +1111,7 @@ $_LANG['para honorarios y en'] = 'para honorários e em';
 
 $_LANG['Horas Cobrables'] = 'Horas Cobráveis';
 $_LANG['SI'] = 'Sim';
+$_LANG['SÍ'] = 'Sim';
 $_LANG['NO'] = 'Não';
 $_LANG['Tasa Horas Hombres'] = 'Taxa Hora Homem';
 $_LANG['Según HH en'] = 'Segundo HH em';
