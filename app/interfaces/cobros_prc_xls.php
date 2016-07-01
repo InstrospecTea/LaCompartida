@@ -587,8 +587,17 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, 3, $simbolo_moneda_total, $letra_chica_derecha);
 		$ws->writeNumber($filas, 4, $x_resultados['monto_subtotal'][$Cobro->fields['opc_moneda_total']], $formato_total);
 		$filas ++;
-		$monto_flat_fee = $Cobro->fields['forma_cobro'] == 'FLAT FEE' ? $simbolo_moneda_total .' '. $Cobro->fields['monto_contrato'] : '';
-		$ws->write($filas, $col_id_trabajo, "{$Cobro->fields['forma_cobro']} $monto_flat_fee", $letra_chica );
+		$ContractManager = new ContractManager($Sesion);
+		$fee = $ContractManager->getDefaultFee($Cobro->fields['id_contrato']);
+		$tarifa_flat = $fee->get('tarifa_flat');
+		if ($Cobro->fields['forma_cobro'] == 'TASA' && !empty($tarifa_flat)) {
+			$descripcion = "Tarifa plana {$simbolo_moneda_total} {$tarifa_flat} por hora";
+		} else {
+			$monto_flat_fee = $Cobro->fields['forma_cobro'] == 'FLAT FEE' ? $simbolo_moneda_total .' '. $Cobro->fields['monto_contrato'] : '';
+			$descripcion = 	"{$Cobro->fields['forma_cobro']} $monto_flat_fee";
+		}
+
+		$ws->write($filas, $col_id_trabajo, $descripcion, $letra_chica );
 	}
 	$fila_honorario = $filas;
 	$filas += 3;
