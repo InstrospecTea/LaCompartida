@@ -117,11 +117,9 @@ $formato_cliente_asunto2->setTextWrap();
 
 
 $formato_duracion = $formato_cliente_asunto;
-if (Conf::GetConf($Sesion, 'MostrarSoloMinutos')) {
-	$formato_duracion->setNumFormat("[hh]:mm");
-}
 $formato_duracion2 = $formato_cliente_asunto2;
 if (Conf::GetConf($Sesion, 'MostrarSoloMinutos')) {
+	$formato_duracion->setNumFormat("[hh]:mm");	
 	$formato_duracion2->setNumFormat("[hh]:mm");
 }
 
