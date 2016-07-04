@@ -404,11 +404,16 @@ class WorkbookMiddleware {
 	 * @param int $last_col
 	 */
 	public function mergeCells($first_row, $first_col, $last_row, $last_col) {
+		if ($first_col > $last_col) {
+			$temp = $first_col;
+			$first_col = $last_col;
+			$last_col = $temp;
+		}
+
 		$cellsMerged =
 					PHPExcel_Cell::stringFromColumnIndex($first_col).($first_row + 1) .
 					":" .
-					PHPExcel_Cell::stringFromColumnIndex($last_col).($last_row + 1)
-					;
+					PHPExcel_Cell::stringFromColumnIndex($last_col).($last_row + 1);
 
 		$this->workSheetObj->mergeCells($cellsMerged);
 	}
