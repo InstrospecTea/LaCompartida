@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
 	var vendors = [
 		'./bower_components/jquery-file-download/src/Scripts/jquery.fileDownload.js',
-		'./bower_components/jquery-mask-plugin/src/jquery.mask.js'
+		'./bower_components/jquery-mask-plugin/dist/jquery.mask.min.js'
 	];
 
 	grunt.file.defaultEncoding = 'iso-8859-1';
