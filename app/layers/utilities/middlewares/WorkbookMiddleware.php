@@ -388,8 +388,12 @@ class WorkbookMiddleware {
 	 */
 	public function setRow($row, $height, $format = null) {
 		$row = $row + 1;
-
-		$this->workSheetObj->getRowDimension($row)->setRowHeight($height);
+		
+		if ($height == 0) {
+			$this->workSheetObj->getRowDimension($row)->setVisible(false);
+		} else {
+			$this->workSheetObj->getRowDimension($row)->setRowHeight($height);
+		}
 
 		if(is_object($format)) {
 			$this->setFormat($format, $row, -1);
