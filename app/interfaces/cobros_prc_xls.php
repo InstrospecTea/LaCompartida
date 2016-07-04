@@ -594,7 +594,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$descripcion = "Tarifa plana {$simbolo_moneda_total} {$tarifa_flat} por hora";
 		} else {
 			$monto_flat_fee = $Cobro->fields['forma_cobro'] == 'FLAT FEE' ? $simbolo_moneda_total .' '. $Cobro->fields['monto_contrato'] : '';
-			$descripcion = 	"{$Cobro->fields['forma_cobro']} $monto_flat_fee";
+			$descripcion = 	"{$Cobro->fields['forma_cobro']} {$monto_flat_fee}";
 		}
 
 		$ws->write($filas, $col_id_trabajo, $descripcion, $letra_chica );
