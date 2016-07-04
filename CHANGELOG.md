@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.11
+Thursday, Jun 30th
+* **Fix** [Validar antes de usar el nuevo Tag](https://github.com/LemontechSA/ttb/pull/1609)
+
 ## Hotfix 16.21.10
 Thursday, Jun 30th
 * **Fix** [Usuarios sin horas Reporte General](https://github.com/LemontechSA/ttb/pull/1608)
