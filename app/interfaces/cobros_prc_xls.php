@@ -587,8 +587,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, 3, $simbolo_moneda_total, $letra_chica_derecha);
 		$ws->writeNumber($filas, 4, $x_resultados['monto_subtotal'][$Cobro->fields['opc_moneda_total']], $formato_total);
 		$filas ++;
-		$ContractManager = new ContractManager($Sesion);
-		$fee = $ContractManager->getDefaultFee($Cobro->fields['id_contrato']);
+		$AgreementManager = new AgreementManager($Sesion);
+		$fee = $AgreementManager->getDefaultFee($Cobro->fields['id_contrato']);
 		$tarifa_flat = $fee->get('tarifa_flat');
 		if ($Cobro->fields['forma_cobro'] == 'TASA' && !empty($tarifa_flat)) {
 			$descripcion = "Tarifa plana {$simbolo_moneda_total} {$tarifa_flat} por hora";

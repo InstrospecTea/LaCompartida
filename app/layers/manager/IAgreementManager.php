@@ -1,10 +1,10 @@
 <?php
 
-interface IContractManager extends BaseManager {
+interface IAgreementManager extends BaseManager {
 	/**
 	 * Obtiene la Tarifa asociada a un Contrato
 	 * @param 	string $contract_id
 	 * @return 	Tarifa
 	 */
-	public function getDefaultFee($contract_id);
+	public function getDefaultFee($agreement_id);
 }
