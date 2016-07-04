@@ -1532,7 +1532,10 @@ UtilesApp::GetConfJS($sesion, 'PrellenarTrabajoConActividad');
 
 		jQuery('#codigo_asunto, #codigo_asunto_secundario').change(function () {
 			var codigo = jQuery(this).val();
+			changeLanguage(codigo);
+		});
 
+		function changeLanguage(codigo){
 			if (!codigo) {
 				jQuery('#txt_span').html('');
 				return false;
@@ -1551,7 +1554,9 @@ UtilesApp::GetConfJS($sesion, 'PrellenarTrabajoConActividad');
 					jQuery('#descripcion').data('googie').setCurrentLanguage(language.code);
 				});
 			}
-		}).change();
+		}
+
+		changeLanguage(jQuery('#codigo_asunto, #codigo_asunto_secundario').first().val());
 
 		top.window.jQuery('#versemana').click();
 		top.window.jQuery('.resizableframe').load();

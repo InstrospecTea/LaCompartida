@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.12
+Monday, July 4th
+* **Fix** [Evento de cambio del selector de actividades al editar un trabajo](https://github.com/LemontechSA/ttb/pull/1623)
+
 ## Hotfix 16.21.11
 Thursday, Jun 30th
 * **Fix** [Validar antes de usar el nuevo Tag](https://github.com/LemontechSA/ttb/pull/1609)
