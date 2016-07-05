@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 16.21.14
+Tuesday, July 5th
+* **Fix** [Agrega las acciones desde la configuración](https://github.com/LemontechSA/ttb/pull/1627)
+
+## Hotfix 16.21.13
+Monday, July 4th
+* **Fix** [Se deshabilita el selector cliente si se está editando el adelanto cuyo saldo fue utilizado](https://github.com/LemontechSA/ttb/pull/1625)
+
+## Hotfix 16.21.12
+Monday, July 4th
+* **Fix** [Evento de cambio del selector de actividades al editar un trabajo](https://github.com/LemontechSA/ttb/pull/1623)
+
 ## Hotfix 16.21.11
 Thursday, Jun 30th
 * **Fix** [Validar antes de usar el nuevo Tag](https://github.com/LemontechSA/ttb/pull/1609)
