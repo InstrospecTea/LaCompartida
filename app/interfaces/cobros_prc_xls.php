@@ -591,7 +591,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$fee = $AgreementManager->getDefaultFee($Cobro->fields['id_contrato']);
 		$tarifa_flat = $fee->get('tarifa_flat');
 		if ($Cobro->fields['forma_cobro'] == 'TASA' && !empty($tarifa_flat)) {
-			$descripcion = "Tarifa plana {$simbolo_moneda_total} {$tarifa_flat} por hora";
+			$descripcion = __('Tarifa plana') . " {$simbolo_moneda_total} {$tarifa_flat} " . __('por hora');
 		} else {
 			$monto_flat_fee = $Cobro->fields['forma_cobro'] == 'FLAT FEE' ? $simbolo_moneda_total .' '. $Cobro->fields['monto_contrato'] : '';
 			$descripcion = 	"{$Cobro->fields['forma_cobro']} {$monto_flat_fee}";
