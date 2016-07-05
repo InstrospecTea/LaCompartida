@@ -14,7 +14,7 @@ class ChargeManager extends AbstractManager implements IChargeManager {
 
 		$this->loadService('Document');
 
-		$Documents = $this->DocumentService->findAll(
+		$Documents = $this->DocumentService->findFirst(
 			CriteriaRestriction::equals('id_cobro', $charge_id),
 			'id_documento'
 		);
@@ -37,7 +37,7 @@ class ChargeManager extends AbstractManager implements IChargeManager {
 		$SearchCriteria
 			->filter('id_documento_cobro')
 			->restricted_by('equals')
-			->compare_with($Documents[0]->fields['id_documento']);
+			->compare_with($Documents->fields['id_documento']);
 
  		$DocumentPaymentsTransactions = $this->SearchManager->searchByCriteria($SearchCriteria);
 
