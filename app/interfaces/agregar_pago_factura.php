@@ -130,7 +130,6 @@ if ($utilizando_adelanto) {
 } else {
 	if (!empty($lista_facturas)) {
 		$InvoiceManager = new InvoiceManager($sesion);
-		var_dump($lista_facturas); exit();
 		$num_invoice = explode(', ', $numeros_facturas);
 		$desc_array = array();
 		foreach (explode(',', $lista_facturas) as $key => $value) {
