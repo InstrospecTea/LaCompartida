@@ -77,7 +77,7 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 	}
 
 	private function generateWorkData($user_id, $matters, $date) {
-		$actions = array();
+		$actions = $this->config->actions;
 
 		$cont_trabajos = 0;
 		$cont_trabajos_total = 0;
@@ -102,11 +102,9 @@ class DemoGeneratorBusiness extends AbstractBusiness implements IDemoGeneratorBu
 				$person = $this->config->personas[$person_index];
 				$add_index = array_rand($this->config->adicional, 1);
 				$add = $this->config->adicional[$add_index];
-
-				if (
-					($action_index == 3 && ( $add_index == 1 || $add_index == 2 ) ) ||
-					( $person_index == 1 && ( $add_index == 0 || $add_index == 2) )
-				) {
+				$condition_1 = $action_index == 3 && ($add_index == 1 || $add_index == 2);
+				$condition_2 = $person_index == 1 && ($add_index == 0 || $add_index == 2);
+				if ($condition_1 || $condition_2) {
 					$descripcion_trabajo = $action['name'] . ' ' . $person;
 				} else {
 					$descripcion_trabajo = $action['name'] . ' ' . $person . ' ' . $add;
