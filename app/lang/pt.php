@@ -1183,3 +1183,4 @@ $_LANG['Se produjo un error generando el documento, por favor intente nuevamente
 $_LANG['No existen movimientos para este Asunto'] = 'Não existem movimentos para esse assunto';
 $_LANG['Ha ocurrido un error al consultar el historial. Por favor inicie sesión nuevamente.'] = 'Ocorreu um erro ao consultar o histórico. Por favor inicie a sessão novamente.';
 $_LANG['Profesionales sin trabajos'] = 'Profissionais sem trabalhos';
+$_LANG['Pago de'] = 'Pagamento de';
