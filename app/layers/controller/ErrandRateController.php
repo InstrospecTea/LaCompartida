@@ -33,6 +33,7 @@ class ErrandRateController extends AbstractController {
 		$this->set('rates', $rates);
 		$this->set('errands_rate_table', $errands_rate_table);
 		$this->set('coins', $this->CoiningBusiness->currenciesToArray($this->CoiningBusiness->getCurrencies()));
+		$this->set('id_tarifa_tramite', isset($this->data['id_tarifa_tramite']) ? $this->data['id_tarifa_tramite'] : null);
 	}
 
 	/**
