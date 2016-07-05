@@ -128,14 +128,17 @@ if ($utilizando_adelanto) {
 	$id_banco = $documento_adelanto->fields['id_banco'];
 	$id_cuenta = $documento_adelanto->fields['id_cuenta'];
 } else {
-	$InvoiceManager = new InvoiceManager($sesion);
-	$num_invoice = explode(', ', $numeros_facturas);
-	$desc_array = array();
-	foreach (explode(',', $lista_facturas) as $key => $value) {
-		$LegalDocument = $InvoiceManager->getLegalDocument($value);
-		$desc_array[] = __($LegalDocument->get('glosa')) . ' #' . $num_invoice[$key];
+	if (!empty($lista_facturas)) {
+		$InvoiceManager = new InvoiceManager($sesion);
+		var_dump($lista_facturas); exit();
+		$num_invoice = explode(', ', $numeros_facturas);
+		$desc_array = array();
+		foreach (explode(',', $lista_facturas) as $key => $value) {
+			$LegalDocument = $InvoiceManager->getLegalDocument($value);
+			$desc_array[] = __($LegalDocument->get('glosa')) . ' #' . $num_invoice[$key];
+		}
+		$descripcion = __('Pago de') . ' ' . implode(', ', $desc_array);
 	}
-	$descripcion = __('Pago de') . ' ' . implode(', ', $desc_array);
 }
 
 if ($opcion == 'imprimir_voucher') {
