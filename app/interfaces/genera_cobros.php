@@ -909,8 +909,8 @@ if ($opc == 'buscar') {
 	 * Revisa por ajax si el proceso ha sido desbloqueado.
 	 */
 	function checkProcessLock() {
-		jQuery.get(root_dir + '/app/ProcessLock/get_process_lock_not_notified/<?php echo Cobro::PROCESS_NAME; ?>', function(proceso) {
-			if (proceso.id) {
+		jQuery.get(root_dir + '/app/ProcessLock/get_process_lock_not_notified/<?= Cobro::PROCESS_NAME; ?>', function(proceso) {
+			if (proceso !== null && proceso.id) {
 				window.clearTimeout(timerProcessLock);
 				jQuery.get(root_dir + '/app/ProcessLock/get_notification_html/' + proceso.id, function(html) {
 					mostrar_notificacion(html, proceso.id);
