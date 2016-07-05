@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.15
+Tuesday, July 5th
+* **Fix** [Validar que el json de bloqueo proceso no sea nulo](https://github.com/LemontechSA/ttb/pull/1629)
+
 ## Hotfix 16.21.14
 Tuesday, July 5th
 * **Fix** [Agrega las acciones desde la configuración](https://github.com/LemontechSA/ttb/pull/1627)
