@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.17
+Tuesday, July 5th
+* **Fix** [Adelanto: Siempre se aplicará la conversión de moneda al saldo antes de comparar.](https://github.com/LemontechSA/ttb/pull/1634)
+
 ## Hotfix 16.21.16
 Tuesday, July 5th
 * **Feature** [Se genera un mensaje personalizado cuando la tarifa es plana hh en excel](https://github.com/LemontechSA/ttb/pull/1633)
