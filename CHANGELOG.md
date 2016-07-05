@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.16
+Tuesday, July 5th
+* **Feature** [Se genera un mensaje personalizado cuando la tarifa es plana hh en excel](https://github.com/LemontechSA/ttb/pull/1633)
+
 ## Hotfix 16.21.15
 Tuesday, July 5th
 * **Fix** [Validar que el json de bloqueo proceso no sea nulo](https://github.com/LemontechSA/ttb/pull/1629)
