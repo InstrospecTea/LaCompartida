@@ -986,4 +986,16 @@ class Documento extends Objeto {
 		return true;
 	}
 
+	public function getTotalAdvanceCharge($id_charge) {
+		$ChargeManager = new ChargeManager($this->sesion);
+		$advances = $ChargeManager->getAdvances($id_charge);
+
+		$advances_total = 0;
+		foreach ($advances as $key => $value) {
+			$advances_total += $value['monto'];
+		}
+
+		return $advances_total;
+	}
+
 }
