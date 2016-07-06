@@ -8,16 +8,22 @@ class ChargeManager extends AbstractManager implements IChargeManager {
 	 * @return
 	 */
 	public function getAdvances($charge_id) {
+		$result = array();
+
 		if (empty($charge_id) || !is_numeric($charge_id)) {
 			throw new InvalidIdentifier;
 		}
 
 		$this->loadService('Document');
 
-		$Documents = $this->DocumentService->findFirst(
+		$Document = $this->DocumentService->findFirst(
 			CriteriaRestriction::equals('id_cobro', $charge_id),
 			'id_documento'
 		);
+
+		if ($Document === false) {
+			return $result;
+		}
 
 		$this->loadManager('Search');
 		$SearchCriteria = new SearchCriteria('DocumentPaymentsTransactions');
@@ -37,11 +43,10 @@ class ChargeManager extends AbstractManager implements IChargeManager {
 		$SearchCriteria
 			->filter('id_documento_cobro')
 			->restricted_by('equals')
-			->compare_with($Documents->fields['id_documento']);
+			->compare_with($Document->get('id_documento'));
 
- 		$DocumentPaymentsTransactions = $this->SearchManager->searchByCriteria($SearchCriteria);
+		$DocumentPaymentsTransactions = $this->SearchManager->searchByCriteria($SearchCriteria);
 
-		$result = array();
 		foreach ($DocumentPaymentsTransactions as $key => $value) {
 			$DocumentAdvance = $this->DocumentService->get($value->get('id_documento_pago'), 'glosa_documento');
 			$amount = $value->get('valor_pago_gastos') + $value->get('valor_pago_honorarios');
