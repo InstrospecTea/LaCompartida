@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.20
+Wednesday, July 6th
+* **Fix** [Problema Descarga Excel](https://github.com/LemontechSA/ttb/pull/1638)
+
 ## Hotfix 16.21.19
 Wednesday, July 6th
 * **Fix** [Validar que exista un documento tipo n antes de buscar los adelantos al descargar la nota de cobro](https://github.com/LemontechSA/ttb/pull/1637)
