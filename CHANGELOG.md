@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.21.19
+Wednesday, July 6th
+* **Fix** [Validar que exista un documento tipo n antes de buscar los adelantos al descargar la nota de cobro](https://github.com/LemontechSA/ttb/pull/1637)
+
 ## Hotfix 16.21.18
 Wednesday, July 6th
 * **Fix** [Implementar la sección de Adelantos en la Nota de Cobro](https://github.com/LemontechSA/ttb/pull/1636)
