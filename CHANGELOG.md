@@ -1,8 +1,12 @@
 # Changelog
 
+## Hotfix 16.21.18
+Wednesday, July 6th
+* **Fix** [Implementar la sección de Adelantos en la Nota de Cobro](https://github.com/LemontechSA/ttb/pull/1636)
+
 ## Hotfix 16.21.17
 Tuesday, July 5th
-* **Fix** [Adelanto: Siempre se aplicará la conversión de moneda al saldo antes de comparar.](https://github.com/LemontechSA/ttb/pull/1634)
+* **Fix** [Adelanto: Siempre se aplicará la conversión de moneda al saldo antes de comparar](https://github.com/LemontechSA/ttb/pull/1634)
 
 ## Hotfix 16.21.16
 Tuesday, July 5th
