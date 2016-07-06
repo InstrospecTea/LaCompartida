@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 16.21.19
+Wednesday, July 6th
+* **Fix** [Validar que exista un documento tipo n antes de buscar los adelantos al descargar la nota de cobro](https://github.com/LemontechSA/ttb/pull/1637)
+
+## Hotfix 16.21.18
+Wednesday, July 6th
+* **Fix** [Implementar la sección de Adelantos en la Nota de Cobro](https://github.com/LemontechSA/ttb/pull/1636)
+
+## Hotfix 16.21.17
+Tuesday, July 5th
+* **Fix** [Adelanto: Siempre se aplicará la conversión de moneda al saldo antes de comparar](https://github.com/LemontechSA/ttb/pull/1634)
+
 ## Hotfix 16.21.16
 Tuesday, July 5th
 * **Feature** [Se genera un mensaje personalizado cuando la tarifa es plana hh en excel](https://github.com/LemontechSA/ttb/pull/1633)

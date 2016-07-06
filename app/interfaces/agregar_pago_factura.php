@@ -94,16 +94,11 @@ $saldo_pago = $id_neteo_documento_adelanto ? $pago->fields['monto_moneda_cobro']
 if ($id_adelanto) {
 	$documento_adelanto->Load($id_adelanto, array('id_documento', 'id_moneda', 'monto', 'saldo_pago', 'tipo_doc', 'numero_doc', 'numero_cheque', 'glosa_documento', 'id_banco', 'id_cuenta'));
 	$tipo_cambio_adelanto = $moneda_pago->fields['tipo_cambio'];
-	$tipo_cambio_cobro = $tipo_cambio_adelanto;
-	if ($moneda_pago->fields['id_moneda'] != $moneda_cobro->fields['id_moneda']) {
-		$moneda_actual_cobro = new Moneda($sesion);
-		$moneda_actual_cobro->Load($id_moneda_cobro);
-		$tipo_cambio_cobro = $moneda_cobro->fields['tipo_cambio'];
-	}
+	$tipo_cambio_cobro = $moneda_cobro->fields['tipo_cambio'];
 	$tasa_cambio = $tipo_cambio_adelanto / $tipo_cambio_cobro;
-	if ($monto_pago > ($documento_adelanto->fields['saldo_pago'] * -1)) {
-		$monto_pago_adelanto = -$documento_adelanto->fields['saldo_pago'];
-		$monto_pago = $monto_pago_adelanto * $tasa_cambio;
+	$monto_pago_adelanto = -$documento_adelanto->fields['saldo_pago'] * $tasa_cambio;
+	if ($monto_pago > $monto_pago_adelanto) {
+		$monto_pago = $monto_pago_adelanto;
 	}
 
 	$saldo_adelanto = $moneda_pago->getFloat(-$documento_adelanto->fields['saldo_pago'] + $pago->fields['monto']);
