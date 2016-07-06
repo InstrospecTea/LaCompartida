@@ -10,8 +10,8 @@ if ($subdomain) {
 	$subdomain = '/' . $subdomain;
 }
 
-$elpath = $subdomain . $_SERVER['SCRIPT_URL'];
-$pathseguro = '//' . str_replace('lemontech.cl', 'thetimebilling.com', $laurl) . $_SERVER['SCRIPT_URL'];
+$elpath = $subdomain . $_SERVER['SCRIPT_NAME'];
+$pathseguro = '//' . str_replace('lemontech.cl', 'thetimebilling.com', $laurl) . $_SERVER['SCRIPT_NAME'];
 
 define('HEADERLOADED', 1);
 define('TEMPLATE_DIR', str_replace('/img', '/', Conf::ImgDir()));
