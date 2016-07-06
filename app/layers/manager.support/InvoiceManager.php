@@ -5,7 +5,7 @@ class InvoiceManager extends AbstractManager implements IInvoiceManager {
 	/**
 	 * Obtiene el documento legal de una Factura
 	 * @param 	string $invoice_id
-	 * @return 	LegalDocument
+	 * @return 	LegalDocument o null
 	 */
 	public function getLegalDocument($invoice_id) {
 		if (empty($invoice_id) || !is_numeric($invoice_id)) {

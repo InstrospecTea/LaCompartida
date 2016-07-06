@@ -129,7 +129,9 @@ if ($utilizando_adelanto) {
 		$desc_array = array();
 		foreach (explode(',', $lista_facturas) as $key => $value) {
 			$LegalDocument = $InvoiceManager->getLegalDocument($value);
-			$desc_array[] = __($LegalDocument->get('glosa')) . ' #' . $num_invoice[$key];
+			if (!is_null($LegalDocument)) {
+				$desc_array[] = __($LegalDocument->get('glosa')) . ' #' . $num_invoice[$key];
+			}
 		}
 		$descripcion = __('Pago de') . ' ' . implode(', ', $desc_array);
 	}
