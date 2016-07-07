@@ -327,7 +327,7 @@ if ($opc == 'buscar') {
 								<?php if (Conf::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') { ?>
 									var data = {
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
-										'form': <?php echo json_encode($_POST);?>,
+										'form': <?php echo json_encode(UtilesApp::utf8izar($_POST)); ?>,
 										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
@@ -340,7 +340,7 @@ if ($opc == 'buscar') {
 								<?php } else { ?>
 									var data = {
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
-										'form': <?php echo json_encode($_POST); ?>,
+										'form': <?php echo json_encode(UtilesApp::utf8izar($_POST)); ?>,
 										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
