@@ -1253,8 +1253,13 @@ foreach ($chargeResults as $charge) {
 					$ws->write($filas, $col_fecha_anyo, $f[0], $CellFormat->get('normal_centrado', $i));
 
 					if (!$opc_ver_asuntos_separados) {
+						if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+							$codigo_asunto = $trabajo->fields['codigo_asunto_secundario'];
+						} else {
+							$codigo_asunto = $trabajo->fields['codigo_asunto'];
+						}
 						$sub = (Conf::GetConf($sesion, 'TipoCodigoAsunto') == 2) ? -3 : -4;
-						$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], $sub), $CellFormat->get('descripcion', $i));
+						$ws->write($filas, $col_asunto, substr($codigo_asunto, $sub), $CellFormat->get('descripcion', $i));
 					}
 					$ws->write($filas, $col_descripcion, str_replace("\r", '', stripslashes($trabajo->fields['descripcion'])), $CellFormat->get('descripcion', $i));
 
