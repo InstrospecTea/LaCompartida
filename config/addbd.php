@@ -31,14 +31,14 @@ defined('LLAVE') || define('LLAVE', $llave);
 
 if (!isset($memcache) || !is_object($memcache)) {
 	$memcache = new Memcache;
-	$memcache->connect('localhost', 11211);
+	$memcache->connect('whisky.tmcxaq.cfg.use1.cache.amazonaws.com', 11211);
 }
 
 if (!$result = @unserialize($memcache->get('teneninformation_' . $llave))) {
 	$array_config = [
 		'default_cache_config' => [
 			[
-				'host' => 'localhost',
+				'host' => 'whisky.tmcxaq.cfg.use1.cache.amazonaws.com',
 				'port' => '11211'
 			]
 		]
