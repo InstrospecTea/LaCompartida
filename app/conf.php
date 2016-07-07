@@ -5,9 +5,6 @@ require_once dirname(__FILE__) . '/../ttbloader.php';
 ini_set('display_errors', 'Off');
 error_reporting(0);
 
-extract($_REQUEST);
-extract($_FILES);
-
 defined('APPPATH') || define('APPPATH', dirname(dirname(__FILE__)));
 defined('__BASEDIR__') || define('__BASEDIR__', dirname(__DIR__));
 defined('CACHEDIR') || define('CACHEDIR', '/var/www/virtual/cache/');
@@ -109,3 +106,6 @@ defined('S3_UPLOAD_BUCKET') || define('S3_UPLOAD_BUCKET', 'timebilling-uploads')
 require_once APPPATH . '/fw/funciones/funciones.php';
 require_once APPPATH . '/app/lang/es.php'; // Para que cargue el idioma por defecto
 require_once APPPATH . '/app/lang/abogado.php'; // Por si hay palabras especificas relacionadas con el rubro
+
+extract($_REQUEST);
+extract($_FILES);
