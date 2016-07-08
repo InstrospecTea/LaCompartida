@@ -416,7 +416,7 @@ $Moneda = new Moneda($sesion);
 
 foreach ($chargeResults as $charge) {
 	$id_cobro = $charge->get('id_cobro');
-
+	$codigo_asunto_anterior = null;
 	$cobro = new Cobro($sesion);
 	$cobro->fields = $charge->fields;
 	$cobro->LoadAsuntos();
@@ -459,6 +459,7 @@ foreach ($chargeResults as $charge) {
 	list($cont_tramites_cobro) = mysql_fetch_array($resp_cont_tramites_cobro);
 
 	$query_cont_gastos_cobro = "SELECT COUNT(*) FROM cta_corriente WHERE id_cobro='{$cobro->fields['id_cobro']}'";
+
 	$resp_cont_gastos_cobro = mysql_query($query_cont_gastos_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_gastos_cobro, __FILE__, __LINE__, $sesion->dbh);
 	list($cont_gastos_cobro) = mysql_fetch_array($resp_cont_gastos_cobro);
 
@@ -2080,7 +2081,7 @@ foreach ($chargeResults as $charge) {
 		if (!empty($impuesto)) {
 			$gastos->add_select('cobro.porcentaje_impuesto_gastos')
 							->add_inner_join_with('cobro', 'cobro.id_cobro = cta_corriente.id_cobro')
-							->add_restriction(CriteriaRestriction::equals('cobro.id_cobro', $cobro->fields['id_cobro']));
+							->add_restriction(CriteriaRestriction::equals('cta_corriente.id_cobro', $cobro->fields['id_cobro']));
 		} else {
 			$gastos->add_restriction(CriteriaRestriction::equals('id_cobro', $cobro->fields['id_cobro']));
 		}
@@ -2088,16 +2089,17 @@ foreach ($chargeResults as $charge) {
 		if (!empty($rut) || !empty($proveedor)) {
 			$gastos->add_select('prm_proveedor.rut', 'rut')
 							->add_select('prm_proveedor.glosa', 'glosa_proveedor')
-							->add_inner_join_with('prm_proveedor', 'cta_corriente.id_proveedor = prm_proveedor.id_proveedor');
+							->add_left_join_with('prm_proveedor', 'cta_corriente.id_proveedor = prm_proveedor.id_proveedor');
 		}
 
 		$columna_gastos_solicitante = $col_solicitante;
 		$columna_gastos_descripcion = $col_descripcion;
 		$columna_gastos_montos = $col_descripcion + 2 + $offsetfactura;
 		$col_formula_gastos_montos = Utiles::NumToColumnaExcel($columna_gastos_montos);
-		$result = $gastos->run();
 
-		for ($i = 0; $i < sizeof($result); $i++) {
+		$result = $gastos->run();
+		$total_gastos = count($result);
+		for ($i = 0; $i < $total_gastos; ++$i) {
 			$gasto = new stdClass();
 			$gasto->fields = $result[$i];
 
