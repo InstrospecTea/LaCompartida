@@ -2,7 +2,7 @@
 
 ## Hotfix 16.21.22
 Monday, July 11th
-* **Fix** [Se aplica el mismo formato a todas las horas del reporte rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/1644)
+* **Fix** [Se aplica el mismo formato a todas las horas del reporte rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/1653)
 
 ## Hotfix 16.21.21
 Thursday, July 7th
