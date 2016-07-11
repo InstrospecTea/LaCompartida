@@ -22,5 +22,8 @@ defined('APPPATH') || define('APPPATH',$_SERVER['DOCUMENT_ROOT'].'/'.ROOTDIR);
 //AmazonWS SDK: https://github.com/amazonwebservices/aws-sdk-for-php.git
 include DOCROOT . '/../backups/AWSSDKforPHP/sdk.class.php';
 
+//Mixpanel
+defined('MIXPANEL_TOKEN') || define('MIXPANEL_TOKEN', '43bb0d35ec38957f9508c6efcecf4051');
+
 ini_set('display_errors', 'On');
 set_time_limit(0);
