@@ -27,6 +27,7 @@ class WorkbookMiddleware {
 
 		$this->phpExcel = new PHPExcel();
 		$this->setDocumentProperties($this->phpExcel);
+		$this->phpExcel->getDefaultStyle()->getFont()->setName('Arial');
 	}
 
 	/**
@@ -388,7 +389,7 @@ class WorkbookMiddleware {
 	 */
 	public function setRow($row, $height, $format = null) {
 		$row = $row + 1;
-		
+
 		if ($height == 0) {
 			$this->workSheetObj->getRowDimension($row)->setVisible(false);
 		} else {
