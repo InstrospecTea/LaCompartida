@@ -1272,9 +1272,15 @@ class Contrato extends Objeto {
 		}
 
 		$this->Edit("id_usuario_modificador", $this->sesion->usuario->fields['id_usuario']);
-		$this->Edit("fono_contacto", $this->extra_fields['fono_contacto_contrato']);
-		$this->Edit("email_contacto", $this->extra_fields['email_contacto_contrato']);
-		$this->Edit("direccion_contacto", $this->extra_fields['direccion_contacto_contrato']);
+		if (isset($this->extra_fields['fono_contacto_contrato'])) {
+			$this->Edit("fono_contacto", $this->extra_fields['fono_contacto_contrato']);
+		}
+		if (isset($this->extra_fields['email_contacto_contrato'])) {
+			$this->Edit("email_contacto", $this->extra_fields['email_contacto_contrato']);
+		}
+		if (isset($this->extra_fields['direccion_contacto_contrato'])) {
+			$this->Edit("direccion_contacto", $this->extra_fields['direccion_contacto_contrato']);
+		}
 
 		if (is_array($this->extra_fields['usuarios_retainer'])) {
 			$retainer_usuarios = implode(',', $this->extra_fields['usuarios_retainer']);
