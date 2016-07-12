@@ -1212,59 +1212,56 @@ class Asunto extends Objeto {
 	 * @param [Cliente] $NuevoCliente: Instancia del nuevo cliente
 	 * @return array
 	 */
-	public function CambiaCliente($NuevoCliente) {
+	public function CambiaCliente($NuevoCliente)
+	{
 		$nuevo_codigo_cliente = $NuevoCliente->fields['codigo_cliente'];
 		$mover_asunto = false;
-		if ($nuevo_codigo_cliente == $this->fields['codigo_cliente']) {
-			return false;
-		} else {
-			$errors = array();
-			if ($NuevoCliente->Contrato()->fields['id_contrato'] == $this->fields['id_contrato']) {
-				$errors[] = 'El asunto debe cobrarse de <b>forma independiente</b>';
-			}
-			$cobros = $this->ObtenerCobrosTrabajos();
-			if (!empty($cobros['cobros'])) {
-				$errors[] = "El asunto tiene <b>Trabajos</b> en los siguientes cobros: {$cobros['cobros']}";
-			}
-			$cobros = $this->ObtenerCobrosTramites();
-			if (!empty($cobros['cobros'])) {
-				$errors[] = "El asunto tiene <b>Trámites</b> en los siguientes cobros: {$cobros['cobros']}";
-			}
-			$cobros = $this->ObtenerCobrosGastos();
-			if (!empty($cobros['cobros'])) {
-				$errors[] = "El asunto tiene <b>Gastos</b> en los siguientes cobros: {$cobros['cobros']}";
-			}
-			$cobros = $this->ObtenerCobrosAdelantos();
-			if (!empty($cobros['cobros'])) {
-				$errors[] = "El asunto tiene <b>Adelantos</b> en los siguientes cobros: {$cobros['cobros']}";
-			}
-			if ($this->ObtenerCantidadAsuntosContrato($this->fields['id_contrato']) > 1) {
-				$mover_asunto = true;
-			}
-			if (!empty($errors)) {
-				array_unshift($errors, "No se puede cambiar el cliente:");
-			} else {
-				$nuevo_codigo_asunto = $this->AsignarCodigoAsunto($nuevo_codigo_cliente);
-				if (!$mover_asunto) {
-					$this->ActualizaClienteContratoAsunto($nuevo_codigo_cliente);
-				} else {
-					$this->ActualizarContratoAsunto($NuevoCliente);
-				}
-				$this->ActualizaClienteLogTrabajo($nuevo_codigo_cliente);
-				$this->ActualizaClienteSolicitudAdelanto($nuevo_codigo_cliente);
-				$this->ActualizaClienteDocumentoAdelanto($nuevo_codigo_cliente);
-				$this->ActualizaClienteTarea($nuevo_codigo_asunto, $nuevo_codigo_cliente);
-				$this->ActualizaClienteGasto($nuevo_codigo_cliente);
-
-				$this->Edit('codigo_cliente', $nuevo_codigo_cliente, true);
-				$this->fields['codigo_asunto'] = $nuevo_codigo_asunto;
-
-				$this->write();
-
-				return array('Client' => $NuevoCliente);
-			}
-			return array('errors' => implode('<br/>', $errors));
+		$errors = array();
+		if ($NuevoCliente->Contrato()->fields['id_contrato'] == $this->fields['id_contrato']) {
+			$errors[] = 'El asunto debe cobrarse de <b>forma independiente</b>';
 		}
+		$cobros = $this->ObtenerCobrosTrabajos();
+		if (!empty($cobros['cobros'])) {
+			$errors[] = "El asunto tiene <b>Trabajos</b> en los siguientes cobros: {$cobros['cobros']}";
+		}
+		$cobros = $this->ObtenerCobrosTramites();
+		if (!empty($cobros['cobros'])) {
+			$errors[] = "El asunto tiene <b>Trámites</b> en los siguientes cobros: {$cobros['cobros']}";
+		}
+		$cobros = $this->ObtenerCobrosGastos();
+		if (!empty($cobros['cobros'])) {
+			$errors[] = "El asunto tiene <b>Gastos</b> en los siguientes cobros: {$cobros['cobros']}";
+		}
+		$cobros = $this->ObtenerCobrosAdelantos();
+		if (!empty($cobros['cobros'])) {
+			$errors[] = "El asunto tiene <b>Adelantos</b> en los siguientes cobros: {$cobros['cobros']}";
+		}
+		if ($this->ObtenerCantidadAsuntosContrato($this->fields['id_contrato']) > 1) {
+			$mover_asunto = true;
+		}
+		if (!empty($errors)) {
+			array_unshift($errors, "No se puede cambiar el cliente:");
+		} else {
+			$nuevo_codigo_asunto = $this->AsignarCodigoAsunto($nuevo_codigo_cliente);
+			if (!$mover_asunto) {
+				$this->ActualizaClienteContratoAsunto($nuevo_codigo_cliente);
+			} else {
+				$this->ActualizarContratoAsunto($NuevoCliente);
+			}
+			$this->ActualizaClienteLogTrabajo($nuevo_codigo_cliente);
+			$this->ActualizaClienteSolicitudAdelanto($nuevo_codigo_cliente);
+			$this->ActualizaClienteDocumentoAdelanto($nuevo_codigo_cliente);
+			$this->ActualizaClienteTarea($nuevo_codigo_asunto, $nuevo_codigo_cliente);
+			$this->ActualizaClienteGasto($nuevo_codigo_cliente);
+
+			$this->Edit('codigo_cliente', $nuevo_codigo_cliente, true);
+			$this->Edit('codigo_asunto', $nuevo_codigo_asunto, true);
+			$this->write();
+
+			return array('Client' => $NuevoCliente);
+		}
+		return array('errors' => implode('<br/>', $errors));
+
 	}
 
 	/**
