@@ -23,18 +23,18 @@
 		"bDeferRender": true,
 		"bDestroy": true,
 		"oLanguage": {
-			"sProcessing": "Procesando...",
-			"sLengthMenu": "Mostrar _MENU_ registros",
-			"sZeroRecords": "No se encontraron resultados",
-			"sInfo": "Mostrando desde _START_ hasta _END_ de _TOTAL_ registros",
-			"sInfoEmpty": "Mostrando desde 0 hasta 0 de 0 registros",
-			"sInfoFiltered": "(filtrado de _MAX_ registros en total)",
+			"sProcessing": __("Procesando..."),
+			"sLengthMenu": __("Mostrar _MENU_ registros"),
+			"sZeroRecords": __("No se encontraron resultados"),
+			"sInfo": __("Mostrando desde _START_ hasta _END_ de _TOTAL_ registros"),
+			"sInfoEmpty": __("Mostrando desde 0 hasta 0 de 0 registros"),
+			"sInfoFiltered": __("(filtrado de _MAX_ registros en total)"),
 			"sInfoPostFix": "",
-			"sSearch": "<b>Buscar Nombre</b>",
+			"sSearch": __("<b>Buscar Nombre</b>"),
 			"sUrl": "",
 			"oPaginate": {
-				"sPrevious": "anterior",
-				"sNext": "siguiente"
+				"sPrevious": __("anterior"),
+				"sNext": __("siguiente")
 			}
 		},
 		"bFilter": true,
@@ -86,7 +86,7 @@
 		],
 		"fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
 			if (aData['ACT'] == "0") {
-				jQuery(nRow).addClass('inactivo').attr('title', 'Usuario Inactivo');
+				jQuery(nRow).addClass('inactivo').attr('title', __('Usuario Inactivo'));
 			}
 		},
 		"sAjaxSource": "../interfaces/ajax/usuarios_ajax.php",
@@ -94,7 +94,7 @@
 		"sDom": '<"top"flp>t<"bottom"i>',
 		"aLengthMenu": [
 			[25, 50, 100, 200, -1],
-			[25, 50, 100, 200, "Todo"]
+			[25, 50, 100, 200, __("Todo")]
 		],
 		"sPaginationType": "full_numbers",
 		"aaSorting": [[2, "asc"]]
@@ -215,6 +215,35 @@
 	jQuery('#btnbuscar').click(function () {
 		jQuery(this).parents('form:first').attr('action', 'usuario_paso1.php?buscar=1').submit();
 	});
+	
+	$('#form_usuario').on('submit', function () {
+		if ($('#cambiar_alerta_diaria').is(':checked')) {
+			var alerta_diaria = '\n ' + __('Alerta diaria') + ':          ' + ($('#alerta_diaria').is(':checked') ? __('SI') : __('NO'));
+			var retraso_max = '\n Restraso Max:        ' + $('#retraso_max').val();
+		} else {
+			var alerta_diaria = '';
+			var retraso_max = '';
+		}
+
+		if ($('#cambiar_alerta_semanal').is(':checked')) {
+			var alerta_semanal = '\n ' + __('Alerta semanal') + ':     ' + ($('#alerta_semanal').is(':checked') ? __('SI') : __('NO'));
+			var restriccion_min = '\n ' + __('Min HH') + ':                 ' + $('#restriccion_min').val();
+			var restriccion_max = '\n ' + __('Max HH') + ':                 ' + $('#restriccion_max').val();
+		} else {
+			var alerta_semanal = '';
+			var restriccion_min = '';
+			var restriccion_max = '';
+		}
+
+		var restriccion_mensual = $('#cambiar_restriccion_mensual').is(':checked') ? '\n ' + __('Min HH mensual') + ': ' + $('#restriccion_mensual').val() : '';
+		var dias_ingreso_trabajo = $('#cambiar_dias_ingreso_trabajo').is(':checked') ? '\n ' + __('Max días ingreso') + ':  ' + $('#dias_ingreso_trabajo').val() : '';
+
+		if (confirm(alerta_diaria + alerta_semanal + retraso_max + restriccion_min + restriccion_max + restriccion_mensual + dias_ingreso_trabajo + '\n\n ' + __('¿Desea cambiar los restricciones y alertas de todos los usuarios?'))) {
+			$(this).attr('action', 'usuario_paso1.php');
+			return true;
+		}
+		return false;
+	});
 })(jQuery);
 
 function Listar(form, from) {
@@ -242,33 +271,6 @@ function Listar(form, from) {
 	}
 
 	form.submit();
-}
-
-function ModificaTodos(from) {
-	if (from.cambiar_alerta_diaria.checked == true) {
-		var alerta_diaria = from.alerta_diaria.checked == true ? '\n Alerta diaria:          SI' : '\n Alerta diaria:          NO';
-		var retraso_max = '\n Restraso Max:        ';
-	} else {
-		var alerta_diaria = '';
-		var retraso_max = '';
-	}
-
-	if (from.cambiar_alerta_semanal.checked == true) {
-		var alerta_semanal = from.alerta_semanal.checked == true ? '\n Alerta semanal:     SI' : '\n Alerta semanal:     NO';
-		var restriccion_min = '\n Min HH:                 ';
-		var restriccion_max = '\n Max HH:                 ';
-	} else {
-		var alerta_semanal = '';
-		var restriccion_min = '';
-		var restriccion_max = '';
-	}
-
-	var restriccion_mensual = from.cambiar_restriccion_mensual.checked == true ? '\n Min HH mensual: ' : '';
-	var dias_ingreso_trabajo = from.cambiar_dias_ingreso_trabajo.checked == true ? '\n Max dias ingreso:  ' : '';
-	if (confirm(alerta_diaria + alerta_semanal + retraso_max + from.retraso_max.value + restriccion_min + from.restriccion_min.value + restriccion_max + from.restriccion_max.value + restriccion_mensual + from.restriccion_mensual.value + dias_ingreso_trabajo + from.dias_ingreso_trabajo.value + '\n\n ¿Desea cambiar los restricciones y alertas de todos los usuarios?')) {
-		from.action = "usuario_paso1.php";
-		from.submit();
-	}
 }
 
 function Cancelar(form) {
