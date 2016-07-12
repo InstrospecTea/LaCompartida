@@ -1218,23 +1218,23 @@ class Asunto extends Objeto {
 		$mover_asunto = false;
 		$errors = array();
 		if ($NuevoCliente->Contrato()->fields['id_contrato'] == $this->fields['id_contrato']) {
-			$errors[] = 'El asunto debe cobrarse de <b>forma independiente</b>';
+			$errors[] = __('El asunto debe cobrarse de <b>forma independiente</b>');
 		}
 		$cobros = $this->ObtenerCobrosTrabajos();
 		if (!empty($cobros['cobros'])) {
-			$errors[] = "El asunto tiene <b>Trabajos</b> en los siguientes cobros: {$cobros['cobros']}";
+			$errors[] = __("El asunto tiene <b>Trabajos</b> en los siguientes cobros:") . " {$cobros['cobros']}";
 		}
 		$cobros = $this->ObtenerCobrosTramites();
 		if (!empty($cobros['cobros'])) {
-			$errors[] = "El asunto tiene <b>Trámites</b> en los siguientes cobros: {$cobros['cobros']}";
+			$errors[] = __("El asunto tiene <b>Trámites</b> en los siguientes cobros:") . " {$cobros['cobros']}";
 		}
 		$cobros = $this->ObtenerCobrosGastos();
 		if (!empty($cobros['cobros'])) {
-			$errors[] = "El asunto tiene <b>Gastos</b> en los siguientes cobros: {$cobros['cobros']}";
+			$errors[] = __("El asunto tiene <b>Gastos</b> en los siguientes cobros:") . " {$cobros['cobros']}";
 		}
 		$cobros = $this->ObtenerCobrosAdelantos();
 		if (!empty($cobros['cobros'])) {
-			$errors[] = "El asunto tiene <b>Adelantos</b> en los siguientes cobros: {$cobros['cobros']}";
+			$errors[] = __("El asunto tiene <b>Adelantos</b> en los siguientes cobros:") . " {$cobros['cobros']}";
 		}
 		if ($this->ObtenerCantidadAsuntosContrato($this->fields['id_contrato']) > 1) {
 			$mover_asunto = true;
