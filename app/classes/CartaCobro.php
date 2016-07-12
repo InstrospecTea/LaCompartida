@@ -3,6 +3,8 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
+use \TTB\Utiles;
+
 class CartaCobro extends NotaCobro {
 
 	var $carta_tabla = 'carta';
@@ -1645,11 +1647,11 @@ class CartaCobro extends NotaCobro {
 
 				/*  MOSTRANDO FECHA SEGUN IDIOMA */
 				if ($lang == 'es') {
-					$fecha_primer_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_primer_trabajo, '%e de %B');
-					$fecha_ultimo_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_ultimo_trabajo, '%e de %B');
+					$fecha_primer_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_primer_trabajo, '%e de ') . Utiles::month($fecha_primer_trabajo, $lang);
+					$fecha_ultimo_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_ultimo_trabajo, '%e de ') . Utiles::month($fecha_ultimo_trabajo, $lang);
 				} else {
-					$fecha_primer_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_primer_trabajo, '%B %e');
-					$fecha_ultimo_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_ultimo_trabajo, '%B %e');
+					$fecha_primer_trabajo_dd_mmmm = Utiles::month($fecha_primer_trabajo, $lang) . Utiles::sql3fecha($fecha_primer_trabajo, ' %e');
+					$fecha_ultimo_trabajo_dd_mmmm = Utiles::month($fecha_ultimo_trabajo, $lang) . Utiles::sql3fecha($fecha_ultimo_trabajo, ' %e');
 				}
 
 				if ($fecha_inicial_primer_trabajo != '' && $fecha_inicial_primer_trabajo != '0000-00-00') {
