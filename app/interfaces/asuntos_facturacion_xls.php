@@ -119,13 +119,8 @@ $ws1->setColumn($col, $col++, 22.00);
 $ws1->setColumn($col, $col++, 27.00);
 $ws1->setColumn($col, $col++, 18.00);
 
-if (method_exists('Conf', 'GetConf')) {
-	$PdfLinea1 = Conf::GetConf($sesion, 'PdfLinea1');
-	$PdfLinea2 = Conf::GetConf($sesion, 'PdfLinea2');
-} else {
-	$PdfLinea1 = Conf::PdfLinea1();
-	$PdfLinea2 = Conf::PdfLinea2();
-}
+$PdfLinea1 = Conf::GetConf($sesion, 'PdfLinea1');
+$PdfLinea2 = Conf::GetConf($sesion, 'PdfLinea2');
 
 $ws1->write(0, 0, 'LISTADO DE ASUNTOS', $encabezado);
 $ws1->mergeCells(0, 0, 0, 8);
@@ -200,41 +195,43 @@ if ($id_usuario)
 if ($id_area_proyecto)
 	$where .= " AND a1.id_area_proyecto = '$id_area_proyecto' ";
 
-$query = "SELECT SQL_CALC_FOUND_ROWS *,
-								grupo_cliente.glosa_grupo_cliente,
-								cliente.glosa_cliente,
-								cliente.codigo_cliente,
-								a1.codigo_asunto,
-								cliente.codigo_cliente_secundario,
-								a1.codigo_asunto_secundario,
-								contrato_cliente.rut AS rut_cliente,
-								IFNULL(contrato.rut, contrato_cliente.rut) AS rut,
-								contrato_cliente.factura_direccion AS direccion_cliente,
-								IFNULL(contrato.factura_direccion, contrato_cliente.factura_direccion) AS direccion,
-								IFNULL(contrato.factura_razon_social, contrato_cliente.factura_razon_social) AS razon_social,
-								IFNULL(contrato.factura_giro, contrato_cliente.factura_giro) AS giro,
-								tarifa.glosa_tarifa,
-								a1.id_moneda,
-								a1.activo,
-								a1.fecha_creacion,
-								usuario.username AS username,
-								usuario.apellido1 AS apellido1,
-								usuario.nombre AS nombre,
-								usuario_secundario.username AS username_secundario,
-								usuario_secundario.apellido1 AS apellido1_secundario,
-								usuario_secundario.nombre AS nombre_secundario
-						FROM
-								asunto AS a1
-							LEFT JOIN cliente ON cliente.codigo_cliente = a1.codigo_cliente
-							LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
-							LEFT JOIN contrato AS contrato_cliente ON contrato_cliente.id_contrato = cliente.id_contrato
-							LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
-							LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
-							LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
-							LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
-						WHERE
+$query = "SELECT
+						grupo_cliente.glosa_grupo_cliente,
+						cliente.glosa_cliente,
+						cliente.codigo_cliente,
+						a1.codigo_asunto,
+						cliente.codigo_cliente_secundario,
+						a1.codigo_asunto_secundario,
+						contrato_cliente.rut AS rut_cliente,
+						IFNULL(contrato.rut, contrato_cliente.rut) AS rut,
+						contrato_cliente.factura_direccion AS direccion_cliente,
+						IFNULL(contrato.factura_direccion, contrato_cliente.factura_direccion) AS direccion,
+						IFNULL(contrato.factura_razon_social, contrato_cliente.factura_razon_social) AS razon_social,
+						IFNULL(contrato.factura_giro, contrato_cliente.factura_giro) AS giro,
+						tarifa.glosa_tarifa,
+						a1.id_moneda,
+						a1.activo,
+						a1.fecha_creacion,
+						IFNULL(usuario.username, usuario_cliente.username) AS username,
+						IFNULL(usuario.apellido1, usuario_cliente.apellido1) AS apellido1,
+						IFNULL(usuario.nombre, usuario_cliente.nombre) AS nombre,
+						usuario_secundario.username AS username_secundario,
+						usuario_secundario.apellido1 AS apellido1_secundario,
+						usuario_secundario.nombre AS nombre_secundario
+					FROM
+							asunto AS a1
+						LEFT JOIN cliente ON cliente.codigo_cliente = a1.codigo_cliente
+						LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
+						LEFT JOIN contrato AS contrato_cliente ON contrato_cliente.id_contrato = cliente.id_contrato
+						LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
+						LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
+						LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
+						LEFT JOIN usuario AS usuario_cliente ON cliente.id_usuario_encargado = usuario_cliente.id_usuario
+						LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
+					WHERE
 								$where
 						ORDER BY grupo_cliente.glosa_grupo_cliente , cliente.codigo_cliente , a1.codigo_asunto , a1.codigo_cliente ASC ";
+
 $resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 
 while ($row = mysql_fetch_array($resp)) {
