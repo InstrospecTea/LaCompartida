@@ -177,7 +177,9 @@ class CartaCobro extends NotaCobro {
 			'%fecha_mta_agno%' => 'Obtiene el año desde el tag %fecha_mta%',
 			'%fecha_mta_dia%' => 'Obtiene el día desde el tag %fecha_mta%',
 			'%fecha_mta_mes%' => 'Obtiene el mes desde el tag %fecha_mta%',
-			'%fecha_periodo_exacto%' => 'Periodo del cobro con fechas exactas (desde el dia DD-MM-YYY hasta el mes de MES de YYYY',
+			'%fecha_periodo_exacto%' => 'Periodo del cobro con fechas exactas (desde el dia DD-MM-YYY hasta el día DD-MM-YYYY',
+			'%fecha_primer_trabajo_dd_mmmm%' => 'Fecha del primer trabajo del cobro (DD de MMMM)',
+			'%fecha_ultimo_trabajo_dd_mmmm%' => 'Fecha del último trabajo del cobro (DD de MMMM)',
 			'%fecha_primer_trabajo%' => 'Fecha del primer trabajo del cobro',
 			'%fecha_primer_trabajo_de%' => 'Agrega segmento (durante el mes mes de MM de YYYY)',
 			'%fecha_primer_trabajo_durante%' => 'Agrega segmento (prestados durante el mes de MM de YYYY',
@@ -1642,6 +1644,14 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%Asunto_ucwords%', $asunto_ucwords, $html2);
 
 				/*  MOSTRANDO FECHA SEGUN IDIOMA */
+				if ($lang == 'es') {
+					$fecha_primer_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_primer_trabajo, '%e de %B');
+					$fecha_ultimo_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_ultimo_trabajo, '%e de %B');
+				} else {
+					$fecha_primer_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_primer_trabajo, '%B %e');
+					$fecha_ultimo_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_ultimo_trabajo, '%B %e');
+				}
+
 				if ($fecha_inicial_primer_trabajo != '' && $fecha_inicial_primer_trabajo != '0000-00-00') {
 					if ($lang == 'es') {
 						$fecha_diff_periodo_exacto = __('desde el día') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
@@ -1690,7 +1700,7 @@ class CartaCobro extends NotaCobro {
 					$fecha_primer_trabajo_durante = $datediff > 0 && $datediff < 48 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
 				}
 
-				if ($fecha_primer_trabajo == 'No existe fecha' && $lang == es) {
+				if ($fecha_primer_trabajo == 'No existe fecha' && $lang == 'es') {
 					$fecha_primer_trabajo = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
 					$fecha_primer_trabajo_de = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
 					$fecha_primer_trabajo_durante = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
@@ -1811,6 +1821,8 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_facturacion_mes%', $fecha_facturacion_mes_carta, $html2);
 				$html2 = str_replace('%monto_total_demo_jdf%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
+				$html2 = str_replace('%fecha_primer_trabajo_dd_mmmm%', $fecha_primer_trabajo_dd_mmmm, $html2);
+				$html2 = str_replace('%fecha_ultimo_trabajo_dd_mmmm%', $fecha_ultimo_trabajo_dd_mmmm, $html2);
 
 				$fecha_dia_carta = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%d de %B de %Y'));
 
