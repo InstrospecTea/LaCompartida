@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.22.0](https://github.com/LemontechSA/ttb/pull/1657)
+Tuesday, July 12th
+* **Feature** [Carga masiva](https://github.com/LemontechSA/ttb/pull/1577)
+
 ## Hotfix 16.21.22
 Monday, July 11th
 * **Fix** [Se aplica el mismo formato a todas las horas del reporte rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/1653)
