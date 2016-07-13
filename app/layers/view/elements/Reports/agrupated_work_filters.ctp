@@ -39,4 +39,15 @@
 			</select>
 		</td>
 	</tr>
+
+	<tr>
+		<th align="right"><?php echo __('Ordenar por') ?>:</th>
+		<td colspan="4" align="left">
+			<select id="ordenar_por">
+				<option value="orderByWorkDate">Fecha</option>
+				<option value="orderByMatterGloss">Asunto</option>
+				<option value="orderByMatterGlossWorkDate">Asunto fecha</option>
+			</select>
+		</td>
+	</tr>
 </table>
