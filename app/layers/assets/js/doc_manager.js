@@ -4,7 +4,8 @@ var intrvl = 0;
 var dm_root = root_dir + '/app/DocManager';
 var tags_cache = {'':[]};
 window.modified = false;
-
+window.previewing = false;
+window.charge_exists = false;
 /**
  * @param string text texto que mostrará la notificación
  * @param string type tipo de notificación, por defecto 'info' success|info|warning|danger
@@ -111,42 +112,37 @@ function itsModified() {
 }
 
 function PrevisualizarCarta() {
+  if (window.previewing || !window.charge_exists) {
+    return;
+  }
 	clearInterval(intrvl);
-
 	var id_cobro = $("#id_cobro").val();
-	if (id_cobro === '') {
-		showError('Es necesario definir un numero de cobro para previsualizar una carta');
-		return;
-	}
-
-	var existecobro = ExisteCobro(id_cobro);
-	if (existecobro === false) {
-		showError('No existe cobro');
-		return;
-	}
-
 	var formato = $('#carta_formato').val();
-	$('#form_doc')
-		.attr('target', 'letter_preview')
-		.attr('action', dm_root + '/obtener_carta/' + id_cobro)
-		.submit();
+  window.previewing = true;
+  $.post(dm_root + '/obtener_carta/' + id_cobro, $('#form_doc').serialize(), function (html) {
+    $('#letter_preview').contents().find('body').html(html);
+    window.previewing = false;
+  }, 'html');	
 }
 
 // Function Existe
 function ExisteCobro(id_cobro) {
-
-	var existecobro;
-	var urlajax = dm_root + '/existe_cobro/' + id_cobro;
-	$.ajax(urlajax, {
+	var existe_cobro = false;
+	var url_ajax = dm_root + '/existe_cobro/' + id_cobro;
+	$.ajax(url_ajax, {
 		method: 'get',
 		async: false,
 		dataType: 'json',
 		success: function(data) {
-			existecobro = data.existe;
+			existe_cobro = data.existe;
 		}
 	});
-
-	return existecobro;
+	if (!existe_cobro) {
+		$('#letter_preview').contents().find('body').html('');
+		showError('No existe cobro');
+	}
+  window.charge_exists = existe_cobro;
+	return existe_cobro;
 
 }
 
@@ -231,7 +227,7 @@ $('#carta_id_carta').on('change', function(event) {
 	}
 
 	loading.start(['formato', 'css', 'margen'], function() {
-		if ($('#id_cobro').val()) {
+		if (window.charge_exists) {
 			PrevisualizarCarta();
 		}
 	});
@@ -268,11 +264,14 @@ $('#carta_formato, #carta_formato_css').on('change', function() {
 // Obteniendo Previsualizacion del formato (live)
 $('#carta_formato, #carta_formato_css').on('input', function(e) {
 	clearInterval(intrvl);
+	if (!window.charge_exists) {
+    return;
+  }
 	intrvl = setInterval(function() {
 		if ($('#id_cobro').val()) {
 			PrevisualizarCarta();
 		}
-	}, 1000);
+	}, 1500);
 });
 
 $('#guardar_nuevo').on('click', function() {
@@ -341,6 +340,10 @@ $('#insertar_elemento').on('click', function() {
 });
 
 $('#btn_previsualizar').on('click', function() {
+	if ($('#id_cobro').val() === '') {
+		showError('Es necesario definir un numero de cobro para previsualizar una carta');
+		return;
+	}
 	$('#form_doc')
 		.removeAttr('target')
 		.attr('action', dm_root + '/previsualizar/' + $('#id_cobro').val());
@@ -364,7 +367,9 @@ $('#secciones').on('change', function() {
 
 // Obteniendo Previsualizacion ( formato, formato_css )
 $('#id_cobro').on('change', function() {
-	PrevisualizarCarta();
+  if (ExisteCobro($(this).val())) {
+    PrevisualizarCarta();
+  }
 });
 
 $('#nuevo_formato').on('show.bs.modal', function() {
