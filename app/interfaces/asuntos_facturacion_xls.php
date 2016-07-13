@@ -9,8 +9,6 @@ $sesion = new Sesion(array('REV', 'ADM'));
 
 $wb = new Spreadsheet_Excel_Writer();
 
-$wb->send('Planilla_Asuntos_Factura.xls');
-
 $wb->setCustomColor(35, 0, 255, 255);
 $wb->setCustomColor(36, 255, 255, 0);
 $wb->setCustomColor(37, 255, 255, 160);
@@ -199,8 +197,9 @@ $query = "SELECT
 						grupo_cliente.glosa_grupo_cliente,
 						cliente.glosa_cliente,
 						cliente.codigo_cliente,
-						a1.codigo_asunto,
 						cliente.codigo_cliente_secundario,
+						a1.glosa_asunto,
+						a1.codigo_asunto,
 						a1.codigo_asunto_secundario,
 						contrato_cliente.rut AS rut_cliente,
 						IFNULL(contrato.rut, contrato_cliente.rut) AS rut,
@@ -222,19 +221,24 @@ $query = "SELECT
 							asunto AS a1
 						LEFT JOIN cliente ON cliente.codigo_cliente = a1.codigo_cliente
 						LEFT JOIN grupo_cliente ON cliente.id_grupo_cliente = grupo_cliente.id_grupo_cliente
-						LEFT JOIN contrato AS contrato_cliente ON contrato_cliente.id_contrato = cliente.id_contrato
 						LEFT JOIN contrato ON contrato.id_contrato = a1.id_contrato
+						LEFT JOIN contrato AS contrato_cliente ON contrato_cliente.id_contrato = cliente.id_contrato
 						LEFT JOIN tarifa ON contrato.id_tarifa = tarifa.id_tarifa
-						LEFT JOIN usuario ON a1.id_encargado = usuario.id_usuario
-						LEFT JOIN usuario AS usuario_cliente ON cliente.id_usuario_encargado = usuario_cliente.id_usuario
+						LEFT JOIN usuario ON contrato.id_usuario_responsable = usuario.id_usuario
+						LEFT JOIN usuario AS usuario_cliente ON contrato_cliente.id_usuario_responsable = usuario_cliente.id_usuario
 						LEFT JOIN usuario AS usuario_secundario ON contrato.id_usuario_secundario = usuario_secundario.id_usuario
 					WHERE
 								$where
 						ORDER BY grupo_cliente.glosa_grupo_cliente , cliente.codigo_cliente , a1.codigo_asunto , a1.codigo_cliente ASC ";
 
-$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+try {
+	$statement = $sesion->pdodbh->prepare($query);
+	$statement->execute();
+} catch (Exception $e) {
+	Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->pdodbh);
+}
 
-while ($row = mysql_fetch_array($resp)) {
+while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 	$col = 0;
 	$ws1->write($fila_inicial, $col++, $row['glosa_grupo_cliente'], $f4);
 
@@ -282,6 +286,8 @@ while ($row = mysql_fetch_array($resp)) {
 	$ws1->write($fila_inicial, $col++, $row['glosa_tarifa'], $f5);
 	$fila_inicial++;
 }
+
+$wb->send('Planilla_Asuntos_Factura.xls');
 
 $wb->close();
 exit;
