@@ -14,9 +14,9 @@ abstract class AbstractInvoiceProportionalDataCalculator
 
 	function addCurrencyToInvoiceQuery($Criteria) {
 		$Criteria->add_left_join_with(
-				array('documento_moneda', 'moneda_factura'),
+				array('factura_moneda', 'moneda_factura'),
 				CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('moneda_factura.id_documento', 'documento.id_documento'),
+					CriteriaRestriction::equals('moneda_factura.id_factura', 'factura.id_factura'),
 					CriteriaRestriction::equals('moneda_factura.id_moneda', 'factura.id_moneda')
 				)
 			);
