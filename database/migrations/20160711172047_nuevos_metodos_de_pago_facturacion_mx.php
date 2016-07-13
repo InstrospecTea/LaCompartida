@@ -9,8 +9,8 @@ class NuevosMetodosDePagoFacturacionMx extends \Database\Migration implements \D
    * @return void
    */
 	function up() {
-		$factura_mx = $this->getResultsQuery("SELECT COUNT(*) FROM `prm_plugin` WHERE `archivo_nombre` = 'facturacion_electronica_mx.php' AND `activo` = 1");
-		if (!empty($factura_mx)) {
+		$factura_mx = $this->getResultsQuery("SELECT COUNT(*) plugin FROM `prm_plugin` WHERE `archivo_nombre` = 'facturacion_electronica_mx.php' AND `activo` = 1");
+		if (!empty($factura_mx[0]['plugin'])) {
 			// Se hace el reemplazo de datos antiguos
 			$this->addQueryUp("UPDATE `prm_codigo` SET grupo = 'OLD_FACTURA_MX_METOD' WHERE grupo = 'PRM_FACTURA_MX_METOD';");
 
@@ -35,12 +35,15 @@ class NuevosMetodosDePagoFacturacionMx extends \Database\Migration implements \D
    * @return void
    */
 	function down() {
-		// Se elimina nuevo grupo
-		$query = 'DELETE FROM `prm_codigo` WHERE ';
-		$query .= "`grupo` = 'PRM_FACTURA_MX_METOD';";
-		$this->addQueryDown($query);
+		$factura_mx = $this->getResultsQuery("SELECT COUNT(*) plugin FROM `prm_plugin` WHERE `archivo_nombre` = 'facturacion_electronica_mx.php' AND `activo` = 1");
+		if (!empty($factura_mx[0]['plugin'])) {
+			// Se elimina nuevo grupo
+			$query = 'DELETE FROM `prm_codigo` WHERE ';
+			$query .= "`grupo` = 'PRM_FACTURA_MX_METOD';";
+			$this->addQueryDown($query);
 
-		// Se restaura grupo antiguo
-		$this->addQueryDown("UPDATE `prm_codigo` SET grupo = 'PRM_FACTURA_MX_METOD' WHERE grupo = 'OLD_FACTURA_MX_METOD';");
+			// Se restaura grupo antiguo
+			$this->addQueryDown("UPDATE `prm_codigo` SET grupo = 'PRM_FACTURA_MX_METOD' WHERE grupo = 'OLD_FACTURA_MX_METOD';");
+		}
 	}
 }
