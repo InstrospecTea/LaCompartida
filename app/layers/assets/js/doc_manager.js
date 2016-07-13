@@ -117,14 +117,12 @@ function PrevisualizarCarta() {
   }
 	clearInterval(intrvl);
 	var id_cobro = $("#id_cobro").val();
-	var formato = $('#carta_formato').val();
   window.previewing = true;
-  $.post(dm_root + '/obtener_carta/' + id_cobro, $('#form_doc').serialize(), function (html) {
-    $('#letter_preview').contents().find('body').html(html);
-    window.previewing = false;
-  }, 'html');	
+	$('#form_doc')
+		.attr('target', 'letter_preview')
+		.attr('action', dm_root + '/obtener_carta/' + id_cobro)
+		.submit();
 }
-
 // Function Existe
 function ExisteCobro(id_cobro) {
 	var existe_cobro = false;
@@ -183,6 +181,10 @@ function set_options(selector, data, empty) {
 }
 
 $('#tabs').tab();
+
+$('#letter_preview').on('load', function() {
+	window.previewing = false;
+});
 
 // Verifica que input solo acepte numeros y no letras.
 $('#id_cobro').keypress(function(e) {
