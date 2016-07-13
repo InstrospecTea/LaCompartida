@@ -1605,17 +1605,15 @@ class CartaCobro extends NotaCobro {
 				}
 
 				/*  OBTENEMOS LA FECHA FINAL DEL ULTIMO TRABAJO (PARA EVITAR FECHAS 1969) */
-				$query = "SELECT LAST_DAY(fecha) FROM trabajo WHERE id_cobro='" . $this->fields['id_cobro'] . "' AND visible='1' ORDER BY fecha DESC LIMIT 1";
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				if (mysql_num_rows($resp) > 0) {
-					list($fecha_ultimo_trabajo) = mysql_fetch_array($resp);
+				$query = "SELECT fecha FROM trabajo WHERE id_cobro='{$this->fields['id_cobro']}' AND visible='1' ORDER BY fecha DESC LIMIT 1";
+				$resp = $this->sesion->pdodbh->query($query)->fetch(PDO::FETCH_ASSOC);
+				if ($resp) {
+					$fecha_ultimo_trabajo = $resp['fecha'];
 				} else {
 					$fecha_ultimo_trabajo = $this->fields['fecha_fin'];
 				}
-
 				$fecha_inicial_primer_trabajo = date('Y-m-01', strtotime($fecha_primer_trabajo));
-				$fecha_final_ultimo_trabajo = date('Y-m-d', strtotime($fecha_ultimo_trabajo));
+				$fecha_final_ultimo_trabajo = date('Y-m-t', strtotime($fecha_ultimo_trabajo));
 				$datefrom = strtotime($fecha_inicial_primer_trabajo, 0);
 				$dateto = strtotime($fecha_final_ultimo_trabajo, 0);
 				$difference = $dateto - $datefrom; //Dif segundos
