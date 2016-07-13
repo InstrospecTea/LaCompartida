@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.23.0](https://github.com/LemontechSA/ttb/pull/1667)
+Wednesday, July 13th
+* **Fix** [Método pago facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/1665)
+
 ## Hotfix 16.22.1
 Wednesday, July 13th
 * **Feature** [En la interfaz de usuario se agregó la columna username](https://github.com/LemontechSA/ttb/pull/1662)
