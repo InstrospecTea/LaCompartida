@@ -500,8 +500,8 @@ $phrases = array(
 		'¿Desea cambiar los restricciones y alertas de todos los usuarios?'
 );
 $tanslations = array();
-foreach ($phrases as $phrace) {
-	$tanslations[$phrace] = __($phrace);
+foreach ($phrases as $phrase) {
+	$tanslations[$phrase] = __($phrase);
 }
 $_tanslations = json_encode(UtilesApp::utf8izar($tanslations));
 $JS = <<<JS
