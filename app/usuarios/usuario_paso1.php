@@ -255,7 +255,7 @@
 				</tr>
 				<tr>
 					<td>
-						<form name="form_usuario" method="post" enctype="multipart/form-data">
+						<form name="form_usuario" id="form_usuario" method="post" enctype="multipart/form-data">
 							<input type="hidden" name="opc" value="edit" />
 							<fieldset class="table_blanco">
 								<legend><?php echo __('Restricciones y alertas') ?></legend>
@@ -350,7 +350,7 @@
 									<tr><td align="center">
 											<?php
 											if ($sesion->usuario->fields['id_visitante'] == 0)
-												echo "<input type=\"button\" value=\"" . __('Guardar') . "\" class='botonizame' onclick=\"ModificaTodos(this.form);\"  /> &nbsp;&nbsp;";
+												echo "<input type=\"submit\" value=\"" . __('Guardar') . "\" class='botonizame' /> &nbsp;&nbsp;";
 											else
 												echo "<input type=\"button\" value=\"" . __('Guardar') . "\" class='botonizame' onclick=\"alert('Usted no tiene derecho para modificar estos valores.');\" /> &nbsp;&nbsp;";
 											?>
@@ -468,21 +468,46 @@
 
 <script src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
 <?php
-$_tanslations = json_encode(UtilesApp::utf8izar(array(
-		'Atención' => __('Atención'),
-		'Se desactivará al usuario seleccionado' => __('Se desactivará al usuario seleccionado'),
-		'el cual está asociado a' => __('el cual está asociado a'),
-		'acuerdos comerciales' => __('acuerdos comerciales'),
-		'como' => __('como'),
-		'Encargado Comercial' => __('Encargado Comercial'),
-		'Clientes' => __('Clientes'),
-		'Asuntos' => __('Asuntos'),
-		'Desea continuar' => __('Desea continuar')
-	)));
+$phrases = array(
+		'Atención',
+		'Se desactivará al usuario seleccionado',
+		'el cual está asociado a',
+		'acuerdos comerciales',
+		'como',
+		'Encargado Comercial',
+		'Clientes',
+		'Asuntos',
+		'Desea continuar',
+		'Procesando...',
+		'Mostrar _MENU_ registros',
+		'No se encontraron resultados',
+		'Mostrando desde _START_ hasta _END_ de _TOTAL_ registros',
+		'Mostrando desde 0 hasta 0 de 0 registros',
+		'(filtrado de _MAX_ registros en total)',
+		'<b>Buscar Nombre</b>',
+		'anterior',
+		'siguiente',
+		'Alerta diaria',
+		'Alerta semanal',
+		'Usuario Inactivo',
+		'Todo',
+		'SI',
+		'NO',
+		'Min HH',
+		'Max HH',
+		'Min HH mensual',
+		'Max días ingreso',
+		'¿Desea cambiar los restricciones y alertas de todos los usuarios?'
+);
+$tanslations = array();
+foreach ($phrases as $phrace) {
+	$tanslations[$phrace] = __($phrace);
+}
+$_tanslations = json_encode(UtilesApp::utf8izar($tanslations));
 $JS = <<<JS
 	var _tanslations = {$_tanslations};
 	function __(text) {
-		return _tanslations[text];
+		return _tanslations[text] ? _tanslations[text] : text;
 	}
 JS;
 
