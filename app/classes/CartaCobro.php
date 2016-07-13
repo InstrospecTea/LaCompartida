@@ -1218,7 +1218,7 @@ class CartaCobro extends NotaCobro {
 
 		$this->FillTemplateData($idioma, $moneda);
 
-		$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
+		$html2 = $parser_carta->tags[$theTag];
 
 		$_codigo_asunto_secundario = Conf::GetConf($this->sesion, 'CodigoSecundario');
 
@@ -2233,7 +2233,7 @@ class CartaCobro extends NotaCobro {
 				break;
 		}
 
-		return $html2;
+		return $this->RenderTemplate($html2);
 	}
 
 	function GenerarDocumentoCartaComun($parser_carta, $theTag = '', $lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta) {
