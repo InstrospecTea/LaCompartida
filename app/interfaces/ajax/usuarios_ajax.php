@@ -6,6 +6,7 @@ $sesion = new Sesion(array('ADM'));
 $queryuser = "SELECT
 	usuario.rut,
 	usuario.id_usuario,
+	usuario.username,
 	LOWER(concat(usuario.apellido1, ' ', usuario.apellido2, ', ', usuario.nombre)) AS nombrecompleto,
 	MAX(usuario.activo) AS ACT,
 	SUM(IF(usuario_permiso.codigo_permiso = 'DAT', 1, 0)) AS DAT,
@@ -46,9 +47,9 @@ while($fila = mysql_fetch_assoc($resp)) {
 		echo ',';
 	}
 
-	$fila['nombrecompleto'] = ucwords(utf8_encode(trim($fila['nombrecompleto'])));
+	$fila['nombrecompleto'] = ucwords(trim($fila['nombrecompleto']));
 
-  echo json_encode($fila) ;
+  echo json_encode(UtilesApp::utf8izar($fila));
 }
 
 echo '] }';

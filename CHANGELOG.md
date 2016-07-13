@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.22.1
+Wednesday, July 13th
+* **Feature** [En la interfaz de usuario se agregó la columna username](https://github.com/LemontechSA/ttb/pull/1662)
+
 ## [Release 16.22.0](https://github.com/LemontechSA/ttb/pull/1657)
 Tuesday, July 12th
 * **Feature** [Carga masiva](https://github.com/LemontechSA/ttb/pull/1577)
