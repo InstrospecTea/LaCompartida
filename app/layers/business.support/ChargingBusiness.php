@@ -1200,4 +1200,35 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		return $this->Report;
 	}
+
+	public function getDocumentCurrencies($chargeId) {
+		$Criteria = new Criteria($this->Session);
+		$Criteria
+			->add_select('prm_moneda.id_moneda')
+			->add_select('prm_moneda.glosa_moneda')
+			->add_select('documento_moneda.tipo_cambio')
+			->add_from('documento_moneda')
+			->add_inner_join_with('documento',
+				CriteriaRestriction::equals(
+					'documento_moneda.id_documento',
+					'documento.id_documento'
+				)
+			)
+			->add_inner_join_with('cobro',
+				CriteriaRestriction::and_clause(
+					CriteriaRestriction::equals('documento.id_cobro', 'cobro.id_cobro'),
+					CriteriaRestriction::equals('documento.tipo_doc', "'N'")
+				)
+			)
+			->add_inner_join_with('prm_moneda',
+				CriteriaRestriction::equals(
+					'documento_moneda.id_moneda',
+					'prm_moneda.id_moneda'
+				)
+			)
+			->add_restriction(CriteriaRestriction::equals('cobro.id_cobro', $chargeId));
+
+		return $Criteria->run();
+	}
+
 }

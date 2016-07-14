@@ -71,4 +71,65 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 			$currency);
 	}
 
+	public function getDefaultInvoiceCurrenciesByCurrency() {
+		$currencies = $this->CoiningBusiness->getCurrencies();
+		$result = array();
+		foreach ($currencies as $currency) {
+			$result[] = array(
+				'id_moneda' => $currency->get('id_moneda'),
+				'glosa_moneda' => $currency->get('glosa_moneda'),
+				'tipo_cambio' => $currency->get('tipo_cambio')
+			);
+		}
+		return $result;
+	}
+
+	public function getDefaultInvoiceCurrenciesByCharge($chargeId) {
+		$this->loadBusiness('Charging');
+		$this->loadBusiness('Coining');
+
+		$Charge = $this->ChargingBusiness->getCharge($chargeId);
+
+		$today = date_create('now');
+		$charge_date = date_create($Charge->get('fecha_emision'));
+
+		if ($today > $charge_date) {
+			return $this->getDefaultInvoiceCurrenciesByCurrency();
+		}
+
+		return $this->ChargingBusiness->getDocumentCurrencies($chargeId);
+	}
+
+	public function getInvoiceCurrencies($invoiceId, $chargeId) {
+		return $this->getDefaultInvoiceCurrenciesByCharge($chargeId);
+
+		if (empty($invoiceId)) {
+			return $this->getDefaultInvoiceCurrenciesByCharge($chargeId);
+		}
+
+		$Criteria = new Criteria($this->Session);
+		$Criteria
+			->add_select('prm_moneda.id_moneda')
+			->add_select('prm_moneda.glosa_moneda')
+			->add_select('factura_moneda.tipo_cambio')
+			->add_from('factura_moneda')
+			->add_inner_join_with('factura',
+				CriteriaRestriction::equals(
+					'factura_moneda.id_factura',
+					'factura.id_factura'
+				)
+			)
+			->add_inner_join_with('prm_moneda',
+				CriteriaRestriction::equals(
+					'factura_moneda.id_moneda',
+					'prm_moneda.id_moneda'
+				)
+			)
+			->add_restriction(
+				CriteriaRestriction::equals('factura.id_factura', $invoiceId)
+			);
+
+		return $Criteria->run();
+	}
+
 }
