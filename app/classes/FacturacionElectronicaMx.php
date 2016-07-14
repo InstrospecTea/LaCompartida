@@ -49,15 +49,13 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 
 			echo "<b id='metodo_pago_texto'>$metodo_pago</b> ";
 
-			if ($metodo_pago != 'No Identificado') {
-				$cta_pago = $factura->fields['dte_metodo_pago_cta'];
-				if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
-					$cta_pago = "";
-				} else {
-					$cta_pago = (int) $cta_pago;
-				}
-				echo $Form->input('dte_metodo_pago_cta', $cta_pago, array('size' => 10, 'maxlength' => 30, 'placeholder' => 'No. cuenta'));
+			$cta_pago = $factura->fields['dte_metodo_pago_cta'];
+			if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
+				$cta_pago = "";
+			} else {
+				$cta_pago = (int) $cta_pago;
 			}
+			echo $Form->input('dte_metodo_pago_cta', $cta_pago, array('size' => 10, 'maxlength' => 30, 'placeholder' => 'No. cuenta'));
 		}
 		echo "</td>";
 		echo '</tr>';
