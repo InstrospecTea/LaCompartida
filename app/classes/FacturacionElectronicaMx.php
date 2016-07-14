@@ -12,8 +12,9 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		echo '<tr>';
 		echo '<td align="right">M&eacute;todo de Pago</td>';
 		echo '<td align="left" colspan="3">';
+		$query = "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY codigo ASC";
 		if (empty($dte_fecha_creacion)) {
-			echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY codigo ASC", 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], '', '', '300');
+			echo Html::SelectQuery($Sesion, $query, 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], '', '', '300');
 			$cta_pago = $factura->fields['dte_metodo_pago_cta'];
 			if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
 				$cta_pago = "";
@@ -22,6 +23,8 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 			}
 			echo $Form->input('dte_metodo_pago_cta', $cta_pago, array('size' => 10, 'maxlength' => 30, 'placeholder' => 'No. cuenta'));
 		} else {
+			$options = "style='display: none;' data-default='{$factura->fields['dte_metodo_pago']}'";
+			echo Html::SelectQuery($Sesion, $query, 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], $options, __('Seleccione'), '300');
 			$Criteria = new Criteria($Sesion);
 			$metodo_pago = $Criteria->add_select('glosa')
 															->add_from('prm_codigo')
@@ -44,7 +47,7 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 				$metodo_pago = $metodo_pago[0]['glosa'];
 			}
 
-			echo "<b>$metodo_pago</b> ";
+			echo "<b id='metodo_pago_texto'>$metodo_pago</b> ";
 
 			if ($metodo_pago != 'No Identificado') {
 				$cta_pago = $factura->fields['dte_metodo_pago_cta'];
@@ -113,7 +116,15 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 				window.location = root_dir + "/api/index.php/invoices/" + id_factura +  "/document?format=" + format
 			});
 
-			jQuery("#dte_metodo_pago").trigger("change");
+			jQuery("#id_estado").on("change", function() {
+				if (jQuery(this).val() == 5) {
+					jQuery('#metodo_pago_texto').hide();
+					jQuery('#dte_metodo_pago').show();
+				} else {
+					jQuery('#dte_metodo_pago').val(jQuery('#dte_metodo_pago').data('default')).hide();
+					jQuery('#metodo_pago_texto').show();
+				};
+			});
 EOF;
 	}
 
