@@ -1,5 +1,29 @@
 # Changelog
 
+## Hotfix 16.23.2
+Thursday, July 14th
+* **Fix** [Fix Anular Factura MX](https://github.com/LemontechSA/ttb/pull/1669)
+
+## Hotfix 16.23.1
+Thursday, July 14th
+* **Feature** [Obtiene los datos del encargado comercial del contrato del asunto o del contrato principal cliente](https://github.com/LemontechSA/ttb/pull/1668)
+
+## [Release 16.23.0](https://github.com/LemontechSA/ttb/pull/1667)
+Wednesday, July 13th
+* **Fix** [Método pago facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/1665)
+
+## Hotfix 16.22.1
+Wednesday, July 13th
+* **Feature** [En la interfaz de usuario se agregó la columna username](https://github.com/LemontechSA/ttb/pull/1662)
+
+## [Release 16.22.0](https://github.com/LemontechSA/ttb/pull/1657)
+Tuesday, July 12th
+* **Feature** [Carga masiva](https://github.com/LemontechSA/ttb/pull/1577)
+
+## Hotfix 16.21.22
+Monday, July 11th
+* **Fix** [Se aplica el mismo formato a todas las horas del reporte rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/1653)
+
 ## Hotfix 16.21.21
 Thursday, July 7th
 * **Fix** [Imprimir el tipo de documento en la glosa del pago](https://github.com/LemontechSA/ttb/pull/1644)
