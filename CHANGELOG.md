@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.23.2
+Thursday, July 14th
+* **Fix** [Fix Anular Factura MX](https://github.com/LemontechSA/ttb/pull/1669)
+
 ## Hotfix 16.23.1
 Thursday, July 14th
 * **Feature** [Obtiene los datos del encargado comercial del contrato del asunto o del contrato principal cliente](https://github.com/LemontechSA/ttb/pull/1668)
