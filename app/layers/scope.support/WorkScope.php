@@ -63,7 +63,7 @@ class WorkScope implements IWorkScope {
 	}
 
 	/**
-	 * Ordena por fecha del trabajo
+	 * Ordena por glosa del asunto y fecha del trabajo
 	 * @param  Criteria $criteria
 	 * @return mixed
 	 */
