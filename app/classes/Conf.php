@@ -46,7 +46,7 @@ class Conf {
 	 * @param type $conf
 	 * @return type
 	 */
-	public function read($conf) {
+	public static function read($conf) {
 		if(isset(self::$statics[$conf])) {
 			return self::$statics[$conf];
 		} else if (isset(self::$configs[$conf])) {
@@ -69,7 +69,7 @@ class Conf {
 		self::$configs[$conf] = $value;
 	}
 
-	public function loadFromArray($confs) {
+	public static function loadFromArray($confs) {
 		if (self::$loaded) {
 			return;
 		}
