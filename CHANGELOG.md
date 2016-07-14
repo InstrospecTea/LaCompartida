@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.22.1
+Thursday, July 14th
+* **Feature** [Obtiene los datos del encargado comercial del contrato del asunto o del contrato principal cliente](https://github.com/LemontechSA/ttb/pull/1668)
+
 ## [Release 16.23.0](https://github.com/LemontechSA/ttb/pull/1667)
 Wednesday, July 13th
 * **Fix** [Método pago facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/1665)
