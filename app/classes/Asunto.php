@@ -1,11 +1,5 @@
 <?php
 
-require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
-require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-
 class Asunto extends Objeto {
 
 	//Etapa actual del proyecto
@@ -399,11 +393,11 @@ class Asunto extends Objeto {
 	//función que asigna los códigos nuevos
 	public function AsignarCodigoAsunto($codigo_cliente, $glosa_asunto = "", $secundario = false) {
 		$campo = 'codigo_asunto' . ($secundario ? '_secundario' : '');
-		$tipo = UtilesApp::GetConf($this->sesion, 'TipoCodigoAsunto'); //0: -AAXX, 1: -XXXX, 2: -XXX
+		$tipo = Conf::GetConf($this->sesion, 'TipoCodigoAsunto'); //0: -AAXX, 1: -XXXX, 2: -XXX
 		$largo = $tipo == 2 ? 3 : 4;
 
 		$where_codigo_gastos = '';
-		if (UtilesApp::GetConf($this->sesion, 'CodigoEspecialGastos')) {
+		if (Conf::GetConf($this->sesion, 'CodigoEspecialGastos')) {
 			if ($glosa_asunto == 'GASTOS' || $glosa_asunto == 'Gastos') {
 				return "$codigo_cliente-9999";
 			}
@@ -940,14 +934,13 @@ class Asunto extends Objeto {
 		$Contrato->editable_fields = array_keys($this->extra_fields);
 		$Contrato->Fill($this->extra_fields, true);
 		$Contrato->Edit('codigo_cliente', $this->fields['codigo_cliente']);
-		if ($Contrato->Write()) {
-			$this->Edit('id_contrato', $Contrato->fields['id_contrato']);
-			$this->Edit('id_contrato_indep', $Contrato->fields['id_contrato']);
-			if (!$this->Write()) {
-				throw new Exception('No se pudo asociar el contrato al asunto');
-			}
-		} else {
+		if (!$Contrato->Write()) {
 			throw new Exception('No se pudo guardar el contrato asociado al asunto');
+		}
+		$this->Edit('id_contrato', $Contrato->fields['id_contrato']);
+		$this->Edit('id_contrato_indep', $Contrato->fields['id_contrato']);
+		if (!$this->Write()) {
+			throw new Exception('No se pudo asociar el contrato al asunto');
 		}
 	}
 
@@ -1207,206 +1200,6 @@ class Asunto extends Objeto {
 		return false;
 	}
 
-	/**
-	 * Cambia el cliente de un asunto y todas sus cositas
-	 * @param [Cliente] $NuevoCliente: Instancia del nuevo cliente
-	 * @return array
-	 */
-	public function CambiaCliente($NuevoCliente)
-	{
-		$nuevo_codigo_cliente = $NuevoCliente->fields['codigo_cliente'];
-		$mover_asunto = false;
-		$errors = array();
-		if ($NuevoCliente->Contrato()->fields['id_contrato'] == $this->fields['id_contrato']) {
-			$errors[] = __('El asunto debe cobrarse de <b>forma independiente</b>');
-		}
-		$cobros = $this->ObtenerCobrosTrabajos();
-		if (!empty($cobros['cobros'])) {
-			$errors[] = __("El asunto tiene <b>Trabajos</b> en los siguientes cobros:") . " {$cobros['cobros']}";
-		}
-		$cobros = $this->ObtenerCobrosTramites();
-		if (!empty($cobros['cobros'])) {
-			$errors[] = __("El asunto tiene <b>Trámites</b> en los siguientes cobros:") . " {$cobros['cobros']}";
-		}
-		$cobros = $this->ObtenerCobrosGastos();
-		if (!empty($cobros['cobros'])) {
-			$errors[] = __("El asunto tiene <b>Gastos</b> en los siguientes cobros:") . " {$cobros['cobros']}";
-		}
-		$cobros = $this->ObtenerCobrosAdelantos();
-		if (!empty($cobros['cobros'])) {
-			$errors[] = __("El asunto tiene <b>Adelantos</b> en los siguientes cobros:") . " {$cobros['cobros']}";
-		}
-		if ($this->ObtenerCantidadAsuntosContrato($this->fields['id_contrato']) > 1) {
-			$mover_asunto = true;
-		}
-		if (!empty($errors)) {
-			array_unshift($errors, "No se puede cambiar el cliente:");
-		} else {
-			$nuevo_codigo_asunto = $this->AsignarCodigoAsunto($nuevo_codigo_cliente);
-			if (!$mover_asunto) {
-				$this->ActualizaClienteContratoAsunto($nuevo_codigo_cliente);
-			} else {
-				$this->ActualizarContratoAsunto($NuevoCliente);
-			}
-			$this->ActualizaClienteLogTrabajo($nuevo_codigo_cliente);
-			$this->ActualizaClienteSolicitudAdelanto($nuevo_codigo_cliente);
-			$this->ActualizaClienteDocumentoAdelanto($nuevo_codigo_cliente);
-			$this->ActualizaClienteTarea($nuevo_codigo_asunto, $nuevo_codigo_cliente);
-			$this->ActualizaClienteGasto($nuevo_codigo_cliente);
-
-			$this->Edit('codigo_cliente', $nuevo_codigo_cliente, true);
-			$this->Edit('codigo_asunto', $nuevo_codigo_asunto, true);
-			$this->write();
-
-			return array('Client' => $NuevoCliente);
-		}
-		return array('errors' => implode('<br/>', $errors));
-
-	}
-
-	/**
-	 * Obtiene la cantidad de asuntos asociados al contrato indicado
-	 * @param integer $id_contrato
-	 * @return mixed
-	 * @throws Exception
-	 */
-	public function ObtenerCantidadAsuntosContrato($id_contrato) {
-		$criteria = new Criteria($this->sesion);
-		try {
-			$result = $criteria->add_select('count(asunto.id_asunto)', 'asuntos')
-				->add_from('contrato')
-				->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.id_contrato', 'contrato.id_contrato'))
-				->add_restriction(CriteriaRestriction::equals('contrato.id_contrato', $id_contrato))
-				->run();
-		} catch (Exception $e) {
-			die($e->getMessage());
-		}
-		return $result[0]['asuntos'];
-	}
-
-	/**
-	 * Actualiza el asunto actual a un nuevo cliente
-	 * @param Cliente $Cliente
-	 * @return bool
-	 */
-	public function ActualizarContratoAsunto(Cliente $Cliente) {
-		$this->fields['id_contrato'] = $Cliente->fields['id_contrato'];
-	}
-
-	public function ActualizaClienteContratoAsunto($nuevo_codigo_cliente) {
-			$query = "UPDATE contrato
-			SET codigo_cliente = '{$nuevo_codigo_cliente}'
-			WHERE id_contrato = '{$this->fields['id_contrato']}';";
-
-		return mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-	}
-
-	public function ActualizaClienteLogTrabajo($nuevo_codigo_cliente) {
-		$query = "UPDATE log_trabajo
-			SET codigo_cliente = '{$nuevo_codigo_cliente}'
-			WHERE codigo_asunto = '{$this->fields['codigo_asunto']}';";
-
-		return mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-	}
-
-	public function ActualizaClienteSolicitudAdelanto($nuevo_codigo_cliente) {
-		$query = "UPDATE solicitud_adelanto
-			SET codigo_cliente = '{$nuevo_codigo_cliente}'
-			WHERE codigo_asunto = '{$this->fields['codigo_asunto']}';";
-
-		return mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-	}
-
-	public function ActualizaClienteDocumentoAdelanto($nuevo_codigo_cliente) {
-		$query = "UPDATE documento
-			SET codigo_cliente = '{$nuevo_codigo_cliente}'
-			WHERE codigo_asunto = '{$this->fields['codigo_asunto']}' AND es_adelanto = 1;";
-
-		return mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-	}
-
-	public function ActualizaClienteTarea($nuevo_codigo_asunto, $nuevo_codigo_cliente) {
-		$query = "UPDATE tarea
-			SET codigo_cliente = '{$nuevo_codigo_cliente}',
-				codigo_asunto = '{$nuevo_codigo_asunto}'
-			WHERE codigo_asunto = '{$this->fields['codigo_asunto']}';";
-
-		return mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-	}
-
-	public function ActualizaClienteGasto($nuevo_codigo_cliente) {
-		$query = "UPDATE cta_corriente
-			SET codigo_cliente = '{$nuevo_codigo_cliente}'
-			WHERE codigo_asunto = '{$this->fields['codigo_asunto']}'
-			AND egreso IS NOT NULL	;";
-
-		return mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-	}
-
-	/**
-	 * Obtiene los cobros de los trabajos asociados al asunto
-	 */
-	public function ObtenerCobrosTrabajos() {
-		$Criteria = new Criteria($this->sesion);
-
-		$Criteria->add_select('GROUP_CONCAT(DISTINCT id_cobro SEPARATOR ", ")', 'cobros')
-				->add_from('trabajo')
-				->add_restriction(CriteriaRestriction::is_not_null('id_cobro'))
-				->add_restriction(CriteriaRestriction::equals('trabajo.codigo_asunto', "'{$this->fields['codigo_asunto']}'"));
-
-		$result = $Criteria->run();
-
-		return array_shift($result);
-	}
-
-	/**
-	 * Obtiene los cobros de los trabajos asociados al asunto
-	 */
-	public function ObtenerCobrosTramites() {
-		$Criteria = new Criteria($this->sesion);
-		$Criteria->add_select('GROUP_CONCAT(DISTINCT id_cobro SEPARATOR ", ")', 'cobros')
-				->add_from('tramite')
-				->add_restriction(CriteriaRestriction::is_not_null('id_cobro'))
-				->add_restriction(CriteriaRestriction::equals('tramite.codigo_asunto', "'{$this->fields['codigo_asunto']}'"));
-
-		$result = $Criteria->run();
-
-		return array_shift($result);
-	}
-
-	/**
-	 * Obtiene los cobros de los gastos asociados al asunto
-	 */
-	public function ObtenerCobrosGastos() {
-		$Criteria = new Criteria($this->sesion);
-		$Criteria->add_select('GROUP_CONCAT(DISTINCT id_cobro SEPARATOR ", ")', 'cobros')
-				->add_from('cta_corriente')
-				->add_restriction(CriteriaRestriction::is_not_null('id_cobro'))
-				->add_restriction(CriteriaRestriction::is_not_null('egreso'))
-				->add_restriction(CriteriaRestriction::equals('cta_corriente.codigo_asunto', "'{$this->fields['codigo_asunto']}'"));
-
-		$result = $Criteria->run();
-
-		return array_shift($result);
-	}
-
-	/**
-	 * Obtiene los cobros de los adelantos asociados al asunto
-	 */
-	public function ObtenerCobrosAdelantos() {
-		$Criteria = new Criteria($this->sesion);
-
-		$Criteria->add_select('GROUP_CONCAT(DISTINCT dc.id_cobro SEPARATOR ", ")', 'cobros')
-				->add_from('neteo_documento nd')
-				->add_inner_join_with('documento dc', CriteriaRestriction::equals('nd.id_documento_cobro', 'dc.id_documento'))
-				->add_inner_join_with('documento da', CriteriaRestriction::equals('nd.id_documento_pago', 'da.id_documento'))
-				->add_restriction(CriteriaRestriction::equals('da.es_adelanto', "1"))
-				->add_restriction(CriteriaRestriction::equals('da.codigo_asunto', "'{$this->fields['codigo_asunto']}'"));
-
-		$result = $Criteria->run();
-
-		return array_shift($result);
-	}
 
 	/**
 	 * Busca un codigo de asunto secundario para un asunto con id_asunto

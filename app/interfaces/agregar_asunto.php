@@ -177,8 +177,7 @@ if ($opcion == 'guardar') {
 
 		$Asunto->Edit("glosa_asunto", $glosa_asunto);
 
-		$client_code = !is_null($nuevo_codigo_cliente) ? $nuevo_codigo_cliente : $codigo_cliente;
-		$Asunto->Edit("codigo_cliente", $client_code, true);
+		$Asunto->Edit("codigo_cliente", $codigo_cliente, true);
 
 		if (Conf::GetConf($Sesion, 'ExportacionLedes')) {
 			$Asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
@@ -416,26 +415,18 @@ if ($opcion == 'guardar') {
 	}
 
 	$errors = $Pagina->GetErrors();
-	if (empty($errors)) {
-		$NuevoCliente = new Cliente($Sesion);
-		if ($nuevo_codigo_cliente_secundario != '') {
-			$NuevoCliente->LoadByCodigoSecundario($nuevo_codigo_cliente_secundario);
-			$nuevo_codigo_cliente = $NuevoCliente->fields['codigo_cliente'];
-		} else {
-			$NuevoCliente = new Cliente($Sesion);
-			$NuevoCliente->LoadByCodigo($nuevo_codigo_cliente);
-		}
-		if ($NuevoCliente->Loaded()) {
-			$response = $Asunto->CambiaCliente($NuevoCliente);
-			if (!empty($response['errors'])) {
-				$Pagina->AddError($response['errors']);
-			} else {
-				if (!empty($response['Client'])) {
-					$NuevoCliente = $response['Client'];
-					$Cliente = $response['Client'];
-					$Pagina->AddInfo("El asunto fue asociado al cliente: <b>{$Cliente->fields['glosa_cliente']}</b>");
-				}
-			}
+
+	$new_client = Conf::GetConf($Sesion, 'CodigoSecundario') ? $nuevo_codigo_cliente_secundario : $nuevo_codigo_cliente;
+	$client_code = 'codigo_cliente' . (Conf::GetConf($Sesion, 'CodigoSecundario') ? '_secundario' : '');
+	if (empty($errors) && $new_client != $Cliente->fields[$client_code]) {
+		try {
+			$MattersBusiness = new MattersBusiness($Sesion);
+			$entities = $MattersBusiness->changeClientOfMatter($Asunto, $new_client);
+			$Cliente = $entities['Client'];
+			$Asunto = $entities['Matter'];
+			$Pagina->AddInfo("El asunto fue asociado al cliente: {$Cliente->fields['glosa_cliente']}");
+		} catch (Exception $e) {
+			$Pagina->AddError($e->getMessage());
 		}
 	}
 }
@@ -1080,7 +1071,7 @@ jQuery('document').ready(function () {
 });
 
 /**
- * Si el usuario no está en la lista se agrega
+ * Si el usuario no estï¿½ en la lista se agrega
  * @param {type} data
  * @returns {undefined|Boolean}
  */
