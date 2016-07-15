@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.23.3
+Friday, July 15th
+* **Fix** [Lang Inglés para Careyallende](https://github.com/LemontechSA/ttb/pull/1674)
+
 ## Hotfix 16.23.2
 Thursday, July 14th
 * **Fix** [Fix Anular Factura MX](https://github.com/LemontechSA/ttb/pull/1669)
