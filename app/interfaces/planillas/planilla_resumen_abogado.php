@@ -10,7 +10,6 @@ $moneda_base = Utiles::MonedaBase($Sesion);
 
 // ARMANDO XLS
 $wb = new Spreadsheet_Excel_Writer();
-$wb->send("Planilla_resumen_profesionales.xls");
 
 if ($moneda_base['cifras_decimales'] == 0) {
 	$string_decimales = "";
@@ -119,7 +118,7 @@ $formato_cliente_asunto2->setTextWrap();
 $formato_duracion = $formato_cliente_asunto;
 $formato_duracion2 = $formato_cliente_asunto2;
 if (Conf::GetConf($Sesion, 'MostrarSoloMinutos')) {
-	$formato_duracion->setNumFormat("[hh]:mm");	
+	$formato_duracion->setNumFormat("[hh]:mm");
 	$formato_duracion2->setNumFormat("[hh]:mm");
 }
 
@@ -528,6 +527,7 @@ function Print_Prof(& $ws1, $td) {
 	}
 }
 
+$wb->send('Planilla_resumen_profesionales.xls');
 $wb->close();
 
 function excel_column($col_number) {
