@@ -8,5 +8,5 @@ $_LANG['Hrs. Tarificadas'] = "Billed Hours";
 $_LANG['Hrs. Trabajadas'] = "Hours Worked";
 $_LANG['Nombre'] = "Biller";
 $_LANG['Resumen detalle profesional'] = "Summary of fees";
-$_LANG['Tarifa'] = "Fee";
-$_LANG['TARIFA'] = "Fee";
+$_LANG['Tarifa'] = "Fees";
+$_LANG['TARIFA'] = "Fees";
