@@ -1547,7 +1547,7 @@ class Reporte {
 
 	//Transforma las horas a hh:mm en el caso de que tenga el conf y que sean horas
 	public function FormatoValor($sesion, $valor, $tipo_dato = "horas_", $tipo_reporte = "", $formato_valor = array('cifras_decimales' => 2, 'miles' => '.', 'decimales' => ',')) {
-		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, "horas_")) {
+		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, 'horas_')) {
 			$valor_horas = floor($valor);
 			$valor_minutos = number_format((($valor - $valor_horas) * 60), 0);
 			if ($tipo_reporte == "excel") {

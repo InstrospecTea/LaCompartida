@@ -441,7 +441,16 @@ function Print_Prof(& $ws1, $td) {
 			extender($ws1, $fila_titulos + 1, $col, 6, $formato_periodo);
 			$ws1->write($fila_titulos + 2, $col, Reporte::FormatoValor($Sesion, n($td['horas_por_cobrar']['labels_col'][$id_col]['total']), 'horas_', 'excel'), $formato_duracion_totales);
 			extender($ws1, $fila_titulos + 2, $col, 6, $formato_periodo);
-			$ws1->write($fila_titulos + 3, $col, Reporte::FormatoValor($Sesion, n($td['horas_castigadas']['labels_col'][$id_col]['total']), 'horas_', 'excel'), $formato_duracion_totales);
+
+			$horas_castigadas = 0;
+			// Las horas castigadas deben ser siempre mayor a cero, de lo contrario, la resta
+			// entre duración y duración cobrada no corresponde a un castigo, si no mas bien a un
+			// cobro adicional que realiza el abogado al trabajo
+			if ($td['horas_castigadas']['labels_col'][$id_col]['total'] > 0) {
+				$horas_castigadas = $td['horas_castigadas']['labels_col'][$id_col]['total'];
+			}
+			$ws1->write($fila_titulos + 3, $col, Reporte::FormatoValor($Sesion, n($horas_castigadas), 'horas_', 'excel'), $formato_duracion_totales);
+
 			extender($ws1, $fila_titulos + 3, $col, 6, $formato_periodo);
 			$ws1->write($fila_titulos + 4, $col, Reporte::FormatoValor($Sesion, n($td['horas_no_cobrables']['labels_col'][$id_col]['total']), 'horas_', 'excel'), $formato_duracion_totales);
 			extender($ws1, $fila_titulos + 4, $col, 6, $formato_periodo);
@@ -472,7 +481,13 @@ function Print_Prof(& $ws1, $td) {
 				}
 				$ws1->writeNumber($fila_base, $col, Reporte::FormatoValor($Sesion, number_format($td['horas_cobradas']['celdas'][$id_lab][$id_col]['valor'], 2, '.', ''), "horas_", "excel"), $formato_duracion_stp);
 				$ws1->writeNumber($fila_base, $col + 1, Reporte::FormatoValor($Sesion, number_format($td['horas_por_cobrar']['celdas'][$id_lab][$id_col]['valor'], 2, '.', ''), "horas_", "excel"), $formato_duracion_stp);
-				$ws1->writeNumber($fila_base, $col + 2, Reporte::FormatoValor($Sesion, number_format($td['horas_castigadas']['celdas'][$id_lab][$id_col]['valor'], 2, '.', ''), "horas_", "excel"), $formato_duracion_stp);
+
+				$horas_castigadas = 0;
+				if ($td['horas_castigadas']['celdas'][$id_lab][$id_col]['valor'] > 0) {
+					$horas_castigadas = $td['horas_castigadas']['celdas'][$id_lab][$id_col]['valor'];
+				}
+				$ws1->writeNumber($fila_base, $col + 2, Reporte::FormatoValor($Sesion, number_format($horas_castigadas, 2, '.', ''), 'horas_', 'excel'), $formato_duracion_stp);
+
 				$ws1->writeNumber($fila_base, $col + 3, Reporte::FormatoValor($Sesion, number_format($td['horas_no_cobrables']['celdas'][$id_lab][$id_col]['valor'], 2, '.', ''), "horas_", "excel"), $formato_duracion_stp);
 				$ws1->writeNumber($fila_base, $col + 4, n($td['valor_cobrado']['celdas'][$id_lab][$id_col]['valor']), $formato_moneda_fila);
 				$ws1->writeNumber($fila_base, $col + 5, n($td['valor_cobrado_estandar']['celdas'][$id_lab][$id_col]['valor']), $formato_moneda_fila);
