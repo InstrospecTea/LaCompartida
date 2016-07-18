@@ -988,7 +988,7 @@ class ReporteCriteria {
 	 * @param array  $formato_valor Datos para hacer format
 	 */
 	public static function FormatoValor($sesion, $valor, $tipo_dato = "horas_", $tipo_reporte = "", $formato_valor = array('cifras_decimales' => 2, 'miles' => '.', 'decimales' => ',')) {
-		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, "oras_")) {
+		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, 'horas_') !== false) {
 			$valor_horas = floor($valor);
 			$valor_minutos = number_format((($valor - $valor_horas) * 60), 0);
 			if ($tipo_reporte == "excel") {
