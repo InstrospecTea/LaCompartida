@@ -4,8 +4,6 @@ class Conf {
 
 	private static $statics = [];
 	private static $configs = [];
-	private static $has_memcache;
-	private static $Sesion;
 	private static $loaded = false;
 
 	/**
