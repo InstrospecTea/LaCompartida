@@ -390,34 +390,17 @@ class Asunto extends Objeto {
 		}
 	}
 
-	//función que asigna los códigos nuevos
+	/**
+	 * Función que crea los códigos de asunto
+	 * @param string $codigo_cliente
+	 * @param string $glosa_asunto
+	 * @param boolean $secundario
+	 * @return string
+	 * @deprecated use MatterManager::makeMatterCode()
+	 */
 	public function AsignarCodigoAsunto($codigo_cliente, $glosa_asunto = "", $secundario = false) {
-		$campo = 'codigo_asunto' . ($secundario ? '_secundario' : '');
-		$tipo = Conf::GetConf($this->sesion, 'TipoCodigoAsunto'); //0: -AAXX, 1: -XXXX, 2: -XXX
-		$largo = $tipo == 2 ? 3 : 4;
-
-		$where_codigo_gastos = '';
-		if (Conf::GetConf($this->sesion, 'CodigoEspecialGastos')) {
-			if ($glosa_asunto == 'GASTOS' || $glosa_asunto == 'Gastos') {
-				return "$codigo_cliente-9999";
-			}
-			$where_codigo_gastos = "AND asunto.glosa_asunto NOT LIKE 'gastos'";
-		}
-		$yy = date('y');
-		$anio = $tipo ? '' : "AND $campo LIKE '%-$yy%'";
-
-		$where_codigo_cliente = $secundario ?
-				"JOIN cliente USING(codigo_cliente) WHERE cliente.codigo_cliente_secundario = '$codigo_cliente'" :
-				"WHERE asunto.codigo_cliente = '$codigo_cliente'";
-
-		$query = "SELECT CONVERT(TRIM(LEADING '0' FROM SUBSTRING_INDEX($campo, '-', -1)), UNSIGNED INTEGER) AS x FROM asunto $where_codigo_cliente $anio $where_codigo_gastos ORDER BY x DESC LIMIT 1";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($codigo) = mysql_fetch_array($resp);
-		if (empty($codigo)) {
-			$codigo = $tipo ? 0 : $yy * 100;
-		}
-
-		return sprintf("%s-%0{$largo}d", $codigo_cliente, $codigo + 1);
+		$MatterManager = new MatterManager($this->sesion);
+		return $MatterManager->makeMatterCode($codigo_cliente, $glosa_asunto, $secundario);
 	}
 
 	public function AsignarCodigoAsuntoSecundario($codigo_cliente_secundario, $glosa_asunto = "") {

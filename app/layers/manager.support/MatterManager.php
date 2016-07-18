@@ -1,62 +1,63 @@
 <?php
 
 class MatterManager extends AbstractManager implements BaseManager {
+
   /**
-	 * Obtiene los cobros de los trabajos asociados al asunto
-	 */
-	public function getChargesOfWorks($matter_code) {
-		$Criteria = new Criteria($this->Sesion);
-		$Criteria->add_select('GROUP_CONCAT(DISTINCT id_cobro SEPARATOR ", ")', 'cobros')
-			->add_from('trabajo')
-			->add_restriction(CriteriaRestriction::is_not_null('id_cobro'))
-			->add_restriction(CriteriaRestriction::equals('trabajo.codigo_asunto', "'{$matter_code}'"));
-
-    $result = $Criteria->first();
-    return $result !== false ? $result['cobros'] : false;
-	}
-
-	/**
-	 * Obtiene los cobros de los trabajos asociados al asunto
-	 */
-	public function getChargesOfErrands($matter_code) {
+   * Devuelve los id de los cobros del asunto
+   * @param Matter $Matter
+   * @return string|boolean ids separados por "," o false
+   */
+  public function getCharges(Matter $Matter) {
+    $matter_code = $Matter->get('codigo_asunto');
     $Criteria = new Criteria($this->Sesion);
-		$Criteria->add_select('GROUP_CONCAT(DISTINCT id_cobro SEPARATOR ", ")', 'cobros')
-			->add_from('tramite')
-			->add_restriction(CriteriaRestriction::is_not_null('id_cobro'))
-			->add_restriction(CriteriaRestriction::equals('tramite.codigo_asunto', "'{$matter_code}'"));
-
-		$result = $Criteria->first();
-    return $result !== false ? $result['cobros'] : false;
-	}
-
-	/**
-	 * Obtiene los cobros de los gastos asociados al asunto
-	 */
-	public function getChargesOfExpenses($matter_code) {
-    $Criteria = new Criteria($this->Sesion);
-		$Criteria->add_select('GROUP_CONCAT(DISTINCT id_cobro SEPARATOR ", ")', 'cobros')
-			->add_from('cta_corriente')
-			->add_restriction(CriteriaRestriction::is_not_null('id_cobro'))
-			->add_restriction(CriteriaRestriction::is_not_null('egreso'))
-			->add_restriction(CriteriaRestriction::equals('cta_corriente.codigo_asunto', "'{$matter_code}'"));
-
+    $Criteria->add_select('GROUP_CONCAT(DISTINCT id_cobro SEPARATOR ", ")', 'cobros')
+      ->add_from('cobro_asunto')
+      ->add_restriction(CriteriaRestriction::equals('codigo_asunto', "'{$matter_code}'"));
     $result = $Criteria->first();
-		return $result !== false ? $result['cobros'] : false;
-	}
+    return empty($result['cobros']) ? false : $result['cobros'];
+  }
 
-	/**
-	 * Obtiene los cobros de los adelantos asociados al asunto
+  /**
+	 * Función que crea los códigos de asunto
+	 * @param string $client_code
+	 * @param string $matter_gloss
+	 * @param boolean $secundary
+	 * @return string nuevo código de asunto
 	 */
-	public function getChargesOfAdvances($matter_code) {
-    $Criteria = new Criteria($this->Sesion);
-		$Criteria->add_select('GROUP_CONCAT(DISTINCT dc.id_cobro SEPARATOR ", ")', 'cobros')
-			->add_from('neteo_documento nd')
-			->add_inner_join_with('documento dc', CriteriaRestriction::equals('nd.id_documento_cobro', 'dc.id_documento'))
-			->add_inner_join_with('documento da', CriteriaRestriction::equals('nd.id_documento_pago', 'da.id_documento'))
-			->add_restriction(CriteriaRestriction::equals('da.es_adelanto', "1"))
-			->add_restriction(CriteriaRestriction::equals('da.codigo_asunto', "'{$matter_code}'"));
+	public function makeMatterCode($client_code, $matter_gloss = "", $secundary = false) {
+		$field = 'codigo_asunto' . ($secundary ? '_secundario' : '');
+		$type = Conf::GetConf($this->Sesion, 'TipoCodigoAsunto'); //0: -AAXX, 1: -XXXX, 2: -XXX
+		$size = $type == 2 ? 3 : 4;
 
-    $result = $Criteria->first();
-    return $result !== false ? $result['cobros'] : false;
+    $Criteria = new Criteria($this->Sesion);
+		if (Conf::GetConf($this->Sesion, 'CodigoEspecialGastos')) {
+			if ($matter_gloss == 'GASTOS' || $matter_gloss == 'Gastos') {
+				return "$client_code-9999";
+			}
+      $Criteria->add_restriction(CriteriaRestriction::not_equals('asunto.glosa_asunto', 'gastos'));
+		}
+    $yy = date('y');
+    if (!$type) {
+      $Criteria->add_restriction(CriteriaRestriction::like($field, "'%-$yy%'"));
+    }
+    if ($secundary) {
+      $Criteria->add_inner_join_with('cliente', 'USING(codigo_cliente)');
+      $Criteria->add_restriction(CriteriaRestriction::equals('cliente.codigo_cliente_secundario', "'$client_code'"));
+    } else {
+      $Criteria->add_restriction(CriteriaRestriction::equals('asunto.codigo_cliente', "'$client_code'"));
+    }
+
+    $result = $Criteria->add_select("CONVERT(TRIM(LEADING '0' FROM SUBSTRING_INDEX($field, '-', -1)), UNSIGNED INTEGER)", 'code_number')
+      ->add_from('asunto')
+      ->add_ordering('code_number', 'DESC')
+			->first();
+		if (empty($result['code_number'])) {
+			$code = $type ? 0 : $yy * 100;
+		} else {
+			$code = (int) $result['code_number'];
+		}
+
+		return sprintf("%s-%0{$size}d", $client_code, $code + 1);
 	}
+
 }
