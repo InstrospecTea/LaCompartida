@@ -9,26 +9,48 @@ $pagina->titulo = __('Subir excel modificado');
 $pagina->PrintTop($popup);
 ?>
 
+<style type="text/css">
+	table {
+		margin: 5px;
+	}
+
+	table td {
+		padding: 2px;
+	}
+
+	.title {
+		border-bottom: 2px solid #a3d45c;
+	}
+
+	.title span {
+		display:block;
+		font-weight: bold;
+		font-size: 10pt;
+	}
+
+	.warning {
+		color: red;
+		padding: 3px;
+	}
+</style>
+
 <table width="480">
 	<tr>
-		<td style="border-bottom: 2px solid #a3d45c;">
-			<span align="left" style="display:block; font-weight: bold; font-size: 10pt;">Aqu&iacute; se sube el excel modificado</span>
+		<td class="title">
+			<span align="left"><?= __('Excel borrador modificado'); ?></span>
 		</td>
 	</tr>
 	<tr>
-		<td>&nbsp;</td>
+		<td class="warning"><?= __('Recuerde que al subir el Excel modificará los trabajos'); ?></td>
 	</tr>
 	<tr>
 		<td align="center">
 			<form name="form_archivo" id="form_archivo" method="post" action="" enctype="multipart/form-data">
 				<input type="hidden" name="opc" id="opc" value="subir_excel" />
-				Subir excel modificado: <input type="file" name="archivo_data" />
-				<input type="button" value="<?php echo __('Cargar Documento'); ?>" class="btn" onclick="confirmar(this.form);" />
+				<?= __('Subir excel modificado'); ?>: <input type="file" name="archivo_data" />
+				<input type="button" value="<?= __('Cargar Excel'); ?>" class="btn" onclick="enviar(this.form);" />
 			</form>
 		</td>
-	</tr>
-	<tr>
-		<td>&nbsp;</td>
 	</tr>
 	<tr>
 		<td>
@@ -40,7 +62,7 @@ $pagina->PrintTop($popup);
 						// Esta función actualiza los trabajos y entrega feedback del resultado.
 						echo Trabajo::ActualizarConExcel($archivo_data, $sesion);
 					} else {
-						echo '<b>La extenci&oacute;n del excel fue adjuntado es inv&aacute;lido.</b>';
+						echo '<b>' . __('La extención del Excel adjuntado es inválida') . '.</b>';
 					}
 				}
 				?>
@@ -50,11 +72,9 @@ $pagina->PrintTop($popup);
 </table>
 
 <script type="text/javascript">
-	function confirmar(form) {
-		if (confirm("Esta modificando algunos trabajos con el excel,\n ¿Desea continuar?")) {
-			form.submit();
-			window.opener.Refrescar();
-		}
+	function enviar(form) {
+		form.submit();
+		window.opener.Refrescar();
 	}
 </script>
 
