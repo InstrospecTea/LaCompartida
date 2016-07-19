@@ -12,6 +12,38 @@ use \TipoCorreo as TipoCorreo;
 
 class Utiles extends \Utiles {
 
+	/** eliminar junto con month() **/
+	static protected $months = array(
+		'en' => array(
+			'January',
+			'February',
+			'March',
+			'April',
+			'May',
+			'June',
+			'July',
+			'August',
+			'September',
+			'October',
+			'November',
+			'December'
+		),
+		'es' => array(
+			'Enero',
+			'Febrero',
+			'Marzo',
+			'Abril',
+			'Mayo',
+			'Junio',
+			'Julio',
+			'Agosto',
+			'Septiembre',
+			'Octubre',
+			'Noviembre',
+			'Diciembre'
+		)
+	);
+
 	public function send_mail($emailaddress, $fromname, $fromaddress, $emailsubject, $body, $attachments = false, $type_content = 'txt') {
 		$eol = "\r\n";
 		$mime_boundary = md5(time());
@@ -220,4 +252,17 @@ class Utiles extends \Utiles {
 			return isset($as_array[$key]) ? $as_array[$key] : '';
 		}, $template);
 	}
+
+	/**
+	 * Devuelve el nombre del mes en la idioma indicado
+	 * se debe cambiar por __() cuando funcione correctamente.
+	 * @param string $date
+	 * @param string $lang
+	 * @returns string
+	 */
+	function month($date, $lang) {
+		$month = date('n', strtotime($date)) - 1;
+		return self::$months[$lang][$month];
+	}
+
 }
