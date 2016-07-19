@@ -90,7 +90,7 @@ abstract class Humanize {
 	 */
 	private static function getClassName($table_name) {
 		if (isset($table_name) && !empty($table_name)) {
-			return \TTB\Utiles::pascalize("{$table_name}Humanize");
+			return Utiles::pascalize("{$table_name}Humanize");
 		}
 		return '';
 	}
@@ -102,7 +102,7 @@ abstract class Humanize {
 	 */
 	private static function getTableName($data) {
 		if (isset($data) && !empty($data)) {
-			return \TTB\Utiles::pascalize($data->fields['titulo_tabla']);
+			return Utiles::pascalize($data->fields['titulo_tabla']);
 		}
 		return '';
 	}
@@ -125,7 +125,7 @@ abstract class Humanize {
 			$string_humanize .= "{$field_humanize} ha cambiado a {$data->fields['valor_nuevo']}";
 		}
 
-		return \TTB\Utiles::pascalize($string_humanize);
+		return Utiles::pascalize($string_humanize);
 	}
 
 	/**

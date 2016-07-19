@@ -4,6 +4,37 @@ class Utiles {
 
 	static $emailError = '';
 
+	static protected $months = array(
+		'en' => array(
+			'January',
+			'February',
+			'March',
+			'April',
+			'May',
+			'June',
+			'July',
+			'August',
+			'September',
+			'October',
+			'November',
+			'December'
+		),
+		'es' => array(
+			'Enero',
+			'Febrero',
+			'Marzo',
+			'Abril',
+			'Mayo',
+			'Junio',
+			'Julio',
+			'Agosto',
+			'Septiembre',
+			'Octubre',
+			'Noviembre',
+			'Diciembre'
+		)
+	);
+
 	public static function errorSQL($query, $error_file = '', $error_line = '', $dbh = NULL, $mensaje_adicional = '', $e = null) {
 		global $ROOT_PATH, $IMAGES_PATH, $save_log, $sesion, $Sesion;
 
@@ -1125,6 +1156,31 @@ HTML;
 		mcrypt_generic_deinit($td);
 		mcrypt_module_close($td);
 		return $msg;
+	}
+
+	/**
+	 * Busca campos entre {} y los reemplaza por su valor del objeto
+	 * @param object|array $object
+	 * @param string $template '{name} {last_name}'
+	 */
+	public function interpolate($object, $template) {
+		$as_array = (array) $object;
+		return preg_replace_callback('/\{([^\}]+)\}/', function ($matches) use ($as_array) {
+			$key = $matches[1];
+			return isset($as_array[$key]) ? $as_array[$key] : '';
+		}, $template);
+	}
+
+	/**
+	 * Devuelve el nombre del mes en la idioma indicado
+	 * se debe cambiar por __() cuando funcione correctamente.
+	 * @param string $date
+	 * @param string $lang
+	 * @returns string
+	 */
+	function month($date, $lang) {
+		$month = date('n', strtotime($date)) - 1;
+		return self::$months[$lang][$month];
 	}
 
 }
