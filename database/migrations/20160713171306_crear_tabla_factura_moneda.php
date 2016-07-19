@@ -10,17 +10,19 @@ class CrearTablaFacturaMoneda extends \Database\Migration implements \Database\I
 	 */
 	function up() {
 		$this->addQueryUp('CREATE TABLE `factura_moneda` (
+				`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				`id_factura` int(11) NOT NULL,
 				`id_moneda` int(11) NOT NULL,
 				`tipo_cambio` double NOT NULL DEFAULT "0",
-			PRIMARY KEY (`id_factura`,`id_moneda`),
+				`fecha_creacion` datetime NOT NULL default "0000-00-00 00:00:00",
+				`fecha_modificacion` datetime NOT NULL default "0000-00-00 00:00:00",
 			KEY `factura_moneda_fk_moneda` (`id_moneda`),
 			CONSTRAINT `factura_moneda_fk_factura` FOREIGN KEY (`id_factura`) REFERENCES `factura` (`id_factura`) ON DELETE CASCADE ON UPDATE CASCADE,
 			CONSTRAINT `factura_moneda_fk_moneda` FOREIGN KEY (`id_moneda`) REFERENCES `prm_moneda` (`id_moneda`) ON UPDATE CASCADE
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT="Tipo de cambio de la factura";
 		');
 
-		$this->addQueryUp('INSERT INTO factura_moneda
+		$this->addQueryUp('INSERT INTO factura_moneda (id_factura, id_moneda, tipo_cambio)
 			SELECT id_factura, documento_moneda.id_moneda, documento_moneda.tipo_cambio
 			  FROM factura
 			 INNER JOIN cobro ON factura.id_cobro = cobro.id_cobro

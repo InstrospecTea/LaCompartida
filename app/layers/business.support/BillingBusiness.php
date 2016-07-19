@@ -61,16 +61,42 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 		return $amountDetail;
 	}
 
-	public function setInvoiceExchangeRates($invoiceId, $chargeId, $exchangeRatesParams = array()) {
+	public function saveInvoiceExchangeRates($invoiceId, $chargeId, $exchangeRatesParams = array()) {
+
+		$this->loadService('InvoiceCurrency');
 		$exchangeRates = array();
 
-		if (empty($exchangeRates)) {
+		if (empty($exchangeRatesParams)) {
 			$exchangeRates = $this->getInvoiceExchangeRates($invoiceId, $chargeId);
 		} else {
-			$exchangeRates = $this->arrayToInvoiceExchangeRates($exchangeRatesParams);
+			$exchangeRates = $this->arrayToInvoiceExchangeRates($invoiceId, $exchangeRatesParams);
 		}
 
+		foreach ($exchangeRates as $newInvoiceExchange) {
+			$invoiceExchange = $this->InvoiceCurrencyService->getByCompositeKey(
+				$invoiceId,
+				$newInvoiceExchange->get('id_moneda')
+			);
 
+			if (!empty($invoiceExchange)) {
+				$identity = $invoiceExchange->getIdentity();
+				$newInvoiceExchange->set($identity, $invoiceExchange->get($identity));
+			}
+
+			$this->InvoiceCurrencyService->saveOrUpdate($newInvoiceExchange);
+		}
+
+	}
+
+	public function arrayToInvoiceExchangeRates($invoiceId, $exchangeRatesParams = array()) {
+		foreach ($exchangeRatesParams as $currencyId => $value) {
+			$invoiceCurrency = new InvoiceCurrency();
+			$invoiceCurrency->set('id_factura', $invoiceId);
+			$invoiceCurrency->set('id_moneda', $currencyId);
+			$invoiceCurrency->set('tipo_cambio', $value);
+			$invoiceCurrencies[] = $invoiceCurrency;
+		}
+		return $invoiceCurrencies;
 	}
 
 	public function getInvoiceFeesAmountInCurrency(Invoice $invoice, Currency $currency) {

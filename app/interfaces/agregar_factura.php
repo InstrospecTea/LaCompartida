@@ -98,9 +98,9 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		}
 	}
 }
-
-
 //FIN DE ELSE (No es WEBSERVICE)
+
+$BillingBusiness = new BillingBusiness($sesion);
 
 if ($opcion == "guardar") {
 
@@ -273,6 +273,14 @@ if ($opcion == "guardar") {
 					$factura->GuardarNumeroDocLegal($id_documento_legal, $numero, $serie, $id_estudio);
 				}
 
+				if (!empty($factura_moneda)) {
+					$BillingBusiness->saveInvoiceExchangeRates(
+						$factura->fields['id_factura'],
+						$id_cobro,
+						$factura_moneda
+					);
+				}
+
 				$signo = $codigo_tipo_doc == 'NC' ? 1 : -1; //es 1 o -1 si el tipo de doc suma o resta su monto a la liq
 				$neteos = empty($id_factura_padre) ? null : array(array($id_factura_padre, $signo * $factura->fields['total']));
 
@@ -358,9 +366,8 @@ if (!$id_factura && $factura->loaded()) {
 	$id_factura = $factura->fields['id_factura'];
 }
 
-$BillingBusiness = new BillingBusiness($sesion);
 $invoiceCurrencies = $BillingBusiness->getInvoiceExchangeRates($id_factura, $id_cobro);
-pr($invoiceCurrencies);
+
 $titulo_pagina = $txt_pagina = $id_factura ? __('Edición de ') . $tipo_documento_legal . ' #' . $factura->fields['numero'] : __('Ingreso de ') . $tipo_documento_legal;
 
 if ($id_cobro) {

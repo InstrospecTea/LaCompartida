@@ -7,7 +7,7 @@ class InvoiceCurrency extends Entity {
 	 * @return string
 	 */
 	public function getIdentity() {
-		return 'id_factura';
+		return 'id';
 	}
 
 	/**
