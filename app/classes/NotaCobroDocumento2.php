@@ -696,7 +696,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$html = str_replace('%valor_gastos%', $moneda_total->fields['simbolo'] . $this->espacio . number_format($total_gastos_moneda, $moneda_total->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html);
 				}
 
-				$total_cobro = $total_en_moneda + $total_gastos_moneda;
+				$total_cobro = $total_en_moneda + $total_gastos_moneda + $x_resultados['impuesto_gastos'][$this->fields['opc_moneda_total']];
 				$total_cobro_cyc = $subtotal_en_moneda_cyc + $total_gastos_moneda - $descuento_cyc;
 				$total_cobro_demo = $x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']];
 				$iva_cyc = $impuestos_total_gastos_moneda + $impuestos_cyc;
