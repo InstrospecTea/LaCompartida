@@ -359,8 +359,8 @@ if (!$id_factura && $factura->loaded()) {
 }
 
 $BillingBusiness = new BillingBusiness($sesion);
-$invoice_currencies = $BillingBusiness->getInvoiceCurrencies($id_factura, $id_cobro);
-
+$invoiceCurrencies = $BillingBusiness->getInvoiceExchangeRates($id_factura, $id_cobro);
+pr($invoiceCurrencies);
 $titulo_pagina = $txt_pagina = $id_factura ? __('Edición de ') . $tipo_documento_legal . ' #' . $factura->fields['numero'] : __('Ingreso de ') . $tipo_documento_legal;
 
 if ($id_cobro) {
@@ -884,29 +884,32 @@ $Form->defaultLabel = false;
 			</tr>
 
 			<tr id='descripcion_factura'>
-				<td align="right" colspan=2><?php echo __('Monto Total') ?></td>
+				<td align="right" colspan=2>
+				<a id="exchange_rate_button" href="javascript:void(0);" title="Actualizar Tipo de cambio de la Factura para Reportes">
+					<img src="<?php echo Conf::ImgDir()  ?>/money_16.gif" border="0"></a>
+				<?php echo __('Monto Total') ?></td>
 				<td align="left" nowrap><?php echo $simbolo; ?>
 					<input type="text" id='total' name="total"  class="aproximable"  value="<?php echo $suma_total; ?>" size="10" maxlength="30"  readonly="readonly">
-					<a id="exchange_rate_button" href="javascript:void(0);" title="Actualizar Tipo de cambio de la Factura para Reportes">
-						<img src="<?php echo Conf::ImgDir()  ?>/money_16.gif" border="0">
-					</a>
 				</td>
 				<td align="left">&nbsp;</td>
 			</tr>
-			<tr class='exchange_rate_container' style='display:none'>
-				<td colspan="3" align="right">
-					<table>
+			<tr class='exchange_rate_container' style='display:none;border:solid 1px'>
+				<td align="right">
+					<?php echo __('Tipo de Cambio') ?>
+				</td>
+				<td colspan="2" align="left">
+					<table style="border: solid 1px #AAA;width:100%;">
 						<tbody>
 							<tr>
 							<?php
-							foreach ($invoice_currencies as $currency) {
+							foreach ($invoiceCurrencies as $currency) {
 							?>
 								<td>
-									<span><b><?php echo $currency['glosa_moneda'] ?></b></span><br>
+									<span><b><?php echo $currency->get('glosa_moneda') ?></b></span><br>
 									<input type='text'
 												 size='9'
-												 name='factura_moneda[<?php echo $currency["id_moneda"] ?>]'
-												 value='<?php echo $currency["tipo_cambio"] ?>'>
+												 name='factura_moneda[<?php echo $currency->get("id_moneda") ?>]'
+												 value='<?php echo $currency->get("tipo_cambio") ?>'>
 								</td>
 							<?php
 							}

@@ -1201,34 +1201,43 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 		return $this->Report;
 	}
 
-	public function getDocumentCurrencies($chargeId) {
-		$Criteria = new Criteria($this->Session);
-		$Criteria
-			->add_select('prm_moneda.id_moneda')
-			->add_select('prm_moneda.glosa_moneda')
-			->add_select('documento_moneda.tipo_cambio')
-			->add_from('documento_moneda')
-			->add_inner_join_with('documento',
-				CriteriaRestriction::equals(
-					'documento_moneda.id_documento',
-					'documento.id_documento'
-				)
-			)
-			->add_inner_join_with('cobro',
-				CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('documento.id_cobro', 'cobro.id_cobro'),
-					CriteriaRestriction::equals('documento.tipo_doc', "'N'")
-				)
-			)
-			->add_inner_join_with('prm_moneda',
-				CriteriaRestriction::equals(
-					'documento_moneda.id_moneda',
-					'prm_moneda.id_moneda'
-				)
-			)
-			->add_restriction(CriteriaRestriction::equals('cobro.id_cobro', $chargeId));
+	public function getDocumentExchangeRates($chargeId) {
+		$this->loadManager('Search');
 
-		return $Criteria->run();
+		$SearchCriteria = new SearchCriteria('DocumentCurrency');
+
+		$SearchCriteria->related_with('Document')
+			->on_property('id_documento')
+			->with_direction('INNER');
+
+		$SearchCriteria->related_with('Charge')
+		  ->joined_with('Document')
+			->on_property('id_cobro')
+			->with_direction('INNER');
+
+		$SearchCriteria
+			->related_with('Currency')
+			->on_property('id_moneda')
+			->with_direction('INNER');
+
+		$SearchCriteria
+			->filter('tipo_doc')
+			->restricted_by('equals')
+			->compare_with("'N'")
+			->for_entity('Document');
+
+		$SearchCriteria
+			->filter('id_cobro')
+			->restricted_by('equals')
+			->compare_with($chargeId)
+			->for_entity('Charge');
+
+		$exchangeRates = (array) $this->SearchManager->searchByCriteria(
+			$SearchCriteria,
+			array('id_moneda', 'Currency.glosa_moneda', 'DocumentCurrency.tipo_cambio')
+		);
+
+		return $exchangeRates;
 	}
 
 }
