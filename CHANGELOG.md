@@ -1,5 +1,129 @@
 # Changelog
 
+## Hotfix 16.23.6
+Tuesday, July 19th
+* **Feature** [Suma el impuesto del gasto al total del cobro](https://github.com/LemontechSA/ttb/pull/1682)
+
+## Hotfix 16.23.5
+Tuesday, July 19th
+* **Feature** [Agrega tag %fecha_primer_trabajo_dd_mmmm% y %fecha_ultimo_trabajo_dd_mmmm%](https://github.com/LemontechSA/ttb/pull/1681)
+
+## Hotfix 16.23.4
+Tuesday, July 19th
+* **Feature** [Se agrega un filtro llamado "Ordenar por" en las opciones de descarga del PDF](https://github.com/LemontechSA/ttb/pull/1679)
+
+## Hotfix 16.23.3
+Friday, July 15th
+* **Fix** [Lang Inglés para Careyallende](https://github.com/LemontechSA/ttb/pull/1674)
+
+## Hotfix 16.23.2
+Thursday, July 14th
+* **Fix** [Fix Anular Factura MX](https://github.com/LemontechSA/ttb/pull/1669)
+
+## Hotfix 16.23.1
+Thursday, July 14th
+* **Feature** [Obtiene los datos del encargado comercial del contrato del asunto o del contrato principal cliente](https://github.com/LemontechSA/ttb/pull/1668)
+
+## [Release 16.23.0](https://github.com/LemontechSA/ttb/pull/1667)
+Wednesday, July 13th
+* **Fix** [Método pago facturación electrónica MX](https://github.com/LemontechSA/ttb/pull/1665)
+
+## Hotfix 16.22.1
+Wednesday, July 13th
+* **Feature** [En la interfaz de usuario se agregó la columna username](https://github.com/LemontechSA/ttb/pull/1662)
+
+## [Release 16.22.0](https://github.com/LemontechSA/ttb/pull/1657)
+Tuesday, July 12th
+* **Feature** [Carga masiva](https://github.com/LemontechSA/ttb/pull/1577)
+
+## Hotfix 16.21.22
+Monday, July 11th
+* **Fix** [Se aplica el mismo formato a todas las horas del reporte rendimiento profesionales](https://github.com/LemontechSA/ttb/pull/1653)
+
+## Hotfix 16.21.21
+Thursday, July 7th
+* **Fix** [Imprimir el tipo de documento en la glosa del pago](https://github.com/LemontechSA/ttb/pull/1644)
+
+## Hotfix 16.21.20
+Wednesday, July 6th
+* **Fix** [Problema Descarga Excel](https://github.com/LemontechSA/ttb/pull/1638)
+
+## Hotfix 16.21.19
+Wednesday, July 6th
+* **Fix** [Validar que exista un documento tipo n antes de buscar los adelantos al descargar la nota de cobro](https://github.com/LemontechSA/ttb/pull/1637)
+
+## Hotfix 16.21.18
+Wednesday, July 6th
+* **Fix** [Implementar la sección de Adelantos en la Nota de Cobro](https://github.com/LemontechSA/ttb/pull/1636)
+
+## Hotfix 16.21.17
+Tuesday, July 5th
+* **Fix** [Adelanto: Siempre se aplicará la conversión de moneda al saldo antes de comparar](https://github.com/LemontechSA/ttb/pull/1634)
+
+## Hotfix 16.21.16
+Tuesday, July 5th
+* **Feature** [Se genera un mensaje personalizado cuando la tarifa es plana hh en excel](https://github.com/LemontechSA/ttb/pull/1633)
+
+## Hotfix 16.21.15
+Tuesday, July 5th
+* **Fix** [Validar que el json de bloqueo proceso no sea nulo](https://github.com/LemontechSA/ttb/pull/1629)
+
+## Hotfix 16.21.14
+Tuesday, July 5th
+* **Fix** [Agrega las acciones desde la configuración](https://github.com/LemontechSA/ttb/pull/1627)
+
+## Hotfix 16.21.13
+Monday, July 4th
+* **Fix** [Se deshabilita el selector cliente si se está editando el adelanto cuyo saldo fue utilizado](https://github.com/LemontechSA/ttb/pull/1625)
+
+## Hotfix 16.21.12
+Monday, July 4th
+* **Fix** [Evento de cambio del selector de actividades al editar un trabajo](https://github.com/LemontechSA/ttb/pull/1623)
+
+## Hotfix 16.21.11
+Thursday, Jun 30th
+* **Fix** [Validar antes de usar el nuevo Tag](https://github.com/LemontechSA/ttb/pull/1609)
+
+## Hotfix 16.21.10
+Thursday, Jun 30th
+* **Fix** [Usuarios sin horas Reporte General](https://github.com/LemontechSA/ttb/pull/1608)
+
+## Hotfix 16.21.9
+Thursday, Jun 30th
+* **Fix** [Append Form a Body](https://github.com/LemontechSA/ttb/pull/1607)
+
+## Hotfix 16.21.8
+Thursday, Jun 30th
+* **Fix** [Agregar columna con los montos calculados según tipo de cambio en cuadro resumen](https://github.com/LemontechSA/ttb/pull/1606)
+
+## Hotfix 16.21.7
+Wednesday, Jun 29th
+* **Fix** [Error al editar trámite](https://github.com/LemontechSA/ttb/pull/1605)
+
+## Hotfix 16.21.6
+Wednesday, Jun 29th
+* **Fix** [Despliegue campo Activo (SI o NO)](https://github.com/LemontechSA/ttb/pull/1603)
+
+## Hotfix 16.21.5
+Tuesday, Jun 28th
+* **Fix** [Descarga la aplicación de escritorio](https://github.com/LemontechSA/ttb/pull/1599)
+
+## Hotfix 16.21.4
+Tuesday, Jun 28th
+* **Fix** [:bug: Corregir visibilidad de variables en clase NotaCobro](https://github.com/LemontechSA/ttb/pull/1598)
+
+## Hotfix 16.21.3
+Friday, Jun 24th
+* **Fix** [Revertir nueva sección para mostrar asuntos sin separar](https://github.com/LemontechSA/ttb/pull/1592)
+
+## Hotfix 16.21.2
+Friday, Jun 24th
+* **Fix** [Agregar nueva sección para mostrar asuntos sin separar](https://github.com/LemontechSA/ttb/pull/1589)
+
+## Hotfix 16.21.1
+Friday, Jun 24th
+* **Fix** [Actualiza correo](https://github.com/LemontechSA/ttb/pull/1587)
+
 ## [Release 16.21.0](https://github.com/LemontechSA/ttb/pull/1579)
 Wednesday, Jun 22nd
 * **Feature** [Refactor Tarifa Tramites](https://github.com/LemontechSA/ttb/pull/1350)

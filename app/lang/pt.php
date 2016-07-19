@@ -1111,6 +1111,7 @@ $_LANG['para honorarios y en'] = 'para honorários e em';
 
 $_LANG['Horas Cobrables'] = 'Horas Cobráveis';
 $_LANG['SI'] = 'Sim';
+$_LANG['SÍ'] = 'Sim';
 $_LANG['NO'] = 'Não';
 $_LANG['Tasa Horas Hombres'] = 'Taxa Hora Homem';
 $_LANG['Según HH en'] = 'Segundo HH em';
@@ -1181,3 +1182,5 @@ $_LANG['Monto Total'] = 'Valor Total';
 $_LANG['Se produjo un error generando el documento, por favor intente nuevamente.'] = 'Foi registrado um erro ao gerar o documento, por favor tente novamente.';
 $_LANG['No existen movimientos para este Asunto'] = 'Não existem movimentos para esse assunto';
 $_LANG['Ha ocurrido un error al consultar el historial. Por favor inicie sesión nuevamente.'] = 'Ocorreu um erro ao consultar o histórico. Por favor inicie a sessão novamente.';
+$_LANG['Profesionales sin trabajos'] = 'Profissionais sem trabalhos';
+$_LANG['Pago de'] = 'Pagamento de';
