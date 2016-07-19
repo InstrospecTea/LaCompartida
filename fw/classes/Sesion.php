@@ -21,7 +21,6 @@ class Sesion {
 	 */
 	var $pdodbh = null;
 	var $pdoslave = null;
-	var $arrayconf = array();
 	// Fecha ultimo ingreso
 	var $ultimo_ingreso = null;
 	// El usuario esta logueado?
@@ -67,9 +66,11 @@ class Sesion {
 
 		$this->dbConnect();
 
+		$this->loadConfig();
+
 		static $i2=0;
 		if(!$i2++) {
-			$MaxLoggedTime= intval(Conf::GetConf($this, 'MaxLoggedTime')) ;
+			$MaxLoggedTime= intval(Conf::read('MaxLoggedTime')) ;
 			setcookie("MaxLoggedTime",'14400', time()+$MaxLoggedTime);
 		}
 		$this->LoadLang();
@@ -84,8 +85,6 @@ class Sesion {
 				'session.handler' => null
 			)
 		);
-
-
 
 		$this->LoadPlugin();
 
@@ -537,6 +536,66 @@ class Sesion {
 		$iv_size = mcrypt_get_block_size($cipher, MCRYPT_MODE_CBC);
 		$iv = substr($key, 0, $iv_size);
 		return compact('cipher', 'key', 'iv');
+	}
+
+	protected function loadConfig() {
+		if ($this->has('array_conf')) {
+			return Conf::loadFromArray($this->read('array_conf'));
+		}
+		if (!isset($this->pdodbh)) {
+			return false;
+		}
+		$array_conf = [];
+		$query = "SELECT glosa_opcion AS glosa, valor_opcion AS valor FROM configuracion";
+		$bd_configs = $this->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($bd_configs as $conf) {
+			$array_conf[$conf['glosa']] = $conf['valor'];
+		}
+		$this->write('array_conf', $array_conf);
+		Conf::loadFromArray($array_conf);
+		/**
+		 * @TODO: Implementar memcache sin usar una variable global
+		// 4.2) Si existe memcache, fijo la llave usando lo obtenido en 4.1
+		if (self::$has_memcache) {
+			$memcache->set(self::dbName() . '_config', json_encode(UtilesApp::utf8izar(self::$array_conf[$conf])), false, 120);
+		}
+		 */
+	}
+
+	/**
+	 * Lee un valor  desde $_SESSION
+	 * @param $key
+	 * @return null
+	 */
+	public function read($key) {
+		return $this->has($key) ? $_SESSION[$key] : null;
+	}
+
+	/**
+	 * Escribe un valor en $_SESSION
+	 * @param type $key
+	 * @param type $value
+	 */
+	public function write($key, $value) {
+		$_SESSION[$key] = $value;
+	}
+
+
+	/**
+	 * Verifica existencia de un valor en $_SESSION
+	 * @param $key
+	 * @return bool
+	 */
+	public function has($key) {
+		return isset($_SESSION[$key]) && !is_null($_SESSION[$key]);
+	}
+
+	/**
+	 * Elimina un valor desde $_SESSION
+	 * @param type $key
+	 */
+	public function drop($key) {
+		unset($_SESSION[$key]);
 	}
 
 }

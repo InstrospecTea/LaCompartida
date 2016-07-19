@@ -2,7 +2,6 @@
 require_once dirname(__FILE__) . '/../conf.php';
 
 $Sesion = new Sesion(array('ADM'));
-
 use TTB\Pagina as Pagina;
 $pagina = new Pagina($Sesion);
 
@@ -69,6 +68,10 @@ if ($opc == 'guardar') {
 		$memcache->set(DBNAME . '_config', json_encode($Sesion->arrayconf), false, 120);
 		error_log("MEMCACHE CACHE SET $conf = {$Sesion->arrayconf[$conf]} (" . count($Sesion->arrayconf) . " registros)");
 	}
+	/**
+	 * Elimina las configuraciones de la sesión
+	 */
+	$Sesion->drop('array_conf');
 }
 ?>
 
@@ -424,5 +427,3 @@ $ConfRS = $Sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
 	<?php
 	$pagina->PrintBottom($popup, true);
-
-
