@@ -1304,6 +1304,7 @@ echo $Form->script();
 								var showHours = jQuery('#mostrar_valores').val();
 								var filterCurrency = jQuery('#moneda_filtro').val();
 								var time = jQuery('#tiempo_en').val();
+								var order = jQuery('#ordenar_por').val();
 
 								if (!groupedBy) {
 									alert("Debe seleccionar una agrupación");
@@ -1328,6 +1329,7 @@ echo $Form->script();
 								form.append('<input type="hidden" name="showHours" value="' + showHours + '" id="showHours" />');
 								form.append('<input type="hidden" name="filterCurrency" value="' + filterCurrency + '" id="filterCurrency" />');
 								form.append('<input type="hidden" name="time" value="' + time + '" id="time" />');
+								form.append('<input type="hidden" name="order" value="' + order + '" id="order" />');
 
 								if (groupedBy === 'client') {
 									form.append('<input type="hidden" name="groupByPartner" value="' + isGrouped + '" id="groupByPartner" />');

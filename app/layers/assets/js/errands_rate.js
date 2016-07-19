@@ -4,6 +4,7 @@ var tarifa_temp = '';
 jQuery(function() {
 	var messages = {};
 	var rateSelected = jQuery('#id_tramite_tarifa').val();
+	var rateEdit = jQuery('#nueva_tarifa').val();
 
 	jQuery.ajax({
 		url: dm_root + 'ErrandsRateMessages',
@@ -16,7 +17,17 @@ jQuery(function() {
 		}
 	});
 
-	jQuery.loadData(rateSelected);
+	if (rateEdit) {
+		switch (rateEdit) {
+			case 'nuevo':
+				jQuery.crearNuevaTarifa();
+				break;
+			default:
+				jQuery.loadData(rateEdit);
+		}
+	} else {
+		jQuery.loadData(rateSelected);
+	};
 
 	jQuery('.tarifas').on('focus', function() {
 		tarifa_temp = jQuery.trim(jQuery(this).val());
@@ -62,15 +73,7 @@ jQuery(function() {
 	});
 
 	jQuery('#crear_nueva_tarifa').on('click', function() {
-		if (!jQuery('#usar_tarifa_previa').is(':checked')) {
-			jQuery('input[type="text"], #id_tramite_tarifa_edicion, [name="tarifa_defecto"]').val(null);
-		} else {
-			jQuery('input[type="text"][class!="tarifas"], #id_tramite_tarifa_edicion, [name="tarifa_defecto"]').val(null);
-		};
-		jQuery('input[type="checkbox"]').attr('checked', false);
-		jQuery('.edicion_tarifa').hide();
-		jQuery('.nueva_tarifa').show();
-		jQuery('#usar_tarifa_previa').attr('checked', false);
+		jQuery.crearNuevaTarifa();
 	});
 
 	jQuery('#cancelar_nueva_tarifa').on('click', function() {
@@ -80,6 +83,18 @@ jQuery(function() {
 		jQuery.loadData(jQuery('#id_tramite_tarifa').val());
 	});
 });
+
+jQuery.crearNuevaTarifa = function() {
+	if (!jQuery('#usar_tarifa_previa').is(':checked')) {
+		jQuery('input[type="text"], #id_tramite_tarifa_edicion, [name="tarifa_defecto"]').val(null);
+	} else {
+		jQuery('input[type="text"][class!="tarifas"], #id_tramite_tarifa_edicion, [name="tarifa_defecto"]').val(null);
+	};
+	jQuery('input[type="checkbox"]').attr('checked', false);
+	jQuery('.edicion_tarifa').hide();
+	jQuery('.nueva_tarifa').show();
+	jQuery('#usar_tarifa_previa').attr('checked', false);
+}
 
 jQuery.loadData = function(errand_rate_id) {
 	jQuery.ajax({

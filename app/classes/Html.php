@@ -82,7 +82,7 @@ class Html extends \Html {
 	 * @return string
 	 */
 	public static function SelectSiNo($name, $selected = '', $opciones = '') {
-		$array = array('SI' => __('SI'), 'NO' => __('NO'));
+		$array = array('SI' => __('SÍ'), 'NO' => __('NO'));
 		return parent::SelectArrayDecente($array, $name, $selected, $opciones, 'Todos', '60');
 	}
 
@@ -110,8 +110,19 @@ class Html extends \Html {
 	 * @param string $script_block
 	 * @param array $attrs
 	 * @return string
+	 * @deprecated Use scriptBlock()
 	 */
 	public function script_block($script_block, $attrs = null) {
+		return $this->scriptBlock($script_block, $attrs);
+	}
+
+	/**
+	 *
+	 * @param string $script_block
+	 * @param array $attrs
+	 * @return string
+	 */
+	public function scriptBlock($script_block, $attrs = null) {
 		return $this->tag('script', $script_block, array_merge(array('type' => 'text/javascript'), (array) $attrs)) . "\n";
 	}
 
@@ -203,5 +214,41 @@ class Html extends \Html {
 		}
 
 		return $Form->input('', $value, array('name' => $input_name, 'id' => $input_name, 'class' => $clase, 'size' => $size));
+	}
+
+	/**
+	 * Crea variables JS según argumentos
+	 * @param string|array $var nombre de la variable, puede ser un array asociativo 'var' => value
+	 * @param variant $value valor de la variable
+	 * @return string
+	 */
+	public function scriptVarBlock($var, $value = null,  $attrs = null) {
+		if (!is_array($var)) {
+			$this->scriptVarBlock(array($var => $value), null, $attrs);
+		}
+		$script_block = '';
+		foreach ($var as $k => $v) {
+			$script_block .= $this->makeScriptVar($k, $v);
+		}
+		return $this->scriptBlock($script_block, $attrs);
+	}
+
+	private function makeScriptVar($name, $value) {
+		switch (gettype($value)) {
+			case 'array':
+			case 'object':
+				$val = json_encode(\UtilesApp::utf8izar($value));
+				break;
+			case 'integer':
+			case 'double':
+				$val = $value;
+				break;
+			case 'boolean':
+				$val = $value ? 'true' : 'false';
+				break;
+			default:
+				$val = "'$value'";
+		}
+		return sprintf("var %s = %s;\n", $name, $val);
 	}
 }

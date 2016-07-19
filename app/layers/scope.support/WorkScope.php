@@ -53,6 +53,27 @@ class WorkScope implements IWorkScope {
 	}
 
 	/**
+	 * Ordena por fecha del trabajo
+	 * @param  Criteria $criteria
+	 * @return mixed
+	 */
+	function orderByWorkDate(Criteria $criteria) {
+		$criteria->add_ordering('Work.fecha', 'ASC');
+		return $criteria;
+	}
+
+	/**
+	 * Ordena por glosa del asunto y fecha del trabajo
+	 * @param  Criteria $criteria
+	 * @return mixed
+	 */
+	function orderByMatterGlossWorkDate(Criteria $criteria) {
+		$this->orderByMatterGloss($criteria);
+		$this->orderByWorkDate($criteria);
+		return $criteria;
+	}
+
+	/**
 	 * Obtiene condición para cuando el trabajo no está cobrado
 	 * @param  Criteria $criteria
 	 * @return mixed
