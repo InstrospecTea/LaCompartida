@@ -24,7 +24,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 		}
 
 		$this->FillTemplateData($idioma, $moneda);
-		$html = $this->RenderTemplate($parser->tags[$theTag]);
+		$html = $parser->tags[$theTag];
 		if (!$this->tiene_tag_asuntos_no_separados) {
 			$this->tiene_tag_asuntos_no_separados = strpos($html, '%ASUNTOS_NO_SEPARADOS%');
 		}
@@ -3774,6 +3774,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$html = str_replace('%CTA_CORRIENTE_SALDO_FINAL%', $this->GenerarDocumentoComun($parser, 'CTA_CORRIENTE_SALDO_FINAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
 				break;
 		}
-		return $html;
+
+		return $this->RenderTemplate($html);
 	}
 }
