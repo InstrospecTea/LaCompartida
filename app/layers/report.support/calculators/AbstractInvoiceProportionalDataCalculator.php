@@ -22,6 +22,10 @@ abstract class AbstractInvoiceProportionalDataCalculator
 			);
 	}
 
+	function getCurrencySource() {
+		return 'factura';
+	}
+
 	/**
 	 * Sobrecarga la query de trabajos para agregar los datos de factura
 	 * @param  Criteria $Criteria Criteria a modificar

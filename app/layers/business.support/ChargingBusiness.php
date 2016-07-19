@@ -1042,16 +1042,16 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_left_join_with('cliente', 'cliente.codigo_cliente = factura.codigo_cliente')
 			->add_left_join_with('documento', 'documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = "N"')
 			->add_left_join_with(
-				array('documento_moneda', 'moneda_display'),
+				array('factura_moneda', 'moneda_display'),
 				CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('moneda_display.id_documento', 'documento.id_documento'),
+					CriteriaRestriction::equals('moneda_display.id_factura', 'factura.id_factura'),
 					CriteriaRestriction::equals('moneda_display.id_moneda', $parameters['display_currency']->fields['id_moneda'])
 				)
 			)
 			->add_left_join_with(
-				array('documento_moneda', 'moneda_factura'),
+				array('factura_moneda', 'moneda_factura'),
 				CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('moneda_factura.id_documento', 'documento.id_documento'),
+					CriteriaRestriction::equals('moneda_factura.id_factura', 'factura.id_factura'),
 					CriteriaRestriction::equals('moneda_factura.id_moneda', 'factura.id_moneda')
 				)
 			);
