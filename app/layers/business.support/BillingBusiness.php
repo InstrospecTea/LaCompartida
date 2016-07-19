@@ -61,6 +61,18 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 		return $amountDetail;
 	}
 
+	public function setInvoiceExchangeRates($invoiceId, $chargeId, $exchangeRatesParams = array()) {
+		$exchangeRates = array();
+
+		if (empty($exchangeRates)) {
+			$exchangeRates = $this->getInvoiceExchangeRates($invoiceId, $chargeId);
+		} else {
+			$exchangeRates = $this->arrayToInvoiceExchangeRates($exchangeRatesParams);
+		}
+
+
+	}
+
 	public function getInvoiceFeesAmountInCurrency(Invoice $invoice, Currency $currency) {
 		$this->loadBusiness('Coining');
 		return $this->CoiningBusiness->changeCurrency(
@@ -71,20 +83,7 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 			$currency);
 	}
 
-	public function getDefaultInvoiceCurrenciesByCurrency() {
-		$currencies = $this->CoiningBusiness->getCurrencies();
-		$result = array();
-		foreach ($currencies as $currency) {
-			$result[] = array(
-				'id_moneda' => $currency->get('id_moneda'),
-				'glosa_moneda' => $currency->get('glosa_moneda'),
-				'tipo_cambio' => $currency->get('tipo_cambio')
-			);
-		}
-		return $result;
-	}
-
-	public function getDefaultInvoiceCurrenciesByCharge($chargeId) {
+	public function getDefaultExchangeRatesByCharge($chargeId) {
 		$this->loadBusiness('Charging');
 		$this->loadBusiness('Coining');
 
@@ -94,42 +93,58 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 		$charge_date = date_create($Charge->get('fecha_emision'));
 
 		if ($today > $charge_date) {
-			return $this->getDefaultInvoiceCurrenciesByCurrency();
+			return $this->CoiningBusiness->getCurrencies();
 		}
 
-		return $this->ChargingBusiness->getDocumentCurrencies($chargeId);
+		return $this->ChargingBusiness->getDocumentExchangeRates($chargeId);
 	}
 
-	public function getInvoiceCurrencies($invoiceId, $chargeId) {
-		return $this->getDefaultInvoiceCurrenciesByCharge($chargeId);
+	public function currenciesToInvoiceCurrencyArray($currencies) {
+		$invoiceCurrencies = array();
+		foreach ($currencies as $currency) {
+			$invoiceCurrency = new InvoiceCurrency();
+			$invoiceCurrency->set('id_moneda', $currency->get('id_moneda'));
+			$invoiceCurrency->set('tipo_cambio', $currency->get('tipo_cambio'));
+			$invoiceCurrency->set('glosa_moneda', $currency->get('glosa_moneda'));
+			$invoiceCurrencies[] = $invoiceCurrency;
+		}
+		return $invoiceCurrencies;
+	}
+
+	public function getInvoiceExchangeRatesByInvoiceId($invoiceId) {
+		$this->loadManager('Search');
+
+		$SearchCriteria = new SearchCriteria('InvoiceCurrency');
+
+		$SearchCriteria->related_with('Invoice')
+			->with_direction('inner')
+			->on_property('id_factura');
+
+		$SearchCriteria->related_with('Currency')
+			->with_direction('inner')
+			->on_property('id_moneda');
+
+		$SearchCriteria->filter('id_factura')
+			->restricted_by('equals')->compare_with($invoiceId);
+
+		$exchangeRates = (array) $this->SearchManager->searchByCriteria(
+			$SearchCriteria,
+			array('id_moneda', 'Currency.glosa_moneda', 'InvoiceCurrency.tipo_cambio')
+		);
+
+		return $exchangeRates;
+	}
+
+	public function getInvoiceExchangeRates($invoiceId, $chargeId) {
+		$this->loadManager('Search');
 
 		if (empty($invoiceId)) {
-			return $this->getDefaultInvoiceCurrenciesByCharge($chargeId);
+			return $this->currenciesToInvoiceCurrencyArray(
+				$this->getDefaultExchangeRatesByCharge($chargeId)
+			);
 		}
 
-		$Criteria = new Criteria($this->Session);
-		$Criteria
-			->add_select('prm_moneda.id_moneda')
-			->add_select('prm_moneda.glosa_moneda')
-			->add_select('factura_moneda.tipo_cambio')
-			->add_from('factura_moneda')
-			->add_inner_join_with('factura',
-				CriteriaRestriction::equals(
-					'factura_moneda.id_factura',
-					'factura.id_factura'
-				)
-			)
-			->add_inner_join_with('prm_moneda',
-				CriteriaRestriction::equals(
-					'factura_moneda.id_moneda',
-					'prm_moneda.id_moneda'
-				)
-			)
-			->add_restriction(
-				CriteriaRestriction::equals('factura.id_factura', $invoiceId)
-			);
-
-		return $Criteria->run();
+		return $this->getInvoiceExchangeRatesByInvoiceId($invoiceId);
 	}
 
 }
