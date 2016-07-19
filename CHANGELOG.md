@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.23.4
+Tuesday, July 19th
+* **Feature** [Se agrega un filtro llamado "Ordenar por" en las opciones de descarga del PDF](https://github.com/LemontechSA/ttb/pull/1679)
+
 ## Hotfix 16.23.3
 Friday, July 15th
 * **Fix** [Lang Inglés para Careyallende](https://github.com/LemontechSA/ttb/pull/1674)
