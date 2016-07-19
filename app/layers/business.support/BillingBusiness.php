@@ -61,13 +61,15 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 		return $amountDetail;
 	}
 
-	public function setInvoiceExchangeRates($invoiceId, $chargeId, $exchangeRates = array()) {
+	public function setInvoiceExchangeRates($invoiceId, $chargeId, $exchangeRatesParams = array()) {
+		$exchangeRates = array();
 
 		if (empty($exchangeRates)) {
-			$exchangeRates = $this->invoiceExchangeRatesToArray(
-				$this->getInvoiceExchangeRates($invoiceId, $chargeId)
-			);
+			$exchangeRates = $this->getInvoiceExchangeRates($invoiceId, $chargeId);
+		} else {
+			$exchangeRates = $this->arrayToInvoiceExchangeRates($exchangeRatesParams);
 		}
+
 
 	}
 
@@ -97,24 +99,16 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 		return $this->ChargingBusiness->getDocumentExchangeRates($chargeId);
 	}
 
-	public function toInvoiceCurrencyArray($objects) {
+	public function currenciesToInvoiceCurrencyArray($currencies) {
 		$invoiceCurrencies = array();
-		foreach ($objects as $rate) {
+		foreach ($currencies as $currency) {
 			$invoiceCurrency = new InvoiceCurrency();
-			$invoiceCurrency->set('id_moneda', $rate->get('id_moneda'));
-			$invoiceCurrency->set('tipo_cambio', $rate->get('tipo_cambio'));
-			$invoiceCurrency->set('glosa_moneda', $rate->get('glosa_moneda'));
+			$invoiceCurrency->set('id_moneda', $currency->get('id_moneda'));
+			$invoiceCurrency->set('tipo_cambio', $currency->get('tipo_cambio'));
+			$invoiceCurrency->set('glosa_moneda', $currency->get('glosa_moneda'));
 			$invoiceCurrencies[] = $invoiceCurrency;
 		}
 		return $invoiceCurrencies;
-	}
-
-	public function invoiceExchangeRatesToArray($exchangeRates) {
-		$arrayRates = array();
-		foreach ($exchangeRates as $rate) {
-			$arrayRates[$rate['id_moneda']] = $rate['tipo_cambio'];
-		}
-		return $arrayRates;
 	}
 
 	public function getInvoiceExchangeRatesByInvoiceId($invoiceId) {
@@ -145,7 +139,7 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 		$this->loadManager('Search');
 
 		if (empty($invoiceId)) {
-			return $this->toInvoiceCurrencyArray(
+			return $this->currenciesToInvoiceCurrencyArray(
 				$this->getDefaultExchangeRatesByCharge($chargeId)
 			);
 		}
