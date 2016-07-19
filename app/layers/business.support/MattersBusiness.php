@@ -37,8 +37,9 @@ class MattersBusiness extends AbstractBusiness implements BaseBusiness {
 			$NuevoCliente->LoadByCodigo($client_code);
 		}
 
+		$this->loadManager('Matter');
 		$new_client_code = $NuevoCliente->fields['codigo_cliente'];
-		$new_matter_code = $this->MatterService->makeMatterCode($new_client_code);
+		$new_matter_code = $this->MatterManager->makeMatterCode($new_client_code);
 		$old_client_code = $Matter->get('codigo_cliente');
 
 		$this->begin();

@@ -418,7 +418,7 @@ if ($opcion == 'guardar') {
 
 	$new_client = Conf::GetConf($Sesion, 'CodigoSecundario') ? $nuevo_codigo_cliente_secundario : $nuevo_codigo_cliente;
 	$client_code = 'codigo_cliente' . (Conf::GetConf($Sesion, 'CodigoSecundario') ? '_secundario' : '');
-	if (empty($errors) && $new_client != $Cliente->fields[$client_code]) {
+	if (empty($errors) && !empty($new_client) && $new_client != $Cliente->fields[$client_code]) {
 		try {
 			$MattersBusiness = new MattersBusiness($Sesion);
 			$entities = $MattersBusiness->changeClientOfMatter($Asunto, $new_client);
