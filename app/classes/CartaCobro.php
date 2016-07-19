@@ -3,6 +3,8 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
+use \TTB\Utiles;
+
 class CartaCobro extends NotaCobro {
 
 	var $carta_tabla = 'carta';
@@ -177,7 +179,9 @@ class CartaCobro extends NotaCobro {
 			'%fecha_mta_agno%' => 'Obtiene el año desde el tag %fecha_mta%',
 			'%fecha_mta_dia%' => 'Obtiene el día desde el tag %fecha_mta%',
 			'%fecha_mta_mes%' => 'Obtiene el mes desde el tag %fecha_mta%',
-			'%fecha_periodo_exacto%' => 'Periodo del cobro con fechas exactas (desde el dia DD-MM-YYY hasta el mes de MES de YYYY',
+			'%fecha_periodo_exacto%' => 'Periodo del cobro con fechas exactas (desde el dia DD-MM-YYY hasta el día DD-MM-YYYY',
+			'%fecha_primer_trabajo_dd_mmmm%' => 'Fecha del primer trabajo del cobro (DD de MMMM)',
+			'%fecha_ultimo_trabajo_dd_mmmm%' => 'Fecha del último trabajo del cobro (DD de MMMM)',
 			'%fecha_primer_trabajo%' => 'Fecha del primer trabajo del cobro',
 			'%fecha_primer_trabajo_de%' => 'Agrega segmento (durante el mes mes de MM de YYYY)',
 			'%fecha_primer_trabajo_durante%' => 'Agrega segmento (prestados durante el mes de MM de YYYY',
@@ -1214,7 +1218,7 @@ class CartaCobro extends NotaCobro {
 
 		$this->FillTemplateData($idioma, $moneda);
 
-		$html2 = $this->RenderTemplate($parser_carta->tags[$theTag]);
+		$html2 = $parser_carta->tags[$theTag];
 
 		$_codigo_asunto_secundario = Conf::GetConf($this->sesion, 'CodigoSecundario');
 
@@ -1601,17 +1605,15 @@ class CartaCobro extends NotaCobro {
 				}
 
 				/*  OBTENEMOS LA FECHA FINAL DEL ULTIMO TRABAJO (PARA EVITAR FECHAS 1969) */
-				$query = "SELECT LAST_DAY(fecha) FROM trabajo WHERE id_cobro='" . $this->fields['id_cobro'] . "' AND visible='1' ORDER BY fecha DESC LIMIT 1";
-				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-
-				if (mysql_num_rows($resp) > 0) {
-					list($fecha_ultimo_trabajo) = mysql_fetch_array($resp);
+				$query = "SELECT fecha FROM trabajo WHERE id_cobro='{$this->fields['id_cobro']}' AND visible='1' ORDER BY fecha DESC LIMIT 1";
+				$resp = $this->sesion->pdodbh->query($query)->fetch(PDO::FETCH_ASSOC);
+				if ($resp) {
+					$fecha_ultimo_trabajo = $resp['fecha'];
 				} else {
 					$fecha_ultimo_trabajo = $this->fields['fecha_fin'];
 				}
-
 				$fecha_inicial_primer_trabajo = date('Y-m-01', strtotime($fecha_primer_trabajo));
-				$fecha_final_ultimo_trabajo = date('Y-m-d', strtotime($fecha_ultimo_trabajo));
+				$fecha_final_ultimo_trabajo = date('Y-m-t', strtotime($fecha_ultimo_trabajo));
 				$datefrom = strtotime($fecha_inicial_primer_trabajo, 0);
 				$dateto = strtotime($fecha_final_ultimo_trabajo, 0);
 				$difference = $dateto - $datefrom; //Dif segundos
@@ -1642,6 +1644,14 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%Asunto_ucwords%', $asunto_ucwords, $html2);
 
 				/*  MOSTRANDO FECHA SEGUN IDIOMA */
+				if ($lang == 'es') {
+					$fecha_primer_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_primer_trabajo, '%e de ') . Utiles::month($fecha_primer_trabajo, $lang);
+					$fecha_ultimo_trabajo_dd_mmmm = Utiles::sql3fecha($fecha_ultimo_trabajo, '%e de ') . Utiles::month($fecha_ultimo_trabajo, $lang);
+				} else {
+					$fecha_primer_trabajo_dd_mmmm = Utiles::month($fecha_primer_trabajo, $lang) . Utiles::sql3fecha($fecha_primer_trabajo, ' %e');
+					$fecha_ultimo_trabajo_dd_mmmm = Utiles::month($fecha_ultimo_trabajo, $lang) . Utiles::sql3fecha($fecha_ultimo_trabajo, ' %e');
+				}
+
 				if ($fecha_inicial_primer_trabajo != '' && $fecha_inicial_primer_trabajo != '0000-00-00') {
 					if ($lang == 'es') {
 						$fecha_diff_periodo_exacto = __('desde el día') . ' ' . date("d-m-Y", strtotime($fecha_primer_trabajo)) . ' ';
@@ -1690,7 +1700,7 @@ class CartaCobro extends NotaCobro {
 					$fecha_primer_trabajo_durante = $datediff > 0 && $datediff < 48 ? $texto_fecha_en : __('during') . ' ' . ucfirst(date('F Y', strtotime($fecha_final_ultimo_trabajo)));
 				}
 
-				if ($fecha_primer_trabajo == 'No existe fecha' && $lang == es) {
+				if ($fecha_primer_trabajo == 'No existe fecha' && $lang == 'es') {
 					$fecha_primer_trabajo = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
 					$fecha_primer_trabajo_de = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
 					$fecha_primer_trabajo_durante = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%B %Y'));
@@ -1811,6 +1821,8 @@ class CartaCobro extends NotaCobro {
 				$html2 = str_replace('%fecha_facturacion_mes%', $fecha_facturacion_mes_carta, $html2);
 				$html2 = str_replace('%monto_total_demo_jdf%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . number_format($x_resultados['monto_total_cobro'][$this->fields['opc_moneda_total']], $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html2);
 				$html2 = str_replace('%fecha_periodo_exacto%', $fecha_diff_periodo_exacto, $html2);
+				$html2 = str_replace('%fecha_primer_trabajo_dd_mmmm%', $fecha_primer_trabajo_dd_mmmm, $html2);
+				$html2 = str_replace('%fecha_ultimo_trabajo_dd_mmmm%', $fecha_ultimo_trabajo_dd_mmmm, $html2);
 
 				$fecha_dia_carta = ucfirst(Utiles::sql3fecha(date('Y-m-d'), '%d de %B de %Y'));
 
@@ -2219,7 +2231,7 @@ class CartaCobro extends NotaCobro {
 				break;
 		}
 
-		return $html2;
+		return $this->RenderTemplate($html2);
 	}
 
 	function GenerarDocumentoCartaComun($parser_carta, $theTag = '', $lang, $moneda_cliente_cambio, $moneda_cli, & $idioma, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $cliente, $id_carta) {
