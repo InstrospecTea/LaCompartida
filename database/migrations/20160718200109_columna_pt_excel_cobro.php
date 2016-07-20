@@ -5,7 +5,7 @@ namespace Database;
 class ColumnaPtExcelCobro extends \Database\Migration implements \Database\ITemplateMigration {
 
 	private $sqls = array(
-		"UPDATE `prm_excel_cobro` SET glosa_pt = 'N°' WHERE `nombre_interno` LIKE 'id_trabajo' AND `grupo` LIKE 'Listado de trabajos'",
+		"UPDATE `prm_excel_cobro` SET glosa_pt = 'No' WHERE `nombre_interno` LIKE 'id_trabajo' AND `grupo` LIKE 'Listado de trabajos'",
 		"UPDATE `prm_excel_cobro` SET glosa_pt = 'Data' WHERE `nombre_interno` LIKE 'fecha' AND `grupo` LIKE 'Listado de trabajos'",
 		"UPDATE `prm_excel_cobro` SET glosa_pt = 'Advogado' WHERE `nombre_interno` LIKE 'abogado' AND `grupo` LIKE 'Listado de trabajos'",
 		"UPDATE `prm_excel_cobro` SET glosa_pt = 'Assunto' WHERE `nombre_interno` LIKE 'asunto' AND `grupo` LIKE 'Listado de trabajos'",
@@ -56,7 +56,7 @@ class ColumnaPtExcelCobro extends \Database\Migration implements \Database\ITemp
 		"UPDATE `prm_excel_cobro` SET glosa_pt = 'Minuta da cobrança N°' WHERE `nombre_interno` LIKE 'minuta' AND `grupo` LIKE 'Encabezado'",
 		"UPDATE `prm_excel_cobro` SET glosa_pt = 'Trâmites' WHERE `nombre_interno` LIKE 'titulo' AND `grupo` LIKE 'Listado de trámites'",
 		"UPDATE `prm_excel_cobro` SET glosa_pt = 'Data' WHERE `nombre_interno` LIKE 'fecha' AND `grupo` LIKE 'Listado de trámites'",
-		"UPDATE `prm_excel_cobro` SET glosa_pt = 'N°' WHERE `nombre_interno` LIKE 'id_trabajo' AND `grupo` LIKE 'Listado de trámites'",
+		"UPDATE `prm_excel_cobro` SET glosa_pt = 'No' WHERE `nombre_interno` LIKE 'id_trabajo' AND `grupo` LIKE 'Listado de trámites'",
 		"UPDATE `prm_excel_cobro` SET glosa_pt = 'Advogado' WHERE `nombre_interno` LIKE 'abogado' AND `grupo` LIKE 'Listado de trámites'",
 		"UPDATE `prm_excel_cobro` SET glosa_pt = 'Assunto' WHERE `nombre_interno` LIKE 'asunto' AND `grupo` LIKE 'Listado de trámites'",
 		"UPDATE `prm_excel_cobro` SET glosa_pt = 'Solicitante' WHERE `nombre_interno` LIKE 'solicitante' AND `grupo` LIKE 'Listado de trámites'",
@@ -97,6 +97,14 @@ class ColumnaPtExcelCobro extends \Database\Migration implements \Database\ITemp
 		foreach ($this->sqls as $value) {
 			$this->addQueryUp($value);
 		}
+
+		$this->addQueryUp("INSERT INTO `prm_excel_cobro`
+			SET
+				`nombre_interno` = 'no_modificar',
+				`grupo` = 'General',
+				`glosa_es` = 'NO MODIFICAR ESTA COLUMNA',
+				`glosa_en` = 'Do not modify this column',
+				`glosa_pt` = 'Não modificar esta coluna'");
 	}
 
 	/**
