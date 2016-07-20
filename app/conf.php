@@ -46,6 +46,7 @@ if (!class_exists('Conf')) {
 		public static function LogoPdf($fullPath = true) { return ($fullPath ? Conf::Server() : '') . Conf::ImgDir() . '/logo_pdf.jpg'; }
 		public static function Templates() { return 'default'; }
 		public static function Host() { return Conf::Server() . '/' . ROOTDIR . '/'; }
+		public static function MixpanelToken() { return MIXPANEL_TOKEN; }
 
 		public static function MantencionTablas() {
 			return array(
@@ -159,6 +160,7 @@ defined('PASSWS') || define('PASSWS', Conf::UsuarioWS());
 defined('CACHEDIR') || define('CACHEDIR', '/var/www/virtual/cache/');
 defined('LOGDIR') || define('LOGDIR', '/tmp/logs/');
 defined('S3_UPLOAD_BUCKET') || define('S3_UPLOAD_BUCKET', 'timebilling-uploads');
+defined('MIXPANEL_TOKEN') || define('MIXPANEL_TOKEN', '35700d667425ad9858d92ff694febf63');
 
 defined('__BASEDIR__') || define('__BASEDIR__', dirname(__DIR__));
 
