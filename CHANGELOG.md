@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.3
+Wednesday, July 20th
+* **Feature** [Cambia métodos de verificación de fechas desde >= y fecha hasta <=](https://github.com/LemontechSA/ttb/pull/1693)
+
 ## Hotfix 16.24.2
 Wednesday, July 20th
 * **Feature** [Se valida que las horas castigadas deben ser siempre mayor a cero](https://github.com/LemontechSA/ttb/pull/1691)
