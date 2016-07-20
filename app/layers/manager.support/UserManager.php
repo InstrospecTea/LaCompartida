@@ -75,6 +75,7 @@ class UserManager extends AbstractManager implements IUserManager {
 			->related_with('Client')
 			->with_direction('LEFT')
 			->joined_with('Matter')
+			->on_property('codigo_cliente')
 			->on_entity_property('codigo_cliente');
 
 		$SearchCriteria
