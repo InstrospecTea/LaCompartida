@@ -284,7 +284,7 @@ class Trabajo extends Objeto
 		return gmdate('Y-m-d',($dias * $seconds_in_a_day) - $ut_to_ed_diff);
 	}
 
-	static function ActualizarConExcel($archivo_data, $sesion) {
+	static function ActualizarConExcel($archivo_data, $sesion, $lang = 'es') {
 		/*
 		Los campos que pueden ser modificados son:
 			fecha
@@ -292,6 +292,8 @@ class Trabajo extends Objeto
 			descripción
 			duración cobrable
 		*/
+		$PrmExcelCobro = new PrmExcelCobro($sesion);
+
 		$ingresado_por_decimales = false;
 
 		if (UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal') {
@@ -327,7 +329,7 @@ class Trabajo extends Objeto
 
 		// Encontrar en qué fila están los títulos.
 		$fila_base=1;
-		while(!($excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == __('N°')
+		while(!($excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang)
 					&& in_array(trim($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini]),array('Dia','Día','Day','Month','Mes')) )
 					&& $fila_base<$excel->sheets[0]['numRows']) {
 			++$fila_base;
@@ -415,10 +417,10 @@ class Trabajo extends Objeto
 
 		// Leemos todas las hojas
 		foreach ($excel->sheets as $hoja) {
-			if ($hoja['cells'][1][$col_id_trabajo] == __('N°') ||
-					$hoja['cells'][2][$col_id_trabajo] == __('N°') ||
-					$hoja['cells'][3][$col_id_trabajo] == __('N°') ||
-					$hoja['cells'][4][$col_id_trabajo] == __('N°') ) {
+			if ($hoja['cells'][1][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang) ||
+					$hoja['cells'][2][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang) ||
+					$hoja['cells'][3][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang) ||
+					$hoja['cells'][4][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang) ) {
 				continue;
 			}
 
@@ -475,9 +477,9 @@ class Trabajo extends Objeto
 					continue;
 				}
 
-				if ($hoja['cells'][$fila][$col_fecha] == __('NO MODIFICAR ESTA COLUMNA')
-						|| $hoja['cells'][$fila][$col_fecha_dia] == __('NO MODIFICAR ESTA COLUMNA')
-						|| $hoja['cells'][$fila][$col_fecha_mes] == __('NO MODIFICAR ESTA COLUMNA') )	{
+				if ($hoja['cells'][$fila][$col_fecha] == $PrmExcelCobro->getGlosa('no_modificar', 'General', $lang)
+						|| $hoja['cells'][$fila][$col_fecha_dia] == $PrmExcelCobro->getGlosa('no_modificar', 'General', $lang)
+						|| $hoja['cells'][$fila][$col_fecha_mes] == $PrmExcelCobro->getGlosa('no_modificar', 'General', $lang) )	{
 					$continuar = true;
 					continue;
 				}
