@@ -143,7 +143,6 @@ if(isset($sesion->usuario)){
 		'$email' => $usuario_fields['email'],
 		'cliente' => $subdominio
 	));
-	$mp->identifyAndTrack($usuario_fields['rut'], 'Login');
 }
 
 $pagina = new Pagina($sesion);

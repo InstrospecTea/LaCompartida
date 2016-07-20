@@ -265,7 +265,7 @@ if ($opcion == "guardar") {
 					$archivo->LoadById($contrato->fields['id_contrato']);
 					if ($desde_agrega_cliente == 1) {
 						$mp = new \TTB\Mixpanel();
-						$mp->identifyAndTrack($RUT, "Agregar Cliente");
+						$mp->identifyAndTrack($_SESSION['RUT'], "Agregar Cliente");
 					}
 				} else {
 					$Pagina->AddError($contrato->error);

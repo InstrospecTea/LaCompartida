@@ -72,6 +72,9 @@ Conf::setStatic('LogoDoc', function ($fullPath = false) {
 Conf::setStatic('LogoPdf', function ($fullPath = true) {
 	return ($fullPath ? Conf::Server() : '') . Conf::ImgDir() . '/logo_pdf.jpg';
 });
+Conf::setStatic('MixpanelToken', function () {
+	return MIXPANEL_TOKEN;
+});
 
 Conf::setStatic('AmazonKey', [
 	'key' => 'AKIAIQYFL5PYVQKORTBA',
@@ -101,7 +104,7 @@ defined('USERWS') || define('USERWS', Conf::PasswordWS());
 defined('PASSWS') || define('PASSWS', Conf::UsuarioWS());
 defined('LOGDIR') || define('LOGDIR', '/tmp/logs/');
 defined('S3_UPLOAD_BUCKET') || define('S3_UPLOAD_BUCKET', 'timebilling-uploads');
-
+defined('MIXPANEL_TOKEN') || define('MIXPANEL_TOKEN', '35700d667425ad9858d92ff694febf63');
 
 require_once APPPATH . '/fw/funciones/funciones.php';
 require_once APPPATH . '/app/lang/es.php'; // Para que cargue el idioma por defecto

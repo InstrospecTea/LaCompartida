@@ -322,7 +322,7 @@ if ($opcion == "guardar") {
 				// Mixpanel Event: Ingreso Horas
 				if ($es_trabajo_nuevo == 1) {
 					$mp = new \TTB\Mixpanel();
-					$mp->identifyAndTrack($RUT, 'Ingreso Horas');
+					$mp->identifyAndTrack($_SESSION['RUT'], 'Ingreso Horas');
 				}
 			} else {
 				$pagina->AddError($t->error);

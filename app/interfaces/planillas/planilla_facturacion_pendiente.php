@@ -25,7 +25,7 @@ if ($AtacheSecundarioSoloAsunto) {
 if ($xls) {
 	header('Set-Cookie: fileDownload=true; path=/');
 	$mp = new \TTB\Mixpanel();
-	$mp->identifyAndTrack($RUT, 'Reporte Horas x Facturar');
+	$mp->identifyAndTrack($_SESSION['RUT'], 'Reporte Horas x Facturar');
 	$fecha1 = date('Y-m-d', strtotime($fecha1));
 	$fecha2 = date('Y-m-d', strtotime($fecha2));
 	$moneda = new Moneda($sesion);

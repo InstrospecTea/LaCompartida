@@ -110,7 +110,7 @@ $campos_porcentajes = array();
 
 if ($REQUEST_METHOD == 'GET') {
 	$mp = new \TTB\Mixpanel();
-	$mp->identifyAndTrack($RUT, 'Ingresa Reporte General');
+	$mp->identifyAndTrack($_SESSION['RUT'], 'Ingresa Reporte General');
 }
 
 if (isset($_POST['tipo'])) {

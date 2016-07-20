@@ -19,5 +19,8 @@ defined('DOCROOT') || define('DOCROOT',dirname(__FILE__));
 
 defined('APPPATH') || define('APPPATH',$_SERVER['DOCUMENT_ROOT'].'/'.ROOTDIR);
 
+//Mixpanel
+defined('MIXPANEL_TOKEN') || define('MIXPANEL_TOKEN', '43bb0d35ec38957f9508c6efcecf4051');
+
 ini_set('display_errors', 'On');
 set_time_limit(0);
