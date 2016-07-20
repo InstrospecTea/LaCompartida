@@ -155,7 +155,7 @@ class TimeEntriesAPI extends AbstractSlimAPI {
 		}
 
 		if (!$User->LoadId($user_id)) {
-			$this->alt(__("The user doesn't exist"), 'UserDoesntExist');
+			$this->halt(__("The user doesn't exist"), 'UserDoesntExist');
 		} else {
 			$validate = $Work->validateDataOfWork($work);
 			if ($validate['error'] == true) {
