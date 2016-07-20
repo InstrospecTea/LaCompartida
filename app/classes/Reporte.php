@@ -1546,20 +1546,24 @@ class Reporte {
 	}
 
 	//Transforma las horas a hh:mm en el caso de que tenga el conf y que sean horas
-	public function FormatoValor($sesion, $valor, $tipo_dato = "horas_", $tipo_reporte = "", $formato_valor = array('cifras_decimales' => 2, 'miles' => '.', 'decimales' => ',')) {
-		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, "oras_")) {
-			$valor_horas = floor($valor);
-			$valor_minutos = number_format((($valor - $valor_horas) * 60), 0);
+	public function FormatoValor($sesion, $valor, $tipo_dato = 'horas_', $tipo_reporte = "", $formato_valor = array('cifras_decimales' => 2, 'miles' => '.', 'decimales' => ',')) {
+		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, 'oras_') !== false) {
+			$h = (int) ($valor);
+			$m = round($valor * 60) % 60;
+
 			if ($tipo_reporte == "excel") {
-				$valor_tiempo = ($valor_horas / 24) + ($valor_minutos / (60 * 24));
+				$valor_tiempo = '=' . (($h * 60) + $m) . '/1440';
 			} else {
-				$valor_tiempo = sprintf('%02d', $valor_horas) . ":" . sprintf('%02d', $valor_minutos);
+				$valor_tiempo = sprintf('%02d', $h) . ':' . sprintf('%02d', $m);
 			}
+
 			return $valor_tiempo;
 		}
+
 		if (strpos($tipo_dato, 'valor_') !== false || strpos($tipo_dato, 'costo') !== false) {
 			return number_format($valor, $formato_valor['cifras_decimales'], $formato_valor['decimales'], $formato_valor['miles']);
 		}
+
 		return $valor;
 	}
 
