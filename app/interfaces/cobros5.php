@@ -258,7 +258,7 @@ if ($opc == 'anular_emision') {
 			}
 
 			$mp = new \TTB\Mixpanel();
-			$mp->identifyAndTrack($RUT, 'Emitir Cobro');
+			$mp->identifyAndTrack($_SESSION['RUT'], 'Emitir Cobro');
 
 			$refrescar = "<script language='javascript' type='text/javascript'>if(window.opener.Refrescar) window.opener.Refrescar(" . $id_foco . ");</script>";
 			$pagina->Redirect("cobros6.php?id_cobro=" . $cobro->fields['id_cobro'] . "&popup=1&contitulo=true&refrescar=1&opc=guardar");

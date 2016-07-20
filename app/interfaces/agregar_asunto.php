@@ -396,7 +396,7 @@ if ($opcion == 'guardar') {
 					}
 					if ($motivo == 'agregar_proyecto') {
 						$mp = new \TTB\Mixpanel();
-						$mp->identifyAndTrack($RUT, 'Agregar Asunto');
+						$mp->identifyAndTrack($_SESSION['RUT'], 'Agregar Asunto');
 					}
 				} else {
 					$Pagina->AddError($Asunto->error);
