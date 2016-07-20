@@ -123,14 +123,14 @@ class UserManager extends AbstractManager implements IUserManager {
 		if (!empty($init_date) && \Utiles::es_fecha_sql($init_date)){
 			$SearchCriteria
 				->filter('fecha')
-				->restricted_by('greater_than')
+				->restricted_by('greater_or_equals_than')
 				->compare_with("'{$init_date}'");
 		}
 
 		if (!empty($end_date) && \Utiles::es_fecha_sql($end_date)){
 			$SearchCriteria
 				->filter('fecha')
-				->restricted_by('lower_than')
+				->restricted_by('lower_or_equals_than')
 				->compare_with("'{$end_date}'");
 		}
 
@@ -148,10 +148,10 @@ class UserManager extends AbstractManager implements IUserManager {
 		$restrictions_array = array(CriteriaRestriction::equals('id_usuario', $user_id));
 
 		if (!empty($init_date) && \Utiles::es_fecha_sql($init_date)){
-			array_push($restrictions_array, CriteriaRestriction::greater_than('fecha', "'{$init_date}'"));
+			array_push($restrictions_array, CriteriaRestriction::greater_or_equals_than('fecha', "'{$init_date}'"));
 		}
 		if (!empty($end_date) && \Utiles::es_fecha_sql($end_date)){
-			array_push($restrictions_array, CriteriaRestriction::lower_than('fecha', "'{$end_date}'"));
+			array_push($restrictions_array, CriteriaRestriction::lower_or_equals_than('fecha', "'{$end_date}'"));
 		}
 
 		return CriteriaRestriction::and_clause($restrictions_array);
