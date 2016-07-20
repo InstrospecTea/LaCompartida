@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.1
+Wednesday, July 20th
+* **Feature** [Se corrige el join de searchCriteria](https://github.com/LemontechSA/ttb/pull/1689)
+
 ## [Release 16.24.0](https://github.com/LemontechSA/ttb/pull/1686)
 Wednesday, July 20th
 * **Feature** [Fix undefined events mix panel](https://github.com/LemontechSA/ttb/pull/1671)
