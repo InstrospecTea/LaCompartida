@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.6
+Thursday, July 21th
+* **Fix** [Se cambia el texto de %nom_doc% en NotaCobroDocumento y en NotaCobroDocumentoComun](https://github.com/LemontechSA/ttb/pull/1699)
+
 ## Hotfix 16.24.5
 Thursday, July 21th
 * **Fix** [Se corrige la asignación de las fechas para las semana actual y la semana siguiente en reporte Produccion por Profesional](https://github.com/LemontechSA/ttb/pull/1698)
