@@ -414,13 +414,14 @@ class Trabajo extends Objeto
 		$mensajes = '';
 		$trabajos_en_hoja = array();
 		$cobros_en_excel = array();
+		$id_trabajo_prm = $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang);
 
 		// Leemos todas las hojas
 		foreach ($excel->sheets as $hoja) {
-			if ($hoja['cells'][1][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang) ||
-					$hoja['cells'][2][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang) ||
-					$hoja['cells'][3][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang) ||
-					$hoja['cells'][4][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang) ) {
+			if ($hoja['cells'][1][$col_id_trabajo] == $id_trabajo_prm ||
+					$hoja['cells'][2][$col_id_trabajo] == $id_trabajo_prm ||
+					$hoja['cells'][3][$col_id_trabajo] == $id_trabajo_prm ||
+					$hoja['cells'][4][$col_id_trabajo] == $id_trabajo_prm ) {
 				continue;
 			}
 
