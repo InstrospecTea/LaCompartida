@@ -66,7 +66,7 @@ $pagina->PrintTop($popup);
 							// Esta función actualiza los trabajos y entrega feedback del resultado.
 							echo Trabajo::ActualizarConExcel($archivo_data, $sesion, $lang);
 						} else {
-							echo '<b>' . __('La extención del Excel adjuntado es inválida') . '.</b>';
+							echo '<b>' . __('La extensión del Excel adjuntado es inválida') . '.</b>';
 						}
 					}
 					?>

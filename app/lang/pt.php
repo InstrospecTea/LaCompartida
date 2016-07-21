@@ -1188,5 +1188,5 @@ $_LANG['Excel borrador modificado'] = 'Rascunho Excel modificado';
 $_LANG['Recuerde que al subir el Excel modificará los trabajos'] = 'Lembre-se que ao subir o Excel, modificará seus trabalhos';
 $_LANG['Subir excel modificado'] = 'Subir excel modificado';
 $_LANG['Cargar Excel'] = 'Carregar Excel';
-$_LANG['La extención del Excel adjuntado es inválida'] = 'A extensão do Excel anexado é inválida';
+$_LANG['La extensión del Excel adjuntado es inválida'] = 'A extensão do Excel anexado é inválida';
 $_LANG['NO MODIFICAR ESTA COLUMNA'] = "Não modificar esta coluna";
