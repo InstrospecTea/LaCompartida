@@ -41,6 +41,7 @@ $_LANG['Horas cobrables corregidas'] = 'Horas facturables corregidas';
 $_LANG['Horas cobradas'] = 'Horas facturadas';
 $_LANG['Valor cobrado'] = 'Valor facturado';
 $_LANG['Valor cobrado por hora'] = 'Valor facturado por hora';
+$_LANG['Cobrado'] = "Facturado";
 $_LANG['% Cobrado'] = "% Facturado";
 $_LANG['Valor cobrado'] = "Valor Facturado";
 $_LANG['cobrabilidad'] = 'Facturabilidad';
