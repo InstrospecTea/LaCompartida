@@ -5,6 +5,7 @@ $directorios = array(
 	'/app/classes/',
 	'/app/classes/Api/',
 	'/app/classes/Graficos/',
+	'/app/classes/Reportes/',
 	'/app/layers/business.support/',
 	'/app/layers/business/',
 	'/app/layers/dao.framework/',
@@ -35,7 +36,7 @@ $directorios = array(
 	'/app/layers/manager/exceptions/',
 	'/database/lib/',
 	'/fw/classes/',
-	'/app/layers/configurations/',
+	'/app/layers/configurations/'
 );
 
 $appNamespaces = array('Api\V1', 'Api\V2');

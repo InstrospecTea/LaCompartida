@@ -2506,7 +2506,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 				$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
 				$html = str_replace('%descripcion_gastos%', __('Descripción de Gastos'), $html);
 				$html = str_replace('%fecha%', __('Fecha'), $html);
-				$html = str_replace('%num_doc%', __('N? Documento'), $html);
+				$html = str_replace('%num_doc%', __('N° Documento'), $html);
 				$html = str_replace('%tipo_gasto%', __('Tipo'), $html);
 				$html = str_replace('%descripcion%', __('Descripción'), $html);
 				$html = str_replace('%monto_original%', __('Monto'), $html);
