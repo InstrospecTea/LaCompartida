@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.7
+Friday, July 22th
+* **Fix** [Eliminar traducción "Cobrado" en es_facturacion y se quita el escape al selector](https://github.com/LemontechSA/ttb/pull/1702)
+
 ## Hotfix 16.24.6
 Thursday, July 21th
 * **Fix** [Se cambia el texto de %nom_doc% en NotaCobroDocumento y en NotaCobroDocumentoComun](https://github.com/LemontechSA/ttb/pull/1699)
