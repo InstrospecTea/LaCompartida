@@ -41,7 +41,6 @@ $_LANG['Horas cobrables corregidas'] = 'Horas facturables corregidas';
 $_LANG['Horas cobradas'] = 'Horas facturadas';
 $_LANG['Valor cobrado'] = 'Valor facturado';
 $_LANG['Valor cobrado por hora'] = 'Valor facturado por hora';
-$_LANG['Cobrado'] = "Facturado";
 $_LANG['% Cobrado'] = "% Facturado";
 $_LANG['Valor cobrado'] = "Valor Facturado";
 $_LANG['cobrabilidad'] = 'Facturabilidad';
@@ -59,8 +58,6 @@ $_LANG['horas_visibles'] = "Horas Facturables Corregidas";
 $_LANG['UsarImpuestoSeparado'] = "Facturar impuestos por separado";
 $_LANG['UsarImpuestoPorGastos'] = "Facturar impuestos por separado a los gastos";
 $_LANG['ValorImpuestoGastos'] = "Valor impuesto (%) que se cobra a los gastos";
-
-$_LANG['Cobrado'] = "Facturado";
 
 $_LANG['Valor estimado p/cobrar'] = "Valor estimado p/facturar";
 $_LANG['Valor cobrado + p/cobrar'] = "Valor cobrado + p/facturar";
@@ -86,7 +83,6 @@ $_LANG['HORAS POR COBRAR'] = "HORAS POR FACTURAR";
 $_LANG['Hrs. Cobradas'] = "Hrs. Facturadas";
 $_LANG['Hrs. No Cobrables'] = "Hrs. No Facturables";
 $_LANG['Hrs. por Cobrar'] = "Hrs. por Facturar";
-$_LANG['Cobrado'] = "Facturado";
 
 $_LANG['hr_asunto_cobrable'] = "Hrs. Trabajadas(Asuntos Facturables)";
 $_LANG['hr_asunto_no_cobrable'] = "Hrs. Trabajadas(Asuntos No Facturables)";
