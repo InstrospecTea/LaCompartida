@@ -216,3 +216,6 @@ tags
 app/tests/_log
 
 bower_components
+
+## Local bundle
+.bundle
