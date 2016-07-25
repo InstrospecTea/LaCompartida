@@ -735,8 +735,11 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 								if ($Asunto->Loaded()) { ?>
 									<a href='#' id='change_client'><img src='//static.thetimebilling.com/images/editar_on.gif' border='0' title='Cambiar Cliente'></a>
 									<span style="color:#FF0000; font-size:10px">*</span>
-									<div id="nuevo_codigo" class="hidden" style="padding: 5px 0px 5px 5px; background-color: yellowgreen">Asociar a cliente</br>
-										<?php echo $input_cliente; ?>
+									<div id="new_client" style="padding: 5px; background-color: yellowgreen; display: none; width: 405px;">
+										<div id="new_client_message" class="alert" style="margin-bottom: 5px;"></div>
+										<div id="new_client_code" style="display: none"><strong>Asociar a cliente</strong></br>
+											<?php echo $input_cliente; ?>
+										</div>
 									</div>
 								<?php } ?>
 							</td>
@@ -1045,16 +1048,39 @@ jQuery('document').ready(function () {
 		jQuery('.fields_trabajo_conjunto').hide();
 	}
 	});
-	jQuery('#change_client').click(function() {
+	jQuery('#change_client').click(function(event) {
+		event.preventDefault();
 		var $ = jQuery;
-		var input_nuevo_codigo = $('input.nuevo_codigo_cliente');
-		var select_nuevo_codigo = $('select.nuevo_codigo_cliente');
-		var secundario = input_nuevo_codigo.hasClass('secundario') ? '_secundario' : '';
-		var codigo_cliente = $('#campo_codigo_cliente' + secundario).val();
-		var glosa_cliente = $('#glosa_codigo_cliente' + secundario).val();
-		$('#nuevo_codigo').toggleClass('hidden');
-		input_nuevo_codigo.val(codigo_cliente);
-		select_nuevo_codigo.val(codigo_cliente);
+		var $this = $(this);
+		var $image = $('<img/>').attr('src', '//static.thetimebilling.com/images/loading.gif');
+		$this.after($image).hide();
+		$('#new_client').hide();
+		$('#new_client_code').hide();
+		var url = root_dir + '/app/Matters/validateChangeOfClient/' + $('#id_asunto').val();
+		$.get(url, function (response) {
+				var valid = response.valid;
+				$('#new_client_message').removeClass('alert-info alert-error').hide();
+				if (response.error) {
+					$('#new_client_message').html(response.error).addClass('alert-error').show();
+				} else if (response.advice) {
+					$('#new_client_message').html(response.advice).addClass('alert-info').show();
+				}
+				if (valid) {
+					var input_nuevo_codigo = $('input.nuevo_codigo_cliente');
+					var select_nuevo_codigo = $('select.nuevo_codigo_cliente');
+					var secundario = input_nuevo_codigo.hasClass('secundario') ? '_secundario' : '';
+					var codigo_cliente = $('#campo_codigo_cliente' + secundario).val();
+					var glosa_cliente = $('#glosa_codigo_cliente' + secundario).val();
+					$('#new_client_code').show();
+					input_nuevo_codigo.val(codigo_cliente);
+					select_nuevo_codigo.val(codigo_cliente);
+				}
+				$('#new_client').show();
+				$image.remove();
+				$this.show();
+			},
+			'json'
+		);
 	});
 
 	jQuery(document).on("change", "#cobro_independiente", function() {

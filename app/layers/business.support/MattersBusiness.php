@@ -2,14 +2,14 @@
 
 class MattersBusiness extends AbstractBusiness implements BaseBusiness {
 
-	protected function changeClientOfMatterValidation(Matter $Matter) {
-		if ($Matter->get('id_contrato_indep') !== $Matter->get('id_contrato')) {
-			throw new Exception(__('El asunto debe cobrarse de forma independiente'));
-		}
+	public function changeClientOfMatterValidation(Matter $Matter) {
 		$this->loadManager('Matter');
 		$charges = $this->MatterManager->getCharges($Matter);
 		if ($charges !== false) {
-			throw new Exception(__('El asunto tiene cobros:') . " {$charges}");
+			throw new Exception(__('No se puede cambiar el cliente, el asunto tiene cobros:') . " {$charges}");
+		}
+		if(!$this->MatterManager->hasMoreMattersThan($Matter)) {
+			return __('Al trasladar este asunto, no podrá ingresar horas a este cliente a menos de que ingrese un nuevo asunto');
 		}
 	}
 
@@ -28,7 +28,7 @@ class MattersBusiness extends AbstractBusiness implements BaseBusiness {
 		try {
 			$this->changeClientOfMatterValidation($Matter);
 		} catch (Exception $e) {
-			throw new Exception(__('No se puede cambiar el cliente') . ':<br/>' . $e->getMessage());
+			throw new Exception($e->getMessage());
 		}
 		$NuevoCliente = new Cliente($this->Sesion);
 		if (Configure::read('CodigoSecundario')) {
@@ -47,7 +47,11 @@ class MattersBusiness extends AbstractBusiness implements BaseBusiness {
 			$matter_code = $Matter->get('codigo_asunto');
 			$agreement_id = $Matter->get('id_contrato');
 			$this->loadManager('Agreement');
-			$this->AgreementManager->changeClient($agreement_id, $new_client_code);
+			if ($Matter->get('id_contrato_indep') === $Matter->get('id_contrato')) {
+				$this->AgreementManager->changeClient($agreement_id, $new_client_code);
+			} else {
+				$Asunto->Edit('id_contrato', $NuevoCliente->fields['id_contrato'], true);
+			}
 			$Asunto->Edit('codigo_asunto', $new_matter_code, true);
 			$Asunto->Edit('codigo_cliente', $new_client_code, true);
 			$Asunto->Write();

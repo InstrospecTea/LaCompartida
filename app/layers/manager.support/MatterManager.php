@@ -60,4 +60,14 @@ class MatterManager extends AbstractManager implements BaseManager {
 		return sprintf("%s-%0{$size}d", $client_code, $code + 1);
 	}
 
+  public function hasMoreMattersThan(Matter $Matter) {
+		$this->loadService('Matter');
+		$conditions = CriteriaRestriction::and_clause(
+			CriteriaRestriction::not_equal('id_asunto', $Matter->get('id_asunto')),
+			CriteriaRestriction::equals('codigo_cliente', "'{$Matter->get('codigo_cliente')}'")
+		);
+		$matters = $this->MatterService->findAll($conditions, 'id_asunto');
+		return count($matters) > 0;
+	}
+
 }
