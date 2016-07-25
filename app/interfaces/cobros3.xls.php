@@ -335,12 +335,14 @@ for ($i = 0; $i < $lista->num; $i++) {
 
         $duracion_cobrada_decimal = number_format($h + $m / 60, 1, '.', '');
         $tiempo_excel_duracion_cobrada = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
+        $duracion_castigada_excel = $tiempo_excel_duracion - $tiempo_excel_duracion_cobrada;
+        $duracion_castigada_decimal = $duracion_decimal-$duracion_cobrada_decimal;
         if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
             $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $duracion_cobrada_decimal, $fdd);
-            $ws->writeNumber($fila_inicial + $i, $col_duracion_castigada, $duracion_decimal-$duracion_cobrada_decimal, $fdd);
+            $ws->writeNumber($fila_inicial + $i, $col_duracion_castigada, $duracion_castigada_decimal > 0 ? $duracion_castigada_decimal : 0, $fdd);
         } else {
             $ws->writeNumber($fila_inicial + $i, $col_duracion_cobrada, $tiempo_excel_duracion_cobrada, $time_format);
-            $ws->writeNumber($fila_inicial + $i, $col_duracion_castigada, $tiempo_excel_duracion - $tiempo_excel_duracion_cobrada, $time_format);
+            $ws->writeNumber($fila_inicial + $i, $col_duracion_castigada, $duracion_castigada_excel > 0 ? $duracion_castigada_excel : 0, $time_format);
         }
     } else {
         $ws->write($fila_inicial + $i, $col_duracion_cobrada, '', $time_format);
