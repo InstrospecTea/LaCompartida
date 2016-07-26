@@ -1,16 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/classes/PaginaCobro.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Html.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/classes/InputId.php';
-require_once Conf::ServerDir() . '/classes/Trabajo.php';
-require_once Conf::ServerDir() . '/classes/Funciones.php';
-require_once Conf::ServerDir() . '/classes/Cobro.php';
-require_once Conf::ServerDir() . '/classes/Cliente.php';
 
 $sesion = new Sesion(array('COB'));
 $pagina = new PaginaCobro($sesion);
@@ -48,7 +37,7 @@ if ($popup) {
 ?>
 <table width="100%" border="0" cellspacing="0" cellpadding="2">
 	<tr>
-		<td valign="top" align="left" class="titulo" bgcolor="<?php echo (method_exists('Conf','GetConf') ? Conf::GetConf($sesion,'ColorTituloPagina') : Conf::ColorTituloPagina()); ?>">
+		<td valign="top" align="left" class="titulo" bgcolor="<?= (method_exists('Conf','GetConf') ? Conf::GetConf($sesion,'ColorTituloPagina') : Conf::ColorTituloPagina()); ?>">
 			<?php echo __('Emitir') . ' ' . __('Cobro') . __(' :: Selección de trabajos #') . $id_cobro . ' ' . $nombre_cliente; ?>
 		</td>
 	</tr>
@@ -59,7 +48,7 @@ if ($popup) {
 <form method="post">
 	<input type="hidden" name="opc">
 	<input type="hidden" name="id_cobro" value="<?php echo $id_cobro; ?>">
-	<?php $pagina->PrintPasos($sesion, 2, '', $id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']); ?>
+	<?= $pagina->PrintPasos($sesion, 2, '', $id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']); ?>
 	<table border="0" width="100%">
 		<tr>
 			<td align="left"><input type="button" class="btn" value="<?php echo __('<< Anterior'); ?>" onclick="this.form.opc.value = 'anterior'; this.form.submit();"></td>
@@ -77,11 +66,11 @@ if ($popup) {
 				}
 			?>
 			<td class="cvs" align="center" colspan="2">
-				<iframe name="trabajos" id="asuntos" src="trabajos.php?<?php echo $codigo_cliente_query_string; ?>&id_cobro=<?php echo $id_cobro; ?>&motivo=cobros&opc=buscar&popup=1" frameborder="0" width="800px" height="1500px"></iframe>
+				<iframe name="trabajos" id="asuntos" src="trabajos.php?<?php echo $codigo_cliente_query_string; ?>&id_cobro=<?php echo $id_cobro; ?>&motivo=cobros&opc=buscar&popup=1&from_cobro=1" frameborder="0" width="800px" height="1500px"></iframe>
 			</td>
 		</tr>
 	</table>
 </form>
-<?php echo InputId::Javascript($sesion) ?>
+<?= InputId::Javascript($sesion); ?>
 <script type="text/javascript" src="guardar_campo_trabajo.js"></script>
 <?php $pagina->PrintBottom($popup);
