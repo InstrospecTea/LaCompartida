@@ -66,7 +66,7 @@ if ($popup) {
 				}
 			?>
 			<td class="cvs" align="center" colspan="2">
-				<iframe name="trabajos" id="asuntos" src="trabajos.php?<?php echo $codigo_cliente_query_string; ?>&id_cobro=<?php echo $id_cobro; ?>&motivo=cobros&opc=buscar&popup=1&from_cobro=1" frameborder="0" width="800px" height="1500px"></iframe>
+				<iframe name="trabajos" id="asuntos" src="trabajos.php?<?php echo $codigo_cliente_query_string; ?>&id_cobro=<?php echo $id_cobro; ?>&motivo=cobros&opc=buscar&popup=1&mostrar_descargar_pdf_agrupado=1" frameborder="0" width="800px" height="1500px"></iframe>
 			</td>
 		</tr>
 	</table>

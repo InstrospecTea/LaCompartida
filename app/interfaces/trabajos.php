@@ -787,7 +787,7 @@ $pagina->PrintTop($popup);
 						$fecha_ok = ($sinceObject->diff($untilObject)->format('%a') > 364) ? false : true;
 					}
 				}
-			if ($fecha_ok && is_null($from_cobro) && ((!empty($id_encargado_comercial) || !empty($id_usuario)) || (!empty($codigo_cliente) || !empty($codigo_cliente_secundario)))
+			if ($fecha_ok && is_null($mostrar_descargar_pdf_agrupado) && ((!empty($id_encargado_comercial) || !empty($id_usuario)) || (!empty($codigo_cliente) || !empty($codigo_cliente_secundario)))
 			) {
 				echo $Form->icon_button(__('Descargar listado Agrupado'), 'pdf', array('id' => 'descargar_pdf_agrupado'));
 			} ?>
