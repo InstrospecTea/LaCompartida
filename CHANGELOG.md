@@ -2,7 +2,7 @@
 
 ## Hotfix 16.24.8
 Tuesday, July 26th
-* **Fix** [Problema en reporte horas](https://github.com/LemontechSA/ttb/pull/1703)
+* **Fix** [Problema en reporte horas](https://github.com/LemontechSA/ttb/pull/1705)
 
 ## Hotfix 16.24.7
 Friday, July 22th
