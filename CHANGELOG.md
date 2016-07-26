@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.9
+Tuesday, July 26th
+* **Fix** [Se modifica el submit por un botón en formulario de tarifas](https://github.com/LemontechSA/ttb/pull/1706)
+
 ## Hotfix 16.24.8
 Tuesday, July 26th
 * **Fix** [Problema en reporte horas](https://github.com/LemontechSA/ttb/pull/1705)
