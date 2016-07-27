@@ -15,6 +15,8 @@ class WorkbookMiddleware {
 	protected $extension = 'xlsx';
 	protected $content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
+	protected $local_images = array();
+
 	private $time = 0;
 	/**
 	 * Construct of the class
@@ -141,6 +143,7 @@ class WorkbookMiddleware {
 
 		unset($this->workSheetObj);
 		unset($this->phpExcel);
+		$this->deleteLocalImages();
 	}
 
 	/**
@@ -437,7 +440,7 @@ class WorkbookMiddleware {
 		if (filter_var($bitmap, FILTER_VALIDATE_URL)) {
 			$path_parts = pathinfo($bitmap);
 			$data = $this->getContentCurl($bitmap);
-			$bitmap = $this->writeLocalBitmap($data, '/tmp/' . $path_parts['basename']);
+			$bitmap = $this->writeLocalImage($data, '/tmp/' . $path_parts['basename']);
 		}
 
 		$objDrawing = new PHPExcel_Worksheet_Drawing();
@@ -625,12 +628,19 @@ class WorkbookMiddleware {
 		return $response;
 	}
 
-	private function writeLocalBitmap($data, $path) {
+	private function writeLocalImage($data, $path) {
 		$file = fopen($path,'w');
 		fwrite($file, $data);
 		fclose($file);
 
+		$this->local_images[] = $path;
+
 		return $path;
 	}
 
+	private function deleteLocalImages() {
+		foreach ($this->local_images as $path) {
+			unlink($path);
+		}
+	}
 }
