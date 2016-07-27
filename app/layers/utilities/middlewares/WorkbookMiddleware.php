@@ -434,6 +434,11 @@ class WorkbookMiddleware {
 	 * @param int $scale_y
 	 */
 	public function insertBitmap($row, $col, $bitmap, $x = 0, $y = 0, $scale_x = 1, $scale_y = 1) {
+		if (filter_var($bitmap, FILTER_VALIDATE_URL)) {
+			$data = $this->getContentCurl($bitmap);
+			$bitmap = $this->writeLocalBitmap($data);
+		}
+
 		$objDrawing = new PHPExcel_Worksheet_Drawing();
 		$objDrawing->setPath($bitmap)
 							->setCoordinates(PHPExcel_Cell::stringFromColumnIndex($col).($row + 1))
@@ -606,6 +611,25 @@ class WorkbookMiddleware {
 		} else if (!is_null($this->formats[$column])) {
 			$this->setFormat($this->formats[$column], $row, $col);
 		}
+	}
+
+	private function getContentCurl($url) {
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HEADER, false);
+		$response = curl_exec($curl);
+		curl_close($curl);
+
+		return $response;
+	}
+
+	private function writeLocalBitmap($data, $path = '/tmp/logo.png') {
+		$file = fopen($path,'w');
+		fwrite($file, $data);
+		fclose($file);
+
+		return $path;
 	}
 
 }
