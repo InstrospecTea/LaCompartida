@@ -435,8 +435,9 @@ class WorkbookMiddleware {
 	 */
 	public function insertBitmap($row, $col, $bitmap, $x = 0, $y = 0, $scale_x = 1, $scale_y = 1) {
 		if (filter_var($bitmap, FILTER_VALIDATE_URL)) {
+			$path_parts = pathinfo($bitmap);
 			$data = $this->getContentCurl($bitmap);
-			$bitmap = $this->writeLocalBitmap($data);
+			$bitmap = $this->writeLocalBitmap($data, '/tmp/' . $path_parts['basename']);
 		}
 
 		$objDrawing = new PHPExcel_Worksheet_Drawing();
@@ -624,7 +625,7 @@ class WorkbookMiddleware {
 		return $response;
 	}
 
-	private function writeLocalBitmap($data, $path = '/tmp/logo.png') {
+	private function writeLocalBitmap($data, $path) {
 		$file = fopen($path,'w');
 		fwrite($file, $data);
 		fclose($file);
