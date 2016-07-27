@@ -787,9 +787,10 @@ $pagina->PrintTop($popup);
 						$fecha_ok = ($sinceObject->diff($untilObject)->format('%a') > 364) ? false : true;
 					}
 				}
-			if ($fecha_ok && (!empty($id_encargado_comercial) || !empty($id_usuario)) || !empty($codigo_cliente) || !empty($codigo_cliente_secundario)) { ?>
-				<?php echo $Form->icon_button(__('Descargar listado Agrupado'), 'pdf', array('id' => 'descargar_pdf_agrupado')); ?>
-			<?php } ?>
+			if ($fecha_ok && is_null($ocultar_btn_descarga_pdf) && ((!empty($id_encargado_comercial) || !empty($id_usuario)) || (!empty($codigo_cliente) || !empty($codigo_cliente_secundario)))
+			) {
+				echo $Form->icon_button(__('Descargar listado Agrupado'), 'pdf', array('id' => 'descargar_pdf_agrupado'));
+			} ?>
 			<br />
 		</center>
 	</form>
