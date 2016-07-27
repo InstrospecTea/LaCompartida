@@ -285,8 +285,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 						else
 							$html3 = str_replace('%hrs_trabajadas%', ($columna_hrs_trabajadas ? $data['glosa_duracion_cobrada'] : ''), $html3);
 						$html3 = str_replace('%hrs_trabajadas_vio%', $data['glosa_duracion_cobrada'], $html3);
-					}
-					else {
+					} else {
 						$html3 = str_replace('%hrs_trabajadas%', '', $html3);
 						$html3 = str_replace('%hrs_trabajadas_vio%', ($columna_hrs_trabajadas ? $data['glosa_duracion_cobrada'] : ''), $html3);
 					}
@@ -316,7 +315,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 							$html3 = str_replace('%hh_trabajada%', $data['glosa_duracion_trabajada'], $html3);
 						}
 						if ($descontado) {
-							$html3 = str_replace('%td_descontada%', '<td align=\'center\'>%hh_descontada%</td>', $html3);
+							$html3 = str_replace('%td_descontada%', '<td align="center">%hh_descontada%</td>', $html3);
 							if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 								$html3 = str_replace('%hh_descontada%', number_format($data['duracion_descontada'], Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $html3);
 							} else {
@@ -332,7 +331,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 						$html3 = str_replace('%hh_descontada%', '', $html3);
 					}
 					if ($retainer || $flatfee) {
-						$html3 = str_replace('%td_cobrable%', '<td align=\'center\'>%hh_cobrable%</td>', $html3);
+						$html3 = str_replace('%td_cobrable%', '<td align="center">%hh_cobrable%</td>', $html3);
 						if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 							$html3 = str_replace('%hh_cobrable%', number_format($data['duracion_cobrada'], Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $html3);
 						} else {
@@ -411,22 +410,25 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 						$resumen_hrs_cobradas_temp = $resumen_hrs_cobradas > 0 ? $resumen_hrs_cobradas : 1;
 						$resumen_filas[$prof] = str_replace('%porcentaje_participacion%', number_format($x_resumen_profesional[$prof]['duracion_cobrada'] / $resumen_hrs_cobradas_temp * 100, 2, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) . '%', $resumen_filas[$prof]);
 
-						if ($incobrables)
+						if ($incobrables) {
 							$resumen_filas[$prof] = str_replace('%columna_horas_no_cobrables%', '<td align="center">' . $x_resumen_profesional[$prof]['glosa_duracion_incobrables'] . '</td>', $resumen_filas[$prof]);
-						else
+						} else {
 							$resumen_filas[$prof] = str_replace('%columna_horas_no_cobrables%', '', $resumen_filas[$prof]);
+						}
 						if ($han_trabajado_menos_del_retainer && !$this->fields['opc_ver_detalle_retainer']) {
 							$resumen_filas[$prof] = str_replace('%valor_retainer%', '', $resumen_filas[$prof]);
 							$resumen_filas[$prof] = str_replace('%valor_retainer_vio%', '', $resumen_filas[$prof]);
-						} else
+						} else {
 							$resumen_filas[$prof] = str_replace('%valor_retainer%', $columna_hrs_retainer ? number_format($x_resumen_profesional[$prof]['duracion_cobrada'] / $resumen_hrs_cobradas_temp * $this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']) : '', $resumen_filas[$prof]);
-						if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL')
+						}
+						if ($this->fields['forma_cobro'] == 'FLAT FEE' || $this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 							$resumen_filas[$prof] = str_replace('%valor_retainer_vio%', number_format($x_resumen_profesional[$prof]['duracion_cobrada'] / $resumen_hrs_cobradas_temp * $this->fields['monto_contrato'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_filas[$prof]);
-						else
+						} else {
 							$resumen_filas[$prof] = str_replace('%valor_retainer_vio%', '', $resumen_filas[$prof]);
-						if ($han_trabajado_menos_del_retainer)
+						}
+						if ($han_trabajado_menos_del_retainer) {
 							$resumen_filas[$prof] = str_replace('%valor_cobrado_hh%', number_format(0, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_filas[$prof]);
-						else {
+						} else {
 							$resumen_filas[$prof] = str_replace('%valor_cobrado_hh%', number_format($x_resumen_profesional[$prof]['valor_tarificada'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $resumen_filas[$prof]);
 							$total_valor += $x_resumen_profesional[$prof]['valor_tarificada'];
 						}
