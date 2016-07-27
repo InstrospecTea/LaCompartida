@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.10
+Wednesday, July 27th
+* **Fix** [Separa método GenerarSeccionResumenProfesional de la clase principal](https://github.com/LemontechSA/ttb/pull/1708)
+
 ## Hotfix 16.24.9
 Tuesday, July 26th
 * **Fix** [Se modifica el submit por un botón en formulario de tarifas](https://github.com/LemontechSA/ttb/pull/1706)
