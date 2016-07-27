@@ -124,7 +124,7 @@ class FormatMiddleware {
 	 * @param int $top
 	 */
 	public function setBottom($bottom) {
-		$this->bottom = $bottom == 1 ? true : false;
+		$this->bottom = $bottom;
 	}
 
 	/**
