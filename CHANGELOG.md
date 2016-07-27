@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.11
+Wednesday, July 27th
+* **Fix** [No desplegar botón "Descargar listado Agrupado" en listado de trabajos en paso 3 del cobro](https://github.com/LemontechSA/ttb/pull/1710)
+
 ## Hotfix 16.24.10
 Wednesday, July 27th
 * **Fix** [Separa método GenerarSeccionResumenProfesional de la clase principal](https://github.com/LemontechSA/ttb/pull/1708)
