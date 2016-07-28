@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.12
+Thursday, July 28th
+* **Fix** [En factura campo dte_metodo_pago_cta es guardado como string](https://github.com/LemontechSA/ttb/pull/1713)
+
 ## Hotfix 16.24.11
 Wednesday, July 27th
 * **Fix** [No desplegar botón "Descargar listado Agrupado" en listado de trabajos en paso 3 del cobro](https://github.com/LemontechSA/ttb/pull/1710)
