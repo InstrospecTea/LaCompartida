@@ -161,14 +161,14 @@ $letra_chica_underline = &$wb->addFormat(array(
 $letra_chica_bottomgrid = &$wb->addFormat(array(
 						'Size' => 8,
 						'Valign' => 'top',
-						'Bottom' => '2',
+						'Bottom' => '1',
 						'Align' => 'left',
 						'Italic' => 1
 				));
 $letra_chica_derecha_bottomgrid = &$wb->addFormat(array(
 						'Size' => 8,
 						'Valign' => 'top',
-						'Bottom' => '2',
+						'Bottom' => '1',
 						'Align' => 'right',
 						'Italic' => 1
 				));
@@ -527,6 +527,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$filas += 1;
 
 	$ws->write($filas, $col_id_trabajo, $arraylang['descripcion_del_asunto']['Resumen'][$lang], $letra_chica_underline);
+	$row_description = $filas;
 	$filas += 1;
 
 	$glosa_asuntos = array();
@@ -660,8 +661,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$filas += 1;
 
 	for ($i = 0; $i <= $filas; $i++) {
-		$ws->setRow($i, '11.25');
+		$ws->setRow($i, 11.25);
 	}
+	$ws->setRow($row_description, 18);
 
 	if ($Cobro->fields['opc_ver_profesional']) {
 		//Hoja Resumen
