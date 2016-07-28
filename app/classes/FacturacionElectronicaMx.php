@@ -46,7 +46,7 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 
 			echo "<b id='metodo_pago_texto'>$metodo_pago</b> ";
 		}
-		
+
 		$cta_pago = $factura->fields['dte_metodo_pago_cta'];
 		if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
 			$cta_pago = '';
@@ -136,7 +136,7 @@ EOF;
 		if (empty($dte_metodo_pago)) {
 			$pagina->AddError(__('Debe seleccionar el Método de Pago.'));
 		}
-		if ((int) $dte_metodo_pago_cta < 1000 && (int) $dte_metodo_pago_cta > 0) {
+		if (strlen($dte_metodo_pago_cta) > 0 && strlen($dte_metodo_pago_cta) < 4) {
 			$pagina->AddError(__('El número de cuenta debe tener al menos 4 d&iacute;gitos'));
 		}
 		if (empty($dte_id_pais)) {
