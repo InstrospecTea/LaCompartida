@@ -15,13 +15,6 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		$query = "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY codigo ASC";
 		if (empty($dte_fecha_creacion)) {
 			echo Html::SelectQuery($Sesion, $query, 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], '', '', '300');
-			$cta_pago = $factura->fields['dte_metodo_pago_cta'];
-			if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
-				$cta_pago = "";
-			} else {
-				$cta_pago = (int) $cta_pago;
-			}
-			echo $Form->input('dte_metodo_pago_cta', $cta_pago, array('size' => 10, 'maxlength' => 30, 'placeholder' => 'No. cuenta'));
 		} else {
 			$options = "style='display: none;' data-default='{$factura->fields['dte_metodo_pago']}'";
 			echo Html::SelectQuery($Sesion, $query, 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], $options, __('Seleccione'), '300');
@@ -48,15 +41,14 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 			}
 
 			echo "<b id='metodo_pago_texto'>$metodo_pago</b> ";
-
-			$cta_pago = $factura->fields['dte_metodo_pago_cta'];
-			if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
-				$cta_pago = "";
-			} else {
-				$cta_pago = (int) $cta_pago;
-			}
-			echo $Form->input('dte_metodo_pago_cta', $cta_pago, array('size' => 10, 'maxlength' => 30, 'placeholder' => 'No. cuenta'));
 		}
+
+		$cta_pago = $factura->fields['dte_metodo_pago_cta'];
+		if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
+			$cta_pago = '';
+		}
+		echo $Form->input('dte_metodo_pago_cta', $cta_pago, array('size' => 10, 'maxlength' => 30, 'placeholder' => 'No. cuenta'));
+
 		echo "</td>";
 		echo '</tr>';
 
@@ -140,7 +132,7 @@ EOF;
 		if (empty($dte_metodo_pago)) {
 			$pagina->AddError(__('Debe seleccionar el Método de Pago.'));
 		}
-		if ((int) $dte_metodo_pago_cta < 1000 && (int) $dte_metodo_pago_cta > 0) {
+		if (strlen($dte_metodo_pago_cta) > 0 && strlen($dte_metodo_pago_cta) < 4) {
 			$pagina->AddError(__('El número de cuenta debe tener al menos 4 d&iacute;gitos'));
 		}
 		if (empty($dte_id_pais)) {
