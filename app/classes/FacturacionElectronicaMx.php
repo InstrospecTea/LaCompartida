@@ -15,10 +15,6 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 		$query = "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_MX_METOD' ORDER BY codigo ASC";
 		if (empty($dte_fecha_creacion)) {
 			echo Html::SelectQuery($Sesion, $query, 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], '', '', '300');
-			$cta_pago = $factura->fields['dte_metodo_pago_cta'];
-			if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
-				$cta_pago = '';
-			}
 		} else {
 			$options = "style='display: none;' data-default='{$factura->fields['dte_metodo_pago']}'";
 			echo Html::SelectQuery($Sesion, $query, 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], $options, __('Seleccione'), '300');
