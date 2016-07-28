@@ -17,11 +17,8 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 			echo Html::SelectQuery($Sesion, $query, 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], '', '', '300');
 			$cta_pago = $factura->fields['dte_metodo_pago_cta'];
 			if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
-				$cta_pago = "";
-			} else {
-				$cta_pago = (int) $cta_pago;
+				$cta_pago = '';
 			}
-			echo $Form->input('dte_metodo_pago_cta', $cta_pago, array('size' => 10, 'maxlength' => 30, 'placeholder' => 'No. cuenta'));
 		} else {
 			$options = "style='display: none;' data-default='{$factura->fields['dte_metodo_pago']}'";
 			echo Html::SelectQuery($Sesion, $query, 'dte_metodo_pago', $factura->fields['dte_metodo_pago'], $options, __('Seleccione'), '300');
@@ -48,15 +45,14 @@ class FacturacionElectronicaMx extends FacturacionElectronica {
 			}
 
 			echo "<b id='metodo_pago_texto'>$metodo_pago</b> ";
-
-			$cta_pago = $factura->fields['dte_metodo_pago_cta'];
-			if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
-				$cta_pago = "";
-			} else {
-				$cta_pago = (int) $cta_pago;
-			}
-			echo $Form->input('dte_metodo_pago_cta', $cta_pago, array('size' => 10, 'maxlength' => 30, 'placeholder' => 'No. cuenta'));
 		}
+		
+		$cta_pago = $factura->fields['dte_metodo_pago_cta'];
+		if (is_null($cta_pago) || empty($cta_pago) || $cta_pago === 0) {
+			$cta_pago = '';
+		}
+		echo $Form->input('dte_metodo_pago_cta', $cta_pago, array('size' => 10, 'maxlength' => 30, 'placeholder' => 'No. cuenta'));
+
 		echo "</td>";
 		echo '</tr>';
 
