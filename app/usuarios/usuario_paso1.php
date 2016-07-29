@@ -166,29 +166,6 @@
 	}
 </style>
 
-<script src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
-<?php
-$_tanslations = json_encode(UtilesApp::utf8izar(array(
-	'Atención' => __('Atención'),
-	'Se desactivará al usuario seleccionado' => __('Se desactivará al usuario seleccionado'),
-	'el cual está asociado a' => __('el cual está asociado a'),
-	'acuerdos comerciales' => __('acuerdos comerciales'),
-	'como' => __('como'),
-	'Encargado Comercial' => __('Encargado Comercial'),
-	'Clientes' => __('Clientes'),
-	'Asuntos' => __('Asuntos'),
-	'Desea continuar' => __('Desea continuar')
-)));
-$JS = <<<JS
-	var _tanslations = {$_tanslations};
-	function __(text) {
-		return _tanslations[text];
-	}
-JS;
-?>
-<?= $Html->script_block($JS); ?>
-<?= $Html->script(Conf::RootDir() . '/app/layers/assets/js/users_data_table.js');?>
-
 <table width="96%" align="left">
 	<tr>
 		<td width="20">&nbsp;</td>
@@ -426,35 +403,39 @@ JS;
 				<tr>
 					<td colspan=2>
 						<br />
-						<table id="tablapermiso">
-							<thead>
-								<tr>
-									<td class="encabezado"><?php echo __('RUT'); ?></td>
-									<th><?php echo __('ID'); ?></th>
-									<th><?php echo __('Nombre'); ?></th>
-									<th><?php echo __('Admin'); ?></th>
-									<th><?php echo __('Admin<br>Datos'); ?></th>
-									<th width="23"><?php echo __('Cobranza'); ?></th>
-									<th><?php echo __('Editar<br/>Biblioteca'); ?></th>
-									<th><?php echo __('Lectura'); ?></th>
-									<th><?php echo __('Oficina'); ?></th>
-									<th><?php echo __('Profesional'); ?></th>
-									<th><?php echo __('Reportes'); ?></th>
-									<th><?php echo __('Revisión'); ?></th>
-									<th><?php echo __('Secretaría'); ?></th>
-									<th><?php echo __('Socio'); ?></th>
-									<th><?php echo __('Tarifa'); ?></th>
-									<th><?php echo __('Retribuciones'); ?></th>
-									<th width="25"><?php echo __('Activo'); ?></th>
-								</tr>
-							</thead>
-							<tbody></tbody>
-						</table>
 					</td>
 				</tr>
 			</table>
 		</td>
 	</tr>
+</table>
+<table id="tablapermiso">
+	<thead>
+		<tr>
+			<td class="encabezado"><?php echo __('RUT'); ?></td>
+			<th><?php echo __('ID'); ?></th>
+			<th><?php echo __('Nombre'); ?></th>
+			<th><?php echo __('Usuario'); ?></th>
+			<th><?php echo __('Admin'); ?></th>
+			<th><?php echo __('Admin<br>Datos'); ?></th>
+			<th width="23"><?php echo __('Cobranza'); ?></th>
+			<th><?php echo __('Editar<br/>Biblioteca'); ?></th>
+			<th><?php echo __('Lectura'); ?></th>
+			<th><?php echo __('Oficina'); ?></th>
+			<th><?php echo __('Profesional'); ?></th>
+			<th><?php echo __('Reportes'); ?></th>
+			<th><?php echo __('Revisión'); ?></th>
+			<th><?php echo __('Secretaría'); ?></th>
+			<th><?php echo __('Socio'); ?></th>
+			<th><?php echo __('Tarifa'); ?></th>
+			<th><?php echo __('Retribuciones'); ?></th>
+			<th width="25"><?php echo __('Activo'); ?></th>
+		</tr>
+	</thead>
+	<tbody></tbody>
+</table>
+
+<table width="96%">
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
@@ -485,7 +466,27 @@ JS;
 	</tr>
 </table>
 
+<script src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
 <?php
+$_tanslations = json_encode(UtilesApp::utf8izar(array(
+		'Atención' => __('Atención'),
+		'Se desactivará al usuario seleccionado' => __('Se desactivará al usuario seleccionado'),
+		'el cual está asociado a' => __('el cual está asociado a'),
+		'acuerdos comerciales' => __('acuerdos comerciales'),
+		'como' => __('como'),
+		'Encargado Comercial' => __('Encargado Comercial'),
+		'Clientes' => __('Clientes'),
+		'Asuntos' => __('Asuntos'),
+		'Desea continuar' => __('Desea continuar')
+	)));
+$JS = <<<JS
+	var _tanslations = {$_tanslations};
+	function __(text) {
+		return _tanslations[text];
+	}
+JS;
 
+echo $Html->script_block($JS);
+echo $Html->script(Conf::RootDir() . '/app/layers/assets/js/users_data_table.js');
 
-	$pagina->PrintBottom();
+$pagina->PrintBottom();

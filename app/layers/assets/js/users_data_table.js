@@ -1,5 +1,24 @@
-jQuery(document).ready(function () {
-	var oTable = jQuery('#tablapermiso').dataTable({
+(function ($) {
+	function actionButtons(o, val) {
+		var botones = '';
+		botones += "<div style='float:left;display:inline;' id='" + o.aData['id_usuario'] + ';' + o.mDataProp + "'>";
+		if (val == 1) {
+			botones += "<input class='permiso usuarioactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb.png' alt='ACTIVO' title='Usuario Activo'";
+		} else {
+			botones += "<input class='permiso usuarioinactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb_off.png' alt='INACTIVO' title='Usuario Inactivo'";
+		}
+		return botones + " rel='" + o.aData['id_usuario'] + ';' + o.mDataProp + "' data-contracts='" + o.aData['total_contracts'] + "' data-clientscontracts='" + o.aData['total_clients_contracts'] + "' data-matterscontracts='" + o.aData['total_matters_contracts'] + "'/></div>\n\&nbsp;<a style='display:inline;position: relative;top: 0;right: 0;' href='usuario_paso2.php?rut=" + o.aData['rut'] + "' title='Editar usuario'><img border=0 src='https://static.thetimebilling.com/images/ver_persona_nuevo.gif' alt='Editar' /></a>";
+
+	}
+
+	function permissionButton(o, val) {
+		if (val == 1) {
+			return "<div class='permiso on' id='" + o.aData['id_usuario'] + ';' + o.mDataProp + "'><input class='permiso' type='image' src='https://static.thetimebilling.com/images/check_nuevo.gif' alt='OK' rel='" + o.aData['id_usuario'] + ';' + o.mDataProp + "'/></div>";
+		} else {
+			return "<div class='permiso off' id='" + o.aData['id_usuario'] + ';' + o.mDataProp + "'><input class='permiso'  type='image' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif' rel='" + o.aData['id_usuario'] + ';' + o.mDataProp + "' alt='NO' /></div>";
+		}
+	}
+	var oTable = $('#tablapermiso').dataTable({
 		"bJQueryUI": true,
 		"bDeferRender": true,
 		"bDestroy": true,
@@ -23,6 +42,7 @@ jQuery(document).ready(function () {
 			{"mDataProp": "rut"},
 			{"mDataProp": "id_usuario"},
 			{"mDataProp": "nombrecompleto"},
+			{"mDataProp": "username"},
 			{"mDataProp": "ADM"},
 			{"mDataProp": "DAT"},
 			{"mDataProp": "COB"},
@@ -39,25 +59,30 @@ jQuery(document).ready(function () {
 			{"mDataProp": "ACT"}
 		],
 		"aoColumnDefs": [
-			{"sClass": "dttnombres", "aTargets": [2]},
-			{"fnRender": function (o, val) {
-					var botones = '';
-					botones += "<div style='float:left;display:inline;' id='" + o.aData['id_usuario'] + ';' + o.mDataProp + "'>";
-					if (val == 1) {
-						botones += "<input class='permiso usuarioactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb.png' alt='ACTIVO' title='Usuario Activo'";
-					} else {
-						botones += "<input class='permiso usuarioinactivo' type='image' src='https://static.thetimebilling.com/images/lightbulb_off.png' alt='INACTIVO' title='Usuario Inactivo'";
-					}
-					return botones + " rel='" + o.aData['id_usuario'] + ';' + o.mDataProp + "' data-contracts='" + o.aData['total_contracts'] + "' data-clientscontracts='" + o.aData['total_clients_contracts'] + "' data-matterscontracts='" + o.aData['total_matters_contracts'] + "'/></div>&nbsp;<a style='display:inline;position: relative;top: 0;right: 0;' href='usuario_paso2.php?rut=" + o.aData['rut'] + "' title='Editar usuario'><img border=0 src='https://static.thetimebilling.com/images/ver_persona_nuevo.gif' alt='Editar' /></a>";
-				}, "sClass": "dttactivo", "bUseRendered": false, "aTargets": [16]},
-			{"fnRender": function (o, val) {
-					if (val == 1) {
-						return "<div class='permiso on' id='" + o.aData['id_usuario'] + ';' + o.mDataProp + "'><input class='permiso' type='image' src='https://static.thetimebilling.com/images/check_nuevo.gif' alt='OK' rel='" + o.aData['id_usuario'] + ';' + o.mDataProp + "'/></div>";
-					} else {
-						return "<div class='permiso off' id='" + o.aData['id_usuario'] + ';' + o.mDataProp + "'><input class='permiso'  type='image' src='https://static.thetimebilling.com/images/cruz_roja_nuevo.gif' rel='" + o.aData['id_usuario'] + ';' + o.mDataProp + "' alt='NO' /></div>";
-					}
-				}, "bUseRendered": false, "sClass": "dttpermisos", "aTargets": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]},
-			{"bVisible": false, "aTargets": [0, 1]}
+			{
+				"bVisible": false,
+				"aTargets": [0, 1]
+			},
+			{
+				"sClass": "dttnombres",
+				"aTargets": [2, 3]
+			},
+			{
+				"fnRender": function (o, val) {
+					return permissionButton(o, val);
+				},
+				"bUseRendered": false,
+				"sClass": "dttpermisos",
+				"aTargets": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+			},
+			{
+				"fnRender": function (o, val) {
+					return actionButtons(o, val);
+				},
+				"sClass": "dttactivo",
+				"bUseRendered": false,
+				"aTargets": [17]
+			}
 		],
 		"fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
 			if (aData['ACT'] == "0") {
@@ -67,19 +92,23 @@ jQuery(document).ready(function () {
 		"sAjaxSource": "../interfaces/ajax/usuarios_ajax.php",
 		"iDisplayLength": 25,
 		"sDom": '<"top"flp>t<"bottom"i>',
-		"aLengthMenu": [[25, 50, 100, 200, -1], [25, 50, 100, 200, "Todo"]],
+		"aLengthMenu": [
+			[25, 50, 100, 200, -1],
+			[25, 50, 100, 200, "Todo"]
+		],
 		"sPaginationType": "full_numbers",
 		"aaSorting": [[2, "asc"]]
 	});
 	jQuery('#contienefiltro').append(jQuery('#tablapermiso_filter'));
-	oTable.fnFilter('1', 16);
+	oTable.fnFilter('1', 17);
 	jQuery('#activo').click(function () {
 		if (jQuery(this).is(':checked')) {
-			oTable.fnFilter('1', 16, 0, 1);
+			oTable.fnFilter('1', 17, 0, 1);
 		} else {
-			oTable.fnFilter('', 16, 0, 1);
+			oTable.fnFilter('', 17, 0, 1);
 		}
 	});
+
 	jQuery('input.permiso').live('click', function () {
 		var self = jQuery(this);
 		var src = self.attr('src');
@@ -186,7 +215,8 @@ jQuery(document).ready(function () {
 	jQuery('#btnbuscar').click(function () {
 		jQuery(this).parents('form:first').attr('action', 'usuario_paso1.php?buscar=1').submit();
 	});
-});
+})(jQuery);
+
 function Listar(form, from) {
 	var nom = document.act.nombre.value;
 	var activo = 0;
