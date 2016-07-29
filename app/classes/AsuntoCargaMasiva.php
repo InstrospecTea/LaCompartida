@@ -73,7 +73,7 @@ class AsuntoCargaMasiva extends AsuntoConfig {
 			$this->extra_fields['contacto'] = $data['contacto'];
 		}
 		if (!empty($data['email_contacto'])) {
-			$this->email_contacto['email_contacto'] = $data['email_contacto'];
+			$this->extra_fields['email_contacto'] = $data['email_contacto'];
 		}
 		if (!empty($data['fono_contacto'])) {
 			$this->extra_fields['fono_contacto'] = $data['fono_contacto'];
