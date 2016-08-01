@@ -211,7 +211,7 @@ function DescripcionHonorariosGastos(&$fila) {
 	$id_documento = $fila->fields['id_documento'];
 	$id_cobro = $fila->fields['id_cobro'];
 
-	$html .= "<a href='cobros5.php?id_cobro={$id_cobro}&popup=1'>{$fila->fields['glosa_documento']}</a>";
+	$html .= "<a href=\"#!\" onClick=\"nuevaVentana('Editar_Cobro',1050,700,'cobros5.php?id_cobro={$id_cobro}&popup=1&contitulo=true&id_foco=1', '');\">{$fila->fields['glosa_documento']}</a>";
 
 	// Honorarios
 	$monto_total = Valor_Monto_Honorarios($fila);
