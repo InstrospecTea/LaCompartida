@@ -2684,7 +2684,7 @@ if (!class_exists('Cobro')) {
 						if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
 							$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
 						} else {
-							$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
+							$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] );
 						}
 						$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
 					} else {
@@ -2717,7 +2717,7 @@ if (!class_exists('Cobro')) {
 						if (method_exists('Conf', 'GetConf') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
 							$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) - $row['duracion_retainer'];
 						} else {
-							$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
+							$array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada'] += ( $row['duracion_cobrada'] - $row['duracion_incobrables'] );
 						}
 						$array_resumen_profesionales[$row['id_usuario']]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_resumen_profesionales[$row['id_usuario']]['duracion_tarificada']);
 					} else {
@@ -2775,7 +2775,7 @@ if (!class_exists('Cobro')) {
 					$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
 					$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
 				} else if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
-					$array_profesional_usuario['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] ) * $factor_proporcional;
+					$array_profesional_usuario['duracion_tarificada'] = ( $row['duracion_cobrada'] - $row['duracion_incobrables'] );
 					$array_profesional_usuario['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($array_profesional_usuario['duracion_tarificada']);
 					$array_profesional_usuario['duracion_tarificada'] = Utiles::GlosaHora2Multiplicador($array_profesional_usuario['glosa_duracion_tarificada']);
 					$array_profesional_usuario['valor_tarificada'] = $array_profesional_usuario['duracion_tarificada'] * $row['tarifa'];
@@ -2813,7 +2813,6 @@ if (!class_exists('Cobro')) {
 			} else {
 				$factor_ajuste = 1;
 			}
-
 			return array($array_profesionales, $array_resumen_profesionales, $factor_ajuste);
 		}
 
