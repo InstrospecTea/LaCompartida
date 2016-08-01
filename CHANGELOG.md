@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.13
+Monday, August 1st
+* **Fix** [Popup a Cobro Desde Adelanto](https://github.com/LemontechSA/ttb/pull/1715)
+
 ## Hotfix 16.24.12
 Thursday, July 28th
 * **Fix** [En factura campo dte_metodo_pago_cta es guardado como string](https://github.com/LemontechSA/ttb/pull/1713)
