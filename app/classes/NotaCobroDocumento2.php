@@ -567,6 +567,8 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$html = str_replace('%DETALLE_TARIFA_ADICIONAL%', '', $html);
 				}
 
+				$html = str_replace('%DETALLE_PROPORCIONAL%', $this->detalleProporcional($x_resultados, $moneda, $idioma), $html);
+
 				if (Conf::GetConf($this->sesion, 'ParafoAsuntosSoloSiHayTrabajos') && ($this->fields['incluye_honorarios'] == 0)) {
 					$html = str_replace('%honorarios%', '', $html);
 				} else if (Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
@@ -3772,4 +3774,46 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 
 		return $this->RenderTemplate($html);
 	}
+
+	private function detalleProporcional($x_resultados, $moneda, $idioma) {
+		if ($this->fields['forma_cobro'] != 'PROPORCIONAL') {
+			return '';
+		}
+		$id_moneda = $moneda->fields['id_moneda'];
+		$decimales = $moneda->fields['cifras_decimales'];
+		$separador_decimal = $idioma->fields['separador_decimales'];
+		$separador_miles = $idioma->fields['separador_miles'];
+		$simbolo = $moneda->fields['simbolo'];
+
+
+		$horas_tarificadas = $this->fields['total_minutos'] / 60;
+		$monto_trabajos = $this->fields['monto_trabajos'];
+		$monto_retainer = $this->fields['monto_contrato'];
+		$horas_retainer = $this->fields['retainer_horas'];
+		$monto_honorarios = $monto_trabajos - $monto_retainer;
+
+		$data = array(
+			'glosa_retainer' => ucwords(strtolower(__('PROPORCIONAL'))),
+			'monto_retainer' => $simbolo . $this->espacio . number_format($monto_retainer, $decimales, $separador_decimal, $separador_miles),
+			'glosa_honorarios' => __('Honorarios tarificados'),
+			'monto_thh' => $simbolo . $this->espacio . number_format($x_resultados['monto_thh'][$id_moneda], $decimales, $separador_decimal, $separador_miles),
+			'monto_honorarios' => $simbolo . $this->espacio . number_format($monto_honorarios, $decimales, $separador_decimal, $separador_miles),
+			'glosa_descuento' => __('Descuento retainer'),
+			'porcentaje_descuento' => number_format($horas_retainer / $horas_tarificadas * 100, 2, $separador_decimal, $separador_miles)
+		);
+
+		$template = <<<TPL
+<tr>
+	<td>{glosa_retainer}</td>
+	<td align="right">{monto_retainer}</td>
+</tr>
+<tr>
+	<td>{glosa_honorarios}<div class="descuento-retainer">({monto_thh} - {porcentaje_descuento}% {glosa_descuento})</div></td>
+	<td align="right">{monto_honorarios}</td>
+</tr>
+
+TPL;
+		return \TTB\Utiles::interpolate($data, $template);
+	}
+
 }

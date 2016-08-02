@@ -209,7 +209,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 
 				if (is_array($x_resumen_profesional)) {
 					foreach ($x_resumen_profesional as $prof => $data) {
-						if ($data['duracion_retainer'] > 0 && ($this->fields['forma_cobro'] != 'FLAT FEE' || ( Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) )) {
+						if ($data['duracion_retainer'] > 0 && $this->fields['forma_cobro'] != 'PROPORCIONAL' && ($this->fields['forma_cobro'] != 'FLAT FEE' || ( Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) )) {
 							$retainer = true;
 						}
 						//if ($data['duracion_descontada'] > 0)
@@ -809,7 +809,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 
 				if (is_array($x_resumen_profesional)) {
 					foreach ($x_resumen_profesional as $index => $data) {
-						if ($data['duracion_retainer'] > 0 && ($this->fields['forma_cobro'] != 'FLAT FEE' || Conf::GetConf($this->sesion, 'ResumenProfesionalVial'))) {
+						if ($data['duracion_retainer'] > 0 && $this->fields['forma_cobro'] != 'PROPORCIONAL' && ($this->fields['forma_cobro'] != 'FLAT FEE' || Conf::GetConf($this->sesion, 'ResumenProfesionalVial'))) {
 							$retainer = true;
 						}
 						if (($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
