@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 16.24.16
+Tuesday, August 2nd
+* **Fix** [Traducción PT](https://github.com/LemontechSA/ttb/pull/1720)
+
+## Hotfix 16.24.15
+Tuesday, August 2nd
+* **Update** [Actualizar credenciales para el deploy de PHP53](https://github.com/LemontechSA/ttb/pull/1719)
+
 ## Hotfix 16.24.14
 Tuesday, August 2nd
 * **Fix** [Eliminar perfil Retribuciones](https://github.com/LemontechSA/ttb/pull/1718)
