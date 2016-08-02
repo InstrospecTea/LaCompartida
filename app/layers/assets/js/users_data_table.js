@@ -55,7 +55,6 @@
 			{"mDataProp": "SEC"},
 			{"mDataProp": "SOC"},
 			{"mDataProp": "TAR"},
-			{"mDataProp": "RET"},
 			{"mDataProp": "ACT"}
 		],
 		"aoColumnDefs": [
@@ -73,7 +72,7 @@
 				},
 				"bUseRendered": false,
 				"sClass": "dttpermisos",
-				"aTargets": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+				"aTargets": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 			},
 			{
 				"fnRender": function (o, val) {
@@ -81,7 +80,7 @@
 				},
 				"sClass": "dttactivo",
 				"bUseRendered": false,
-				"aTargets": [17]
+				"aTargets": [16]
 			}
 		],
 		"fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
@@ -100,12 +99,12 @@
 		"aaSorting": [[2, "asc"]]
 	});
 	jQuery('#contienefiltro').append(jQuery('#tablapermiso_filter'));
-	oTable.fnFilter('1', 17);
+	oTable.fnFilter('1', 16);
 	jQuery('#activo').click(function () {
 		if (jQuery(this).is(':checked')) {
-			oTable.fnFilter('1', 17, 0, 1);
+			oTable.fnFilter('1', 16, 0, 1);
 		} else {
-			oTable.fnFilter('', 17, 0, 1);
+			oTable.fnFilter('', 16, 0, 1);
 		}
 	});
 
@@ -215,7 +214,7 @@
 	jQuery('#btnbuscar').click(function () {
 		jQuery(this).parents('form:first').attr('action', 'usuario_paso1.php?buscar=1').submit();
 	});
-	
+
 	$('#form_usuario').on('submit', function () {
 		if ($('#cambiar_alerta_diaria').is(':checked')) {
 			var alerta_diaria = '\n ' + __('Alerta diaria') + ':          ' + ($('#alerta_diaria').is(':checked') ? __('SI') : __('NO'));

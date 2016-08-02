@@ -21,7 +21,6 @@ $queryuser = "SELECT
 	SUM(IF(usuario_permiso.codigo_permiso = 'SEC', 1, 0)) AS SEC,
 	SUM(IF(usuario_permiso.codigo_permiso = 'SOC', 1, 0)) AS SOC,
 	SUM(IF(usuario_permiso.codigo_permiso = 'TAR', 1, 0)) AS TAR,
-	SUM(IF(usuario_permiso.codigo_permiso = 'RET', 1, 0)) AS RET,
 	SUM(IF(usuario_permiso.codigo_permiso = 'ALL', 1, 0)) AS PALL
 FROM usuario
 	LEFT JOIN usuario_permiso ON usuario_permiso.id_usuario = usuario.id_usuario

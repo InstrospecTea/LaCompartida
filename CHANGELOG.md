@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.14
+Tuesday, August 2nd
+* **Fix** [Eliminar perfil Retribuciones](https://github.com/LemontechSA/ttb/pull/1718)
+
 ## Hotfix 16.24.13
 Monday, August 1st
 * **Fix** [Popup a Cobro Desde Adelanto](https://github.com/LemontechSA/ttb/pull/1715)
