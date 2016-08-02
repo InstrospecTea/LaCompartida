@@ -62,8 +62,6 @@ $obligatorios = function($key) use ($validacionesCliente, $contractValidation) {
 	}
 };
 
-$modulo_retribuciones_activo = Conf::GetConf($Sesion, 'UsarModuloRetribuciones');
-
 if (!defined('HEADERLOADED')) {
 	$addheaderandbottom = true;
 }
@@ -1614,18 +1612,6 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					?>
 				</td>
 			</tr>
-			<?php if ($modulo_retribuciones_activo) { ?>
-				<tr>
-				<td class="al">
-					<div class="span4">
-						<?php echo __('Retribución') . ' ' . __('Encargado Comercial');?>
-					</div>
-				</td>
-				<td class="al">
-					<input name="retribucion_usuario_responsable" type="text" size="6" value="<?php echo empty($contrato->fields['id_contrato']) ? Conf::GetConf($Sesion, 'RetribucionUsuarioResponsable') : $contrato->fields['retribucion_usuario_responsable']; ?>"/>%
-				</td>
-				</tr>
-			<?php } ?>
 
 			<?php if (Conf::GetConf($Sesion, 'EncargadoSecundario')) { ?>
 				<tr class="controls controls-row ">
@@ -1643,19 +1629,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos("OR id_usuario = '{$contrato->fields['id_usuario_secundario']}'"), 'id_usuario_secundario', $contrato->fields['id_usuario_secundario'], 'class="span3"', 'Vacio', '200px'); ?>
 					</td>
 				</tr>
-				<?php if ($modulo_retribuciones_activo) { ?>
-					<tr>
-						<td class="al">
-							<div class="span4">
-								<?php echo __('Retribución') . ' ' . __('Encargado Secundario'); ?>
-							</div>
-						</td>
-						<td class="al">
-							<input name="retribucion_usuario_secundario" type="text" size="6" value="<?php echo empty($contrato->fields['id_contrato']) ? Conf::GetConf($Sesion, 'RetribucionUsuarioSecundario') : $contrato->fields['retribucion_usuario_secundario']; ?>" />%
-						</td>
-					</tr>
-				<?php }
-			} ?>
+			<?php } ?>
 			<?php if (Conf::GetConf($Sesion, 'ExportacionLedes')) { ?>
 				<tr   class="controls controls-row ">
 					<td class="al">
