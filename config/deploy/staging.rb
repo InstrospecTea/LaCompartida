@@ -146,8 +146,8 @@ end
 namespace :db do
   task :load do
     s3 = AWS::S3.new(
-      :access_key_id     => "AKIAJSLZNMWQ3H3BN3WA",
-      :secret_access_key => "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"
+      :access_key_id     => "AKIAJ3GT6FBUHCKUO4QQ",
+      :secret_access_key => "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"
     )
 
     client = Capistrano::CLI.ui.ask("Client Name: ")

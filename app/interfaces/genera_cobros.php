@@ -250,7 +250,7 @@ if ($opc == 'buscar') {
 			var largoContratos = arrayContratos.length;
 
 			if (largoContratos == 0 || largoClientes == 0) {
-				text_window = '<div style="font-weight:bold;padding:10px;">No hay datos para los filtros que Ud. ha seleccionado</div>';
+				text_window = '<div style="font-weight:bold;padding:10px;"><?= __('No hay datos para los filtros que Ud. ha seleccionado') ?></div>';
 				jQuery('<p/>')
 					.attr('title', 'Advertencia')
 					.html(text_window)
@@ -278,8 +278,8 @@ if ($opc == 'buscar') {
 			text_window += '<br><span style="font-size:11px; text-align:center; color:#FF0000;"><?php echo __('Recuerde que al generar los borradores se eliminarán todos los borradores antiguos asociados a los contratos') ?></span><br>';
 			text_window += '<br><span style="font-size:11px; text-align:center;font-weight:bold"><?php echo __('¿Desea generar los borradores?') ?></span><br>';
 			text_window += '<div style="text-align:left;font-weight:normal;margin:0 20px;">';
-			text_window += '<?php echo $Form->radio('radio_generacion', '', true, array('id' => 'radio_wip')) .  __('Honorarios') . ' y ' . __('Gastos') . __(', se incluirán horas hasta el') ?> ' + jQuery('#fecha_fin').val();
-			text_window += '<br/><?php echo $Form->checkbox('cobrosencero_generacion', 1, $cobrosencero_chk, array('label' => 'Incluir ' . __('cobros') . ' de monto cero'));?>';
+			text_window += '<?php echo $Form->radio('radio_generacion', '', true, array('id' => 'radio_wip')) .  __('Honorarios') . ' ' . __('y') . ' ' . __('Gastos') . ', ' . __('se incluirán horas hasta el') ?> ' + jQuery('#fecha_fin').val();
+			text_window += '<br/><?php echo $Form->checkbox('cobrosencero_generacion', 1, $cobrosencero_chk, array('label' => __('Incluir') . __('cobros') . ' ' . __('de monto cero')));?>';
 			text_window += '</div><div style="text-align:center;"> ';
 			text_window += '<span id="loading" style="text-align:center;margin:auto;">&nbsp;</span> ';
 			text_window += '<br><span id="respuestahh">&nbsp;</span> ';
@@ -482,7 +482,7 @@ if ($opc == 'buscar') {
 										.css({'font-weight':'bold', 'margin-bottom':'15px'})
 										.html("Emitiendo <?php echo __('cobros'); ?>")
 								)
-								.append(jQuery('<div/>').html('Procure no cerrar la pestaña actual de su navegador.'));
+								.append(jQuery('<div/>').html('<?= __('Procure no cerrar la pestaña actual de su navegador') ?>.'));
 
 							jQuery('#modal_emitir_cobros_resumen')
 								.append(
@@ -547,7 +547,7 @@ if ($opc == 'buscar') {
 						.append(
 							jQuery('<div/>')
 							.html("<br><b><?php echo __('¿Desea cambiar el estado de los cobros a EN REVISION?'); ?></b><br><br>" +
-								'<label for="cobrosencero_cobros_en_revision" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo 'Incluir ' . __('cobros') . ' de monto cero'; ?>:</label><?php echo $Form->checkbox('cobrosencero_cobros_en_revision', 1, $cobrosencero_chk); ?>')
+								'<label for="cobrosencero_cobros_en_revision" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Incluir') . ' ' . __('cobros') . ' ' . __('de monto cero'); ?>:</label><?php echo $Form->checkbox('cobrosencero_cobros_en_revision', 1, $cobrosencero_chk); ?>')
 						)
 				)
 				.dialog({
@@ -583,7 +583,7 @@ if ($opc == 'buscar') {
 										.css({'font-weight':'bold', 'margin-bottom':'15px'})
 										.html("Emitiendo <?php echo __('cobros'); ?>")
 								)
-								.append(jQuery('<div/>').html('Procure no cerrar la pestaña actual de su navegador.'));
+								.append(jQuery('<div/>').html('<?= __('Procure no cerrar la pestaña actual de su navegador') ?>.'));
 
 							jQuery('#modal_en_revision_cobros_resumen')
 								.append(
@@ -642,11 +642,11 @@ if ($opc == 'buscar') {
 						text_window += '<strong><center>No hay datos para los filtros que Ud. ha seleccionado</center></strong>';
 					} else {
 						text_window += '<div style="padding-left:40px; text-align:left; color:red; ">';
-						text_window += '<label for="id_formato" style="padding-bottom: 4px;display:inline-block;width:180px;">Formato del borrador:</label>';
-						text_window += '<?php echo str_replace(array("'", "\n"), array('"', ''), Html::SelectQuery($sesion, "SELECT id_formato, descripcion FROM cobro_rtf", "id_formato", "", "", "Según opciones del " . __('Contrato'), '200px')); ?>';
-						text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:180px;">Incluir cartas:</label><input type="checkbox" name="cartas" id="cartas"  />';
-						text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:180px;">Agrupar borradores por cliente:</label><input type="checkbox" name="agrupar" id="agrupar" />';
-						text_window += '<br><label for="cobrosencero_descargar_borradores" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo 'Incluir ' . __('cobros') . ' de monto cero'; ?>:</label><?php echo $Form->checkbox('cobrosencero_descargar_borradores', 1, $cobrosencero_chk); ?>';
+						text_window += '<label for="id_formato" style="padding-bottom: 4px;display:inline-block;width:180px;"><?= __('Formato del borrador') ?>:</label>';
+						text_window += '<?php echo str_replace(array("'", "\n"), array('"', ''), Html::SelectQuery($sesion, "SELECT id_formato, descripcion FROM cobro_rtf", "id_formato", "", "", __('Según opciones del') . ' ' . __('Contrato'), '200px')); ?>';
+						text_window += '<br><label for="cartas" style="padding-bottom: 4px;display:inline-block;width:180px;"><?= __('Incluir cartas') ?>:</label><input type="checkbox" name="cartas" id="cartas"  />';
+						text_window += '<br><label for="agrupar" style="padding-bottom: 4px;display:inline-block;width:180px;"><?= __('Agrupar borradores por cliente') ?>:</label><input type="checkbox" name="agrupar" id="agrupar" />';
+						text_window += '<br><label for="cobrosencero_descargar_borradores" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Incluir') . ' ' . __('cobros') . ' ' . __('de monto cero'); ?>:</label><?php echo $Form->checkbox('cobrosencero_descargar_borradores', 1, $cobrosencero_chk); ?>';
 						text_window += '<br><label for="mostrar_asuntos_cobrables_sin_horas_borradores" style="padding-bottom: 4px;display:inline-block;width:180px;"><?php echo __('Mostrar Asuntos Cobrables Sin Horas') ?>:</label><?php echo $Form->checkbox('mostrar_asuntos_cobrables_sin_horas_borradores', 1); ?>';
 						text_window += '</div>';
 					}
