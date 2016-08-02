@@ -1210,5 +1210,3 @@ $_LANG['Según opciones del'] = "Segundo opções do";
 $_LANG['Agrupar borradores por cliente'] = "Agrupar rascunhos por cliente";
 $_LANG['No hay datos para los filtros que Ud. ha seleccionado'] = "Não existem dados para os filtros selecionados";
 $_LANG['Procure no cerrar la pestaña actual de su navegador'] = "Procure não fechar a janela atual do seu navegador";
-$_LANG[''] = "";
-$_LANG[''] = "";
