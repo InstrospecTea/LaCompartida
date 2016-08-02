@@ -95,15 +95,8 @@ class ClientsController extends AbstractController {
 			$this->contractDataFields[] = 'usa_impuesto_gastos';
 		}
 
-		if (Configure::read('UsarModuloRetribuciones')) {
-			$this->contractDataFields[] = 'retribucion_usuario_responsable';
-		}
-
 		if (Configure::read('EncargadoSecundario')) {
 			$this->contractDataFields[] = 'id_usuario_secundario';
-			if (Configure::read('UsarModuloRetribuciones')) {
-				$this->contractDataFields[] = 'retribucion_usuario_secundario';
-			}
 		}
 
 		if (Configure::read('ExportacionLedes')) {

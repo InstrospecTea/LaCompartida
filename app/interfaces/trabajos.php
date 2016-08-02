@@ -685,11 +685,6 @@ $pagina->PrintTop($popup);
 					<td valign="top" class="texto" align="left">
 						<?php
 							$query_areas = 'SELECT id, glosa FROM prm_area_usuario ORDER BY glosa';
-							if ( Conf::GetConf($sesion, 'UsarModuloRetribuciones') ) {
-								$query_areas = 'SELECT area.id, CONCAT(REPEAT("&nbsp;", IF(ISNULL(padre.id), 0, 5)), area.glosa) FROM prm_area_usuario AS area
-												LEFT JOIN prm_area_usuario AS padre ON area.id_padre = padre.id
-												ORDER BY  IFNULL(padre.glosa, area.glosa), padre.glosa, area.glosa ASC ';
-							}
 							echo Html::SelectQuery($sesion, $query_areas, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario, "", __("Ninguna"))
 							?>
 					</td>

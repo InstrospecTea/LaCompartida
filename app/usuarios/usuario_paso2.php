@@ -31,7 +31,6 @@ if ($opc == "eliminar") {
 	}
 }
 
-$modulo_retribuciones_activo = Conf::GetConf($sesion, 'UsarModuloRetribuciones') || false;
 $id_categoria_anterior = $usuario->fields['id_categoria_usuario'];
 
 if ($opc == 'edit') {
@@ -50,11 +49,6 @@ if ($opc == 'edit') {
 
 	$usuario->Edit('username', $username);
 	$usuario->Edit('centro_de_costo', $centro_de_costo);
-
-	if ($modulo_retribuciones_activo){
-		$usuario->Edit('porcentaje_retribucion', $porcentaje_retribucion);
-	}
-
 	$usuario->Edit('id_categoria_usuario', $id_categoria_usuario);
 	$usuario->Edit('id_area_usuario', $id_area_usuario);
 	$usuario->Edit('telefono1', $telefono1);
@@ -470,19 +464,6 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					<?php echo AreaUsuario::SelectAreas($sesion, 'id_area_usuario', $usuario->fields['id_area_usuario'] ? $usuario->fields['id_area_usuario'] : $id_area_usuario); ?>
 				</td>
 			</tr>
-
-			<?php if ($modulo_retribuciones_activo) { ?>
-
-				<tr>
-					<td valign="top" class="texto" align="right">
-						<?php echo __('Porcentaje de Retribución') ?>
-					</td>
-					<td valign="top" class="texto" align="left">
-						<?php	echo '<input type="text" size="6" value="' . $usuario->fields['porcentaje_retribucion']  . '" name="porcentaje_retribucion" />%'; ?>
-					</td>
-				</tr>
-
-			<?php }	?>
 
 			<tr><td>&nbsp;</td></tr>  <!-- spacer -->
 

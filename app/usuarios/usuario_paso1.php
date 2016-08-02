@@ -428,7 +428,6 @@
 			<th><?php echo __('Secretaría'); ?></th>
 			<th><?php echo __('Socio'); ?></th>
 			<th><?php echo __('Tarifa'); ?></th>
-			<th><?php echo __('Retribuciones'); ?></th>
 			<th width="25"><?php echo __('Activo'); ?></th>
 		</tr>
 	</thead>
