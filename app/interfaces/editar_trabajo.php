@@ -1142,6 +1142,10 @@ UtilesApp::GetConfJS($sesion, 'PrellenarTrabajoConActividad');
 	function CargarTarifa() {
 		var id_usuario = jQuery('#id_usuario').val();
 
+		if (jQuery('#id_trabajo').length > 0 && jQuery('#id_trabajo').val() > 0) {
+			return;
+		}
+
 		if (CodigoSecundario) {
 			var codigo_asunto = jQuery('#codigo_asunto_secundario').val();
 			var codigo_cliente = jQuery('#codigo_cliente_secundario').val();
