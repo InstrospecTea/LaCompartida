@@ -39,6 +39,11 @@ class Gasto extends Objeto {
 			'title' => 'Ingresado por',
 		),
 		array(
+			'field' => 'solicitante',
+			'title' => 'Solicitado por',
+			'visible' => false
+		),
+		array(
 			'field' => 'usuario_ordena',
 			'title' => 'Ordenado por',
 		),
@@ -347,7 +352,9 @@ class Gasto extends Objeto {
 												ON cta_corriente.detraccion = prm_codigo_detraccion.codigo
 												AND prm_codigo_detraccion.grupo = 'DETRACCION'";
 		}
-
+		if (Conf::GetConf($this->sesion, 'OrdenadoPor')) {
+			$SimpleReport->Config->columns['solicitante']->Visible();
+		}
 		$col_select = !empty($col_select) ? "," . implode(",", $col_select) : NULL;
 		$join_extra = !empty($join_extra) ? implode(" ", $join_extra) : NULL;
 
@@ -525,6 +532,9 @@ class Gasto extends Objeto {
 		} else {
 			$query.="	if(IFNULL(cobro.estado, 'SIN COBRO')='PAGADO',0, if(	ifnull(cta_corriente.ingreso,0)>0,-1*ifnull(ingreso,0), ifnull(cta_corriente.egreso,0)) ) AS monto_cobrable,
 						IF( cta_corriente.id_cobro IS NOT NULL, (cobro_moneda_gasto.tipo_cambio/cobro_moneda_base.tipo_cambio), (moneda_gasto.tipo_cambio/moneda_base.tipo_cambio) )*cta_corriente.cobrable*if(ifnull(egreso,0)=0,ifnull(ingreso,0), egreso)  as monto_cobrable_moneda_base,  \n \n";
+		}
+		if (Conf::GetConf($sesion, 'OrdenadoPor')) {
+			$query .= 'solicitante,';
 		}
 
 		$impuestoGastos = Conf::GetConf($sesion, 'ValorImpuestoGastos');

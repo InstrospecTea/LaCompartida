@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.24.17
+Tuesday, August 2nd
+* **Fix** [Solo se editará la tarifa en trabajos guardados](https://github.com/LemontechSA/ttb/pull/1722)
+
 ## Hotfix 16.24.16
 Tuesday, August 2nd
 * **Fix** [Traducción PT](https://github.com/LemontechSA/ttb/pull/1720)

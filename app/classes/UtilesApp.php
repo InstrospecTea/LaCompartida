@@ -1770,6 +1770,7 @@ HTML;
 		$query = "SELECT SQL_CALC_FOUND_ROWS
 					cta_corriente.id_movimiento,
 					cta_corriente.descripcion,
+					cta_corriente.solicitante,
 					prm_proveedor.id_proveedor as id_proveedor,
 					prm_proveedor.glosa as glosa_proveedor,
 					usuario.username as id_usuario,
@@ -1880,6 +1881,7 @@ HTML;
 				$lista[$v]['monto_total_impuesto'] = $suma_total_impuesto;
 				$lista[$v]['monto_total_mas_impuesto'] = $suma_total_impuesto + $suma_a_total;
 				$lista[$v]['descripcion'] = $gasto->fields['descripcion'];
+				$lista[$v]['solicitante'] = $gasto->fields['solicitante'];
 				$lista[$v]['id_proveedor'] = $gasto->fields['id_proveedor'];
 				$lista[$v]['glosa_proveedor'] = $gasto->fields['glosa_proveedor'];
 				$lista[$v]['id_usuario'] = $gasto->fields['id_usuario'];
