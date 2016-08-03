@@ -2,9 +2,6 @@
 
 class CobroDetalleProfesional {
 
-	// Utiles::GlosaHora2Multiplicador
-	// Utiles::Decimal2GlosaHora
-
 	protected $Sesion;
 	protected $fields;
 
