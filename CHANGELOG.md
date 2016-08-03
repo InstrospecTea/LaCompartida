@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.25.0](https://github.com/LemontechSA/ttb/pull/1723)
+Tuesday, August 2nd
+* **Feature** [Solicitante Gasto](https://github.com/LemontechSA/ttb/pull/1543)
+
 ## Hotfix 16.24.17
 Tuesday, August 2nd
 * **Fix** [Solo se editará la tarifa en trabajos guardados](https://github.com/LemontechSA/ttb/pull/1722)
