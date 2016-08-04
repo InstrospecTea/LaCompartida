@@ -177,8 +177,7 @@ if ($opcion == 'guardar') {
 
 		$Asunto->Edit("glosa_asunto", $glosa_asunto);
 
-		$client_code = !is_null($nuevo_codigo_cliente) ? $nuevo_codigo_cliente : $codigo_cliente;
-		$Asunto->Edit("codigo_cliente", $client_code, true);
+		$Asunto->Edit("codigo_cliente", $codigo_cliente, true);
 
 		if (Conf::GetConf($Sesion, 'ExportacionLedes')) {
 			$Asunto->Edit("codigo_homologacion", $codigo_homologacion ? $codigo_homologacion : 'NULL');
@@ -416,26 +415,18 @@ if ($opcion == 'guardar') {
 	}
 
 	$errors = $Pagina->GetErrors();
-	if (empty($errors)) {
-		$NuevoCliente = new Cliente($Sesion);
-		if ($nuevo_codigo_cliente_secundario != '') {
-			$NuevoCliente->LoadByCodigoSecundario($nuevo_codigo_cliente_secundario);
-			$nuevo_codigo_cliente = $NuevoCliente->fields['codigo_cliente'];
-		} else {
-			$NuevoCliente = new Cliente($Sesion);
-			$NuevoCliente->LoadByCodigo($nuevo_codigo_cliente);
-		}
-		if ($NuevoCliente->Loaded()) {
-			$response = $Asunto->CambiaCliente($NuevoCliente);
-			if (!empty($response['errors'])) {
-				$Pagina->AddError($response['errors']);
-			} else {
-				if (!empty($response['Client'])) {
-					$NuevoCliente = $response['Client'];
-					$Cliente = $response['Client'];
-					$Pagina->AddInfo("El asunto fue asociado al cliente: <b>{$Cliente->fields['glosa_cliente']}</b>");
-				}
-			}
+
+	$new_client = Conf::GetConf($Sesion, 'CodigoSecundario') ? $nuevo_codigo_cliente_secundario : $nuevo_codigo_cliente;
+	$client_code = 'codigo_cliente' . (Conf::GetConf($Sesion, 'CodigoSecundario') ? '_secundario' : '');
+	if (empty($errors) && !empty($new_client) && $new_client != $Cliente->fields[$client_code]) {
+		try {
+			$MattersBusiness = new MattersBusiness($Sesion);
+			$entities = $MattersBusiness->changeClientOfMatter($Asunto, $new_client);
+			$Cliente = $entities['Client'];
+			$Asunto = $entities['Matter'];
+			$Pagina->AddInfo("El asunto fue asociado al cliente: {$Cliente->fields['glosa_cliente']}");
+		} catch (Exception $e) {
+			$Pagina->AddError($e->getMessage());
 		}
 	}
 }
@@ -744,8 +735,11 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 								if ($Asunto->Loaded()) { ?>
 									<a href='#' id='change_client'><img src='//static.thetimebilling.com/images/editar_on.gif' border='0' title='Cambiar Cliente'></a>
 									<span style="color:#FF0000; font-size:10px">*</span>
-									<div id="nuevo_codigo" class="hidden" style="padding: 5px 0px 5px 5px; background-color: yellowgreen">Asociar a cliente</br>
-										<?php echo $input_cliente; ?>
+									<div id="new_client" style="padding: 5px; background-color: yellowgreen; display: none; width: 405px;">
+										<div id="new_client_message" class="alert" style="margin-bottom: 5px;"></div>
+										<div id="new_client_code" style="display: none"><strong>Asociar a cliente</strong></br>
+											<?php echo $input_cliente; ?>
+										</div>
 									</div>
 								<?php } ?>
 							</td>
@@ -1054,16 +1048,39 @@ jQuery('document').ready(function () {
 		jQuery('.fields_trabajo_conjunto').hide();
 	}
 	});
-	jQuery('#change_client').click(function() {
+	jQuery('#change_client').click(function(event) {
+		event.preventDefault();
 		var $ = jQuery;
-		var input_nuevo_codigo = $('input.nuevo_codigo_cliente');
-		var select_nuevo_codigo = $('select.nuevo_codigo_cliente');
-		var secundario = input_nuevo_codigo.hasClass('secundario') ? '_secundario' : '';
-		var codigo_cliente = $('#campo_codigo_cliente' + secundario).val();
-		var glosa_cliente = $('#glosa_codigo_cliente' + secundario).val();
-		$('#nuevo_codigo').toggleClass('hidden');
-		input_nuevo_codigo.val(codigo_cliente);
-		select_nuevo_codigo.val(codigo_cliente);
+		var $this = $(this);
+		var $image = $('<img/>').attr('src', '//static.thetimebilling.com/images/loading.gif');
+		$this.after($image).hide();
+		$('#new_client').hide();
+		$('#new_client_code').hide();
+		var url = root_dir + '/app/Matters/validateChangeOfClient/' + $('#id_asunto').val();
+		$.get(url, function (response) {
+				var valid = response.valid;
+				$('#new_client_message').removeClass('alert-info alert-error').hide();
+				if (response.error) {
+					$('#new_client_message').html(response.error).addClass('alert-error').show();
+				} else if (response.advice) {
+					$('#new_client_message').html(response.advice).addClass('alert-info').show();
+				}
+				if (valid) {
+					var input_nuevo_codigo = $('input.nuevo_codigo_cliente');
+					var select_nuevo_codigo = $('select.nuevo_codigo_cliente');
+					var secundario = input_nuevo_codigo.hasClass('secundario') ? '_secundario' : '';
+					var codigo_cliente = $('#campo_codigo_cliente' + secundario).val();
+					var glosa_cliente = $('#glosa_codigo_cliente' + secundario).val();
+					$('#new_client_code').show();
+					input_nuevo_codigo.val(codigo_cliente);
+					select_nuevo_codigo.val(codigo_cliente);
+				}
+				$('#new_client').show();
+				$image.remove();
+				$this.show();
+			},
+			'json'
+		);
 	});
 
 	jQuery(document).on("change", "#cobro_independiente", function() {
@@ -1080,7 +1097,7 @@ jQuery('document').ready(function () {
 });
 
 /**
- * Si el usuario no está en la lista se agrega
+ * Si el usuario no estï¿½ en la lista se agrega
  * @param {type} data
  * @returns {undefined|Boolean}
  */

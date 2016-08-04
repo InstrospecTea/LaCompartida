@@ -1,13 +1,5 @@
 <?php
 
-require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/classes/Contrato.php';
-require_once Conf::ServerDir() . '/classes/Cliente.php';
-require_once Conf::ServerDir() . '/classes/UsuarioExt.php';
-require_once Conf::ServerDir() . '/classes/Template.php';
-
 /**
  * Clase para manejar las solicitudes de adelanto
  */
@@ -265,7 +257,7 @@ class SolicitudAdelanto extends Objeto {
 	 */
 	public function Prepare() {
 		// Formateo de fecha para correcto almacenamiento
-		if (isset($this->fields['fecha'])) {
+		if (isset($this->fields['fecha']) && !Utiles::es_fecha_sql($this->fields['fecha'])) {
 			$this->fields['fecha'] = Utiles::fecha2sql($this->fields['fecha']);
 		}
 
