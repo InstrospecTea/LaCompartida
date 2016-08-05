@@ -284,7 +284,7 @@ class WorkbookMiddleware {
 			}
 		}
 
-		// $this->workSheetObj->getStyle($cellCode)->applyFromArray($formatArray);
+		$this->workSheetObj->getStyle($cellCode)->applyFromArray($formatArray);
 
 		return;
 	}
