@@ -107,10 +107,10 @@ if (!$id_cobro) {
 $mostrar_resumen_de_profesionales = 1;
 
 if ($guardar_respaldo) {
-	$wb = new WorkbookMiddleware(Conf::ServerDir() . '/respaldos/ResumenCobros' . date('ymdHis') . '.xls');
+	$wb = new Spreadsheet_Excel_Writer(Conf::ServerDir() . '/respaldos/ResumenCobros' . date('ymdHis') . '.xls');
 	$wb->setVersion(8);
 } else {
-	$wb = new WorkbookMiddleware();
+	$wb = new Spreadsheet_Excel_Writer();
 	$wb->setVersion(88);
 	// No se hace $wb->send() todavía por si acaso no hay horas en el cobro.
 }
@@ -294,10 +294,14 @@ if ($borradores) {
 	++$filas;
 	$ws->write($filas, $col_descripcion, 'INSTRUCCIONES:', $CellFormat->get('instrucciones12'));
 	$filas+=2;
+
+	// $first_row = $filas;
+
 	$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang), $CellFormat->get('normal'));
 	$ws->write($filas, $col_fecha_ini, "Número del trabajo (no modificar). En el caso de dejar en blanco se ingresará un nuevo trabajo", $CellFormat->get('normal'));
 	$ws->mergeCells($filas, $col_fecha_ini, $filas, $col_valor_trabajo);
 	++$filas;
+
 	$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('fecha', 'Listado de trabajos', $lang), $CellFormat->get('normal'));
 	$ws->write($filas, $col_fecha_ini, "La fecha se puede modificar, en el caso de ser modificada debe estar en el formato dd-mm-aaaa", $CellFormat->get('normal'));
 	$ws->mergeCells($filas, $col_fecha_ini, $filas, $col_valor_trabajo);
@@ -321,6 +325,20 @@ if ($borradores) {
 	$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('valor_trabajo', 'Listado de trabajos', $lang, '%glosa_moneda%', $simbolo_moneda), $CellFormat->get('normal'));
 	$ws->write($filas, $col_fecha_ini, "Fórmula que equivale a la multiplicación de la tarifa por la duración cobrable.", $CellFormat->get('normal'));
 	$ws->mergeCells($filas, $col_fecha_ini, $filas, $col_valor_trabajo);
+
+	// $first_col = $col_id_trabajo;
+	// $last_row = $filas;
+	// $last_col = $col_fecha_ini;
+	// $format = [
+	// 	'font' => [
+	// 		'size' => 7,
+	// 		'align' => 'left',
+	// 		'valing' => 'top',
+	// 		'color' => ['rgb' => 'FF000000']
+	// 	]
+	// ];
+
+	// $ws->setFormatRange($first_row, $first_col, $last_row, $last_col, $format);
 
 	++$filas;
 	++$filas;
@@ -398,6 +416,8 @@ $results = $SearchingBusiness->searchByGenericCriteria($searchCriteria, array('D
 $chargeIds = array_map(function($element) {
 	return $element->get('charge_id_cobro');
 }, $results->toArray());
+
+// $chargeIds = ["39148", "39184", "39137", "39187", "39141", "39142", "39147"];
 
 // Search criteria que obtiene las entidades Cobro para no hacer
 // select  por cada uno, además trae la información necesaria de Document.
@@ -517,6 +537,8 @@ foreach ($chargeResults as $charge) {
 	} else {
 		$ws->fitToPages(1, 0);
 	}
+
+	// continue;
 
 	/*
 	 *	 Seteamas el ancho de las columnas

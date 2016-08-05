@@ -84,7 +84,7 @@ class FormatMiddleware {
 	 * @param int $bold
 	 */
 	public function setBold($bold) {
-		$this->bold = $bold == 1 ? true : false;
+		$this->bold = ($bold == 1);
 	}
 
 	/**
@@ -92,7 +92,7 @@ class FormatMiddleware {
 	 * @param int $italic
 	 */
 	public function setItalic($italic) {
-		$this->italic = $italic == 1 ? true : false;
+		$this->italic = ($italic == 1);
 	}
 
 	/**
@@ -108,7 +108,7 @@ class FormatMiddleware {
 	 * @param int $locked
 	 */
 	public function setLocked($locked) {
-		$this->locked = $locked == 1 ? true : false;
+		$this->locked = ($locked == 1);
 	}
 
 	/**
@@ -116,7 +116,7 @@ class FormatMiddleware {
 	 * @param int $top
 	 */
 	public function setTop($top) {
-		$this->top = $top == 1 ? true : false;
+		$this->top = $top == 1 ? PHPExcel_Style_Border::BORDER_THIN : PHPExcel_Style_Border::BORDER_THICK;
 	}
 
 	/**
@@ -124,7 +124,7 @@ class FormatMiddleware {
 	 * @param int $top
 	 */
 	public function setBottom($bottom) {
-		$this->bottom = $bottom;
+		$this->bottom = $bottom == 1 ? PHPExcel_Style_Border::BORDER_THIN : PHPExcel_Style_Border::BORDER_THICK;
 	}
 
 	/**
@@ -132,7 +132,7 @@ class FormatMiddleware {
 	 * @param int $top
 	 */
 	public function setBorder($border) {
-		$this->border = $border;
+		$this->border = $border == 1 ? PHPExcel_Style_Border::BORDER_THIN : PHPExcel_Style_Border::BORDER_NONE;
 	}
 
 	/**
@@ -152,7 +152,7 @@ class FormatMiddleware {
 	 * @param string $textwrap
 	 */
 	public function setTextwrap($textwrap) {
-		$this->textwrap = $textwrap == 1 ? true : false;
+		$this->textwrap = ($textwrap == 1);
 	}
 
 	/**
