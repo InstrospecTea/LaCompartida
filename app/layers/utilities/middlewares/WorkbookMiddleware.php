@@ -629,34 +629,4 @@ class WorkbookMiddleware {
 			unlink($path);
 		}
 	}
-
-	public function setFormatRange($first_row, $first_col, $last_row, $last_col, $format = null) {
-		// $format = array(
-    //          'font'    => array(
-    //              'name'      => 'Arial',
-    //              'bold'      => true,
-    //              'italic'    => false,
-    //              'underline' => PHPExcel_Style_Font::UNDERLINE_DOUBLE,
-    //              'strike'    => false,
-    //              'color'     => array(
-    //                  'rgb' => '808080'
-    //              )
-    //          ),
-    //          'borders' => array(
-    //              'bottom'     => array(
-    //                  'style' => PHPExcel_Style_Border::BORDER_DASHDOT,
-    //                  'color' => array(
-    //                      'rgb' => '808080'
-    //                  )
-    //              ),
-    //              'top'     => array(
-    //                  'style' => PHPExcel_Style_Border::BORDER_DASHDOT,
-    //                  'color' => array(
-    //                      'rgb' => '808080'
-    //                  )
-    //              )
-    //          )
-    //      );
-		$this->workSheetObj->getStyle('A4:B10')->applyFromArray($format);
-	}
 }
