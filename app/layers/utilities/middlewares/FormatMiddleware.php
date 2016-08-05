@@ -168,7 +168,7 @@ class FormatMiddleware {
 	 * @param int $underline
 	 */
 	public function setUnderline($underline) {
-		$this->underline = $underline;
+		$this->underline = ($underline == 1);
 	}
 
 	public function setTextRotation($angle) {
