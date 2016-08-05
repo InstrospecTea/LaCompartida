@@ -100,4 +100,19 @@ class SandboxController extends AbstractController {
 		$this->set(compact('data'));
 	}
 
+	public function date($lang = 'es') {
+		//Cambio de Lang
+		global $_LANG;
+		$_LANG = array();
+		include Conf::ServerDir() . "/lang/$lang.php";
+		$this->layoutTitle = 'Translated Dates';
+		$langs = array('es', 'en', 'pt');
+		$formats = array(
+			Date::RFC822,
+			Date::COOKIE,
+			'l d \d\e F \d\e Y',
+			'F, l d \d\e Y'
+		);
+		$this->set(compact('langs', 'lang', 'formats'));
+	}
 }
