@@ -31,4 +31,20 @@ class Date extends Carbon {
 		return str_replace($char, '{' . $index . '}', $format);;
 	}
 
+	/**
+	 * __toString() devuelve solo la fecha 'Y-m-d'
+	 */
+	public function toDate() {
+		self::$toStringFormat = array_shift(explode(' ', self::DEFAULT_TO_STRING_FORMAT));
+		return $this;
+	}
+
+	/**
+	 * __toString() devuelve solo la hora 'H:i:s'
+	 */
+	public function toTime() {
+		self::$toStringFormat = array_pop(explode(' ', self::DEFAULT_TO_STRING_FORMAT));
+		return $this;
+	}
+
 }
