@@ -1,18 +1,19 @@
 <?php
-include dirname(dirname(__DIR__)) . '/conf.php';
 
 use Carbon\Carbon;
+use TTB\Utiles;
 
 class Date extends Carbon {
 
 	private $escapes = array();
 
 	public function format($format) {
-		$this->escape($format, 'M');
-		$this->escape($format, 'F');
-		$this->escape($format, 'l');
-		$this->escape($format, 'D');
-		$format = str_replace(array_keys($this->escapes), $this->escapes, $format);
+		$format = $this->escape($format, 'M');
+		$format = $this->escape($format, 'F');
+		$format = $this->escape($format, 'l');
+		$format = $this->escape($format, 'D');
+		$format = Utiles::interpolate($this->escapes, $format);
+		$this->escapes = array();
 		return parent::format($format);
 	}
 
@@ -24,18 +25,10 @@ class Date extends Carbon {
 		if (strpos($format, $char) === false) {
 			return $format;
 		}
+		$index = count($this->escapes);
 		$result = $this->escapeText(parent::format($char));
-		$this->escapes[$char] = $result;
+		$this->escapes[$index] = $result;
+		return str_replace($char, '{' . $index . '}', $format);;
 	}
 
-}
-
-$Sesion = new Sesion();
-
-for ($x = 1; $x <= 12; ++$x) {
-	$dt = Date::parse("2016-$x-1");
-	pr($dt->toCookieString());
-	pr($dt->toRfc822String());
-	pr($dt->format('l d \d\e F \d\e Y'));
-	pr($dt->format('F, l d \d\e Y'));
 }
