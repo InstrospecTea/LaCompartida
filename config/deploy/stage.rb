@@ -2,7 +2,7 @@ require 'capistrano/cli'
 
 load 'config/cap_notify'
 load 'config/cap_shared'
-load 'config/cap_servers_staging'
+load 'config/cap_servers_stage'
 
 mysqlCmd = 'mysql -uroot -pasdwsx2016'
 
@@ -40,7 +40,7 @@ namespace :composer do
 end
 
 namespace :deploy do
-  set :current_stage, "staging"
+  set :current_stage, "stage"
   set :deploy_to, base_directory
 
   git_branch  = ""
@@ -173,7 +173,7 @@ namespace :db do
     outputFile = "#{home_directory}/backups/#{client}_#{backupDate}.tar.gz"
     run "wget '#{downloadUrl}' -O #{outputFile}"
 
-    bd = "#{client}_#{backupDate}_staging"
+    bd = "#{client}_#{backupDate}_stage"
 
     run "#{mysqlCmd} -e 'DROP DATABASE IF EXISTS `#{bd}`'"
     run "#{mysqlCmd} -e 'CREATE DATABASE `#{bd}`'"
