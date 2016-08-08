@@ -137,6 +137,8 @@ class WorkbookMiddleware {
 
 		$this->phpExcel->setActiveSheetIndex(0);
 
+		// aplicar formatos a las hojas
+
 		$writer = PHPExcel_IOFactory::createWriter($this->phpExcel, $this->writer);
 
 		$writer->save('php://output');
@@ -166,6 +168,8 @@ class WorkbookMiddleware {
 	 * @param int $col
 	 */
 	private function setFormat($format, $row, $col) {
+		$formatArray = [];
+
 		if ($row == -1) {
 			$cellCode = $col;
 		} else if($col == -1) {
@@ -177,90 +181,72 @@ class WorkbookMiddleware {
 		foreach ($format->getElements() as $key => $formatValue) {
 			switch ($key) {
 				case 'size':
-					$this->workSheetObj->getStyle($cellCode)->getFont()->setSize($formatValue);
+					$formatArray['font']['size'] = $formatValue;
 					break;
 				case 'align':
-					$this->workSheetObj->getStyle($cellCode)->getAlignment()->setHorizontal($formatValue);
+					$formatArray['alignment']['horizontal'] = $formatValue;
 					break;
 				case 'valign':
-					$this->workSheetObj->getStyle($cellCode)->getAlignment()->setVertical($formatValue);
+					$formatArray['alignment']['vertical'] = $formatValue;
 					break;
 				case 'bold':
-					$this->workSheetObj->getStyle($cellCode)->getFont()->setBold($formatValue);
+					$formatArray['font']['bold'] = $formatValue;
 					break;
 				case 'italic':
-					$this->workSheetObj->getStyle($cellCode)->getFont()->setItalic($formatValue);
+					$formatArray['font']['italic'] = $formatValue;
 					break;
 				case 'color':
-					$this->workSheetObj->getStyle($cellCode)->getFont()->getColor()->setARGB($formatValue);
+					$formatArray['font']['color'] = ['argb' => $formatValue];
 					break;
 				case 'locked':
-					$this->workSheetObj->getStyle($cellCode)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_PROTECTED);
+					$formatArray['protection'] = ['locked' => PHPExcel_Style_Protection::PROTECTION_PROTECTED];
 					break;
 				case 'top':
-					if (strval($formatValue) == '1') {
-						$this->workSheetObj->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-					} else if (strval($formatValue) == '2') {
-						$this->workSheetObj->getStyle($cellCode)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
-					}
+					$formatArray['borders']['top'] = ['style' => $formatValue];
 					break;
 				case 'bottom':
-					if (strval($formatValue) == '1') {
-						$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-					} else if (strval($formatValue) == '2') {
-						$this->workSheetObj->getStyle($cellCode)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
-					}
+					$formatArray['borders']['bottom'] = ['style' => $formatValue];
 					break;
 				case 'fgcolor':
 					if (is_int($formatValue)) {
 						if ($formatValue > 8 && $formatValue < 64) {
 							// the subtraction is for continue the logic of the method setCustomColor
 							$rgb = $this->palette[$formatValue - 8];
-
-							$this->workSheetObj->getStyle($cellCode)
-										->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
-										->getStartColor()->setRGB($this->rgb2hex($rgb));
+							$formatValue = $this->rgb2hex($rgb);
 						}
-					} else {
-						$this->workSheetObj->getStyle($cellCode)
-										->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
-										->getStartColor()->setARGB($formatValue);
 					}
+
+					$formatArray['fill']['type'] = PHPExcel_Style_Fill::FILL_SOLID;
+					$formatArray['fill']['startcolor'] = ['argb' => $formatValue];
 					break;
 				case 'textwrap':
-					$this->workSheetObj->getStyle($cellCode)->getAlignment()->setWrapText($formatValue);
+					$formatArray['alignment']['wrap'] = $formatValue;
 					break;
 				case 'numformat':
-					$this->workSheetObj->getStyle($cellCode)->getNumberFormat()->setFormatCode($formatValue);
+					$formatArray['numberformat'] = ['code' => $formatValue];
 					break;
 				case 'border':
-					if (strval($formatValue) == '1') {
-						$this->workSheetObj->getStyle($cellCode)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-					} else if (strval($formatValue) == '2') {
-						$this->workSheetObj->getStyle($cellCode)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THICK);
-					}
+					$formatArray['borders']['allborders'] = ['style' => $formatValue];
 					break;
 				case 'underline':
-					if (strval($formatValue) == '1') {
-						$this->workSheetObj->getStyle($cellCode)->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_SINGLE);
-					} else if (strval($formatValue) == '2') {
-						$this->workSheetObj->getStyle($cellCode)->getFont()->setUnderline(PHPExcel_Style_Font::UNDERLINE_DOUBLE);
-					}
+					$formatArray['font']['underline'] = $formatValue;
 					break;
 				case 'textrotation':
 					switch (intval($formatValue)) {
 						case 90:
-							$this->workSheetObj->getRowDimension($row + 1)->setRowHeight(-1);
-							$this->workSheetObj->getStyle($cellCode)->getAlignment()->setTextRotation(-90);
+							$formatArray['alignment']['rotation'] = -90;
 							break;
 						case 270:
-							$this->workSheetObj->getRowDimension($row + 1)->setRowHeight(-1);
-							$this->workSheetObj->getStyle($cellCode)->getAlignment()->setTextRotation(90);
+							$formatArray['alignment']['rotation'] = 90;
 							break;
 					}
 					break;
 			}
 		}
+
+		$this->workSheetObj->getStyle($cellCode)->applyFromArray($formatArray);
+
+		return;
 	}
 
 	/**
