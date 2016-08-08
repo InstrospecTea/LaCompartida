@@ -194,7 +194,7 @@ if ($id_area_proyecto)
 	$where .= " AND a1.id_area_proyecto = '$id_area_proyecto' ";
 
 if ($id_grupo_cliente) {
-	$where .= " AND grupo_cliente.id_grupo_cliente = '$id_grupo_cliente' ";
+	$where .= " AND grupo_cliente.id_grupo_cliente = '{$id_grupo_cliente}' ";
 }
 
 $query = "SELECT
