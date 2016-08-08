@@ -1024,7 +1024,6 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 		$this->ultimo_cobro = $this->fields['id_cobro'];
 		$where_horas_cero = '';
 
-		//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuarioe s true se ordena por categoria
 		if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario')) {
 			$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
 			$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
