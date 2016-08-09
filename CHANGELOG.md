@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.26.2
+Tuesday, August 9th
+* **Fix** [Se agrega filtro por grupo de cliente en el where](https://github.com/LemontechSA/ttb/pull/1731)
+
 ## Hotfix 16.26.1
 Tuesday, August 9th
 * **Fix** [Corrige Restriction](https://github.com/LemontechSA/ttb/pull/1730)
