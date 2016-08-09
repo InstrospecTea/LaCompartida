@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.26.1
+Tuesday, August 9th
+* **Fix** [Corrige Restriction](https://github.com/LemontechSA/ttb/pull/1730)
+
 ## [Release 16.26.0](https://github.com/LemontechSA/ttb/pull/1729)
 Monday, August 8th
 * **Feature** [Cambiar Cliente Del Asunto](https://github.com/LemontechSA/ttb/pull/1676)
