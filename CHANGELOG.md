@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.26.0](https://github.com/LemontechSA/ttb/pull/1729)
+Monday, August 8th
+* **Feature** [Cambiar Cliente Del Asunto](https://github.com/LemontechSA/ttb/pull/1676)
+
 ## [Release 16.25.0](https://github.com/LemontechSA/ttb/pull/1723)
 Tuesday, August 2nd
 * **Feature** [Solicitante Gasto](https://github.com/LemontechSA/ttb/pull/1543)

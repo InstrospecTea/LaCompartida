@@ -6,7 +6,12 @@
  */
 abstract class AbstractController {
 
+	/**
+	 * @deprecated
+	 */
 	protected $Session;
+	
+	protected $Sesion;
 	protected $messageManager;
 	protected $permisions;
 	protected $layoutTitle;
@@ -21,15 +26,16 @@ abstract class AbstractController {
 
 
 	public function __construct() {
-		$this->Session = new \TTB\Sesion($this->permisions);
-		Configure::setSession($this->Session);
+		$this->Sesion = new \TTB\Sesion($this->permisions);
+		$this->Session = &$this->Sesion;
+		Configure::setSession($this->Sesion);
 		$this->verifySession();
 		$this->messageManager = new MessageManager();
 	}
 
 	protected function verifySession() {
-		if (!$this->Session->logged) {
-			$this->Session->logout();
+		if (!$this->Sesion->logged) {
+			$this->Sesion->logout();
 			$this->redirect(Configure::read('logoutRedirect'));
 		}
 	}
@@ -237,6 +243,24 @@ abstract class AbstractController {
 			return;
 		}
 		$this->{$alias} = new $classname($this->Session);
+		$this->loadedClass[] = $alias;
+	}
+
+	/**
+	 * Carga un Servicio al vuelo
+	 * @param string $name
+	 * @param string $alias
+	 * @return type
+	 */
+	protected function loadService($name, $alias = null) {
+		$classname = "{$name}Service";
+		if (empty($alias)) {
+			$alias = $classname;
+		}
+		if (in_array($alias, $this->loadedClass)) {
+			return;
+		}
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $alias;
 	}
 
