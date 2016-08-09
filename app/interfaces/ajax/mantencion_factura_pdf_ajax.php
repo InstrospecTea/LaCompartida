@@ -1,9 +1,6 @@
 <?php
 
 require_once dirname(__FILE__) . '/../../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/classes/FacturaPdfDatos.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
 
@@ -93,9 +90,26 @@ if ($opc == 'dibuja_tabla') {
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	}
 
+	$found_rows = (int) current(mysql_fetch_row(mysql_query("SELECT FOUND_ROWS()")));
+
+	// en caso de no encontrar datos trae el id_documento_legal = 1
+	if ($found_rows == 0) {
+		$query = "SELECT *
+			FROM factura_pdf_datos
+				JOIN factura_pdf_tipo_datos USING(id_tipo_dato)
+				JOIN factura_pdf_datos_categoria USING(id_factura_pdf_datos_categoria)
+			WHERE factura_pdf_datos.id_documento_legal = 1
+			ORDER BY factura_pdf_datos_categoria.id_factura_pdf_datos_categoria, factura_pdf_tipo_datos.glosa_tipo_dato ASC";
+
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	}
+
 	$celda = 0;
 	$fila = array();
-	$fila = $factura_pdf_datos->CargarGlosaDatos($id_factura);
+
+	if (!empty($id_factura)) {
+		$fila = $factura_pdf_datos->CargarGlosaDatos($id_factura);
+	}
 
 	$arraypapeles = array();
 	$arraypapeles['216x280'] = 'Carta Portrait';
@@ -145,7 +159,11 @@ if ($opc == 'dibuja_tabla') {
 
 		else:
 
-			$ejemplo = nl2br(($row['Ejemplo'] != '') ? $row['Ejemplo'] : $fila[$row['codigo_tipo_dato']] );
+			if (!empty($fila)) {
+				$ejemplo = nl2br(($row['Ejemplo'] != '') ? $row['Ejemplo'] : $fila[$row['codigo_tipo_dato']] );
+			} else {
+				$ejemplo = $row['Ejemplo'];
+			}
 
 			echo "<ul  class='cat_" . $row['id_factura_pdf_datos_categoria'] . "' rel='" . $celda . "' id=\"fila_" . $row['id_dato'] . "\">";
 
