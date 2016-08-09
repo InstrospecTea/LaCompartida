@@ -17,4 +17,21 @@ class MattersController extends AbstractController {
 		$this->renderJSON($language);
 	}
 
+	public function validateChangeOfClient($matter_id) {
+		$response = array('valid' => false);
+		error_reporting(E_ALL);
+		try {
+			$this->loadService('Matter');
+			$Matter = $this->MatterService->get($matter_id, array('id_asunto', 'codigo_asunto', 'codigo_cliente'));
+			$this->loadBusiness('Matters');
+			$advice = $this->MattersBusiness->changeClientOfMatterValidation($Matter);
+			if (!empty($advice)) {
+				$response['advice'] = $advice;
+			}
+			$response['valid'] = true;
+		} catch (Exception $e) {
+			$response['error'] = $e->getMessage();
+		}
+		$this->renderJSON($response);
+	}
 }
