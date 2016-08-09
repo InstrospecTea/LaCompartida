@@ -34,7 +34,7 @@ class MatterManager extends AbstractManager implements BaseManager {
 			if ($matter_gloss == 'GASTOS' || $matter_gloss == 'Gastos') {
 				return "$client_code-9999";
 			}
-      $Criteria->add_restriction(CriteriaRestriction::not_equals('asunto.glosa_asunto', 'gastos'));
+      $Criteria->add_restriction(CriteriaRestriction::not_equal('asunto.glosa_asunto', "'gastos'"));
 		}
     $yy = date('y');
     if (!$type) {
