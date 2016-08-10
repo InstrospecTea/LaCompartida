@@ -267,7 +267,7 @@ function dato($fila, $columna, $valor, $bold = false) {
 		$ws1->writeNote($fila, $columna, __('Valor Indeterminado: denominador de fórmula es 0.'));
 	} else {
 		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && (strpos($tipo_dato, 'oras_') || strpos($tipo_dato_comparado, 'oras_'))) {
-			$ws1->writeNumber($fila, $columna, Reporte::FormatoValor($sesion, $valor, $tipo_dato, 'excel'), $hm);
+			$ws1->writeFormula($fila, $columna, Reporte::FormatoValor($sesion, $valor, $tipo_dato, 'excel'), $hm);
 		} else {
 			$ws1->writeNumber($fila, $columna, $valor, $n);
 		}
