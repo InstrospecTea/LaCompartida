@@ -2097,7 +2097,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 												<?php echo __('Fecha inicio') . $obligatorios('fecha_inicio_cap'); ?>
 											</td>
 											<td align="left">
-												<?php echo $Html::PrintCalendar('fecha_inicio_cap', Utiles::sql2date($contrato->fields['fecha_inicio_cap'])); ?>
+											<?php
+												/* @TODO: Esta lógica es solo para resolver el ticket TTBC-4180. Cuando pasemos los componentes a React debe ser resuelta de manera correcta. */
+												if(is_null(Utiles::sql2date($contrato->fields['fecha_inicio_cap']))){
+													echo $Html::PrintCalendar('fecha_inicio_cap', $contrato->fields['fecha_inicio_cap'], 12, 'fechadiff', true);
+												} else {
+													echo $Html::PrintCalendar('fecha_inicio_cap', Utiles::sql2date($contrato->fields['fecha_inicio_cap']));
+												}
+											?>
 											</td>
 										</tr>
 									</table>
