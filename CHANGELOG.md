@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.26.4
+Wednesday, August 10th
+* **Fix** [Reporte avanzado escribe el valor como formula.](https://github.com/LemontechSA/ttb/pull/1735)
+
 ## Hotfix 16.26.3
 Tuesday, August 9th
 * **Fix** [Desplegar datos en mantenedor de factura cuando no exista una factura](https://github.com/LemontechSA/ttb/pull/1732)
