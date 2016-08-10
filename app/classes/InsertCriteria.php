@@ -33,8 +33,12 @@ class InsertCriteria {
 	 * Constructor de la clase.
 	 * @param $sesion
 	 */
-	function __construct($sesion = null) {
+	public function __construct($sesion = null) {
 		$this->sesion = $sesion;
+	}
+
+	public function __toString() {
+		return $this->getPlainQuery();
 	}
 
 	/**

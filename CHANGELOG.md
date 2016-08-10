@@ -1,5 +1,53 @@
 # Changelog
 
+## Hotfix 16.26.3
+Tuesday, August 9th
+* **Fix** [Desplegar datos en mantenedor de factura cuando no exista una factura](https://github.com/LemontechSA/ttb/pull/1732)
+
+## Hotfix 16.26.2
+Tuesday, August 9th
+* **Fix** [Se agrega filtro por grupo de cliente en el where](https://github.com/LemontechSA/ttb/pull/1731)
+
+## Hotfix 16.26.1
+Tuesday, August 9th
+* **Fix** [Corrige Restriction](https://github.com/LemontechSA/ttb/pull/1730)
+
+## [Release 16.26.0](https://github.com/LemontechSA/ttb/pull/1729)
+Monday, August 8th
+* **Feature** [Cambiar Cliente Del Asunto](https://github.com/LemontechSA/ttb/pull/1676)
+
+## [Release 16.25.0](https://github.com/LemontechSA/ttb/pull/1723)
+Tuesday, August 2nd
+* **Feature** [Solicitante Gasto](https://github.com/LemontechSA/ttb/pull/1543)
+
+## Hotfix 16.24.17
+Tuesday, August 2nd
+* **Fix** [Solo se editará la tarifa en trabajos guardados](https://github.com/LemontechSA/ttb/pull/1722)
+
+## Hotfix 16.24.16
+Tuesday, August 2nd
+* **Fix** [Traducción PT](https://github.com/LemontechSA/ttb/pull/1720)
+
+## Hotfix 16.24.15
+Tuesday, August 2nd
+* **Update** [Actualizar credenciales para el deploy de PHP53](https://github.com/LemontechSA/ttb/pull/1719)
+
+## Hotfix 16.24.14
+Tuesday, August 2nd
+* **Fix** [Eliminar perfil Retribuciones](https://github.com/LemontechSA/ttb/pull/1718)
+
+## Hotfix 16.24.13
+Monday, August 1st
+* **Fix** [Popup a Cobro Desde Adelanto](https://github.com/LemontechSA/ttb/pull/1715)
+
+## Hotfix 16.24.12
+Thursday, July 28th
+* **Fix** [En factura campo dte_metodo_pago_cta es guardado como string](https://github.com/LemontechSA/ttb/pull/1713)
+
+## Hotfix 16.24.11
+Wednesday, July 27th
+* **Fix** [No desplegar botón "Descargar listado Agrupado" en listado de trabajos en paso 3 del cobro](https://github.com/LemontechSA/ttb/pull/1710)
+
 ## Hotfix 16.24.10
 Wednesday, July 27th
 * **Fix** [Separa método GenerarSeccionResumenProfesional de la clase principal](https://github.com/LemontechSA/ttb/pull/1708)

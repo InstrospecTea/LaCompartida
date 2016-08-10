@@ -4,8 +4,8 @@ class AgreementManager extends AbstractManager implements IAgreementManager {
 
 	/**
 	 * Obtiene la Tarifa asociada a un Contrato
-	 * @param 	string $contract_id
-	 * @return 	Tarifa
+	 * @param integer $agreement_id
+	 * @return Tarifa
 	 */
 	public function getDefaultFee($agreement_id) {
 		if (empty($agreement_id) || !is_numeric($agreement_id)) {
@@ -23,6 +23,21 @@ class AgreementManager extends AbstractManager implements IAgreementManager {
 		}
 
 		return $Fee;
+	}
+
+	/**
+	 * Cambia el cliente al contrato indicado
+	 * @param type $agreement_id
+	 * @param type $new_client_code
+	 * @throws Exception
+	 */
+	public function changeClient($agreement_id, $new_client_code) {
+		$Contrato = $this->loadModel('Contrato', null, true);
+		$Contrato->load($agreement_id);
+		$Contrato->Edit('codigo_cliente', $new_client_code);
+		if (!$Contrato->Write()) {
+			throw new Exception("No se pudo cambiar el cliente del contrato {$agreement_id}");
+		}
 	}
 
 }

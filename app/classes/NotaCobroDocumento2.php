@@ -1905,7 +1905,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$html = str_replace('%num_registro%', __('Nº Registro'), $html);
 				$html = str_replace('%importe%', __('Importe'), $html);
 				$html = str_replace('%tarifa_hora%', __('Tarifa Hora'), $html);
-				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Ordenado Por') : '', $html);
+				$html = str_replace('%ordenado_por%', $this->fields['opc_ver_solicitante'] ? __('Solicitado Por') : '', $html);
 				$html = str_replace('%ordenado_por_jjr%', $this->fields['opc_ver_solicitante'] ? __('Solicitado Por') : '', $html);
 				$html = str_replace('%periodo%', (($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') and ( $this->fields['fecha_fin'] == '0000-00-00' or $this->fields['fecha_fin'] == '')) ? '' : __('Periodo'), $html);
 				$html = str_replace('%valor_periodo_ini%', ($this->fields['fecha_ini'] == '0000-00-00' or $this->fields['fecha_ini'] == '') ? '' : Utiles::sql2fecha($this->fields['fecha_ini'], $idioma->fields['formato_fecha']), $html);
@@ -3493,7 +3493,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				}
 
 				if ($this->fields['opc_ver_solicitante']) {
-					$html = str_replace('%solicitante%', __('Ordenado<br>Por'), $html);
+					$html = str_replace('%solicitante%', __('Solicitado Por'), $html);
 				} else {
 					$html = str_replace('%solicitante%', '', $html);
 				}
@@ -3608,7 +3608,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					}
 
 					if ($this->fields['opc_ver_solicitante']) {
-						$row = str_replace('%solicitante%', $detalle['username'], $row);
+						$row = str_replace('%solicitante%', $detalle['solicitante'], $row);
 					} else {
 						$row = str_replace('%solicitante%', '', $row);
 					}

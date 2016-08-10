@@ -12,7 +12,6 @@ if(isset($_SESSION['flash_msg'])) {
 $id_usuario = $sesion->usuario->fields['id_usuario'];
 
 $pagina->titulo = __('Reportes espec&iacute;ficos');
-$modulo_retribuciones_activo = Conf::GetConf($sesion, 'UsarModuloRetribuciones');
 $pagina->PrintTop();
 
 $img_dir = '';
@@ -119,10 +118,6 @@ if (Conf::GetConf($sesion,'UsaDisenoNuevo')) {
 													<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/reportes_horas.php' style="color:#000;text-decoration: none;"><?php echo __('Gráfico por Período') ?></a></li>
 													<li><a href='planillas.php' style="color:#000;text-decoration: none;"><?php echo __('Profesional v/s Cliente') ?></a></li>
 													<li><a href='olap.php' style="color:#000;text-decoration: none;"><?php echo __('Reporte gen&eacute;rico') ?></a></li>
-													<?php if ($modulo_retribuciones_activo && $sesion->usuario->TienePermiso('RET')) { ?>
-														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/reporte_retribuciones_b.php' style="color:#000;text-decoration: none;"><?php echo 'Detalle de ' . __('Retribuciones') . ' por ' . __('Cobro'); ?></a></li>
-														<li><a href='<?php echo Conf::RootDir() ?>/app/interfaces/reporte_retribuciones_resumen_b.php' style="color:#000;text-decoration: none;"><?php echo 'Resumen de ' . __('Retribuciones') . ' por ' . __('Profesional'); ?></a></li>
-													<?php } ?>
 												</ul>
 											</td>
 										</tr>
