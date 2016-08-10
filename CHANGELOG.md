@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.26.3
+Tuesday, August 9th
+* **Fix** [Desplegar datos en mantenedor de factura cuando no exista una factura](https://github.com/LemontechSA/ttb/pull/1732)
+
 ## Hotfix 16.26.2
 Tuesday, August 9th
 * **Fix** [Se agrega filtro por grupo de cliente en el where](https://github.com/LemontechSA/ttb/pull/1731)
