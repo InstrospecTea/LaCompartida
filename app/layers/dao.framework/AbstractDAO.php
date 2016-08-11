@@ -188,7 +188,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$this->sesion = $this->sesion;
 		$this->fields = $object->fields;
 		$this->changes = $object->changes;
-		$this->guardar_fecha = true;
+		$this->guardar_fecha = $object->save_created;
 		if ($this->Write()) {
 			$object->set($object->getIdentity(), $this->fields[$object->getIdentity()]);
 			return $object;
