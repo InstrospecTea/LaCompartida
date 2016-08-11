@@ -801,7 +801,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$query_saldo_adelantos = "SELECT SUM(- 1 * d.saldo_pago * (moneda_documento.tipo_cambio / moneda_base.tipo_cambio)) AS saldo_adelantos
 										FROM documento d
 									INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
-									INNER join prm_moneda moneda_base ON moneda_base.id_moneda = 1
+									INNER join prm_moneda moneda_base ON moneda_base.moneda_base = 1
 									INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
 									LEFT JOIN contrato ON d.id_contrato = contrato.id_contrato
 									LEFT JOIN usuario encargado_comercial ON encargado_comercial.id_usuario = contrato.id_usuario_responsable
@@ -840,7 +840,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							INNER JOIN cobro ON cobro.id_cobro = d.id_cobro
 							INNER JOIN prm_moneda moneda_documento ON d.id_moneda = moneda_documento.id_moneda
 							INNER JOIN cobro_moneda tipo_cambio_documento ON tipo_cambio_documento.id_moneda = moneda_documento.id_moneda AND tipo_cambio_documento.id_cobro = cobro.id_cobro
-							INNER JOIN prm_moneda moneda_base ON moneda_base.id_moneda = 1
+							INNER JOIN prm_moneda moneda_base ON moneda_base.moneda_base = 1
 							INNER JOIN cobro_moneda tipo_cambio_base ON tipo_cambio_base.id_moneda = moneda_base.id_moneda AND tipo_cambio_base.id_cobro = cobro.id_cobro
 							INNER JOIN contrato ON contrato.id_contrato = cobro.id_contrato
 							INNER JOIN cliente ON cliente.codigo_cliente = d.codigo_cliente
