@@ -1,6 +1,6 @@
 <?php
 
-class Currency extends Entity {
+class CurrencyCharge extends Entity {
 
 	public $save_created = false;
 
@@ -9,7 +9,7 @@ class Currency extends Entity {
 	 * @return string
 	 */
 	public function getIdentity() {
-		return 'id_moneda';
+		return 'id_cobro';
 	}
 
 	/**
@@ -18,7 +18,7 @@ class Currency extends Entity {
 	 * @return string
 	 */
 	public function getPersistenceTarget() {
-		return 'prm_moneda';
+		return 'cobro_moneda';
 	}
 
 	/**

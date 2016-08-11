@@ -2,6 +2,11 @@
 
 class ChargeManager extends AbstractManager implements IChargeManager {
 
+	public function __construct(Sesion $Sesion) {
+		$this->Sesion = $Sesion;
+		$this->loadService('Charge');
+	}
+
 	/**
 	 * Obtiene los adelantos utilizados en un cobro
 	 * @param 	string $charge_id
@@ -60,6 +65,10 @@ class ChargeManager extends AbstractManager implements IChargeManager {
 		}
 
 		return $result;
+	}
+
+	public function findAll($restrictions = null, $fields = null, $order = null, $limit = null) {
+		return $this->ChargeService->findAll($restrictions, $fields, $order, $limit);
 	}
 
 }
