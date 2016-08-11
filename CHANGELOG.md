@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.26.5
+Thursday, August 11th
+* **Fix** [Reporte avanzado escribe el total como formula.](https://github.com/LemontechSA/ttb/pull/1736)
+
 ## Hotfix 16.26.4
 Wednesday, August 10th
 * **Fix** [Reporte avanzado escribe el valor como formula.](https://github.com/LemontechSA/ttb/pull/1735)

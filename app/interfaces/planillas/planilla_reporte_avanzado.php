@@ -242,10 +242,11 @@ function total($fila, $columna, $valor) {
 	global $sesion;
 
 	if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && (strpos($tipo_dato, 'oras_') || strpos($tipo_dato_comparado, 'oras_'))) {
-		$ws1->write($fila, $columna, Reporte::FormatoValor($sesion, $valor, $tipo_dato, 'excel'), $horas_minutos_bold);
+		$formato = $horas_minutos_bold;
 	} else {
-		$ws1->write($fila, $columna, $valor, $numeros_bold);
+		$formato = $numeros_bold;
 	}
+	$ws1->writeFormula($fila, $columna, $valor, $formato);
 }
 
 function dato($fila, $columna, $valor, $bold = false) {
