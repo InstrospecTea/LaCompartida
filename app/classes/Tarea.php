@@ -121,9 +121,6 @@ class Tarea extends Objeto {
 		if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
 			return UtilesApp::Time2Decimal($total);
 		}
-		if (Conf::TipoIngresoHoras() == 'decimal') {
-			return UtilesApp::Time2Decimal($total);
-		}
 		$tiempo = explode(':', $total);
 
 		if ($tiempo[0] || $tiempo[1]) {
@@ -284,7 +281,7 @@ class Tarea extends Objeto {
 	 * @param id_usuario
 	 * @param id_tarea
 	 * */
-	function getNovedades($id_usuario, $id_tarea) {
+	function getNovedades(Sesion $Sesion, $id_usuario, $id_tarea) {
 		$query = sprintf("SELECT
 								tarea.id_tarea,
 								COUNT(tarea_comentario.id_comentario) AS comentarios,
@@ -296,7 +293,8 @@ class Tarea extends Objeto {
 							WHERE usuario.id_usuario = '%d' AND tarea.id_tarea = '%d'
 							GROUP BY tarea.id_tarea", $id_usuario, $id_usuario, $id_tarea);
 
-		return $this->queryOrError($query, false);
+		$Tarea = new self($Sesion);
+		return $Tarea->queryOrError($query, false);
 	}
 
 	/**
