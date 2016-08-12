@@ -71,4 +71,30 @@ class ChargeManager extends AbstractManager implements IChargeManager {
 		return $this->ChargeService->findAll($restrictions, $fields, $order, $limit);
 	}
 
+	/**
+	 * @param $id
+	 * @return mixed
+	 * @throws ServiceException
+	 */
+	public function get($id, $fields = null) {
+		return $this->ChargeService->get($id, $fields);
+	}
+
+	/**
+	 * @return mixed
+	 * @throws ServiceException
+	 */
+	public function count() {
+		return $this->ChargeService->count();
+	}
+
+	public function getCurrencyRates($charge_id) {
+		if (empty($charge_id) || !is_numeric($charge_id)) {
+			throw new InvalidIdentifier;
+		}
+
+		$this->loadManager('CurrencyCharge');
+		return $this->CurrencyChargeManager->findAll(CriteriaRestriction::equals('id_cobro', $charge_id));
+	}
+
 }
