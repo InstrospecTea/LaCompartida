@@ -281,7 +281,7 @@ class Tarea extends Objeto {
 	 * @param id_usuario
 	 * @param id_tarea
 	 * */
-	function getNovedades(Sesion $Sesion, $id_usuario, $id_tarea) {
+	public static function getNovedades(Sesion $Sesion, $id_usuario, $id_tarea) {
 		$query = sprintf("SELECT
 								tarea.id_tarea,
 								COUNT(tarea_comentario.id_comentario) AS comentarios,
