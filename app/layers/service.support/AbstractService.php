@@ -50,6 +50,16 @@ abstract class AbstractService implements BaseService {
 		}
 	}
 
+	public function count() {
+		$daoClass = $this->getDaoLayer();
+		$dao = new $daoClass($this->sesion);
+		try {
+			return $dao->count();
+		} catch(CouldNotFindEntityException $ex) {
+			throw new EntityNotFound($ex);
+		}
+	}
+
 	public function findAll($restrictions = null, $fields = null, $order = null, $limit = null) {
 		$daoClass = $this->getDaoLayer();
 		$dao = new $daoClass($this->sesion);
