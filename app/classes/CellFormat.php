@@ -14,7 +14,7 @@ class CellFormat {
 		$this->SpreadsheetExcelWriter = $SpreadsheetExcelWriter;
 	}
 
-	public function serDefault(array $normal, array $even = array(), array $odd = array()) {
+	public function setDefault(array $normal, array $even = array(), array $odd = array()) {
 		$this->default = array(
 			self::NORMAL => $normal,
 			self::EVEN => $even,

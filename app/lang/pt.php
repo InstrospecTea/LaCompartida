@@ -1210,3 +1210,45 @@ $_LANG['Según opciones del'] = "Segundo opções do";
 $_LANG['Agrupar borradores por cliente'] = "Agrupar rascunhos por cliente";
 $_LANG['No hay datos para los filtros que Ud. ha seleccionado'] = "Não existem dados para os filtros selecionados";
 $_LANG['Procure no cerrar la pestaña actual de su navegador'] = "Procure não fechar a janela atual do seu navegador";
+
+$_LANG['January'] = 'Janeiro';
+$_LANG['February'] = 'Fevereiro';
+$_LANG['March'] = 'Março';
+$_LANG['April'] = 'Abril';
+$_LANG['May'] = 'Maio';
+$_LANG['June'] = 'Junho';
+$_LANG['July'] = 'Julho';
+$_LANG['August'] = 'Agosto';
+$_LANG['September'] = 'Setembro';
+$_LANG['October'] = 'Outubro';
+$_LANG['November'] = 'Novembro';
+$_LANG['December'] = 'Dezembro';
+
+$_LANG['Monday'] = 'Segunda-feira';
+$_LANG['Tuesday'] = 'Terça-Feira';
+$_LANG['Wednesday'] = 'Quarta-Feira';
+$_LANG['Thursday'] = 'Quinta-Feira';
+$_LANG['Friday'] = 'Sexta-Feira';
+$_LANG['Saturday'] = 'Sábado';
+$_LANG['Sunday'] = 'Domingo';
+
+$_LANG['Jan'] = 'Jan';
+$_LANG['Feb'] = 'Fev';
+$_LANG['Mar'] = 'Mar';
+$_LANG['Apr'] = 'Abr';
+$_LANG['May'] = 'Mai';
+$_LANG['Jun'] = 'Jun';
+$_LANG['Jul'] = 'Jul';
+$_LANG['Aug'] = 'Ago';
+$_LANG['Sep'] = 'Set';
+$_LANG['Oct'] = 'Out';
+$_LANG['Nov'] = 'Nov';
+$_LANG['Dec'] = 'Dez';
+
+$_LANG['Mon'] = 'Seg';
+$_LANG['Tue'] = 'Ter';
+$_LANG['Wed'] = 'Qua';
+$_LANG['Thu'] = 'Qui';
+$_LANG['Fri'] = 'Sex';
+$_LANG['Sat'] = 'Sáb';
+$_LANG['Sun'] = 'Dom';

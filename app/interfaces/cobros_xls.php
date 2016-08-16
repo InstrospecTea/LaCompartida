@@ -123,35 +123,36 @@ $wb->setCustomColor(38, 234, 234, 234);
 /*
  *	FORMATO DE CELDAS PARA EL DOCUMENTO
  */
-$CellFormat = new CellFormat($wb);
-$CellFormat->serDefault(
-	array('Size' => 7, 'VAlign' => 'top', 'Color' => 'black', 'Align' => 'left'),
-	array('FgColor' => '38'),
-	array('FgColor' => 'white')
+$configs = array(
+	'encabezado',
+	'encabezado2',
+	'encabezado_derecha',
+	'titulo',
+	'titulo_vcentrado',
+	'normal_centrado',
+	'normal',
+	'descripcion',
+	'observacion',
+	'tiempo',
+	'total',
+	'tiempo_total',
+	'instrucciones12',
+	'instrucciones10',
+	'resumen_text',
+	'resumen_text_derecha',
+	'resumen_text_titulo',
+	'resumen_text_amarillo',
+	'numeros',
+	'numeros_amarillo',
+	'numero_rut',
+	'encabezado_numero_rut'
 );
-$CellFormat->add('encabezado', array('Size' => 10, 'VAlign' => 'middle', 'Bold' => 1));
-$CellFormat->add('encabezado2', array('Size' => 10, 'VAlign' => 'middle'));
-$CellFormat->add('encabezado_derecha', array('Size' => 10, 'Align' => 'right', 'Bold' => 1));
-$CellFormat->add('titulo', array('Size' => 10, 'Bold' => 1, 'Locked' => 1, 'Bottom' => 1, 'FgColor' => 35));
-$CellFormat->add('titulo_vcentrado', array('Size' => 10, 'VAlign' => 'vjustify', 'FgColor' => 35, 'Bottom' => 1, 'Locked' => 1, 'Bold' => 1));
-$CellFormat->add('normal_centrado', array('Align' => 'center'));
-$CellFormat->add('normal');
-$CellFormat->add('descripcion', array('TextWrap' => 1));
-$CellFormat->add('observacion', array('Bold' => 1, 'Italic' => 1));
-$CellFormat->add('tiempo', array('NumFormat' => $formato_duraciones));
-$CellFormat->add('total', array('Size' => 10, 'Bold' => 1, 'Top' => 1));
-$CellFormat->add('tiempo_total', array('Size' => 10, 'Bold' => 1, 'Top' => 1, 'NumFormat' => $formato_duraciones));
-$CellFormat->add('instrucciones12', array('Size' => 12, 'Bold' => 1));
-$CellFormat->add('instrucciones10', array('Size' => 10, 'Bold' => 1));
-$CellFormat->add('resumen_text', array('Border' => 1, 'TextWrap' => 1));
-$CellFormat->add('resumen_text_derecha', array('Align' => 'right', 'Border' => 1));
-$CellFormat->add('resumen_text_titulo', array('Size' => 9, 'Bold' => 1, 'Border' => 1));
-$CellFormat->add('resumen_text_amarillo', array('Border' => 1, 'FgColor' => '37', 'TextWrap' => 1));
-$CellFormat->add('numeros', array('Border' => 1, 'Align' => 'right', 'NumFormat' => '0'));
-$CellFormat->add('numeros_amarillo', array('Border' => 1, 'Align' => 'right', 'TextWrap' => '0', 'FgColor' => '37'));
-$CellFormat->add('numero_rut', array('Align' => 'right', 'NumFormat' => '#'));
-$CellFormat->add('encabezado_numero_rut', array('Size' => 10, 'VAlign' => 'middle', 'Bold' => 1, 'NumFormat' => '#'));
-
+$CellFormat = new CellFormat($wb);
+call_user_func_array(array($CellFormat, 'setDefault'), json_decode(Conf::GetConf($sesion, 'FormatoExcelCobro_default'), 1));
+foreach ($configs as $name) {
+	$config = array_merge(array($name), json_decode(Conf::GetConf($sesion, "FormatoExcelCobro_{$name}"), 1));
+	call_user_func_array(array($CellFormat, 'add'), $config);
+}
 /*
  *	FIN FORMATO DE CELDAS PARA EL DOCUMENTO
  */
