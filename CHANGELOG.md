@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.26.6
+Tuesday, August 16th
+* **Fix** [Corrige clase Tarea](https://github.com/LemontechSA/ttb/pull/1738)
+
 ## Hotfix 16.26.5
 Thursday, August 11th
 * **Fix** [Reporte avanzado escribe el total como formula.](https://github.com/LemontechSA/ttb/pull/1736)
