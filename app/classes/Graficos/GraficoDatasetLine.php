@@ -30,7 +30,7 @@ class GraficoDatasetLine extends GraficoDataset {
 	 */
 	public function addPointColor($r = self::R, $g = self::G, $b = self::B, $a = 0.5) {
 		if ($this->validarRGBA($r, $g, $b, $a)) {
-			$this->pointColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $a . ')';
+			$this->pointColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 1, '.', '') . ')';
 			return $this;
 		} else {
 			error_log('Debe ingresar un color válido');
@@ -47,7 +47,7 @@ class GraficoDatasetLine extends GraficoDataset {
 	 */
 	public function addPointStrokeColor($r = self::R, $g = self::G, $b = self::B, $a = 1) {
 		if ($this->validarRGBA($r, $g, $b, $a)) {
-			$this->pointStrokeColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $a . ')';
+			$this->pointStrokeColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 1, '.', '') . ')';
 			return $this;
 		} else {
 			error_log('Debe ingresar un color válido');
@@ -64,7 +64,7 @@ class GraficoDatasetLine extends GraficoDataset {
 	 */
 	public function addPointHighlightFill($r = self::R, $g = self::G, $b = self::B, $a = 1) {
 		if ($this->validarRGBA($r, $g, $b, $a)) {
-			$this->pointHighlightFill = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $a . ')';
+			$this->pointHighlightFill = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 1, '.', '') . ')';
 			return $this;
 		} else {
 			error_log('Debe ingresar un color válido');
@@ -81,7 +81,7 @@ class GraficoDatasetLine extends GraficoDataset {
 	 */
 	public function addPointHighlightStroke($r = self::R, $g = self::G, $b = self::B, $a = 1) {
 		if ($this->validarRGBA($r, $g, $b, $a)) {
-			$this->pointHighlightStroke = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $a . ')';
+			$this->pointHighlightStroke = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 1, '.', '') . ')';
 			return $this;
 		} else {
 			error_log('Debe ingresar un color válido');
