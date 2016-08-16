@@ -1043,13 +1043,6 @@ $_LANG['CorreosModificacionAdminDatos'] = "Enviar email por modificación de asun
 $_LANG['ImprimirDuracionTrabajada'] = "Imprimir duración trabajada";
 $_LANG['ImprimirValorTrabajo'] = "Imprimir valor trabajo";
 $_LANG['DiaMailSemanal'] = "Día email semanal";
-$_LANG['Mon'] = "Lunes";
-$_LANG['Tue'] = "Martes";
-$_LANG['Wed'] = "Miércoles";
-$_LANG['Thu'] = "Jueves";
-$_LANG['Fri'] = "Viernes";
-$_LANG['Sat'] = "Sábado";
-$_LANG['Sun'] = "Domingo";
 $_LANG['CiudadSignatura'] = "Ciudad signatura";
 $_LANG['NombreEmpresa'] = "Titulo empresa";
 $_LANG['SubtituloEmpresa'] = "Subtitulo empresa";
@@ -1195,3 +1188,46 @@ $_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponible
 $_LANG["Posee documentos con error. - ERROR: P0001: No existen folios disponibles para el TipoDTE: 61"] = "No hay folios disponibles para Nota De Credito Electronica";
 
 $_LANG['Su sesión ha expirado, por favor ingrese nuevamente.'] = 'Su sesión ha expirado, por favor ingrese nuevamente.';
+
+
+$_LANG['January'] = 'Enero';
+$_LANG['February'] = 'Febrero';
+$_LANG['March'] = 'Marzo';
+$_LANG['April'] = 'Abril';
+$_LANG['May'] = 'Mayo';
+$_LANG['June'] = 'Junio';
+$_LANG['July'] = 'Julio';
+$_LANG['August'] = 'Agosto';
+$_LANG['September'] = 'Septiembre';
+$_LANG['October'] = 'Octubre';
+$_LANG['November'] = 'Noviembre';
+$_LANG['December'] = 'Diciembre';
+
+$_LANG['Monday'] = 'Lunes';
+$_LANG['Tuesday'] = 'Martes';
+$_LANG['Wednesday'] = 'Miércoles';
+$_LANG['Thursday'] = 'Jueves';
+$_LANG['Friday'] = 'Viernes';
+$_LANG['Saturday'] = 'Sábado';
+$_LANG['Sunday'] = 'Domingo';
+
+$_LANG['Jan'] = 'Ene';
+$_LANG['Feb'] = 'Feb';
+$_LANG['Mar'] = 'Mar';
+$_LANG['Apr'] = 'Abr';
+$_LANG['May'] = 'May';
+$_LANG['Jun'] = 'Jun';
+$_LANG['Jul'] = 'Jul';
+$_LANG['Aug'] = 'Ago';
+$_LANG['Sep'] = 'Sep';
+$_LANG['Oct'] = 'Oct';
+$_LANG['Nov'] = 'Nov';
+$_LANG['Dec'] = 'Dic';
+
+$_LANG['Mon'] = 'Lun';
+$_LANG['Tue'] = 'Mar';
+$_LANG['Wed'] = 'Mié';
+$_LANG['Thu'] = 'Jue';
+$_LANG['Fri'] = 'Vie';
+$_LANG['Sat'] = 'Sáb';
+$_LANG['Sun'] = 'Dom';
