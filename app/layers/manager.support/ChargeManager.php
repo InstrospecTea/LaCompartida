@@ -97,4 +97,15 @@ class ChargeManager extends AbstractManager implements IChargeManager {
 		return $this->CurrencyChargeManager->findAll(CriteriaRestriction::equals('id_cobro', $charge_id));
 	}
 
+	public function forceIssue($charge_id) {
+		if (empty($charge_id) || !is_numeric($charge_id)) {
+			throw new InvalidIdentifier;
+		}
+
+		$Cobro = new Cobro($this->Sesion);
+		$Cobro->Load($charge_id);
+		$Cobro->fields['estado'] = 'EN REVISION';
+		$Cobro->GuardarCobro(true);
+	}
+
 }
