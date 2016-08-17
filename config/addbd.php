@@ -12,10 +12,10 @@ $subdir = $_SERVER['SUBDIR'];
 
 if (extension_loaded('newrelic')) {
 	newrelic_capture_params();
-	if ($subdir == 'juicios' || strpos($script_url, "juicios")) {
-		newrelic_set_appname("Case Tracking");
+	if ($subdir == 'juicios' || strpos($script_url, 'juicios')) {
+		newrelic_set_appname('Case Tracking');
 	} else {
-		newrelic_set_appname("The Time Billing");
+		newrelic_set_appname('The Time Billing');
 	}
 	newrelic_add_custom_parameter('subdominio', $subdominio);
 	if (strpos($script_url, 'cron') || strpos($script_url, 'web_services')) {
@@ -31,23 +31,24 @@ defined('LLAVE') || define('LLAVE', $llave);
 
 if (!isset($memcache) || !is_object($memcache)) {
 	$memcache = new Memcache;
-	$memcache->connect('whisky.tmcxaq.cfg.use1.cache.amazonaws.com', 11211);
+	$memcache->connect(Conf::read('MemcacheServer'), Conf::read('MemcachePort'));
 }
 
 if (!$result = @unserialize($memcache->get('teneninformation_' . $llave))) {
 	$array_config = [
 		'default_cache_config' => [
 			[
-				'host' => 'whisky.tmcxaq.cfg.use1.cache.amazonaws.com',
-				'port' => '11211'
+				'host' => Conf::read('MemcacheServer'),
+				'port' => Conf::read('MemcachePort')
 			]
 		]
 	];
+
 	try {
 		$DynamoDb = new DynamoDb($array_config);
 		$result = $DynamoDb->get([
 			'TableName' => 'thetimebilling',
-			'Key' => array('HashKeyElement' => array('S' => $llave))
+			'Key' => ['HashKeyElement' => ['S' => $llave]]
 		]);
 	} catch (Exception $e) {
 		echo 'The item could not be retrieved.';
@@ -62,7 +63,6 @@ Conf::setStatic('dbHost', $result['dbhost']);
 Conf::setStatic('dbName', $result['dbname']);
 Conf::setStatic('dbUser', $result['dbuser']);
 Conf::setStatic('dbPass', $result['dbpass']);
-
 
 foreach ($result as $tipo => $valor) {
 	$static = strtoupper($tipo);

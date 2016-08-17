@@ -83,7 +83,10 @@ Conf::setStatic('AmazonKey', [
 	'default_cache_config' => CACHEDIR
 ]);
 
+Conf::setStatic('MemcacheServer', 'ttbcache.tmcxaq.0001.use1.cache.amazonaws.com');
+Conf::setStatic('MemcachePort', 11211);
 $confFile = __BASEDIR__ . '/config/addbd.php';
+
 if (file_exists(__BASEDIR__ . '/app/miconf.php')) {
 	require_once __BASEDIR__ . '/app/miconf.php';
 } elseif (file_exists($confFile)) {
