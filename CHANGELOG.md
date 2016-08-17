@@ -1,5 +1,10 @@
 # Changelog
 
+## [Release 16.27.0](https://github.com/LemontechSA/ttb/pull/1740)
+Tuesday, August 16th
+* **Feature** [Configuracion formato excel cobro](https://github.com/LemontechSA/ttb/pull/1734)
+* **Feature** [Translate Date](https://github.com/LemontechSA/ttb/pull/1726)
+
 ## Hotfix 16.26.6
 Tuesday, August 16th
 * **Fix** [Corrige clase Tarea](https://github.com/LemontechSA/ttb/pull/1738)
