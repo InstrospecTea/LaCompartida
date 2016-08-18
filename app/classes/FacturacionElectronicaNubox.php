@@ -457,7 +457,7 @@ EOF;
 			$PrmDocumentoLegal->Load($Factura->fields['id_documento_legal']);
 			$docName = UtilesApp::slug($PrmDocumentoLegal->fields['glosa']);
 			$file_name = '/dtes/' . Utiles::sql2date($Factura->fields['fecha'], "%Y%m%d") . "_{$docName}_{$Factura->obtenerNumero()}.pdf";
-			$file_url = UtilesApp::UploadToS3($file_name, $file_data, 'application/pdf');
+			$file_url = UtilesApp::UploadFileContentsToS3($file_name, $file_data, 'application/pdf');
 			$Factura->Edit('dte_url_pdf', $file_url);
 			if ($Factura->Write()) {
 				$hookArg['InvoiceURL'] = $file_url;
@@ -487,4 +487,3 @@ EOF;
 		return $nuevo_numero;
 	}
 }
-
