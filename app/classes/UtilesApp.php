@@ -2285,7 +2285,7 @@ HTML;
 	public static function UploadToS3($name, $file_path, $content_type = 'application/octet-stream') {
 		$S3 = new S3(S3_UPLOAD_BUCKET);
 		$name = SUBDOMAIN . $name;
-		$response = $S3->uploadFile($name, $file_path, array(
+		$response = $S3->putFileContents($name, $file_path, array(
 			'ACL' => 'public-read',
 			'ContentType' => $content_type,
 			'ContentDisposition' => 'attachment'
