@@ -68,7 +68,10 @@
 	$grafico = new TTB\Graficos\GraficoBarra();
 	$dataset = new TTB\Graficos\GraficoDataset();
 
-	$dataset->addLabel('Horas trabajadas por empleado')
+	$dataset->addType('bar')
+		->addFill(false)
+		->addYAxisID('y-axis-1')
+		->addLabel('Horas trabajadas por empleado')
 		->addData($tiempo);
 
 	$grafico->addDataSets($dataset)
