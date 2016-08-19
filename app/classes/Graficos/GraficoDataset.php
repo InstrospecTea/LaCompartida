@@ -11,10 +11,48 @@ class GraficoDataset {
 	 * Constructor de la clase. Añade colores por defecto.
 	 */
 	public function __construct() {
-		$this->addFillColor(self::R, self::G, self::B, 0.5);
-		$this->addStrokeColor(self::R, self::G, self::B, 0.8);
-		$this->addHighlightFill(self::R, self::G, self::B, 0.75);
-		$this->addHighlightStroke(self::R, self::G, self::B, 1);
+		$this->addBackgroundColor(self::R, self::G, self::B, 0.5);
+		$this->addBorderColor(self::R, self::G, self::B, 0.8);
+		$this->addHoverBackgroundColor(self::R, self::G, self::B, 0.75);
+		$this->addHoverBorderColor(self::R, self::G, self::B, 1);
+	}
+
+	/**
+	 * Añade un tipo a al GraficoDataset.
+	 * @param string $label
+	 * @return GraficoDataset
+	 */
+	public function addType($type) {
+		if (!empty($type)) {
+			$this->type = $type;
+			return $this;
+		} else {
+			error_log('Debe ingresar un String no vacío');
+		}
+	}
+
+	/**
+	 * Añade un fill a al GraficoDataset.
+	 * @param string $label
+	 * @return GraficoDataset
+	 */
+	public function addFill($fill = false) {
+		$this->fill = $fill;
+		return $this;
+	}
+
+	/**
+	 * Añade un tipo a al GraficoDataset.
+	 * @param string $label
+	 * @return GraficoDataset
+	 */
+	public function addYAxisID($yAxisID) {
+		if (!empty($yAxisID)) {
+			$this->yAxisID = $yAxisID;
+			return $this;
+		} else {
+			error_log('Debe ingresar un String no vacío');
+		}
 	}
 
 	/**
@@ -32,16 +70,16 @@ class GraficoDataset {
 	}
 
 	/**
-	 * Añade un FillColor al GraficoDataset.
+	 * Añade un BackgroundColor al GraficoDataset.
 	 * @param int $r
 	 * @param int $g
 	 * @param int $b
 	 * @param number $a
 	 * @return GraficoDataset
 	 */
-	public function addFillColor($r = self::R, $g = self::G, $b = self::B, $a = 0.5) {
+	public function addBackgroundColor($r = self::R, $g = self::G, $b = self::B, $a = 0.5) {
 		if ($this->validarRGBA($r, $g, $b, $a)) {
-			$this->fillColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 2, '.', '') . ')';
+			$this->backgroundColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 2, '.', '') . ')';
 			return $this;
 		} else {
 			error_log('Debe ingresar un color válido');
@@ -49,16 +87,16 @@ class GraficoDataset {
 	}
 
 	/**
-	 * Añade un StrokeColor al GraficoDataset.
+	 * Añade un BorderColor al GraficoDataset.
 	 * @param int $r
 	 * @param int $g
 	 * @param int $b
 	 * @param number $a
 	 * @return GraficoDataset
 	 */
-	public function addStrokeColor($r = self::R, $g = self::G, $b = self::B, $a = 0.8) {
+	public function addBorderColor($r = self::R, $g = self::G, $b = self::B, $a = 0.8) {
 		if ($this->validarRGBA($r, $g, $b, $a)) {
-			$this->strokeColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 2, '.', '') . ')';
+			$this->borderColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 2, '.', '') . ')';
 			return $this;
 		} else {
 			error_log('Debe ingresar un color válido');
@@ -66,16 +104,16 @@ class GraficoDataset {
 	}
 
 	/**
-	 * Añade un HighlightFill al GraficoDataset.
+	 * Añade unHoverBackgroundColor al GraficoDataset.
 	 * @param int $r
 	 * @param int $g
 	 * @param int $b
 	 * @param number $a
 	 * @return GraficoDataset
 	 */
-	public function addHighlightFill($r = self::R, $g = self::G, $b = self::B, $a = 0.75) {
+	public function addHoverBackgroundColor($r = self::R, $g = self::G, $b = self::B, $a = 0.75) {
 		if ($this->validarRGBA($r, $g, $b, $a)) {
-			$this->highlightFill = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 2, '.', '') . ')';
+			$this->hoverBackgroundColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 2, '.', '') . ')';
 			return $this;
 		} else {
 			error_log('Debe ingresar un color válido');
@@ -83,16 +121,16 @@ class GraficoDataset {
 	}
 
 	/**
-	 * Añade un HighlightStroke al GraficoDataset.
+	 * Añade un HoverBorderColor al GraficoDataset.
 	 * @param int $r
 	 * @param int $g
 	 * @param int $b
 	 * @param number $a
 	 * @return GraficoDataset
 	 */
-	public function addHighlightStroke($r = self::R, $g = self::G, $b = self::B, $a = 1) {
+	public function addHoverBorderColor($r = self::R, $g = self::G, $b = self::B, $a = 1) {
 		if ($this->validarRGBA($r, $g, $b, $a)) {
-			$this->highlightStroke = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 2, '.', '') . ')';
+			$this->hoverBorderColor = 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . number_format($a, 2, '.', '') . ')';
 			return $this;
 		} else {
 			error_log('Debe ingresar un color válido');
