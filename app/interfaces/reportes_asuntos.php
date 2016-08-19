@@ -107,32 +107,31 @@ jQuery(function() {
 		var solo_activos = jQuery("#solo_activos:checked").val();
 		var fecha_ini = jQuery("#fecha_ini").val();
 		var fecha_fin = jQuery("#fecha_fin").val();
+		var url = 'graficos/grafico_' + jQuery("#tipo_reporte").val() + '.php'
 
 		jQuery.ajax({
-			url: 'graficos/grafico_' + jQuery("#tipo_reporte").val() + '.php',
+			url: 'render_grafico.php',
 			data: {
 				'usuarios': usuarios,
 				'clientes': clientes,
 				'solo_activos': solo_activos,
 				'fecha_ini': fecha_ini,
-				'fecha_fin': fecha_fin
+				'fecha_fin': fecha_fin,
+				'url': url
 			},
-			dataType: 'json',
+			dataType: 'html',
 			type: 'POST',
 			success: function(respuesta) {
 				if (respuesta != null) {
-					agregarCanvas('hito', jQuery('#contenedor_grafico_hito'), respuesta['name_chart']);
-					var canvas = jQuery("#grafico_hito")[0];
-					var context = canvas.getContext('2d');
+					var iframe = document.createElement('iframe');
+					iframe.style = "border: none;";
+					iframe.scrolling = "no";
+					iframe.width = "700";
+					iframe.height = "500";
+					iframe.srcdoc = respuesta;
 
-					if (graficoBarraHito) {
-						graficoBarraHito.destroy();
-					}
-
-					graficoBarraHito = new Chart(context).Bar(respuesta);
-				} else {
 					jQuery('#contenedor_grafico_hito').empty();
-					jQuery('#contenedor_grafico_hito').append('<h3>No exiten datos para generar el gráfico</h3>');
+					jQuery('#contenedor_grafico_hito').append(iframe);
 				}
 			},
 			error: function(e) {
