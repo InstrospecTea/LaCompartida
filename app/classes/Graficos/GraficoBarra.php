@@ -70,6 +70,20 @@ class GraficoBarra {
 	}
 
 	/**
+	 * Añade las opciones al GraficoBarra.
+	 * @param array $options
+	 * @return GraficoBarra
+	 */
+	function addOptions($options) {
+		if (is_array($options)) {
+			$this->options = $options;
+			return $this;
+		} else {
+			error_log('Debe enviar un array');
+		}
+	}
+
+	/**
 	 * Obtiene el JSON de GraficoBarra para ser entregado a Chart.js.
 	 * @return JSON
 	 */
@@ -77,16 +91,29 @@ class GraficoBarra {
 		if ($this->datasets) {
 			if ($this->labels) {
 				$json = [
-					'labels' => $this->labels,
-					'datasets' => $this->datasets,
+					'data' => [
+						'labels' => $this->labels,
+						'datasets' => $this->datasets
+					],
+					'options' => $this->options,
 					'name_chart' => $this->name_chart
 				];
-				return json_encode($json);
 			} else {
-				error_log('Debe agregar labels para generar el JSON');
+				$json = [
+					'error' => [
+						'code' => 1,
+						'message' => 'Debe agregar labels para generar el JSON'
+					]
+				];
 			}
 		} else {
-			error_log('Debe agregar al menos un Dataset para el JSON');
+			$json = [
+				'error' => [
+					'code' => 2,
+					'message' => 'Debe agregar al menos un Dataset para generar el JSON'
+				]
+			];
 		}
+		return json_encode($json);
 	}
 }

@@ -15,6 +15,8 @@ class GraficoDataset {
 		$this->addBorderColor(self::R, self::G, self::B, 0.8);
 		$this->addHoverBackgroundColor(self::R, self::G, self::B, 0.75);
 		$this->addHoverBorderColor(self::R, self::G, self::B, 1);
+		$this->addFill();
+		$this->addBorderWidth();
 	}
 
 	/**
@@ -32,13 +34,27 @@ class GraficoDataset {
 	}
 
 	/**
-	 * Añade un fill a al GraficoDataset.
+	 * Añade fill a al GraficoDataset.
 	 * @param string $label
 	 * @return GraficoDataset
 	 */
 	public function addFill($fill = false) {
 		$this->fill = $fill;
 		return $this;
+	}
+
+	/**
+	 * Añade ancho borde a al GraficoDataset.
+	 * @param int $borderWidth
+	 * @return GraficoDataset
+	 */
+	public function addBorderWidth($borderWidth = 2) {
+		if (is_int($borderWidth)) {
+			$this->borderWidth = $borderWidth;
+			return $this;
+		} else {
+			error_log('Debe ingresar un entero');
+		}
 	}
 
 	/**
