@@ -17,114 +17,71 @@
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		jQuery.ajax({
-			url: '<?= $_POST['url']; ?>',
-			data: <?= json_encode($_POST); ?>,
-			dataType: 'json',
-			type: 'POST',
-			success: function(respuesta) {
-				// TODO: MULTIPLES GRÁFICOS
-				if (respuesta != null) {
-					var context = document.getElementById("canvas").getContext("2d");
+		var charts_data = <?= json_encode($_POST['charts_data']); ?>;
+		var responses = [];
 
-					// var canvas = document.createElement('canvas');
-					// canvas.id = 'canvas';
-					// var h3 = document.createElement('h3');
-					// h3.innerHTML = respuesta['name_chart'];
-
-					jQuery('#h3').html(respuesta['name_chart']);
-					// jQuery('#contenedor_grafico').append(canvas);
-					// agregarCanvas('hito', jQuery('#contenedor_grafico_hito'), respuesta['name_chart']);
-
-					// var barChartData = {
-     //        labels: ["January", "February", "March", "April", "May", "June", "July"],
-     //        datasets: [{
-     //          label: "Sales",
-     //          type:'line',
-     //          data: [51, 65, 40, 49, 60, 37, 40],
-     //          fill: false,
-     //          borderColor: '#EC932F',
-     //          backgroundColor: '#EC932F',
-     //          pointBorderColor: '#EC932F',
-     //          pointBackgroundColor: '#EC932F',
-     //          pointHoverBackgroundColor: '#EC932F',
-     //          pointHoverBorderColor: '#EC932F',
-     //          yAxisID: 'y-axis-2'
-     //        }, {
-     //          type: 'bar',
-     //          label: "Visitor",
-     //          data: [200, 185, 590, 621, 250, 400, 95],
-     //          fill: false,
-     //          backgroundColor: '#71B37C',
-     //          borderColor: '#71B37C',
-     //          hoverBackgroundColor: '#71B37C',
-     //          hoverBorderColor: '#71B37C',
-     //          yAxisID: 'y-axis-1'
-     //        }]
-     //    	};
-
-			graficoBarraHito = new Chart(context, {
-  				type: 'bar',
-					data: respuesta,
-					options: {
-						responsive: true,
-						tooltips: {
-							mode: 'label'
-						},
-						elements: {
-							line: {
-								fill: false
-							}
-						},
-						scales: {
-							xAxes: [{
-								display: true,
-								gridLines: {
-									display: false
-								},
-								labels: {
-									show: true,
-								}
-							}],
-							yAxes: [{
-								type: "linear",
-								display: true,
-								position: "left",
-								id: "y-axis-1",
-								gridLines:{
-									display: false
-								},
-								labels: {
-									show:true,
-								}
-							}, {
-								type: "linear",
-								display: true,
-								position: "right",
-								id: "y-axis-2",
-								gridLines:{
-									display: false
-								},
-								labels: {
-									show:true,
-								}
-							}]
-						}
-					}
-					});
-				} else {
-					jQuery('#contenedor_grafico').empty();
-					jQuery('#contenedor_grafico').append('<h3>No exiten datos para generar el gráfico</h3>');
+		var promises = jQuery.map(charts_data, function(chart_data) {
+			return jQuery.ajax({
+				url: chart_data.url,
+				data: chart_data.data,
+				dataType: 'json',
+				type: 'POST',
+				success: function(response) {
+					responses.push(response);
+				},
+				error: function(e) {
+					alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
 				}
-			},
-			error: function(e) {
-				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
+			});
+		});
+
+		jQuery.when.apply(jQuery, promises).done(function( x ) {
+			// console.log(x);
+			console.log(responses);
+			if (responses[0].error != null) {
+				var h3 = document.createElement('h3');
+				h3.style = 'text-align: center; font-family: Tahoma, Arial, Geneva, sans-serif;';
+				h3.innerText = 'No exiten datos para generar el gráfico'
+
+				jQuery('#contenedor_graficos').append(h3);
+				return;
+			}
+
+			for (var i in responses) {
+				var response = responses[i];
+				var canvas_id = response['name_chart'].toLowerCase().replace(/ /g, '_');
+
+				agregarCanvas(canvas_id, jQuery("#contenedor_graficos"));
+
+				jQuery('#h3').html(response['name_chart']);
+				jQuery('#contenedor_' + canvas_id + ' h2').append(response['name_chart']);
+
+				var context = document.getElementById('grafico_' + canvas_id).getContext('2d');
+
+				var chart = new Chart(context, {
+					type: response.data.datasets[0].type,
+					data: response.data,
+					options: response.options
+				});
 			}
 		});
+
+		function agregarCanvas(id, contenedor) {
+			var div = document.createElement('div');
+			var canvas = document.createElement('canvas');
+			var h2 = document.createElement('h2');
+			canvas.width = 600;
+			canvas.height = 400;
+			canvas.id = 'grafico_' + id;
+			div.id = 'contenedor_' + id;
+			div.className = 'contenedorCanvas';
+			h2.style = 'text-align: center; font-family: Tahoma, Arial, Geneva, sans-serif;';
+
+			div.appendChild(h2);
+			div.appendChild(canvas);
+			contenedor.append(div);
+		}
 	});
 </script>
 
-<div id="contenedor_grafico">
-	<h3 id="h3" style="text-align: center;"></h3>
-	<canvas id="canvas" width="600" height="400"></canvas>
-</div>
+<div id="contenedor_graficos"></div>
