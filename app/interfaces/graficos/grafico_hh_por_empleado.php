@@ -68,6 +68,39 @@
 	$grafico = new TTB\Graficos\GraficoBarra();
 	$dataset = new TTB\Graficos\GraficoDataset();
 
+	$options = [
+		'responsive' => true,
+		'tooltips' => [
+			'mode' => 'label'
+		],
+		'scales' => [
+			'xAxes' => [[
+				'display' => true,
+				'gridLines' => [
+					'display' => false
+				],
+				'labels' => [
+					'show' => true,
+				]
+			]],
+			'yAxes' => [[
+				'type' => 'linear',
+				'display' => true,
+				'position' => 'left',
+				'id' => 'y-axis-1',
+				'gridLines' => [
+					'display' => false
+				],
+				'labels' => [
+					'show' => true
+				],
+				'ticks' => [
+					'beginAtZero' => true
+				]
+			]]
+		]
+	];
+
 	$dataset->addType('bar')
 		->addFill(false)
 		->addYAxisID('y-axis-1')
@@ -76,6 +109,7 @@
 
 	$grafico->addDataSets($dataset)
 		->addNameChart('Horas trabajadas por empleado')
+		->addOptions($options)
 		->addLabels($empleado);
 
 	echo $grafico->getJson();

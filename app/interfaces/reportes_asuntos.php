@@ -109,16 +109,24 @@ jQuery(function() {
 		var fecha_fin = jQuery("#fecha_fin").val();
 		var url = 'graficos/grafico_' + jQuery("#tipo_reporte").val() + '.php'
 
+		var data = {
+			'charts_data': [
+				{
+					'url': url,
+					'data': {
+						'usuarios': usuarios,
+						'clientes': clientes,
+						'solo_activos': solo_activos,
+						'fecha_ini': fecha_ini,
+						'fecha_fin': fecha_fin
+					}
+				}
+			]
+		};
+
 		jQuery.ajax({
 			url: 'render_grafico.php',
-			data: {
-				'usuarios': usuarios,
-				'clientes': clientes,
-				'solo_activos': solo_activos,
-				'fecha_ini': fecha_ini,
-				'fecha_fin': fecha_fin,
-				'url': url
-			},
+			data: data,
 			dataType: 'html',
 			type: 'POST',
 			success: function(respuesta) {
