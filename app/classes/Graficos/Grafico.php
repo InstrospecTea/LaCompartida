@@ -12,23 +12,24 @@ class Grafico {
 	protected $options = [];
 	protected $name_chart = '';
 
+	/**
+	 * Define el tipo del Gráfico.
+	 * @param string $type
+	 * @return Grafico
+	 */
 	public function setType($type) {
 		$this->type = $type;
 		return $this;
 	}
 
 	/**
-	 * Añade el nombre del Gráfico.
+	 * Define el nombre del Gráfico.
 	 * @param string $name_chart
 	 * @return Grafico
 	 */
 	public function setNameChart($name_chart) {
-		if (!empty($name_chart)) {
-			$this->name_chart = mb_detect_encoding($name_chart, 'UTF-8', true) ? $name_chart : utf8_encode($name_chart);
-			return $this;
-		} else {
-			error_log('Debe enviar un String no vacío');
-		}
+		$this->name_chart = mb_detect_encoding($name_chart, 'UTF-8', true) ? $name_chart : utf8_encode($name_chart);
+		return $this;
 	}
 
 	/**
@@ -51,15 +52,13 @@ class Grafico {
 	 * @return Grafico
 	 */
 	public function addLabels($labels) {
-		if (is_array($labels)) {
-			foreach ($labels as $i => $value) {
-				$labels[$i] = mb_detect_encoding($value, 'UTF-8', true) ? $value : utf8_encode($value);
-			}
-			$this->labels = $labels;
-			return $this;
-		} else {
+		if (!is_array($labels)) {
 			error_log('Debe enviar un array');
 		}
+		foreach ($labels as $value) {
+			$this->addLabel($value);
+		}
+		return $this;
 	}
 
 	/**
@@ -68,12 +67,11 @@ class Grafico {
 	 * @return Grafico
 	 */
 	public function addLabel($label) {
-		if (!empty($label)) {
-			$this->labels[] = mb_detect_encoding($label, 'UTF-8', true) ? $label : utf8_encode($label);
-			return $this;
-		} else {
+		if (empty($label)) {
 			error_log('Debe enviar un String no vacío');
 		}
+		$this->labels[] = mb_detect_encoding($label, 'UTF-8', true) ? $label : utf8_encode($label);
+		return $this;
 	}
 
 	/**
@@ -82,12 +80,11 @@ class Grafico {
 	 * @return Grafico
 	 */
 	public function addOptions($options) {
-		if (is_array($options)) {
-			$this->options = $options;
-			return $this;
-		} else {
+		if (!is_array($options)) {
 			error_log('Debe enviar un array');
 		}
+		$this->options = $options;
+		return $this;
 	}
 
 	/**
