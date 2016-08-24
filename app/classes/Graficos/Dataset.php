@@ -177,4 +177,11 @@ class Dataset {
 		}
 	}
 
+	protected function getRandomColor($a = 1) {
+		$r = rand(100, 200);
+		$g = rand(100, 200);
+		$b = rand(100, 200);
+		return "rgba({$r}, {$g}, {$b}, {$a})";
+	}
+
 }
