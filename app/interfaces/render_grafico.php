@@ -36,8 +36,6 @@
 		});
 
 		jQuery.when.apply(jQuery, promises).done(function( x ) {
-			// console.log(x);
-			console.log(responses);
 			if (responses[0].error != null) {
 				var h3 = document.createElement('h3');
 				h3.style = 'text-align: center; font-family: Tahoma, Arial, Geneva, sans-serif;';
@@ -58,11 +56,7 @@
 
 				var context = document.getElementById('grafico_' + canvas_id).getContext('2d');
 
-				var chart = new Chart(context, {
-					type: response.data.datasets[0].type,
-					data: response.data,
-					options: response.options
-				});
+				var chart = new Chart(context, response);
 			}
 		});
 
