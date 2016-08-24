@@ -11,11 +11,9 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 		global $contrato;
 		global $cobro_moneda;
 		global $masi;
-		global $x_resultados;
 		global $x_cobro_gastos;
 
-		$this->cargarTrabajos($lang, $asunto);
-		list($x_detalle_profesional, $x_resumen_profesional, $x_factor_ajuste) = $this->detalle_profesional;
+		//list($x_detalle_profesional, $x_resumen_profesional, $x_factor_ajuste) = $this->DetalleProfesional();
 
 		$moneda_total = new Objeto($this->sesion, '', '', 'prm_moneda', 'id_moneda');
 		$moneda_total->Load($this->fields['opc_moneda_total'] > 0 ? $this->fields['opc_moneda_total'] : 1);
@@ -206,6 +204,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 				$descontado = false;
 				$flatfee = false;
 				$incobrables = false;
+				$x_resumen_profesional = $this->ChargeData->getSumary($asunto->fields['codigo_asunto']);
 
 				if (is_array($x_resumen_profesional)) {
 					foreach ($x_resumen_profesional as $prof => $data) {
@@ -1014,109 +1013,5 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 				break;
 		}
 		return $html;
-	}
-
-	private function cargarTrabajos($lang, $asunto) {
-		if ($this->fields['id_cobro'] == $this->ultimo_cobro) {
-			return;
-		}
-
-		$this->ultimo_cobro = $this->fields['id_cobro'];
-		$where_horas_cero = '';
-
-		if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario')) {
-			$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-			$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-		} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-			$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-			$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-		} elseif (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-			$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-			$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
-		} elseif (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional')) {
-			$select_categoria = "";
-			$order_categoria = "usuario.id_categoria_usuario DESC, ";
-		} elseif (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorFechaCategoria')) {
-			$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-			$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
-		} else {
-			$select_categoria = "";
-			$order_categoria = "";
-		}
-
-		if (!Conf::GetConf($this->sesion, 'MostrarHorasCero')) {
-			$field = $columna_hrs_trabajadas ? 'duracion' : 'duracion_cobrada';
-			$where_horas_cero = "AND trabajo.{$field} > '0000-00-00 00:00:00'";
-		}
-
-		if ($this->fields['opc_ver_valor_hh_flat_fee'] && $this->fields['forma_cobro'] != 'ESCALONADA') {
-			$dato_monto_cobrado = " ( trabajo.tarifa_hh * TIME_TO_SEC( trabajo.duracion_cobrada ) ) / 3600 ";
-		} else {
-			$dato_monto_cobrado = " trabajo.monto_cobrado ";
-		}
-
-		if ($columna_hrs_trabajadas == 0) {
-			$cobrable = " AND trabajo.cobrable = 1";
-		}
-
-		if ($this->fields['opc_ver_cobrable']) {
-			$visible = "";
-			if ($columna_hrs_trabajadas == 0) {
-				$cobrable = " AND ((trabajo.cobrable = 0 AND trabajo.visible = 0)
-								OR (trabajo.cobrable = 1 AND trabajo.visible = 1))";
-			}
-		} else {
-			$visible = "AND trabajo.visible = 1";
-		}
-
-		if ($lang == 'es') {
-			$query_categoria_lang = "prm_categoria_usuario.glosa_categoria AS categoria,";
-		} else {
-			$query_categoria_lang = "IFNULL(prm_categoria_usuario.glosa_categoria_lang ,prm_categoria_usuario.glosa_categoria) AS categoria,";
-		}
-
-		/*
-		 * 	Contenido de filas de seccion trabajo.
-		 */
-		$query = "SELECT SQL_CALC_FOUND_ROWS
-							IF(trabajo.cobrable,trabajo.duracion_cobrada,'00:00:00') as duracion_cobrada,
-							trabajo.duracion_retainer,
-							trabajo.descripcion,
-							trabajo.fecha,
-							trabajo.id_usuario,
-							$dato_monto_cobrado as monto_cobrado,
-							trabajo.visible,
-							trabajo.cobrable,
-							trabajo.id_trabajo,
-							trabajo.tarifa_hh,
-							IF (trabajo.cobrable, trabajo.tarifa_hh * ( TIME_TO_SEC( duracion_cobrada ) / 3600 ),0) as importe,
-							trabajo.codigo_asunto,
-							trabajo.solicitante,
-							$query_categoria_lang
-							CONCAT_WS(' ', nombre, apellido1) as nombre_usuario,
-							trabajo.duracion,
-							usuario.username as username $select_categoria
-					FROM trabajo
-					LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-					LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro
-					LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario
-					WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
-					AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-					$cobrable
-					$visible
-					AND trabajo.id_tramite=0 $where_horas_cero
-					ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
-
-		$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
-		array_map(array($this, 'deleteSesion'), $lista_trabajos->datos);
-		$this->deleteSesion($lista_trabajos);
-		$this->lista_trabajos = $lista_trabajos;
-		unset($lista_trabajos);
-		$CobroDetalleProfesional = new CobroDetalleProfesional($this->sesion, $this->fields);
-		$this->detalle_profesional = $CobroDetalleProfesional->detalleProfesional($this->lista_trabajos);
-	}
-
-	private function deleteSesion($obj) {
-		unset($obj->sesion);
 	}
 }

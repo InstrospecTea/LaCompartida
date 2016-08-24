@@ -5,11 +5,9 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 	protected $tiene_tag_asuntos_no_separados;
 
 	function GenerarDocumento2($parser, $theTag = 'INFORME', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, &$idioma, & $cliente, $moneda, $moneda_base, $trabajo, & $profesionales, $gasto, & $totales, $tipo_cambio_moneda_total, $asunto, $mostrar_asuntos_cobrables_sin_horas = FALSE) {
-
 		global $contrato;
 		global $cobro_moneda;
 		global $masi;
-		global $x_detalle_profesional;
 		global $x_resumen_profesional;
 		global $x_factor_ajuste;
 		global $x_resultados;
@@ -2999,13 +2997,15 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 			case 'PROFESIONAL_FILAS': //GenerarDocumento2
 				$row_tmpl = $html;
 				$html = '';
-				if (is_array($x_detalle_profesional[$asunto->fields['codigo_asunto']])) {
+				$works = $this->ChargeData->getWorksOfMatter($asunto->fields['codigo_asunto']);
+				if (!empty($works)) {
 					$retainer = false;
 					$descontado = false;
 					$flatfee = false;
 
-					if (is_array($x_resumen_profesional)) {
-						foreach ($x_resumen_profesional as $data) {
+					$sumary = $this->ChargeData->getSumary($asunto->fields['codigo_asunto']);
+					if (!empty($sumary)) {
+						foreach ($sumary as $data) {
 							if ($data['duracion_retainer'] > 0 && ( $this->fields['forma_cobro'] != 'FLAT FEE' || Conf::GetConf($this->sesion, 'ResumenProfesionalVial'))) {
 								$retainer = true;
 							}
@@ -3028,7 +3028,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$totales['tiempo_descontado_real'] = 0;
 					$totales['valor_total'] = 0;
 
-					foreach ($x_detalle_profesional[$asunto->fields['codigo_asunto']] as $prof => $data) {
+					foreach ($sumary as $prof => $data) {
 						// Para mostrar un resumen de horas de cada profesional al principio del documento.
 						$row = $row_tmpl;
 						$totales['valor'] += $data['valor_tarificada'];
@@ -3045,10 +3045,11 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							$totales['valor_total'] += $data['valor_tarificada'];
 						}
 
-						if ($this->fields['opc_ver_profesional_iniciales'] == 1)
+						if ($this->fields['opc_ver_profesional_iniciales'] == 1) {
 							$row = str_replace('%nombre_siglas%', $data['username'], $row);
-						else
+						} else {
 							$row = str_replace('%nombre_siglas%', $data['nombre_usuario'], $row);
+						}
 						$row = str_replace('%nombre%', $data['nombre_usuario'], $row);
 						$row = str_replace('%username%', $data['username'], $row);
 
@@ -3140,12 +3141,14 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							$row = str_replace('%hrs_trabajadas%', '', $row);
 							$row = str_replace('%hrs_trabajadas_real%', '', $row);
 						}
+
 						if ($retainer) {
 							if ($data['duracion_retainer'] > 0) {
-								if ($this->fields['forma_cobro'] == 'PROPORCIONAL')
+								if ($this->fields['forma_cobro'] == 'PROPORCIONAL') {
 									$row = str_replace('%hrs_retainer%', floor($data['duracion_retainer']) . ':' . sprintf('%02d', floor(( floor($data['duracion_retainer']) - $data['duracion_retainer']) * 60)) . ':' . sprintf('%02d', round(( floor($data['duracion_retainer']) - $data['duracion_retainer']) * 3600)), $row);
-								else // retainer simple, no imprime segundos
+								} else { // retainer simple, no imprime segundos
 									$row = str_replace('%hrs_retainer%', $data['glosa_duracion_retainer'], $row);
+								}
 								$row = str_replace('%horas_retainer%', number_format($data['duracion_retainer'], 1, $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $row);
 							}
 							else {
@@ -3162,6 +3165,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							$row = str_replace('%hrs_retainer%', '', $row);
 							$row = str_replace('%horas_retainer%', '', $row);
 						}
+
 						if ($descontado) {
 							$row = str_replace('%columna_horas_no_cobrables%', '<td align="center" width="65">%hrs_descontado%</td>', $row);
 							if ($data['duracion_incobrables'] > 0)
@@ -3172,12 +3176,12 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 								$row = str_replace('%hrs_descontadas_real%', $data['glosa_duracion_descontada'], $row);
 							else
 								$row = str_replace('hrs_descontadas_real%', '-', $row);
-						}
-						else {
+						} else {
 							$row = str_replace('%columna_horas_no_cobrables%', '', $row);
 							$row = str_replace('%hrs_descontadas_real%', '', $row);
 							$row = str_replace('%hrs_descontadas%', '', $row);
 						}
+
 						if ($flatfee) {
 							$row = str_replace('%hh%', '0:00', $row);
 						} else if ($this->fields['forma_cobro'] == 'ESCALONADA') {
@@ -3236,8 +3240,9 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$descontado = false;
 				$flatfee = false;
 
-				if (is_array($x_resumen_profesional)) {
-					foreach ($x_resumen_profesional as $data) {
+				$sumary = $this->ChargeData->getSumary($asunto->fields['codigo_asunto']);
+				if (!empty($sumary)) {
+					foreach ($sumary as $data) {
 						if ($data['duracion_retainer'] > 0 && ($this->fields['forma_cobro'] != 'FLAT FEE' || Conf::GetConf($this->sesion, 'ResumenProfesionalVial'))) {
 							$retainer = true;
 						}

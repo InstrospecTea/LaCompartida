@@ -8,14 +8,14 @@ class ChargeData {
 	protected $id = 0;
 	protected $Sesion;
 	protected $Charge;
-	protected $factor = 1;
+	protected $proportional_factor = 1;
 	protected $total_works_fee = 0;
 	protected $total_errands_fee = 0;
 	protected $total_expenses_fee = 0;
 	protected $works = array();
 	protected $matters = array();
 	protected $sumary = array();
-	protected $matterSumary = array();
+	protected $matter_sumary = array();
 
 	private $base_data = array(
 		'id_categoria_usuario' => '',
@@ -41,18 +41,14 @@ class ChargeData {
 		'monto_cobrado_escalonada' => 0
 	);
 
-	public function __construct(Sesion $Sesion, $id) {
+	public function __construct(Sesion $Sesion, Cobro $Cobro) {
 		$this->Sesion = $Sesion;
-		$this->id = $id;
-		$this->loadCharge();
-		$this->loadFactor();
+		$this->Charge = new Charge();
+		$this->Charge->fillFromArray($Cobro->fields);
+		$this->loadProportionalFactor();
 		$this->loadWorks();
 		$this->makeSumary();
 		$this->Sesion = null;
-		echo $this->tableize($this->matterSumary);
-		echo $this->tableize($this->sumary);
-		echo $this->tableize($this->works);
-		exit;
 	}
 
 	private function tableize($data, $caption = null) {
@@ -80,8 +76,8 @@ class ChargeData {
 			$tds = array();
 			foreach ($row as $key => $field) {
 				if (in_array($key, $currency_columns)) {
-					$field = round($field, 2);
 					$totales[$key] += $field;
+					$field = round($field, 2);
 				}
 				$tds[] = $Html->td($field);
 			}
@@ -89,7 +85,7 @@ class ChargeData {
 		}
 		$ths = array();
 		foreach ($headers as $header) {
-			$value = in_array($header, $currency_columns) ? $totales[$header] : '';
+			$value = in_array($header, $currency_columns) ? round($totales[$header], 2) : '';
 			$ths[] = $Html->th($value);
 		}
 		$trs[] = $Html->tr(implode('', $ths));
@@ -113,7 +109,7 @@ class ChargeData {
 		if (is_null($matter_code)) {
 			return $this->sumary;
 		}
-		return $this->matterSumary[$matter_code];
+		return $this->matter_sumary[$matter_code];
 	}
 
 	/**
@@ -154,11 +150,6 @@ class ChargeData {
 		return $this->get("opc_{$opt}") == 1;
 	}
 
-	protected function loadCharge() {
-		$ChargeService = new ChargeService($this->Sesion);
-		$this->Charge = $ChargeService->get($this->id);
-	}
-
 	/**
 	 * Cartga todos los trabajos del cobro
 	 */
@@ -166,8 +157,9 @@ class ChargeData {
 		$ver_horas_trabajadas = $this->opt('ver_horas_trabajadas');
 		$Criteria = new Criteria($this->Sesion);
 		$Criteria->add_from('trabajo')
-			->add_select("IF(trabajo.cobrable,trabajo.duracion_cobrada,'00:00:00')", 'duracion_cobrada')
-			->add_select('trabajo.duracion_retainer')
+			->add_select('trabajo.duracion', 'glosa_duracion')
+			->add_select("IF(trabajo.cobrable, trabajo.duracion_cobrada, 0)", 'glosa_duracion_cobrada')
+			->add_select('trabajo.duracion_retainer', 'glosa_duracion_retainer')
 			->add_select('trabajo.descripcion')
 			->add_select('trabajo.fecha')
 			->add_select('trabajo.id_usuario')
@@ -175,16 +167,15 @@ class ChargeData {
 			->add_select('trabajo.cobrable')
 			->add_select('trabajo.id_trabajo')
 			->add_select('trabajo.tarifa_hh')
-			->add_select('IF(trabajo.cobrable, trabajo.tarifa_hh * (TIME_TO_SEC(duracion_cobrada) / 3600 ), 0)', 'importe')
+			->add_select('IF(trabajo.cobrable, trabajo.tarifa_hh * (TIME_TO_SEC(trabajo.duracion_cobrada) / 3600 ), 0)', 'importe')
 			->add_select('trabajo.codigo_asunto')
 			->add_select('trabajo.solicitante')
 			->add_select("CONCAT_WS(' ', nombre, apellido1)", 'nombre_usuario')
-			->add_select('trabajo.duracion')
-			->add_select('usuario.username', 'username')
+			->add_select('usuario.username')
 			->add_left_join_with('usuario', Restriction::equals('trabajo.id_usuario', 'usuario.id_usuario'))
 			//->add_left_join_with('cobro', Restriction::equals('cobro.id_cobro', 'trabajo.id_cobro'))
 			->add_left_join_with('prm_categoria_usuario', Restriction::equals('usuario.id_categoria_usuario', 'prm_categoria_usuario.id_categoria_usuario'))
-			->add_restriction(Restriction::equals('trabajo.id_cobro', $this->id))
+			->add_restriction(Restriction::equals('trabajo.id_cobro', $this->get('id_cobro')))
 			->add_restriction(Restriction::equals('trabajo.id_tramite', '0'));
 
 		$Criteria = $this->userCategoryScope($Criteria);
@@ -196,7 +187,7 @@ class ChargeData {
 		if ($this->opt('ver_valor_hh_flat_fee') && $this->get('forma_cobro') != 'ESCALONADA') {
 			$Criteria->add_select('(trabajo.tarifa_hh * TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600', 'monto_cobrado');
 		} else {
-			$Criteria->add_select('trabajo.monto_cobrado', 'monto_cobrado');
+			$Criteria->add_select('trabajo.monto_cobrado');
 		}
 
 		if ($ver_horas_trabajadas) {
@@ -222,10 +213,20 @@ class ChargeData {
 			$Criteria->add_restriction(Restriction::equals('trabajo.visible', '1'));
 		}
 
-		$Criteria->add_select('IFNULL(prm_categoria_usuario.glosa_categoria_lang ,prm_categoria_usuario.glosa_categoria)', 'categoria');
-		$Criteria->add_ordering('trabajo.fecha', 'ASC');
-		$Criteria->add_ordering('trabajo.descripcion');
 		$this->works = $Criteria->run();
+
+		foreach ($this->works as $i => $work) {
+			$work['duracion'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion']);
+			$work['duracion_cobrada'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion_cobrada']);
+			$work['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion_retainer']);
+
+			if ($this->get('forma_cobro') == 'PROPORCIONAL') {
+				$work['duracion_retainer'] = $work['duracion_cobrada'] * $this->proportional_factor;
+				$work['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($work['duracion_retainer']);
+			}
+			$work['valor_tarificada'] = max($work['duracion_cobrada'] - $work['duracion_retainer'], 0) * $work['tarifa_hh'];
+			$this->works[$i] = $work;
+		}
 	}
 
 	/**
@@ -249,7 +250,16 @@ class ChargeData {
 				->add_ordering('trabajo.fecha')
 				->add_ordering('usuario.id_categoria_usuario')
 				->add_ordering('usuario.id_usuario');
+		} else {
+			if ($lang == 'es') {
+				$Criteria->add_select('prm_categoria_usuario.glosa_categoria', 'categoria');
+			} else {
+				$Criteria->add_select('IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria)', 'categoria');
+			}
+			$Criteria->add_ordering('trabajo.fecha', 'ASC')
+				->add_ordering('trabajo.descripcion');
 		}
+
 		return $Criteria;
 	}
 
@@ -268,11 +278,7 @@ class ChargeData {
 			$work['duracion_incobrables'] = $this->duracionIncobrables($matter_code, $user_id);
 			$work['duracion_trabajada'] = $work['duracion'];
 
-			$work['duracion_cobrada'] = Utiles::GlosaHora2Multiplicador($work['duracion_cobrada']);
-			$work['duracion_trabajada'] = Utiles::GlosaHora2Multiplicador($work['duracion_trabajada']);
-			$work['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($work['duracion_retainer']);
-
-			$work['duracion_descontada'] = $work['duracion_trabajada'] - $work['duracion_cobrada'] + $work['duracion_incobrables'];
+			$work['duracion_descontada'] = $work['duracion_trabajada'] - $work['duracion_cobrada'] - $work['duracion_incobrables'];
 			$work['duracion_incobrables'] = $work['duracion_incobrables'];
 
 			if ($this->get('forma_cobro') == 'FLAT FEE' && !$this->opt('ver_valor_hh_flat_fee')) {
@@ -282,12 +288,8 @@ class ChargeData {
 				$work['duracion_retainer'] = $work['duracion_cobrada'];
 			} else if ($this->get('forma_cobro') == 'ESCALONADA') {
 				$work['monto_cobrado_escalonada'] = $work['monto_cobrado'];
-			} else if ($this->get('forma_cobro') == 'RETAINER') {
+			} else if ($this->get('forma_cobro') == 'RETAINER' || $this->get('forma_cobro') == 'PROPORCIONAL') {
 				$work['duracion_tarificada'] = $work['duracion_cobrada'] - $work['duracion_incobrables'] - $work['duracion_retainer'];
-				$work['valor_tarificada'] = $work['duracion_tarificada'] * $work['tarifa_hh'];
-			} else if ($this->get('forma_cobro') == 'PROPORCIONAL') {
-				$work['duracion_retainer'] = $work['duracion_cobrada'] * $this->factor;
-				$work['duracion_tarificada'] = ($work['duracion_cobrada'] - $work['duracion_incobrables']) - $work['duracion_retainer'];
 				$work['valor_tarificada'] = $work['duracion_tarificada'] * $work['tarifa_hh'];
 			} else {
 				$work['duracion_tarificada'] = $work['duracion_cobrada'] - $work['duracion_incobrables'];
@@ -363,14 +365,14 @@ class ChargeData {
 			$sumary[$user_id]['valor_tarificada'] = $sumary[$user_id]['duracion_tarificada'] * $data['tarifa'];
 		}
 		$this->sumary = $sumary;
-		$this->matterSumary = $professionals;
+		$this->matter_sumary = $professionals;
 	}
 
 	private function duracionIncobrables($matter_code, $user_id) {
 		$Criteria = new Criteria($this->Sesion);
 		$Criteria->add_select('SUM(TIME_TO_SEC(duracion_cobrada) / 3600)', 'duracion_incobrables')
 			->add_from('trabajo')
-			->add_restriction(Restriction::equals('id_cobro', $this->id))
+			->add_restriction(Restriction::equals('id_cobro', $this->get('id_cobro')))
 			->add_restriction(Restriction::equals('id_usuario', $user_id))
 			->add_restriction(Restriction::equals('codigo_asunto', "'$matter_code'"))
 			->add_restriction(Restriction::equals('visible', '1'))
@@ -380,7 +382,7 @@ class ChargeData {
 		return $result['duracion_incobrables']?:0;
 	}
 
-	private function loadFactor() {
+	private function loadProportionalFactor() {
 		if ($this->get('forma_cobro') != 'PROPORCIONAL') {
 			return;
 		}
@@ -390,6 +392,6 @@ class ChargeData {
 			->add_restriction(Restriction::equals('id_cobro', $this->get('id_cobro')))
 			->add_restriction(Restriction::equals('cobrable', 1));
 		$result = $Criteria->first();
-		$this->factor = $this->get('retainer_horas') / $result['duracion_cobrable'];
+		$this->proportional_factor = $this->get('retainer_horas') / $result['duracion_cobrable'];
 	}
 }

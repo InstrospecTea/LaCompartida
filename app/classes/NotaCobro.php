@@ -11,7 +11,7 @@ class NotaCobro extends NotaCobroResumenProfesional {
 	protected $detalle_en_asuntos = FALSE;
 	protected $hitos = FALSE;
 	protected $resumen_cap = null;
-
+	protected $ChargeData;
 	var $asuntos = array();
 	var $x_resultados = array();
 
@@ -224,6 +224,7 @@ class NotaCobro extends NotaCobroResumenProfesional {
 		global $masi;
 		$masi = $masivo;
 
+		$this->ChargeData = new ChargeData($this->sesion, $this);
 		$parametros = $this->ParametrosGeneracion();
 		extract($parametros);
 
