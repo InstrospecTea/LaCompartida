@@ -1,21 +1,28 @@
-<?php namespace TTB\Graficos;
+<?php
 
-require_once dirname(__FILE__).'/../../conf.php';
+namespace TTB\Graficos;
 
-class GraficoBarra {
+use TTB\Graficos\Dataset;
 
-	/**
-	 * Constructor de la clase.
-	 */
-	function __construct() {
+class Grafico {
+
+	protected $type = 'bar';
+	protected $labels = [];
+	protected $datasets = [];
+	protected $options = [];
+	protected $name_chart = '';
+
+	public function setType($type) {
+		$this->type = $type;
+		return $this;
 	}
 
 	/**
 	 * Añade el nombre del Gráfico.
 	 * @param string $name_chart
-	 * @return GraficoBarra
+	 * @return Grafico
 	 */
-	function addNameChart($name_chart) {
+	public function setNameChart($name_chart) {
 		if (!empty($name_chart)) {
 			$this->name_chart = mb_detect_encoding($name_chart, 'UTF-8', true) ? $name_chart : utf8_encode($name_chart);
 			return $this;
@@ -25,13 +32,13 @@ class GraficoBarra {
 	}
 
 	/**
-	 * Añade un GraficoDataset.
-	 * @param GraficoDataset $datasets
-	 * @return GraficoBarra
+	 * Añade un Dataset.
+	 * @param Dataset $datasets
+	 * @return Grafico
 	 */
-	function addDataSets(GraficoDataset $datasets) {
+	public function addDataSets(Dataset $Dataset) {
 		try {
-			$this->datasets[] = $datasets;
+			$this->datasets[] = $Dataset;
 			return $this;
 		} catch (ErrorException $e) {
 			error_log($e);
@@ -39,11 +46,11 @@ class GraficoBarra {
 	}
 
 	/**
-	 * Añade los labels al GraficoBarra.
+	 * Añade los labels al Grafico.
 	 * @param array $labels
-	 * @return GraficoBarra
+	 * @return Grafico
 	 */
-	function addLabels($labels) {
+	public function addLabels($labels) {
 		if (is_array($labels)) {
 			foreach ($labels as $i => $value) {
 				$labels[$i] = mb_detect_encoding($value, 'UTF-8', true) ? $value : utf8_encode($value);
@@ -56,11 +63,11 @@ class GraficoBarra {
 	}
 
 	/**
-	 * Añade un label al GraficoBarra.
+	 * Añade un label al Grafico.
 	 * @param string $label
-	 * @return GraficoBarra
+	 * @return Grafico
 	 */
-	function addLabel($label) {
+	public function addLabel($label) {
 		if (!empty($label)) {
 			$this->labels[] = mb_detect_encoding($label, 'UTF-8', true) ? $label : utf8_encode($label);
 			return $this;
@@ -70,11 +77,11 @@ class GraficoBarra {
 	}
 
 	/**
-	 * Añade las opciones al GraficoBarra.
+	 * Añade las opciones al Grafico.
 	 * @param array $options
-	 * @return GraficoBarra
+	 * @return Grafico
 	 */
-	function addOptions($options) {
+	public function addOptions($options) {
 		if (is_array($options)) {
 			$this->options = $options;
 			return $this;
@@ -84,19 +91,20 @@ class GraficoBarra {
 	}
 
 	/**
-	 * Obtiene el JSON de GraficoBarra para ser entregado a Chart.js.
+	 * Obtiene el JSON de Grafico para ser entregado a Chart.js.
 	 * @return JSON
 	 */
-	function getJson() {
+	public function getJson() {
 		if ($this->datasets) {
 			if ($this->labels) {
 				$json = [
+					'type' => $this->type,
+					'name_chart' => $this->name_chart,
 					'data' => [
 						'labels' => $this->labels,
 						'datasets' => $this->datasets
 					],
-					'options' => $this->options,
-					'name_chart' => $this->name_chart
+					'options' => $this->options
 				];
 			} else {
 				$json = [
