@@ -4,7 +4,7 @@
 	$sesion = new Sesion();
 	$Criteria = new Criteria($sesion);
 
- 	if (method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema')) {
+ 	if (Conf::read('UsaUsernameEnTodoElSistema')) {
  		$letra_profesional = 'username';
  	} else {
  		$letra_profesional = 'usuario';
@@ -32,28 +32,28 @@
 
 	$Criteria->add_select("CONCAT_WS(', ', apellido1, nombre)", 'usuario')
 		->add_select('username')
-		->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
+		->add_select('SUM(TIME_TO_SEC(duracion)) / 3600', 'tiempo')
 		->add_from('trabajo')
 		->add_custom_join_with(
 			'usuario',
 			CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario'), ''
-			)
+		)
 		->add_custom_join_with(
 			'asunto',
 			CriteriaRestriction::equals('trabajo.codigo_asunto', 'asunto.codigo_asunto'), ''
-			)
+		)
 		->add_custom_join_with(
 			'cliente',
 			CriteriaRestriction::equals('asunto.codigo_cliente', 'cliente.codigo_cliente'), ''
-			)
+		)
 		->add_restriction(
 			CriteriaRestriction::between('trabajo.fecha', "'" . Utiles::fecha2sql($fecha_ini) . "'", "'" . Utiles::fecha2sql($fecha_fin) . "'")
-			)
+		)
 		->add_grouping('usuario.id_usuario')
 		->add_ordering('tiempo', 'DESC')
 		->add_limit(14, 0);
 
-	try{
+	try {
 		$respuesta = $Criteria->run();
 	} catch(Exception $e) {
 		error_log('Error al ejecutar la SQL');
@@ -65,8 +65,8 @@
 		$total_tiempo += $value['tiempo'];
 	}
 
-	$grafico = new TTB\Graficos\GraficoBarra();
-	$dataset = new TTB\Graficos\GraficoDataset();
+	$grafico = new TTB\Graficos\Grafico();
+	$dataset = new TTB\Graficos\Dataset();
 
 	$options = [
 		'responsive' => true,
@@ -83,32 +83,34 @@
 					'show' => true,
 				]
 			]],
-			'yAxes' => [[
-				'type' => 'linear',
-				'display' => true,
-				'position' => 'left',
-				'id' => 'y-axis-1',
-				'gridLines' => [
-					'display' => false
-				],
-				'labels' => [
-					'show' => true
-				],
-				'ticks' => [
-					'beginAtZero' => true
+			'yAxes' => [
+				[
+					'type' => 'linear',
+					'display' => true,
+					'position' => 'left',
+					'id' => 'y-axis-1',
+					'gridLines' => [
+						'display' => false
+					],
+					'labels' => [
+						'show' => true
+					],
+					'ticks' => [
+						'beginAtZero' => true
+					]
 				]
-			]]
+			]
 		]
 	];
 
-	$dataset->addType('bar')
-		->addFill(false)
-		->addYAxisID('y-axis-1')
-		->addLabel('Horas trabajadas por empleado')
-		->addData($tiempo);
+	$dataset->setType('bar')
+		->setFill(false)
+		->setYAxisID('y-axis-1')
+		->setLabel('Horas trabajadas por empleado')
+		->setData($tiempo);
 
-	$grafico->addDataSets($dataset)
-		->addNameChart('Horas trabajadas por empleado')
+	$grafico->setNameChart('Horas trabajadas por empleado')
+		->addDataSets($dataset)
 		->addOptions($options)
 		->addLabels($empleado);
 

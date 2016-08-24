@@ -22,7 +22,7 @@
 		);
 	}
 
-	if (method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario')) {
+	if (Conf::read('CodigoSecundario')) {
  		$codigo_cliente = 'codigo_cliente_secundario';
  	} else {
  		$codigo_cliente = 'codigo_cliente';
@@ -36,25 +36,25 @@
 		->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
 		->add_from('cliente')
 		->add_left_join_with(
-				'asunto',
-				CriteriaRestriction::equals('asunto.codigo_cliente', 'cliente.codigo_cliente')
-			)
+			'asunto',
+			CriteriaRestriction::equals('asunto.codigo_cliente', 'cliente.codigo_cliente')
+		)
 		->add_left_join_with(
-				'trabajo',
-				CriteriaRestriction::equals('trabajo.codigo_asunto', 'asunto.codigo_asunto')
-			)
+			'trabajo',
+			CriteriaRestriction::equals('trabajo.codigo_asunto', 'asunto.codigo_asunto')
+		)
 		->add_inner_join_with(
-				'usuario',
-				CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario')
-			)
+			'usuario',
+			CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario')
+		)
 		->add_restriction(
-				CriteriaRestriction::between('trabajo.fecha', "'" . Utiles::fecha2sql($fecha_ini) . "'", "'" . Utiles::fecha2sql($fecha_fin) . "'")
-			)
+			CriteriaRestriction::between('trabajo.fecha', "'" . Utiles::fecha2sql($fecha_ini) . "'", "'" . Utiles::fecha2sql($fecha_fin) . "'")
+		)
 		->add_grouping('cliente.codigo_cliente')
 		->add_ordering('tiempo', 'DESC')
 		->add_limit(14, 0);
 
-	try{
+	try {
 		$respuesta = $Criteria->run();
 	} catch(Exception $e) {
 		error_log('Error al ejecutar la SQL');
@@ -66,14 +66,51 @@
 		$total_tiempo += $fila['tiempo'];
 	}
 
-	$grafico = new TTB\Graficos\GraficoBarra();
-	$dataset = new TTB\Graficos\GraficoDataset();
+	$grafico = new TTB\Graficos\Grafico();
+	$dataset = new TTB\Graficos\Dataset();
 
-	$dataset->addLabel('Horas trabajadas por cliente')
-		->addData($tiempo);
+	$options = [
+		'responsive' => true,
+		'tooltips' => [
+			'mode' => 'label'
+		],
+		'scales' => [
+			'xAxes' => [[
+				'display' => true,
+				'gridLines' => [
+					'display' => false
+				],
+				'labels' => [
+					'show' => true,
+				]
+			]],
+			'yAxes' => [[
+				'type' => 'linear',
+				'display' => true,
+				'position' => 'left',
+				'id' => 'y-axis-1',
+				'gridLines' => [
+					'display' => false
+				],
+				'labels' => [
+					'show' => true
+				],
+				'ticks' => [
+					'beginAtZero' => true
+				]
+			]]
+		]
+	];
 
-	$grafico->addDataSets($dataset)
-		->addNameChart('Horas trabajadas por cliente')
+	$dataset->setType('bar')
+		->setFill(false)
+		->setYAxisID('y-axis-1')
+		->setLabel('Horas trabajadas por cliente')
+		->setData($tiempo);
+
+	$grafico->setNameChart('Horas trabajadas por cliente')
+		->addDataSets($dataset)
+		->addOptions($options)
 		->addLabels($cliente);
 
 	echo $grafico->getJson();

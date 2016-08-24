@@ -29,25 +29,25 @@
 		->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
 		->add_from('trabajo')
 		->add_inner_join_with(
-				'usuario',
-				CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario')
-			)
+			'usuario',
+			CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario')
+		)
 		->add_inner_join_with(
-				'asunto',
-				CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto')
-			)
+			'asunto',
+			CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto')
+		)
 		->add_inner_join_with(
-				'cliente',
-				CriteriaRestriction::equals('cliente.codigo_cliente', 'asunto.codigo_cliente')
-			)
+			'cliente',
+			CriteriaRestriction::equals('cliente.codigo_cliente', 'asunto.codigo_cliente')
+		)
 		->add_restriction(
-				CriteriaRestriction::between('trabajo.fecha', "'" . Utiles::fecha2sql($fecha_ini) . "'", "'" . Utiles::fecha2sql($fecha_fin) . "'")
-			)
+			CriteriaRestriction::between('trabajo.fecha', "'" . Utiles::fecha2sql($fecha_ini) . "'", "'" . Utiles::fecha2sql($fecha_fin) . "'")
+		)
 		->add_grouping('asunto.codigo_asunto')
 		->add_ordering('tiempo', 'DESC')
 		->add_limit(14, 0);
 
-	try{
+	try {
 		$respuesta = $Criteria->run();
 	} catch(Exception $e) {
 		error_log('Error al ejecutar la SQL');
@@ -59,14 +59,51 @@
 		$total_tiempo += $fila['tiempo'];
 	}
 
-	$grafico = new TTB\Graficos\GraficoBarra();
-	$dataset = new TTB\Graficos\GraficoDataset();
+	$grafico = new TTB\Graficos\Grafico();
+	$dataset = new TTB\Graficos\Dataset();
 
-	$dataset->addLabel('Horas trabajadas por asunto')
-		->addData($tiempo);
+	$options = [
+		'responsive' => true,
+		'tooltips' => [
+			'mode' => 'label'
+		],
+		'scales' => [
+			'xAxes' => [[
+				'display' => true,
+				'gridLines' => [
+					'display' => false
+				],
+				'labels' => [
+					'show' => true,
+				]
+			]],
+			'yAxes' => [[
+				'type' => 'linear',
+				'display' => true,
+				'position' => 'left',
+				'id' => 'y-axis-1',
+				'gridLines' => [
+					'display' => false
+				],
+				'labels' => [
+					'show' => true
+				],
+				'ticks' => [
+					'beginAtZero' => true
+				]
+			]]
+		]
+	];
 
-	$grafico->addDataSets($dataset)
-		->addNameChart('Horas trabajadas por asunto')
+	$dataset->setType('bar')
+		->setFill(false)
+		->setYAxisID('y-axis-1')
+		->setLabel('Horas trabajadas por asunto')
+		->setData($tiempo);
+
+	$grafico->setNameChart('Horas trabajadas por asunto')
+		->addDataSets($dataset)
+		->addOptions($options)
 		->addLabels($asunto);
 
 	echo $grafico->getJson();
