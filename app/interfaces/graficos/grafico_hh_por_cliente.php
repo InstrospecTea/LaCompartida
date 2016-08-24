@@ -109,7 +109,7 @@
 		->setData($tiempo);
 
 	$grafico->setNameChart('Horas trabajadas por cliente')
-		->addDataSets($dataset)
+		->addDataset($dataset)
 		->addOptions($options)
 		->addLabels($cliente);
 

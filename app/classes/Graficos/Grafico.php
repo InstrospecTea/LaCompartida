@@ -34,10 +34,10 @@ class Grafico {
 
 	/**
 	 * Añade un Dataset.
-	 * @param Dataset $datasets
+	 * @param Dataset $Dataset
 	 * @return Grafico
 	 */
-	public function addDataSets(Dataset $Dataset) {
+	public function addDataset(Dataset $Dataset) {
 		try {
 			$this->datasets[] = $Dataset;
 			return $this;
