@@ -34,7 +34,7 @@ class Dataset {
 
 	/**
 	 * Define fill a al Dataset.
-	 * @param string $label
+	 * @param boolean $fill
 	 * @return Dataset
 	 */
 	public function setFill($fill) {
@@ -167,7 +167,7 @@ class Dataset {
 	 * @param number $a
 	 * @return boolean
 	 */
-	private function validarRGBA($r, $g, $b, $a) {
+	protected function validarRGBA($r, $g, $b, $a) {
 		if ((is_int($r) && $r <= 255) &&
 				(is_int($g) && $g <= 255) &&
 				(is_int($b) && $b <= 255) && is_numeric($a)) {
@@ -181,6 +181,7 @@ class Dataset {
 		$r = rand(100, 200);
 		$g = rand(100, 200);
 		$b = rand(100, 200);
+		$a = number_format($a, 2, '.', '');
 		return "rgba({$r}, {$g}, {$b}, {$a})";
 	}
 
