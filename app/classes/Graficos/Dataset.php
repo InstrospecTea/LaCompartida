@@ -15,7 +15,7 @@ class Dataset {
 		$this->setBorderColor(self::R, self::G, self::B, 0.8);
 		$this->setHoverBackgroundColor(self::R, self::G, self::B, 0.75);
 		$this->setHoverBorderColor(self::R, self::G, self::B, 1);
-		$this->setFill();
+		$this->setFill(false);
 		$this->setBorderWidth(2);
 	}
 
@@ -37,7 +37,7 @@ class Dataset {
 	 * @param string $label
 	 * @return Dataset
 	 */
-	public function setFill($fill = false) {
+	public function setFill($fill) {
 		$this->fill = $fill;
 		return $this;
 	}
