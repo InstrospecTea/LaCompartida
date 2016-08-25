@@ -1407,11 +1407,7 @@ if ($opc == 'print' || $popup) {
 }
 
 if ($opc == 'grafico') {
-	if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
-		$letra_profesional = 'profesional';
-	} else {
-		$letra_profesional = 'username';
-	}
+	$letra_profesional = Conf::read('UsaUsernameEnTodoElSistema') ? 'profesional' : 'username';
 
 	########## VER GRAFICO ##########
 	$titulo_reporte = __('Gráfico de') . ' ' . __($horas_sql) . ' ' . __('en vista por') . ' ' . $desc;
@@ -1497,7 +1493,6 @@ if ($opc == 'grafico') {
 
 	$datos_grafico['nombres'] = UtilesApp::utf8izar($datos_grafico['nombres']);
 	$datos_grafico_compara['nombres'] = UtilesApp::utf8izar($datos_grafico_compara['nombres']);
-
 	$datos = base64_encode(json_encode($datos_grafico));
 	$datosC = '';
 	$grafico = 'grafico_resumen_actividades';
@@ -1517,52 +1512,38 @@ if ($opc == 'grafico') {
 	var datos_compara = '<?php echo $datosC; ?>';
 	var labels = '<?php echo $labels; ?>';
 
+	var url = 'graficos/<?php echo $grafico; ?>.php'
+
+	var data = {
+		'charts_data': [
+			{
+				'url': url,
+				'data': {
+					'datos': datos,
+					'titulo': titulo,
+					'datos_compara': datos_compara,
+					'labels': labels
+				}
+			}
+		]
+	};
+
 	jQuery.ajax({
-		url: "graficos/<?php echo $grafico; ?>.php",
-		data: {
-			'datos': datos,
-			'titulo': titulo,
-			'datos_compara': datos_compara,
-			'labels': labels
-		},
-		dataType: 'json',
+		url: 'render_grafico.php',
+		data: data,
+		dataType: 'html',
 		type: 'POST',
 		success: function(respuesta) {
 			if (respuesta != null) {
-				agregarCanvas('resumen_actividad',
-						jQuery('#contenedor_grafico_resumen_actividad'),
-						titulo,
-						true);
+				var iframe = document.createElement('iframe');
+				iframe.style = "border: none;";
+				iframe.scrolling = "no";
+				iframe.width = "700";
+				iframe.height = "500";
+				iframe.srcdoc = respuesta;
 
-				var canvas = jQuery('#grafico_resumen_actividad')[0];
-				var context = canvas.getContext('2d');
-
-				if (graficoResumenActividades) {
-					graficoResumenActividades.destroy();
-				}
-
-				if (datos_compara) {
-					graficoResumenActividades = new Chart(context).Bar(respuesta, {
-						multiTooltipTemplate: '<%= datasetLabel %> <%= value %>'
-					});
-				} else {
-					graficoResumenActividades = new Chart(context).Pie(respuesta, {
-
-						tooltipTemplate:  '<%= label %>: <%= value %>hrs. (<%= Math.round(circumference / 6.283 * 100) %>%)',
-						legendTemplate : '<ul>'
-							+ '<% for (var i=0; i<segments.length; i++) { %>'
-							+ '<li>'
-							+ '<span style=\"background-color: <%=segments[i].fillColor%>;\"></span>'
-							+ '<% if (segments[i].label) { %><%= segments[i].label %><% } %>'
-							+ '</li>'
-							+ '<% } %>'
-							+ '</ul>'
-
-					});
-					jQuery('#leyenda').append(graficoResumenActividades.generateLegend());
-				}
-			} else {
-				jQuery('#contenedor_grafico_resumen_actividad').append('<h3>No exiten datos para generar el gráfico</h3>');
+				jQuery('#contenedor_grafico_resumen_actividad').empty();
+				jQuery('#contenedor_grafico_resumen_actividad').append(iframe);
 			}
 		},
 		error: function(e) {

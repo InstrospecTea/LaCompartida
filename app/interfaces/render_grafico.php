@@ -47,7 +47,7 @@
 
 			for (var i in responses) {
 				var response = responses[i];
-				var canvas_id = response['name_chart'].toLowerCase().replace(/ /g, '_');
+				var canvas_id = new Date().getTime();
 
 				agregarCanvas(canvas_id, jQuery("#contenedor_graficos"));
 

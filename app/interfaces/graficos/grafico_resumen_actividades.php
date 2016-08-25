@@ -26,15 +26,14 @@ foreach ($datos as $key => $value) {
 	++$k;
 }
 
-$grafico = new TTB\Graficos\GraficoTarta();
+$grafico = new TTB\Graficos\Grafico();
+$dataset = new TTB\Graficos\DatasetPie();
 
-foreach ($datos as $key => $value) {
-	$data_grafico = new TTB\Graficos\GraficoData();
+$dataset->setData(array_values($datos))
+	->setLabel('Resumen actividades profesionales');
 
-	$data_grafico->addLabel($key, true)
-	->addValue($value);
-
-	$grafico->addData($data_grafico);
-}
+$grafico->setType('pie')
+	->addLabels(array_keys($datos))
+	->addDataset($dataset);
 
 echo $grafico->getJson();
