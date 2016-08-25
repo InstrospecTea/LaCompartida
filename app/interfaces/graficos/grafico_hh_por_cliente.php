@@ -110,7 +110,7 @@
 
 	$grafico->setNameChart('Horas trabajadas por cliente')
 		->addDataset($dataset)
-		->addOptions($options)
+		->setOptions($options)
 		->addLabels($cliente);
 
 	echo $grafico->getJson();

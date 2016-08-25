@@ -75,11 +75,11 @@ class Grafico {
 	}
 
 	/**
-	 * Añade las opciones al Grafico.
+	 * Define las opciones al Grafico.
 	 * @param array $options
 	 * @return Grafico
 	 */
-	public function addOptions($options) {
+	public function setOptions($options) {
 		if (!is_array($options)) {
 			error_log('Debe enviar un array');
 		}

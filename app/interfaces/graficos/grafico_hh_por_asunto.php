@@ -96,14 +96,13 @@
 	];
 
 	$dataset->setType('bar')
-		->setFill(false)
 		->setYAxisID('y-axis-1')
 		->setLabel('Horas trabajadas por asunto')
 		->setData($tiempo);
 
 	$grafico->setNameChart('Horas trabajadas por asunto')
 		->addDataset($dataset)
-		->addOptions($options)
+		->setOptions($options)
 		->addLabels($asunto);
 
 	echo $grafico->getJson();
