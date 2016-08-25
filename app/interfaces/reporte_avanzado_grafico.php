@@ -181,68 +181,181 @@ switch ($tipo_grafico) {
 }
 
 function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
-	$grafico = new TTB\Graficos\GraficoBarra();
-	$dataset = new TTB\Graficos\GraficoDataset();
+	$grafico = new TTB\Graficos\Grafico();
+	$dataset = new TTB\Graficos\Dataset();
 
-	$dataset->addLabel(__($tipo_dato))
-		->addData($datos);
+	$yAxes[] = [
+		'type' => 'linear',
+		'display' => true,
+		'position' => 'left',
+		'id' => 'y-axis-1',
+		'gridLines' => [
+			'display' => false
+		],
+		'labels' => [
+			'show' => true
+		],
+		'ticks' => [
+			'beginAtZero' => true
+		]
+	];
 
-	$grafico->addDataSets($dataset)
-		->addNameChart($titulo)
+	$dataset->setType('bar')
+		->setLabel(__($tipo_dato))
+		->setYAxisID('y-axis-1')
+		->setData($datos);
+
+	$grafico->setNameChart($titulo)
+		->addDataset($dataset)
 		->addLabels($labels);
 
 	if ($datos_comparados) {
-		$dataset_comparado = new TTB\Graficos\GraficoDataset();
+		if (strcmp(Reporte::sTipoDato($tipo_dato), Reporte::sTipoDato($tipo_dato_comparado)) !== 0) {
+			$option_display = true;
+			$dataset_comparado = new TTB\Graficos\DatasetLine();
+			$dataset_comparado->setType('line')
+			->setYAxisID('y-axis-2')
+			->setLabel(__($tipo_dato_comparado))
+			->setBackgroundColor(39, 174, 96, 0.5)
+			->setBorderColor(39, 174, 96, 0.8)
+			->setPointHoverBackgroundColor(39, 174, 96, 0.75)
+			->setPointHoverBorderColor(39, 174, 96, 1)
+		  ->setData($datos_comparados);
+		} else {
+			$option_display = false;
+			$dataset_comparado = new TTB\Graficos\Dataset();
+			$dataset_comparado->setType('bar')
+			->setYAxisID('y-axis-2')
+			->setLabel(__($tipo_dato_comparado))
+			->setBackgroundColor(39, 174, 96, 0.5)
+			->setBorderColor(39, 174, 96, 0.8)
+			->setHoverBackgroundColor(39, 174, 96, 0.75)
+			->setHoverBorderColor(39, 174, 96, 1)
+		  ->setData($datos_comparados);
+		}
 
-		$dataset_comparado->addLabel(__($tipo_dato_comparado))
-			->addFillColor(39, 174, 96, 0.5)
-			->addStrokeColor(39, 174, 96, 0.8)
-			->addHighlightFill(39, 174, 96, 0.75)
-			->addHighlightStroke(39, 174, 96, 1)
-		  ->addData($datos_comparados);
+		$grafico->addDataset($dataset_comparado);
 
-		$grafico->addDataSets($dataset_comparado);
+		$yAxes[] = [
+			'type' => 'linear',
+			'display' => $option_display,
+			'position' => 'right',
+			'id' => 'y-axis-2',
+			'gridLines' => [
+				'display' => false
+			],
+			'labels' => [
+				'show' => true
+			],
+			'ticks' => [
+				'beginAtZero' => true
+			]
+		];
 	}
+
+	$options = [
+		'responsive' => true,
+		'tooltips' => [
+			'mode' => 'label'
+		],
+		'scales' => [
+			'xAxes' => [[
+				'display' => true,
+				'gridLines' => [
+					'display' => false
+				],
+				'labels' => [
+					'show' => true,
+				]
+			]],
+			'yAxes' => $yAxes
+		]
+	];
+
+	$grafico->setOptions($options);
 
 	echo $grafico->getJson();
 }
 
 function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
-	$grafico = new TTB\Graficos\GraficoTarta();
+	$grafico = new TTB\Graficos\Grafico();
+	$dataset = new TTB\Graficos\DatasetPie();
 
-	foreach ($datos as $key => $value) {
-		$data_grafico = new TTB\Graficos\GraficoData();
+	$dataset->setData(array_values($datos))
+	->setLabel('Resumen actividades profesionales')
+	->setBorderColor(255, 255, 255, 0)
+	->setHoverBorderColor(255, 255, 255, 0);
 
-		$data_grafico->addLabel($labels[$key], true)
-		->addValue($value);
+	$grafico->setNameChart($titulo)
+		->setType('pie')
+		->addLabels(array_values($labels))
+		->addDataset($dataset);
 
-		$grafico->addData($data_grafico);
-	}
-
-	$titulo = mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo);
-
-	echo json_encode(array('json' => json_decode($grafico->getJson()), 'chart_name' => $titulo));
+	echo $grafico->getJson();
 }
 
 function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
-	$grafico = new TTB\Graficos\GraficoLinea();
-	$datasetLinea = new TTB\Graficos\GraficoDatasetLine();
-	$datasetLineaComparado = new TTB\Graficos\GraficoDatasetLine();
+	$grafico = new TTB\Graficos\Grafico();
+	$datasetLinea = new TTB\Graficos\DatasetLine();
+	$datasetLineaComparado = new TTB\Graficos\DatasetLine();
 
-	$datasetLinea->addLabel(__($tipo_dato))
-		->addData($datos);
+	$datasetLinea->setLabel(__($tipo_dato))
+		->setType('line')
+		->setYAxisID('y-axis-1')
+		->setData($datos);
 
-	$datasetLineaComparado->addLabel(__($tipo_dato_comparado))
-		->addFillColor(151, 187, 205, 0.2)
-		->addStrokeColor(151, 187, 205, 1)
-		->addPointColor(151, 187, 205, 1)
-		->addPointHighlightStroke(151, 187, 205, 1)
-		->addData($datos_comparados);
+	$datasetLineaComparado->setLabel(__($tipo_dato_comparado))
+		->setType('line')
+		->setYAxisID('y-axis-2')
+		->setBackgroundColor(39, 174, 96, 0.5)
+		->setBorderColor(39, 174, 96, 0.8)
+		->setData($datos_comparados);
 
-	$grafico->addDataSets($datasetLinea)
-		->addDataSets($datasetLineaComparado)
-		->addNameChart($titulo)
-		->addLabels($labels);
+	$yAxes[] = [
+		'type' => 'linear',
+		'display' => true,
+		'position' => 'left',
+		'stacked' => true,
+		'id' => 'y-axis-1',
+		'gridLines' => [
+			'display' => false
+		],
+		'labels' => [
+			'show' => true
+		],
+		'ticks' => [
+			'beginAtZero' => true
+		]
+	];
+
+	$yAxes[] = [
+		'type' => 'linear',
+		'display' => true,
+		'position' => 'right',
+		'id' => 'y-axis-2',
+		'gridLines' => [
+			'display' => false
+		],
+		'labels' => [
+			'show' => true
+		],
+		'ticks' => [
+			'beginAtZero' => true
+		]
+	];
+
+	$options = [
+		'scales' => [
+			'yAxes' => $yAxes
+		]
+	];
+
+	$grafico->setNameChart($titulo)
+		->setType('line')
+		->addLabels($labels)
+		->addDataset($datasetLinea)
+		->addDataset($datasetLineaComparado)
+		->setOptions($options);
 
 	echo $grafico->getJson();
 }
