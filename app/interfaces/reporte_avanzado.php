@@ -1187,9 +1187,9 @@ if (!$popup) {
 											</td>
 											<td>
 												<span class="submit_options barras torta dispersion" id="limite_check" <?php if (!isset($orden_barras_max2min) && isset($tipo_dato)) echo 'style= "display: none; "'; ?>>
-													<input type="checkbox" name="limitar" id="limite_checkbox" value="1" <?php echo $limitar ? 'checked="checked"' : '' ?> />
+													<input type="checkbox" name="limitar" id="limite_checkbox" value="1" checked="checked" />
 													<label for="limite_checkbox"><?php echo __('y mostrar sólo') ?></label> &nbsp;
-													<input type="text" name="limite" value="<?php echo $limite ? $limite : '5' ?>" id="limite" size="2" maxlength="2" /> &nbsp;
+													<input type="text" name="limite" value="<?= $limite ? $limite : '15' ?>" id="limite" size="2" maxlength="2" /> &nbsp;
 													<?php echo __("resultados superiores") ?>
 												</span>
 											</td>
