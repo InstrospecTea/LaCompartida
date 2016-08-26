@@ -61,8 +61,8 @@ $pagina->PrintTop($popup);
 				<span align="center">
 					<?php
 					if ($opc == 'subir_excel') {
-						// Sólo se permiten xls "%\.(xls|xlsx)$%i"
-						if (preg_match('%\.(xls)$%i', $archivo_data['name']) == 1) {
+						// Sólo se permiten xls "%\.(xlsx)$%i"
+						if (preg_match('%\.(xlsx)$%i', $archivo_data['name']) == 1) {
 							// Esta función actualiza los trabajos y entrega feedback del resultado.
 							echo Trabajo::ActualizarConExcel($archivo_data, $sesion, $lang);
 						} else {
