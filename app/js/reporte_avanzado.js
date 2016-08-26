@@ -895,39 +895,12 @@ jQuery(document).ready(function() {
 		});
 		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="' + type_chart +'" />');
 		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista.toString().replace(',', '-') + '" />');
-		jQuery('#iframereporte').empty();
 
-		var data = {
-			'charts_data': [
-				{
-					'url': 'reporte_avanzado_grafico.php',
-					'data': jQuery('#formulario').serialize()
-				}
-			]
-		};
-
-		jQuery.ajax({
-			url: 'render_grafico.php',
-			data: data,
-			dataType: 'html',
-			type: 'POST',
-			success: function(respuesta) {
-				if (respuesta != null) {
-					var iframe = document.createElement('iframe');
-					iframe.style = "border: none;";
-					iframe.scrolling = "no";
-					iframe.width = "700";
-					iframe.height = "500";
-					iframe.srcdoc = respuesta;
-
-					jQuery('#iframereporte').empty();
-					jQuery('#iframereporte').append(iframe);
-				}
-			},
-			error: function(e) {
-				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
-			}
-		});
+		var charts_data = [{
+			'url': 'reporte_avanzado_grafico.php',
+			'data': jQuery('#formulario').serialize()
+		}];
+		graphic.render('#iframereporte', charts_data);
 	}
 
 	jQuery(document).on('click', '#btn_imprimir', function() {

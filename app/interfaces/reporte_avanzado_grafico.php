@@ -17,9 +17,7 @@ if ($tipo_dato_comparado) {
 	$titulo_reporte = __('Gráfico de') . ' ' . __($tipo_dato) . ' ' . __('en vista por') . ' ' . __($agrupadores[0]);
 }
 
-$datos_grafico = '';
 $total = 0;
-
 
 if (!$filtros_check) {
 	$fecha_ultimo_dia = date('t', mktime(0, 0, 0, $fecha_mes, 5, $fecha_anio));
@@ -85,8 +83,6 @@ if ($tipo_dato_comparado) {
 		arsort($r);
 	}
 
-	$datos_grafico .= "&compara=1&unidadC=" . $tipo_dato_comparado;
-
 	$valores_comparados = array();
 	foreach ($r as $id => $fila) {
 		if (is_array($fila)) {
@@ -105,7 +101,7 @@ $valores = array();
 $labels = array();
 foreach ($r as $id => $fila) {
 	if (is_array($fila)) {
-		$labels[] = substr($fila['label'], 0, 12);
+		$labels[] = $fila['label'];
 		$valores[] = str_replace(',', '.', $fila['valor']);
 		$existen_datos = true;
 	}
@@ -146,27 +142,17 @@ if ($limite) {
 	}
 }
 
-foreach ($labels as $label) {
-	$datos_grafico .= "&n[]=" . ($label);
-}
-
-$datos_grafico .= "&t=" . implode(',', $valores);
-
-if ($tipo_dato_comparado) {
-	$datos_grafico .= "&c=" . implode(',', $valores_comparados);
-}
 
 $html_info = '<style type="text/css">
 		@media print {
-		div#print_link {
-		display: none;
-		}
+			div#print_link {
+				display: none;
+			}
 		}
 		</style>';
 
 switch ($tipo_grafico) {
 	case 'barras': {
-		$datos_grafico .= $r['promedio'];
 		graficoBarras($titulo_reporte, $labels, $valores, $valores_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda);
 		break;
 	}

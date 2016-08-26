@@ -403,7 +403,9 @@ if (!$popup) {
 		}
 	</style>
 
-	<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/reporte_avanzado.js"></script>
+	<?= $Form->Html->script(Conf::RootDir() . '/app/js/reporte_avanzado.js'); ?>
+	<?= $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js'); ?>
+
 	<script type="text/javascript">
 		var tipos_moneda = <?php echo json_encode(array_values(ReporteCriteria::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
