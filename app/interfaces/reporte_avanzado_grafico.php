@@ -272,10 +272,18 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 	->setBorderColor(255, 255, 255, 0)
 	->setHoverBorderColor(255, 255, 255, 0);
 
+	$options = [
+		'legend' => [
+			'display' => true,
+			'position' => 'bottom'
+		]
+	];
+
 	$grafico->setNameChart($titulo)
 		->setType('pie')
 		->addLabels(array_values($labels))
-		->addDataset($dataset);
+		->addDataset($dataset)
+		->setOptions($options);
 
 	echo $grafico->getJson();
 }
