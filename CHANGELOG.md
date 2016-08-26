@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 16.27.2
+Wednesday, August 24th
+* **Feature** [Asigar formato segun tipo de dato al descargar excel en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1767)
+
+## Hotfix 16.27.1
+Friday, August 19th
+* **Feature** [Agregar número de cobro y código cliente](https://github.com/LemontechSA/ttb/pull/1758)
+
 ## [Release 16.27.0](https://github.com/LemontechSA/ttb/pull/1740)
 Tuesday, August 16th
 * **Feature** [Configuracion formato excel cobro](https://github.com/LemontechSA/ttb/pull/1734)

@@ -122,7 +122,7 @@
 				$archivoext = substr($archivo_comentario['name'], stripos($archivo_comentario['name'], '.'));
 
 				$name = "/tarea_comentario/{$id_tarea}/{$archivoname}{$archivoext}";
-				$url_file = UtilesApp::UploadToS3($name, $contenido, $archivo_comentario['type']);
+				$url_file = UtilesApp::UploadFileContentsToS3($name, $contenido, $archivo_comentario['type']);
 	            if($url_file!=''){
 	            	$id_file = $tarea_comentario->saveEmptyFile($asunto->fields['id_contrato'],$archivo_comentario['name'],$archivo_comentario['type'], '',NULL,$url_file);
 	            	if($id_file!=""){
