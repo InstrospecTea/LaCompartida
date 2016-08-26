@@ -104,21 +104,26 @@ class Grafico {
 					'options' => $this->options
 				];
 			} else {
-				$json = [
-					'error' => [
-						'code' => 1,
-						'message' => 'Debe agregar labels para generar el JSON'
-					]
-				];
+				return $this->getJsonError(1, 'Debe agregar labels para generar el JSON');
 			}
 		} else {
-			$json = [
-				'error' => [
-					'code' => 2,
-					'message' => 'Debe agregar al menos un Dataset para generar el JSON'
-				]
-			];
+			return $this->getJsonError(2, 'Debe agregar al menos un Dataset para generar el JSON');
 		}
+		return json_encode($json);
+	}
+
+	/**
+	 * Obtiene JSON de error.
+	 * @return JSON
+	 */
+	public function getJsonError($code, $message) {
+		$json = [
+			'error' => [
+				'code' => $code,
+				'message' => mb_detect_encoding($message, 'UTF-8', true) ? $message : utf8_encode($message)
+			]
+		];
+
 		return json_encode($json);
 	}
 }
