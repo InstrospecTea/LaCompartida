@@ -188,8 +188,8 @@ if ($tipo_reporte == 'trabajos_por_cliente') {
 		->add_select("glosa_cliente", 'nombre')
 		->add_from('cliente')
 		->add_restriction(
-				CriteriaRestriction::equals('codigo_cliente', $codigo_cliente)
-			)
+			CriteriaRestriction::equals('codigo_cliente', $codigo_cliente)
+		)
 		->add_limit(1, 0);
 
 	try{
@@ -219,29 +219,81 @@ $titulo_tipo = array(
 
 array_walk($duracion,'fixNumber');
 
-$grafico = new TTB\Graficos\GraficoBarra();
-$dataset = new TTB\Graficos\GraficoDataset();
+$y_axes = [];
+$grafico = new TTB\Graficos\Grafico();
+$dataset = new TTB\Graficos\Dataset();
 
-$dataset->addLabel($titulo_tipo[$tipo_duracion])
-	->addData($duracion);
+$dataset->setLabel($titulo_tipo[$tipo_duracion])
+	->setYAxisID('y-axis-1')
+	->setData($duracion);
 
-$grafico->addDataSets($dataset)
-	->addNameChart($title)
+$grafico->setNameChart($title)
+	->addDataset($dataset)
 	->addLabels($periodo);
 
+$y_axes[] = [
+	'type' => 'linear',
+	'display' => true,
+	'position' => 'left',
+	'id' => 'y-axis-1',
+	'gridLines' => [
+		'display' => false
+	],
+	'labels' => [
+		'show' => true
+	],
+	'ticks' => [
+		'beginAtZero' => true
+	]
+];
+
 if ($comparar) {
-	$dataset_comparar = new TTB\Graficos\GraficoDataset();
+	$dataset_comparar = new TTB\Graficos\Dataset();
 
 	array_walk($duracion_comparada,'fixNumber');
 
-	$dataset_comparar->addLabel($titulo_tipo[$tipo_duracion_comparada])
-		->addFillColor(39, 174, 96, 0.5)
-		->addStrokeColor(39, 174, 96, 0.8)
-		->addHighlightFill(39, 174, 96, 0.75)
-		->addHighlightStroke(39, 174, 96, 1)
-	  ->addData($duracion_comparada);
+	$dataset_comparar->setLabel($titulo_tipo[$tipo_duracion_comparada])
+		->setBackgroundColor(39, 174, 96, 0.5)
+		->setBorderColor(39, 174, 96, 0.8)
+		->setHoverBackgroundColor(39, 174, 96, 0.75)
+		->setHoverBorderColor(39, 174, 96, 1)
+	  ->setData($duracion_comparada);
 
-	$grafico->addDataSets($dataset_comparar);
+	$grafico->addDataset($dataset_comparar);
+	$y_axes[] = [
+		'type' => 'linear',
+		'display' => true,
+		'position' => 'left',
+		'id' => 'y-axis-2',
+		'gridLines' => [
+			'display' => false
+		],
+		'labels' => [
+			'show' => true
+		],
+		'ticks' => [
+			'beginAtZero' => true
+		]
+	];
 }
+$options = [
+	'responsive' => true,
+	'tooltips' => [
+		'mode' => 'label'
+	],
+	'scales' => [
+		'xAxes' => [[
+			'display' => true,
+			'gridLines' => [
+				'display' => false
+			],
+			'labels' => [
+				'show' => true,
+			]
+		]],
+		'yAxes' => $y_axes
+	]
+];
 
+$grafico->setOptions($options);
 echo $grafico->getJson();
