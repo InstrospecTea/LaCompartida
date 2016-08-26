@@ -16,6 +16,18 @@ abstract class AbstractGrouperTranslator  implements IGrouperTranslator {
 	}
 
 	/**
+ * Obtiene la coluna correcta para código cliente
+ * @return String Campo Codigo de cliente
+ */
+	function getClientCodeField() {
+	if (Conf::read('CodigoSecundario')) {
+			return 'cliente.codigo_cliente_secundario';
+		} else {
+			return 'cliente.codigo_cliente';
+		}
+	}
+
+	/**
  * Obtiene la coluna correcta para código asunto
  * @return String Campo Codigo de asunto
  */

@@ -101,7 +101,7 @@ $valores = array();
 $labels = array();
 foreach ($r as $id => $fila) {
 	if (is_array($fila)) {
-		$labels[] = $fila['label'];
+		$labels[] = substr($fila['label'], 0, 16);
 		$valores[] = str_replace(',', '.', $fila['valor']);
 		$existen_datos = true;
 	}
