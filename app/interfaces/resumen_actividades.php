@@ -1502,82 +1502,30 @@ if ($opc == 'grafico') {
 		$labels = base64_encode(json_encode($labels));
 	}
 
-	$html_info .= "<div id='contenedor_grafico_resumen_actividad'></div>";
+	$html_info .= '<div id="contenedor_graficos"></div>';
+	echo $html_info;
+	echo $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js');
+}
 ?>
 <script type="text/javascript">
-	var graficoResumenActividades;
-
 	var titulo = '<?php echo $titulo_reporte; ?>';
 	var datos = '<?php echo $datos; ?>';
 	var datos_compara = '<?php echo $datosC; ?>';
 	var labels = '<?php echo $labels; ?>';
 
 	var url = 'graficos/<?php echo $grafico; ?>.php'
-
-	var data = {
-		'charts_data': [
-			{
-				'url': url,
-				'data': {
-					'datos': datos,
-					'titulo': titulo,
-					'datos_compara': datos_compara,
-					'labels': labels
-				}
-			}
-		]
-	};
-
-	jQuery.ajax({
-		url: 'render_grafico.php',
-		data: data,
-		dataType: 'html',
-		type: 'POST',
-		success: function(respuesta) {
-			if (respuesta != null) {
-				var iframe = document.createElement('iframe');
-				iframe.style = "border: none;";
-				iframe.scrolling = "no";
-				iframe.width = "700";
-				iframe.height = "500";
-				iframe.srcdoc = respuesta;
-
-				jQuery('#contenedor_grafico_resumen_actividad').empty();
-				jQuery('#contenedor_grafico_resumen_actividad').append(iframe);
-			}
-		},
-		error: function(e) {
-			alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
+	var charts_data = [{
+		'url': url,
+		'data': {
+			'datos': datos,
+			'titulo': titulo,
+			'datos_compara': datos_compara,
+			'labels': labels
 		}
-	});
-
-	function agregarCanvas(id, contenedor, titulo, leyenda) {
-		leyenda = leyenda || false;
-		var canvas = document.createElement('canvas');
-		var h3 = document.createElement('h3');
-		canvas.width = 600;
-		canvas.height = 400;
-		canvas.id = 'grafico_' + id;
-		h3.innerHTML = titulo;
-
-		contenedor.empty();
-		contenedor.append(h3);
-		contenedor.append(canvas);
-
-		if (leyenda) {
-			var divLeyenda = document.createElement('div');
-			divLeyenda.id = 'leyenda';
-			divLeyenda.className = 'chart-legend';
-
-			contenedor.append(divLeyenda);
-		}
-	}
+	}];
+	graphic.render('#contenedor_graficos', charts_data);
 </script>
 
-<?php
-	echo $html_info;
-}
-?>
 <script>
 	Calendar.setup(
 			{
