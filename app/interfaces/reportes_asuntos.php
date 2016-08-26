@@ -95,8 +95,9 @@
 </table>
 </form>
 
-<div id="contenedor_grafico_hito"></div>
+<div id="contenedor_graficos"></div>
 
+<?= $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js'); ?>
 <script type="text/javascript">
 jQuery(function() {
 	var graficoBarraHito;
@@ -109,63 +110,25 @@ jQuery(function() {
 		var fecha_fin = jQuery("#fecha_fin").val();
 		var url = 'graficos/grafico_' + jQuery("#tipo_reporte").val() + '.php'
 
-		var data = {
-			'charts_data': [
-				{
-					'url': url,
-					'data': {
-						'usuarios': usuarios,
-						'clientes': clientes,
-						'solo_activos': solo_activos,
-						'fecha_ini': fecha_ini,
-						'fecha_fin': fecha_fin
-					}
-				}
-			]
-		};
-
-		jQuery.ajax({
-			url: 'render_grafico.php',
-			data: data,
-			dataType: 'html',
-			type: 'POST',
-			success: function(respuesta) {
-				if (respuesta != null) {
-					var iframe = document.createElement('iframe');
-					iframe.style = "border: none;";
-					iframe.scrolling = "no";
-					iframe.width = "700";
-					iframe.height = "500";
-					iframe.srcdoc = respuesta;
-
-					jQuery('#contenedor_grafico_hito').empty();
-					jQuery('#contenedor_grafico_hito').append(iframe);
-				}
-			},
-			error: function(e) {
-				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
+		var charts_data = [{
+			'url': url,
+			'data': {
+				'usuarios': usuarios,
+				'clientes': clientes,
+				'solo_activos': solo_activos,
+				'fecha_ini': fecha_ini,
+				'fecha_fin': fecha_fin
 			}
-		});
+		}];
+		graphic.render('#contenedor_graficos', charts_data);
 	});
 
-	function agregarCanvas(id, contenedor, titulo) {
-		var canvas = document.createElement('canvas');
-		var h3 = document.createElement('h3');
-		canvas.width = 600;
-		canvas.height = 400;
-		canvas.id = 'grafico_' + id;
-		h3.innerHTML = titulo;
-
-		contenedor.empty();
-		contenedor.append(h3);
-		contenedor.append(canvas);
+	function Planilla(form) {
+		form.action = 'planillas/planilla_horas_general.php';
+		form.submit();
 	}
 });
 
-function Planilla(form) {
-	form.action = "planillas/planilla_horas_general.php";
-	form.submit();
-}
 </script>
 <?php
 	$pagina->PrintBottom();
