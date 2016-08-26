@@ -17,7 +17,7 @@
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		var charts_data = <?= json_encode($_POST['charts_data']); ?>;
+		var charts_data = <?= json_decode(utf8_encode($_POST['charts_data'])); ?>;
 		var responses = [];
 
 		var promises = jQuery.map(charts_data, function(chart_data) {
@@ -58,6 +58,8 @@
 
 				var chart = new Chart(context, response);
 			}
+
+			reportIFrameHeight();
 		});
 
 		function agregarCanvas(id, contenedor) {
@@ -79,3 +81,21 @@
 </script>
 
 <div id="contenedor_graficos"></div>
+<script type="text/javascript">
+	var RESIZE_MESSAGE = 'RESIZE_MESSAGE';
+	function reportIFrameHeight() {
+		if (!windowIsIFrame()) {
+			return;
+		}
+		var message = {
+			action: RESIZE_MESSAGE,
+			iframeID: window.frameElement.id,
+			height: jQuery('#contenedor_graficos').height() + 20
+		};
+		var targetOrigin = window.location.href;
+		parent.postMessage(JSON.stringify(message), targetOrigin);
+	}
+	function windowIsIFrame() {
+		return window.frameElement != null;
+	}
+</script>
