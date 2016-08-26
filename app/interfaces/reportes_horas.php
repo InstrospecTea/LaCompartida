@@ -48,7 +48,7 @@ echo $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js');
 					});
 				});
 			} else if(tipo_reporte == 'trabajos_por_cliente') {
-				if (clientes == null) {
+				if (!$('#clientes option:selected').length) {
 					alert('Debe seleccionar un cliente.');
 					return false;
 				}

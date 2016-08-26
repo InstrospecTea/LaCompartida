@@ -221,6 +221,10 @@ array_walk($duracion,'fixNumber');
 
 $y_axes = [];
 $grafico = new TTB\Graficos\Grafico();
+if (is_null($duracion)) {
+	echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
+	return;
+}
 $dataset = new TTB\Graficos\Dataset();
 
 $dataset->setLabel($titulo_tipo[$tipo_duracion])
