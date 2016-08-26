@@ -64,7 +64,6 @@ $lista = $b1->lista;
 
 $wb = new WorkbookMiddleware();
 $wb->setVersion(8);
-$wb->send('Resumen de cobros.xls');
 $wb->setCustomColor(35, 220, 255, 220);
 $wb->setCustomColor(36, 255, 255, 220);
 
@@ -77,6 +76,17 @@ $formato_encabezado = & $wb->addFormat(array('Size' => 12,
 			'Bold' => 1,
 			'Color' => 'black',
 			'FontFamily' => 'Calibri'));
+
+$formato_encabezado2 = & $wb->addFormat(
+	array(
+		'Size' => 12,
+		'Align' => 'justify',
+		'Bold' => 1,
+		'Color' => 'black',
+		'FontFamily' => 'Calibri'
+	)
+);
+
 $formato_titulo_arriba = & $wb->addFormat(array('Size' => 12,
 			'VAlign' => 'vcenter',
 			'Align' => 'center',
@@ -240,12 +250,34 @@ if ($altura_logo) {
 	$ws->insertBitmap($filas, $col_asunto, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, 1, 1);
 }
 $filas += 3;
+
+$PrmExcelCobro = new PrmExcelCobro($sesion);
+$ws->write($filas, $col_asunto + 1, $PrmExcelCobro->getGlosa('minuta', 'Encabezado', $lang) . ' ' . $cobro->fields['id_cobro'], $formato_encabezado2);
+for ($x = 2; $x <= 4; $x++) {
+	$ws->write($filas, $col_asunto + $x, '', $formato_encabezado2);
+}
+$ws->mergeCells($filas, $col_asunto + 1, $filas, $col_asunto + 4);
+
+$cliente = new Cliente($sesion);
+if (Conf::GetConf($sesion, 'CodigoSecundario')) {
+	$codigo_cliente = $cliente->CodigoACodigoSecundario($cobro->fields['codigo_cliente']);
+} else {
+	$codigo_cliente = $cobro->fields['codigo_cliente'];
+}
+++$filas;
+$ws->write($filas, $col_asunto + 1, __('Código Cliente') . ': ' . $codigo_cliente, $formato_encabezado2);
+for ($x = 2; $x <= 4; $x++) {
+	$ws->write($filas, $col_asunto + $x, '', $formato_encabezado2);
+}
+$ws->mergeCells($filas, $col_asunto + 1, $filas, $col_asunto + 4);
+
+$filas += 3;
 $ws->write($filas, $col_asunto, __('Cliente'), $formato_encabezado);
 
 $ws->write($filas, $col_asunto + 1, $lista->Get(0)->fields['factura_razon_social'], $formato_encabezado);
-$ws->write($filas, $col_asunto + 2, '', $formato_encabezado);
-$ws->write($filas, $col_asunto + 3, '', $formato_encabezado);
-$ws->write($filas, $col_asunto + 4, '', $formato_encabezado);
+for ($x = 2; $x <= 4; $x++) {
+	$ws->write($filas, $col_asunto + $x, '', $formato_encabezado);
+}
 $ws->mergeCells($filas, $col_asunto + 1, $filas, $col_asunto + 4);
 ++$filas;
 
@@ -414,5 +446,5 @@ $total = & $wb->addFormat(array('Size' => 11,
 			'Color' => 'black',
 			'NumFormat' => 0));
 
+$wb->send('Resumen de cobros.xls');
 $wb->close();
-?>
