@@ -27,6 +27,10 @@ foreach ($datos as $key => $value) {
 }
 
 $grafico = new TTB\Graficos\Grafico();
+if (is_null($datos)) {
+	echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
+	return;
+}
 $dataset = new TTB\Graficos\DatasetPie();
 
 $dataset->setData(array_values($datos))
