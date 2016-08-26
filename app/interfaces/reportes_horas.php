@@ -11,182 +11,79 @@ $Form = new Form($sesion);
 
 $pagina->titulo = __('Reporte Gráfico por Período');
 $pagina->PrintTop();
+echo $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js');
 ?>
 <script type="text/javascript">
 
-jQuery(function() {
-	var graficoBarraHito = [];
+(function($) {
+	$(document).ready(function() {
+		$("#genera_reporte").on("click", function() {
+			var tipo_reporte = $("#tipo_reporte").val();
+			var url = 'graficos/grafico_trabajos.php';
+			var base_data = {
+				'usuarios': $('#usuarios').val(),
+				'clientes': $('#clientes').val(),
+				'tipo_reporte': tipo_reporte,
+				'tipo_duracion': $('#tipo_duracion').val(),
+				'comparar': $('#comparar:checked').val(),
+				'tipo_duracion_comparada': $('#tipo_duracion_comparada').val(),
+				'fecha_desde': $('#fecha_anio_desde').val() + '-' + $('#fecha_mes_desde').val() + '-01',
+				'fecha_hasta': $('#fecha_anio_hasta').val() + '-' + $('#fecha_mes_hasta').val() + '-31'
+			};
 
-	jQuery("#genera_reporte").on("click", function() {
-		var usuarios = jQuery("#usuarios").val();
-		var clientes = jQuery("#clientes").val();
-		var tipo_reporte = jQuery("#tipo_reporte").val();
-		var tipo_duracion = jQuery("#tipo_duracion").val();
-		var comparar = jQuery("#comparar:checked").val();
-		var tipo_duracion_comparada = jQuery("#tipo_duracion_comparada").val();
-		var fecha_desde = jQuery("#fecha_anio_desde").val() + '-' + jQuery("#fecha_mes_desde").val() + '-01';
-		var fecha_hasta = jQuery("#fecha_anio_hasta").val() + '-' + jQuery("#fecha_mes_hasta").val() + '-31';
+			var charts_data = [];
 
-		if(jQuery("#tipo_reporte").val() == 'trabajos_por_empleado') {
-			if (usuarios == null) {
-				alert('Debe seleccionar un profesional.');
-				return false;
+			if(tipo_reporte == 'trabajos_por_empleado') {
+				if (!$('#usuarios option:selected').length) {
+					alert('Debe seleccionar un profesional.');
+					return false;
+				}
+
+				$("#usuarios option:selected").each(function() {
+					var data = jQuery.extend({}, base_data);
+					data.id_usuario = $(this).val();
+					charts_data.push({
+						'url': url,
+						'data': data
+					});
+				});
+			} else if(tipo_reporte == 'trabajos_por_cliente') {
+				if (clientes == null) {
+					alert('Debe seleccionar un cliente.');
+					return false;
+				}
+
+				$("#clientes option:selected").each(function() {
+					var data = jQuery.extend({}, base_data);
+					data.codigo_cliente = $(this).val();
+					charts_data.push({
+						'url': url,
+						'data': data
+					});
+				});
+			} else if(tipo_reporte == 'trabajos_por_estudio') {
+				charts_data.push({
+					'url': url,
+					'data': base_data
+				});
 			}
 
-			jQuery("#contenedor_graficos").empty();
+			graphic.render('#contenedor_graficos', charts_data);
 
-			jQuery("#usuarios option:selected").each(function() {
-				var id_usuario = jQuery(this).val();
-				agregarCanvas(id_usuario, jQuery("#contenedor_graficos"));
+		});
 
-				jQuery.ajax({
-					url: 'graficos/grafico_trabajos.php',
-					data: {
-						'usuarios': usuarios,
-						'clientes': clientes,
-						'tipo_reporte': tipo_reporte,
-						'tipo_duracion': tipo_duracion,
-						'comparar': comparar,
-						'tipo_duracion_comparada': tipo_duracion_comparada,
-						'fecha_desde': fecha_desde,
-						'fecha_hasta': fecha_hasta,
-						'id_usuario': id_usuario
-					},
-					dataType: 'json',
-					type: 'POST',
-					success: function(respuesta) {
-						var canvas = jQuery("#grafico_" + id_usuario)[0];
-						var context = canvas.getContext('2d');
-
-						if (graficoBarraHito[id_usuario]) {
-							graficoBarraHito[id_usuario].destroy();
-						}
-
-						jQuery("#contenedor_grafico_" + id_usuario + " h3").append(respuesta['name_chart']);
-
-						graficoBarraHito[id_usuario] = new Chart(context).Bar(respuesta, {
-        			multiTooltipTemplate: "<%= datasetLabel %> <%= value %>"
-						});
-					},
-					error: function(e) {
-						alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
-					}
-				});
-			});
-		} else if(jQuery("#tipo_reporte").val() == 'trabajos_por_cliente') {
-			if (clientes == null) {
-				alert('Debe seleccionar un cliente.');
-				return false;
+		var disable_selector = function() {
+			if( $('#comparar').is(':checked')) {
+				$("#tipo_duracion_comparada").prop('disabled', false);
+			} else {
+				$("#tipo_duracion_comparada").prop('disabled', 'disabled');
 			}
+		};
 
-			jQuery("#contenedor_graficos").empty();
-
-			jQuery("#clientes option:selected").each(function() {
-				var codigo_cliente = jQuery(this).val();
-				agregarCanvas(codigo_cliente, jQuery("#contenedor_graficos"));
-
-				jQuery.ajax({
-					url: 'graficos/grafico_trabajos.php',
-					data: {
-						'usuarios': usuarios,
-						'clientes': clientes,
-						'tipo_reporte': tipo_reporte,
-						'tipo_duracion': tipo_duracion,
-						'comparar': comparar,
-						'tipo_duracion_comparada': tipo_duracion_comparada,
-						'fecha_desde': fecha_desde,
-						'fecha_hasta': fecha_hasta,
-						'codigo_cliente': codigo_cliente
-					},
-					dataType: 'json',
-					type: 'POST',
-					success: function(respuesta) {
-						var canvas = jQuery("#grafico_" + codigo_cliente)[0];
-						var context = canvas.getContext('2d');
-
-						if (graficoBarraHito[codigo_cliente]) {
-							graficoBarraHito[codigo_cliente].destroy();
-						}
-
-						jQuery("#contenedor_grafico_" + codigo_cliente + " h3").append(respuesta['name_chart']);
-
-						graficoBarraHito[codigo_cliente] = new Chart(context).Bar(respuesta, {
-        			multiTooltipTemplate: "<%= datasetLabel %> <%= value %>"
-						});
-					},
-					error: function(e) {
-						alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
-					}
-				});
-			});
-		} else if(jQuery("#tipo_reporte").val() == 'trabajos_por_estudio') {
-			jQuery("#contenedor_graficos").empty();
-
-			agregarCanvas('simple', jQuery("#contenedor_graficos"));
-
-			jQuery.ajax({
-					url: 'graficos/grafico_trabajos.php',
-					data: {
-						'usuarios': usuarios,
-						'clientes': clientes,
-						'tipo_reporte': tipo_reporte,
-						'tipo_duracion': tipo_duracion,
-						'comparar': comparar,
-						'tipo_duracion_comparada': tipo_duracion_comparada,
-						'fecha_desde': fecha_desde,
-						'fecha_hasta': fecha_hasta,
-					},
-					dataType: 'json',
-					type: 'POST',
-					success: function(respuesta) {
-						var canvas = jQuery("#grafico_simple")[0];
-						var context = canvas.getContext('2d');
-
-						if (graficoBarraHito['simple']) {
-							graficoBarraHito['simple'].destroy();
-						}
-
-						jQuery("#contenedor_grafico_simple h3").append(respuesta['name_chart']);
-
-						graficoBarraHito['simple'] = new Chart(context).Bar(respuesta, {
-        			multiTooltipTemplate: "<%= datasetLabel %> <%= value %>"
-						});
-					},
-					error: function(e) {
-						alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
-					}
-				});
-		}
+		$(disable_selector);
+		$("#comparar").change(disable_selector);
 	});
-
-	function agregarCanvas(id, contenedor) {
-		var div = document.createElement('div');
-		var canvas = document.createElement('canvas');
-		canvas.width = 600;
-		canvas.height = 400;
-		canvas.id = 'grafico_' + id;
-		div.id = 'contenedor_grafico_' + id;
-		div.className = 'contenedorCanvas';
-
-		div.appendChild(document.createElement('h3'));
-		div.appendChild(canvas);
-		contenedor.append(div);
-	}
-});
-
-jQuery(document).ready(function() {
-
-    var disable_selector = function(){
-        if( jQuery('#comparar').is(':checked')) {
-            jQuery("#tipo_duracion_comparada").prop('disabled', false);
-        } else {
-            jQuery("#tipo_duracion_comparada").prop('disabled', 'disabled');
-        }
-    };
-
-    jQuery(disable_selector);
-    jQuery("#comparar").change(disable_selector);
-});
+})(jQuery);
 
 </script>
 
@@ -381,8 +278,6 @@ jQuery(document).ready(function() {
         </tr>
 
     </table>
-
-    <div id="contenedor_graficos"></div>
-
 </form>
+<div id="contenedor_graficos"></div>
 <?php $pagina->PrintBottom(); ?>
