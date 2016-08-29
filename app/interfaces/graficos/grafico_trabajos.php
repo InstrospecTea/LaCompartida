@@ -231,7 +231,7 @@ $dataset->setLabel(__($titulo_tipo[$tipo_duracion]))
 	->setYAxisID('y-axis-1')
 	->setData($duracion);
 
-$grafico->setNameChart(__($title))
+$grafico->setNameChart($title)
 	->addDataset($dataset)
 	->addLabels($periodo);
 
@@ -284,6 +284,10 @@ $options = [
 	'responsive' => true,
 	'tooltips' => [
 		'mode' => 'label'
+	],
+	'title' => [
+		'display' => true,
+		'text' => $titulo
 	],
 	'scales' => [
 		'xAxes' => [[

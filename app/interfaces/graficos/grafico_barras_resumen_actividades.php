@@ -92,10 +92,15 @@ if ($datos_comparados) {
 		]
 	];
 }
+
 $options = [
 	'responsive' => true,
 	'tooltips' => [
 		'mode' => 'label'
+	],
+	'title' => [
+		'display' => true,
+		'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? __($titulo) : utf8_encode(__($titulo))
 	],
 	'scales' => [
 		'xAxes' => [[

@@ -2,7 +2,7 @@
 	require_once dirname(__FILE__).'/../../conf.php';
 
 	$sesion = new Sesion();
-	
+
 	$fecha_inicio = Date::parse($fecha1)->toDate();
 	$fecha_fin = Date::parse($fecha2)->toDate();
 	$Criteria = new Criteria($sesion);
@@ -46,6 +46,10 @@
 		'responsive' => true,
 		'tooltips' => [
 			'mode' => 'label'
+		],
+		'title' => [
+			'display' => true,
+			'text' => __('Horas trabajadas') . (!empty($nombre_usuario) ? ' - ' . $nombre_usuario : '')
 		],
 		'scales' => [
 			'xAxes' => [[

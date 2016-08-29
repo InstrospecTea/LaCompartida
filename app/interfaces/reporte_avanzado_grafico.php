@@ -191,7 +191,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		->setYAxisID('y-axis-1')
 		->setData($datos);
 
-	$grafico->setNameChart(__($titulo))
+	$grafico->setNameChart($titulo)
 		->addDataset($dataset)
 		->addLabels($labels);
 
@@ -244,6 +244,10 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		'tooltips' => [
 			'mode' => 'label'
 		],
+		'title' => [
+			'display' => true,
+			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+		],
 		'scales' => [
 			'xAxes' => [[
 				'display' => true,
@@ -276,10 +280,14 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 		'legend' => [
 			'display' => true,
 			'position' => 'bottom'
+		],
+		'title' => [
+			'display' => true,
+			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
 		]
 	];
 
-	$grafico->setNameChart(__($titulo))
+	$grafico->setNameChart($titulo)
 		->setType('pie')
 		->addLabels(array_values($labels))
 		->addDataset($dataset)
@@ -339,12 +347,16 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 	];
 
 	$options = [
+		'title' => [
+			'display' => true,
+			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+		],
 		'scales' => [
 			'yAxes' => $yAxes
 		]
 	];
 
-	$grafico->setNameChart(__($titulo))
+	$grafico->setNameChart($titulo)
 		->setType('line')
 		->addLabels($labels)
 		->addDataset($datasetLinea)

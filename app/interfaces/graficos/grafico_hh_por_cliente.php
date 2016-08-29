@@ -78,6 +78,10 @@
 		'tooltips' => [
 			'mode' => 'label'
 		],
+		'title' => [
+			'display' => true,
+			'text' => __('Horas trabajadas por cliente')
+		],
 		'scales' => [
 			'xAxes' => [[
 				'display' => true,

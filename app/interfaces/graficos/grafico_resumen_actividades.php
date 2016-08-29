@@ -38,8 +38,21 @@ $dataset = new TTB\Graficos\DatasetPie();
 $dataset->setData(array_values($datos))
 	->setLabel(__('Resumen actividades profesionales'));
 
+$options = [
+	'responsive' => true,
+	'legend' => [
+		'display' => true,
+		'position' => 'bottom'
+	],
+	'title' => [
+		'display' => true,
+		'text' => __($titulo)
+	]
+];
+
 $grafico->setType('pie')
 	->addLabels(array_keys($datos))
-	->addDataset($dataset);
+	->addDataset($dataset)
+	->setOptions($options);
 
 echo $grafico->getJson();
