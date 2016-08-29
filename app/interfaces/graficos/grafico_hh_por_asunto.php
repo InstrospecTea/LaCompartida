@@ -101,10 +101,10 @@
 
 	$dataset->setType('bar')
 		->setYAxisID('y-axis-1')
-		->setLabel('Horas trabajadas por asunto')
+		->setLabel(__('Horas trabajadas por asunto'))
 		->setData($tiempo);
 
-	$grafico->setNameChart('Horas trabajadas por asunto')
+	$grafico->setNameChart(__('Horas trabajadas por asunto'))
 		->addDataset($dataset)
 		->setOptions($options)
 		->addLabels($asunto);

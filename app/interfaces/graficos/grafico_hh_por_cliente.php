@@ -109,10 +109,10 @@
 	$dataset->setType('bar')
 		->setFill(false)
 		->setYAxisID('y-axis-1')
-		->setLabel('Horas trabajadas por cliente')
+		->setLabel(__('Horas trabajadas por cliente'))
 		->setData($tiempo);
 
-	$grafico->setNameChart('Horas trabajadas por cliente')
+	$grafico->setNameChart(__('Horas trabajadas por cliente'))
 		->addDataset($dataset)
 		->setOptions($options)
 		->addLabels($cliente);

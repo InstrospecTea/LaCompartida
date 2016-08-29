@@ -78,7 +78,7 @@
 		->setLabel(__('Horas trabajadas'))
 		->setData(array_values($user_data));
 
-	$grafico->setNameChart('Horas trabajadas' . (!empty($nombre_usuario) ? ' - ' . $nombre_usuario : ''))
+	$grafico->setNameChart(__('Horas trabajadas') . (!empty($nombre_usuario) ? ' - ' . $nombre_usuario : ''))
 		->addDataset($dataset)
 		->setOptions($options)
 		->addLabels(array_keys($user_data));

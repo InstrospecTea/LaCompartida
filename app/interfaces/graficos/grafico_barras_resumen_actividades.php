@@ -40,7 +40,7 @@ $titulo = utf8_decode($_POST['titulo']);
 $grafico = new TTB\Graficos\Grafico();
 $dataset = new TTB\Graficos\Dataset();
 
-$dataset->setLabel('Horas cobrables')
+$dataset->setLabel(__('Horas cobrables'))
 	->setYAxisID('y-axis-1')
 	->setData(array_values($datos));
 
@@ -67,7 +67,7 @@ $y_axes[] = [
 if ($datos_comparados) {
 	$dataset_comparado = new TTB\Graficos\Dataset();
 
-	$dataset_comparado->setLabel('Horas trabajadas')
+	$dataset_comparado->setLabel(__('Horas trabajadas'))
 		->setYAxisID('y-axis-2')
 		->setBackgroundColor(39, 174, 96, 0.5)
 		->setBorderColor(39, 174, 96, 0.8)
