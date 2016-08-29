@@ -36,7 +36,7 @@ if (is_null($datos)) {
 $dataset = new TTB\Graficos\DatasetPie();
 
 $dataset->setData(array_values($datos))
-	->setLabel('Resumen actividades profesionales');
+	->setLabel(__('Resumen actividades profesionales'));
 
 $grafico->setType('pie')
 	->addLabels(array_keys($datos))

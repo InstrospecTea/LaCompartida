@@ -191,7 +191,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		->setYAxisID('y-axis-1')
 		->setData($datos);
 
-	$grafico->setNameChart($titulo)
+	$grafico->setNameChart(__($titulo))
 		->addDataset($dataset)
 		->addLabels($labels);
 
@@ -268,7 +268,7 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 	$dataset = new TTB\Graficos\DatasetPie();
 
 	$dataset->setData(array_values($datos))
-	->setLabel('Resumen actividades profesionales')
+	->setLabel(__('Resumen actividades profesionales'))
 	->setBorderColor(255, 255, 255, 0)
 	->setHoverBorderColor(255, 255, 255, 0);
 
@@ -279,7 +279,7 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 		]
 	];
 
-	$grafico->setNameChart($titulo)
+	$grafico->setNameChart(__($titulo))
 		->setType('pie')
 		->addLabels(array_values($labels))
 		->addDataset($dataset)
@@ -344,7 +344,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 		]
 	];
 
-	$grafico->setNameChart($titulo)
+	$grafico->setNameChart(__($titulo))
 		->setType('line')
 		->addLabels($labels)
 		->addDataset($datasetLinea)

@@ -227,11 +227,11 @@ if (is_null($duracion)) {
 }
 $dataset = new TTB\Graficos\Dataset();
 
-$dataset->setLabel($titulo_tipo[$tipo_duracion])
+$dataset->setLabel(__($titulo_tipo[$tipo_duracion]))
 	->setYAxisID('y-axis-1')
 	->setData($duracion);
 
-$grafico->setNameChart($title)
+$grafico->setNameChart(__($title))
 	->addDataset($dataset)
 	->addLabels($periodo);
 
@@ -256,7 +256,7 @@ if ($comparar) {
 
 	array_walk($duracion_comparada,'fixNumber');
 
-	$dataset_comparar->setLabel($titulo_tipo[$tipo_duracion_comparada])
+	$dataset_comparar->setLabel(__($titulo_tipo[$tipo_duracion_comparada]))
 		->setBackgroundColor(39, 174, 96, 0.5)
 		->setBorderColor(39, 174, 96, 0.8)
 		->setHoverBackgroundColor(39, 174, 96, 0.75)
