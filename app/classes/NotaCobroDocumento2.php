@@ -1548,6 +1548,11 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$asunto = new Asunto($this->sesion);
 						$asunto->LoadByCodigo($this->asuntos[$k]);
 
+						$has_milestones = $this->hasMilestones();
+						$has_works = $this->hasWorks($asunto);
+						$has_expenses = $this->hasExpenses($asunto);
+						$has_errands = $this->hasErrands($asunto);
+
 						unset($GLOBALS['totales']);
 						$totales = array();
 						$totales['tiempo'] = 0;
@@ -1564,24 +1569,6 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$total_trabajos_categoria = '';
 						$encabezado_trabajos_categoria = '';
 
-						$query = "SELECT count(*) FROM tramite
-									WHERE id_cobro=" . $this->fields['id_cobro'] . "
-										AND codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'";
-						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-						list($cont_tramites) = mysql_fetch_array($resp);
-
-						$query = "SELECT count(*) FROM trabajo
-									WHERE id_cobro=" . $this->fields['id_cobro'] . "
-										AND codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'
-										AND id_tramite=0 " . ($this->fields['opc_ver_cobrable'] ? "" : "AND trabajo.visible = 1");
-						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-						list($cont_trabajos) = mysql_fetch_array($resp);
-
-						$query = "SELECT count(*) FROM cta_corriente
-									 WHERE id_cobro=" . $this->fields['id_cobro'] . "
-										AND codigo_asunto='" . $asunto->fields['codigo_asunto'] . "'";
-						$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-						list($cont_gastos) = mysql_fetch_array($resp);
 						$row = $row_tmpl;
 						$row = str_replace('%separador%', '<hr size="2" class="separador">', $row);
 
@@ -1618,7 +1605,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$row = str_replace('%telefono%', empty($asunto->fields['fono_contacto']) ? '' : __('Teléfono'), $row);
 						$row = str_replace('%valor_telefono%', empty($asunto->fields['fono_contacto']) ? '' : $asunto->fields['fono_contacto'], $row);
 
-						if ($cont_trabajos > 0) {
+						if ($has_works) {
 							if ($this->fields["opc_ver_detalles_por_hora"] == 1) {
 								$row = str_replace('%espacio_trabajo%', '<br>', $row);
 								$row = str_replace('%servicios%', __('Servicios prestados'), $row);
@@ -1659,16 +1646,8 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							if ($k == 0 && trim(strstr($row, '%GASTOS_FILAS%')) != '') {
 								$templateNotaCobroGastosSeparados = 1;
 							}
-							foreach ($x_cobro_gastos['gasto_detalle'] as $d) {
-								if ($this->asuntos[$k] == $d['codigo_asunto']) {
-									$asunto_tiene_gastos = 1;
-									break;
-								}
-							}
 
-							if ($templateNotaCobroGastosSeparados && $asunto_tiene_gastos) {
-								$asunto_tiene_gastos = 0;
-								//$html = str_replace('%separador%', '<hr size="2" class="separador">', $html);
+							if ($templateNotaCobroGastosSeparados && $has_expenses) {
 								$row = str_replace('%glosa_gastos%', __('Gastos'), $row);
 								if ($lang == 'es') {
 									$row = str_replace('%glosa_gasto%', __('GASTOS'), $row);
@@ -1682,16 +1661,10 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 								$row = str_replace('%GASTOS_FILAS%', $this->GenerarDocumento2($parser, 'GASTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 								$row = str_replace('%GASTOS_TOTAL%', $this->GenerarDocumento2($parser, 'GASTOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 							} else {
-								//$html = str_replace('%separador%', '<hr size="2" class="separador">', $html);
 								$row = str_replace('%glosa_gastos%', '', $row);
-								if ($lang == 'es') {
-									$row = str_replace('%glosa_gasto%', '', $row);
-								} else {
-									$row = str_replace('%glosa_gasto%', '', $row);
-								}
-								$row = str_replace('%expenses%', '', $row); //en vez de Disbursements es Expenses en inglés
+								$row = str_replace('%glosa_gasto%', '', $row);
+								$row = str_replace('%expenses%', '', $row);
 								$row = str_replace('%detalle_gastos%', '', $row);
-
 								$row = str_replace('%GASTOS_ENCABEZADO%', '', $row);
 								$row = str_replace('%GASTOS_FILAS%', '', $row);
 								$row = str_replace('%GASTOS_TOTAL%', '', $row);
@@ -1699,12 +1672,8 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						}
 
 
-						$query_hitos = "SELECT count(*) from cobro_pendiente where hito=1 and id_cobro=" . $this->fields['id_cobro'];
-						$resp_hitos = mysql_query($query_hitos, $this->sesion->dbh) or Utiles::errorSQL($query_hitos, __FILE__, __LINE__, $this->sesion->dbh);
-
-						list($cont_hitos) = mysql_fetch_array($resp_hitos);
 						$row = str_replace('%hitos%', '<br>' . __('Hitos') . '<br/><br/>', $row);
-						if ($cont_hitos > 0) {
+						if ($has_milestones) {
 							global $total_hitos, $estehito, $cantidad_hitos, $moneda_hitos, $tipo_cambio_hitos;
 
 							$row = str_replace('%HITOS_FILAS%', $this->GenerarDocumento2($parser, 'HITOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
@@ -1718,7 +1687,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							$row = str_replace('%HITOS_TOTAL%', '', $row);
 						}
 
-						if ($cont_tramites > 0) {
+						if ($has_errands) {
 							$row = str_replace('%espacio_tramite%', '<br>', $row);
 							$row = str_replace('%servicios_tramites%', __('Trámites'), $row);
 							$row = str_replace('%titulo_seccion_tramites_castropal%', __('Otros Servicios'), $row);
@@ -1737,13 +1706,10 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						}
 						// El parametro separar_asunto se define para asegurarse que solamente se separan los asuntos,
 						// cuando el template de ese cliente lo soporta.
+
 						$asunto->separar_asuntos = true;
-						if (Conf::GetConf($this->sesion, 'ParafoGastosSoloSiHayGastos')) {
-							if ($cont_gastos > 0) {
-								$row = str_replace('%GASTOS%', $this->GenerarDocumento2($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
-							} else {
-								$row = str_replace('%GASTOS%', '', $row);
-							}
+						if (Conf::GetConf($this->sesion, 'ParafoGastosSoloSiHayGastos') && !$has_expenses) {
+							$row = str_replace('%GASTOS%', '', $row);
 						} else {
 							$row = str_replace('%GASTOS%', $this->GenerarDocumento2($parser, 'GASTOS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 						}
@@ -1752,7 +1718,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						#especial mb
 						$row = str_replace('%codigo_asunto_mb%', __('Código M&B'), $row);
 
-						if ($cont_trabajos > 0 || $cont_hitos > 0 || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $cont_tramites > 0 || ($cont_gastos > 0 && $templateNotaCobroGastosSeparados) || Conf::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites') || ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1 && !$this->get_detalle_en_asuntos())) {
+						if ($has_works || $has_milestones || $asunto->fields['trabajos_total_duracion'] > 0 || $asunto->fields['trabajos_total_duracion_trabajada'] > 0 || $has_errands || ($has_expenses && $templateNotaCobroGastosSeparados) || Conf::GetConf($this->sesion, 'MostrarAsuntosSinTrabajosGastosTramites') || ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1 && !$this->get_detalle_en_asuntos())) {
 							$html .= $row;
 						}
 
@@ -1782,31 +1748,108 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$categoria_valor = 0;
 					$total_trabajos_categoria = '';
 					$encabezado_trabajos_categoria = '';
+
+					$has_milestones = $this->hasMilestones();
+
 					$row_tmpl = str_replace('%asuntos_no_separados%', __('Asuntos'), $row_tmpl);
 					$row_tmpl = str_replace('%TRABAJOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'TRABAJOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row_tmpl);
-					$rows = array();
+					$print_expenses = false;
+					$print_errands = false;
+					$works_rows = array();
+					$expenses_rows = array();
+					$errands_rows = array();
 					$totales_row = array();
 					for ($k = 0; $k < count($this->asuntos); $k++) {
-						$asunto = new Asunto($this->sesion);
-						$asunto->LoadByCodigo($this->asuntos[$k]);
-						$Criteria = new Criteria($this->sesion);
-						$Criteria->add_select('count(*)', 'cantidad')
-							->add_from('trabajo')
-							->add_restriction(CriteriaRestriction::equals('id_cobro', $this->fields['id_cobro']))
-							->add_restriction(CriteriaRestriction::equals('codigo_asunto', "'{$asunto->fields['codigo_asunto']}'"))
-							->add_restriction(CriteriaRestriction::equals('id_tramite', 0));
-						if ($this->fields['opc_ver_cobrable']) {
-							$Criteria->add_restriction(CriteriaRestriction::equals('visible', 1));
+						$Asunto = new Asunto($this->sesion);
+						$Asunto->LoadByCodigo($this->asuntos[$k]);
+						$has_works = $this->hasWorks($Asunto);
+						$has_expenses = $this->hasExpenses($Asunto);
+						$has_errands = $this->hasErrands($Asunto);
+
+						if ($has_works) {
+							$works_rows[] = $this->GenerarDocumento2($parser, 'TRABAJOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto);
 						}
-						$trabajos = $Criteria->run();
-						$cont_trabajos = $trabajos[0]['cantidad'];
-						if ($cont_trabajos > 0) {
-							$rows[] = $this->GenerarDocumento2($parser, 'TRABAJOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
+
+						if ($this->fields['opc_ver_gastos'] != 0) {
+							if ($k == 0 && trim(strstr($row, '%GASTOS_FILAS%')) != '') {
+								$templateNotaCobroGastosSeparados = 1;
+							}
+
+							if ($templateNotaCobroGastosSeparados && $has_expenses) {
+								$print_expenses = true;
+								$expenses_rows[] = str_replace('%GASTOS_FILAS%', $this->GenerarDocumento2($parser, 'GASTOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto), $row);
+							}
 						}
+
+						if ($has_errands) {
+							$print_errands = true;
+							$errands_rows[] = $this->GenerarDocumentoComun($parser, 'TRAMITES_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto);
+						}
+
 					}
 					$html .= $row_tmpl;
-					$html = str_replace('%TRABAJOS_FILAS%', implode(' ', $rows), $html);
-					$html = str_replace('%TRABAJOS_TOTAL_AGRUPADO%', $this->GenerarDocumento2($parser, 'TRABAJOS_TOTAL_AGRUPADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $html);
+					$html = str_replace('%TRABAJOS_FILAS%', implode('', $works_rows), $html);
+					$html = str_replace('%TRABAJOS_TOTAL_AGRUPADO%', $this->GenerarDocumento2($parser, 'TRABAJOS_TOTAL_AGRUPADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto), $html);
+
+					if ($print_expenses) {
+						$html = str_replace('%glosa_gastos%', __('Gastos'), $html);
+						if ($lang == 'es') {
+							$html = str_replace('%glosa_gasto%', __('GASTOS'), $html);
+						} else {
+							$html = str_replace('%glosa_gasto%', __('EXPENSES'), $html);
+						}
+						$html = str_replace('%expenses%', __('%expenses%'), $html); //en vez de Disbursements es Expenses en inglés
+						$html = str_replace('%detalle_gastos%', __('Detalle de gastos'), $html);
+
+						$html = str_replace('%GASTOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'GASTOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto), $html);
+						$html = str_replace('%GASTOS_FILAS%', implode('', $expenses_rows), $html);
+						$html = str_replace('%GASTOS_TOTAL%', $this->GenerarDocumento2($parser, 'GASTOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto), $html);
+					} else {
+						$html = str_replace('%glosa_gastos%', '', $html);
+						$html = str_replace('%glosa_gasto%', '', $html);
+						$html = str_replace('%expenses%', '', $html);
+						$html = str_replace('%detalle_gastos%', '', $html);
+						$html = str_replace('%GASTOS_ENCABEZADO%', '', $html);
+						$html = str_replace('%GASTOS_FILAS%', '', $html);
+						$html = str_replace('%GASTOS_TOTAL%', '', $html);
+					}
+
+					$html = str_replace('%hitos%', '<br>' . __('Hitos') . '<br/><br/>', $html);
+					if ($has_milestones) {
+						global $total_hitos, $estehito, $cantidad_hitos, $moneda_hitos, $tipo_cambio_hitos;
+
+						$html = str_replace('%HITOS_FILAS%', $this->GenerarDocumento2($parser, 'HITOS_FILAS', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto), $html);
+						$html = str_replace('%HITOS_TOTAL%', $this->GenerarDocumento2($parser, 'HITOS_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto), $html);
+						$html = str_replace('%HITOS_ENCABEZADO%', $this->GenerarDocumento2($parser, 'HITOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto), $html);
+						$html = str_replace('%hitos%', '<br>' . __('Hitos') . '(' . $estehito . ' de ' . $total_hitos . ')<br/><br/>', $html);
+					} else {
+						$html = str_replace('%hitos%', '', $html);
+						$html = str_replace('%HITOS_ENCABEZADO%', '', $html);
+						$html = str_replace('%HITOS_FILAS%', '', $html);
+						$html = str_replace('%HITOS_TOTAL%', '', $html);
+					}
+
+					if ($print_errands) {
+						$html = str_replace('%espacio_tramite%', '<br>', $html);
+						$html = str_replace('%servicios_tramites%', __('Trámites'), $html);
+						$html = str_replace('%titulo_seccion_tramites_castropal%', __('Otros Servicios'), $html);
+						$html = str_replace('%servicios_tramites_castropal%', __('Otros Servicios Profesionales'), $html);
+						$html = str_replace('%TRAMITES_ENCABEZADO%', $this->GenerarDocumentoComun($parser, 'TRAMITES_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto), $html);
+						$html = str_replace('%TRAMITES_FILAS%', implode('', $errands_rows), $html);
+						$html = str_replace('%TRAMITES_TOTAL%', $this->GenerarDocumentoComun($parser, 'TRAMITES_TOTAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $Asunto), $html);
+					} else {
+						$html = str_replace('%espacio_tramite%', '', $html);
+						$html = str_replace('%servicios_tramites%', '', $html);
+						$html = str_replace('%titulo_seccion_tramites_castropal%', '', $html);
+						$html = str_replace('%servicios_tramites_castropal%', '', $html);
+						$html = str_replace('%TRAMITES_ENCABEZADO%', '', $html);
+						$html = str_replace('%TRAMITES_FILAS%', '', $html);
+						$html = str_replace('%TRAMITES_TOTAL%', '', $html);
+					}
+
+					$html = str_replace('%texto_servicios_profesionales%', __('Servicios Profesionales por hora'), $html);
+					$html = str_replace('%descripcion_servicios%', __('Descripción de Servicios'), $html);
+					$html = str_replace('%para_los_servicios_prestados%', __('Para los servicios profesionales prestados'), $html);
 				}
 				break;
 
@@ -3821,4 +3864,44 @@ TPL;
 		return \TTB\Utiles::interpolate($data, $template);
 	}
 
+	private function hasErrands(Asunto $Asunto) {
+		$Criteria = new Criteria($this->sesion);
+		$Criteria->add_from('tramite')
+			->add_restriction(CriteriaRestriction::equals('id_cobro', "'{$this->fields['id_cobro']}'"))
+			->add_restriction(CriteriaRestriction::equals('codigo_asunto', "'{$Asunto->fields['codigo_asunto']}'"));
+
+		return $Criteria->count() > 0;
+	}
+
+	private function hasWorks(Asunto $Asunto) {
+		$Criteria = new Criteria($this->sesion);
+		return $Criteria->add_from('trabajo')
+			->add_restriction(CriteriaRestriction::equals('id_cobro', "'{$this->fields['id_cobro']}'"))
+			->add_restriction(CriteriaRestriction::equals('codigo_asunto', "'{$Asunto->fields['codigo_asunto']}'"))
+			->add_restriction(CriteriaRestriction::equals('id_tramite', '0'));
+		if ($this->fields['opc_ver_cobrable']) {
+			$Criteria->add_restriction(CriteriaRestriction::equals('visible', '1'));
+		}
+
+		return $Criteria->count() > 0;
+	}
+
+	private function hasExpenses() {
+		$Criteria = new Criteria($this->sesion);
+		$Criteria->add_from('cta_corriente')
+			->add_restriction(CriteriaRestriction::equals('id_cobro', "'{$this->fields['id_cobro']}'"))
+			->add_restriction(CriteriaRestriction::equals('codigo_asunto', "'{$Asunto->fields['codigo_asunto']}'"));
+
+		return $Criteria->count() > 0;
+	}
+
+	private function hasMilestones() {
+		$Criteria = new Criteria($this->sesion);
+		$Criteria->add_from('cobro_pendiente')
+			->add_restriction(CriteriaRestriction::equals('id_cobro', "'{$this->fields['id_cobro']}'"))
+			->add_restriction(CriteriaRestriction::equals('hito', '1'));
+
+
+		return $Criteria->count() > 0;
+	}
 }

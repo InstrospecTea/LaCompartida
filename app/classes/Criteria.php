@@ -72,6 +72,14 @@ class Criteria {
 		return empty($result[0]) ? false : $result[0];
 	}
 
+	public function count() {
+		$Criteria = clone $this;
+		$Criteria->reset_selection()
+			->add_select('count(1)');
+		$result = $Criteria->run();
+		return empty($result[0]) ? false : $result[0];
+	}
+
 	/**
 	 * Añade un statement de selección al criterio de búsqueda.
 	 * @param string $attribute
