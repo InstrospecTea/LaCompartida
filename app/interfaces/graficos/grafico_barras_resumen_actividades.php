@@ -35,6 +35,8 @@ foreach ($nombres as $d) {
 
 $y_axes = [];
 
+$titulo = utf8_decode($_POST['titulo']);
+
 $grafico = new TTB\Graficos\Grafico();
 $dataset = new TTB\Graficos\Dataset();
 

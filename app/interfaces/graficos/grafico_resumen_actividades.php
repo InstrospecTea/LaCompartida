@@ -26,6 +26,8 @@ foreach ($datos as $key => $value) {
 	++$k;
 }
 
+$titulo = utf8_decode($_POST['titulo']);
+
 $grafico = new TTB\Graficos\Grafico();
 if (is_null($datos)) {
 	echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
