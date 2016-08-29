@@ -76,7 +76,7 @@ class DatasetLine extends Dataset {
 	 * @return Dataset
 	 */
 	public function setPointBorderColor($r = self::R, $g = self::G, $b = self::B, $a = 0.8) {
-		if (!parent::validarRGBA($r, $g, $b, $a)) {
+		if (!parent::isValidRGBA($r, $g, $b, $a)) {
 			error_log('Debe ingresar un color válido');
 		}
 		$a = number_format($a, 2, '.', '');
@@ -93,7 +93,7 @@ class DatasetLine extends Dataset {
 	 * @return Dataset
 	 */
 	public function setPointBackgroundColor($r = self::R, $g = self::G, $b = self::B, $a = 0.5) {
-		if (!parent::validarRGBA($r, $g, $b, $a)) {
+		if (!parent::isValidRGBA($r, $g, $b, $a)) {
 			error_log('Debe ingresar un color válido');
 		}
 		$a = number_format($a, 2, '.', '');
@@ -136,7 +136,7 @@ class DatasetLine extends Dataset {
 	 * @return Dataset
 	 */
 	public function setPointHoverBackgroundColor($r = self::R, $g = self::G, $b = self::B, $a = 0.5) {
-		if (!parent::validarRGBA($r, $g, $b, $a)) {
+		if (!parent::isValidRGBA($r, $g, $b, $a)) {
 			error_log('Debe ingresar un color válido');
 		}
 		$a = number_format($a, 2, '.', '');
@@ -153,7 +153,7 @@ class DatasetLine extends Dataset {
 	 * @return Dataset
 	 */
 	public function setPointHoverBorderColor($r = self::R, $g = self::G, $b = self::B, $a = 0.8) {
-		if (!parent::validarRGBA($r, $g, $b, $a)) {
+		if (!parent::isValidRGBA($r, $g, $b, $a)) {
 			error_log('Debe ingresar un color válido');
 		}
 		$a = number_format($a, 2, '.', '');
