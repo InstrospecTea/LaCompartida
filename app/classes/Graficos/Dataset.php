@@ -3,6 +3,8 @@
 namespace TTB\Graficos;
 
 class Dataset {
+	use GraficoTrait;
+
 	/* TODO: Cambiar el color cuando diseño lo defina.*/
 	const R = 151;
 	const G = 187;
@@ -77,7 +79,7 @@ class Dataset {
 		if (empty($label)) {
 			error_log('Debe ingresar un String no vacío');
 		}
-		$this->label = mb_detect_encoding($label, 'UTF-8', true) ? $label : utf8_encode($label);
+		$this->label = $this->isUTF8($label) ? $label : utf8_encode($label);
 		return $this;
 	}
 

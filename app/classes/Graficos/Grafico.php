@@ -5,6 +5,7 @@ namespace TTB\Graficos;
 use TTB\Graficos\Dataset;
 
 class Grafico {
+	use GraficoTrait;
 
 	protected $type = 'bar';
 	protected $labels = [];
@@ -28,7 +29,7 @@ class Grafico {
 	 * @return Grafico
 	 */
 	public function setNameChart($name_chart) {
-		$this->name_chart = mb_detect_encoding($name_chart, 'UTF-8', true) ? $name_chart : utf8_encode($name_chart);
+		$this->name_chart = $this->isUTF8($name_chart) ? $name_chart : utf8_encode($name_chart);
 		return $this;
 	}
 
@@ -70,7 +71,7 @@ class Grafico {
 		if (empty($label)) {
 			error_log('Debe enviar un String no vacío');
 		}
-		$this->labels[] = mb_detect_encoding($label, 'UTF-8', true) ? $label : utf8_encode($label);
+		$this->labels[] = $this->isUTF8($label) ? $label : utf8_encode($label);
 		return $this;
 	}
 
@@ -120,7 +121,7 @@ class Grafico {
 		$json = [
 			'error' => [
 				'code' => $code,
-				'message' => mb_detect_encoding($message, 'UTF-8', true) ? $message : utf8_encode($message)
+				'message' => $this->isUTF8($message) ? $message : utf8_encode($message)
 			]
 		];
 
