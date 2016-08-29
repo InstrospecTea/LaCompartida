@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.27.3
+Monday, August 29th
+* **Feature** [Agregar código que imprime las subsecciones del asunto, respetando que no se agrupe por asunto.](https://github.com/LemontechSA/ttb/pull/1771)
+
 ## Hotfix 16.27.2
 Wednesday, August 24th
 * **Feature** [Asigar formato segun tipo de dato al descargar excel en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1767)
