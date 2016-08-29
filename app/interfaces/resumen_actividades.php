@@ -1502,8 +1502,7 @@ if ($opc == 'grafico') {
 		$labels = base64_encode(json_encode($labels));
 	}
 
-	$html_info .= '<div id="contenedor_graficos"></div>';
-	echo $html_info;
+	echo '<div id="contenedor_graficos"></div>';
 	echo $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js');
 }
 ?>
