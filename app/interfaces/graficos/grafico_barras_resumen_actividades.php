@@ -78,8 +78,8 @@ if ($datos_comparados) {
 	$grafico->addDataset($dataset_comparado);
 	$y_axes[] = [
 		'type' => 'linear',
-		'display' => true,
-		'position' => 'left',
+		'display' => false,
+		'position' => 'right',
 		'id' => 'y-axis-2',
 		'gridLines' => [
 			'display' => false
