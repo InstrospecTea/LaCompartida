@@ -92,7 +92,7 @@ class Dataset {
 	 * @return Dataset
 	 */
 	public function setBackgroundColor($r = self::R, $g = self::G, $b = self::B, $a = 0.5) {
-		if (!$this->validarRGBA($r, $g, $b, $a)) {
+		if (!$this->isValidRGBA($r, $g, $b, $a)) {
 			error_log('Debe ingresar un color válido');
 		}
 		$a = number_format($a, 2, '.', '');
@@ -109,7 +109,7 @@ class Dataset {
 	 * @return Dataset
 	 */
 	public function setBorderColor($r = self::R, $g = self::G, $b = self::B, $a = 0.8) {
-		if (!$this->validarRGBA($r, $g, $b, $a)) {
+		if (!$this->isValidRGBA($r, $g, $b, $a)) {
 			error_log('Debe ingresar un color válido');
 		}
 		$a = number_format($a, 2, '.', '');
@@ -126,7 +126,7 @@ class Dataset {
 	 * @return Dataset
 	 */
 	public function setHoverBackgroundColor($r = self::R, $g = self::G, $b = self::B, $a = 0.75) {
-		if (!$this->validarRGBA($r, $g, $b, $a)) {
+		if (!$this->isValidRGBA($r, $g, $b, $a)) {
 			error_log('Debe ingresar un color válido');
 		}
 		$a = number_format($a, 2, '.', '');
@@ -143,7 +143,7 @@ class Dataset {
 	 * @return Dataset
 	 */
 	public function setHoverBorderColor($r = self::R, $g = self::G, $b = self::B, $a = 1) {
-		if (!$this->validarRGBA($r, $g, $b, $a)) {
+		if (!$this->isValidRGBA($r, $g, $b, $a)) {
 			error_log('Debe ingresar un color válido');
 		}
 		$a = number_format($a, 2, '.', '');
@@ -169,7 +169,7 @@ class Dataset {
 	 * @param number $a
 	 * @return boolean
 	 */
-	protected function validarRGBA($r, $g, $b, $a) {
+	protected function isValidRGBA($r, $g, $b, $a) {
 		if ((is_int($r) && $r <= 255) &&
 				(is_int($g) && $g <= 255) &&
 				(is_int($b) && $b <= 255) && is_numeric($a)) {

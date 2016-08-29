@@ -2,6 +2,9 @@
 	require_once dirname(__FILE__).'/../../conf.php';
 
 	$sesion = new Sesion();
+	
+	$fecha_inicio = Date::parse($fecha1)->toDate();
+	$fecha_fin = Date::parse($fecha2)->toDate();
 	$Criteria = new Criteria($sesion);
 
 	$Criteria
@@ -15,7 +18,7 @@
 			CriteriaRestriction::equals('trabajo.id_usuario', "'$id_usuario'")
 		)
 		->add_restriction(
-			CriteriaRestriction::between('fecha', "'" . Utiles::fecha2sql($fecha1) . "'", "'" . Utiles::fecha2sql($fecha2) . "'")
+			CriteriaRestriction::between('fecha', "'$fecha_inicio'", "'$fecha_fin'")
 		)
 		->add_grouping('asunto.codigo_asunto')
 		->add_ordering('tiempo', 'DESC')
