@@ -9,7 +9,6 @@ $data_compara = empty($datos_compara) ? false : UtilesApp::utf8izar(json_decode(
 $labels = UtilesApp::utf8izar(json_decode(base64_decode($labels), true), false);
 
 $datos = array_combine($data['nombres'], $data['tiempo']);
-$datos_compara = array_combine($data_compara['nombres'], $data_compara['tiempo']);
 
 function dort_desc($a, $b) {
 	return $a < $b;
@@ -17,7 +16,7 @@ function dort_desc($a, $b) {
 uasort($datos, 'dort_desc');
 
 if ($datos_compara) {
-	// $labels = explode(',', $labels);
+	$datos_compara = array_combine($data_compara['nombres'], $data_compara['tiempo']);
 	$datos_comparados = array();
 	foreach ($datos as $key => $value) {
 		$datos_comparados[] = $datos_compara[$key];
@@ -34,34 +33,83 @@ foreach ($nombres as $d) {
 	}
 }
 
-$estimado_ampliacion = 0;
-$cantidad_datos = count($datos);
+$y_axes = [];
 
-if ($cantidad_datos > 20) {
-	$estimado_ampliacion = 18 * ($cantidad_datos - 20);
-}
+$titulo = utf8_decode($_POST['titulo']);
 
-$grafico = new TTB\Graficos\GraficoBarra();
-$dataset = new TTB\Graficos\GraficoDataset();
+$grafico = new TTB\Graficos\Grafico();
+$dataset = new TTB\Graficos\Dataset();
 
-$dataset->addLabel('Horas cobrables')
-	->addData(array_values($datos));
+$dataset->setLabel(__('Horas cobrables'))
+	->setYAxisID('y-axis-1')
+	->setData(array_values($datos));
 
-$grafico->addDataSets($dataset)
-	->addNameChart($titulo)
+$grafico->setNameChart($titulo)
+	->addDataset($dataset)
 	->addLabels($data['nombres']);
 
+$y_axes[] = [
+	'type' => 'linear',
+	'display' => true,
+	'position' => 'left',
+	'id' => 'y-axis-1',
+	'gridLines' => [
+		'display' => false
+	],
+	'labels' => [
+		'show' => true
+	],
+	'ticks' => [
+		'beginAtZero' => true
+	]
+];
+
 if ($datos_comparados) {
-	$dataset_comparado = new TTB\Graficos\GraficoDataset();
+	$dataset_comparado = new TTB\Graficos\Dataset();
 
-	$dataset_comparado->addLabel('Horas trabajadas')
-		->addFillColor(39, 174, 96, 0.5)
-		->addStrokeColor(39, 174, 96, 0.8)
-		->addHighlightFill(39, 174, 96, 0.75)
-		->addHighlightStroke(39, 174, 96, 1)
-	  ->addData($datos_comparados);
+	$dataset_comparado->setLabel(__('Horas trabajadas'))
+		->setYAxisID('y-axis-2')
+		->setBackgroundColor(39, 174, 96, 0.5)
+		->setBorderColor(39, 174, 96, 0.8)
+		->setHoverBackgroundColor(39, 174, 96, 0.75)
+		->setHoverBorderColor(39, 174, 96, 1)
+	  ->setData($datos_comparados);
 
-	$grafico->addDataSets($dataset_comparado);
+	$grafico->addDataset($dataset_comparado);
+	$y_axes[] = [
+		'type' => 'linear',
+		'display' => false,
+		'position' => 'right',
+		'id' => 'y-axis-2',
+		'gridLines' => [
+			'display' => false
+		],
+		'labels' => [
+			'show' => true
+		],
+		'ticks' => [
+			'beginAtZero' => true
+		]
+	];
 }
+$options = [
+	'responsive' => true,
+	'tooltips' => [
+		'mode' => 'label'
+	],
+	'scales' => [
+		'xAxes' => [[
+			'display' => true,
+			'gridLines' => [
+				'display' => false
+			],
+			'labels' => [
+				'show' => true,
+			]
+		]],
+		'yAxes' => $y_axes
+	]
+];
 
+$grafico->setOptions($options);
 echo $grafico->getJson();

@@ -64,8 +64,9 @@
 </table>
 </form>
 
-<div id="contenedor_grafico_usuarios"></div>
+<div id="contenedor_graficos"></div>
 
+<?= $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js'); ?>
 <script type="text/javascript">
 jQuery(function() {
 	var graficoBarraUsuarios;
@@ -76,54 +77,19 @@ jQuery(function() {
 		var fecha1 = jQuery("#fecha1").val();
 		var fecha2 = jQuery("#fecha2").val();
 
-		jQuery.ajax({
-			url: 'graficos/grafico_' + jQuery("#tipo_reporte").val() + '.php',
-			data: {
+		var url = 'graficos/grafico_' + jQuery("#tipo_reporte").val() + '.php';
+		var charts_data = [{
+			'url': url,
+			'data': {
 				'id_usuario': id_usuario,
 				'nombre_usuario': nombre_usuario,
 				'fecha1': fecha1,
 				'fecha2': fecha2
-			},
-			dataType: 'json',
-			type: 'POST',
-			success: function(respuesta) {
-				if (respuesta != null) {
-					agregarCanvas('usuarios',
-						jQuery('#contenedor_grafico_usuarios'),
-						respuesta['name_chart']);
-
-					var canvas = jQuery('#grafico_usuarios')[0];
-					var context = canvas.getContext('2d');
-
-					if (graficoBarraUsuarios) {
-						graficoBarraUsuarios.destroy();
-					}
-
-					graficoBarraUsuarios = new Chart(context).Bar(respuesta);
-				} else {
-					jQuery('#contenedor_grafico_usuarios').empty();
-					jQuery('#contenedor_grafico_usuarios').append('<h3>No exiten datos para generar el gráfico</h3>');
-				}
-			},
-			error: function(e) {
-				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
 			}
-		});
+		}];
+		graphic.render('#contenedor_graficos', charts_data);
 	});
 });
-
-function agregarCanvas(id, contenedor, titulo) {
-	var canvas = document.createElement('canvas');
-	var h3 = document.createElement('h3');
-	canvas.width = 600;
-	canvas.height = 400;
-	canvas.id = 'grafico_' + id;
-	h3.innerHTML = titulo;
-
-	contenedor.empty();
-	contenedor.append(h3);
-	contenedor.append(canvas);
-}
 
 function Habilitar(form)
 {

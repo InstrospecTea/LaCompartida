@@ -1407,11 +1407,7 @@ if ($opc == 'print' || $popup) {
 }
 
 if ($opc == 'grafico') {
-	if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
-		$letra_profesional = 'profesional';
-	} else {
-		$letra_profesional = 'username';
-	}
+	$letra_profesional = Conf::read('UsaUsernameEnTodoElSistema') ? 'profesional' : 'username';
 
 	########## VER GRAFICO ##########
 	$titulo_reporte = __('Gráfico de') . ' ' . __($horas_sql) . ' ' . __('en vista por') . ' ' . $desc;
@@ -1497,7 +1493,6 @@ if ($opc == 'grafico') {
 
 	$datos_grafico['nombres'] = UtilesApp::utf8izar($datos_grafico['nombres']);
 	$datos_grafico_compara['nombres'] = UtilesApp::utf8izar($datos_grafico_compara['nombres']);
-
 	$datos = base64_encode(json_encode($datos_grafico));
 	$datosC = '';
 	$grafico = 'grafico_resumen_actividades';
@@ -1507,96 +1502,29 @@ if ($opc == 'grafico') {
 		$labels = base64_encode(json_encode($labels));
 	}
 
-	$html_info .= "<div id='contenedor_grafico_resumen_actividad'></div>";
+	echo '<div id="contenedor_graficos"></div>';
+	echo $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js');
+}
 ?>
 <script type="text/javascript">
-	var graficoResumenActividades;
-
 	var titulo = '<?php echo $titulo_reporte; ?>';
 	var datos = '<?php echo $datos; ?>';
 	var datos_compara = '<?php echo $datosC; ?>';
 	var labels = '<?php echo $labels; ?>';
 
-	jQuery.ajax({
-		url: "graficos/<?php echo $grafico; ?>.php",
-		data: {
+	var url = 'graficos/<?php echo $grafico; ?>.php'
+	var charts_data = [{
+		'url': url,
+		'data': {
 			'datos': datos,
 			'titulo': titulo,
 			'datos_compara': datos_compara,
 			'labels': labels
-		},
-		dataType: 'json',
-		type: 'POST',
-		success: function(respuesta) {
-			if (respuesta != null) {
-				agregarCanvas('resumen_actividad',
-						jQuery('#contenedor_grafico_resumen_actividad'),
-						titulo,
-						true);
-
-				var canvas = jQuery('#grafico_resumen_actividad')[0];
-				var context = canvas.getContext('2d');
-
-				if (graficoResumenActividades) {
-					graficoResumenActividades.destroy();
-				}
-
-				if (datos_compara) {
-					graficoResumenActividades = new Chart(context).Bar(respuesta, {
-						multiTooltipTemplate: '<%= datasetLabel %> <%= value %>'
-					});
-				} else {
-					graficoResumenActividades = new Chart(context).Pie(respuesta, {
-
-						tooltipTemplate:  '<%= label %>: <%= value %>hrs. (<%= Math.round(circumference / 6.283 * 100) %>%)',
-						legendTemplate : '<ul>'
-							+ '<% for (var i=0; i<segments.length; i++) { %>'
-							+ '<li>'
-							+ '<span style=\"background-color: <%=segments[i].fillColor%>;\"></span>'
-							+ '<% if (segments[i].label) { %><%= segments[i].label %><% } %>'
-							+ '</li>'
-							+ '<% } %>'
-							+ '</ul>'
-
-					});
-					jQuery('#leyenda').append(graficoResumenActividades.generateLegend());
-				}
-			} else {
-				jQuery('#contenedor_grafico_resumen_actividad').append('<h3>No exiten datos para generar el gráfico</h3>');
-			}
-		},
-		error: function(e) {
-			alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
 		}
-	});
-
-	function agregarCanvas(id, contenedor, titulo, leyenda) {
-		leyenda = leyenda || false;
-		var canvas = document.createElement('canvas');
-		var h3 = document.createElement('h3');
-		canvas.width = 600;
-		canvas.height = 400;
-		canvas.id = 'grafico_' + id;
-		h3.innerHTML = titulo;
-
-		contenedor.empty();
-		contenedor.append(h3);
-		contenedor.append(canvas);
-
-		if (leyenda) {
-			var divLeyenda = document.createElement('div');
-			divLeyenda.id = 'leyenda';
-			divLeyenda.className = 'chart-legend';
-
-			contenedor.append(divLeyenda);
-		}
-	}
+	}];
+	graphic.render('#contenedor_graficos', charts_data);
 </script>
 
-<?php
-	echo $html_info;
-}
-?>
 <script>
 	Calendar.setup(
 			{

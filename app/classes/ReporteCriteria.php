@@ -312,13 +312,7 @@ class ReporteCriteria {
 			$options['ignore_charges_query'] = true;
 		}
 		$grouperFields = $this->agrupador;
-
-		// pr($filtersFields);
-		// pr($grouperFields);
-		// pr($options);
-		// pr($this->proporcionalidad);
-		// pr($this->id_moneda);
-
+		
 		$calculator_name = $this->calculationMapping[$this->tipo_dato];
 
 		$reflectedClass = new ReflectionClass("{$calculator_name}DataCalculator");

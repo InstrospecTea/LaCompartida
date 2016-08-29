@@ -95,8 +95,9 @@
 </table>
 </form>
 
-<div id="contenedor_grafico_hito"></div>
+<div id="contenedor_graficos"></div>
 
+<?= $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js'); ?>
 <script type="text/javascript">
 jQuery(function() {
 	var graficoBarraHito;
@@ -107,58 +108,27 @@ jQuery(function() {
 		var solo_activos = jQuery("#solo_activos:checked").val();
 		var fecha_ini = jQuery("#fecha_ini").val();
 		var fecha_fin = jQuery("#fecha_fin").val();
+		var url = 'graficos/grafico_' + jQuery("#tipo_reporte").val() + '.php'
 
-		jQuery.ajax({
-			url: 'graficos/grafico_' + jQuery("#tipo_reporte").val() + '.php',
-			data: {
+		var charts_data = [{
+			'url': url,
+			'data': {
 				'usuarios': usuarios,
 				'clientes': clientes,
 				'solo_activos': solo_activos,
 				'fecha_ini': fecha_ini,
 				'fecha_fin': fecha_fin
-			},
-			dataType: 'json',
-			type: 'POST',
-			success: function(respuesta) {
-				if (respuesta != null) {
-					agregarCanvas('hito', jQuery('#contenedor_grafico_hito'), respuesta['name_chart']);
-					var canvas = jQuery("#grafico_hito")[0];
-					var context = canvas.getContext('2d');
-
-					if (graficoBarraHito) {
-						graficoBarraHito.destroy();
-					}
-
-					graficoBarraHito = new Chart(context).Bar(respuesta);
-				} else {
-					jQuery('#contenedor_grafico_hito').empty();
-					jQuery('#contenedor_grafico_hito').append('<h3>No exiten datos para generar el gráfico</h3>');
-				}
-			},
-			error: function(e) {
-				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
 			}
-		});
+		}];
+		graphic.render('#contenedor_graficos', charts_data);
 	});
 
-	function agregarCanvas(id, contenedor, titulo) {
-		var canvas = document.createElement('canvas');
-		var h3 = document.createElement('h3');
-		canvas.width = 600;
-		canvas.height = 400;
-		canvas.id = 'grafico_' + id;
-		h3.innerHTML = titulo;
-
-		contenedor.empty();
-		contenedor.append(h3);
-		contenedor.append(canvas);
+	function Planilla(form) {
+		form.action = 'planillas/planilla_horas_general.php';
+		form.submit();
 	}
 });
 
-function Planilla(form) {
-	form.action = "planillas/planilla_horas_general.php";
-	form.submit();
-}
 </script>
 <?php
 	$pagina->PrintBottom();

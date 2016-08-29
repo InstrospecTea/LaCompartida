@@ -875,137 +875,33 @@ jQuery(document).ready(function() {
 		jQuery(selector).show();
 	});
 
-	var graficoBarras;
-
 	jQuery('#barras').on('click', function() {
-		var vista = [];
-		jQuery('#agrupadores select:visible').each(function(i) {
-			vista[i] = jQuery(this).val();
-		});
-		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="barras" />');
-		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista.toString().replace(',', '-') + '" />');
-		jQuery('#iframereporte').empty();
+		render_chart('barras');
 
-		jQuery.ajax({
-			url: 'reporte_avanzado_grafico.php',
-			data: jQuery('#formulario').serialize(),
-			dataType: 'json',
-			type: 'POST',
-			success: function(respuesta) {
-				if (respuesta != null) {
-					agregarCanvas('barras', jQuery('#iframereporte'));
-					var canvas = jQuery("#grafico_barras")[0];
-					var context = canvas.getContext('2d');
-
-					if (graficoBarras) {
-						graficoBarras.destroy();
-					}
-
-					jQuery('#iframereporte h3').append(respuesta['name_chart']);
-					graficoBarras = new Chart(context).Bar(respuesta, {
-						multiTooltipTemplate: '<%= datasetLabel %> <%= value %>'
-					});
-				} else {
-					jQuery('#iframereporte').append('<h3>No exiten datos para generar el gráfico</h3>');
-				}
-			},
-			error: function(e) {
-				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
-			}
-		});
 	});
-
-	var graficoTarta;
 
 	jQuery('#circular').on('click', function() {
-		var vista = [];
-		jQuery('#agrupadores select:visible').each(function(i) {
-			vista[i] = jQuery(this).val();
-		});
-		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="circular" />');
-		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista.toString().replace(',', '-') + '" />');
-		jQuery('#iframereporte').empty();
-
-		jQuery.ajax({
-			url: 'reporte_avanzado_grafico.php',
-			data: jQuery('#formulario').serialize(),
-			dataType: 'json',
-			type: 'POST',
-			success: function(respuesta) {
-				if (respuesta != null && respuesta['json'] != null) {
-					agregarCanvas('tarta', jQuery('#iframereporte'), true);
-					var canvas = jQuery('#grafico_tarta')[0];
-					var context = canvas.getContext('2d');
-
-					if (graficoTarta) {
-						graficoTarta.destroy();
-					}
-
-					jQuery('#iframereporte h3').append(respuesta['chart_name']);
-
-					graficoTarta = new Chart(context).Pie(respuesta['json'], {
-						tooltipTemplate:  '<%= label %>: <%= value %>hrs. (<%= Math.round(circumference / 6.283 * 100) %>%)',
-						legendTemplate : '<ul>'
-							+ '<% for (var i=0; i<segments.length; i++) { %>'
-							+ '<li>'
-							+ '<span style=\"background-color: <%=segments[i].fillColor%>;\"></span>'
-							+ '<% if (segments[i].label) { %><%= segments[i].label %><% } %>'
-							+ '</li>'
-							+ '<% } %>'
-							+ '</ul>'
-					});
-
-					jQuery('#leyenda').append(graficoTarta.generateLegend());
-				} else {
-					jQuery('#iframereporte').append('<h3>No exiten datos para generar el gráfico</h3>');
-				}
-			},
-			error: function(e) {
-				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
-			}
-		});
+		render_chart('circular');
 	});
-
-	var graficoLinea;
 
 	jQuery('#dispersion').on('click', function() {
+		render_chart('dispersion');
+	});
+
+	function render_chart(type_chart){
 		var vista = [];
 		jQuery('#agrupadores select:visible').each(function(i) {
 			vista[i] = jQuery(this).val();
 		});
-		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="dispersion" />');
+		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="' + type_chart +'" />');
 		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista.toString().replace(',', '-') + '" />');
-		jQuery('#iframereporte').empty();
 
-		jQuery.ajax({
-			url: 'reporte_avanzado_grafico.php',
-			data: jQuery('#formulario').serialize(),
-			dataType: 'json',
-			type: 'POST',
-			success: function(respuesta) {
-				if (respuesta != null) {
-					agregarCanvas('linea', jQuery('#iframereporte'));
-					var canvas = jQuery('#grafico_linea')[0];
-					var context = canvas.getContext('2d');
-
-					if (graficoLinea) {
-						graficoLinea.destroy();
-					}
-
-					jQuery('#iframereporte h3').append(respuesta['name_chart']);
-
-					graficoLinea = new Chart(context).Line(respuesta, {
-						multiTooltipTemplate: '<%= datasetLabel %> <%= value %>'
-					});
-				} else {
-					jQuery('#iframereporte').append('<h3>No exiten datos para generar el gráfico</h3>');
-				}
-			},
-			error: function(e) {
-				alert('Se ha producido un error en la carga de los gráficos, favor volver a cargar la pagina. Si el problema persiste favor comunicarse con nuestra área de Soporte.');
-			}
-		});
-	});
+		var charts_data = [{
+			'url': 'reporte_avanzado_grafico.php',
+			'data': jQuery('#formulario').serialize()
+		}];
+		graphic.render('#iframereporte', charts_data);
+	}
 
 	jQuery(document).on('click', '#btn_imprimir', function() {
 		var oldClassDropLine = document.getElementById('droplinetabs1').className;

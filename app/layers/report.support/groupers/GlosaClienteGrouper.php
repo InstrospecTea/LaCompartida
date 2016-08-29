@@ -23,7 +23,8 @@ class GlosaClienteGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return 'cliente.glosa_cliente';
+		$client_code = $this->getClientCodeField();
+		return "CONCAT($client_code, ' - ', cliente.glosa_cliente)";
 	}
 
 	/**

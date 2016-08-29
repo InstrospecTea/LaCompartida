@@ -26,15 +26,20 @@ foreach ($datos as $key => $value) {
 	++$k;
 }
 
-$grafico = new TTB\Graficos\GraficoTarta();
+$titulo = utf8_decode($_POST['titulo']);
 
-foreach ($datos as $key => $value) {
-	$data_grafico = new TTB\Graficos\GraficoData();
-
-	$data_grafico->addLabel($key, true)
-	->addValue($value);
-
-	$grafico->addData($data_grafico);
+$grafico = new TTB\Graficos\Grafico();
+if (is_null($datos)) {
+	echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
+	return;
 }
+$dataset = new TTB\Graficos\DatasetPie();
+
+$dataset->setData(array_values($datos))
+	->setLabel(__('Resumen actividades profesionales'));
+
+$grafico->setType('pie')
+	->addLabels(array_keys($datos))
+	->addDataset($dataset);
 
 echo $grafico->getJson();
