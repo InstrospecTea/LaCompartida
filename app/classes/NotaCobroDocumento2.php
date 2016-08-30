@@ -3832,18 +3832,19 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 
 	private function hasWorks(Asunto $Asunto) {
 		$Criteria = new Criteria($this->sesion);
-		return $Criteria->add_from('trabajo')
+		$Criteria->add_from('trabajo')
 			->add_restriction(CriteriaRestriction::equals('id_cobro', "'{$this->fields['id_cobro']}'"))
 			->add_restriction(CriteriaRestriction::equals('codigo_asunto', "'{$Asunto->fields['codigo_asunto']}'"))
 			->add_restriction(CriteriaRestriction::equals('id_tramite', '0'));
-		if ($this->fields['opc_ver_cobrable']) {
+
+		if ($this->fields['opc_ver_cobrable'] == '0') {
 			$Criteria->add_restriction(CriteriaRestriction::equals('visible', '1'));
 		}
 
 		return $Criteria->count() > 0;
 	}
 
-	private function hasExpenses() {
+	private function hasExpenses(Asunto $Asunto) {
 		$Criteria = new Criteria($this->sesion);
 		$Criteria->add_from('cta_corriente')
 			->add_restriction(CriteriaRestriction::equals('id_cobro', "'{$this->fields['id_cobro']}'"))
