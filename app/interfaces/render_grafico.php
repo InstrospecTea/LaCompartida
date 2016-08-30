@@ -60,7 +60,8 @@
 					.addClass('contenedorCanvas');
 
 				var $canvas = jQuery('<canvas/>')
-					.css({width: 600, height: 400})
+					.attr('width', 600)
+					.attr('height', 400)
 					.attr('id', 'grafico_' + canvas_id);
 
 				agregarBotones($div, 'grafico_' + canvas_id, response.name_chart);
