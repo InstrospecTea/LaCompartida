@@ -1163,7 +1163,7 @@ HTML;
 	 * @param object|array $object
 	 * @param string $template '{name} {last_name}'
 	 */
-	public function interpolate($object, $template) {
+	static public function interpolate($object, $template) {
 		$as_array = (array) $object;
 		return preg_replace_callback('/\{([^\}]+)\}/', function ($matches) use ($as_array) {
 			$key = $matches[1];
