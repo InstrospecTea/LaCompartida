@@ -288,6 +288,7 @@ $options = [
 	],
 	'title' => [
 		'display' => true,
+		'fontSize' => 14,
 		'text' => utf8_encode($title)
 	],
 	'scales' => [

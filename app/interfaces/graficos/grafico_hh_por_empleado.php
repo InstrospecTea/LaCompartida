@@ -80,6 +80,7 @@
 		],
 		'title' => [
 			'display' => true,
+			'fontSize' => 14,
 			'text' => __('Horas trabajadas por empleado')
 		],
 		'scales' => [

@@ -48,6 +48,7 @@ $options = [
 	],
 	'title' => [
 		'display' => true,
+		'fontSize' => 14,
 		'text' => __($titulo)
 	]
 ];

@@ -51,6 +51,7 @@
 		],
 		'title' => [
 			'display' => true,
+			'fontSize' => 14,
 			'text' => mb_detect_encoding($text, 'UTF-8', true) === 'UTF-8' ? $titulo : utf8_encode($titulo)
 		],
 		'scales' => [

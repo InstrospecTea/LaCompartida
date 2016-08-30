@@ -246,6 +246,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		],
 		'title' => [
 			'display' => true,
+			'fontSize' => 14,
 			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
 		],
 		'scales' => [
@@ -283,6 +284,7 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 		],
 		'title' => [
 			'display' => true,
+			'fontSize' => 14,
 			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
 		]
 	];
@@ -349,6 +351,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 	$options = [
 		'title' => [
 			'display' => true,
+			'fontSize' => 14,
 			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
 		],
 		'scales' => [
