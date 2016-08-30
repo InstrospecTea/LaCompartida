@@ -15,6 +15,12 @@
 	echo $Html->css('//static.thetimebilling.com/css/main.css');
 ?>
 
+<style type="text/css">
+	.contenedorCanvas {
+		margin-top: 20px;
+	}
+</style>
+
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		var charts_data = <?= json_decode(utf8_encode($_POST['charts_data'])); ?>;
@@ -51,9 +57,6 @@
 
 				agregarCanvas(canvas_id, jQuery("#contenedor_graficos"));
 
-				jQuery('#h3').html(response['name_chart']);
-				jQuery('#contenedor_' + canvas_id + ' h2').append(response['name_chart']);
-
 				var context = document.getElementById('grafico_' + canvas_id).getContext('2d');
 
 				var chart = new Chart(context, response);
@@ -65,15 +68,12 @@
 		function agregarCanvas(id, contenedor) {
 			var div = document.createElement('div');
 			var canvas = document.createElement('canvas');
-			var h2 = document.createElement('h2');
 			canvas.width = 600;
 			canvas.height = 400;
 			canvas.id = 'grafico_' + id;
 			div.id = 'contenedor_' + id;
 			div.className = 'contenedorCanvas';
-			h2.style = 'text-align: center; font-family: Tahoma, Arial, Geneva, sans-serif;';
 
-			div.appendChild(h2);
 			div.appendChild(canvas);
 			contenedor.append(div);
 		}
