@@ -74,10 +74,11 @@ class Criteria {
 
 	public function count() {
 		$Criteria = clone $this;
-		$Criteria->reset_selection()
-			->add_select('count(1)');
-		$result = $Criteria->run();
-		return empty($result[0]) ? false : $result[0];
+		$result = $Criteria
+			->reset_selection()
+			->add_select('count(1)', 'count')
+			->run();
+		return empty($result[0]['count']) ? false : $result[0]['count'];
 	}
 
 	/**
