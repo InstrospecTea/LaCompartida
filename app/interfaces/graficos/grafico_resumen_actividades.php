@@ -36,7 +36,9 @@ if (is_null($datos)) {
 $dataset = new TTB\Graficos\DatasetPie();
 
 $dataset->setData(array_values($datos))
-	->setLabel(__('Resumen actividades profesionales'));
+	->setLabel(__('Resumen actividades profesionales'))
+	->setBorderColor(255, 255, 255, 0)
+	->setHoverBorderColor(255, 255, 255, 0);
 
 $options = [
 	'responsive' => true,
