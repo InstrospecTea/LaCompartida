@@ -167,6 +167,7 @@ switch ($tipo_grafico) {
 }
 
 function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
+	global $sesion;
 	$grafico = new TTB\Graficos\Grafico();
 	$dataset = new TTB\Graficos\Dataset();
 
@@ -180,6 +181,10 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		],
 		'labels' => [
 			'show' => true
+		],
+		'scaleLabel' =>[
+			'display' => true,
+			'labelString' => Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda)
 		],
 		'ticks' => [
 			'beginAtZero' => true
@@ -232,6 +237,10 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 			],
 			'labels' => [
 				'show' => true
+			],
+			'scaleLabel' =>[
+				'display' => true,
+				'labelString' => Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda)
 			],
 			'ticks' => [
 				'beginAtZero' => true
@@ -299,6 +308,7 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 }
 
 function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
+	global $sesion;
 	$grafico = new TTB\Graficos\Grafico();
 	$datasetLinea = new TTB\Graficos\DatasetLine();
 	$datasetLineaComparado = new TTB\Graficos\DatasetLine();
@@ -327,6 +337,10 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 		'labels' => [
 			'show' => true
 		],
+		'scaleLabel' =>[
+			'display' => true,
+			'labelString' => Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda)
+		],
 		'ticks' => [
 			'beginAtZero' => true
 		]
@@ -342,6 +356,10 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 		],
 		'labels' => [
 			'show' => true
+		],
+		'scaleLabel' =>[
+			'display' => true,
+			'labelString' => Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda)
 		],
 		'ticks' => [
 			'beginAtZero' => true
