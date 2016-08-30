@@ -55,7 +55,18 @@
 				var response = responses[i];
 				var canvas_id = new Date().getTime();
 
-				agregarCanvas(canvas_id, jQuery("#contenedor_graficos"));
+				var $div = jQuery('<div/>')
+					.attr('id', 'contenedor_' + canvas_id)
+					.addClass('contenedorCanvas');
+
+				var $canvas = jQuery('<canvas/>')
+					.css({width: 600, height: 400})
+					.attr('id', 'grafico_' + canvas_id);
+
+				agregarBotones($div, 'grafico_' + canvas_id, response.name_chart);
+
+				$div.append($canvas);
+				jQuery("#contenedor_graficos").append($div);
 
 				var context = document.getElementById('grafico_' + canvas_id).getContext('2d');
 
@@ -65,17 +76,29 @@
 			reportIFrameHeight();
 		});
 
-		function agregarCanvas(id, contenedor) {
-			var div = document.createElement('div');
-			var canvas = document.createElement('canvas');
-			canvas.width = 600;
-			canvas.height = 400;
-			canvas.id = 'grafico_' + id;
-			div.id = 'contenedor_' + id;
-			div.className = 'contenedorCanvas';
+		function agregarBotones($contenedor, id_canvas, report_name) {
+			var $button = jQuery('<button/>')
+				.text('PDF')
+				.attr('id', 'btn_pdf_' + id_canvas)
+				.addClass('btn_pdf')
+				.css({float: 'right'})
+				.data('id_canvas', id_canvas)
+				.on('click', function(event){
+					var id_canvas = '#' + jQuery(this).data('id_canvas');
+					var $canvas = jQuery(id_canvas);
 
-			div.appendChild(canvas);
-			contenedor.append(div);
+					var pdf = new jsPDF('portrait', 'mm', 'a4');
+					pdf.setProperties({
+						title: report_name,
+						author: 'Lemontech',
+						creator: '© Lemontech'
+					});
+
+					pdf.addImage($canvas[0].toDataURL('image/png'), 'png', 13, 20);
+					pdf.save(report_name + '.pdf');
+				});
+
+			$contenedor.append($button);
 		}
 	});
 </script>
