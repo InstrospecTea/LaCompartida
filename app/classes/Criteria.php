@@ -77,8 +77,8 @@ class Criteria {
 		$result = $Criteria
 			->reset_selection()
 			->add_select('count(1)', 'count')
-			->run();
-		return empty($result[0]['count']) ? false : $result[0]['count'];
+			->first();
+		return $result['count'];
 	}
 
 	/**
