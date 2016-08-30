@@ -266,8 +266,8 @@ if ($comparar) {
 	$grafico->addDataset($dataset_comparar);
 	$y_axes[] = [
 		'type' => 'linear',
-		'display' => true,
-		'position' => 'left',
+		'display' => false,
+		'position' => 'right',
 		'id' => 'y-axis-2',
 		'gridLines' => [
 			'display' => false
@@ -280,6 +280,7 @@ if ($comparar) {
 		]
 	];
 }
+
 $options = [
 	'responsive' => true,
 	'tooltips' => [
@@ -287,7 +288,7 @@ $options = [
 	],
 	'title' => [
 		'display' => true,
-		'text' => $titulo
+		'text' => utf8_encode($title)
 	],
 	'scales' => [
 		'xAxes' => [[
