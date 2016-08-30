@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.27.4
+Tuesday, August 30th
+* **Feature** [Corregir validación del count en Criteria](https://github.com/LemontechSA/ttb/pull/1778)
+
 ## Hotfix 16.27.3
 Monday, August 29th
 * **Feature** [Agregar código que imprime las subsecciones del asunto, respetando que no se agrupe por asunto.](https://github.com/LemontechSA/ttb/pull/1771)
