@@ -34,6 +34,8 @@
 		$user_data[$fila['glosa_asunto']] = $fila['tiempo'];
 	}
 
+	$titulo = __('Horas trabajadas') . (!empty($nombre_usuario) ? ' - ' . $nombre_usuario : '');
+
 	$grafico = new TTB\Graficos\Grafico();
 	if (is_null($user_data)) {
 		echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
@@ -49,7 +51,7 @@
 		],
 		'title' => [
 			'display' => true,
-			'text' => __('Horas trabajadas') . (!empty($nombre_usuario) ? ' - ' . $nombre_usuario : '')
+			'text' => mb_detect_encoding($text, 'UTF-8', true) === 'UTF-8' ? $titulo : utf8_encode($titulo)
 		],
 		'scales' => [
 			'xAxes' => [[
@@ -85,7 +87,7 @@
 		->setLabel(__('Horas trabajadas'))
 		->setData(array_values($user_data));
 
-	$grafico->setNameChart(__('Horas trabajadas') . (!empty($nombre_usuario) ? ' - ' . $nombre_usuario : ''))
+	$grafico->setNameChart($titulo)
 		->addDataset($dataset)
 		->setOptions($options)
 		->addLabels(array_keys($user_data));
