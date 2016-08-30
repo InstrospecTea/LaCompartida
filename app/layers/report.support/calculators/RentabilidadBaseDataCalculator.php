@@ -19,17 +19,10 @@ class RentabilidadBaseDataCalculator extends AbstractProportionalDataCalculator 
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$factor = $this->getWorksProportionalFactor();
-		$billed_amount = "SUM(
-			{$factor}
+		$subtotal = $this->getWorksProportionalDocumentSubtotal();
+		$factor = $this->getFactor();
+		$billed_amount = "SUM({$factor} * {$subtotal})
 			*
-			(
-				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
-		)
-		*
 		(1 / cobro_moneda.tipo_cambio)";
 
 		$standard_amount = "
@@ -116,17 +109,9 @@ class RentabilidadBaseDataCalculator extends AbstractProportionalDataCalculator 
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
-		$factor = $this->getErrandsProportionalFactor();
-
-		$billed_amount =  "SUM(
-			{$factor}
-			*
-			(
-				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
-		)
+		$subtotal = $this->getErrandsProportionalDocumentSubtotal();
+		$factor = $this->getFactor();
+		$billed_amount =  "SUM({$factor} * {$subtotal})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
 
@@ -171,12 +156,13 @@ class RentabilidadBaseDataCalculator extends AbstractProportionalDataCalculator 
 	 * @return void
 	 */
 	function getReportChargeQuery($Criteria) {
-				$billed_amount = '
-			SUM((cobro.monto_subtotal - cobro.descuento)
+		$factor = $this->getFactor();
+		$billed_amount = "
+			SUM({$factor} * (cobro.monto_subtotal - cobro.descuento)
 				* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
-		';
+		";
 
 		$billed_amount = "IF(
 			cobro.estado IN ('EMITIDO','FACTURADO','ENVIADO AL CLIENTE','PAGO PARCIAL','PAGADO'),

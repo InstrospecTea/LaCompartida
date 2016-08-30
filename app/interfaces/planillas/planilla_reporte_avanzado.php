@@ -56,7 +56,7 @@ if ($comparar) {
 }
 
 foreach ($datos as $dato) {
-	$reporte[$dato] = new ReporteCriteria($sesion);
+	$reporte[$dato] = new Reporte($sesion);
 	$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 		'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
 		'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
@@ -64,9 +64,8 @@ foreach ($datos as $dato) {
 	$reporte[$dato]->Query();
 	$resultado[$dato] = $reporte[$dato]->toArray();
 }
-$wb = new Spreadsheet_Excel_Writer();
 
-$wb->send('Planilla Horas por Cliente.xls');
+$wb = new Spreadsheet_Excel_Writer();
 
 /* FORMATOS */
 $wb->setCustomColor(35, 220, 255, 220);
@@ -234,43 +233,36 @@ function fila_col($fila, $col) {
 	return Spreadsheet_Excel_Writer::rowcolToCell($fila, $col);
 }
 
-function total($fila, $columna, $valor) {
+function total($fila, $columna, $valor, $tipo_dato) {
 	global $ws1;
 	global $numeros_bold;
 	global $horas_minutos_bold;
-	global $tipo_dato;
 	global $sesion;
 
-	if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && (strpos($tipo_dato, 'oras_') || strpos($tipo_dato_comparado, 'oras_'))) {
+	if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, 'oras_')) {
 		$formato = $horas_minutos_bold;
 	} else {
 		$formato = $numeros_bold;
 	}
+
 	$ws1->writeFormula($fila, $columna, $valor, $formato);
 }
 
-function dato($fila, $columna, $valor, $bold = false) {
+function dato($fila, $columna, $valor, $tipo_dato, $bold = false) {
 	global $ws1;
 	global $numeros;
-	global $numeros_bold;
 	global $horas_minutos;
-	global $horas_minutos_bold;
-	global $tipo_dato;
 	global $sesion;
-	global $tipo_dato_comparado;
 	global $txt_rojo;
-
-	$hm = $bold ? $horas_minutos_bold : $horas_minutos;
-	$n = $bold ? $numeros_bold : $numeros;
 
 	if ($valor === '99999!*') {
 		$ws1->write($fila, $columna, '99999!*', $txt_rojo);
 		$ws1->writeNote($fila, $columna, __('Valor Indeterminado: denominador de fórmula es 0.'));
 	} else {
-		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && (strpos($tipo_dato, 'oras_') || strpos($tipo_dato_comparado, 'oras_'))) {
-			$ws1->writeFormula($fila, $columna, Reporte::FormatoValor($sesion, $valor, $tipo_dato, 'excel'), $hm);
+		if (Conf::GetConf($sesion, 'MostrarSoloMinutos') && strpos($tipo_dato, 'oras_')) {
+			$ws1->writeFormula($fila, $columna, Reporte::FormatoValor($sesion, $valor, $tipo_dato, 'excel'), $horas_minutos);
 		} else {
-			$ws1->writeNumber($fila, $columna, $valor, $n);
+			$ws1->writeNumber($fila, $columna, $valor, $numeros);
 		}
 	}
 }
@@ -317,12 +309,12 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 			extender($fila_a, $col_a, $a['filas'], $k_a);
 			$col_a++;
 
-			dato($fila_a, $col_a, $resultado[$tipo_dato][$k_a]['valor']);
+			dato($fila_a, $col_a, $resultado[$tipo_dato][$k_a]['valor'], $tipo_dato);
 			extender($fila_a, $col_a, $a['filas'], '');
 			$col_a++;
 
 			if ($comparar) {
-				dato($fila_a, $col_a, $resultado[$tipo_dato_comparado][$k_a]['valor']);
+				dato($fila_a, $col_a, $resultado[$tipo_dato_comparado][$k_a]['valor'], $tipo_dato_comparado);
 				extender($fila_a, $col_a, $a['filas'], '');
 				$col_a++;
 			}
@@ -338,12 +330,12 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 					extender($fila_b, $col_b, $b['filas'], $k_b);
 					$col_b++;
 
-					dato($fila_b, $col_b, $resultado[$tipo_dato][$k_a][$k_b]['valor']);
+					dato($fila_b, $col_b, $resultado[$tipo_dato][$k_a][$k_b]['valor'], $tipo_dato);
 					extender($fila_b, $col_b, $b['filas'], '');
 					$col_b++;
 
 					if ($comparar) {
-						dato($fila_b, $col_b, $resultado[$tipo_dato_comparado][$k_a][$k_b]['valor']);
+						dato($fila_b, $col_b, $resultado[$tipo_dato_comparado][$k_a][$k_b]['valor'], $tipo_dato_comparado);
 						extender($fila_b, $col_b, $b['filas'], '');
 						$col_b++;
 					}
@@ -359,12 +351,12 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 							extender($fila_c, $col_c, $c['filas'], $k_c);
 							$col_c++;
 
-							dato($fila_c, $col_c, $resultado[$tipo_dato][$k_a][$k_b][$k_c]['valor']);
+							dato($fila_c, $col_c, $resultado[$tipo_dato][$k_a][$k_b][$k_c]['valor'], $tipo_dato);
 							extender($fila_c, $col_c, $c['filas'], '');
 							$col_c++;
 
 							if ($comparar) {
-								dato($fila_c, $col_c, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c]['valor']);
+								dato($fila_c, $col_c, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c]['valor'], $tipo_dato_comparado);
 								extender($fila_c, $col_c, $c['filas'], '');
 								$col_c++;
 							}
@@ -379,12 +371,12 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 									extender($fila_d, $col_d, $d['filas'], $k_d);
 									$col_d++;
 
-									dato($fila_d, $col_d, $resultado[$tipo_dato][$k_a][$k_b][$k_c][$k_d]['valor']);
+									dato($fila_d, $col_d, $resultado[$tipo_dato][$k_a][$k_b][$k_c][$k_d]['valor'], $tipo_dato);
 									extender($fila_d, $col_d, $d['filas'], '');
 									$col_d++;
 
 									if ($comparar) {
-										dato($fila_d, $col_d, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c][$k_d]['valor']);
+										dato($fila_d, $col_d, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c][$k_d]['valor'], $tipo_dato_comparado);
 										extender($fila_d, $col_d, $d['filas'], '');
 										$col_d++;
 									}
@@ -399,12 +391,12 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 											extender($fila_e, $col_e, $e['filas'], $k_e);
 											$col_e++;
 
-											dato($fila_e, $col_e, $resultado[$tipo_dato][$k_a][$k_b][$k_c][$k_d][$k_e]['valor']);
+											dato($fila_e, $col_e, $resultado[$tipo_dato][$k_a][$k_b][$k_c][$k_d][$k_e]['valor'], $tipo_dato);
 											extender($fila_e, $col_e, $e['filas'], '');
 											$col_e++;
 
 											if ($comparar) {
-												dato($fila_e, $col_e, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c][$k_d][$k_e]['valor']);
+												dato($fila_e, $col_e, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c][$k_d][$k_e]['valor'], $tipo_dato_comparado);
 												extender($fila_e, $col_e, $e['filas'], '');
 												$col_e++;
 											}
@@ -418,11 +410,11 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 												texto($fila_f, $col_f, $k_f);
 												$col_f++;
 
-												dato($fila_f, $col_f, $resultado[$tipo_dato][$k_a][$k_b][$k_c][$k_d][$k_e][$k_f]['valor']);
+												dato($fila_f, $col_f, $resultado[$tipo_dato][$k_a][$k_b][$k_c][$k_d][$k_e][$k_f]['valor'], $tipo_dato);
 												$col_f++;
 
 												if ($comparar) {
-													dato($fila_f, $col_f, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c][$k_d][$k_e][$k_f]['valor']);
+													dato($fila_f, $col_f, $resultado[$tipo_dato_comparado][$k_a][$k_b][$k_c][$k_d][$k_e][$k_f]['valor'], $tipo_dato_comparado);
 												}
 												$fila_f++;
 											}
@@ -443,13 +435,15 @@ foreach ($resultado[$tipo_dato] as $k_a => $a) {
 	}
 }
 $col_c = $cantidad_columnas - ($comparar ? 3 : 2);
+
 //TOTALES
 $ws1->write($fila_a, $columna + $col_c, 'TOTAL', $txt_derecha_bold);
 
-total($fila_a, $col_c + 1, '=SUM(' . fila_col($fila, $col_c + 1) . ':' . fila_col($fila_a - 1, $col_c + 1) . ')');
+total($fila_a, $col_c + 1, '=SUM(' . fila_col($fila, $col_c + 1) . ':' . fila_col($fila_a - 1, $col_c + 1) . ')', $tipo_dato);
 
 if ($comparar) {
-	total($fila_a, $col_c + 2, '=SUM(' . fila_col($fila, $col_c + 2) . ':' . fila_col($fila_a - 1, $col_c + 2) . ')');
+	total($fila_a, $col_c + 2, '=SUM(' . fila_col($fila, $col_c + 2) . ':' . fila_col($fila_a - 1, $col_c + 2) . ')', $tipo_dato_comparado);
 }
 
+$wb->send('Planilla Horas por Cliente.xls');
 $wb->close();

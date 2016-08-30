@@ -950,7 +950,7 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 	}
 
 	public function getAreaAgrupatedReport($filters) {
-		$reporte = new ReporteCriteria($this->Session);
+		$reporte = new Reporte($this->Session);
 
 		$filtros = array(
 			'clientes' => array(),
@@ -1042,16 +1042,16 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 			->add_left_join_with('cliente', 'cliente.codigo_cliente = factura.codigo_cliente')
 			->add_left_join_with('documento', 'documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = "N"')
 			->add_left_join_with(
-				array('documento_moneda', 'moneda_display'),
+				array('factura_moneda', 'moneda_display'),
 				CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('moneda_display.id_documento', 'documento.id_documento'),
+					CriteriaRestriction::equals('moneda_display.id_factura', 'factura.id_factura'),
 					CriteriaRestriction::equals('moneda_display.id_moneda', $parameters['display_currency']->fields['id_moneda'])
 				)
 			)
 			->add_left_join_with(
-				array('documento_moneda', 'moneda_factura'),
+				array('factura_moneda', 'moneda_factura'),
 				CriteriaRestriction::and_clause(
-					CriteriaRestriction::equals('moneda_factura.id_documento', 'documento.id_documento'),
+					CriteriaRestriction::equals('moneda_factura.id_factura', 'factura.id_factura'),
 					CriteriaRestriction::equals('moneda_factura.id_moneda', 'factura.id_moneda')
 				)
 			);
@@ -1200,4 +1200,44 @@ class ChargingBusiness extends AbstractBusiness implements IChargingBusiness {
 
 		return $this->Report;
 	}
+
+	public function getDocumentExchangeRates($chargeId) {
+		$this->loadManager('Search');
+
+		$SearchCriteria = new SearchCriteria('DocumentCurrency');
+
+		$SearchCriteria->related_with('Document')
+			->on_property('id_documento')
+			->with_direction('INNER');
+
+		$SearchCriteria->related_with('Charge')
+		  ->joined_with('Document')
+			->on_property('id_cobro')
+			->with_direction('INNER');
+
+		$SearchCriteria
+			->related_with('Currency')
+			->on_property('id_moneda')
+			->with_direction('INNER');
+
+		$SearchCriteria
+			->filter('tipo_doc')
+			->restricted_by('equals')
+			->compare_with("'N'")
+			->for_entity('Document');
+
+		$SearchCriteria
+			->filter('id_cobro')
+			->restricted_by('equals')
+			->compare_with($chargeId)
+			->for_entity('Charge');
+
+		$exchangeRates = (array) $this->SearchManager->searchByCriteria(
+			$SearchCriteria,
+			array('id_moneda', 'Currency.glosa_moneda', 'DocumentCurrency.tipo_cambio')
+		);
+
+		return $exchangeRates;
+	}
+
 }

@@ -1,5 +1,30 @@
 # Changelog
 
+## Hotfix 16.27.4
+Tuesday, August 30th
+* **Feature** [Corregir validación del count en Criteria](https://github.com/LemontechSA/ttb/pull/1778)
+
+## Hotfix 16.27.3
+Monday, August 29th
+* **Feature** [Agregar código que imprime las subsecciones del asunto, respetando que no se agrupe por asunto.](https://github.com/LemontechSA/ttb/pull/1771)
+
+## Hotfix 16.27.2
+Wednesday, August 24th
+* **Feature** [Asigar formato segun tipo de dato al descargar excel en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1767)
+
+## Hotfix 16.27.1
+Friday, August 19th
+* **Feature** [Agregar número de cobro y código cliente](https://github.com/LemontechSA/ttb/pull/1758)
+
+## [Release 16.27.0](https://github.com/LemontechSA/ttb/pull/1740)
+Tuesday, August 16th
+* **Feature** [Configuracion formato excel cobro](https://github.com/LemontechSA/ttb/pull/1734)
+* **Feature** [Translate Date](https://github.com/LemontechSA/ttb/pull/1726)
+
+## Hotfix 16.26.6
+Tuesday, August 16th
+* **Fix** [Corrige clase Tarea](https://github.com/LemontechSA/ttb/pull/1738)
+
 ## Hotfix 16.26.5
 Thursday, August 11th
 * **Fix** [Reporte avanzado escribe el total como formula.](https://github.com/LemontechSA/ttb/pull/1736)

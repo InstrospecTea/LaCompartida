@@ -9,6 +9,7 @@
  *
  */
 class HorasTrabajadasDataCalculator extends AbstractDataCalculator {
+	private $fieldName = 'horas_trabajadas';
 
 	/**
 	 * Obtiene la query de trabajos correspondiente a Horas Trabajadas
@@ -17,10 +18,11 @@ class HorasTrabajadasDataCalculator extends AbstractDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$horas_trabajadas = "SUM(TIME_TO_SEC(trabajo.duracion)) / 3600";
+	 	$factor = $this->getFactor();
+		$value = "SUM({$factor}
+			* TIME_TO_SEC(trabajo.duracion)) / 3600";
 
-		$Criteria
-			->add_select($horas_trabajadas, 'horas_trabajadas');
+		$Criteria->add_select($value, $this->fieldName);
 	}
 
 
@@ -31,7 +33,7 @@ class HorasTrabajadasDataCalculator extends AbstractDataCalculator {
 	 * @return void
 	 */
 	function getReportErrandQuery(&$Criteria) {
-		$Criteria = null;
+		$Criteria = null; //cancel criteria condition
 	}
 
 

@@ -32,8 +32,9 @@ class ValorTrabajadoEstandarDataCalculator extends AbstractCurrencyDataCalculato
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
+		$factor = $this->getFactor();
 		$standard_amount = "
-			SUM((TIME_TO_SEC(duracion) / 3600) *
+			SUM({$factor} * (TIME_TO_SEC(duracion) / 3600) *
 			IF(
 				cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
 				IFNULL(usuario_tarifa.tarifa, IFNULL(categoria_tarifa.tarifa, 0)) * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
@@ -110,8 +111,9 @@ class ValorTrabajadoEstandarDataCalculator extends AbstractCurrencyDataCalculato
 	 * @return void
 	 */
 	function getReportErrandQuery($Criteria) {
+		$factor = $this->getFactor();
 		$standard_amount = "
-			SUM(
+			SUM({$factor} *
 			IF(
 				cobro.id_cobro IS NULL OR cobro_moneda_cobro.tipo_cambio IS NULL OR cobro_moneda.tipo_cambio IS NULL,
 				tramite.tarifa_tramite_estandar * (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio),
