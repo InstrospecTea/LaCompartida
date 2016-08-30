@@ -3,20 +3,27 @@
 class AbstractBusiness implements BaseBusiness {
 
 	/**
-	 * @deprecated
+	 * @deprecated por convención
 	 * @var sesion
 	 */
 	public $sesion;
+	/**
+	 * @deprecated por convención
+	 * @var Session
+	 */
 	public $Session;
+	public $Sesion;
 	public $errors = array();
 	public $infos = array();
 	private $loadedClass = array();
+	protected $transactions = 0;
 
-	public function __construct(Sesion $sesion) {
-		$this->sesion = $sesion;
-		$this->Session = $sesion;
+	public function __construct(Sesion $Sesion) {
+		$this->sesion = $Sesion;
+		$this->Session = $Sesion;
+		$this->Sesion = $Sesion;
 
-		Configure::setSession($this->Session);
+		Configure::setSession($this->Sesion);
 	}
 
 	/**
@@ -85,7 +92,7 @@ class AbstractBusiness implements BaseBusiness {
 		if (in_array($alias, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->sesion);
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $alias;
 	}
 
@@ -103,7 +110,7 @@ class AbstractBusiness implements BaseBusiness {
 		if (in_array($alias, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->sesion);
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $alias;
 	}
 
@@ -115,7 +122,7 @@ class AbstractBusiness implements BaseBusiness {
 	 */
 	protected function loadModel($classname, $alias = null, $returned = false) {
 		if ($returned) {
-			return new $classname($this->sesion);
+			return new $classname($this->Sesion);
 		}
 		if (empty($alias)) {
 			$alias = $classname;
@@ -123,7 +130,7 @@ class AbstractBusiness implements BaseBusiness {
 		if (in_array($classname, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->sesion);
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $classname;
 	}
 
@@ -141,7 +148,7 @@ class AbstractBusiness implements BaseBusiness {
 		if (in_array($alias, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->Session);
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $alias;
 	}
 
@@ -159,8 +166,30 @@ class AbstractBusiness implements BaseBusiness {
 		if (in_array($alias, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->Session);
+		$this->{$alias} = new $classname($this->Sesion);
 		$this->loadedClass[] = $alias;
 	}
+
+	protected function begin() {
+		if ($this->transactions === 0) {
+			$this->Sesion->pdodbh->beginTransaction();
+		}
+		++$this->transactions;
+	}
+
+	protected function commit() {
+		--$this->transactions;
+		if ($this->transactions === 0) {
+			$this->Sesion->pdodbh->commit();
+		}
+	}
+
+	protected function rollback() {
+		--$this->transactions;
+		if ($this->transactions === 0) {
+			$this->Sesion->pdodbh->rollback();
+		}
+	}
+
 
 }

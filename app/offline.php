@@ -1,14 +1,14 @@
 <?php
-$laurl= ($_SERVER['HTTP_HOST'])? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']; 
-$punto=strpos($laurl,'.'); 
-$subdomain=substr($laurl,0,$punto); 
-$maindomain=str_replace($subdomain.'.','',$laurl); 
+$laurl= ($_SERVER['HTTP_HOST'])? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
+$punto=strpos($laurl,'.');
+$subdomain=substr($laurl,0,$punto);
+$maindomain=str_replace($subdomain.'.','',$laurl);
 if($subdomain) $subdomain='/'.$subdomain;
 $elpath=$subdomain.$_SERVER['PHP_SELF'];
 
- 
- 
-	 
+
+
+
 ?>
 <!DOCTYPE html>
    <head>
@@ -25,7 +25,7 @@ $elpath=$subdomain.$_SERVER['PHP_SELF'];
 	var _sf_async_config={};
         var __dcid = __dcid || [];
             _sf_async_config.uid = 32419;
-            _sf_async_config.domain = "<?php echo $maindomain; ?>"; 
+            _sf_async_config.domain = "<?php echo $maindomain; ?>";
             _sf_async_config.path = "<?php echo $elpath; ?>";
     </script>
 
@@ -54,32 +54,32 @@ jQuery('#usar_ad').tooltip( {animation:true, placement:'right',title:'Seleccione
 <div class="row">
 <div class="span3">&nbsp;</div>
 <div class="span6">
- 
-			
-		 
+
+
+
 						<table width="100%"   cellspacing="2" cellpadding="2" id="maintable"  >
-						 
+
 				<tr>
 					<td   width="400">
-									<img  src="http://static.thetimebilling.com/cartas/img/lemontech_logo400.png" height="126" width="400"  alt="Lemontech: Case Tracking"/> 
+									<img  src="http://static.thetimebilling.com/cartas/img/lemontech_logo400.png" height="126" width="400"  alt="Lemontech: Case Tracking"/>
 								</td>
-					 
+
 				</tr>
-							
-						
+
+
 							<tr><td  >&nbsp;</td>
-								 
+
 							</tr>
-							
-                          
+
+
 							<tr><td  class="alert alert-block"><h4 class="alert-heading">Error</h4>Estamos experimentando problemas<br>Rogamos disculpar las molestias</td>
-								 
+
 							</tr>
-						
-				
-						</table>			
-					 
-		 
+
+
+						</table>
+
+
 
 </div>
 <div class="span3">&nbsp;</div>

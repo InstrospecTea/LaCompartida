@@ -15,7 +15,7 @@ if (!Conf::GetConf($sesion, 'ReportesAvanzados')) {
 
 if ($REQUEST_METHOD == 'GET') {
 	$mp = new \TTB\Mixpanel();
-	$mp->identifyAndTrack($RUT, 'Ingreso Reporte Avanzado');
+	$mp->identifyAndTrack($_SESSION['RUT'], 'Ingreso Reporte Avanzado');
 }
 
 $dias_semana = array(

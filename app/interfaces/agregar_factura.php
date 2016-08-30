@@ -344,7 +344,7 @@ if ($opcion == "guardar") {
 		$observacion->Write();
 
 		$mp = new \TTB\Mixpanel();
-		$mp->identifyAndTrack($RUT, 'Emitir Factura');
+		$mp->identifyAndTrack($_SESSION['RUT'], 'Emitir Factura');
 	}
 }
 

@@ -235,9 +235,7 @@ if ($opcion == "guardar") {
 				$t->Edit('id_area_trabajo', empty($id_area_trabajo) ? "NULL" : $id_area_trabajo );
 			}
 
-			$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
-
-			if ($Ordenado_por == 1 || $Ordenado_por == 2) {
+			if (Conf::GetConf($sesion, 'OrdenadoPor')) {
 				$t->Edit('solicitante', addslashes($solicitante));
 			}
 
@@ -322,7 +320,7 @@ if ($opcion == "guardar") {
 				// Mixpanel Event: Ingreso Horas
 				if ($es_trabajo_nuevo == 1) {
 					$mp = new \TTB\Mixpanel();
-					$mp->identifyAndTrack($RUT, 'Ingreso Horas');
+					$mp->identifyAndTrack($_SESSION['RUT'], 'Ingreso Horas');
 				}
 			} else {
 				$pagina->AddError($t->error);
@@ -695,17 +693,11 @@ if ($refresh_parent) {
 
 				<input type="text" name="fecha" class="fechadiff" <?php echo $fechamin ? "minDate='$fechamin'" : ""; ?> value="<?php echo $t->fields['fecha'] ? Utiles::sql2date($t->fields['fecha']) : $fecha ?>" id="fecha" size="11" maxlength="10"/>
 
-				<?php
-				$Ordenado_por = Conf::GetConf($sesion, 'OrdenadoPor');
-				if ($Ordenado_por == 1 || $Ordenado_por == 2) {
-					?>
+				<?php if (Conf::GetConf($sesion, 'OrdenadoPor')): ?>
 					&nbsp;
-					<?php echo __('Ordenado por') ?>
-					&nbsp;
-					<input type="text" name="solicitante" value="<?php echo $t->fields['solicitante'] ? $t->fields['solicitante'] : '' ?>" id="solicitante" size="32" />
-	<?php
-}
-?>
+					<?= $Form->label(__('Solicitado por'), 'solicitante'); ?>
+					<?= $Form->input('solicitante', $t->fields['solicitante'], array('size' => '32', 'label' => false)); ?>
+				<?php endif; ?>
 			</td>
 		</tr>
 		<tr>
@@ -1141,6 +1133,10 @@ UtilesApp::GetConfJS($sesion, 'PrellenarTrabajoConActividad');
 
 	function CargarTarifa() {
 		var id_usuario = jQuery('#id_usuario').val();
+
+		if (jQuery('#id_trabajo').length > 0 && jQuery('#id_trabajo').val() > 0) {
+			return;
+		}
 
 		if (CodigoSecundario) {
 			var codigo_asunto = jQuery('#codigo_asunto_secundario').val();

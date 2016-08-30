@@ -64,8 +64,6 @@ $_LANG['UsarImpuestoSeparado'] = "Facturar impuestos por separado";
 $_LANG['UsarImpuestoPorGastos'] = "Facturar impuestos por separado a los gastos";
 $_LANG['ValorImpuestoGastos'] = "Valor impuesto (%) que se cobra a los gastos";
 
-$_LANG['Cobrado'] = "Facturado";
-
 $_LANG['Valor estimado p/cobrar'] = "Valor estimado p/facturar";
 $_LANG['Valor cobrado + p/cobrar'] = "Valor cobrado + p/facturar";
 

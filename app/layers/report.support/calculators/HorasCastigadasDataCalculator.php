@@ -19,9 +19,10 @@ class HorasCastigadasDataCalculator extends AbstractDataCalculator {
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
 		$factor = $this->getFactor();
-		$horas_castigadas = "SUM(
-			{$factor} * (TIME_TO_SEC(trabajo.duracion) - TIME_TO_SEC(trabajo.duracion_cobrada))
-		) / 3600";
+		$horas_castigadas = "IF(
+			(SUM({$factor} * (TIME_TO_SEC(trabajo.duracion) - TIME_TO_SEC(trabajo.duracion_cobrada))) / 3600) > 0,
+				SUM({$factor} * (TIME_TO_SEC(trabajo.duracion) - TIME_TO_SEC(trabajo.duracion_cobrada))) / 3600,
+			0)";
 
 		$Criteria
 			->add_select($horas_castigadas, $this->fieldName);

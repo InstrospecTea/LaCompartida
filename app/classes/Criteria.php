@@ -53,7 +53,6 @@ class Criteria {
 	 * Ejecuta una query en base a PDO, considerando los criterios definidos en este Criteria.
 	 * @return Array asociativo de resultados.
 	 * @throws Exception
-	 *
 	 */
 	public function run() {
 		if ($this->sesion == null) {
@@ -62,9 +61,25 @@ class Criteria {
 		return self::query($this->get_plain_query(), $this->sesion);
 	}
 
-	/*
-	  QUERY BUILDER METHODS
+	/**
+	 * Ejecuta una query limirada a un registro en base a PDO, considerando los criterios definidos en este Criteria.
+	 * @return array|boolean asociativo del primer resultado de la consulta o falso.
+	 * @throws Exception
 	 */
+	public function first() {
+		$this->add_limit(1);
+		$result = $this->run();
+		return empty($result[0]) ? false : $result[0];
+	}
+
+	public function count() {
+		$Criteria = clone $this;
+		$result = $Criteria
+			->reset_selection()
+			->add_select('count(1)', 'count')
+			->first();
+		return $result['count'];
+	}
 
 	/**
 	 * Añade un statement de selección al criterio de búsqueda.

@@ -605,7 +605,7 @@ if ($orden_click) {
 				$id_usuario = $Sesion->usuario->fields['id_usuario'];
 				$id_tarea = $fila->fields['id_tarea'];
 				$h = '0';
-				if($row == Tarea::getNovedades($id_usuario,$id_tarea)) {
+				if($row == Tarea::getNovedades($Sesion, $id_usuario, $id_tarea)) {
 					if(!$row['vistos']){
 						$row['vistos'] = 0;
                     }
@@ -632,7 +632,7 @@ if ($orden_click) {
 				if(mktime(0,0,0,$split[1],$split[0],$split[2]) <= mktime(0,0,0) ) {
 					if($fila->fields['estado'] != 'Lista'){
 						$fecha = '<span style="color:#B00" title="Atrasada"  >'.$fecha.'</span>';
-                    }
+          }
 				}
 				return $fecha;
 			}
