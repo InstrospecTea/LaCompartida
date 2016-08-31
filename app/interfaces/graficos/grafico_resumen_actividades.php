@@ -54,6 +54,7 @@ $options = [
 ];
 
 $grafico->setType('pie')
+	->setNameChart(__($titulo))
 	->addLabels(array_keys($datos))
 	->addDataset($dataset)
 	->setOptions($options);
