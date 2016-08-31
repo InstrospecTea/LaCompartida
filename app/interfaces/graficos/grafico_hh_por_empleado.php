@@ -30,7 +30,7 @@
 
 	$total_tiempo = 0;
 
-	$Criteria->add_select("CONCAT_WS(', ', apellido1, nombre)", 'usuario')
+	$Criteria->add_select("CONCAT(CONCAT_WS(' ', apellido1, SUBSTRING(nombre, 1, 1)), '.')", 'usuario')
 		->add_select('username')
 		->add_select('SUM(TIME_TO_SEC(duracion)) / 3600', 'tiempo')
 		->add_from('trabajo')
