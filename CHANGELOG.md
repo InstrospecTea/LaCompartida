@@ -2,7 +2,7 @@
 
 ## [Release 16.28.0](https://github.com/LemontechSA/ttb/pull/1780)
 Tuesday, August 30th
-* **Feature** [Agrega Valor Facutardo en repite Avanzado](https://github.com/LemontechSA/ttb/pull/1428)
+* **Feature** [Agrega valor facturado en reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1428)
 * **Feature** [Modificar moneda base](https://github.com/LemontechSA/ttb/pull/1779)
 
 ## Hotfix 16.27.4
