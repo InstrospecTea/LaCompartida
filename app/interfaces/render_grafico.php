@@ -33,6 +33,14 @@
 				dataType: 'json',
 				type: 'POST',
 				success: function(response) {
+					for (var key in response.options.tooltips.callbacks) {
+						(function(text) {
+							response.options.tooltips.callbacks[key] = function(tooltipItem, data){
+								return text[tooltipItem[0].index];
+							}
+						})(response.options.tooltips.callbacks[key]);
+					}
+
 					responses.push(response);
 				},
 				error: function(e) {
