@@ -526,10 +526,14 @@ class WorkbookMiddleware {
 	public function writeNote($row, $col, $note) {
 		$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
 
-		$this->workSheetObj->getComment($cellCode)->setAuthor('The TimeBilling');
+		$this->workSheetObj
+			->getComment($cellCode)
+			->setAuthor('The TimeBilling');
 
-		$this->workSheetObj->getComment($cellCode)
-											->getText()->createTextRun($note);
+		$this->workSheetObj
+			->getComment($cellCode)
+			->getText()
+			->createTextRun(utf8_encode($note));
 	}
 
 	/**
