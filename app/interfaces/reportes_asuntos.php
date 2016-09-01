@@ -22,7 +22,7 @@
 
 ?>
 
-<form method='post' name='formulario'>
+<form method='post' name="formulario" id="formulario">
 <input type="hidden" name="opcion" value="desplegar">
 
 <table class="border_plomo tb_base">
@@ -78,7 +78,7 @@
 		</td>
 		<td align=left>
 			<select id="tipo_reporte" name="tipo_reporte">
-				<option <?php $tipo_reporte == "hh_por_empleado" ? "selected" : "" ?> value="hh_por_empleado"><?php echo __('Horas trabajadas por empleado'); ?></option>
+				<option <?php $tipo_reporte == "hh_por_usuario" ? "selected" : "" ?> value="hh_por_usuario"><?php echo __('Horas trabajadas por usuario'); ?></option>
 				<option <?php $tipo_reporte == "hh_por_asunto" ? "selected" : "" ?> value="hh_por_asunto"><?php echo __('Horas trabajadas por asunto'); ?></option>
 				<option <?php $tipo_reporte == "hh_por_cliente" ? "selected" : "" ?> value="hh_por_cliente"><?php echo __('Horas trabajadas por cliente'); ?></option>
 			</select>
@@ -89,7 +89,7 @@
 			<input type="button" class="btn" id="genera_reporte" value="<?php echo __('Generar reporte'); ?>">
 		</td>
 		<td align="right">
-			<input type="submit" class="btn" value="<?php echo __('Planilla'); ?>" onclick="return Planilla(this.form);">
+			<input type="button" class="btn" id="genera_planilla" value="<?php echo __('Planilla'); ?>"s>
 		</td>
 	</tr>
 </table>
@@ -123,10 +123,11 @@ jQuery(function() {
 		graphic.render('#contenedor_graficos', charts_data);
 	});
 
-	function Planilla(form) {
-		form.action = 'planillas/planilla_horas_general.php';
-		form.submit();
-	}
+	jQuery("#genera_planilla").on("click", function() {
+		$formulario = jQuery('#formulario');
+		$formulario.attr('action', 'planillas/planilla_horas_general.php');
+		$formulario.submit();
+	});
 });
 
 </script>

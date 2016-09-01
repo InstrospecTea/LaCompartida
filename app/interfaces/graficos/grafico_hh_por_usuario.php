@@ -79,7 +79,7 @@
 		'title' => [
 			'display' => true,
 			'fontSize' => 14,
-			'text' => __('Horas trabajadas por empleado')
+			'text' => __('Horas trabajadas por usuario')
 		],
 		'scales' => [
 			'xAxes' => [[
@@ -114,10 +114,10 @@
 	$dataset->setType('bar')
 		->setFill(false)
 		->setYAxisID('y-axis-1')
-		->setLabel(__('Horas trabajadas por empleado'))
+		->setLabel(__('Horas trabajadas por usuario'))
 		->setData($tiempo);
 
-	$grafico->setNameChart(__('Horas trabajadas por empleado'))
+	$grafico->setNameChart(__('Horas trabajadas por usuario'))
 		->addDataset($dataset)
 		->setOptions($options)
 		->addLabels($empleado);
