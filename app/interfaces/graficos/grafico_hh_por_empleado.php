@@ -4,12 +4,6 @@
 	$sesion = new Sesion();
 	$Criteria = new Criteria($sesion);
 
- 	if (Conf::read('UsaUsernameEnTodoElSistema')) {
- 		$letra_profesional = 'username';
- 	} else {
- 		$letra_profesional = 'usuario';
- 	}
-
  	if (is_array($usuarios)) {
  		$Criteria->add_restriction(
  			CriteriaRestriction::in('trabajo.id_usuario', $usuarios)
@@ -30,7 +24,7 @@
 
 	$total_tiempo = 0;
 
-	$Criteria->add_select("CONCAT(CONCAT_WS(' ', apellido1, SUBSTRING(nombre, 1, 1)), '.')", 'usuario')
+	$Criteria->add_select("CONCAT_WS(', ', apellido1, nombre)", 'usuario')
 		->add_select('username')
 		->add_select('SUM(TIME_TO_SEC(duracion)) / 3600', 'tiempo')
 		->add_from('trabajo')
@@ -60,7 +54,8 @@
 	}
 
 	foreach ($respuesta as $i => $value) {
-		$empleado[] = $value[$letra_profesional];
+		$empleado[] = $value['username'];
+		$nombre_empleado[] = $value['usuario'];
 		$tiempo[] = $value['tiempo'];
 		$total_tiempo += $value['tiempo'];
 	}
@@ -76,7 +71,10 @@
 	$options = [
 		'responsive' => true,
 		'tooltips' => [
-			'mode' => 'label'
+			'mode' => 'label',
+			'callbacks' => [
+				'afterTitle' => $nombre_empleado,
+			]
 		],
 		'title' => [
 			'display' => true,
