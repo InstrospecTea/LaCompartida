@@ -430,7 +430,6 @@ class Asunto extends AsuntoCargaMasiva {
 		$query .= $where . "
 		GROUP BY a1.codigo_asunto
 		ORDER BY a1.codigo_asunto, a1.codigo_cliente ASC";
-		echo $query;exit;
 		return $query;
 	}
 
