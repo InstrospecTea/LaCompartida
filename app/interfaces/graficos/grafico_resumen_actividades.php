@@ -50,7 +50,8 @@ $options = [
 		'display' => true,
 		'fontSize' => 14,
 		'text' => __($titulo)
-	]
+	],
+	'showAllTooltips' => true
 ];
 
 $grafico->setType('pie')
