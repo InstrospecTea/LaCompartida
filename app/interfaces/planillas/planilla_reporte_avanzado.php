@@ -201,8 +201,6 @@ $ws1->write($fila, 1, $hoy, $titulo);
 $ws1->write($fila, 2, '');
 $ws1->mergeCells($fila, 1, $fila, 2);
 
-
-
 $columna = 0;
 
 $fila += 2;
