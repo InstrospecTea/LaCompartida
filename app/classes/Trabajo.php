@@ -615,8 +615,8 @@ class Trabajo extends Objeto
 				if (($id_trabajo > 0 && !$trabajo_original)
 						|| ($trabajo_original->fields['fecha'] == $fecha
 						&& ($col_solicitante == 23 || $trabajo_original->fields['solicitante'] == $solicitante)
-						&& ($col_duracion_trabajada == 23 || $trabajo_original->fields['duracion'] == $duracion_trabajada )
-						&& $trabajo_original->fields['descripcion'] == $descripcion
+						&& ($col_duracion_trabajada == 23 || $trabajo_original->fields['duracion'] == $duracion_trabajada)
+						&& trim($trabajo_original->fields['descripcion']) == trim($descripcion)
 						&& (($col_asunto == 23 && $codigo_asunto_escondido == '') || $trabajo_original->fields['codigo_asunto'] == $codigo_asunto)
 						&& !$trabajo_original->isUpdateableChargeableDuration($duracion_cobrable)
 						&& $trabajo_original->fields['id_usuario'] == $usuario->fields['id_usuario']
