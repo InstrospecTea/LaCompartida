@@ -56,7 +56,7 @@
 
 	foreach ($respuesta as $i => $fila) {
 		$asunto[] = $fila['codigo_asunto'];
-		$glosa_asunto[] = $fila['glosa_asunto'];
+		$glosa_asunto[] = mb_detect_encoding($fila['glosa_asunto'], 'UTF-8', true) === 'UTF-8' ? $fila['glosa_asunto'] : utf8_encode($fila['glosa_asunto']);
 		$tiempo[] = $fila['tiempo'];
 		$total_tiempo += $fila['tiempo'];
 	}
