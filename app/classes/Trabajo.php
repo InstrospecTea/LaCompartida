@@ -615,10 +615,10 @@ class Trabajo extends Objeto
 				if (($id_trabajo > 0 && !$trabajo_original)
 						|| ($trabajo_original->fields['fecha'] == $fecha
 						&& ($col_solicitante == 23 || $trabajo_original->fields['solicitante'] == $solicitante)
-						&& ($col_duracion_trabajada == 23 || $trabajo_original->fields['duracion'] == $duracion_trabajada )
-						&& $trabajo_original->fields['descripcion'] == $descripcion
+						&& ($col_duracion_trabajada == 23 || $trabajo_original->fields['duracion'] == $duracion_trabajada)
+						&& trim($trabajo_original->fields['descripcion']) == trim($descripcion)
 						&& (($col_asunto == 23 && $codigo_asunto_escondido == '') || $trabajo_original->fields['codigo_asunto'] == $codigo_asunto)
-						&& ($trabajo_original->fields['duracion_cobrada'] == $duracion_cobrable || ($trabajo_original->fields['duracion_cobrada'] == '' && $duracion_cobrable == '00:00:00'))
+						&& !$trabajo_original->isUpdateableChargeableDuration($duracion_cobrable)
 						&& $trabajo_original->fields['id_usuario'] == $usuario->fields['id_usuario']
 						&& $trabajo_original->fields['id_cobro'] == $id_cobro)) {
 					continue;
@@ -729,6 +729,29 @@ class Trabajo extends Objeto
 				return "$mensajes$num_modificados trabajos actualizados.<br/>$num_insertados trabajos agregados.";
 			}
 		}
+	}
+
+	/**
+	 * El método retorna `true` cuando es necesario actualizar la duración
+	 * cobrable del trabajo
+	 */
+	public function isUpdateableChargeableDuration($duracion_cobrable) {
+		if ($this->fields['duracion_cobrada'] == $duracion_cobrable) {
+			return false;
+		}
+
+		if ($this->fields['duracion_cobrada'] == '' && $duracion_cobrable == '00:00:00') {
+			return false;
+		}
+
+		// Por defecto en el excel se asigna '00:00:00' a los trabajos no cobrables
+		// Pero el trabajo puede tener un valor distinto a cero en la base de datos
+		// No hay que sobre escribir en estos casos
+		if ($this->fields['cobrable'] == '0' && $duracion_cobrable == '00:00:00') {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

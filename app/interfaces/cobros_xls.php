@@ -448,24 +448,6 @@ foreach ($chargeResults as $charge) {
 	$idioma = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
 	$idioma->Load($cobro->fields['codigo_idioma']);
 
-	/*
-	 *	Estas variables son necesario para poder decidir si se imprima una tabla o no,
-	 *	generalmente si no tiene data no se escribe
-	 */
-
-	$query_cont_trabajos_cobro = "SELECT COUNT(*) FROM trabajo WHERE id_cobro='{$cobro->fields['id_cobro']}'";
-	$resp_cont_trabajos_cobro = mysql_query($query_cont_trabajos_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_trabajos_cobro, __FILE__, __LINE__, $sesion->dbh);
-	list($cont_trabajos_cobro) = mysql_fetch_array($resp_cont_trabajos_cobro);
-
-	$query_cont_tramites_cobro = "SELECT COUNT(*) FROM tramite WHERE id_cobro='{$cobro->fields['id_cobro']}'";
-	$resp_cont_tramites_cobro = mysql_query($query_cont_tramites_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_tramites_cobro, __FILE__, __LINE__, $sesion->dbh);
-	list($cont_tramites_cobro) = mysql_fetch_array($resp_cont_tramites_cobro);
-
-	$query_cont_gastos_cobro = "SELECT COUNT(*) FROM cta_corriente WHERE id_cobro='{$cobro->fields['id_cobro']}'";
-
-	$resp_cont_gastos_cobro = mysql_query($query_cont_gastos_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_gastos_cobro, __FILE__, __LINE__, $sesion->dbh);
-	list($cont_gastos_cobro) = mysql_fetch_array($resp_cont_gastos_cobro);
-
 	$cobro_moneda = new CobroMoneda($sesion);
 	$cobro_moneda->Load($cobro->fields['id_cobro']);
 
@@ -1515,21 +1497,22 @@ foreach ($chargeResults as $charge) {
 				$query_tramites = "SELECT SQL_CALC_FOUND_ROWS * FROM (" . $query_tramites_si_trabajos . "  UNION ALL " . $query_tramites_no_trabajos . "  ) a ORDER BY fecha ASC";
 				$lista_tramites = new ListaTramites($sesion, '', $query_tramites);
 
-				/*
-				 *  Encabezado de la tabla de trámites
-				 */
-
+				// Encabezado de la tabla de trámites
 				$filas++;
 				$ws->write($filas, $col_id_trabajo, $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trámites', $lang), $CellFormat->get('titulo'));
 				$ws->write($filas, $col_fecha_dia, $PrmExcelCobro->getGlosa('fecha_dia', 'Listado de trámites', $lang), $CellFormat->get('titulo'));
 				$ws->write($filas, $col_fecha_mes, $PrmExcelCobro->getGlosa('fecha_mes', 'Listado de trámites', $lang), $CellFormat->get('titulo'));
 				$ws->write($filas, $col_fecha_anyo, $PrmExcelCobro->getGlosa('fecha_anyo', 'Listado de trámites', $lang), $CellFormat->get('titulo'));
 				$ws->write($filas, $col_abogado, $PrmExcelCobro->getGlosa('abogado', 'Listado de trámites', $lang), $CellFormat->get('titulo'));
+
 				if (!$opc_ver_asuntos_separados) {
 					$ws->write($filas, $col_abogado + 1, $PrmExcelCobro->getGlosa('asunto', 'Listado de trámites', $lang), $CellFormat->get('titulo'));
 				}
+
 				if ($cobro->fields['opc_ver_solicitante'] == 1) {
 					$ws->write($filas, $col_solicitante, $PrmExcelCobro->getGlosa('solicitante', 'Listado de trámites', $lang), $CellFormat->get('titulo'));
+				} else {
+					$ws->write($filas, $col_solicitante, '', $CellFormat->get('titulo'));
 				}
 
 				$ws->write($filas, $col_descripcion, $PrmExcelCobro->getGlosa('descripcion', 'Listado de trámites', $lang), $CellFormat->get('titulo'));
@@ -1882,6 +1865,10 @@ foreach ($chargeResults as $charge) {
 
 	$rut = NULL;
 	$proveedor = NULL;
+
+	$query_cont_gastos_cobro = "SELECT COUNT(*) FROM cta_corriente WHERE id_cobro='{$cobro->fields['id_cobro']}'";
+	$resp_cont_gastos_cobro = mysql_query($query_cont_gastos_cobro, $sesion->dbh) or Utiles::errorSQL($query_cont_gastos_cobro, __FILE__, __LINE__, $sesion->dbh);
+	list($cont_gastos_cobro) = mysql_fetch_array($resp_cont_gastos_cobro);
 
 	if ($cont_gastos_cobro > 0 && $cobro->fields['opc_ver_gastos']) {
 

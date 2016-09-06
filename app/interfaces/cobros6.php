@@ -1368,7 +1368,7 @@ $existe_pago = ($numero_documentos_pagos_asociados > 0) ? 1 : 0;
             <input type="hidden" name="existe_factura" id="existe_factura" value="<?php echo $existe_factura ?>" />
             <input type="hidden" name="existe_pago" id="existe_pago" value="<?php echo $existe_pago ?>" />
             <input type="hidden" name="id_cobro" value="<?php echo $cobro->fields['id_cobro'] ?>" />
-            <input type="hidden" name="id_factura_grabada" value = 0 />
+            <input type="hidden" name="id_factura_grabada" value="0" />
             <input type="hidden" name="estado_original" id="estado_original" value="<?php echo $cobro->fields['estado'] ?>" />
             <input type="hidden" name="honorarios_pagados_original" value="<?php echo $cobro->fields['honorarios_pagados'] ?>" />
             <input type="hidden" name="gastos_pagados_original" value="<?php echo $cobro->fields['gastos_pagados'] ?>" />
@@ -1613,7 +1613,7 @@ if (Conf::GetConf($sesion, 'SeEstaCobrandoEspecial')) {
 													</tr>
 													<tr>
 														<td align="left" colspan=3>
-													<?php echo __('Facturado') ?>: <input type="checkbox" name=facturado id=facturado value=1 <?php echo $cobro->fields['facturado'] ? 'checked' : '' ?> >
+													<?php echo __('Facturado') ?>: <input type="checkbox" name="facturado" id="facturado" value="1" <?php echo $cobro->fields['facturado'] ? 'checked' : '' ?> >
 														</td>
 													</tr>
 															<?php if (Conf::GetConf($sesion, 'NotaCobroExtra')) { ?>
@@ -1980,8 +1980,8 @@ if ($solicitante == 0) {  // no mostrar
                         <td colspan=2 align=left><?php echo __('Email Cliente') ?>:</td>
                     </tr>
                     <tr>
-                        <td colspan=2 align=right>
-                            <input type="text" name="email_cliente" id="email_cliente" style="width:98%;" maxlength="50" value = <?php echo $contrato->fields['email_contacto'] ?> />
+                        <td colspan="2" align="right">
+                            <input type="text" name="email_cliente" id="email_cliente" style="width:98%;" maxlength="50" value="<?php echo $contrato->fields['email_contacto'] ?>" />
                         </td>
                     </tr>
                 </table>
@@ -1996,9 +1996,6 @@ if ($solicitante == 0) {  // no mostrar
         </form>
     </div>
 </div>
-
-
-
 
 <div id="TipoCambioDocumento" style="display:none; left: 100px; top: 300px; background-color: white; position:absolute; z-index: 4;">
     <fieldset style="background-color:white;">
@@ -2058,4 +2055,3 @@ if ($solicitante == 0) {  // no mostrar
 
 <?php
 $pagina->PrintBottom($popup);
-
