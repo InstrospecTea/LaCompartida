@@ -33,6 +33,12 @@ if (is_null($datos)) {
 	echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
 	return;
 }
+
+$labels = [];
+foreach ($datos as $key => $value) {
+	$labels[] = $key . ': ' . $value;
+}
+
 $dataset = new TTB\Graficos\DatasetPie();
 
 $dataset->setData(array_values($datos))
@@ -51,12 +57,17 @@ $options = [
 		'fontSize' => 14,
 		'text' => __($titulo)
 	],
-	'showAllTooltips' => true
+	'tooltips' => [
+		'mode' => 'label',
+		'callbacks' => [
+			'label' => $labels,
+		]
+	]
 ];
 
 $grafico->setType('pie')
 	->setNameChart(__($titulo))
-	->addLabels(array_keys($datos))
+	->addLabels($labels)
 	->addDataset($dataset)
 	->setOptions($options);
 

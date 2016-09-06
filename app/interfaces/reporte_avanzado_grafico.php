@@ -295,12 +295,23 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 			'display' => true,
 			'fontSize' => 14,
 			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+		],
+		'tooltips' => [
+			'mode' => 'label',
+			'callbacks' => [
+				'label' => $labels,
+			]
 		]
 	];
 
+	$labels_leyend = [];
+	foreach ($labels as $key => $value) {
+		$labels_leyend[] = $value . ': ' . $datos[$key];
+	}
+
 	$grafico->setNameChart($titulo)
 		->setType('pie')
-		->addLabels(array_values($labels))
+		->addLabels($labels_leyend)
 		->addDataset($dataset)
 		->setOptions($options);
 
