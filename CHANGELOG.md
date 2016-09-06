@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.27.5
+Tuesday, September 6th
+* **Feature** [Agrega tag nro_factura_sin_serie](https://github.com/LemontechSA/ttb/pull/1791)
+
 ## Hotfix 16.27.4
 Tuesday, August 30th
 * **Feature** [Corregir validación del count en Criteria](https://github.com/LemontechSA/ttb/pull/1778)
