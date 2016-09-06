@@ -33,7 +33,8 @@
 				dataType: 'json',
 				type: 'POST',
 				success: function(response) {
-					if(response.options.tooltips) {
+					if (typeof response.options != 'undefined' &&
+							typeof response.options.tooltips != 'undefined') {
 						for (var key in response.options.tooltips.callbacks) {
 							(function(text) {
 								response.options.tooltips.callbacks[key] = function(tooltipItem, data){
