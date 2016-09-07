@@ -30,7 +30,6 @@ class WorkbookMiddleware {
 		$this->phpExcel = new PHPExcel();
 		$this->setDocumentProperties($this->phpExcel);
 
-		$CellFormat = new CellFormat($this);
 		$default = json_decode(Conf::read('FormatoExcelCobro_default'), 1);
 		$font = empty($default[0]['FontFamily']) ? 'Arial' : $default[0]['FontFamily'];
 		$this->phpExcel->getDefaultStyle()->getFont()->setName($font);
