@@ -180,7 +180,7 @@ class WsFacturacionSatcom extends WsFacturacion {
 		$impuesto = $impuestos->addChild('Impuesto');
 		$impuesto->addChild('CodigoImpuesto', 2);
 		$impuesto->addChild('Impuesto', 'IVA');
-		$impuesto->addChild('CodigoPorcentaje', 2);
+		$impuesto->addChild('CodigoPorcentaje', 3);
 		$impuesto->addChild('Porcentaje', $factura->fields['porcentaje_impuesto']);
 		$impuesto->addChild('BaseImponible', $factura->fields['subtotal']);
 		$impuesto->addChild('Valor', $factura->fields['iva']);
