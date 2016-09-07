@@ -840,13 +840,13 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 									$UsuarioEncargado = new Usuario($Sesion);
 									$UsuarioEncargado->LoadId($Asunto->fields['id_encargado']);
 									if ($UsuarioEncargado->fields['activo'] == 0) {
-										$id_usuario_inactivo = $UsuarioEncargado->fields['id_usuario'];
+										$id_usuario_inactivo1 = $UsuarioEncargado->fields['id_usuario'];
 									} else {
-										$id_usuario_inactivo = null;
+										$id_usuario_inactivo1 = null;
 									}
 								 ?>
-							<?php echo $Form->select('id_encargado', $Sesion->usuario->ListarActivos('', TRUE, $id_usuario_inactivo), $Asunto->fields['id_encargado'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
-							<?=  isset($id_usuario_inactivo) ? '(Usuario Inactivo)' : ''; ?>
+							<?php echo $Form->select('id_encargado', $Sesion->usuario->ListarActivos('', TRUE, $id_usuario_inactivo1), $Asunto->fields['id_encargado'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
+							<?=  isset($id_usuario_inactivo1) ? ' (Usuario Inactivo)' : ''; ?>
 							<?php
 							if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 								echo $obligatorio;
@@ -857,7 +857,17 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 						<tr>
 							<td align="right"><?php echo __('Encargado 2'); ?></td>
 							<td align="left">'<!-- Nuevo Select -->
-								<?php echo $Form->select('id_encargado2', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado2'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
+								<?php
+									$UsuarioEncargado2 = new Usuario($Sesion);
+									$UsuarioEncargado2->LoadId($Asunto->fields['id_encargado2']);
+									if ($UsuarioEncargado2->fields['activo'] == 0) {
+										$id_usuario_inactivo2 = $UsuarioEncargado2->fields['id_usuario'];
+									} else {
+										$id_usuario_inactivo2 = null;
+									}
+								 ?>
+								<?php echo $Form->select('id_encargado2', $Sesion->usuario->ListarActivos('', TRUE, $id_usuario_inactivo2), $Asunto->fields['id_encargado2'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
+									<?=  isset($id_usuario_inactivo2) ? ' (Usuario Inactivo)' : ''; ?>
 							</td>
 						</tr>
 						<?php } ?>
