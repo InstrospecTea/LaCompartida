@@ -148,6 +148,7 @@ $configs = array(
 	'encabezado_numero_rut'
 );
 $CellFormat = new CellFormat($wb);
+call_user_func_array(array($CellFormat, 'setDefault'), json_decode(Conf::GetConf($sesion, 'FormatoExcelCobro_default'), 1));
 foreach ($configs as $name) {
 	$config = array_merge(array($name), json_decode(Conf::GetConf($sesion, "FormatoExcelCobro_{$name}"), 1));
 	call_user_func_array(array($CellFormat, 'add'), $config);

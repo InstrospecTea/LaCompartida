@@ -32,11 +32,8 @@ class WorkbookMiddleware {
 
 		$CellFormat = new CellFormat($this);
 		$default = json_decode(Conf::read('FormatoExcelCobro_default'), 1);
-		call_user_func_array(array($CellFormat, 'setDefault'), $default);
-
-		if (empty($default[0]['FontFamily'])) {
-			$this->phpExcel->getDefaultStyle()->getFont()->setName('Arial');
-		}
+		$font = empty($default[0]['FontFamily']) ? 'Arial' : $default[0]['FontFamily'];
+		$this->phpExcel->getDefaultStyle()->getFont()->setName($font);
 	}
 
 	/**
