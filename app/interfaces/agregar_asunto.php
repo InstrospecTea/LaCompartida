@@ -845,8 +845,17 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 										$id_usuario_inactivo1 = null;
 									}
 								 ?>
-							<?php echo $Form->select('id_encargado', $Sesion->usuario->ListarActivos('', TRUE, $id_usuario_inactivo1), $Asunto->fields['id_encargado'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
-							<?=  isset($id_usuario_inactivo1) ? ' (Usuario Inactivo)' : ''; ?>
+							<?php echo $Form->select(
+							'id_encargado',
+							$Sesion->usuario->ListarActivos('', TRUE, $id_usuario_inactivo1),
+							$Asunto->fields['id_encargado'],
+							array(
+								'empty' => __('Seleccione'),
+								'style' => 'width: 200px',
+								'onchange' => "selectInactiveUser(this, '$id_usuario_inactivo1', 'id_encargado_1')"
+							)
+							); ?>
+							<?=  isset($id_usuario_inactivo1) ? '<span id="id_encargado_1"> (Usuario Inactivo)</span>' : ''; ?>
 							<?php
 							if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 								echo $obligatorio;
@@ -866,8 +875,17 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 										$id_usuario_inactivo2 = null;
 									}
 								 ?>
-								<?php echo $Form->select('id_encargado2', $Sesion->usuario->ListarActivos('', TRUE, $id_usuario_inactivo2), $Asunto->fields['id_encargado2'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
-									<?=  isset($id_usuario_inactivo2) ? ' (Usuario Inactivo)' : ''; ?>
+								<?php echo $Form->select(
+								'id_encargado2',
+								$Sesion->usuario->ListarActivos('', TRUE, $id_usuario_inactivo2),
+								$Asunto->fields['id_encargado2'],
+								array(
+									'empty' => __('Seleccione'),
+									'style' => 'width: 200px',
+									'onchange' => "selectInactiveUser(this, '$id_usuario_inactivo2', 'id_encargado_2')"
+								)
+								); ?>
+									<?=  isset($id_usuario_inactivo2) ? '<span id="id_encargado_2"> (Usuario Inactivo)</span>' : ''; ?>
 							</td>
 						</tr>
 						<?php } ?>
@@ -1115,6 +1133,17 @@ jQuery('document').ready(function () {
 
 	jQuery("#cobro_independiente").trigger("change");
 });
+
+function selectInactiveUser(ele, id_inactive, span_message_id) {
+	var selected_user = jQuery(ele).val();
+	if (selected_user == id_inactive) {
+		console.log('inactivo');
+		jQuery('#' + span_message_id).html(' (Usuario Inactivo)');
+	} else {
+		jQuery('#' + span_message_id).html('');
+		console.log('activo');
+	}
+}
 
 /**
  * Si el usuario no est� en la lista se agrega
