@@ -153,8 +153,8 @@ class WorkbookMiddleware {
 	 * @param PHPExcel $phpExcel
 	 */
 	private function setDocumentProperties($phpExcel) {
-		$this->phpExcel->getProperties()->setCreator('LemonTech')
-							 ->setLastModifiedBy('LemonTech')
+		$this->phpExcel->getProperties()->setCreator('Lemontech')
+							 ->setLastModifiedBy('Lemontech')
 							 ->setTitle($this->filename)
 							 ->setSubject($this->filename)
 							 ->setDescription('Reporte generado por The TimeBilling, http://thetimebilling.com/.')
@@ -180,6 +180,9 @@ class WorkbookMiddleware {
 
 		foreach ($format->getElements() as $key => $formatValue) {
 			switch ($key) {
+				case 'fontfamily':
+					$formatArray['font']['name'] = $formatValue;
+					break;
 				case 'size':
 					$formatArray['font']['size'] = $formatValue;
 					break;
