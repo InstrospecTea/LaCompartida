@@ -29,10 +29,14 @@ class WorkbookMiddleware {
 
 		$this->phpExcel = new PHPExcel();
 		$this->setDocumentProperties($this->phpExcel);
-		$this->phpExcel->getDefaultStyle()->getFont()->setName('Arial');
 
 		$CellFormat = new CellFormat($this);
-		call_user_func_array(array($CellFormat, json_decode(Conf::read('FormatoExcelCobro_default')), $default, 1));
+		$default = json_decode(Conf::read('FormatoExcelCobro_default'), 1);
+		call_user_func_array(array($CellFormat, 'setDefault'), $default);
+
+		if (empty($default[0]['FontFamily'])) {
+			$this->phpExcel->getDefaultStyle()->getFont()->setName('Arial');
+		}
 	}
 
 	/**
