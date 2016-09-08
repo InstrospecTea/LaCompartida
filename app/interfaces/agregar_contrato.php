@@ -1358,11 +1358,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 	function selectInactiveUser(ele, id_inactive, span_message_id) {
 		var selected_user = jQuery(ele).val();
 		if (selected_user == id_inactive) {
-			console.log('inactivo');
-			jQuery('#' + span_message_id).html(' (Usuario Inactivo)');
+			jQuery('#' + span_message_id).html(' (<?= __('Usuario Inactivo')?>)');
 		} else {
 			jQuery('#' + span_message_id).html('');
-			console.log('activo');
 		}
 	}
 
@@ -1609,6 +1607,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						} else {
 							$id_usuario_inactivo1 = null;
 						}
+						$mensaje_inactivo = __('Usuario Inactivo');
 					 ?>
 					<?php
 					if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto->Loaded() && !$contrato->Loaded()) {
@@ -1618,7 +1617,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						 $contrato_defecto->fields['id_usuario_responsable'] ? $contrato_defecto->fields['id_usuario_responsable'] : $id_usuario_responsable,
 						 array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this, \'' . $id_usuario_inactivo1 . '\')', 'disabled' => 'disabled'));
 						echo '(Se copia del contrato principal)';
-						echo isset($id_usuario_inactivo1) ? ' <span id="usuario_inactivo_1">(Usuario Inactivo)</span>' : '';
+						echo isset($id_usuario_inactivo1) ? ' <span id="usuario_inactivo_1">(' . $mensaje_inactivo . ')</span>' : '';
 						echo '<input type="hidden" value="' . ($contrato_defecto->fields['id_usuario_responsable'] ? $contrato_defecto->fields['id_usuario_responsable'] :  $id_usuario_responsable) . '" name="id_usuario_responsable" />';
 					} else {
 						if ($contrato_defecto->Loaded() && $contrato->Loaded()) {
@@ -1630,7 +1629,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this, \'' . $id_usuario_inactivo1 . '\')', 'disabled' => 'disabled'));
 								echo '<input type="hidden" value="' . ($contrato_defecto->fields['id_usuario_responsable'] ? $contrato_defecto->fields['id_usuario_responsable'] : $id_usuario_responsable) . '" name="id_usuario_responsable" />';
 								echo '(Se copia del contrato principal)';
-								echo isset($id_usuario_inactivo1) ? ' <span id="usuario_inactivo_1">(Usuario Inactivo)</span>' : '';
+								echo isset($id_usuario_inactivo1) ? ' <span id="usuario_inactivo_1">(' . $mensaje_inactivo . ')</span>' : '';
 							} else {
 								//FFF si estoy agregando o editando un asunto que se cobra por separado
 								echo $Form->select(
@@ -1639,7 +1638,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								$contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable,
 								array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this, \'' . $id_usuario_inactivo1 . '\')'));
 
-								echo isset($id_usuario_inactivo1) ? ' <span id="usuario_inactivo_1">(Usuario Inactivo)</span>' : '';
+								echo isset($id_usuario_inactivo1) ? ' <span id="usuario_inactivo_1">(' . $mensaje_inactivo . ')</span>' : '';
 
 							}
 						} else if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && $desde_agrega_cliente) {
@@ -1686,7 +1685,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							 'Vacio',
 							 '200px'
 						 ); ?>
-						<span id="usuario_inactivo_2"><?= isset($id_usuario_inactivo2) ? ' (Usuario Inactivo)' : ''; ?></span>
+						<span id="usuario_inactivo_2"><?= isset($id_usuario_inactivo2) ? ' (' . $mensaje_inactivo . ')' : ''; ?></span>
 					</td>
 				</tr>
 			<?php } ?>

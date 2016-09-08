@@ -844,6 +844,7 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 									} else {
 										$id_usuario_inactivo1 = null;
 									}
+									$mensaje_inactivo = __('Usuario Inactivo');
 								 ?>
 							<?php echo $Form->select(
 							'id_encargado',
@@ -855,7 +856,7 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 								'onchange' => "selectInactiveUser(this, '$id_usuario_inactivo1', 'id_encargado_1')"
 							)
 							); ?>
-							<?=  isset($id_usuario_inactivo1) ? '<span id="id_encargado_1"> (Usuario Inactivo)</span>' : ''; ?>
+							<?=  isset($id_usuario_inactivo1) ? '<span id="id_encargado_1"> (' . $mensaje_inactivo . ')</span>' : ''; ?>
 							<?php
 							if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 								echo $obligatorio;
@@ -885,7 +886,7 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 									'onchange' => "selectInactiveUser(this, '$id_usuario_inactivo2', 'id_encargado_2')"
 								)
 								); ?>
-									<?=  isset($id_usuario_inactivo2) ? '<span id="id_encargado_2"> (Usuario Inactivo)</span>' : ''; ?>
+									<?=  isset($id_usuario_inactivo2) ? '<span id="id_encargado_2"> (' . $mensaje_inactivo . ')</span>' : ''; ?>
 							</td>
 						</tr>
 						<?php } ?>
@@ -1137,11 +1138,9 @@ jQuery('document').ready(function () {
 function selectInactiveUser(ele, id_inactive, span_message_id) {
 	var selected_user = jQuery(ele).val();
 	if (selected_user == id_inactive) {
-		console.log('inactivo');
-		jQuery('#' + span_message_id).html(' (Usuario Inactivo)');
+		jQuery('#' + span_message_id).html(' (<?= __('Usuario Inactivo')?>)');
 	} else {
 		jQuery('#' + span_message_id).html('');
-		console.log('activo');
 	}
 }
 
