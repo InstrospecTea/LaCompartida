@@ -30,10 +30,16 @@ class WorkbookMiddleware {
 		$this->phpExcel = new PHPExcel();
 		$this->setDocumentProperties($this->phpExcel);
 
-		$CellFormat = new CellFormat($this);
 		$default = json_decode(Conf::read('FormatoExcelCobro_default'), 1);
-		$font = empty($default[0]['FontFamily']) ? 'Arial' : $default[0]['FontFamily'];
-		$this->phpExcel->getDefaultStyle()->getFont()->setName($font);
+		// Se utiliza el primer elemento ya que los que siguen corresponden al
+		// cebreado y no al estilo del Excel como tal
+		$format = $this->createFormatArray($default[0]);
+
+		if (empty($format['font']['name'])) {
+			$format['font']['name'] = 'Arial';
+		}
+
+		$this->phpExcel->getDefaultStyle()->applyFromArray($format);
 	}
 
 	/**
@@ -182,8 +188,18 @@ class WorkbookMiddleware {
 			$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
 		}
 
-		foreach ($format->getElements() as $key => $formatValue) {
-			switch ($key) {
+		$formatArray = $this->createFormatArray($format->getElements());
+
+		$this->workSheetObj->getStyle($cellCode)->applyFromArray($formatArray);
+
+		return;
+	}
+
+	public function createFormatArray($format) {
+		$formatArray = [];
+
+		foreach ($format as $key => $formatValue) {
+			switch (strtolower($key)) {
 				case 'fontfamily':
 					$formatArray['font']['name'] = $formatValue;
 					break;
@@ -251,9 +267,7 @@ class WorkbookMiddleware {
 			}
 		}
 
-		$this->workSheetObj->getStyle($cellCode)->applyFromArray($formatArray);
-
-		return;
+		return $formatArray;
 	}
 
 	/**
