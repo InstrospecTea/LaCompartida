@@ -270,45 +270,46 @@ if ($vista == 'profesional') {
  * valor_cobrado  Este se compara con las horas trabajadas para tener el costo real por hora.
  */
 
+$_vista = $vista == 'glosa_asunto' ? 'codigo_asunto' : $vista;
 $datos_reporte = array(
 	'horas_trabajadas' => array(
 		'formato' => $formato_numero,
-		'vista' => $vista == "glosa_asunto" ? "codigo_asunto" : $vista,
+		'vista' => $_vista,
 		'columna' => $offset_columnas + 1
 	),
 	'horas_cobrables' => array(
 		'formato' => $formato_numero,
-		'vista' => $vista == "glosa_asunto" ? "codigo_asunto" : $vista,
+		'vista' => $_vista,
 		'columna' => $offset_columnas + 2
 	),
 	'horas_visibles' => array(
 		'formato' => $formato_numero,
-		'vista' => $vista == "glosa_asunto" ? "codigo_asunto" : $vista,
+		'vista' => $_vista,
 		'columna' => $offset_columnas + 3
 	),
 	'horas_cobradas' => array(
 		'formato' => $formato_numero,
-		'vista' => $vista == "glosa_asunto" ? "codigo_asunto" : $vista,
+		'vista' => $_vista,
 		'columna' => $offset_columnas + 4
 	),
 	'horas_pagadas' => array(
 		'formato' => $formato_numero,
-		'vista' => $vista == "glosa_asunto" ? "codigo_asunto" : $vista,
+		'vista' => $_vista,
 		'columna' => $offset_columnas + 5
 	),
 	'valor_tramites' => array(
 		'formato' => $formato_moneda,
-		'vista' => $vista,
+		'vista' => $_vista,
 		'columna' => $offset_columnas + 6
  	),
 	'valor_cobrado' => array(
 		'formato' => $formato_moneda,
-		'vista' => $vista,
+		'vista' => $_vista,
 		'columna' => $offset_columnas + 7
 	),
 	'costo' => array(
 		'formato' => $formato_moneda,
-		'vista' => $vista,
+		'vista' => $_vista,
 		'columna' => $offset_columnas + 9
 	)
 );
