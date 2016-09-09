@@ -1,4 +1,6 @@
-
+<?php
+$sesion = new Sesion();
+?>
 <div id="footer" style="clear:both;display:block;">
 	&nbsp;
 		<script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.20151207051013.js"></script>
@@ -10,98 +12,101 @@
 </div>
 
 <?php
-$Html = new \TTB\Html();
-?>
-<?= $Html->script(Conf::RootDir() . '/bower_components/unslider/src/js/unslider.js'); ?>
-<?= $Html->css(Conf::RootDir() . '/bower_components/unslider/dist/css/unslider.css'); ?>
-<?= $Html->css(Conf::RootDir() . '/bower_components/unslider/dist/css/unslider-dots.css'); ?>
+if ($sesion->usuario->fields['mostrar_popup']) {
+	$Html = new \TTB\Html();
+	?>
+	<?= $Html->script(Conf::RootDir() . '/bower_components/unslider/src/js/unslider.js'); ?>
+	<?= $Html->css(Conf::RootDir() . '/bower_components/unslider/dist/css/unslider.css'); ?>
+	<?= $Html->css(Conf::RootDir() . '/bower_components/unslider/dist/css/unslider-dots.css'); ?>
 
-<style type="text/css">
-.unslider-nav {
-	background-color: #e4e4e4;
-	overflow: hidden;
-}
-.unslider-nav ol {
-	margin: 15px 0
-}
-.unslider-nav ol li {
-	background: #ffffff;
-	width: 9px;
-	height: 9px;
-	border-width: 1px;
-	border-color: #a0a1a3;
-}
-.unslider-nav ol li.unslider-active {
-	background: #4179ef;
-}
-.unslider-nav .btn-close {
-	display: inline-block;
-	padding: 12px 20px;
-	margin: 6px 10px 0 0;
-	border: none;
-	border-radius: 5px;
-	background: #4279ee;
-	color: #ffffff !important;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
-	font-size: 12px;
-	position: absolute;
-	right: 0;
-}
-.new-design .ui-dialog-titlebar {
-	display: none;
-}
+	<style type="text/css">
+	.unslider-nav {
+		background-color: #e4e4e4;
+		overflow: hidden;
+	}
+	.unslider-nav ol {
+		margin: 15px 0
+	}
+	.unslider-nav ol li {
+		background: #ffffff;
+		width: 9px;
+		height: 9px;
+		border-width: 1px;
+		border-color: #a0a1a3;
+	}
+	.unslider-nav ol li.unslider-active {
+		background: #4179ef;
+	}
+	.unslider-nav .btn-close {
+		display: inline-block;
+		padding: 12px 20px;
+		margin: 6px 10px 0 0;
+		border: none;
+		border-radius: 5px;
+		background: #4279ee;
+		color: #ffffff !important;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+		font-size: 12px;
+		position: absolute;
+		right: 0;
+	}
+	.new-design .ui-dialog-titlebar {
+		display: none;
+	}
 
-</style>
-<div id="new-design-cotainer">
-	<div id="new-design" style="display: none">
-		<ul>
-			<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider1.jpg" height="576" /></li>
-			<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider2.jpg"/></li>
-			<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider3.jpg"/></li>
-		</ul>
+	</style>
+	<div id="new-design-cotainer">
+		<div id="new-design" style="display: none">
+			<ul>
+				<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider1.jpg" height="576" /></li>
+				<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider2.jpg"/></li>
+				<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider3.jpg"/></li>
+			</ul>
+		</div>
 	</div>
-</div>
-<script type="text/javascript">
-	var $new_design_close_button;
-	(function ($) {
-		$.when(jQueryUI).then(function () {
-			$('#new-design-cotainer').dialog({
-				width: 600,
-				height: 'auto',
-				modal: true,
-				closeOnEscape: false,
-				resizable: false,
-				dialogClass: 'new-design',
-				create: function () {
-					$('#new-design').show();
-					var slider = $('#new-design').unslider({
-						arrows: false,
-						infinite: true
-					});
-					slider.on('unslider.change', function (event, index, slide) {
-						if (!$new_design_close_button) {
-							$new_design_close_button = $('<button/>')
-								.addClass('btn-close')
-								.text('Ir a mis trabajos')
-								.on('click', function (event) {
-									event.preventDefault();
-									$('#new-design-cotainer').dialog('close');
-								});
-							$('#new-design-cotainer .unslider-nav')
-								.prepend($new_design_close_button);
-						}
-						if (index == 2) {
-							$new_design_close_button.show();
-						} else {
-							$new_design_close_button.hide();
-						}
-					});
-				}
+	<script type="text/javascript">
+		var $new_design_close_button;
+		(function ($) {
+			$.when(jQueryUI).then(function () {
+				$('#new-design-cotainer').dialog({
+					width: 600,
+					height: 'auto',
+					modal: true,
+					closeOnEscape: false,
+					resizable: false,
+					dialogClass: 'new-design',
+					create: function () {
+						$('#new-design').show();
+						var slider = $('#new-design').unslider({
+							arrows: false,
+							infinite: true
+						});
+						slider.on('unslider.change', function (event, index, slide) {
+							if (!$new_design_close_button) {
+								$new_design_close_button = $('<button/>')
+									.addClass('btn-close')
+									.text('Ir a mis trabajos')
+									.on('click', function (event) {
+										event.preventDefault();
+										$.post(root_dir + '/app/Users/markPopup');
+										$('#new-design-cotainer').dialog('close');
+									});
+								$('#new-design-cotainer .unslider-nav')
+									.prepend($new_design_close_button);
+							}
+							if (index == 2) {
+								$new_design_close_button.show();
+							} else {
+								$new_design_close_button.hide();
+							}
+						});
+					}
+				});
 			});
-		});
 
-	})(jQuery);
-</script>
+		})(jQuery);
+	</script>
+<?php } ?>
 
 <?php
 $Slim=Slim::getInstance('default',true);
@@ -130,7 +135,6 @@ $Slim=Slim::getInstance('default',true);
 	}
 </style>
 <?php
-$sesion = new Sesion();
 $BloqueoProceso = new BloqueoProceso($sesion);
 $notificaciones = $BloqueoProceso->getNotifications($sesion->usuario->fields['id_usuario']);
 
