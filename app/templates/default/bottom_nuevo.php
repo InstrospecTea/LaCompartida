@@ -49,6 +49,7 @@ if ($sesion->usuario->fields['mostrar_popup']) {
 		font-size: 12px;
 		position: absolute;
 		right: 0;
+		cursor: pointer;
 	}
 	.new-design .ui-dialog-titlebar {
 		display: none;
