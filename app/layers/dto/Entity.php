@@ -14,6 +14,11 @@ abstract class Entity {
 	public $relations = array();
 
 	/**
+   * @var boolean Indica si se guarda el campo fecha_creacion
+   */
+	public $save_created = true;
+
+	/**
 	 * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
 	 * @return string
 	 */

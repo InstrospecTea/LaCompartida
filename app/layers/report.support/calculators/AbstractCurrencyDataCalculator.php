@@ -10,10 +10,10 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 
 	/**
 	 * Constructor
-	 * @param Sesion $Session       La sesi√≥n para el acceso a datos
+	 * @param Sesion $Session       La sesiÛn para el acceso a datos
 	 * @param [type] $filtersFields Los campos/keys por los que se debe filtrar y sus valores
 	 * @param [type] $grouperFields Los campos/keys por los que se debe agrupar
-	 * @param [type] $currencyId    La moneda en la que se devolver√°n los valores
+	 * @param [type] $currencyId    La moneda en la que se devolver·n los valores
 	 */
 	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $options, $currencyId) {
 		parent::__construct($Session, $filtersFields, $grouperFields, $options);
@@ -24,7 +24,7 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 	 * Agrega las relaciones y selecciones para obtener las monedas
 	 * y sus tipos de cambio para convertir los valores a devolver
 	 *
-	 * @param Criteria $Criteria La Query a la que se le agregar√° las relaciones y selects
+	 * @param Criteria $Criteria La Query a la que se le agregar· las relaciones y selects
 	 */
 	function addCurrencyToQuery(Criteria $Criteria) {
 
@@ -32,20 +32,21 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 
 		$currencySource = $this->getCurrencySource();
 
-		if ($currencySource == 'documento') {
+		if ($currencySource == 'documento' || $currencySource == 'factura') {
+			// moneda del documento
 			$Criteria->add_left_join_with('documento', CriteriaRestriction::and_clause(
 				CriteriaRestriction::equals('documento.id_cobro', 'cobro.id_cobro'),
 				CriteriaRestriction::equals('documento.tipo_doc', "'N'")
 			));
 
-			// moneda del documento
-			$Criteria->add_left_join_with(array('documento_moneda', 'cobro_moneda_documento'), CriteriaRestriction::and_clause(
+			$Criteria->add_left_join_with(array("{$currencySource}_moneda", 'cobro_moneda_documento'), CriteriaRestriction::and_clause(
 				CriteriaRestriction::equals("cobro_moneda_documento.id_{$currencySource}", "{$currencySource}.id_{$currencySource}"),
 				CriteriaRestriction::equals('cobro_moneda_documento.id_moneda', 'documento.id_moneda')
 			));
+
 		}
 
-		// moneda de visualizaci√≥n
+		// moneda de visualizaciÛn
 		$Criteria->add_left_join_with(array("{$currencySource}_moneda", 'cobro_moneda'), CriteriaRestriction::and_clause(
 			CriteriaRestriction::equals("cobro_moneda.id_{$currencySource}", "{$currencySource}.id_{$currencySource}"),
 			CriteriaRestriction::equals('cobro_moneda.id_moneda', $this->currencyId)
@@ -67,7 +68,7 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 	}
 
 	/**
-	 * Establece de d√≥nde se obtiene la moneda y tipo de cambio
+	 * Establece de dÛnde se obtiene la moneda y tipo de cambio
 	 * @return [type] [description]
 	 */
 	function getCurrencySource() {
@@ -85,7 +86,7 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 	}
 
 	/**
-	 * Sobrecarga la query de tr√°mites para agregar los datos de moneda
+	 * Sobrecarga la query de tr·mites para agregar los datos de moneda
 	 * @param  Criteria $Criteria Criteria a modificar
 	 * @return void
 	 */

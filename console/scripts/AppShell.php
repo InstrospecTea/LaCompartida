@@ -4,12 +4,16 @@ abstract class AppShell {
 
 	public $debug;
 	public $data;
+	private $time_start;
 
 	protected $Session;
 
 	public function __construct() {
 		$this->Session = new \TTB\Sesion();
 		Configure::setSession($this->Session);
+
+		// start log time lapse
+		$this->time_script_start = microtime(true);
 	}
 
 	public abstract function main();
@@ -53,5 +57,27 @@ abstract class AppShell {
 			$caller = array_shift($bt);
 			$this->out("L[{$caller['line']}] " . print_r($text, true));
 		}
+	}
+
+	/**
+	 * Setea el tiempo de inicio del script
+	 * @param microtime $time_start
+	 */
+	public function setTimeScriptStart($time_start = null) {
+		if (!is_null($time_start)) {
+			$this->time_script_start = $time_start;
+		} else {
+			$this->time_script_start = microtime(true);
+		}
+	}
+
+	/**
+	 * Obtiene el tiempo transcurrido de ejecución del script
+	 * @param string $format
+	 */
+	public function getTimeLapse($format = 'H:i:s') {
+		$time_end = microtime(true);
+		$time = $time_end - $this->time_script_start;
+		return gmdate($format, $time);
 	}
 }

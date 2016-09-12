@@ -75,9 +75,12 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		'grupo_o_cliente',
 		'id_usuario_responsable',
 		'id_cobro',
+		'numero_documento',
+		'razon_social_factura',
 		'id_trabajo',
 		'mes_emision',
 		'mes_facturacion',
+		'mes_documento',
 		'mes_reporte',
 		'profesional',
 		'solicitante',
@@ -288,6 +291,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto','trabajo.codigo_asunto'))
 			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', CriteriaRestriction::ifnull('cobro.id_contrato', 'asunto.id_contrato')));
 
+		$this->addInvoiceToQuery($Criteria);
 		$this->addFiltersToCriteria($Criteria, 'Works');
 		$this->addGroupersToCriteria($Criteria, 'Works');
 	}
@@ -304,6 +308,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 			->add_left_join_with('asunto', CriteriaRestriction::equals('asunto.codigo_asunto','tramite.codigo_asunto'))
 			->add_left_join_with('contrato', CriteriaRestriction::equals('contrato.id_contrato', CriteriaRestriction::ifnull('cobro.id_contrato', 'asunto.id_contrato')));
 
+		$this->addInvoiceToQuery($Criteria);
 		$this->addFiltersToCriteria($Criteria, 'Errands');
 		$this->addGroupersToCriteria($Criteria, 'Errands');
 	}
@@ -329,6 +334,8 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 				'tramite.id_cobro'
 			)
 		);
+
+		$this->addInvoiceToQuery($Criteria);
 
 		$SubCriteria = new Criteria();
 		$SubCriteria->add_from('cobro_asunto')
@@ -365,6 +372,133 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$this->addFiltersToCriteria($Criteria, 'Charges');
 		$this->addGroupersToCriteria($Criteria, 'Charges');
 	}
+
+	function getIssuedInvoicesCriteria() {
+		$invoiceCriteria = $this->getGenericInvoiceCriteria();
+		$issued = __('Emitido');
+		$invoiceCriteria->add_select("'{$issued}'", 'estado_documento');
+		return $invoiceCriteria;
+	}
+
+	function getAnnuledInvoicesCriteria() {
+		$invoiceCriteria = $this->getGenericInvoiceCriteria(-1, 'fecha_anulacion');
+		$nulled = __('Anulado');
+		$invoiceCriteria->add_select("'{$nulled}'", 'estado_documento');
+		$invoiceCriteria->add_restriction(
+			CriteriaRestriction::not_equal('IFNULL(f.anulado, 0)', '0') // anulado = 1
+		);
+
+		return $invoiceCriteria;
+	}
+
+	function getGenericInvoiceCriteria($factor = 1, $date = 'fecha') {
+		$invoiceCriteria = new Criteria($this->Session);
+
+		$invoiceCriteria
+			->add_select('f.RUT_cliente', 'rut_cliente')
+			->add_select('f.cliente', 'glosa_cliente')
+			->add_select('f.id_cobro', 'id_cobro')
+			->add_select('f.id_moneda', 'id_moneda')
+			->add_select('f.id_factura')
+			->add_select('f.anulado', 'anulado')
+			->add_select("f.{$date}", 'fecha_contable')
+			->add_select("CONCAT(pdl.codigo , ' ', LPAD(f.serie_documento_legal, '3', '0'), '-', LPAD(f.numero, '7', '0'))", 'numero')
+			->add_select("CONCAT(pdl.codigo , ' ', LPAD(f.numero, '7', '0'))", 'numero_sin_serie')
+			->add_select("(IF(pdl.codigo = 'NC', -1, 1) * {$factor} * f.subtotal)", 'subtotal');
+
+		$filters = $this->filtersFields;
+
+		if (array_key_exists('campo_fecha', $filters) && $filters['campo_fecha'] == 'facturacion') {
+			$start_date = "'{$filters['fecha_ini']}'";
+			$end_date = "'{$filters['fecha_fin']} 23:59:59'";
+			$invoiceCriteria->add_restriction(CriteriaRestriction::between("f.{$date}", $start_date, $end_date));
+		}
+
+		$invoiceCriteria
+			->add_from('factura', 'f')
+			->add_left_join_with(
+				array('prm_documento_legal', 'pdl'),
+				'pdl.id_documento_legal = f.id_documento_legal'
+			);
+
+		if ($this->excludeAnulledInvoicesInQuery()) {
+			$invoiceCriteria->add_restriction(
+				CriteriaRestriction::equals('IFNULL(f.anulado, 0)', '0')
+			);
+		}
+
+		return $invoiceCriteria;
+	}
+
+	/**
+	 * By default exclude anulled Invoices
+	 * @return Boolean
+	 */
+	function excludeAnulledInvoicesInQuery() {
+		return true;
+	}
+
+	function getInvoiceCriterias() {
+		$criterias = array();
+		$criterias[] = $this->getIssuedInvoicesCriteria();
+
+		if (!$this->excludeAnulledInvoicesInQuery()) {
+			$criterias[] = $this->getAnnuledInvoicesCriteria();
+		}
+		return $criterias;
+	}
+
+	/**
+	 * Agrega Invoice a Criteria
+	 * @param Criteria $Criteria [description]
+	 */
+	function addInvoiceToQuery(Criteria $Criteria) {
+		$criterias = $this->getInvoiceCriterias();
+
+		$Criteria->add_custom_join_with_union_criteria($criterias, 'factura',
+			CriteriaRestriction::equals('factura.id_cobro', 'cobro.id_cobro')
+		);
+	}
+
+ 	/**
+ 	 * Estable un factor para multiplicar los montos
+ 	 * ya que se multiplicarán por el número de facturas
+ 	 * @return [type] [description]
+ 	 */
+	public function invoiceFactor() {
+		$criterias = $this->getInvoiceCriterias();
+		$queries = array();
+
+		// clean criteria
+		foreach ($criterias as $criteria) {
+			$criteria->reset_selection();
+			$criteria->add_select('id_factura');
+			$criteria->add_select('id_cobro');
+			$queries[] = $criteria;
+		}
+
+		$factorCriteria = new Criteria($this->Session);
+		$factorCriteria->add_select(
+			'IF(COUNT(IFNULL(factor_factura.id_factura, 0)) = 0, 1, COUNT(factor_factura.id_factura))'
+		);
+
+		$factorCriteria->add_from_union_criteria($criterias, 'factor_factura');
+		$factorCriteria->add_restriction(
+			CriteriaRestriction::equals('factor_factura.id_cobro', 'cobro.id_cobro')
+		);
+
+		$query = $factorCriteria->get_plain_query();
+
+		return "(1 / IFNULL(({$query}), 1))";
+	}
+
+	/**
+	 * Factor to apply to heach sum element
+	 * @return factor
+	 */
+ 	public function getFactor() {
+ 		return $this->invoiceFactor();
+ 	}
 
 	/**
 	 * Construye la query de trabajos
