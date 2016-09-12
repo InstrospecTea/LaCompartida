@@ -43,6 +43,73 @@ abstract class AbstractProportionalDataCalculator extends AbstractCurrencyDataCa
 	}
 
 	/**
+	 * Obtiene el monto subtotal sin descuento del documento
+	 * en la moneda base
+	 * @return String Query
+	 */
+	function getDocumentDiscountedSubTotalBase() {
+		return "(documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio)";
+	}
+
+	/**
+	 * Obtiene el factor de aporte del monto trabajos en el documento
+	 * @return String Query
+	 */
+	function getWorksDocumentAmountContribution() {
+		return "(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))";
+	}
+
+	/**
+	 * Obtiene el factor de aporte del monto trámites en el documento
+	 * @return String Query
+	 */
+	function getErrandsDocumentAmountContribution() {
+		return "(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))";
+	}
+
+	/**
+	 * Obtiene el Monto de Trabajos Subtotal Descontado
+	 * del Documento en moneda base
+	 * @return String query
+	 */
+	public function getWorksDocumentSubtotalAmount() {
+		$contribution = $this->getWorksDocumentAmountContribution();
+		$documentSubtotal = $this->getDocumentDiscountedSubTotalBase();
+		return "({$contribution} * {$documentSubtotal})";
+	}
+
+	/**
+	 * Obtiene el Monto de Trámites Subtotal Descontado
+	 * del Documento en moneda base
+	 * @return String query
+	 */
+	public function getErrandsDocumentSubtotalAmount() {
+		$contribution = $this->getErrandsDocumentAmountContribution();
+		$documentSubtotal = $this->getDocumentDiscountedSubTotalBase();
+		return "({$contribution} * {$documentSubtotal})";
+	}
+
+	/**
+	 * Obtiene el monto de trabajos subtotal descontado proporcional
+	 * @return String Query
+	 */
+	public function getWorksProportionalDocumentSubtotal() {
+		$factor = $this->getWorksProportionalFactor();
+		$subtotal = $this->getWorksDocumentSubtotalAmount();
+		return "({$factor} *{$subtotal})";
+	}
+
+	/**
+	 * Obtiene el monto de trámites subtotal descontado proporcional
+	 * @return String Query
+	 */
+	public function getErrandsProportionalDocumentSubtotal() {
+		$factor = $this->getErrandsProportionalFactor();
+		$subtotal = $this->getErrandsDocumentSubtotalAmount();
+		return "({$factor} *{$subtotal})";
+	}
+
+	/**
 	 * Devuelve el par tabla.campo de la tarifa del trabajo
 	 * en base a la proporcionalidad elegida
 	 * @return string campo de donde se obtendrá la tarifa

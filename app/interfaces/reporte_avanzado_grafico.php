@@ -53,7 +53,7 @@ if (!$filtros_check) {
 }
 
 /* Se crea el reporte según el Input del usuario */
-$reporte = new ReporteCriteria($sesion);
+$reporte = new Reporte($sesion);
 $dato = $tipo_dato;
 $filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 	'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
@@ -65,7 +65,7 @@ $r = $reporte->toBars();
 
 /* * REPORTE COMPARADO* */
 if ($tipo_dato_comparado) {
-	$reporte_c = new ReporteCriteria($sesion);
+	$reporte_c = new Reporte($sesion);
 	$dato = $tipo_dato_comparado;
 	$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 		'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
@@ -145,25 +145,25 @@ if ($limite) {
 
 $html_info = '<style type="text/css">
 		@media print {
-			div#print_link {
-				display: none;
-			}
+		div#print_link {
+		display: none;
+		}
 		}
 		</style>';
 
 switch ($tipo_grafico) {
 	case 'barras': {
 		graficoBarras($titulo_reporte, $labels, $valores, $valores_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda);
-		break;
-	}
+			break;
+		}
 	case 'dispersion': {
 		graficoLinea($titulo_reporte, $labels, $valores, $valores_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda);
-		break;
-	}
+			break;
+		}
 	case 'circular': {
 		graficoTarta($titulo_reporte, $labels, $valores, $tipo_dato);
-		break;
-	}
+			break;
+		}
 }
 
 function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
@@ -217,7 +217,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 			->setBorderColor(39, 174, 96, 0.8)
 			->setHoverBackgroundColor(39, 174, 96, 0.75)
 			->setHoverBorderColor(39, 174, 96, 1)
-		  ->setData($datos_comparados);
+			->setData($datos_comparados);
 		}
 
 		$grafico->addDataset($dataset_comparado);

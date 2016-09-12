@@ -17,7 +17,8 @@ class HorasSpotDataCalculator extends AbstractDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$horas_spot = "SUM(TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
+		$factor = $this->getFactor();
+		$horas_spot = "SUM({$factor} * TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
 
 		$Criteria
 			->add_select($horas_spot, 'horas_spot');

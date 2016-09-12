@@ -1,13 +1,13 @@
 <?php
-	require_once dirname(__FILE__).'/../../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-	require_once Conf::ServerDir().'/../app/classes/Reporte.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
+    require_once dirname(__FILE__).'/../../conf.php';
+    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
+    require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
+    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
+    require_once Conf::ServerDir().'/../app/classes/Reporte.php';
+    require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
-	$sesion = new Sesion( array('REP') );
-	$pagina = new Pagina( $sesion );
+    $sesion = new Sesion( array('REP') );
+    $pagina = new Pagina( $sesion );
 
 	$vista .= '-dia_reporte';
 	$agrupadores = explode('-',$vista);
@@ -34,7 +34,7 @@
 	$titulo_reporte = __('Resumen - ').' '.__($tipo_dato).' '.__(' en vista por').' '.__($agrupadores[0]);
 
 
-	$reporte = new ReporteCriteria($sesion);
+	$reporte = new Reporte($sesion);
 
 	if($clientes)
 		foreach($clientes as $cliente)

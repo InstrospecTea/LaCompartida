@@ -17,15 +17,12 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
-		$factor = $this->getWorksProportionalFactor();
-		$billed_amount = "SUM(
-			{$factor}
-			*
-			(
-				(documento.monto_trabajos / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
+		$subtotalBase = $this->getWorksProportionalDocumentSubtotal();
+		$factor = $this->getFactor();
+		$billed_amount = "SUM({$factor}
+				* {$subtotalBase}
+ 				*
+				(1 - documento.saldo_honorarios / documento.honorarios)
 		)
 		*
 		(1 / cobro_moneda.tipo_cambio)";
@@ -33,7 +30,7 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado')
 			->add_restriction(CriteriaRestriction::equals('trabajo.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL', 'PAGADO')));
 	}
 
 	/**
@@ -41,24 +38,20 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
-	function getReportErrandQuery($Criteria) {
-		$factor = $this->getErrandsProportionalFactor();
-		$billed_amount =  "SUM(
-			{$factor}
+	function getReportErrandQuery(Criteria $Criteria) {
+		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
+		$factor = $this->getFactor();
+		$billed_amount =  "SUM({$factor}
+			* {$subtotalBase}
 			*
-			(
-				(documento.monto_tramites / (documento.monto_trabajos + documento.monto_tramites))
-				*
-				documento.subtotal_sin_descuento * cobro_moneda_documento.tipo_cambio
-			)
+			(1 - documento.saldo_honorarios / documento.honorarios)
 		)
-		*
-		(1 / cobro_moneda.tipo_cambio)";
+		* (1 / cobro_moneda.tipo_cambio)";
 
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado')
 			->add_restriction(CriteriaRestriction::equals('tramite.cobrable', 1))
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL', 'PAGADO')));
 	}
 
 	/**
@@ -66,17 +59,18 @@ class ValorPagadoDataCalculator extends AbstractProportionalDataCalculator {
 	 * @param  Criteria $Criteria Query a la que se agregará el cálculo
 	 * @return void
 	 */
-	function getReportChargeQuery($Criteria) {
-		$billed_amount = '
-			SUM((cobro.monto_subtotal - cobro.descuento)
+	function getReportChargeQuery(Criteria $Criteria) {
+		$factor = $this->getFactor();
+		$billed_amount = "
+			SUM({$factor} * (cobro.monto_subtotal - cobro.descuento)
+				* (1 - documento.saldo_honorarios / documento.honorarios)
 				* (1 / IFNULL(asuntos_cobro.total_asuntos, 1))
 				* (cobro_moneda_cobro.tipo_cambio / cobro_moneda.tipo_cambio)
 			)
-		';
+		";
 
 		$Criteria
 			->add_select($billed_amount, 'valor_pagado')
-			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGADO')));
+			->add_restriction(CriteriaRestriction::in('cobro.estado', array('PAGO PARCIAL', 'PAGADO')));
 	}
-
 }
