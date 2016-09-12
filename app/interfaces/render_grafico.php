@@ -103,7 +103,7 @@
 					pdf.setProperties({
 						title: report_name,
 						author: 'Lemontech',
-						creator: '© Lemontech'
+						creator: 'Lemontech'
 					});
 
 					pdf.addImage($canvas[0].toDataURL('image/png'), 'png', 13, 20);
