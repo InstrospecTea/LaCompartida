@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 16.27.7
+Thursday, September 8th
+* **Fix** [Se homologan todos los agrupadores de las columnas en reporte financiero](https://github.com/LemontechSA/ttb/pull/1795)
+
+## Hotfix 16.27.6
+Wednesday, September 7th
+* **Fix** [Cambiar codigo porcentaje Facturación SATCOM](https://github.com/LemontechSA/ttb/pull/1793)
+
 ## Hotfix 16.27.5
 Tuesday, September 6th
 * **Feature** [Agrega tag nro_factura_sin_serie](https://github.com/LemontechSA/ttb/pull/1791)
