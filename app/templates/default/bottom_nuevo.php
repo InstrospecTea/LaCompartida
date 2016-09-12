@@ -53,12 +53,16 @@ if ($sesion->usuario->fields['mostrar_popup']) {
 	.new-design .ui-dialog-titlebar {
 		display: none;
 	}
+	#new-design img {
+		width: 600px;
+		height: 576px;
+	}
 
 	</style>
 	<div id="new-design-cotainer">
 		<div id="new-design" style="display: none">
 			<ul>
-				<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider1.jpg" height="576" /></li>
+				<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider1.jpg"/></li>
 				<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider2.jpg"/></li>
 				<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider3.jpg"/></li>
 			</ul>
