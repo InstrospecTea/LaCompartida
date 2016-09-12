@@ -16,7 +16,7 @@
 		$fecha2 = date("d-m-Y");
 	}
 
-	$pagina->titulo = __('Reporte Gráfico Usuarios');
+	$pagina->titulo = __('Reporte gráfico profesionales');
 	$pagina->PrintTop();
 ?>
 
@@ -40,7 +40,7 @@
 	</tr>
 	<tr>
 		<td align="right">
-			<?php echo __('Usuario'); ?>
+			<?php echo __('Profesional'); ?>
 		</td>
 		<td align="left"><!-- Nuevo Select -->
 			<?php echo $Form->select('id_usuario', $sesion->usuario->ListarActivos('', 'PRO'), $id_usuario, array('empty' => FALSE, 'style' => 'width: 200px')); ?>
