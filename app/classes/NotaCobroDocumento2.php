@@ -459,6 +459,9 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$html = str_replace('%nro_cobro%', $this->fields['id_cobro'], $html);
 				$html = str_replace('%cobro_factura_nro%', empty($this->fields['documento']) ? '' : $this->fields['documento'], $html);
 				$html = str_replace('%nro_factura%', empty($this->fields['documento']) ? '' : $this->fields['documento'], $html);
+				if (strpos($html, '%nro_factura_sin_serie%')) {
+				  $html = str_replace('%nro_factura_sin_serie%', $this->documentoSinSerie(), $html);
+				}
 
 				$facturasRS = $this->ArrayFacturasDelContrato;
 				foreach ($facturasRS as $factura => $datos) {
@@ -3861,5 +3864,19 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 
 
 		return $Criteria->count() > 0;
+	}
+
+	private function documentoSinSerie() {
+	  if (empty($this->fields['documento'])) {
+	    return '';
+	  }
+	  $results = array();
+	  $documents = explode(',', $this->fields['documento']);
+	  foreach ($documents as $document) {
+	    preg_match('/(\w{2}) (\d+\-)?(\d+) ?([^ ]+)? ?/', $document, $match);
+	    $results[] = trim(\TTB\Utiles::interpolate($match, '{1} {3} {4}'));
+	  }
+
+	  return implode(', ', $results);
 	}
 }
