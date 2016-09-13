@@ -3874,7 +3874,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 	  $documents = explode(',', $this->fields['documento']);
 	  foreach ($documents as $document) {
 	    preg_match('/(\w{2}) (\d+\-)?(\d+) ?([^ ]+)? ?/', $document, $match);
-	    $results[] = trim(\TTB\Utiles::interpolate($match, '{1} {3} {4}'));
+	    $results[] = trim(Utiles::interpolate($match, '{1} {3} {4}'));
 	  }
 
 	  return implode(', ', $results);
