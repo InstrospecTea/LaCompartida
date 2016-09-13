@@ -13,8 +13,11 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 			case 'envio':
 				$field_name = 'cobro.fecha_enviado_cliente';
 				break;
+			case 'pago':
+				$field_name = array('cobro.fecha_pago_parcial', 'cobro.fecha_cobro');
+				break;
 			case 'facturacion':
-				$field_name = 'cobro.fecha_facturacion';
+				$field_name = 'factura.fecha_contable';
 				break;
 			case 'creacion':
 				$field_name = 'cobro.fecha_creacion';
@@ -37,6 +40,17 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 
 	static function getNameOfDependantFilters() {
 		return array('fecha_ini', 'fecha_fin');
+	}
+
+	function addPaymentDateToCriteria(Criteria $Criteria) {
+		$filters = $this->getFilterData();
+		$field_name = $this->getFieldName();
+		$Criteria->add_restriction(
+			CriteriaRestriction::or_clause(
+				CriteriaRestriction::between($field_name[0], "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'"),
+				CriteriaRestriction::between($field_name[1], "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'")
+			)
+		);
 	}
 
 	function translateForCharges(Criteria $Criteria) {
@@ -63,6 +77,8 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 					)
 				)
 			);
+		} elseif ($this->getParentFilter() == 'pago') {
+			$this->addPaymentDateToCriteria($Criteria);
 		} else {
 			$Criteria->add_restriction(CriteriaRestriction::between($field_name, "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'"));
 		}
@@ -79,14 +95,21 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 			$field_name = 'tramite.fecha';
 		}
 
-		$Criteria->add_restriction(CriteriaRestriction::between($field_name, "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'"));
-
+		if ($this->getParentFilter() == 'pago') {
+			$this->addPaymentDateToCriteria($Criteria);
+		} else {
+			$Criteria->add_restriction(CriteriaRestriction::between($field_name, "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'"));
+		}
 		return $Criteria;
 	}
 
 	function translateForWorks(Criteria $Criteria) {
 		$filters = $this->getFilterData();
-		$Criteria->add_restriction(CriteriaRestriction::between($this->getFieldName(), "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'"));
+		if ($this->getParentFilter() == 'pago') {
+			$this->addPaymentDateToCriteria($Criteria);
+		} else {
+			$Criteria->add_restriction(CriteriaRestriction::between($this->getFieldName(), "'{$filters['fecha_ini']}'", "'{$filters['fecha_fin']} 23:59:59'"));
+		}
 		return $Criteria;
 	}
 

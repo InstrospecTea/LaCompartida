@@ -102,8 +102,9 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		}
 	}
 }
-
 //FIN DE ELSE (No es WEBSERVICE)
+
+$BillingBusiness = new BillingBusiness($sesion);
 
 if ($opcion == "guardar") {
 
@@ -276,6 +277,14 @@ if ($opcion == "guardar") {
 					$factura->GuardarNumeroDocLegal($id_documento_legal, $numero, $serie, $id_estudio);
 				}
 
+				if (!empty($factura_moneda)) {
+					$BillingBusiness->saveInvoiceExchangeRates(
+						$factura->fields['id_factura'],
+						$id_cobro,
+						$factura_moneda
+					);
+				}
+
 				$signo = $codigo_tipo_doc == 'NC' ? 1 : -1; //es 1 o -1 si el tipo de doc suma o resta su monto a la liq
 				$neteos = empty($id_factura_padre) ? null : array(array($id_factura_padre, $signo * $factura->fields['total']));
 
@@ -360,6 +369,8 @@ if ($desde_webservice) {
 if (!$id_factura && $factura->loaded()) {
 	$id_factura = $factura->fields['id_factura'];
 }
+
+$invoiceCurrencies = $BillingBusiness->getInvoiceExchangeRates($id_factura, $id_cobro);
 
 $titulo_pagina = $txt_pagina = $id_factura ? __('Edición de ') . $tipo_documento_legal . ' #' . $factura->fields['numero'] : __('Ingreso de ') . $tipo_documento_legal;
 
@@ -884,12 +895,41 @@ $Form->defaultLabel = false;
 			</tr>
 
 			<tr id='descripcion_factura'>
-				<td align="right" colspan=2><?php echo __('Monto Total') ?></td>
+				<td align="right" colspan=2>
+				<a id="exchange_rate_button" href="javascript:void(0);" title="Actualizar Tipo de cambio de la Factura para Reportes">
+					<img src="<?php echo Conf::ImgDir()  ?>/money_16.gif" border="0"></a>
+				<?php echo __('Monto Total') ?></td>
 				<td align="left" nowrap><?php echo $simbolo; ?>
-					<input type="text" id='total' name="total"  class="aproximable"  value="<?php echo $suma_total; ?>" size="10" maxlength="30"  readonly="readonly"></td>
-				<td>&nbsp;</td>
+					<input type="text" id='total' name="total"  class="aproximable"  value="<?php echo $suma_total; ?>" size="10" maxlength="30"  readonly="readonly">
+				</td>
+				<td align="left">&nbsp;</td>
 			</tr>
-
+			<tr class='exchange_rate_container' style='display:none;border:solid 1px'>
+				<td align="right">
+					<?php echo __('Tipo de Cambio') ?>
+				</td>
+				<td colspan="2" align="left">
+					<table style="border: solid 1px #AAA;width:100%;">
+						<tbody>
+							<tr>
+							<?php
+							foreach ($invoiceCurrencies as $currency) {
+							?>
+								<td>
+									<span><b><?php echo $currency->get('glosa_moneda') ?></b></span><br>
+									<input type='text'
+												 size='9'
+												 name='factura_moneda[<?php echo $currency->get("id_moneda") ?>]'
+												 value='<?php echo $currency->get("tipo_cambio") ?>'>
+								</td>
+							<?php
+							}
+							?>
+							</tr>
+            </tbody>
+          </table>
+				</td>
+			</td>
 		<?php } else { ?>
 
 			<tr id='descripcion_factura'>
@@ -1740,6 +1780,11 @@ $Form->defaultLabel = false;
 	?>
 
 	jQuery(document).ready(function() {
+
+		jQuery('#exchange_rate_button').click(function () {
+			jQuery('.exchange_rate_container').toggle();
+		});
+
 		jQuery(document).data('estudio_serie_numero', {
 			'estudio': jQuery('#id_estudio').val(),
 			'serie': jQuery('#serie').val(),

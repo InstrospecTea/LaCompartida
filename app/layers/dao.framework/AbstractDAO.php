@@ -188,7 +188,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		$this->sesion = $this->sesion;
 		$this->fields = $object->fields;
 		$this->changes = $object->changes;
-		$this->guardar_fecha = true;
+		$this->guardar_fecha = $object->save_created;
 		if ($this->Write()) {
 			$object->set($object->getIdentity(), $this->fields[$object->getIdentity()]);
 			return $object;
@@ -303,7 +303,11 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 
 	private function add_limits($criteria, $limit) {
 		if (!is_null($limit)) {
-			$criteria->add_limit($limit);
+			if (is_array($limit)) {
+				$criteria->add_limit($limit['limit'], $limit['from']);
+			} else {
+				$criteria->add_limit($limit);
+			}
 		}
 	}
 
@@ -447,6 +451,18 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			$Instance->fillFromArray($properties, true);
 		}
 		return $Instance;
+	}
+
+	public function count() {
+		$criteria = new Criteria($this->sesion);
+		$reflected = new ReflectionClass($this->getClass());
+
+		$result = $criteria
+			->add_select('COUNT(*)', 'count')
+			->add_from($reflected->getMethod('getPersistenceTarget')->invoke($reflected->newInstance()))
+			->run();
+
+		return isset($result[0]['count']) ? (int) $result[0]['count'] : 0;
 	}
 
 }

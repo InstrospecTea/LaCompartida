@@ -17,6 +17,7 @@ class CostoHhDataCalculator extends AbstractCurrencyDataCalculator {
 	 * @return void
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
+		$factor = $this->getFactor();
 		$costo_hh = "SUM(IFNULL((cobro_moneda_base.tipo_cambio / cobro_moneda.tipo_cambio), 1) * usuario_costo_hh.costo_hh * (TIME_TO_SEC(duracion) / 3600))";
 
 		$Criteria

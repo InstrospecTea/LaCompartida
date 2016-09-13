@@ -65,36 +65,40 @@ while ($reporte_encontrado = mysql_fetch_assoc($resp_mis_reportes)) {
 }
 
 /* REPORTE AVANZADO. ESTA PANTALLA SOLO TIENE INPUTS DEL USUARIO. SUBMIT LLAMA AL TIPO DE REPORTE SELECCIONADO */
-$pagina->titulo = __('Resumen actividades profesionales');
+$pagina->titulo = __('Reporte Avanzado');
 
 $tipos_de_dato = array(
 	'horas_trabajadas',
 	'horas_cobrables',
-	'horas_no_cobrables',
-	'horas_castigadas',
 	'horas_visibles',
 	'horas_cobradas',
-	'horas_por_cobrar',
+	'horas_facturadas',
+	'horas_facturadas_contable',
 	'horas_pagadas',
 	'horas_por_pagar',
+	'horas_por_cobrar',
 	'horas_incobrables',
+	'horas_castigadas',
+	'horas_no_cobrables',
+	'horas_convenio',
 	'horas_spot',
 	'valor_cobrable',
-	'valor_por_cobrar',
 	'valor_cobrado',
-	'valor_por_pagar',
+	'valor_facturado',
+	'valor_facturado_contable',
+	'valor_tramites',
 	'valor_pagado',
-	'valor_pagado_parcial',
+	'valor_por_pagar',
+	'valor_por_cobrar',
 	'valor_incobrable',
-	'rentabilidad',
-	'rentabilidad_base',
-	'valor_hora',
-	'diferencia_valor_estandar',
-	'valor_estandar',
 	'valor_trabajado_estandar',
+	'valor_estandar',
+	'diferencia_valor_estandar',
+	'valor_hora',
+	'rentabilidad_base',
+	'rentabilidad',
 	'costo',
-	'costo_hh',
-	'valor_tramites'
+	'costo_hh'
 );
 
 $tipos_de_dato_select = array();
@@ -136,6 +140,9 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'profesional',
 		'estado',
 		'id_cobro',
+		'numero_documento',
+		'estado_documento',
+		'razon_social_factura',
 		'glosa_estudio',
 		'forma_cobro',
 		'tipo_asunto',
@@ -149,6 +156,7 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'dia_reporte',
 		'mes_emision',
 		'mes_facturacion',
+		'mes_documento',
 		'grupo_o_cliente',
 		'solicitante'
 	);
@@ -161,6 +169,9 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'profesional',
 		'estado',
 		'id_cobro',
+		'numero_documento',
+		'estado_documento',
+		'razon_social_factura',
 		'glosa_estudio',
 		'forma_cobro',
 		'tipo_asunto',
@@ -174,9 +185,14 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 		'dia_reporte',
 		'mes_emision',
 		'mes_facturacion',
+		'mes_documento',
 		'grupo_o_cliente',
 		'solicitante'
 	);
+}
+
+if (Conf::GetConf($sesion, 'UsoActividades')) {
+	$agrupadores[] = 'actividad';
 }
 
 if (Conf::GetConf($sesion, 'UsarAreaTrabajos')) {
@@ -206,6 +222,8 @@ $ReporteAvanzado->glosa_dato['horas_trabajadas'] = "Total de Horas Trabajadas";
 $ReporteAvanzado->glosa_dato['horas_cobrables'] = __("Total de Horas Trabajadas en asuntos Facturables");
 $ReporteAvanzado->glosa_dato['horas_visibles'] = __("Horas que ve el Cliente en nota de cobro (tras revisión)");
 $ReporteAvanzado->glosa_dato['horas_cobradas'] = __("Horas Visibles en Cobros que ya fueron Emitidos");
+$ReporteAvanzado->glosa_dato['horas_facturdas'] = __("Horas Visibles que han sido facturadas");
+$ReporteAvanzado->glosa_dato['horas_facturdas_contable'] = __("Prorrateo de horas liquidadas en el monto facturado contable");
 $ReporteAvanzado->glosa_dato['horas_pagadas'] = __("Horas Cobradas en Cobros con estado Pagado");
 $ReporteAvanzado->glosa_dato['horas_por_pagar'] = __("Horas Cobradas que aún no han sido pagadas");
 $ReporteAvanzado->glosa_dato['horas_por_cobrar'] = "Horas Visibles que aún no se Emiten al Cliente";
@@ -216,12 +234,11 @@ $ReporteAvanzado->glosa_dato['horas_spot'] = __("Horas cobrables de profesionale
 
 $ReporteAvanzado->glosa_dato['valor_cobrable'] = __("Valor monetario que corresponde a cada Profesional (por horas o trámites)");
 $ReporteAvanzado->glosa_dato['valor_cobrado'] = __("Valor monetario que corresponde a cada Profesional (por horas o trámites), en un Cobro ya Emitido");
+$ReporteAvanzado->glosa_dato['valor_facturado'] = __("Monto total Facturado de la liquidación");
 $ReporteAvanzado->glosa_dato['valor_tramites'] = __("Valor monetario que corresponde a cada Profesional por concepto de trámites, en un Cobro ya Emitido");
 
 $ReporteAvanzado->glosa_dato['valor_pagado'] = __("Valor Cobrado que ha sido Pagado totalmente");
-$ReporteAvanzado->glosa_dato['valor_pagado_parcial'] = __("Valor Pagado de un Cobro que ha sido parcialmente pagado");
 $ReporteAvanzado->glosa_dato['valor_por_pagar'] = __("Valor Cobrado que aún no ha sido pagado");
-$ReporteAvanzado->glosa_dato['valor_por_pagar_parcial'] = __("Valor Por Pagar de un Cobro que ha sido pagado parcialmente");
 $ReporteAvanzado->glosa_dato['valor_por_cobrar'] = __("Valor monetario estimado que corresponde a cada Profesional en horas por cobrar");
 $ReporteAvanzado->glosa_dato['valor_incobrable'] = __("Valor monetario que corresponde a cada Profesional, en un Cobro Incobrable");
 $ReporteAvanzado->glosa_dato['valor_trabajado_estandar'] = __("Horas Trabajadas por THH Estándar, para todo Trabajo");
@@ -246,8 +263,8 @@ $explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
 $explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
 $explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
 $explica_periodo_envio = 'Sólo considera Trabajos en Cobros con fecha de envío en el Periodo';
-$explica_periodo_facturacion = 'Sólo considera Trabajos en Cobros con fecha de facturación en el Periodo';
-
+$explica_periodo_pago = 'Sólo considera Trabajos en Cobros con fecha de Pago en el Periodo';
+$explica_periodo_facturacion = 'Sólo considera Trabajos en Documentos tributarios emitidos en el Periodo';
 /* Calculos de fechas */
 $hoy = date("Y-m-d");
 if (!$fecha_anio) {
@@ -319,9 +336,9 @@ if (!$popup) {
 			border-color: blue;
 		}
 		td.boton_disabled {
-			border-color: #e5e5e5;
-			background-color: #e5e5e5;
-			color: #444444;
+			border-color: #CCC;
+			background-color: #EEE;
+			color: #888;
 			cursor: default;
 		}
 		td.borde_rojo {
@@ -407,9 +424,10 @@ if (!$popup) {
 	<?= $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js'); ?>
 
 	<script type="text/javascript">
-		var tipos_moneda = <?php echo json_encode(array_values(ReporteCriteria::getTiposMoneda())); ?>;
+		var tipos_moneda = <?php echo json_encode(array_values(Reporte::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
 		var urlAjaxReporteAvanzado = '<?php echo Conf::RootDir(); ?>/app/interfaces/ajax/reporte_avanzado.php';
+		var mapPeriodos = <?php echo json_encode(Reporte::mapPeriodos()); ?>;
 		var buttonsReporte = {
 			'<?php echo __('Guardar') ?>': GuardarReporte,
 			'<?php echo __('Cancelar') ?>': function() {
@@ -789,7 +807,7 @@ if (!$popup) {
 													</span>
 												</td>
 												<td align=left>
-													<label for="campo_fecha_cobro" title=""><?php echo __("Corte") ?></label>
+													<label for="campo_fecha_cobro" title=""><?php echo __("Liquidación - Corte") ?></label>
 												</td>
 											</tr>
 											<tr>
@@ -811,7 +829,7 @@ if (!$popup) {
 													</span>
 												</td>
 												<td align=left>
-													<label for="campo_fecha_emision" title="<?php echo __($explica_periodo_emision) ?>"><?php echo __("Emisión") ?></label>
+													<label for="campo_fecha_emision" title="<?php echo __($explica_periodo_emision) ?>"><?php echo __("Liquidación - Emisión") ?></label>
 												</td>
 											</tr>
 											<tr>
@@ -833,7 +851,29 @@ if (!$popup) {
 													</span>
 												</td>
 												<td align="left">
-													<label title="<?php echo __($explica_periodo_envio) ?>" for="campo_fecha_envio"><?php echo __('Envio'); ?></label>
+													<label title="<?php echo __($explica_periodo_envio) ?>" for="campo_fecha_envio"><?php echo __('Liquidación - Envio'); ?></label>
+												</td>
+											</tr>
+											<tr>
+												<td align="right">
+													&nbsp;
+												</td>
+												<td align="left">
+													&nbsp;
+												</td>
+												<td align="right">
+													<span title="<?php echo __($explica_periodo_pago) ?>">
+														<input type="radio" name="campo_fecha" id="campo_fecha_pago" value="pago"
+														<?php
+														if ($campo_fecha == 'pago') {
+															echo 'checked="checked"';
+														}
+														?>
+															onclick="SincronizarCampoFecha()" />
+													</span>
+												</td>
+												<td align="left">
+													<label title="<?php echo __($explica_periodo_pago) ?>" for="campo_fecha_pago"><?php echo __('Liquidación - Pago'); ?></label>
 												</td>
 											</tr>
 											<tr>
@@ -855,7 +895,7 @@ if (!$popup) {
 													</span>
 												</td>
 												<td align="left">
-													<label title="<?php echo __($explica_periodo_facturacion) ?>" for="campo_fecha_facturacion"><?php echo __('Facturación'); ?></label>
+													<label title="<?php echo __($explica_periodo_facturacion) ?>" for="campo_fecha_facturacion"><?php echo __('Documento Tributario'); ?></label>
 												</td>
 											</tr>
 											<tr>
@@ -865,7 +905,7 @@ if (!$popup) {
 												<td align=left colspan=3>
 													<span onclick="jQuery('#fecha_corta_selector').click()">
 														<?php echo Html::SelectArrayDecente($meses, 'fecha_mes', $fecha_mes, 'id="fecha_mes"', '', '90px'); ?>
-														<?php echo Html::SelectArrayDecente($anios, 'fecha_anio', $fecha_anio, 'id="fecha_anio"', '', '55px'); ?>
+														<?php echo Html::SelectArrayDecente($anios, 'fecha_anio', $fecha_anio, 'id="fecha_anio"', '', '65px'); ?>
 													</span>
 												</td>
 											</tr>
@@ -966,7 +1006,22 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(3) ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->nada(1) ?>
+								<?php echo $ReporteAvanzado->nada(7) ?>
+								<?php echo $ReporteAvanzado->borde_derecha() ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(7) ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(8) ?>
+								<?php echo $ReporteAvanzado->borde_abajo() ?>
+								<?php echo $ReporteAvanzado->celda('horas_facturadas') ?>
+								<?php // echo $ReporteAvanzado->nada(3) ?>
+								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
+								<?php echo $ReporteAvanzado->celda('horas_facturadas_contable') ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(13) ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(13) ?>
@@ -982,8 +1037,6 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->celda('valor_cobrado') ?>
 								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
 								<?php echo $ReporteAvanzado->celda('valor_pagado') ?>
-								<?php echo $ReporteAvanzado->borde_abajo() ?>
-								<?php echo $ReporteAvanzado->celda('valor_pagado_parcial') ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(7) ?>
@@ -1065,9 +1118,6 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(11) ?>
 							</tr>
 							<tr>
-								<?php echo $ReporteAvanzado->nada(1) ?>
-							</tr>
-							<tr>
 								<?php echo $ReporteAvanzado->nada(12) ?>
 							</tr>
 							<tr>
@@ -1075,6 +1125,18 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->nada(2) ?>
 								<?php echo $ReporteAvanzado->select_moneda() ?>
 								<?php echo $ReporteAvanzado->nada(5) ?>
+								<?php echo $ReporteAvanzado->celda('valor_facturado') ?>
+								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
+								<?php echo $ReporteAvanzado->celda('valor_facturado_contable') ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(12) ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(12) ?>
+							</tr>
+							<tr>
+								<?php echo $ReporteAvanzado->nada(9) ?>
 								<?php echo $ReporteAvanzado->celda('valor_trabajado_estandar') ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->borde_abajo() ?>

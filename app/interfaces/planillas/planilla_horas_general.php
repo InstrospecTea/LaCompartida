@@ -1,9 +1,9 @@
 <?php
-	require_once dirname(__FILE__).'/../../conf.php';
+    require_once dirname(__FILE__).'/../../conf.php';
 
-	$sesion = new Sesion( array('REP') );
+    $sesion = new Sesion( array('REP') );
 
-	$pagina = new Pagina( $sesion );
+    $pagina = new Pagina( $sesion );
 
 	if(!is_array($usuarios))
 		$usuarios = array($usuarios);
@@ -38,7 +38,7 @@
 
 	foreach($datos as $dato)
 	{
-		$reporte[$dato] = new ReporteCriteria($sesion);
+		$reporte[$dato] = new Reporte($sesion);
 
 		foreach($clientes as $cliente)
 			if($cliente)
@@ -181,7 +181,7 @@
 	{
 		foreach($datos as $col => $dato)
 		{
-			$resultado[$dato]= ReporteCriteria::fixBar($resultado[$dato],$resultado['horas_trabajadas']);
+			$resultado[$dato]= Reporte::fixBar($resultado[$dato],$resultado['horas_trabajadas']);
 			ksort($resultado[$dato]);
 		}
 		//TITULOS
@@ -233,7 +233,7 @@
 		}
 
 		foreach($datos as $col => $dato)
-			$resultado[$dato]= ReporteCriteria::fixArray($resultado[$dato],$resultado['horas_trabajadas']);
+			$resultado[$dato]= Reporte::fixArray($resultado[$dato],$resultado['horas_trabajadas']);
 		$ws1->write($fila-1,$columna,__("Cliente"), $encabezado);
 		$ws1->mergeCells($fila-1,$columna+1,$fila-1,$columna+2);
 		$ws1->write($fila-1,$columna+1,__("Asunto"), $encabezado);

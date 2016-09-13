@@ -2,6 +2,8 @@
 
 class Currency extends Entity {
 
+	public $save_created = false;
+
 	/**
 	 * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
 	 * @return string
