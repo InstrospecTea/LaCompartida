@@ -1,10 +1,5 @@
 <?php
     require_once dirname(__FILE__).'/../../conf.php';
-    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-    require_once Conf::ServerDir().'/../app/classes/Reporte.php';
-    require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
     $sesion = new Sesion( array('REP') );
 
@@ -26,7 +21,7 @@
 			$vista = $vista_cliente;
 			$titulo_reporte = __('Reporte de Horas por Cliente');
 			break;
-		case "hh_por_empleado":
+		case "hh_por_usuario":
 			$vista = $vista_empleado;
 			$titulo_reporte = __('Reporte de Horas por Profesional');
 			break;

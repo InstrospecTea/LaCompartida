@@ -32,7 +32,8 @@
 	$total_tiempo = 0;
 
 	$Criteria
-		->add_select("CONCAT_WS(' - ', cliente." . $codigo_cliente . ", SUBSTRING(cliente.glosa_cliente, 1, 12))", 'glosa_cliente')
+		->add_select("cliente." . $codigo_cliente, 'codigo_cliente')
+		->add_select("cliente.glosa_cliente", 'glosa_cliente')
 		->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
 		->add_from('cliente')
 		->add_left_join_with(
@@ -61,7 +62,8 @@
 	}
 
 	foreach ($respuesta as $i => $fila) {
-		$cliente[] = $fila['glosa_cliente'];
+		$cliente[] = $fila['codigo_cliente'];
+		$glosa_cliente[] = mb_detect_encoding($fila['glosa_cliente'], 'UTF-8', true) === 'UTF-8' ? $fila['glosa_cliente'] : utf8_encode($fila['glosa_cliente']);
 		$tiempo[] = $fila['tiempo'];
 		$total_tiempo += $fila['tiempo'];
 	}
@@ -76,7 +78,15 @@
 	$options = [
 		'responsive' => true,
 		'tooltips' => [
-			'mode' => 'label'
+			'mode' => 'label',
+			'callbacks' => [
+				'afterTitle' => $glosa_cliente,
+			]
+		],
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => __('Horas trabajadas por cliente')
 		],
 		'scales' => [
 			'xAxes' => [[

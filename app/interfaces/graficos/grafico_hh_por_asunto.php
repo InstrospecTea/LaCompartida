@@ -26,6 +26,7 @@
 
 	$Criteria
 		->add_select('asunto.codigo_asunto')
+		->add_select('asunto.glosa_asunto')
 		->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
 		->add_from('trabajo')
 		->add_inner_join_with(
@@ -55,6 +56,7 @@
 
 	foreach ($respuesta as $i => $fila) {
 		$asunto[] = $fila['codigo_asunto'];
+		$glosa_asunto[] = mb_detect_encoding($fila['glosa_asunto'], 'UTF-8', true) === 'UTF-8' ? $fila['glosa_asunto'] : utf8_encode($fila['glosa_asunto']);
 		$tiempo[] = $fila['tiempo'];
 		$total_tiempo += $fila['tiempo'];
 	}
@@ -69,7 +71,15 @@
 	$options = [
 		'responsive' => true,
 		'tooltips' => [
-			'mode' => 'label'
+			'mode' => 'label',
+			'callbacks' => [
+				'afterTitle' => $glosa_asunto,
+			]
+		],
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => __('Horas trabajadas por asunto')
 		],
 		'scales' => [
 			'xAxes' => [[

@@ -4,12 +4,6 @@
 	$sesion = new Sesion();
 	$Criteria = new Criteria($sesion);
 
- 	if (Conf::read('UsaUsernameEnTodoElSistema')) {
- 		$letra_profesional = 'username';
- 	} else {
- 		$letra_profesional = 'usuario';
- 	}
-
  	if (is_array($usuarios)) {
  		$Criteria->add_restriction(
  			CriteriaRestriction::in('trabajo.id_usuario', $usuarios)
@@ -60,7 +54,8 @@
 	}
 
 	foreach ($respuesta as $i => $value) {
-		$empleado[] = $value[$letra_profesional];
+		$empleado[] = $value['username'];
+		$nombre_empleado[] = mb_detect_encoding($value['usuario'], 'UTF-8', true) === 'UTF-8' ? $value['usuario'] : utf8_encode($value['usuario']);
 		$tiempo[] = $value['tiempo'];
 		$total_tiempo += $value['tiempo'];
 	}
@@ -76,7 +71,15 @@
 	$options = [
 		'responsive' => true,
 		'tooltips' => [
-			'mode' => 'label'
+			'mode' => 'label',
+			'callbacks' => [
+				'afterTitle' => $nombre_empleado,
+			]
+		],
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => __('Horas trabajadas por usuario')
 		],
 		'scales' => [
 			'xAxes' => [[
@@ -111,10 +114,10 @@
 	$dataset->setType('bar')
 		->setFill(false)
 		->setYAxisID('y-axis-1')
-		->setLabel(__('Horas trabajadas por empleado'))
+		->setLabel(__('Horas trabajadas por usuario'))
 		->setData($tiempo);
 
-	$grafico->setNameChart(__('Horas trabajadas por empleado'))
+	$grafico->setNameChart(__('Horas trabajadas por usuario'))
 		->addDataset($dataset)
 		->setOptions($options)
 		->addLabels($empleado);

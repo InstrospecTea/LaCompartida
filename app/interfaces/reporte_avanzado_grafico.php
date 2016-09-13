@@ -167,6 +167,7 @@ switch ($tipo_grafico) {
 }
 
 function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
+	global $sesion;
 	$grafico = new TTB\Graficos\Grafico();
 	$dataset = new TTB\Graficos\Dataset();
 
@@ -181,6 +182,10 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		'labels' => [
 			'show' => true
 		],
+		'scaleLabel' =>[
+			'display' => true,
+			'labelString' => Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda)
+		],
 		'ticks' => [
 			'beginAtZero' => true
 		]
@@ -191,7 +196,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		->setYAxisID('y-axis-1')
 		->setData($datos);
 
-	$grafico->setNameChart(__($titulo))
+	$grafico->setNameChart($titulo)
 		->addDataset($dataset)
 		->addLabels($labels);
 
@@ -233,6 +238,10 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 			'labels' => [
 				'show' => true
 			],
+			'scaleLabel' =>[
+				'display' => true,
+				'labelString' => Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda)
+			],
 			'ticks' => [
 				'beginAtZero' => true
 			]
@@ -243,6 +252,11 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		'responsive' => true,
 		'tooltips' => [
 			'mode' => 'label'
+		],
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
 		],
 		'scales' => [
 			'xAxes' => [[
@@ -276,12 +290,28 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 		'legend' => [
 			'display' => true,
 			'position' => 'bottom'
+		],
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+		],
+		'tooltips' => [
+			'mode' => 'label',
+			'callbacks' => [
+				'label' => $labels,
+			]
 		]
 	];
 
-	$grafico->setNameChart(__($titulo))
+	$labels_leyend = [];
+	foreach ($labels as $key => $value) {
+		$labels_leyend[] = $value . ': ' . $datos[$key];
+	}
+
+	$grafico->setNameChart($titulo)
 		->setType('pie')
-		->addLabels(array_values($labels))
+		->addLabels($labels_leyend)
 		->addDataset($dataset)
 		->setOptions($options);
 
@@ -289,6 +319,7 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 }
 
 function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
+	global $sesion;
 	$grafico = new TTB\Graficos\Grafico();
 	$datasetLinea = new TTB\Graficos\DatasetLine();
 	$datasetLineaComparado = new TTB\Graficos\DatasetLine();
@@ -317,6 +348,10 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 		'labels' => [
 			'show' => true
 		],
+		'scaleLabel' =>[
+			'display' => true,
+			'labelString' => Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda)
+		],
 		'ticks' => [
 			'beginAtZero' => true
 		]
@@ -333,18 +368,27 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 		'labels' => [
 			'show' => true
 		],
+		'scaleLabel' =>[
+			'display' => true,
+			'labelString' => Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda)
+		],
 		'ticks' => [
 			'beginAtZero' => true
 		]
 	];
 
 	$options = [
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+		],
 		'scales' => [
 			'yAxes' => $yAxes
 		]
 	];
 
-	$grafico->setNameChart(__($titulo))
+	$grafico->setNameChart($titulo)
 		->setType('line')
 		->addLabels($labels)
 		->addDataset($datasetLinea)

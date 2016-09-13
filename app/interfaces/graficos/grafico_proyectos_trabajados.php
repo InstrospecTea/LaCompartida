@@ -2,13 +2,21 @@
 	require_once dirname(__FILE__).'/../../conf.php';
 
 	$sesion = new Sesion();
-	
+
 	$fecha_inicio = Date::parse($fecha1)->toDate();
 	$fecha_fin = Date::parse($fecha2)->toDate();
 	$Criteria = new Criteria($sesion);
 
+	if (Conf::read('CodigoSecundario')) {
+		$codigo_asunto = 'codigo_asunto_secundario';
+	} else {
+		$codigo_asunto = 'codigo_asunto';
+	}
+
 	$Criteria
-		->add_select("CONCAT_WS(' - ', asunto.codigo_cliente, SUBSTRING(asunto.glosa_asunto, 1, 12))", 'glosa_asunto')
+		->add_select("asunto." . $codigo_asunto, 'codigo_asunto')
+		->add_select("asunto.codigo_cliente", 'codigo_cliente')
+		->add_select("asunto.glosa_asunto", 'glosa_asunto')
 		->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
 		->add_from('asunto')
 		->add_left_join_with('trabajo',
@@ -31,11 +39,19 @@
 	}
 
 	foreach ($respuesta as $i => $fila) {
-		$user_data[$fila['glosa_asunto']] = $fila['tiempo'];
+		$tiempo[] = $fila['tiempo'];
+		$labels[] = $fila['codigo_asunto'];
+		$fila['glosa_asunto'] = mb_detect_encoding($fila['glosa_asunto'], 'UTF-8', true) === 'UTF-8' ? $fila['glosa_asunto'] : utf8_encode($fila['glosa_asunto']);
+		$glosa_asunto[] = [
+			__('Cliente') . ': ' . $fila['codigo_cliente'],
+			__('Asunto')  . ': ' . $fila['glosa_asunto']
+		];
 	}
 
+	$titulo = __('Horas trabajadas') . (!empty($nombre_usuario) ? ' - ' . $nombre_usuario : '');
+
 	$grafico = new TTB\Graficos\Grafico();
-	if (is_null($user_data)) {
+	if (is_null($tiempo)) {
 		echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
 		return;
 	}
@@ -45,7 +61,15 @@
 	$options = [
 		'responsive' => true,
 		'tooltips' => [
-			'mode' => 'label'
+			'mode' => 'label',
+			'callbacks' => [
+				'afterTitle' => $glosa_asunto,
+			]
+		],
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => mb_detect_encoding($titulo, 'UTF-8', true) === 'UTF-8' ? $titulo : utf8_encode($titulo)
 		],
 		'scales' => [
 			'xAxes' => [[
@@ -79,11 +103,11 @@
 
 	$dataset->setYAxisID('y-axis-1')
 		->setLabel(__('Horas trabajadas'))
-		->setData(array_values($user_data));
+		->setData($tiempo);
 
-	$grafico->setNameChart(__('Horas trabajadas') . (!empty($nombre_usuario) ? ' - ' . $nombre_usuario : ''))
+	$grafico->setNameChart($titulo)
 		->addDataset($dataset)
 		->setOptions($options)
-		->addLabels(array_keys($user_data));
+		->addLabels($labels);
 
 	echo $grafico->getJson();

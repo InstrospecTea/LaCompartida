@@ -231,7 +231,7 @@ $dataset->setLabel(__($titulo_tipo[$tipo_duracion]))
 	->setYAxisID('y-axis-1')
 	->setData($duracion);
 
-$grafico->setNameChart(__($title))
+$grafico->setNameChart($title)
 	->addDataset($dataset)
 	->addLabels($periodo);
 
@@ -266,8 +266,8 @@ if ($comparar) {
 	$grafico->addDataset($dataset_comparar);
 	$y_axes[] = [
 		'type' => 'linear',
-		'display' => true,
-		'position' => 'left',
+		'display' => false,
+		'position' => 'right',
 		'id' => 'y-axis-2',
 		'gridLines' => [
 			'display' => false
@@ -280,10 +280,16 @@ if ($comparar) {
 		]
 	];
 }
+
 $options = [
 	'responsive' => true,
 	'tooltips' => [
 		'mode' => 'label'
+	],
+	'title' => [
+		'display' => true,
+		'fontSize' => 14,
+		'text' => utf8_encode($title)
 	],
 	'scales' => [
 		'xAxes' => [[
