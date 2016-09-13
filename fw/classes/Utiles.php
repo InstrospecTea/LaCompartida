@@ -817,11 +817,11 @@ HTML;
 			$where_dia = " AND YEAR(fecha)=YEAR(NOW()) AND MONTH(fecha)=MONTH(NOW()) AND DAY(fecha)=DAY(NOW())";
 		}
 		$query = "SELECT COUNT(id_log_correo) FROM log_correo
-								WHERE subject='$subject' AND mail='$email' AND mensaje='" . mysql_real_escape_string($mensaje) . "' $where_dia";
+								WHERE subject='" . mysql_real_escape_string($subject) . "' AND mail='$email' AND mensaje='" . mysql_real_escape_string($mensaje) . "' $where_dia";
 		$resp2 = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($count) = mysql_fetch_array($resp2);
 		if ($count == 0) {
-			$query2 = "INSERT INTO log_correo (subject, mensaje, fecha, mail, nombre) VALUES('" . $subject . "','" . mysql_real_escape_string($mensaje) . "', NOW(), '" . $email . "', '" . $nombre . "')";
+			$query2 = "INSERT INTO log_correo (subject, mensaje, fecha, mail, nombre) VALUES('" . mysql_real_escape_string($subject) . "','" . mysql_real_escape_string($mensaje) . "', NOW(), '" . $email . "', '" . $nombre . "')";
 			mysql_query($query2, $sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $sesion->dbh);
 		}
 	}

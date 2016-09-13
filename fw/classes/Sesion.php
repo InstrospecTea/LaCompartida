@@ -318,7 +318,7 @@ class Sesion {
 		return false;
 	}
 
-	function Login($rut, $dvrut, $password, $recordar = false, $desde = "", $use_ad = false) {
+	function Login($rut, $dvrut, $password, $recordar = false, $desde = "", $use_ad = false, $auth_token = '') {
 		$this->Logout();
 
 		if (!Conf::GetConf($this, 'LoginDesdeSitio')) {
@@ -360,6 +360,21 @@ class Sesion {
 
 			$_SESSION['ACTIVO_JUICIO'] = $this->usuario->fields['activo_juicio'];
 
+			if (empty($auth_token)) {
+				$UserToken = new \UserToken($this);
+				$auth_token = $UserToken->makeAuthToken($this->usuario->fields['rut']);
+
+				$user_token_data = array(
+					'user_id' => $this->usuario->fields['id_usuario'],
+					'auth_token' => $auth_token,
+					'app_key' => 'ttb'
+				);
+
+				$UserToken->save($user_token_data);
+			}
+
+			$_SESSION['AUTHTOKEN'] = $auth_token;
+
 			/*
 			  Seteando cookie
 			 */
@@ -367,6 +382,7 @@ class Sesion {
 				setcookie("ttbrut", $rut, time() + 60 * 60 * 24 * 100, "/");
 				setcookie("ttbdv", $dvrut, time() + 60 * 60 * 24 * 100, "/");
 				setcookie("ttbpass", $this->encrypt($password), time() + 60 * 60 * 24 * 100, "/");
+				setcookie("lmjuiciosauthtoken", $auth_token, time() + 60 * 60 * 24 * 100, "/");
 			}
 
 			$this->logged = true;
@@ -386,6 +402,7 @@ class Sesion {
 			setcookie("ttbrut", '', time() + 60 * 60 * 24 * 100, "/");
 			setcookie("ttbdv", '', time() + 60 * 60 * 24 * 100, "/");
 			setcookie("ttbpass", '', time() + 60 * 60 * 24 * 100, "/");
+			setcookie("lmjuiciosauthtoken", '', time() + 60 * 60 * 24 * 100, "/");
 		}
 
 		$_SESSION = array();
@@ -409,7 +426,8 @@ class Sesion {
 			$rut = $_COOKIE['ttbrut'];
 			$dvrut = $_COOKIE['ttbdv'];
 			$password = $this->decrypt($_COOKIE['ttbpass']);
-			if ($this->logged || $this->Login($rut, $dvrut, $password, true)) {
+			$auth_token = $_COOKIE['lmjuiciosauthtoken'];
+			if ($this->logged || $this->Login($rut, $dvrut, $password, true, '', false, $auth_token)) {
 				if (file_exists(Conf::ServerDir() . '/usuarios/index.php')) {
 					$pagina_inicio = Conf::RootDir() . "/app/usuarios/index.php";
 				} else {
