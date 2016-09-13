@@ -286,6 +286,10 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 	->setBorderColor(255, 255, 255, 0)
 	->setHoverBorderColor(255, 255, 255, 0);
 
+	array_walk($labels, function(&$labels) {
+		$labels = mb_detect_encoding($labels, 'UTF-8', true) ? $labels : utf8_encode($labels);
+	});
+
 	$options = [
 		'legend' => [
 			'display' => true,
