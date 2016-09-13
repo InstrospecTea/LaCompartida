@@ -1,4 +1,7 @@
 # Changelog
+## Hotfix 16.28.1
+Tuesday, September 13th
+* **Fix** [Corrección selector encargado comercial](https://github.com/LemontechSA/ttb/pull/1786)
 
 ## [Release 16.28.0](https://github.com/LemontechSA/ttb/pull/1780)
 Tuesday, August 30th
