@@ -1358,13 +1358,25 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		}
 	}
 
+
+	function selectInactiveUser(ele, id_inactive, span_message_id) {
+		var selected_user = jQuery(ele).val();
+		if (selected_user == id_inactive) {
+			jQuery('#' + span_message_id).html(' (<?= __('Usuario Inactivo')?>)');
+		} else {
+			jQuery('#' + span_message_id).html('');
+		}
+	}
+
+
+
 	var mismoEncargado = <?php echo Conf::GetConf($Sesion, 'EncargadoSecundario') && $contrato->fields['id_usuario_responsable'] == $contrato->fields['id_usuario_secundario'] ? 'true' : 'false' ?>;
 	var CopiarEncargadoAlAsunto=<?php echo (Conf::GetConf($Sesion, "CopiarEncargadoAlAsunto") ) ? '1' : '0'; ?>;
 	var EncargadoSecundario=<?php echo (Conf::GetConf($Sesion, "EncargadoSecundario") ) ? '1' : '0'; ?>;
-    var DesdeAgregaCliente=<?php echo ($desde_agrega_cliente ) ? '1' : '0'; ?>;
+  var DesdeAgregaCliente=<?php echo ($desde_agrega_cliente ) ? '1' : '0'; ?>;
 
-	function CambioEncargado(elemento){
-
+	function CambioEncargado(elemento, usuario_inactivo){
+		selectInactiveUser(elemento, usuario_inactivo , 'usuario_inactivo_1');
 		if (CopiarEncargadoAlAsunto && DesdeAgregaCliente) {
 
 			if (elemento.name == "id_usuario_responsable") {
@@ -1592,23 +1604,54 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				</td>
 				<td class="al"><!-- Nuevo Select -->
 					<?php
+						$UsuarioEncargado = new Usuario($Sesion);
+						$UsuarioEncargado->LoadId($contrato->fields['id_usuario_responsable']);
+						if ($UsuarioEncargado->fields['activo'] == 0) {
+							$id_usuario_inactivo1 = $UsuarioEncargado->fields['id_usuario'];
+						} else {
+							$id_usuario_inactivo1 = null;
+						}
+						$mensaje_inactivo = __('Usuario Inactivo');
+					 ?>
+					<?php
 					if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && $contrato_defecto->Loaded() && !$contrato->Loaded()) {
-						echo $Form->select('id_usuario_responsable', $Sesion->usuario->ListarActivos('', 'SOC'), $contrato_defecto->fields['id_usuario_responsable'] ? $contrato_defecto->fields['id_usuario_responsable'] : $id_usuario_responsable, array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this)', 'disabled' => 'disabled'));
+						echo $Form->select(
+						'id_usuario_responsable',
+						 $Sesion->usuario->ListarActivos('', 'SOC', $id_usuario_inactivo1),
+						 $contrato_defecto->fields['id_usuario_responsable'] ? $contrato_defecto->fields['id_usuario_responsable'] : $id_usuario_responsable,
+						 array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this, \'' . $id_usuario_inactivo1 . '\')', 'disabled' => 'disabled'));
 						echo '(Se copia del contrato principal)';
+						echo isset($id_usuario_inactivo1) ? ' <span id="usuario_inactivo_1">(' . $mensaje_inactivo . ')</span>' : '';
 						echo '<input type="hidden" value="' . ($contrato_defecto->fields['id_usuario_responsable'] ? $contrato_defecto->fields['id_usuario_responsable'] :  $id_usuario_responsable) . '" name="id_usuario_responsable" />';
 					} else {
 						if ($contrato_defecto->Loaded() && $contrato->Loaded()) {
 							if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && !$desde_agrega_cliente) {
-								echo $Form->select('id_usuario_responsable', $Sesion->usuario->ListarActivos('', 'SOC'), $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable, array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this)', 'disabled' => 'disabled'));
+								echo $Form->select(
+								'id_usuario_responsable',
+								$Sesion->usuario->ListarActivos('', 'SOC', $id_usuario_inactivo1),
+								$contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable,
+								array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this, \'' . $id_usuario_inactivo1 . '\')', 'disabled' => 'disabled'));
 								echo '<input type="hidden" value="' . ($contrato_defecto->fields['id_usuario_responsable'] ? $contrato_defecto->fields['id_usuario_responsable'] : $id_usuario_responsable) . '" name="id_usuario_responsable" />';
 								echo '(Se copia del contrato principal)';
+								echo isset($id_usuario_inactivo1) ? ' <span id="usuario_inactivo_1">(' . $mensaje_inactivo . ')</span>' : '';
 							} else {
 								//FFF si estoy agregando o editando un asunto que se cobra por separado
-								echo $Form->select('id_usuario_responsable', $Sesion->usuario->ListarActivos('', 'SOC'), $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable, array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this)'));
+								echo $Form->select(
+								'id_usuario_responsable',
+								$Sesion->usuario->ListarActivos('', 'SOC', $id_usuario_inactivo1),
+								$contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable,
+								array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this, \'' . $id_usuario_inactivo1 . '\')'));
+
+								echo isset($id_usuario_inactivo1) ? ' <span id="usuario_inactivo_1">(' . $mensaje_inactivo . ')</span>' : '';
+
 							}
 						} else if (Conf::GetConf($Sesion, 'CopiarEncargadoAlAsunto') && $desde_agrega_cliente) {
 							// Estoy creando un cliente (y su contrato por defecto).
-							echo $Form->select('id_usuario_responsable', $Sesion->usuario->ListarActivos('', 'SOC'), $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable, array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this)'));
+							echo $Form->select(
+							'id_usuario_responsable',
+							$Sesion->usuario->ListarActivos('', 'SOC'),
+							$contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable,
+							array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3', 'onchange' => 'CambioEncargado(this, \'' . $id_usuario_inactivo1 . '\')'));
 						} else {
 							echo $Form->select('id_usuario_responsable', $Sesion->usuario->ListarActivos('', 'SOC'), $contrato->fields['id_usuario_responsable'] ? $contrato->fields['id_usuario_responsable'] : $id_usuario_responsable, array('empty' => 'Seleccione...', 'style' => 'width: 200px', 'class' => 'span3'));
 						}
@@ -1629,8 +1672,24 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							?>
 						</div>
 					</td>
+					<?php
+						$UsuarioSecundario = new Usuario($Sesion);
+						$UsuarioSecundario->LoadId($contrato->fields['id_usuario_secundario']);
+						if ($UsuarioSecundario->fields['activo'] == 0) {
+							$id_usuario_inactivo2 = $UsuarioSecundario->fields['id_usuario'];
+						} else {
+							$id_usuario_inactivo2 = null;
+						}
+					 ?>
 					<td class="al">
-						<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos("OR id_usuario = '{$contrato->fields['id_usuario_secundario']}'"), 'id_usuario_secundario', $contrato->fields['id_usuario_secundario'], 'class="span3"', 'Vacio', '200px'); ?>
+						<?php echo Html::SelectArrayDecente(
+						$Sesion->usuario->ListarActivos('', false, $id_usuario_inactivo2),
+						 'id_usuario_secundario', $contrato->fields['id_usuario_secundario'],
+						  'class="span3" onchange="selectInactiveUser(this,' . $id_usuario_inactivo2 . ', \'usuario_inactivo_2\')"',
+							 'Vacio',
+							 '200px'
+						 ); ?>
+						<span id="usuario_inactivo_2"><?= isset($id_usuario_inactivo2) ? ' (' . $mensaje_inactivo . ')' : ''; ?></span>
 					</td>
 				</tr>
 			<?php } ?>
@@ -3448,7 +3507,6 @@ echo $Form->script();
 			ActualizarFormaCobro(laID);
 		});
 	});
-
 
 	function YoucangonowMichael() {
 		<?php
