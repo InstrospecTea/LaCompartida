@@ -67,91 +67,91 @@ $wb->setCustomColor(55, 150, 150, 150);
 
 //--------------- Definamos los formatos generales, los que quedan constante por todo el documento -------------
 
-$formato_encabezado = & $wb->addFormat(array('Size' => 8,
+$formato_encabezado = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'middle',
 						'Align' => 'left',
 						'Bold' => 1,
 						'Color' => 'black'));
-$formato_encabezado_derecha = & $wb->addFormat(array('Size' => 8,
+$formato_encabezado_derecha = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'middle',
 						'Align' => 'right',
 						'Bold' => 1,
 						'Color' => 'black'));
-$formato_encabezado_center = & $wb->addFormat(array('Size' => 8,
+$formato_encabezado_center = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'middle',
 						'Align' => 'center',
 						'Bold' => 1,
 						'Color' => 'black'));
-$formato_tiempo = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'middle',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_tiempo2 = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo2 = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_tiempo2_centrado = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo2_centrado = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Align' => 'center',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_tiempo_total = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo_total = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Bold' => '1',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_tiempo_total_tabla = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo_total_tabla = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Bold' => '1',
 						'Top' => '1',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_tiempo_total_tabla_centrado = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo_total_tabla_centrado = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Align' => 'center',
 						'Bold' => '1',
 						'Top' => '1',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_total = & $wb->addFormat(array('Size' => 8,
+$formato_total = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Bold' => 1,
 						'Top' => 1,
 						'Color' => 'black'));
-$formato_resumen_text = & $wb->addFormat(array('Size' => 8,
+$formato_resumen_text = & $wb->addFormat(array('Size' => 10,
 						'Valign' => 'top',
 						'Bold' => '1',
 						'Align' => 'left',
 						'Color' => 'black',
 						'TextWrap' => 1));
 $letra_chica = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'left',
 						'Italic' => 1
 				));
 $letra_chica_derecha = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'right',
 						'Italic' => 1
 				));
 $letra_chica_bold = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'left',
 						'Bold' => 1,
 						'Italic' => 1
 				));
 $letra_chica_bold_derecha = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'right',
 						'Bold' => 1,
 						'Italic' => 1
 				));
 $letra_chica_underline = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'left',
 						'Bold' => 1,
@@ -159,41 +159,41 @@ $letra_chica_underline = &$wb->addFormat(array(
 						'Underline' => 1
 				));
 $letra_chica_bottomgrid = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Bottom' => '1',
 						'Align' => 'left',
 						'Italic' => 1
 				));
 $letra_chica_derecha_bottomgrid = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Bottom' => '1',
 						'Align' => 'right',
 						'Italic' => 1
 				));
 $letra_encabezado_lista = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'left',
 						'FgColor' => '55',
 						'Bold' => 1
 				));
 $letra_datos_lista = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'left',
 						'TextWrap' => 1
 				));
 $letra_encabezado_lista_centrado = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'center',
 						'FgColor' => '55',
 						'Bold' => 1
 				));
 $letra_datos_lista_centrado = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'center',
 						'TextWrap' => 1
@@ -338,7 +338,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$ff = str_replace('%m', 'MM', $ff);
 	$ff = str_replace('%y', 'YY', $ff);
 	$ff = str_replace('%Y', 'YY', $ff);
-	$formato_fecha = & $wb->addFormat(array('Size' => 8,
+	$formato_fecha = & $wb->addFormat(array('Size' => 10,
 							'Valign' => 'top',
 							'Color' => 'black'));
 	$formato_fecha->setNumFormat($ff);
@@ -368,12 +368,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$Cliente->LoadByCodigo($Cobro->fields['codigo_cliente']);
 
 	// ----------------- Define formatos specificos dentro del cobro ------------------
-	$formato_moneda_gastos = & $wb->addFormat(array('Size' => 8,
+	$formato_moneda_gastos = & $wb->addFormat(array('Size' => 10,
 							'VAlign' => 'top',
 							'Align' => 'right',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
-	$formato_moneda_gastos_total = & $wb->addFormat(array('Size' => 8,
+	$formato_moneda_gastos_total = & $wb->addFormat(array('Size' => 10,
 							'VAlign' => 'top',
 							'Align' => 'right',
 							'Bold' => 1,
@@ -410,32 +410,32 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$decimales_total = '';
 	}
 	$formato_moneda = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'top',
 							'Align' => 'right',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda2 = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda2_centrado = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'center',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda_total = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Bold' => '1',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales_total"));
 	$formato_moneda_tabla = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Top' => '1',
@@ -443,7 +443,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda_tabla_centrado = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'center',
 							'Top' => '1',
@@ -451,7 +451,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda_total_tabla = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Top' => '1',
@@ -459,13 +459,13 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales_total"));
 	$formato_monto = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Color' => 'black',
 							'NumFormat' => "#,###,0$decimales"));
 	$formato_total = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Bold' => '1',
