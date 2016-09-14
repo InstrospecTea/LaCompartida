@@ -1,4 +1,8 @@
 # Changelog
+## Hotfix 16.28.2
+Tuesday, September 13th
+* **Fix** [Corrección decimales en excel reporte avanzado](https://github.com/LemontechSA/ttb/pull/1815)
+
 ## Hotfix 16.28.1
 Tuesday, September 13th
 * **Fix** [Corrección selector encargado comercial](https://github.com/LemontechSA/ttb/pull/1812)
