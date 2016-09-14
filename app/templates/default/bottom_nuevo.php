@@ -37,7 +37,8 @@ if ($sesion->usuario->fields['mostrar_popup']) {
 	.unslider-nav ol li.unslider-active {
 		background: #4179ef;
 	}
-	.unslider-nav .btn-close {
+	.unslider-nav .btn-close,
+	.unslider-nav .btn-next {
 		display: inline-block;
 		padding: 12px 20px;
 		margin: 6px 10px 0 0;
@@ -50,6 +51,7 @@ if ($sesion->usuario->fields['mostrar_popup']) {
 		position: absolute;
 		right: 0;
 		cursor: pointer;
+		outline: none;
 	}
 	.new-design .ui-dialog-titlebar {
 		display: none;
@@ -71,6 +73,7 @@ if ($sesion->usuario->fields['mostrar_popup']) {
 	</div>
 	<script type="text/javascript">
 		var $new_design_close_button;
+		var $new_design_next_button;
 		(function ($) {
 			$.when(jQueryUI).then(function () {
 				$('#new-design-cotainer').dialog({
@@ -81,30 +84,51 @@ if ($sesion->usuario->fields['mostrar_popup']) {
 					resizable: false,
 					dialogClass: 'new-design',
 					create: function () {
-						$('#new-design').show();
-						var slider = $('#new-design').unslider({
-							arrows: false,
-							infinite: true
+
+						$new_design_next_button = $('<button/>')
+							.addClass('btn-next')
+							.text('Continuar')
+							.hide()
+							.on('click', function (event) {
+								event.preventDefault();
+								$('#new-design').unslider('next');
+							});
+
+						$('#new-design').on('unslider.ready', function() {
+							$new_design_close_button = $('<button/>')
+								.addClass('btn-close')
+								.text('Finalizar')
+								.hide()
+								.on('click', function (event) {
+									event.preventDefault();
+									$.post(root_dir + '/app/Users/markPopup');
+									$('#new-design-cotainer').dialog('close');
+								});
+
+							$('#new-design-cotainer .unslider-nav')
+								.prepend($new_design_next_button)
+								.prepend($new_design_close_button);
+
 						});
-						slider.on('unslider.change', function (event, index, slide) {
-							if (!$new_design_close_button) {
-								$new_design_close_button = $('<button/>')
-									.addClass('btn-close')
-									.text('Ir a mis trabajos')
-									.on('click', function (event) {
-										event.preventDefault();
-										$.post(root_dir + '/app/Users/markPopup');
-										$('#new-design-cotainer').dialog('close');
-									});
-								$('#new-design-cotainer .unslider-nav')
-									.prepend($new_design_close_button);
-							}
-							if (index == 2) {
+
+						$('#new-design').on('unslider.change', function (event, index, slide) {
+
+							if (index == 2 || (index == -1 && slide.hasClass('unslider-clone'))) {
+								$new_design_next_button.hide();
 								$new_design_close_button.show();
 							} else {
 								$new_design_close_button.hide();
+								$new_design_next_button.show();
 							}
+
 						});
+
+						$('#new-design').show();
+						$('#new-design').unslider({
+							arrows: false,
+							infinite: true
+						});
+
 					}
 				});
 			});
