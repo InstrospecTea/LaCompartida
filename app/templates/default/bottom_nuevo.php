@@ -1,4 +1,6 @@
-
+<?php
+$sesion = new Sesion();
+?>
 <div id="footer" style="clear:both;display:block;">
 	&nbsp;
 		<script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.20151207051013.js"></script>
@@ -8,6 +10,132 @@
 		<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/layers/assets/js/LoadingModal.js"></script>
 		<link rel="stylesheet" type="text/css" href="<?php echo Conf::RootDir(); ?>/app/layers/assets/css/LoadingModal.css" />
 </div>
+
+<?php
+if ($sesion->usuario->fields['mostrar_popup']) {
+	$Html = new \TTB\Html();
+	?>
+	<?= $Html->script(Conf::RootDir() . '/bower_components/unslider/src/js/unslider.js'); ?>
+	<?= $Html->css(Conf::RootDir() . '/bower_components/unslider/dist/css/unslider.css'); ?>
+	<?= $Html->css(Conf::RootDir() . '/bower_components/unslider/dist/css/unslider-dots.css'); ?>
+
+	<style type="text/css">
+	.unslider-nav {
+		background-color: #e4e4e4;
+		overflow: hidden;
+	}
+	.unslider-nav ol {
+		margin: 15px 0
+	}
+	.unslider-nav ol li {
+		background: #ffffff;
+		width: 9px;
+		height: 9px;
+		border-width: 1px;
+		border-color: #a0a1a3;
+	}
+	.unslider-nav ol li.unslider-active {
+		background: #4179ef;
+	}
+	.unslider-nav .btn-close,
+	.unslider-nav .btn-next {
+		display: inline-block;
+		padding: 12px 20px;
+		margin: 6px 10px 0 0;
+		border: none;
+		border-radius: 5px;
+		background: #4279ee;
+		color: #ffffff !important;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+		font-size: 12px;
+		position: absolute;
+		right: 0;
+		cursor: pointer;
+		outline: none;
+	}
+	.new-design .ui-dialog-titlebar {
+		display: none;
+	}
+	#new-design img {
+		width: 600px;
+		height: 576px;
+	}
+
+	</style>
+	<div id="new-design-cotainer">
+		<div id="new-design" style="display: none">
+			<ul>
+				<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider1.jpg"/></li>
+				<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider2.jpg"/></li>
+				<li><img src="https://s3.amazonaws.com/static.thetimebilling.com/new-design/slider3.jpg"/></li>
+			</ul>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var $new_design_close_button;
+		var $new_design_next_button;
+		(function ($) {
+			$.when(jQueryUI).then(function () {
+				$('#new-design-cotainer').dialog({
+					width: 600,
+					height: 'auto',
+					modal: true,
+					closeOnEscape: false,
+					resizable: false,
+					dialogClass: 'new-design',
+					create: function () {
+
+						$new_design_next_button = $('<button/>')
+							.addClass('btn-next')
+							.text('Continuar')
+							.hide()
+							.on('click', function (event) {
+								event.preventDefault();
+								$('#new-design').unslider('next');
+							});
+
+						$('#new-design').on('unslider.ready', function() {
+							$new_design_close_button = $('<button/>')
+								.addClass('btn-close')
+								.text('Finalizar')
+								.hide()
+								.on('click', function (event) {
+									event.preventDefault();
+									$.post(root_dir + '/app/Users/markPopup');
+									$('#new-design-cotainer').dialog('close');
+								});
+
+							$('#new-design-cotainer .unslider-nav')
+								.prepend($new_design_next_button)
+								.prepend($new_design_close_button);
+
+						});
+
+						$('#new-design').on('unslider.change', function (event, index, slide) {
+
+							if (index == 2 || (index == -1 && slide.hasClass('unslider-clone'))) {
+								$new_design_next_button.hide();
+								$new_design_close_button.show();
+							} else {
+								$new_design_close_button.hide();
+								$new_design_next_button.show();
+							}
+
+						});
+
+						$('#new-design').show();
+						$('#new-design').unslider({
+							arrows: false,
+							infinite: true
+						});
+
+					}
+				});
+			});
+
+		})(jQuery);
+	</script>
+<?php } ?>
 
 <?php
 $Slim=Slim::getInstance('default',true);
@@ -36,7 +164,6 @@ $Slim=Slim::getInstance('default',true);
 	}
 </style>
 <?php
-$sesion = new Sesion();
 $BloqueoProceso = new BloqueoProceso($sesion);
 $notificaciones = $BloqueoProceso->getNotifications($sesion->usuario->fields['id_usuario']);
 
