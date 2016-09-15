@@ -1,4 +1,9 @@
 # Changelog
+
+## [Release 16.29.0](https://github.com/LemontechSA/ttb/pull/1820)
+Thursday, September 15th
+* **Feature** [Popup New Design](https://github.com/LemontechSA/ttb/pull/1797)
+
 ## Hotfix 16.28.2
 Tuesday, September 13th
 * **Fix** [Corrección decimales en excel reporte avanzado](https://github.com/LemontechSA/ttb/pull/1815)
