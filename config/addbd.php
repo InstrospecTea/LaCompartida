@@ -71,8 +71,8 @@ if (!function_exists('decrypt')) {
 }
 
 if( !isset($memcache) || !is_object($memcache) ) {
-	$memcache = new Memcache;
-	$memcache->connect('ttbcache.tmcxaq.0001.use1.cache.amazonaws.com', 11211);
+	 $memcache = new Memcache;
+	 $memcache->connect('ttbcache.tmcxaq.0001.use1.cache.amazonaws.com', 11211);
 }
 
 use Aws\Common\Aws;
@@ -91,7 +91,7 @@ $arrayconfig=array(
 );
 
 $aws = Aws::factory($arrayconfig);
-if( ! $dynamodbresponse = @unserialize( $memcache->get('dynamodbresponse_' . $llave) ) ) {
+ if( ! $dynamodbresponse = @unserialize( $memcache->get('dynamodbresponse_' . $llave) ) ) {
 	try {
 		$dynamodb = $aws->get('dynamodb');
 		$result = $dynamodb->getItem(array(
@@ -102,14 +102,38 @@ if( ! $dynamodbresponse = @unserialize( $memcache->get('dynamodbresponse_' . $ll
 		$dynamodbresponse = $result['Item']; //$response->body->Item->to_array();
 
 	} catch (Exception $e) {
-		Utiles::errorSQL('', '', '', null, '', $e);
+		$now = Date::now();
+		$file = $e->getFile();
+		$line = $e->getLine();
+		$message = $e->getMessage();
+		$trace = $e->getTraceAsString();
+		$error = <<<EOF
+
+{$now}
+Archivo: {$file}
+Linea: {$line}
+Mensaje: {$message}
+Traza: {$trace}
+---------------------------
+
+EOF;
+		echo "<!-- {$error} -->";
+		file_put_contents('/tmp/dynamo.log', $error, FILE_APPEND);
+		echo '
+			<div id="sql_error" style="margin: 0px auto  0px; width: 414px; border: 1px solid #00782e; padding: 5px; font-family: Arial, Helvetica, sans_serif;font-size:12px;">
+				<div style="background:#00782e;"><img src="' . Conf::ImgDir() . '/logo_top.png" border="0"/></div>
+				<br/><strong>Se encontró un error al procesar su solicitud.</strong><br />El error ha sido informado a soporte Lemontech.<br/>
+				<br><i>SU IP (' . $_SERVER['REMOTE_ADDR'] . ') ha sido registrada para mayor seguridad.</i>
+			</div>
+		';
+		exit;
 	} catch (DynamoDbException $e) {
 		echo 'The item could not be retrieved.';
 	}
 
 	$memcache->set( 'dynamodbresponse_'.$llave, serialize($dynamodbresponse), false, 90);
 
-}
+ }
 
 foreach ($dynamodbresponse as $tipo => $valor) {
 	if (is_string($valor)) {
