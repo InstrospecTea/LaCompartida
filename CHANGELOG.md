@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.29.2
+Wednesday, September 21st
+* **Fix** [Modifica nombre de clase Reporte en resumen abogado](https://github.com/LemontechSA/ttb/pull/1826)
+
 ## Hotfix 16.29.1
 Wednesday, September 21st
 * **Fix** [muestra error SQL cuando falla la conexión a dynamo](https://github.com/LemontechSA/ttb/pull/1825)
