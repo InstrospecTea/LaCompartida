@@ -1,16 +1,9 @@
 <?php
-
 list($subdominio)=explode('.',$_SERVER['HTTP_HOST']);
 
 ini_set('error_log', "/var/www/html/logs/{$subdominio}_error_log.log");
 
-if( $_SERVER['REMOTE_ADDR'] == '152.231.82.18' && $subdominio == 'palcantarcol' ) {
-	ini_set('display_errors', 'On');
-	error_reporting(E_ERROR);
-
-} else {
-	ini_set('display_errors', 'Off');
-}
+ini_set('display_errors', 'Off');
 
 list($_SERVER['DUMMY'],$_SERVER['SUBDIR'],$_SERVER['SUBSUBDIR']) = explode('/', $_SERVER['REQUEST_URI']);
 
@@ -21,7 +14,7 @@ if (extension_loaded('newrelic')) {
 	newrelic_capture_params();
 
 	if ($subdir == 'juicios' || strpos($script_url, "juicios")) {
-			newrelic_set_appname("Case Tracking");
+		newrelic_set_appname("Case Tracking");
 	} else {
 		newrelic_set_appname("The Time Billing");
 	}
@@ -31,7 +24,6 @@ if (extension_loaded('newrelic')) {
 	if( strpos($script_url, 'cron') || strpos($script_url, 'web_services') ) {
 		newrelic_ignore_apdex(true);
 		newrelic_background_job(true);
-		//newrelic_ignore_transaction();
 		newrelic_disable_autorum();
 	}
 }
@@ -83,40 +75,13 @@ if( !isset($memcache) || !is_object($memcache) ) {
 	$memcache->connect('ttbcache.tmcxaq.0001.use1.cache.amazonaws.com', 11211);
 }
 
-if (!function_exists('decrypt')) {
-	function decrypt($msg, $k) {
-
-		$msg = base64_decode($msg);
-		$k = substr($k, 0, 32);
-		# open cipher module (do not change cipher/mode)
-		if (!$td = mcrypt_module_open('rijndael-256', '', 'ctr', ''))
-			return false;
-
-		$iv = substr($msg, 0, 32); // extract iv
-		$mo = strlen($msg) - 32; // mac offset
-		$em = substr($msg, $mo); // extract mac
-		$msg = substr($msg, 32, strlen($msg) - 64); // extract ciphertext
-
-		if (@mcrypt_generic_init($td, $k, $iv) !== 0)
-			return false;
-
-		$msg = mdecrypt_generic($td, $msg);
-		$msg = unserialize($msg);
-		mcrypt_generic_deinit($td);
-		mcrypt_module_close($td);
-		return $msg;
-	}
-}
-
 use Aws\Common\Aws;
 use Aws\DynamoDb\Exception\DynamoDbException;
 
 $arrayconfig=array(
-   // 'includes' => array('_aws', '_sdk1'),
 	'key'    => 'AKIAIQYFL5PYVQKORTBA',
 	'secret' => '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',
 	'region' => 'us-east-1',
-
 	'default_cache_config' =>  array(
 		array(
 			'host' => 'ttbcache.tmcxaq.0001.use1.cache.amazonaws.com',
@@ -126,11 +91,9 @@ $arrayconfig=array(
 );
 
 $aws = Aws::factory($arrayconfig);
-
 if( ! $dynamodbresponse = @unserialize( $memcache->get('dynamodbresponse_' . $llave) ) ) {
 	try {
 		$dynamodb = $aws->get('dynamodb');
-
 		$result = $dynamodb->getItem(array(
 			'TableName' => 'thetimebilling',
 			'Key'       => array( 'HashKeyElement' => array('S' => $llave ))
@@ -139,8 +102,7 @@ if( ! $dynamodbresponse = @unserialize( $memcache->get('dynamodbresponse_' . $ll
 		$dynamodbresponse = $result['Item']; //$response->body->Item->to_array();
 
 	} catch (Exception $e) {
-		print_r($e);
-
+		Utiles::errorSQL('', '', '', null, '', $e);
 	} catch (DynamoDbException $e) {
 		echo 'The item could not be retrieved.';
 	}
