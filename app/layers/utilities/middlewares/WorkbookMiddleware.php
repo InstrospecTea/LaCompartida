@@ -217,7 +217,7 @@ class WorkbookMiddleware {
 					}
 
 					$formatArray['fill']['type'] = PHPExcel_Style_Fill::FILL_SOLID;
-					$formatArray['fill']['startcolor'] = ['rgb' => $formatValue];
+					$formatArray['fill']['startcolor'] = ['argb' => $formatValue];
 					break;
 				case 'textwrap':
 					$formatArray['alignment']['wrap'] = $formatValue;
