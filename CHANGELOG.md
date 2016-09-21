@@ -1,5 +1,17 @@
 # Changelog
 
+## Hotfix 16.29.3
+Wednesday, September 21st
+* **Fix** [crea error personalizado y lo escribe en /tmp/dynamo.log](https://github.com/LemontechSA/ttb/pull/1827)
+
+## Hotfix 16.29.2
+Wednesday, September 21st
+* **Fix** [Modifica nombre de clase Reporte en resumen abogado](https://github.com/LemontechSA/ttb/pull/1826)
+
+## Hotfix 16.29.1
+Wednesday, September 21st
+* **Fix** [muestra error SQL cuando falla la conexión a dynamo](https://github.com/LemontechSA/ttb/pull/1825)
+
 ## [Release 16.29.0](https://github.com/LemontechSA/ttb/pull/1820)
 Thursday, September 15th
 * **Feature** [Popup New Design](https://github.com/LemontechSA/ttb/pull/1797)
