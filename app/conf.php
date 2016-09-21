@@ -1,25 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../ttbloader.php';
-
-ini_set('display_errors', 'Off');
-error_reporting(0);
-
-defined('APPPATH') || define('APPPATH', dirname(dirname(__FILE__)));
-
-$confFile = dirname(__FILE__) . '/../config/addbd.php';
-
-if( file_exists(dirname(__FILE__) . '/miconf.php') ) {
-	require_once dirname(__FILE__) . '/miconf.php';
-} elseif( file_exists($confFile) ) {
-	require_once $confFile;
-}
-
-if (!function_exists('apache_setenv')) {
-	function apache_setenv() {
-		return;
-	}
-}
-
 if (!class_exists('Conf')) {
 	class Conf {
 		public static function AppName() { return html_entity_decode(APPNAME); }
@@ -146,6 +126,25 @@ if (!class_exists('Conf')) {
 				'default_cache_config' => CACHEDIR
 			);
 		}
+	}
+}
+
+ini_set('display_errors', 'Off');
+error_reporting(0);
+
+defined('APPPATH') || define('APPPATH', dirname(dirname(__FILE__)));
+
+$confFile = dirname(__FILE__) . '/../config/addbd.php';
+
+if( file_exists(dirname(__FILE__) . '/miconf.php') ) {
+	require_once dirname(__FILE__) . '/miconf.php';
+} elseif( file_exists($confFile) ) {
+	require_once $confFile;
+}
+
+if (!function_exists('apache_setenv')) {
+	function apache_setenv() {
+		return;
 	}
 }
 
