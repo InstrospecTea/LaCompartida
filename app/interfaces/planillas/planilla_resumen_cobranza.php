@@ -4,9 +4,6 @@ set_time_limit(0);
 $sesion = new Sesion(array('REP'));
 //Revisa el Conf si esta permitido
 
-
-
-
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 $Form = new Form($sesion);
@@ -124,7 +121,7 @@ if ($xls) {
 	$ws1->setLandscape();
 	$ws1->freezePanes(array(0, 3));
 
-	$hoja_historial = array();
+	$hoja_historial = [];
 	$col2_fecha = 1;
 	$col2_comentario = 2;
 
@@ -570,9 +567,6 @@ if ($xls) {
 
 		// Calcular gastos
 		$gastos = 0;
-
-
-
 
 		$cobro_moneda = new CobroMoneda($sesion);
 		$cobro_moneda->Load($cobro['id_cobro']);
@@ -1070,7 +1064,6 @@ $pagina->PrintTop();
 	</table>
 </form>
 <script type="text/javascript">
-
 	function Rangos(obj, form) {
 		if (obj.checked) {
 			jQuery('#periodo').hide();
