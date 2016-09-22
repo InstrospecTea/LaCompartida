@@ -51,7 +51,29 @@ if (!$result = @unserialize($memcache->get('teneninformation_' . $llave))) {
 			'Key' => ['HashKeyElement' => ['S' => $llave]]
 		]);
 	} catch (Exception $e) {
-		echo 'The item could not be retrieved.';
+		// TODO: esto hay que refactorizar, retornar una vista o algo por el estilo
+		$now = Date::now();
+		$file = $e->getFile();
+		$line = $e->getLine();
+		$message = $e->getMessage();
+		$trace = $e->getTraceAsString();
+		$error = "{$now}\n" .
+			"Archivo: {$file}\n" .
+			"Linea: {$line}\n" .
+			"Mensaje: {$message}\n" .
+			"Traza: {$trace}\n" .
+			"---------------------------";
+
+		echo "<!-- {$error} -->";
+		file_put_contents('/tmp/dynamo.log', $error, FILE_APPEND);
+		echo '
+			<div id="sql_error" style="margin: 0px auto  0px; width: 414px; border: 1px solid #00782e; padding: 5px; font-family: Arial, Helvetica, sans_serif;font-size:12px;">
+				<div style="background:#00782e;"><img src="' . Conf::ImgDir() . '/logo_top.png" border="0"/></div>
+				<br/><strong>Se encontró un error al procesar su solicitud.</strong><br />El error ha sido informado a soporte Lemontech.<br/>
+				<br><i>SU IP (' . $_SERVER['REMOTE_ADDR'] . ') ha sido registrada para mayor seguridad.</i>
+			</div>
+		';
+		exit;
 	}
 
 	$memcache->set('teneninformation_' . $llave, serialize($result), false, 90);
