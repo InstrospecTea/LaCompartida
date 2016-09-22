@@ -96,21 +96,15 @@ if ($xls) {
 				FROM prm_moneda
 				ORDER BY id_moneda';
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	$Moneda = new Moneda($sesion);
 	while (list($id_moneda, $simbolo_moneda, $cifras_decimales) = mysql_fetch_array($resp)) {
-		if ($cifras_decimales > 0) {
-			$decimales = '.';
-			while ($cifras_decimales-- > 0) {
-				$decimales .= '0';
-			}
-		} else {
-			$decimales = '';
-		}
+		$formato = $Moneda->getExcelFormat($id_moneda);
 		$formatos_moneda[$id_moneda] = & $wb->addFormat(array('Size' => 11,
 					'VAlign' => 'top',
 					'Align' => 'right',
 					'Border' => '1',
 					'Color' => 'black',
-					'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+					'NumFormat' => $formato));
 	}
 
 	$ws1 = & $wb->addWorksheet(__('Facturacion'));
