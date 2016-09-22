@@ -116,8 +116,6 @@ if ($xls) {
 	$ws1->freezePanes(array(0, 3));
 
 	$hoja_historial = [];
-	$col2_fecha = 1;
-	$col2_comentario = 2;
 
 	// Definir los números de las columnas
 	// El orden que tienen en esta sección es el que mantienen en la planilla.
@@ -819,17 +817,17 @@ if ($xls) {
 
 		if ($cobro['estado'] != 'CREADO' && $cobro['estado'] != 'EN REVISION') {
 			$comentario = "";
-			$query_historial = "SELECT fecha, comentario FROM cobro_historial WHERE id_cobro=" . $cobro['id_cobro'];
+			$query_historial = "SELECT fecha, comentario FROM cobro_historial WHERE id_cobro = {$cobro['id_cobro']}";
 			$resp_historial = mysql_query($query_historial, $sesion->dbh) or Utiles::errorSQL($query_historial, __FILE__, __LINE__, $sesion->dbh);
 			$detalle_historial = [];
 			while ($historial = mysql_fetch_array($resp_historial)) {
-				$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, '-') . ": " . $historial['comentario'] . "\n";
+				$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, '-') . ": {$historial['comentario']}\n";
 				$detalle_historial[] = [
 					'fecha' => Utiles::sql2fecha($historial['fecha'], $formato_fecha, '-'),
 					'comentario' => $historial['comentario']
 				];
 			}
-			$titulo = __("Historial Cobro") . " " . $cobro['id_cobro'] . ' (' . $cobro['glosa_cliente'] . ')';
+			$titulo = __("Historial Cobro") . " {$cobro['id_cobro']} ({$cobro['glosa_cliente']})";
 			$hoja_historial[$titulo] = $detalle_historial;
 			$ws1->writeNote($filas, $col_estado, $comentario);
 		}
@@ -870,8 +868,8 @@ if ($xls) {
 	$ws2->setZoom(75);
 	$ws2->hideGridlines();
 	$ws2->setLandscape();
-	$ws2->setColumn($col2_fecha, $col2_fecha, 17);
-	$ws2->setColumn($col2_comentario, $col2_comentario, 44);
+	$ws2->setColumn($col_fecha, $col_fecha, 17);
+	$ws2->setColumn($col_comentario, $col_comentario, 44);
 
 	foreach ($hoja_historial as $titulo => $historial) {
 		$ws2->write($fila, $col_fecha, $titulo, $titulo_filas);
