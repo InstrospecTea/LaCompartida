@@ -858,7 +858,8 @@
 					$ws1->writeNumber($filas, $col_tarifa_usuario[$data['id']], $abogados_horas[$data['id']]['hora_vendida'], $i % 2 == 0 ? $formatos_moneda_color[$cobro['id_moneda']] : $formatos_moneda[$cobro['id_moneda']] );
 					$ws1->writeNumber($filas, $col_tarifa_estandar_usuario[$data['id']], $abogados_horas[$data['id']]['tarifa_estandar'], $i % 2 == 0 ? $formatos_moneda_color[$cobro['id_moneda']] : $formatos_moneda[$cobro['id_moneda']] );
 					$ws1->writeNumber($filas, $col_valor_usuario[$data['id']], $abogados_horas[$data['id']]['aporte'], $i % 2 == 0 ? $formatos_moneda_color[$cobro['id_moneda']] : $formatos_moneda[$cobro['id_moneda']]);
-					$ws1->writeFormula($filas, $col_valor_moneda_usuario[$data['id']], "=".$col_formula_valor_usuario[$data['id']].($filas+1)."*".$cobro_moneda->moneda[$cobro['id_moneda']]['tipo_cambio']/$cobro['tipo_cambio'], $i % 2 == 0 ? $formatos_moneda_color[$moneda] : $formatos_moneda[$moneda]);
+					$total_conversion = $abogados_horas[$data['id']]['aporte'] * $cobro_moneda->moneda[$cobro['id_moneda']]['tipo_cambio'] / $cobro['tipo_cambio'];
+					$ws1->writeNumber($filas, $col_valor_moneda_usuario[$data['id']], $total_conversion, $i % 2 == 0 ? $formatos_moneda_color[$moneda] : $formatos_moneda[$moneda]);
 				} else {
 					$ws1->write($filas, $col_usuario[$data['id']], '', $i % 2 == 0 ? $txt_centro_color : $txt_centro);
 					$ws1->write($filas, $col_tarifa_usuario[$data['id']], '',$i % 2 == 0 ? $txt_centro_color : $txt_centro);
