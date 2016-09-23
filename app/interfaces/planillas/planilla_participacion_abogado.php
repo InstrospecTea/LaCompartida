@@ -4,94 +4,91 @@
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
 
-
 	$pagina = new Pagina($sesion);
 	$formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
 	$Form = new Form($sesion);
 	$Html = new \TTB\Html;
 
-	if($xls)
-	{
+	if ($xls) {
 		$moneda_base = Utiles::MonedaBase($sesion);
 		#ARMANDO XLS
 		$wb = new WorkbookMiddleware();
 
+		$wb->setCustomColor(35, 220, 255, 220);
+		$wb->setCustomColor(36, 255, 255, 220);
 
-		$wb->setCustomColor (35, 220, 255, 220);
-		$wb->setCustomColor (36, 255, 255, 220);
-
-		$encabezado =& $wb->addFormat(array('Size' => 12,
+		$encabezado = & $wb->addFormat(array('Size' => 12,
 									'VAlign' => 'top',
 									'Align' => 'left',
 									'Bold' => '1',
 									'underline'=>1,
 									'Color' => 'black'));
-		$txt_opcion =& $wb->addFormat(array('Size' => 11,
+		$txt_opcion = & $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'left',
 									'Border' => 1,
 									'Color' => 'black',
 									'TextWrap' => 1));
-		$txt_opcion_color =& $wb->addFormat(array('Size' => 11,
+		$txt_opcion_color = & $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'left',
 									'FgColor' => '35',
 									'Border' => 1,
 									'Color' => 'black',
 									'TextWrap' => 1));
-		$txt_valor =& $wb->addFormat(array('Size' => 11,
+		$txt_valor = & $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'right',
 									'Border' => 1,
 									'Color' => 'black',
 									'TextWrap' => 1));
-		$txt_centro =& $wb->addFormat(array('Size' => 11,
+		$txt_centro = & $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'center',
 									'Border' => 1,
 									'Color' => 'black',
 									'TextWrap' => 1));
-		$txt_centro_color =& $wb->addFormat(array('Size' => 11,
+		$txt_centro_color = & $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'center',
 									'Border' => 1,
 									'FgColor' => '35',
 									'Color' => 'black',
 									'TextWrap' => 1));
-		$fecha =& $wb->addFormat(array('Size' => 11,
+		$fecha = & $wb->addFormat(array('Size' => 11,
 									'Valign' => 'top',
 									'Align' => 'center',
 									'Border' => 1,
 									'Color' => 'black',
 									'TextWrap' => 1));
-		$numeros =& $wb->addFormat(array('Size' => 11,
+		$numeros = & $wb->addFormat(array('Size' => 11,
 									'VAlign' => 'top',
 									'Align' => 'right',
 									'Border' => 1,
 									'Color' => 'black',
 									'NumFormat' => '0'));
-		$numeros_color =& $wb->addFormat(array('Size' => 11,
+		$numeros_color = & $wb->addFormat(array('Size' => 11,
 									'VAlign' => 'top',
 									'Align' => 'right',
 									'FgColor' => '35',
 									'Border' => 1,
 									'Color' => 'black',
 									'NumFormat' => '0'));
-		$titulo_filas =& $wb->addFormat(array('Size' => 12,
+		$titulo_filas = & $wb->addFormat(array('Size' => 12,
 									'Align' => 'center',
 									'Bold' => '1',
 									'FgColor' => '35',
 									'Border' => 1,
 									'Locked' => 1,
 									'Color' => 'black'));
-		$titulo_filas_color =& $wb->addFormat(array('Size' => 12,
+		$titulo_filas_color = & $wb->addFormat(array('Size' => 12,
 									'Align' => 'center',
 									'Bold' => '1',
 									'FgColor' => '35',
 									'Border' => 1,
 									'Locked' => 1,
 									'Color' => 'black'));
-		$time_format =& $wb->addFormat(array('Size' => 10,
+		$time_format = & $wb->addFormat(array('Size' => 10,
 									'VAlign' => 'top',
 									'Align' => 'justify',
 									'Border' => 1,
@@ -104,28 +101,22 @@
 				FROM prm_moneda
 				ORDER BY id_moneda';
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		while(list($id_moneda, $simbolo_moneda, $cifras_decimales) = mysql_fetch_array($resp)){
-			if($cifras_decimales>0)
-			{
-				$decimales = '.';
-				while($cifras_decimales-- >0)
-					$decimales .= '0';
-			}
-			else
-				$decimales = '';
-			$formatos_moneda[$id_moneda] =& $wb->addFormat(array('Size' => 11,
+		$Moneda = new Moneda($sesion);
+		while (list($id_moneda, $simbolo_moneda, $cifras_decimales) = mysql_fetch_array($resp)) {
+			$formato = $Moneda->getExcelFormat($id_moneda);
+			$formatos_moneda[$id_moneda] = & $wb->addFormat(array('Size' => 11,
 																'VAlign' => 'top',
 																'Align' => 'right',
 																'Border' => '1',
 																'Color' => 'black',
-																'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+																'NumFormat' => $formato));
 			$formatos_moneda_color[$id_moneda] =& $wb->addFormat(array('Size' => 11,
 																'VAlign' => 'top',
 																'Align' => 'right',
 																'FgColor' => '35',
 																'Border' => '1',
 																'Color' => 'black',
-																'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+																'NumFormat' => $formato));
 		}
 		$where = "1";
 		if(is_array($socios))
@@ -219,7 +210,7 @@
 				$abogados[$id]=$abogados_datos;
 			}
 
-		$ws1 =& $wb->addWorksheet(__('Facturacion'));
+		$ws1 = & $wb->addWorksheet(__('Facturacion'));
 		$ws1->setInputEncoding('utf-8');
 		$ws1->fitToPages(1,5);
 		$ws1->setZoom(75);
@@ -228,6 +219,7 @@
 
 		// Definir los números de las columnas
 		// El orden que tienen en esta sección es el que mantienen en la planilla.
+		$hoja_historial = [];
 		$col = 0;
 		$col_numero_cobro = ++$col;
 		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) )
@@ -332,10 +324,10 @@
 		$ws1->setColumn($col_fecha_pago, $col_fecha_pago, 13);
 
 		++$filas;
-		$ws1->mergeCells($filas, $col_numero_cobro, $filas, $col_numero_cobro+2);
 		$ws1->write($filas, $col_numero_cobro, __('REPORTE PARTICIPACIÓN ABOGADO'), $encabezado);
 		$ws1->write($filas, $col_numero_cobro+1, '', $encabezado);
 		$ws1->write($filas, $col_numero_cobro+2, '', $encabezado);
+		$ws1->mergeCells($filas, $col_numero_cobro, $filas, $col_numero_cobro+2);
 		$filas +=2;
 		$ws1->write($filas, $col_numero_cobro, __('GENERADO EL:'), $txt_opcion);
 		if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'NotaCobroExtra') ) || ( method_exists('Conf','NotaCobroExtra') && Conf::NotaCobroExtra() ) ) )
@@ -499,21 +491,20 @@
 				$ws1->write($filas, $col_asuntos, __('Asuntos'), $titulo_filas);
 				$ws1->write($filas, $col_encargado, __('Encargado'), $titulo_filas);
 				$i=0;
-				foreach($abogados as $abogado => $data)
-						{
-									$ws1->mergeCells($filas-1, $col_usuario[$data['id']], $filas-1, $col_valor_moneda_usuario[$data['id']]);
-									$ws1->write($filas-1, $col_usuario[$data['id']], '', $titulo_filas);
-									$ws1->write($filas-1, $col_tarifa_usuario[$data['id']], '', $titulo_filas);
-									$ws1->write($filas-1, $col_tarifa_estandar_usuario[$data['id']], $data['nombre'], $titulo_filas);
-									$ws1->write($filas-1, $col_valor_usuario[$data['id']], '', $titulo_filas);
-									$ws1->write($filas-1, $col_valor_moneda_usuario[$data['id']], '', $titulo_filas);
-									$ws1->write($filas, $col_usuario[$data['id']], 'Horas', $i%2==0 ? $titulo_filas_color : $titulo_filas);
-									$ws1->write($filas, $col_tarifa_usuario[$data['id']], __('Hora vendida'), $i%2==0 ? $titulo_filas_color : $titulo_filas);
-									$ws1->write($filas, $col_tarifa_estandar_usuario[$data['id']], __('Tarifa estandar'), $i%2==0 ? $titulo_filas_color : $titulo_filas);
-									$ws1->write($filas, $col_valor_usuario[$data['id']], 'Aporte', $i%2==0 ? $titulo_filas_color : $titulo_filas);
-									$ws1->write($filas, $col_valor_moneda_usuario[$data['id']], $moneda_reporte->fields['simbolo'], $i%2==0 ? $titulo_filas_color : $titulo_filas);
-							$i++;
-						}
+				foreach ($abogados as $abogado => $data) {
+					$ws1->write($filas-1, $col_usuario[$data['id']], $data['nombre'], $titulo_filas);
+					$ws1->write($filas-1, $col_tarifa_usuario[$data['id']], '', $titulo_filas);
+					$ws1->write($filas-1, $col_tarifa_estandar_usuario[$data['id']], '', $titulo_filas);
+					$ws1->write($filas-1, $col_valor_usuario[$data['id']], '', $titulo_filas);
+					$ws1->write($filas-1, $col_valor_moneda_usuario[$data['id']], '', $titulo_filas);
+					$ws1->write($filas, $col_usuario[$data['id']], 'Horas', $i%2==0 ? $titulo_filas_color : $titulo_filas);
+					$ws1->write($filas, $col_tarifa_usuario[$data['id']], __('Hora vendida'), $i%2==0 ? $titulo_filas_color : $titulo_filas);
+					$ws1->write($filas, $col_tarifa_estandar_usuario[$data['id']], __('Tarifa estandar'), $i%2==0 ? $titulo_filas_color : $titulo_filas);
+					$ws1->write($filas, $col_valor_usuario[$data['id']], 'Aporte', $i%2==0 ? $titulo_filas_color : $titulo_filas);
+					$ws1->write($filas, $col_valor_moneda_usuario[$data['id']], $moneda_reporte->fields['simbolo'], $i%2==0 ? $titulo_filas_color : $titulo_filas);
+					$ws1->mergeCells($filas-1, $col_usuario[$data['id']], $filas-1, $col_valor_moneda_usuario[$data['id']]);
+					$i++;
+				}
 				$ws1->write($filas, $col_horas_trabajadas, __('Hrs. Trabajadas'), $titulo_filas);
 				$ws1->write($filas, $col_horas_cobradas, __('Hrs. Cobradas'), $titulo_filas);
 				$ws1->write($filas, $col_total_cobro_original, __('Total Cobro Original'), $titulo_filas);
@@ -724,6 +715,7 @@
 						}
 					$i++;
 				}
+				
 			$ws1->writeNumber($filas, $col_horas_trabajadas, $duracion, $time_format);
 			$ws1->writeNumber($filas, $col_horas_cobradas, $duracion_cobrable, $time_format);
 			$ws1->writeNumber($filas, $col_total_cobro_original, $aproximacion_monto, $formatos_moneda[$cobro['id_moneda']]);
@@ -738,7 +730,7 @@
 			else
 				$ws1->writeFormula($filas, $col_total_cobro, "=$col_formula_honorarios".($filas+1)."+$col_formula_gastos".($filas+1), $formatos_moneda[$moneda]);
 			$ws1->writeNumber($filas, $col_honorarios, number_format($monto_moneda, $cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
-			$ws1->writeNumber($filas, $col_gastos, number_format($monto_gastos, 6/*$cobro['cifras_decimales_titulo']*/, '.', ''), $formatos_moneda[$moneda]);
+			$ws1->writeNumber($filas, $col_gastos, number_format($monto_gastos, 6, '.', ''), $formatos_moneda[$moneda]);
 			if(  ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsarImpuestoSeparado') ) ||  ( method_exists('Conf','UsarImpuestoSeparado') && Conf::UsarImpuestoSeparado() )  ) )
 				$ws1->writeNumber($filas, $col_iva, number_format($monto_iva,$cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
 			$ws1->write($filas, $col_estado, $cobro['estado'], $txt_centro);
@@ -751,19 +743,23 @@
 			$ws1->writeNumber($filas, $col_monto_pago_honorarios, number_format($monto_pago_honorarios, $cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
 			$ws1->writeNumber($filas, $col_monto_pago_gastos, number_format($monto_pago_gastos, $cobro['cifras_decimales_titulo'], '.', ''), $formatos_moneda[$moneda]);
 
-			if($cobro['estado']!='CREADO' && $cobro['estado']!='EN REVISION')
-			{
-				$comentario="";
-				$query_historial="SELECT fecha, comentario FROM cobro_historial WHERE id_cobro=".$cobro['id_cobro'];
+			if ($cobro['estado'] != 'CREADO' && $cobro['estado'] != 'EN REVISION') {
+				$comentario = "";
+				$query_historial = "SELECT fecha, comentario FROM cobro_historial WHERE id_cobro = {$cobro['id_cobro']}";
 				$resp_historial = mysql_query($query_historial, $sesion->dbh) or Utiles::errorSQL($query_historial, __FILE__, __LINE__, $sesion->dbh);
-
-				while($historial = mysql_fetch_array($resp_historial))
-				{
-					$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, "-").": ".$historial['comentario']."\n";
+				$detalle_historial = [];
+				while ($historial = mysql_fetch_array($resp_historial)) {
+					$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, "-") . ": {$historial['comentario']}\n";
+					$detalle_historial[] = [
+						'fecha' => Utiles::sql2fecha($historial['fecha'], $formato_fecha, '-'),
+						'comentario' => $historial['comentario']
+					];
+					$titulo = __("Historial Cobro") . " {$cobro['id_cobro']} ({$cobro['glosa_cliente']})";
+					$hoja_historial[$titulo] = $detalle_historial;
 				}
 				$ws1->writeNote($filas, $col_estado, $comentario);
 			}
-			$tabla_creada=true;
+			$tabla_creada = true;
 		}
 		if ($tabla_creada)
 		{
@@ -788,45 +784,38 @@
 		}
 		else
 		{
-			$ws1->mergeCells($filas, $col_numero_cobro, $filas, $col_fecha_pago);
 			$ws1->write($filas, $col_numero_cobro, __('No se encontraron resultados'), $encabezado);
+			$ws1->mergeCells($filas, $col_numero_cobro, $filas, $col_fecha_pago);
 		}
 
-		$ws2 =& $wb->addWorksheet(__('Historial'));
+
+		// Hoja Historial
+		$fila = 1;
+		$col_fecha = 1;
+		$col_comentario = 2;
+		$ws2 = & $wb->addWorksheet(__('Historial'));
 		$ws2->setInputEncoding('utf-8');
-		$ws2->fitToPages(2,5);
+		$ws2->fitToPages(2, 5);
 		$ws2->setZoom(75);
 		$ws2->hideGridlines();
 		$ws2->setLandscape();
-		$filas2 = 1;
-		$col2_fecha = 1;
-		$col2_comentario = 2;
-		$ws2->setColumn($col2_fecha, $col2_fecha, 17);
-		$ws2->setColumn($col2_comentario, $col2_comentario, 40);
+		$ws2->setColumn($col_fecha, $col_fecha, 17);
+		$ws2->setColumn($col_comentario, $col_comentario, 44);
 
-		mysql_data_seek($resp, 0);
-
-		while($cobro = mysql_fetch_array($resp)) {
-			if($cobro['estado']!='CREADO' && $cobro['estado']!='EN REVISION') {
-				$comentario="";
-				$query_historial="SELECT fecha, comentario FROM cobro_historial WHERE id_cobro=".$cobro['id_cobro'];
-				$resp_historial = mysql_query($query_historial, $sesion->dbh) or Utiles::errorSQL($query_historial, __FILE__, __LINE__, $sesion->dbh);
-
-				$ws2->mergeCells($filas2, $col2_fecha, $filas2, $col2_comentario);
-				$ws2->write($filas2, $col2_fecha, "Historial " . __('Cobro') . " ".$cobro['id_cobro'].' ('.$cobro['glosa_cliente'].')', $titulo_filas);
-				++$filas2;
-				$ws2->write($filas2, $col2_fecha, __('Fecha'), $titulo_filas);
-				$ws2->write($filas2, $col2_comentario, __('Comentario'), $titulo_filas);
-				++$filas2;
-				while($historial = mysql_fetch_array($resp_historial))
-				{
-					$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, "-").": ".$historial['comentario']."\n";
-					$ws2->write($filas2, $col2_fecha, Utiles::sql2fecha($historial['fecha'], $formato_fecha, "-"), $fecha);
-					$ws2->write($filas2, $col2_comentario, $historial['comentario'], $txt_opcion);
-					++$filas2;
-				}
-				++$filas2;
+		foreach ($hoja_historial as $titulo => $historial) {
+			$ws2->write($fila, $col_fecha, $titulo, $titulo_filas);
+			$ws2->write($fila, $col_comentario, '', $titulo_filas);
+			$ws2->mergeCells($fila, $col_fecha, $fila, $col_comentario);
+			++$fila;
+			$ws2->write($fila, $col_fecha, __('Fecha'), $titulo_filas);
+			$ws2->write($fila, $col_comentario, __('Comentario'), $titulo_filas);
+			++$fila;
+			foreach ($historial as $detalle) {
+				$ws2->write($fila, $col_fecha, $detalle['fecha'], $fecha);
+				$ws2->write($fila, $col_comentario, $detalle['comentario'], $txt_opcion);
+				++$fila;
 			}
+			++$fila;
 		}
 
 		$wb->send("planilla_participacion_abogado.xls");
