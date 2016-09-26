@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.29.4
+Monday, september 26th
+* **Fix** [Diferencia en tarifas en reporte Excel de Horas](https://github.com/LemontechSA/ttb/pull/1840)
+
 ## Hotfix 16.29.3
 Wednesday, September 21st
 * **Fix** [crea error personalizado y lo escribe en /tmp/dynamo.log](https://github.com/LemontechSA/ttb/pull/1827)
