@@ -354,10 +354,10 @@ for ($i = 0; $i < $lista->num; $i++) {
     if ($cobranzapermitido || $mostrar_tarifa_al_profesional) {
 
         // Tratamos de sacar la tarifa del trabajo, si no está guardada usamos la tarifa estándar.
-        if ($trabajo->fields['tarifa_hh'] > 0
+        if (($trabajo->fields['tarifa_hh'] > 0
           && !empty($trabajo->fields['estado_cobro'])
           && $trabajo->fields['estado_cobro'] != 'CREADO'
-          && $trabajo->fields['estado_cobro'] != 'EN REVISION'
+          && $trabajo->fields['estado_cobro'] != 'EN REVISION')
           || Conf::GetConf($sesion, 'GuardarTarifaAlIngresoDeHora')) {
 
             $tarifa = $trabajo->fields['tarifa_hh'];
