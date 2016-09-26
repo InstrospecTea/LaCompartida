@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.29.5
+Monday, september 26th
+* **Fix** [Agregar prm_moneda como moneda base a la query de pagos y facturas](https://github.com/LemontechSA/ttb/pull/1841)
+
 ## Hotfix 16.29.4
 Monday, september 26th
 * **Fix** [Diferencia en tarifas en reporte Excel de Horas](https://github.com/LemontechSA/ttb/pull/1840)
