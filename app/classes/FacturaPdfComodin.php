@@ -54,6 +54,9 @@ class FacturaPdfComodin {
 			->add_restriction(
 				CriteriaRestriction::equals('id_moneda', $id_moneda)
 			)
+			->add_restriction(
+				CriteriaRestriction::equals('imprimible', '1')
+			)
 			->run();
 
 		$Moneda = new Moneda($this->Sesion);
@@ -62,7 +65,7 @@ class FacturaPdfComodin {
 				$this->Sesion,
 				$cuenta['id_moneda']
 			);
-			$result .= "{$cuenta['nombre']}: Cta. Cte. {$moneda} {$cuenta['numero']} \n";
+			$result .= "{$cuenta['nombre']}: Cta. Cte. {$moneda} {$cuenta['numero']}\r\n";
 		}
 		return $result;
 	}
