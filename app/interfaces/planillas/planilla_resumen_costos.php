@@ -204,7 +204,7 @@ function generarHoja($wb, $sesion, $fecha1, $fecha2, $nombres, $ids, $codigos_us
 		$s_monto_thh_simple = "IF(cobro.monto_thh>0,cobro.monto_thh,IF(cobro.monto_trabajos>0,cobro.monto_trabajos,1))";
 		$s_monto_thh = $s_monto_thh_simple;
 
-		$reporte = new ReporteCriteria($sesion);
+		$reporte = new Reporte($sesion);
 		$reporte->AddFiltro('usuario', 'id_usuario', $ids[$i]);
 		$reporte->addRangoFecha(Utiles::sql2date($fecha1), Utiles::sql2date($fecha2));
 		$reporte->addAgrupador('profesional');
@@ -216,7 +216,7 @@ function generarHoja($wb, $sesion, $fecha1, $fecha2, $nombres, $ids, $codigos_us
 		$resultado = $reporte->toBars();
 		$total = number_format($resultado[$ids[$i]]['valor'], 2, '.', '');
 
-		$reporte = new ReporteCriteria($sesion);
+		$reporte = new Reporte($sesion);
 		$reporte->AddFiltro('usuario', 'id_usuario', $ids[$i]);
 		$reporte->addRangoFecha(Utiles::sql2date($fecha1), Utiles::sql2date($fecha2));
 		$reporte->addAgrupador('profesional');

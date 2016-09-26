@@ -61,6 +61,44 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 		return $amountDetail;
 	}
 
+	public function saveInvoiceExchangeRates($invoiceId, $chargeId, $exchangeRatesParams = array()) {
+
+		$this->loadService('InvoiceCurrency');
+		$exchangeRates = array();
+
+		if (empty($exchangeRatesParams)) {
+			$exchangeRates = $this->getInvoiceExchangeRates($invoiceId, $chargeId);
+		} else {
+			$exchangeRates = $this->arrayToInvoiceExchangeRates($invoiceId, $exchangeRatesParams);
+		}
+
+		foreach ($exchangeRates as $newInvoiceExchange) {
+			$invoiceExchange = $this->InvoiceCurrencyService->getByCompositeKey(
+				$invoiceId,
+				$newInvoiceExchange->get('id_moneda')
+			);
+
+			if (!empty($invoiceExchange)) {
+				$identity = $invoiceExchange->getIdentity();
+				$newInvoiceExchange->set($identity, $invoiceExchange->get($identity));
+			}
+
+			$this->InvoiceCurrencyService->saveOrUpdate($newInvoiceExchange);
+		}
+
+	}
+
+	public function arrayToInvoiceExchangeRates($invoiceId, $exchangeRatesParams = array()) {
+		foreach ($exchangeRatesParams as $currencyId => $value) {
+			$invoiceCurrency = new InvoiceCurrency();
+			$invoiceCurrency->set('id_factura', $invoiceId);
+			$invoiceCurrency->set('id_moneda', $currencyId);
+			$invoiceCurrency->set('tipo_cambio', $value);
+			$invoiceCurrencies[] = $invoiceCurrency;
+		}
+		return $invoiceCurrencies;
+	}
+
 	public function getInvoiceFeesAmountInCurrency(Invoice $invoice, Currency $currency) {
 		$this->loadBusiness('Coining');
 		return $this->CoiningBusiness->changeCurrency(
@@ -69,6 +107,70 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 				$invoice->get('id_moneda')
 			),
 			$currency);
+	}
+
+	public function getDefaultExchangeRatesByCharge($chargeId) {
+		$this->loadBusiness('Charging');
+		$this->loadBusiness('Coining');
+
+		$Charge = $this->ChargingBusiness->getCharge($chargeId);
+
+		$today = date_create('now');
+		$charge_date = date_create($Charge->get('fecha_emision'));
+
+		if ($today > $charge_date) {
+			return $this->CoiningBusiness->getCurrencies();
+		}
+
+		return $this->ChargingBusiness->getDocumentExchangeRates($chargeId);
+	}
+
+	public function currenciesToInvoiceCurrencyArray($currencies) {
+		$invoiceCurrencies = array();
+		foreach ($currencies as $currency) {
+			$invoiceCurrency = new InvoiceCurrency();
+			$invoiceCurrency->set('id_moneda', $currency->get('id_moneda'));
+			$invoiceCurrency->set('tipo_cambio', $currency->get('tipo_cambio'));
+			$invoiceCurrency->set('glosa_moneda', $currency->get('glosa_moneda'));
+			$invoiceCurrencies[] = $invoiceCurrency;
+		}
+		return $invoiceCurrencies;
+	}
+
+	public function getInvoiceExchangeRatesByInvoiceId($invoiceId) {
+		$this->loadManager('Search');
+
+		$SearchCriteria = new SearchCriteria('InvoiceCurrency');
+
+		$SearchCriteria->related_with('Invoice')
+			->with_direction('inner')
+			->on_property('id_factura');
+
+		$SearchCriteria->related_with('Currency')
+			->with_direction('inner')
+			->on_property('id_moneda');
+
+		$SearchCriteria->filter('id_factura')
+			->restricted_by('equals')->compare_with($invoiceId);
+
+		$exchangeRates = (array) $this->SearchManager->searchByCriteria(
+			$SearchCriteria,
+			array('id_moneda', 'Currency.glosa_moneda', 'InvoiceCurrency.tipo_cambio')
+		);
+
+		return $exchangeRates;
+	}
+
+	public function getInvoiceExchangeRates($invoiceId, $chargeId) {
+		$this->loadManager('Search');
+
+		if (empty($invoiceId)) {
+			return $this->currenciesToInvoiceCurrencyArray(
+				$this->getDefaultExchangeRatesByCharge($chargeId)
+			);
+		}
+
+		return $this->getInvoiceExchangeRatesByInvoiceId($invoiceId);
 	}
 
 }

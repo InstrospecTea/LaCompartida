@@ -54,6 +54,27 @@ namespace :composer do
 
 end
 
+namespace :bower do
+  desc "Setup bower dir and install"
+  task :setup do
+    run "mkdir -p #{shared_path}/bower_components"
+    run "echo '{\"directory\" : \"#{shared_path}/bower_components\"}' > #{release_path}/.bowerrc"
+    bower.install
+    bower.update_symlinks
+  end
+
+  desc "Install libs"
+  task :install do
+    run "cd #{release_path} && bower install --verbose"
+  end
+
+  desc "Update bower symlinks"
+  task :update_symlinks do
+    run "ln -s #{shared_path}/bower_components #{release_path}/bower_components"
+  end
+
+end
+
 def update_database(cap_vars)
   puts "\n\e[0;31m  *** configuring db updates for #{cap_vars.file_path}/current \e[0m\n"
   dynamo_db = AWS::DynamoDB.new(
@@ -103,7 +124,7 @@ def update_symlinks(cap_vars)
   puts "\n Finished!! \n"
 end
 
-after "deploy:update_code", "composer:setup"
+after "deploy:update_code", "composer:setup", "bower:setup"
 
 
 def ask_option(options)

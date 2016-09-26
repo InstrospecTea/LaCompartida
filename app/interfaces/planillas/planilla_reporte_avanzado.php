@@ -56,7 +56,7 @@ if ($comparar) {
 }
 
 foreach ($datos as $dato) {
-	$reporte[$dato] = new ReporteCriteria($sesion);
+	$reporte[$dato] = new Reporte($sesion);
 	$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 		'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
 		'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
@@ -129,14 +129,14 @@ $numeros = & $wb->addFormat(array('Size' => 12,
 		'Align' => 'right',
 		'Border' => 1,
 		'Color' => 'black'));
-$numeros->setNumFormat('0');
+
 $numeros_bold = & $wb->addFormat(array('Size' => 12,
 		'VAlign' => 'top',
 		'Align' => 'right',
 		'Border' => 1,
 		'Bold' => 1,
 		'Color' => 'black'));
-$numeros_bold->setNumFormat('0');
+
 
 $horas_minutos = & $wb->addFormat(array('Size' => 12,
 		'VAlign' => 'top',

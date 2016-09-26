@@ -2,6 +2,11 @@
 
 class ChargeManager extends AbstractManager implements IChargeManager {
 
+	public function __construct(Sesion $Sesion) {
+		$this->Sesion = $Sesion;
+		$this->loadService('Charge');
+	}
+
 	/**
 	 * Obtiene los adelantos utilizados en un cobro
 	 * @param 	string $charge_id
@@ -60,6 +65,47 @@ class ChargeManager extends AbstractManager implements IChargeManager {
 		}
 
 		return $result;
+	}
+
+	public function findAll($restrictions = null, $fields = null, $order = null, $limit = null) {
+		return $this->ChargeService->findAll($restrictions, $fields, $order, $limit);
+	}
+
+	/**
+	 * @param $id
+	 * @return mixed
+	 * @throws ServiceException
+	 */
+	public function get($id, $fields = null) {
+		return $this->ChargeService->get($id, $fields);
+	}
+
+	/**
+	 * @return mixed
+	 * @throws ServiceException
+	 */
+	public function count() {
+		return $this->ChargeService->count();
+	}
+
+	public function getCurrencyRates($charge_id) {
+		if (empty($charge_id) || !is_numeric($charge_id)) {
+			throw new InvalidIdentifier;
+		}
+
+		$this->loadManager('CurrencyCharge');
+		return $this->CurrencyChargeManager->findAll(CriteriaRestriction::equals('id_cobro', $charge_id));
+	}
+
+	public function forceIssue($charge_id) {
+		if (empty($charge_id) || !is_numeric($charge_id)) {
+			throw new InvalidIdentifier;
+		}
+
+		$Cobro = new Cobro($this->Sesion);
+		$Cobro->Load($charge_id);
+		$Cobro->fields['estado'] = 'EN REVISION';
+		$Cobro->GuardarCobro(true);
 	}
 
 }
