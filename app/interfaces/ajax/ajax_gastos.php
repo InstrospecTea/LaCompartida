@@ -175,7 +175,7 @@ if ($_GET['totalctacorriente']) { ?>
 
 	$query = $gasto->SearchQuery($sesion,$where." GROUP BY cta_corriente.id_movimiento order by $orden 	LIMIT $limitdesde,$limitcantidad",$col_select);
 
-	$selectcount = "SELECT COUNT(*) FROM $selectfrom 	WHERE $where GROUP BY cta_corriente.id_movimiento ";
+	$selectcount = "SELECT COUNT(*) FROM $selectfrom 	WHERE $where AND (cta_corriente.ingreso IS NOT NULL OR cta_corriente.egreso IS NOT NULL) GROUP BY cta_corriente.id_movimiento ";
 	try {
 		$rows = $sesion->pdodbh->query($selectcount)->fetchAll();
 		$resp = $sesion->pdodbh->query($query);
