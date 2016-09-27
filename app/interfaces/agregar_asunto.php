@@ -259,7 +259,7 @@ if ($opcion == 'guardar') {
 			if (!$val && empty($errors)) {
 				$contrato->Fill($_REQUEST, true);
 				$contrato->Edit('codigo_cliente', $codigo_cliente);
-				$contrato->Edit('fecha_inicio_cap', Utiles::fecha2sql($fecha_inicio_cap));
+				$contrato->Edit('fecha_inicio_cap', empty($fecha_inicio_cap) ? '' : Utiles::fecha2sql($fecha_inicio_cap));
 				$valid_write = $contrato->Write();
 			}
 			if ($valid_write) {
