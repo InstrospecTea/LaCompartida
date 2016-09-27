@@ -173,12 +173,11 @@ if ($_GET['totalctacorriente']) { ?>
 
 	$selectfrom = $gasto::SelectFromQuery();
 
-	$query = $gasto->SearchQuery($sesion,$where." order by $orden 	LIMIT $limitdesde,$limitcantidad",$col_select);
+	$query = $gasto->SearchQuery($sesion,$where." GROUP BY cta_corriente.id_movimiento order by $orden 	LIMIT $limitdesde,$limitcantidad",$col_select);
 
-	$selectcount = "SELECT COUNT(*) FROM $selectfrom 	WHERE $where ";
-
+	$selectcount = "SELECT COUNT(*) FROM $selectfrom 	WHERE $where AND (cta_corriente.ingreso IS NOT NULL OR cta_corriente.egreso IS NOT NULL) GROUP BY cta_corriente.id_movimiento ";
 	try {
-		$rows = $sesion->pdodbh->query($selectcount)->fetch();
+		$rows = $sesion->pdodbh->query($selectcount)->fetchAll();
 		$resp = $sesion->pdodbh->query($query);
 	} catch (PDOException $e) {
 		if ($sesion->usuario->TienePermiso('SADM')) {
@@ -189,8 +188,8 @@ if ($_GET['totalctacorriente']) { ?>
 		}
 
 		$resultado = array(
-			'iTotalRecords' => $rows[0],
-			'iTotalDisplayRecords' => $rows[0],
+			'iTotalRecords' => count($rows),
+			'iTotalDisplayRecords' => count($rows),
 			'aaData' => array()
 		);
 		echo json_encode($resultado);
@@ -202,10 +201,9 @@ if ($_GET['totalctacorriente']) { ?>
 	/*  $resp = mysql_query($query, $sesion->dbh);
 	  $rows=mysql_fetch_row(mysql_query('SELECT FOUND_ROWS()', $sesion->dbh)); */
 
-
 	$resultado = array(
-		'iTotalRecords' => $rows[0],
-		'iTotalDisplayRecords' => $rows[0],
+		'iTotalRecords' => count($rows),
+		'iTotalDisplayRecords' => count($rows),
 		'aaData' => array()
 	);
 	$mas = 0;
@@ -240,6 +238,7 @@ if ($_GET['totalctacorriente']) { ?>
 		$mas += $fila['egreso'];
 		$mas -= $fila['ingreso'];
 	}
+
 	echo json_encode($resultado);
 }
 
