@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../../conf.php';
 
 $Sesion = new Sesion();
 
-$data = UtilesApp::utf8izar(json_decode(base64_decode($datos), true), false);
+$data = json_decode(base64_decode($datos), true);
 $datos = array_combine($data['nombres'], $data['tiempo']);
 
 function dort_desc($a, $b) {
