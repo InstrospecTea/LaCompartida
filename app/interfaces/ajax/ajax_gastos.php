@@ -175,10 +175,9 @@ if ($_GET['totalctacorriente']) { ?>
 
 	$query = $gasto->SearchQuery($sesion,$where." GROUP BY cta_corriente.id_movimiento order by $orden 	LIMIT $limitdesde,$limitcantidad",$col_select);
 
-	$selectcount = "SELECT COUNT(*) FROM $selectfrom 	WHERE $where GROUP BY cta_corriente.id_movimiento ";
 	try {
-		$rows = $sesion->pdodbh->query($selectcount)->fetchAll();
 		$resp = $sesion->pdodbh->query($query);
+		$total_rows = count($resp);
 	} catch (PDOException $e) {
 		if ($sesion->usuario->TienePermiso('SADM')) {
 			$Slim = Slim::getInstance('default', true);
@@ -188,8 +187,8 @@ if ($_GET['totalctacorriente']) { ?>
 		}
 
 		$resultado = array(
-			'iTotalRecords' => count($rows),
-			'iTotalDisplayRecords' => count($rows),
+			'iTotalRecords' => $total_rows,
+			'iTotalDisplayRecords' => $total_rows,
 			'aaData' => array()
 		);
 		echo json_encode($resultado);
@@ -202,8 +201,8 @@ if ($_GET['totalctacorriente']) { ?>
 	  $rows=mysql_fetch_row(mysql_query('SELECT FOUND_ROWS()', $sesion->dbh)); */
 
 	$resultado = array(
-		'iTotalRecords' => count($rows),
-		'iTotalDisplayRecords' => count($rows),
+		'iTotalRecords' => $total_rows,
+		'iTotalDisplayRecords' => $total_rows,
 		'aaData' => array()
 	);
 	$mas = 0;
