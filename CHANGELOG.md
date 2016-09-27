@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.29.7
+Tuesday, september 27th
+* **Fix** [Fecha inicio de la tarifa CAP se puede dejar en blanco](https://github.com/LemontechSA/ttb/pull/1845)
+
 ## Hotfix 16.29.6
 Tuesday, september 27th
 * **Fix** [Duplicidad de gastos](https://github.com/LemontechSA/ttb/pull/1844)
