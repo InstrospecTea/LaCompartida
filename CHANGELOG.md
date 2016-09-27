@@ -2,7 +2,7 @@
 
 ## Hotfix 16.29.6
 Tuesday, september 27th
-* **Fix** [Duplicidad de gastos](https://github.com/LemontechSA/ttb/pull/1842)
+* **Fix** [Duplicidad de gastos](https://github.com/LemontechSA/ttb/pull/1844)
 
 ## Hotfix 16.29.5
 Monday, september 26th
