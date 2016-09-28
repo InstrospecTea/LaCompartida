@@ -101,12 +101,12 @@ $tipos_de_dato = array(
 	'costo_hh'
 );
 
-if (!Conf::getConf($sesion, 'NuevoModuloFactura')) {
+/*if (!Conf::getConf($sesion, 'NuevoModuloFactura')) {
 	unset($tipos_de_dato[array_search('horas_facturadas_contable', $tipos_de_dato)]);
 	unset($tipos_de_dato[array_search('valor_facturado_contable', $tipos_de_dato)]);
 	unset($tipos_de_dato[array_search('valor_facturado', $tipos_de_dato)]);
 	unset($tipos_de_dato[array_search('horas_facturadas', $tipos_de_dato)]);
-}
+}*/
 
 $tipos_de_dato_select = array();
 foreach ($tipos_de_dato as $tipo) {
