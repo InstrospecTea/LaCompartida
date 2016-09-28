@@ -103,7 +103,7 @@ $tipos_de_dato = array(
 
 if (!Conf::getConf($sesion, 'NuevoModuloFactura')) {
 	unset($tipos_de_dato[array_search('horas_facturadas_contable', $tipos_de_dato)]);
-	unset($tipos_de_dato[array_search('valor_facturado_contable', $tipos_de_dato)]);	
+	unset($tipos_de_dato[array_search('valor_facturado_contable', $tipos_de_dato)]);
 }
 
 $tipos_de_dato_select = array();
@@ -413,7 +413,7 @@ if (!$popup) {
 		var tipos_moneda = <?php echo json_encode(array_values(Reporte::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
 		var urlAjaxReporteAvanzado = '<?php echo Conf::RootDir(); ?>/app/interfaces/ajax/reporte_avanzado.php';
-		var mapPeriodos = <?php echo json_encode(Reporte::mapPeriodos()); ?>;
+		var mapPeriodos = <?php echo json_encode(Reporte::mapPeriodos($sesion)); ?>;
 		var buttonsReporte = {
 			'<?php echo __('Guardar') ?>': GuardarReporte,
 			'<?php echo __('Cancelar') ?>': function() {
