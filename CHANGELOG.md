@@ -1,5 +1,21 @@
 # Changelog
 
+## Hotfix 16.29.7
+Tuesday, september 27th
+* **Fix** [Fecha inicio de la tarifa CAP se puede dejar en blanco](https://github.com/LemontechSA/ttb/pull/1845)
+
+## Hotfix 16.29.6
+Tuesday, september 27th
+* **Fix** [Duplicidad de gastos](https://github.com/LemontechSA/ttb/pull/1844)
+
+## Hotfix 16.29.5
+Monday, september 26th
+* **Fix** [Agregar prm_moneda como moneda base a la query de pagos y facturas](https://github.com/LemontechSA/ttb/pull/1841)
+
+## Hotfix 16.29.4
+Monday, september 26th
+* **Fix** [Diferencia en tarifas en reporte Excel de Horas](https://github.com/LemontechSA/ttb/pull/1840)
+
 ## Hotfix 16.29.3
 Wednesday, September 21st
 * **Fix** [crea error personalizado y lo escribe en /tmp/dynamo.log](https://github.com/LemontechSA/ttb/pull/1827)
