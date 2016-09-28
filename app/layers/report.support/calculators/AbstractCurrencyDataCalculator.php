@@ -33,6 +33,10 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 
 		$currencySource = $this->getCurrencySource();
 
+		if (!Conf::getConf($this->Session, 'NuevoModuloFactura')) {
+			$currencySource = 'documento';
+		}
+
 		if ($currencySource == 'documento' || $currencySource == 'factura') {
 			// moneda del documento
 			$Criteria->add_left_join_with('documento', CriteriaRestriction::and_clause(
