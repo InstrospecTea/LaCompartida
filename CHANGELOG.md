@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.30.0](https://github.com/LemontechSA/ttb/pull/1848)
+Thursday, September 29th
+* **Feature** [Reporte avanzado - Valor tramites](https://github.com/LemontechSA/ttb/pull/1799)
+
 ## Hotfix 16.29.7
 Tuesday, september 27th
 * **Fix** [Fecha inicio de la tarifa CAP se puede dejar en blanco](https://github.com/LemontechSA/ttb/pull/1845)
