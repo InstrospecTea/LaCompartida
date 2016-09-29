@@ -1032,8 +1032,10 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('horas_facturadas') ?>
 								<?php // echo $ReporteAvanzado->nada(3) ?>
-								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
-								<?php echo $ReporteAvanzado->celda('horas_facturadas_contable') ?>
+								<?php if (Conf::GetConf($sesion, 'NuevoModuloFactura')): ?>
+									<?php echo $ReporteAvanzado->borde_abajo(2) ?>
+									<?php echo $ReporteAvanzado->celda('horas_facturadas_contable') ?>
+								<?php endif; ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(13) ?>
@@ -1141,8 +1143,10 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->select_moneda() ?>
 								<?php echo $ReporteAvanzado->nada(5) ?>
 								<?php echo $ReporteAvanzado->celda('valor_facturado') ?>
-								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
-								<?php echo $ReporteAvanzado->celda('valor_facturado_contable') ?>
+								<?php if (Conf::getConf($sesion, 'NuevoModuloFactura')): ?>
+									<?php echo $ReporteAvanzado->borde_abajo(2) ?>
+									<?php echo $ReporteAvanzado->celda('valor_facturado_contable') ?>
+								<?php endif; ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(12) ?>
