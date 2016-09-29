@@ -149,6 +149,9 @@ class ChargeData {
 		return $this->totals[$matter_code] ?: 0;
 	}
 
+	public function getMatterCodes() {
+		return array_keys($this->matter_sumary);
+	}
 	/**
 	 * Obtiene los datos del cobro
 	 * @param type $field
@@ -207,7 +210,7 @@ class ChargeData {
 		}
 
 		$Criteria = $this->scopeUserCategory($Criteria);
-		$Criteria = $this->scopeCobrable($Criteria);
+		$Criteria = $this->scopeChargeable($Criteria);
 
 		$this->works = $Criteria->run();
 
@@ -282,7 +285,7 @@ class ChargeData {
 	 * @param Criteria $Criteria
 	 * @return Criteria
 	 */
-	protected function scopeCobrable(Criteria $Criteria) {
+	protected function scopeChargeable(Criteria $Criteria) {
 		if ($this->opt('ver_horas_trabajadas')) {
 			$Criteria->add_restriction(Restriction::equals('trabajo.cobrable', '1'));
 		}
@@ -323,7 +326,7 @@ class ChargeData {
 			}
 
 			// WHY?
-			//$work['duracion_incobrables'] = $this->duracionIncobrables($matter_code, $user_id);
+			//$work['duracion_incobrables'] = $this->doubtfulDuration($matter_code, $user_id);
 
 			$works[$i] = $work;
 
@@ -418,7 +421,6 @@ class ChargeData {
 			$sumary[$user_id]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($data['duracion_tarificada']);
 			$sumary[$user_id]['glosa_flatfee'] = Utiles::Decimal2GlosaHora($data['flatfee']);
 		}
-		pr($professionals);
 
 		foreach ($totals as $key => $data) {
 			$totals[$key]['glosa_duracion_cobrada'] = Utiles::Decimal2GlosaHora($data['duracion_cobrada']);
@@ -435,7 +437,7 @@ class ChargeData {
 		$this->matter_sumary = $professionals;
 	}
 
-	private function duracionIncobrables($matter_code, $user_id) {
+	private function doubtfulDuration($matter_code, $user_id) {
 		$Criteria = new Criteria($this->Sesion);
 		$Criteria->add_select('SUM(TIME_TO_SEC(duracion_cobrada) / 3600)', 'duracion_incobrables')
 			->add_from('trabajo')
