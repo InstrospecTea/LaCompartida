@@ -101,7 +101,7 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 
 		$valor_por_cobrar  = "IF(cobro.id_cobro IS NOT NULL, {$valor_por_cobrar_con_cobro},
 				SUM(
-					  (tramite.tarifa_tramite)
+					  (IF(tramite.tarifa_tramite_individual > 0, tramite.tarifa_tramite_individual, tramite.tarifa_tramite))
 					* (moneda_por_cobrar.tipo_cambio / moneda_display.tipo_cambio)
 				))";
 
@@ -111,7 +111,7 @@ class ValorPorCobrarDataCalculator extends AbstractProportionalDataCalculator {
 		$Criteria
 			->add_left_join_with(
 				array('prm_moneda', 'moneda_por_cobrar'),
-				CriteriaRestriction::equals('moneda_por_cobrar.id_moneda', 'contrato.id_moneda'))
+				CriteriaRestriction::equals('moneda_por_cobrar.id_moneda', 'IF(tramite.tarifa_tramite_individual > 0, tramite.id_moneda_tramite_individual, contrato.id_moneda)'))
 			->add_left_join_with(
 				array('prm_moneda', 'moneda_display'),
 				CriteriaRestriction::equals('moneda_display.id_moneda', $this->currencyId));
