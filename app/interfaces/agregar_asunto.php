@@ -259,7 +259,7 @@ if ($opcion == 'guardar') {
 			if (!$val && empty($errors)) {
 				$contrato->Fill($_REQUEST, true);
 				$contrato->Edit('codigo_cliente', $codigo_cliente);
-				$contrato->Edit('fecha_inicio_cap', Utiles::fecha2sql($fecha_inicio_cap));
+				$contrato->Edit('fecha_inicio_cap', empty($fecha_inicio_cap) ? '' : Utiles::fecha2sql($fecha_inicio_cap));
 				$valid_write = $contrato->Write();
 			}
 			if ($valid_write) {
@@ -836,7 +836,27 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 						<tr>
 							<td align="right"><?php echo __('Usuario responsable'); ?></td>
 							<td align="left"><!-- Nuevo Select -->
-							<?php echo $Form->select('id_encargado', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
+								<?php
+									$UsuarioEncargado = new Usuario($Sesion);
+									$UsuarioEncargado->LoadId($Asunto->fields['id_encargado']);
+									if ($UsuarioEncargado->fields['activo'] == 0) {
+										$id_usuario_inactivo1 = $UsuarioEncargado->fields['id_usuario'];
+									} else {
+										$id_usuario_inactivo1 = null;
+									}
+									$mensaje_inactivo = __('Usuario Inactivo');
+								 ?>
+							<?php echo $Form->select(
+							'id_encargado',
+							$Sesion->usuario->ListarActivos('', TRUE, $id_usuario_inactivo1),
+							$Asunto->fields['id_encargado'],
+							array(
+								'empty' => __('Seleccione'),
+								'style' => 'width: 200px',
+								'onchange' => "selectInactiveUser(this, '$id_usuario_inactivo1', 'id_encargado_1')"
+							)
+							); ?>
+							<?=  isset($id_usuario_inactivo1) ? '<span id="id_encargado_1"> (' . $mensaje_inactivo . ')</span>' : ''; ?>
 							<?php
 							if (isset($encargado_obligatorio) && $encargado_obligatorio) {
 								echo $obligatorio;
@@ -847,7 +867,26 @@ if (Conf::GetConf($Sesion, 'TodoMayuscula')) {
 						<tr>
 							<td align="right"><?php echo __('Encargado 2'); ?></td>
 							<td align="left">'<!-- Nuevo Select -->
-								<?php echo $Form->select('id_encargado2', $Sesion->usuario->ListarActivos('', TRUE), $Asunto->fields['id_encargado2'], array('empty' => __('Seleccione'), 'style' => 'width: 200px')); ?>
+								<?php
+									$UsuarioEncargado2 = new Usuario($Sesion);
+									$UsuarioEncargado2->LoadId($Asunto->fields['id_encargado2']);
+									if ($UsuarioEncargado2->fields['activo'] == 0) {
+										$id_usuario_inactivo2 = $UsuarioEncargado2->fields['id_usuario'];
+									} else {
+										$id_usuario_inactivo2 = null;
+									}
+								 ?>
+								<?php echo $Form->select(
+								'id_encargado2',
+								$Sesion->usuario->ListarActivos('', TRUE, $id_usuario_inactivo2),
+								$Asunto->fields['id_encargado2'],
+								array(
+									'empty' => __('Seleccione'),
+									'style' => 'width: 200px',
+									'onchange' => "selectInactiveUser(this, '$id_usuario_inactivo2', 'id_encargado_2')"
+								)
+								); ?>
+									<?=  isset($id_usuario_inactivo2) ? '<span id="id_encargado_2"> (' . $mensaje_inactivo . ')</span>' : ''; ?>
 							</td>
 						</tr>
 						<?php } ?>
@@ -1095,6 +1134,15 @@ jQuery('document').ready(function () {
 
 	jQuery("#cobro_independiente").trigger("change");
 });
+
+function selectInactiveUser(ele, id_inactive, span_message_id) {
+	var selected_user = jQuery(ele).val();
+	if (selected_user == id_inactive) {
+		jQuery('#' + span_message_id).html(' (<?= __('Usuario Inactivo')?>)');
+	} else {
+		jQuery('#' + span_message_id).html('');
+	}
+}
 
 /**
  * Si el usuario no est� en la lista se agrega

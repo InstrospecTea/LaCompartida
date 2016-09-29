@@ -1,16 +1,49 @@
 # Changelog
 
-## Hotfix 16.27.7
-Thursday, September 8th
-* **Fix** [Se homologan todos los agrupadores de las columnas en reporte financiero](https://github.com/LemontechSA/ttb/pull/1795)
+## Hotfix 16.29.7
+Tuesday, september 27th
+* **Fix** [Fecha inicio de la tarifa CAP se puede dejar en blanco](https://github.com/LemontechSA/ttb/pull/1845)
 
-## Hotfix 16.27.6
-Wednesday, September 7th
-* **Fix** [Cambiar codigo porcentaje Facturación SATCOM](https://github.com/LemontechSA/ttb/pull/1793)
+## Hotfix 16.29.6
+Tuesday, september 27th
+* **Fix** [Duplicidad de gastos](https://github.com/LemontechSA/ttb/pull/1844)
 
-## Hotfix 16.27.5
-Tuesday, September 6th
-* **Feature** [Agrega tag nro_factura_sin_serie](https://github.com/LemontechSA/ttb/pull/1791)
+## Hotfix 16.29.5
+Monday, september 26th
+* **Fix** [Agregar prm_moneda como moneda base a la query de pagos y facturas](https://github.com/LemontechSA/ttb/pull/1841)
+
+## Hotfix 16.29.4
+Monday, september 26th
+* **Fix** [Diferencia en tarifas en reporte Excel de Horas](https://github.com/LemontechSA/ttb/pull/1840)
+
+## Hotfix 16.29.3
+Wednesday, September 21st
+* **Fix** [crea error personalizado y lo escribe en /tmp/dynamo.log](https://github.com/LemontechSA/ttb/pull/1827)
+
+## Hotfix 16.29.2
+Wednesday, September 21st
+* **Fix** [Modifica nombre de clase Reporte en resumen abogado](https://github.com/LemontechSA/ttb/pull/1826)
+
+## Hotfix 16.29.1
+Wednesday, September 21st
+* **Fix** [muestra error SQL cuando falla la conexión a dynamo](https://github.com/LemontechSA/ttb/pull/1825)
+
+## [Release 16.29.0](https://github.com/LemontechSA/ttb/pull/1820)
+Thursday, September 15th
+* **Feature** [Popup New Design](https://github.com/LemontechSA/ttb/pull/1797)
+
+## Hotfix 16.28.2
+Tuesday, September 13th
+* **Fix** [Corrección decimales en excel reporte avanzado](https://github.com/LemontechSA/ttb/pull/1815)
+
+## Hotfix 16.28.1
+Tuesday, September 13th
+* **Fix** [Corrección selector encargado comercial](https://github.com/LemontechSA/ttb/pull/1812)
+
+## [Release 16.28.0](https://github.com/LemontechSA/ttb/pull/1780)
+Tuesday, August 30th
+* **Feature** [Agrega valor facturado en reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1428)
+* **Feature** [Modificar moneda base](https://github.com/LemontechSA/ttb/pull/1779)
 
 ## Hotfix 16.27.4
 Tuesday, August 30th

@@ -1,16 +1,9 @@
 <?php
-
 list($subdominio)=explode('.',$_SERVER['HTTP_HOST']);
 
 ini_set('error_log', "/var/www/html/logs/{$subdominio}_error_log.log");
 
-if( $_SERVER['REMOTE_ADDR'] == '152.231.82.18' && $subdominio == 'palcantarcol' ) {
-	ini_set('display_errors', 'On');
-	error_reporting(E_ERROR);
-
-} else {
-	ini_set('display_errors', 'Off');
-}
+ini_set('display_errors', 'Off');
 
 list($_SERVER['DUMMY'],$_SERVER['SUBDIR'],$_SERVER['SUBSUBDIR']) = explode('/', $_SERVER['REQUEST_URI']);
 
@@ -21,7 +14,7 @@ if (extension_loaded('newrelic')) {
 	newrelic_capture_params();
 
 	if ($subdir == 'juicios' || strpos($script_url, "juicios")) {
-			newrelic_set_appname("Case Tracking");
+		newrelic_set_appname("Case Tracking");
 	} else {
 		newrelic_set_appname("The Time Billing");
 	}
@@ -31,7 +24,6 @@ if (extension_loaded('newrelic')) {
 	if( strpos($script_url, 'cron') || strpos($script_url, 'web_services') ) {
 		newrelic_ignore_apdex(true);
 		newrelic_background_job(true);
-		//newrelic_ignore_transaction();
 		newrelic_disable_autorum();
 	}
 }
@@ -79,44 +71,17 @@ if (!function_exists('decrypt')) {
 }
 
 if( !isset($memcache) || !is_object($memcache) ) {
-	$memcache = new Memcache;
-	$memcache->connect('ttbcache.tmcxaq.0001.use1.cache.amazonaws.com', 11211);
-}
-
-if (!function_exists('decrypt')) {
-	function decrypt($msg, $k) {
-
-		$msg = base64_decode($msg);
-		$k = substr($k, 0, 32);
-		# open cipher module (do not change cipher/mode)
-		if (!$td = mcrypt_module_open('rijndael-256', '', 'ctr', ''))
-			return false;
-
-		$iv = substr($msg, 0, 32); // extract iv
-		$mo = strlen($msg) - 32; // mac offset
-		$em = substr($msg, $mo); // extract mac
-		$msg = substr($msg, 32, strlen($msg) - 64); // extract ciphertext
-
-		if (@mcrypt_generic_init($td, $k, $iv) !== 0)
-			return false;
-
-		$msg = mdecrypt_generic($td, $msg);
-		$msg = unserialize($msg);
-		mcrypt_generic_deinit($td);
-		mcrypt_module_close($td);
-		return $msg;
-	}
+	 $memcache = new Memcache;
+	 $memcache->connect('ttbcache.tmcxaq.0001.use1.cache.amazonaws.com', 11211);
 }
 
 use Aws\Common\Aws;
 use Aws\DynamoDb\Exception\DynamoDbException;
 
 $arrayconfig=array(
-   // 'includes' => array('_aws', '_sdk1'),
 	'key'    => 'AKIAIQYFL5PYVQKORTBA',
 	'secret' => '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',
 	'region' => 'us-east-1',
-
 	'default_cache_config' =>  array(
 		array(
 			'host' => 'ttbcache.tmcxaq.0001.use1.cache.amazonaws.com',
@@ -126,11 +91,9 @@ $arrayconfig=array(
 );
 
 $aws = Aws::factory($arrayconfig);
-
-if( ! $dynamodbresponse = @unserialize( $memcache->get('dynamodbresponse_' . $llave) ) ) {
+ if( ! $dynamodbresponse = @unserialize( $memcache->get('dynamodbresponse_' . $llave) ) ) {
 	try {
 		$dynamodb = $aws->get('dynamodb');
-
 		$result = $dynamodb->getItem(array(
 			'TableName' => 'thetimebilling',
 			'Key'       => array( 'HashKeyElement' => array('S' => $llave ))
@@ -139,15 +102,38 @@ if( ! $dynamodbresponse = @unserialize( $memcache->get('dynamodbresponse_' . $ll
 		$dynamodbresponse = $result['Item']; //$response->body->Item->to_array();
 
 	} catch (Exception $e) {
-		print_r($e);
+		$now = Date::now();
+		$file = $e->getFile();
+		$line = $e->getLine();
+		$message = $e->getMessage();
+		$trace = $e->getTraceAsString();
+		$error = <<<EOF
 
+{$now}
+Archivo: {$file}
+Linea: {$line}
+Mensaje: {$message}
+Traza: {$trace}
+---------------------------
+
+EOF;
+		echo "<!-- {$error} -->";
+		file_put_contents('/tmp/dynamo.log', $error, FILE_APPEND);
+		echo '
+			<div id="sql_error" style="margin: 0px auto  0px; width: 414px; border: 1px solid #00782e; padding: 5px; font-family: Arial, Helvetica, sans_serif;font-size:12px;">
+				<div style="background:#00782e;"><img src="' . Conf::ImgDir() . '/logo_top.png" border="0"/></div>
+				<br/><strong>Se encontró un error al procesar su solicitud.</strong><br />El error ha sido informado a soporte Lemontech.<br/>
+				<br><i>SU IP (' . $_SERVER['REMOTE_ADDR'] . ') ha sido registrada para mayor seguridad.</i>
+			</div>
+		';
+		exit;
 	} catch (DynamoDbException $e) {
 		echo 'The item could not be retrieved.';
 	}
 
 	$memcache->set( 'dynamodbresponse_'.$llave, serialize($dynamodbresponse), false, 90);
 
-}
+ }
 
 foreach ($dynamodbresponse as $tipo => $valor) {
 	if (is_string($valor)) {
