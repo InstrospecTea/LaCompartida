@@ -2673,6 +2673,11 @@ foreach ($chargeResults as $charge) {
 		$col_formula_id_abogado = Utiles::NumToColumnaExcel($col_id_abogado);
 	}
 
+	if (!$cobro->fields['opc_ver_solicitante']) {
+		$ws->setColumn($col_solicitante, $col_solicitante, 10, $CellFormat->get('total'), 1);
+	} else {
+		$ws->setColumn($col_solicitante, $col_solicitante, $PrmExcelCobro->getTamano('solicitante', 'Listado de trabajos'));
+	}
 }
 
 $query_hitos = "SELECT count(*) from cobro_pendiente where hito=1 and id_contrato='{$cobro->fields['id_contrato']}'";
