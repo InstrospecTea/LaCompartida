@@ -3,9 +3,9 @@
 /**
  * Clase base para cada Calculador
  */
-abstract class AbstractDataCalculator implements IDataCalculator {
+abstract class AbstractDataCalculator implements IDataCalculato {
 
-	private $Session;
+	protected $Session;
 
 	/**
 	 * Filros permitidos por defecto para todos los calculadores y queries

@@ -18,7 +18,6 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 	public function __construct(Sesion $Session, $filtersFields, $grouperFields, $options, $currencyId) {
 		parent::__construct($Session, $filtersFields, $grouperFields, $options);
 		$this->currencyId = $currencyId;
-		$this->Session = $Session;
 	}
 
 	/**
