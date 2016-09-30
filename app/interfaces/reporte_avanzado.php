@@ -4,6 +4,7 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $usuarioExt = new UsuarioExt($sesion);
+$modulo_factura_activo = Conf::GetConf($sesion, 'NuevoModuloFactura');
 
 /*
  * Debe tener habilitado la Conf ReportesAvanzados para acceder a este reporte.
@@ -413,7 +414,7 @@ if (!$popup) {
 		var tipos_moneda = <?php echo json_encode(array_values(Reporte::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
 		var urlAjaxReporteAvanzado = '<?php echo Conf::RootDir(); ?>/app/interfaces/ajax/reporte_avanzado.php';
-		var mapPeriodos = <?php echo json_encode(Reporte::mapPeriodos($sesion)); ?>;
+		var mapPeriodos = <?php echo json_encode(Reporte::mapPeriodos($modulo_factura_activo)); ?>;
 		var buttonsReporte = {
 			'<?php echo __('Guardar') ?>': GuardarReporte,
 			'<?php echo __('Cancelar') ?>': function() {
