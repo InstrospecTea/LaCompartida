@@ -3,7 +3,7 @@
 /**
  * Clase base para cada Calculador
  */
-abstract class AbstractDataCalculator implements IDataCalculato {
+abstract class AbstractDataCalculator implements IDataCalculator {
 
 	protected $Session;
 
