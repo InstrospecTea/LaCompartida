@@ -132,7 +132,7 @@ class Reporte {
 		return array('costo', 'costo_hh', 'valor_cobrado', 'valor_facturado_contable', 'valor_facturado','valor_tramites', 'valor_cobrado_no_estandar', 'valor_por_cobrar', 'valor_pagado', 'valor_por_pagar', 'valor_hora', 'valor_incobrable', 'diferencia_valor_estandar', 'valor_estandar', 'valor_trabajado_estandar', 'rentabilidad', 'rentabilidad_base', 'valor_cobrable');
 	}
 
-	public static function mapPeriodos() {
+	public static function mapPeriodos($modulo_factura_activo) {
 		$mapping = array(
 			'horas_trabajadas' => array('trabajo'),
 			'horas_cobrables' => array('trabajo'),
@@ -167,6 +167,11 @@ class Reporte {
 			'costo' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'costo_hh' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion')
 		);
+
+		if (!$modulo_factura_activo) {
+			unset($mapping['horas_facturadas_contable']);
+			unset($mapping['valor_facturado_contable']);
+		}
 
 		$result = array();
 		foreach ($mapping as $tipo => $fechas) {
