@@ -17,7 +17,11 @@ class CampoFechaFilter extends AbstractDependantFilterTranslator {
 				$field_name = array('cobro.fecha_pago_parcial', 'cobro.fecha_cobro');
 				break;
 			case 'facturacion':
-				$field_name = 'factura.fecha_contable';
+				if (Conf::GetConf($this->Session, 'NuevoModuloFactura')) {
+					$field_name = 'factura.fecha_contable';
+				} else {
+					$field_name = 'cobro.fecha_facturacion';
+				}
 				break;
 			case 'creacion':
 				$field_name = 'cobro.fecha_creacion';
