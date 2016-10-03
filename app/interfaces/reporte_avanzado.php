@@ -277,7 +277,7 @@ $explica_periodo_trabajo = __('Incluye todo Trabajo con fecha en el Periodo');
 $explica_periodo_cobro = __('Sólo considera Trabajos en Cobros con fecha de corte en el Periodo');
 $explica_periodo_emision = __('Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo');
 $explica_periodo_envio = __('Sólo considera Trabajos en Cobros con fecha de envío en el Periodo');
-$explica_periodo_pago = __('Sólo considera Trabajos en Cobros con fecha de Pago en el Periodo');
+$explica_periodo_pago = 'Sólo considera Trabajos en Cobros con fecha de Pago en el Periodo';
 if (Conf::getConf($sesion, 'NuevoModuloFactura')) {
 	$explica_periodo_facturacion = 'Sólo considera Trabajos en Documentos tributarios emitidos en el Periodo';
 } else {
