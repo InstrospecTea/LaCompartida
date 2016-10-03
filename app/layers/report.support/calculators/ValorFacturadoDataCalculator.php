@@ -17,6 +17,10 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 		$subtotalBase = $this->getWorksProportionalDocumentSubtotal();
 		$invoiceContrib = $this->getInvoiceContribution();
 
+		if (!Conf::getConf($this->Session, 'NuevoModuloFactura')) {
+			$invoiceContrib = 1;
+		}
+
 		$billed_amount = "SUM({$subtotalBase} * {$invoiceContrib})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
@@ -38,6 +42,10 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 		$subtotalBase = $this->getErrandsProportionalDocumentSubtotal();
 		$invoiceContrib = $this->getInvoiceContribution();
 
+		if (!Conf::getConf($this->Session, 'NuevoModuloFactura')) {
+			$invoiceContrib = 1;
+		}
+
 		$billed_amount =  "SUM({$invoiceContrib} * {$subtotalBase})
 		*
 		(1 / cobro_moneda.tipo_cambio)";
@@ -57,6 +65,10 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 	 */
 	function getReportChargeQuery($Criteria) {
 		$invoiceContrib = $this->getInvoiceContribution();
+
+		if (!Conf::getConf($this->Session, 'NuevoModuloFactura')) {
+			$invoiceContrib = 1;
+		}
 
 		$billed_amount = "
 			SUM({$invoiceContrib}

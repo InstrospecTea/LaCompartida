@@ -4,6 +4,7 @@ require_once dirname(dirname(__FILE__)) . '/conf.php';
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $usuarioExt = new UsuarioExt($sesion);
+$modulo_factura_activo = Conf::GetConf($sesion, 'NuevoModuloFactura');
 
 /*
  * Debe tener habilitado la Conf ReportesAvanzados para acceder a este reporte.
@@ -101,6 +102,11 @@ $tipos_de_dato = array(
 	'costo_hh'
 );
 
+if (!Conf::getConf($sesion, 'NuevoModuloFactura')) {
+	unset($tipos_de_dato[array_search('horas_facturadas_contable', $tipos_de_dato)]);
+	unset($tipos_de_dato[array_search('valor_facturado_contable', $tipos_de_dato)]);
+}
+
 $tipos_de_dato_select = array();
 foreach ($tipos_de_dato as $tipo) {
 	$tipos_de_dato_select[$tipo] = __($tipo);
@@ -191,6 +197,14 @@ if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 	);
 }
 
+if (!Conf::getConf($sesion, 'NuevoModuloFactura')) {
+	unset($agrupadores[array_search('numero_documento', $agrupadores)]);
+	unset($agrupadores[array_search('estado_documento', $agrupadores)]);
+	unset($agrupadores[array_search('mes_facturacion', $agrupadores)]);
+	unset($agrupadores[array_search('mes_documento', $agrupadores)]);
+	unset($agrupadores[array_search('razon_social_factura', $agrupadores)]);
+}
+
 if (Conf::GetConf($sesion, 'UsoActividades')) {
 	$agrupadores[] = 'actividad';
 }
@@ -222,8 +236,8 @@ $ReporteAvanzado->glosa_dato['horas_trabajadas'] = "Total de Horas Trabajadas";
 $ReporteAvanzado->glosa_dato['horas_cobrables'] = __("Total de Horas Trabajadas en asuntos Facturables");
 $ReporteAvanzado->glosa_dato['horas_visibles'] = __("Horas que ve el Cliente en nota de cobro (tras revisión)");
 $ReporteAvanzado->glosa_dato['horas_cobradas'] = __("Horas Visibles en Cobros que ya fueron Emitidos");
-$ReporteAvanzado->glosa_dato['horas_facturdas'] = __("Horas Visibles que han sido facturadas");
-$ReporteAvanzado->glosa_dato['horas_facturdas_contable'] = __("Prorrateo de horas liquidadas en el monto facturado contable");
+$ReporteAvanzado->glosa_dato['horas_facturadas'] = __("Horas Visibles que han sido facturadas");
+$ReporteAvanzado->glosa_dato['horas_facturadas_contable'] = __("Prorrateo de horas liquidadas en el monto facturado contable");
 $ReporteAvanzado->glosa_dato['horas_pagadas'] = __("Horas Cobradas en Cobros con estado Pagado");
 $ReporteAvanzado->glosa_dato['horas_por_pagar'] = __("Horas Cobradas que aún no han sido pagadas");
 $ReporteAvanzado->glosa_dato['horas_por_cobrar'] = "Horas Visibles que aún no se Emiten al Cliente";
@@ -259,12 +273,16 @@ $glosa_boton['barra'] = "Despliega un Gráfico de Barras, usando el primer Agrupa
 $glosa_boton['torta'] = "Despliega un Gráfico de Torta, usando el primer Agrupador.";
 $glosa_boton['dispersion'] = "Despliega un Gráfico de Dispersión, usando el primer Agrupador.";
 
-$explica_periodo_trabajo = 'Incluye todo Trabajo con fecha en el Periodo';
-$explica_periodo_cobro = 'Sólo considera Trabajos en Cobros con fecha de corte en el Periodo';
-$explica_periodo_emision = 'Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo';
-$explica_periodo_envio = 'Sólo considera Trabajos en Cobros con fecha de envío en el Periodo';
+$explica_periodo_trabajo = __('Incluye todo Trabajo con fecha en el Periodo');
+$explica_periodo_cobro = __('Sólo considera Trabajos en Cobros con fecha de corte en el Periodo');
+$explica_periodo_emision = __('Sólo considera Trabajos en Cobros con fecha de emisión en el Periodo');
+$explica_periodo_envio = __('Sólo considera Trabajos en Cobros con fecha de envío en el Periodo');
 $explica_periodo_pago = 'Sólo considera Trabajos en Cobros con fecha de Pago en el Periodo';
-$explica_periodo_facturacion = 'Sólo considera Trabajos en Documentos tributarios emitidos en el Periodo';
+if (Conf::getConf($sesion, 'NuevoModuloFactura')) {
+	$explica_periodo_facturacion = 'Sólo considera Trabajos en Documentos tributarios emitidos en el Periodo';
+} else {
+	$explica_periodo_facturacion = 'Sólo considera Trabajos en Cobros fon fecha de facturación en el Periodo';
+}
 /* Calculos de fechas */
 $hoy = date("Y-m-d");
 if (!$fecha_anio) {
@@ -427,7 +445,7 @@ if (!$popup) {
 		var tipos_moneda = <?php echo json_encode(array_values(Reporte::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
 		var urlAjaxReporteAvanzado = '<?php echo Conf::RootDir(); ?>/app/interfaces/ajax/reporte_avanzado.php';
-		var mapPeriodos = <?php echo json_encode(Reporte::mapPeriodos()); ?>;
+		var mapPeriodos = <?php echo json_encode(Reporte::mapPeriodos($modulo_factura_activo)); ?>;
 		var buttonsReporte = {
 			'<?php echo __('Guardar') ?>': GuardarReporte,
 			'<?php echo __('Cancelar') ?>': function() {
@@ -876,6 +894,32 @@ if (!$popup) {
 													<label title="<?php echo __($explica_periodo_pago) ?>" for="campo_fecha_pago"><?php echo __('Liquidación - Pago'); ?></label>
 												</td>
 											</tr>
+
+											<?php if(!Conf::getConf($sesion, 'NuevoModuloFactura')): ?>
+											<tr>
+												<td align="right">
+													&nbsp;
+												</td>
+												<td align="left">
+													&nbsp;
+												</td>
+												<td align="right">
+													<span title="<?php echo __($explica_periodo_facturacion) ?>">
+														<input type="radio" name="campo_fecha" id="campo_fecha_facturacion" value="facturacion"
+														<?php
+														if ($campo_fecha == 'facturacion') {
+															echo 'checked="checked"';
+														}
+														?>
+															onclick="SincronizarCampoFecha()" />
+													</span>
+												</td>
+												<td align="left">
+													<label title="<?php echo __($explica_periodo_facturacion) ?>" for="campo_fecha_facturacion"><?php echo __('Liquidación - Facturación'); ?></label>
+												</td>
+											</tr>
+										<?php else: ?>
+
 											<tr>
 												<td align="right">
 													&nbsp;
@@ -898,6 +942,9 @@ if (!$popup) {
 													<label title="<?php echo __($explica_periodo_facturacion) ?>" for="campo_fecha_facturacion"><?php echo __('Documento Tributario'); ?></label>
 												</td>
 											</tr>
+
+										<?php endif; ?>
+
 											<tr>
 												<td align=right>
 													<input type="radio" name="fecha_corta" id="fecha_corta_selector" value="selector" <?php if ($fecha_corta == 'selector' || !$fecha_corta) echo 'checked="checked"'; ?> />
@@ -1017,8 +1064,10 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->borde_abajo() ?>
 								<?php echo $ReporteAvanzado->celda('horas_facturadas') ?>
 								<?php // echo $ReporteAvanzado->nada(3) ?>
-								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
-								<?php echo $ReporteAvanzado->celda('horas_facturadas_contable') ?>
+								<?php if (Conf::GetConf($sesion, 'NuevoModuloFactura')): ?>
+									<?php echo $ReporteAvanzado->borde_abajo(2) ?>
+									<?php echo $ReporteAvanzado->celda('horas_facturadas_contable') ?>
+								<?php endif; ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(13) ?>
@@ -1126,8 +1175,10 @@ if (!$popup) {
 								<?php echo $ReporteAvanzado->select_moneda() ?>
 								<?php echo $ReporteAvanzado->nada(5) ?>
 								<?php echo $ReporteAvanzado->celda('valor_facturado') ?>
-								<?php echo $ReporteAvanzado->borde_abajo(2) ?>
-								<?php echo $ReporteAvanzado->celda('valor_facturado_contable') ?>
+								<?php if (Conf::getConf($sesion, 'NuevoModuloFactura')): ?>
+									<?php echo $ReporteAvanzado->borde_abajo(2) ?>
+									<?php echo $ReporteAvanzado->celda('valor_facturado_contable') ?>
+								<?php endif; ?>
 							</tr>
 							<tr>
 								<?php echo $ReporteAvanzado->nada(12) ?>
