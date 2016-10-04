@@ -50,7 +50,6 @@ class ChargeData {
 		$this->loadProportionalFactor();
 		$this->loadWorks();
 		$this->makeSumary();
-		$this->Sesion = null;
 	}
 
 	private function tableize($data, $caption = null) {
