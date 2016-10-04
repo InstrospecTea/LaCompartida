@@ -169,6 +169,11 @@ $pagina->PrintTop($popup);
 			jQuery('#fecha').focus();
 			return false;
 		}
+		if (jQuery('#id_usuario_revisor').val() == '') {
+			alert('<?= __('Debe ingresar un usuario revisor para la Tarea'); ?>');
+			jQuery('#id_usuario_revisor').focus();
+			return false;
+		}
 		return true;
 	}
 	function CambiaDuracion(form, input) {
@@ -235,7 +240,7 @@ echo(Autocompletador::CSS());
 						echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
 					}
 				}
-				?>
+				?> <?= $req; ?>
 			</td>
 		</tr>
 		<tr>
@@ -296,7 +301,7 @@ echo(Autocompletador::CSS());
 										>
 						<?= $i ?>
 						</option>
-						<?}?>
+						<?php }?>
 					</select>
 				</td>
 			<tr>
@@ -325,7 +330,7 @@ echo(Autocompletador::CSS());
 					<?= __('Estado'); ?>
 				</td>
 				<td align='left'>
-					<?= $Form->select('estado', array_combine($Tarea->estados, $Tarea->estados), empty($id_tarea) ? 'Asignada' : $Tarea->fields['estado']); ?>
+					<?= $Form->select('estado', array_combine($Tarea->estados, $Tarea->estados), empty($id_tarea) ? 'Asignada' : $Tarea->fields['estado'], array('empty' => __('Ninguno'))); ?>
 				</td>
 			</tr>
 			<tr>
@@ -334,9 +339,8 @@ echo(Autocompletador::CSS());
 				</td>
 				<td align='left'>
 					<?=
-					$Form->select('id_usuario_revisor', $usuario_generador->ListarActivos(null, false, $Tarea->fields['usuario_revisor']), $Tarea->fields['usuario_revisor'], array('empty' => __('Ninguno'))
-					);
-					?>
+					$Form->select('id_usuario_revisor', $usuario_generador->ListarActivos(null, false, $Tarea->fields['usuario_revisor']), $Tarea->fields['usuario_revisor']);
+					?> <?= $req; ?>
 				</td>
 				<td align='right'>
 					<?= __('Duración Estimada'); ?>
