@@ -1,19 +1,27 @@
 # Changelog
 
+## [Release 16.31.0](https://github.com/LemontechSA/ttb/pull/1852)
+Monday, October 3rd
+* **Feature** [Reporte avanzado - Sin módulo de facturación](https://github.com/LemontechSA/ttb/pull/1833)
+
+## [Release 16.30.0](https://github.com/LemontechSA/ttb/pull/1848)
+Thursday, September 29th
+* **Feature** [Reporte avanzado - Valor tramites](https://github.com/LemontechSA/ttb/pull/1799)
+
 ## Hotfix 16.29.7
 Tuesday, september 27th
 * **Fix** [Fecha inicio de la tarifa CAP se puede dejar en blanco](https://github.com/LemontechSA/ttb/pull/1845)
 
 ## Hotfix 16.29.6
-Tuesday, september 27th
+Tuesday, September 27th
 * **Fix** [Duplicidad de gastos](https://github.com/LemontechSA/ttb/pull/1844)
 
 ## Hotfix 16.29.5
-Monday, september 26th
+Monday, September 26th
 * **Fix** [Agregar prm_moneda como moneda base a la query de pagos y facturas](https://github.com/LemontechSA/ttb/pull/1841)
 
 ## Hotfix 16.29.4
-Monday, september 26th
+Monday, September 26th
 * **Fix** [Diferencia en tarifas en reporte Excel de Horas](https://github.com/LemontechSA/ttb/pull/1840)
 
 ## Hotfix 16.29.3

@@ -12,31 +12,33 @@ require_once Conf::ServerDir() . '/../app/classes/UsuarioExt.php'; //Siempre deb
 class Sesion {
 
 	// Data Base Handler
-	var $dbh = null;
+	public $dbh = null;
 	// Usuario activo
-	var $usuario = null;
+	public $usuario = null;
 
 	/**
 	 * @var PDO
 	 */
-	var $pdodbh = null;
-	var $pdoslave = null;
+	public $pdodbh = null;
+	public $pdoslave = null;
 	// Fecha ultimo ingreso
-	var $ultimo_ingreso = null;
+	public $ultimo_ingreso = null;
 	// El usuario esta logueado?
-	var $logged = false;
+	public $logged = false;
 	// El usuario debe ser reenviado al index?
-	var $goto_index = false;
+	public $goto_index = false;
 	// String con último error
-	var $error_msg;
-	var $switch_user;
+	public $error_msg;
+	public $switch_user;
 	// tablas
-	var $tbl_usuario = 'usuario';
-	var $Slim=null;
+	public $tbl_usuario = 'usuario';
+	public $Slim=null;
 	protected $plugin=Array();
 
 	private static $pluginsLoaded = false;
 	private static $langLoaded = false;
+
+	public $auth_token;
 
 	function Sesion($permisos = null, $login = false) {
 
@@ -49,7 +51,6 @@ class Sesion {
 			ini_set("session.cookie_lifetime", "18000");
 		}
 
-
 		static $i1 = 0;
 		if (!isset($_SESSION)) {
 			session_cache_expire(480);
@@ -59,6 +60,9 @@ class Sesion {
 				header("Cache-control: private");
 			}
 		}
+
+		//Workarround para simular register globals ON
+		//TODO: Manejar requests mediante una clase especializada
 		extract($_REQUEST);
 
 		$this->error_msg = isset($_SESSION['ERROR']) ? $_SESSION['ERROR'] : '';
@@ -176,8 +180,6 @@ class Sesion {
 	function Validate($permisos) {
 		$this->logged = false;
 
-
-
 		if (method_exists('Conf', 'GetConf')) {
 			$MaxLoggedTime = Conf::GetConf($this, 'MaxLoggedTime');
 		} else if (method_exists('Conf', 'MaxLoggedTime')) {
@@ -186,22 +188,20 @@ class Sesion {
 			$MaxLoggedTime = '14400';
 		}
 
-		if (time() - $_SESSION['LAST_ACTION'] > $MaxLoggedTime)
-		{
+		if (time() - $_SESSION['LAST_ACTION'] > $MaxLoggedTime)	{
 			$ultima_accion = date('H:i:s', $_SESSION['LAST_ACTION']);
 			$minutos_max_logged = number_format((time() - $_SESSION['LAST_ACTION']) / 60);
-			if(!isset($_SESSION['LAST_ACTION']))
-			{
-				if(!isset($this->error_msg))
+			if(!isset($_SESSION['LAST_ACTION'])) {
+				if(!isset($this->error_msg)) {
 					$this->error_msg = 'Error al iniciar sesión';
+				}
 			}
-			if ((time() - $_SESSION['LAST_ACTION']) / 60 > 480)
-			{
-				if(!isset($this->error_msg))
+			if ((time() - $_SESSION['LAST_ACTION']) / 60 > 480)	{
+				if(!isset($this->error_msg)) {
 					$this->error_msg = 'La sesión ha expirado';
+				}
 			}
-				else
-			{
+				else {
 				$this->error_msg = 'La sesión ha expirado (' . $minutos_max_logged . ' min. sin actividad). La última acción fue a las ' . $ultima_accion . '.';
 			}
 			return false;
@@ -225,10 +225,10 @@ class Sesion {
 			}
 		}
 
-		if ($_SESSION['RUT'] == '')
-		{
-			if(!$this->error_msg)
+		if ($_SESSION['RUT'] == '') {
+			if(!$this->error_msg) {
 				$this->error_msg = '';
+			}
 			return false;
 		}
 
@@ -239,16 +239,17 @@ class Sesion {
 			$this->usuario = new UsuarioExt($this, $rut);
 		}
 
-
-
-		if (!$this->usuario->loaded)
-		{
+		if (!$this->usuario->loaded) {
 			$this->error_msg = "No se encuentra el usuario.";
 			return false;
 		}
 
-		if ($permisos != null)
-		{
+		//Obtenemos el auth_token actual para el usuario
+		$UserToken = new UserToken($this);
+		$user_token_data = $UserToken->getLastToken($this->usuario->fields['id_usuario']);
+		$this->auth_token = $user_token_data['auth_token'];
+
+		if ($permisos != null) {
 			$permitido = false;
 			$default_permitido = true;
 				//$default_permitido existe para el caso en que se entreguen solo permisos negativos Ejemplo: Sesion('~RELOJ');
@@ -256,55 +257,44 @@ class Sesion {
 			if(!is_array($permisos))
 				$permisos = array($permisos);
 
-			foreach ($permisos as $val)
-			{
-				if(strpos($val,'~')===0)
-				{
+			foreach ($permisos as $val) {
+				if(strpos($val,'~')===0) {
 					//Se indicó un permiso negativo. '~RELOJ' indica que requiere cualquier permiso que no sea RELOJ.
 					$params_array['codigo_permiso'] = substr($val,1);
 					$p = $this->usuario->permisos->Find('FindPermiso', $params_array);
 
-					if ($p->fields['permitido'])
-					{
+					if ($p->fields['permitido']) {
 						$default_permitido = false; //Ya que el usuario era RELOJ, no puede ver la página.
 						//Sin embargo, todavia puede pasar por ($permitido = true) si tiene un permiso positivo que haya sido requerido.
 						break;
 					}
 				}
-				else
-				{
+				else {
 					//Permisos positivos. Tener cualquier permiso de estos le dará acceso al usuario ($permitido)
 					$params_array['codigo_permiso'] = $val;
 					$p = $this->usuario->permisos->Find('FindPermiso', $params_array);
 
-					if ($p->fields['permitido'])
-					{
+					if ($p->fields['permitido']) {
 						$permitido = true;
 						break;
-					}
-					else
+					} else {
 						$default_permitido = false; //Se requirió al menos un permiso que el usuario no tenia.
+					}
 				}
 			}
 
 			//Pudo haber pasado por tener un permiso positivo ($permitido), o no haber fallado ningun permiso -positivo o negativo- ($default_permitido.)
-			if($permitido || $default_permitido)
-			{
+			if($permitido || $default_permitido) {
 				//ACCESO PERMITIDO
-			}
-			else
-			{
+			} else {
 				//Antes haciamos log off del usuario. Ahora solo lo redirigimos al index. (goto_index es revisado en Pagina.)
-				//$this->error_msg = "No tienes permisos para acceder a este recurso.";
 				$this->goto_index = true;
-				//return false;
 			}
 		}
 
 		$_SESSION['LAST_ACTION'] = time();
 		$this->logged = true;
 		$this->error_msg = '';
-
 		return true;
 	}
 
@@ -373,7 +363,7 @@ class Sesion {
 				$UserToken->save($user_token_data);
 			}
 
-			$_SESSION['AUTHTOKEN'] = $auth_token;
+			$this->auth_token = $auth_token;
 
 			/*
 			  Seteando cookie

@@ -1257,3 +1257,4 @@ $_LANG['Horas trabajadas por asunto'] = 'Horas trabalhadas por assunto';
 $_LANG['Horas trabajadas por cliente'] = 'Horas trabalhadas por cliente';
 $_LANG['Horas trabajadas por empleado'] = 'Horas trabalhadas por colaborador';
 $_LANG['Horas trabajadas por usuario'] = 'Horas trabalhadas por colaborador';
+$_LANG['Cobros pendientes'] = 'Liquidações pendentes';

@@ -29,7 +29,17 @@ class WorkbookMiddleware {
 
 		$this->phpExcel = new PHPExcel();
 		$this->setDocumentProperties($this->phpExcel);
-		$this->phpExcel->getDefaultStyle()->getFont()->setName('Arial');
+
+		$default = json_decode(Conf::read('FormatoExcelCobro_default'), 1);
+		// Se utiliza el primer elemento ya que los que siguen corresponden al
+		// cebreado y no al estilo del Excel como tal
+		$format = $this->createFormatArray($default[0]);
+
+		if (empty($format['font']['name'])) {
+			$format['font']['name'] = 'Arial';
+		}
+
+		$this->phpExcel->getDefaultStyle()->applyFromArray($format);
 	}
 
 	/**
@@ -153,8 +163,8 @@ class WorkbookMiddleware {
 	 * @param PHPExcel $phpExcel
 	 */
 	private function setDocumentProperties($phpExcel) {
-		$this->phpExcel->getProperties()->setCreator('LemonTech')
-							 ->setLastModifiedBy('LemonTech')
+		$this->phpExcel->getProperties()->setCreator('Lemontech')
+							 ->setLastModifiedBy('Lemontech')
 							 ->setTitle($this->filename)
 							 ->setSubject($this->filename)
 							 ->setDescription('Reporte generado por The TimeBilling, http://thetimebilling.com/.')
@@ -178,8 +188,21 @@ class WorkbookMiddleware {
 			$cellCode = PHPExcel_Cell::stringFromColumnIndex($col).($row + 1);
 		}
 
-		foreach ($format->getElements() as $key => $formatValue) {
-			switch ($key) {
+		$formatArray = $this->createFormatArray($format->getElements());
+
+		$this->workSheetObj->getStyle($cellCode)->applyFromArray($formatArray);
+
+		return;
+	}
+
+	public function createFormatArray($format) {
+		$formatArray = [];
+
+		foreach ($format as $key => $formatValue) {
+			switch (strtolower($key)) {
+				case 'fontfamily':
+					$formatArray['font']['name'] = $formatValue;
+					break;
 				case 'size':
 					$formatArray['font']['size'] = $formatValue;
 					break;
@@ -244,9 +267,7 @@ class WorkbookMiddleware {
 			}
 		}
 
-		$this->workSheetObj->getStyle($cellCode)->applyFromArray($formatArray);
-
-		return;
+		return $formatArray;
 	}
 
 	/**
