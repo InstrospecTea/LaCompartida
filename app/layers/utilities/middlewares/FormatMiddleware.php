@@ -17,6 +17,7 @@ class FormatMiddleware {
 	protected $border;
 	protected $underline;
 	protected $textrotation;
+	protected $fontfamily;
 
 
 	/**
@@ -176,6 +177,14 @@ class FormatMiddleware {
 	}
 
 	/**
+	 * Set font-family
+	 * @param string $fontfamily (font family name)
+	 */
+	public function setFontFamily($fontfamily) {
+		$this->fontfamily = $fontfamily;
+	}
+
+	/**
 	 * Get element of this class
 	 * @return element of this class
 	 */
@@ -247,6 +256,9 @@ class FormatMiddleware {
 				break;
 			case 'textrotation':
 				$this->setTextRotation($value);
+				break;
+			case 'fontfamily':
+				$this->setFontFamily($value);
 				break;
 		}
 	}

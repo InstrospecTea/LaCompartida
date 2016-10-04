@@ -27,6 +27,24 @@ class UserToken extends Objeto {
 		}
 	}
 
+ /**
+  * Find the last token for the User
+	* @param integer $user_id
+	* @return string $auth_token
+  */
+	public function getLastToken($user_id) {
+		$auth_token = '';
+		$Criteria = new Criteria($this->sesion);
+		$result = $Criteria->add_select('auth_token')
+			->add_from(user_token)
+			->add_restriction(CriteriaRestriction::equals('user_id', $user_id))
+			->run();
+		if (is_array($result)) {
+			$auth_token = array_pop($result);
+		}
+		return $auth_token;
+	}
+
 	/**
 	 * Find by auth token
 	 * Returns an array with next elements:
