@@ -1234,9 +1234,9 @@ foreach ($chargeResults as $charge) {
 					$trabajo = $lista_trabajos->Get($i);
 
 					$f = explode('-', $trabajo->fields['fecha']);
-					$ws->write($filas, $col_fecha_dia, $f[2], $CellFormat->get('normal_centrado', $i));
-					$ws->write($filas, $col_fecha_mes, $f[1], $CellFormat->get('normal_centrado', $i));
-					$ws->write($filas, $col_fecha_anyo, $f[0], $CellFormat->get('normal_centrado', $i));
+					$ws->write($filas, $col_fecha_dia, (int) $f[2], $CellFormat->get('normal_centrado', $i));
+					$ws->write($filas, $col_fecha_mes, (int) $f[1], $CellFormat->get('normal_centrado', $i));
+					$ws->write($filas, $col_fecha_anyo, (int) $f[0], $CellFormat->get('normal_centrado', $i));
 
 					if (!$opc_ver_asuntos_separados) {
 						if (Conf::GetConf($sesion, 'CodigoSecundario')) {
