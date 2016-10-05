@@ -17,6 +17,7 @@ class ChargeData {
 	protected $sumary = array();
 	protected $totals = array();
 	protected $matter_sumary = array();
+	private $sumary_and_totals = false;
 
 	private $base_data = array(
 		'id_categoria_usuario' => '',
@@ -49,7 +50,6 @@ class ChargeData {
 		$this->Charge->fillFromArray($Cobro->fields);
 		$this->loadProportionalFactor();
 		$this->loadWorks();
-		$this->makeSumary();
 	}
 
 	private function tableize($data, $caption = null) {
@@ -131,10 +131,16 @@ class ChargeData {
 	 * @return array
 	 */
 	public function getSumary($matter_code = null) {
+		$this->sumaryAndTotal();
 		if (is_null($matter_code)) {
 			return $this->sumary;
 		}
 		return $this->matter_sumary[$matter_code];
+	}
+
+	public function getSumaryByCategory() {
+		$this->sumaryByCategory();
+		return $this->category_sumary;
 	}
 
 	/**
@@ -142,6 +148,7 @@ class ChargeData {
 	 * @return array
 	 */
 	public function getTotal($matter_code = null) {
+		$this->sumaryAndTotal();
 		if (is_null($matter_code)) {
 			return $this->totals['total'];
 		}
@@ -149,8 +156,10 @@ class ChargeData {
 	}
 
 	public function getMatterCodes() {
+		$this->sumaryAndTotal();
 		return array_keys($this->matter_sumary);
 	}
+
 	/**
 	 * Obtiene los datos del cobro
 	 * @param type $field
@@ -309,7 +318,7 @@ class ChargeData {
 		return $Criteria;
 	}
 
-	protected function makeSumary() {
+	protected function makeSumaryAndTotal() {
 		$works = $this->getWorks();
 		$professionals = array();
 		$sumary = array();
@@ -434,20 +443,7 @@ class ChargeData {
 		$this->sumary = $sumary;
 		$this->totals = $totals;
 		$this->matter_sumary = $professionals;
-	}
-
-	private function doubtfulDuration($matter_code, $user_id) {
-		$Criteria = new Criteria($this->Sesion);
-		$Criteria->add_select('SUM(TIME_TO_SEC(duracion_cobrada) / 3600)', 'duracion_incobrables')
-			->add_from('trabajo')
-			->add_restriction(Restriction::equals('id_cobro', $this->get('id_cobro')))
-			->add_restriction(Restriction::equals('id_usuario', $user_id))
-			->add_restriction(Restriction::equals('codigo_asunto', "'$matter_code'"))
-			->add_restriction(Restriction::equals('visible', '1'))
-			->add_restriction(Restriction::equals('cobrable', '0'))
-			->add_restriction(Restriction::equals('id_tramite', '0'));
-		$result = $Criteria->first();
-		return $result['duracion_incobrables']?:0;
+		$this->sumary_and_totals = true;
 	}
 
 	private function loadProportionalFactor() {
@@ -461,5 +457,64 @@ class ChargeData {
 			->add_restriction(Restriction::equals('cobrable', 1));
 		$result = $Criteria->first();
 		$this->proportional_factor = $this->get('retainer_horas') / $result['duracion_cobrable'];
+	}
+
+	/**
+	 * Verifica que se hayan creado los datos, de lo contrario los crea.
+	 */
+	private function sumaryAndTotal() {
+		if (!$this->sumary_and_totals) {
+			$this->makeSumaryAndTotal();
+		}
+	}
+
+	/**
+	 * Verifica que se hayan creado los datos, de lo contrario los crea.
+	 */
+	private function sumaryByCategory() {
+		if (empty($this->category_sumary)) {
+			$this->makeSumaryByCategory();
+		}
+	}
+
+	private function makeSumaryByCategory() {
+		$categories = array();
+		$works = $this->getWorks();
+		foreach ($works as $work) {
+			$category_id = $work['id_categoria_usuario'];
+			if (empty($categories[$category_id])) {
+				$category = $this->base_data;
+				unset($category['nombre_usuario'], $category['username']);
+				$category['id_categoria_usuario'] = $work['id_categoria_usuario'];
+				$category['glosa_categoria'] = $work['categoria'];
+				$category['tarifa'] = $work['tarifa_hh']; // Se asume que dentro de la misma categoría todos tienen la misma tarifa.
+			} else {
+				$category = $categories[$category_id];
+			}
+
+			$category['duracion_cobrada'] += $work['duracion_cobrada'];
+			$category['duracion'] += $work['duracion'];
+			$category['duracion_descontada'] += $work['duracion_descontada'];
+			$category['duracion_incobrables'] += $work['duracion_incobrables'];
+			$category['duracion_retainer'] += $work['duracion_retainer'];
+			$category['duracion_tarificada'] += $work['duracion_tarificada'];
+			$category['valor_tarificada'] += $work['valor_tarificada'];
+			$category['importe'] += $work['importe'];
+			$category['flatfee'] += $work['flatfee'];
+			$category['monto_cobrado_escalonada'] += $work['monto_cobrado_escalonada'];
+
+			$categories[$category_id] = $category;
+
+		}
+		foreach ($categories as $key => $data) {
+			$categories[$key]['glosa_duracion_cobrada'] = Utiles::Decimal2GlosaHora($data['duracion_cobrada']);
+			$categories[$key]['glosa_duracion'] = Utiles::Decimal2GlosaHora($data['duracion']);
+			$categories[$key]['glosa_duracion_descontada'] = Utiles::Decimal2GlosaHora($data['duracion_descontada']);
+			$categories[$key]['glosa_duracion_incobrables'] = Utiles::Decimal2GlosaHora($data['duracion_incobrables']);
+			$categories[$key]['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($data['duracion_retainer']);
+			$categories[$key]['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($data['duracion_tarificada']);
+			$categories[$key]['glosa_flatfee'] = Utiles::Decimal2GlosaHora($data['flatfee']);
+		}
+		$this->category_sumary = ($categories);
 	}
 }
