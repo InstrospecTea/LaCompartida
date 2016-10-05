@@ -210,7 +210,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 				$totales = $this->ChargeData->getTotal();
 
 				if (is_array($totales)) {
-					if ($totales['duracion_retainer'] > 0 && $this->fields['forma_cobro'] != 'PROPORCIONAL' && ($this->fields['forma_cobro'] != 'FLAT FEE' || ( Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) )) {
+					if ($totales['duracion_retainer'] > 0 && ($this->fields['forma_cobro'] != 'FLAT FEE' || ( Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) )) {
 						$retainer = true;
 					}
 					//if ($totales['duracion_descontada'] > 0)
@@ -592,123 +592,36 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 				global $columna_hrs_trabajadas;
 				global $columna_hrs_retainer;
 				global $columna_hrs_descontadas;
-				global $sumary;
 
-				$columna_hrs_incobrables = false;
+				$sumary = $this->ChargeData->getSumaryByCategory();
+				$total = $this->ChargeData->getTotal();
 
-				$array_categorias = array();
-				foreach ($sumary as $id => $data) {
-					array_push($array_categorias, $data['id_categoria_usuario']);
-					if ($data['duracion_incobrables'] > 0)
-						$columna_hrs_incobrables = true;
-				}
-
-				// Array que guardar los ids de usuarios para recorrer
-				if (sizeof($array_categorias) > 0)
-					array_multisort($array_categorias, SORT_ASC, $sumary);
-
-				$array_profesionales = array();
-				foreach ($sumary as $id_usuario => $data) {
-					array_push($array_profesionales, $id_usuario);
-				}
+				$columna_hrs_incobrables = $total['duracion_incobrables'] > 0;
 
 				// Encabezado
 				$resumen_encabezado = $this->GenerarSeccionResumenProfesional($parser, 'RESUMEN_PROFESIONAL_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
 				$html = str_replace('%RESUMEN_PROFESIONAL_ENCABEZADO%', $resumen_encabezado, $html);
 				$html = str_replace('%glosa_profesional%', __('Resumen detalle profesional'), $html);
 
-				// Partimos los subtotales de la primera categoría con los datos del primer profesional.
-				$resumen_hrs_trabajadas = $sumary[$array_profesionales[0]]['duracion'];
-				$resumen_hrs_cobradas = $sumary[$array_profesionales[0]]['duracion_cobrada'];
-				$resumen_hrs_retainer = $sumary[$array_profesionales[0]]['duracion_retainer'];
-				$resumen_hrs_descontadas = $sumary[$array_profesionales[0]]['duracion_descontada'];
-				$resumen_hrs_incobrables = $sumary[$array_profesionales[0]]['duracion_incobrables'];
-				$resumen_hh = $sumary[$array_profesionales[0]]['duracion_tarificada'];
-				$resumen_total = $sumary[$array_profesionales[0]]['valor_tarificada'];
-				// Partimos los totales con 0
-				$resumen_total_hrs_trabajadas = 0;
-				$resumen_total_hrs_cobradas = 0;
-				$resumen_total_hrs_retainer = 0;
-				$resumen_total_hrs_descontadas = 0;
-				$resumen_total_hrs_incobrables = 0;
-				$resumen_total_hh = 0;
-				$resumen_total_total = 0;
 
-				for ($k = 1; $k < count($array_profesionales); ++$k) {
-
-					// El profesional actual es de la misma categoría que el anterior, solo aumentamos los subtotales de la categoría.
-					if ($sumary[$array_profesionales[$k]]['id_categoria_usuario'] == $sumary[$array_profesionales[$k - 1]]['id_categoria_usuario']) {
-						$resumen_hrs_trabajadas += $sumary[$array_profesionales[$k]]['duracion'];
-						$resumen_hrs_cobradas += $sumary[$array_profesionales[$k]]['duracion_cobrada'];
-						$resumen_hrs_retainer += $sumary[$array_profesionales[$k]]['duracion_retainer'];
-						$resumen_hrs_descontadas += $sumary[$array_profesionales[$k]]['duracion_descontada'];
-						$resumen_hrs_incobrables += $sumary[$array_profesionales[$k]]['duracion_incobrables'];
-						$resumen_hh += $sumary[$array_profesionales[$k]]['duracion_tarificada'];
-						$resumen_total += $sumary[$array_profesionales[$k]]['valor_tarificada'];
-					} else {
-						// El profesional actual es de distinta categoría que el anterior, imprimimos los subtotales de la categoría anterior y ponemos en cero los de la actual.
-						$html3 = $parser->tags['PROFESIONAL_FILAS'];
-						$html3 = str_replace('%nombre%', $sumary[$array_profesionales[$k - 1]]['glosa_categoria'], $html3);
-						$html3 = str_replace('%iniciales%', $sumary[$array_profesionales[$k - 1]]['glosa_categoria'], $html3);
-
-						$html3 = str_replace('%hrs_trabajadas%', ($columna_hrs_trabajadas ? UtilesApp::Hora2HoraMinuto($resumen_hrs_cobradas) : ''), $html3);
-						$html3 = str_replace('%hrs_retainer%', ($columna_hrs_retainer ? UtilesApp::Hora2HoraMinuto($resumen_hrs_retainer) : ''), $html3);
-						$html3 = str_replace('%hrs_descontadas%', ($columna_hrs_incobrables ? UtilesApp::Hora2HoraMinuto($resumen_hrs_incobrables) : ''), $html3);
-						$html3 = str_replace('%hh%', UtilesApp::Hora2HoraMinuto($resumen_hh), $html3);
-
-						$html3 = str_replace('%total_horas%', $moneda->fields['simbolo'] . $this->espacio . number_format($resumen_total, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
-
-						// Se asume que dentro de la misma categoría todos tienen la misma tarifa.
-						$html3 = str_replace('%tarifa_horas%', number_format($sumary[$array_profesionales[$k - 1]]['tarifa'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
-
-						// Para imprimir la siguiente categorí­a de usuarios
-						$siguiente = " \n%RESUMEN_PROFESIONAL_FILAS%\n";
-						$html = str_replace('%RESUMEN_PROFESIONAL_FILAS%', $html3 . $siguiente, $html);
-
-						// Aumentamos los totales
-						$resumen_total_hrs_trabajadas += $resumen_hrs_trabajadas;
-						$resumen_total_hrs_cobradas += $resumen_hrs_cobradas;
-						$resumen_total_hrs_retainer += $resumen_hrs_retainer;
-						$resumen_total_hrs_descontadas += $resumen_hrs_descontadas;
-						$resumen_total_hrs_incobrables += $resumen_hrs_incobrables;
-						$resumen_total_hh += $resumen_hh;
-						$resumen_total_total += $resumen_total;
-						// Resetear subtotales
-						$resumen_hrs_trabajadas = $sumary[$array_profesionales[$k]]['duracion'];
-						$resumen_hrs_cobradas = $sumary[$array_profesionales[$k]]['duracion_cobrada'];
-						$resumen_hrs_retainer = $sumary[$array_profesionales[$k]]['duracion_retainer'];
-						$resumen_hrs_descontadas = $sumary[$array_profesionales[$k]]['duracion_descontada'];
-						$resumen_hrs_incobrables = $sumary[$array_profesionales[$k]]['duracion_incobrables'];
-						$resumen_hh = $sumary[$array_profesionales[$k]]['duracion_tarificada'];
-						$resumen_total = $sumary[$array_profesionales[$k]]['valor_tarificada'];
-					}
+				$rows = array();
+				foreach ($sumary as $category_id => $data) {
+					$html_row = $parser->tags['PROFESIONAL_FILAS'];
+					$html_row = str_replace('%nombre%', $data['glosa_categoria'], $html_row);
+					$html_row = str_replace('%iniciales%', $data['glosa_categoria'], $html_row);
+					$html_row = str_replace('%hrs_trabajadas%', ($columna_hrs_trabajadas ? $data['glosa_duracion_cobrada'] : ''), $html_row);
+					$html_row = str_replace('%hrs_retainer%', ($columna_hrs_retainer ? $data['glosa_duracion_retainer'] : ''), $html_row);
+					$html_row = str_replace('%hrs_descontadas%', ($columna_hrs_incobrables ? $data['glosa_duracion_incobrables'] : ''), $html_row);
+					$html_row = str_replace('%hh%', $data['glosa_duracion_tarificada'], $html_row);
+					// Se asume que dentro de la misma categoría todos tienen la misma tarifa.
+					$html_row = str_replace('%tarifa_horas%', number_format($data['tarifa'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html_row);
+					$html_row = str_replace('%total_horas%', $moneda->fields['simbolo'] . $this->espacio . number_format($data['valor_tarificada'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html_row);
+					$rows[] = $html_row;
 				}
-
-				// Imprimir la última categoría
-				$html3 = $parser->tags['PROFESIONAL_FILAS'];
-				$html3 = str_replace('%nombre%', $sumary[$array_profesionales[$k - 1]]['glosa_categoria'], $html3);
-				$html3 = str_replace('%iniciales%', $sumary[$array_profesionales[$k - 1]]['glosa_categoria'], $html3);
-				$html3 = str_replace('%hrs_trabajadas%', ($columna_hrs_trabajadas ? UtilesApp::Hora2HoraMinuto($resumen_hrs_cobradas) : ''), $html3);
-				$html3 = str_replace('%hrs_retainer%', ($columna_hrs_retainer ? UtilesApp::Hora2HoraMinuto($resumen_hrs_retainer) : ''), $html3);
-				$html3 = str_replace('%hrs_descontadas%', ($columna_hrs_incobrables ? UtilesApp::Hora2HoraMinuto($resumen_hrs_incobrables) : ''), $html3);
-				$html3 = str_replace('%hh%', UtilesApp::Hora2HoraMinuto($resumen_hh), $html3);
-				// Se asume que dentro de la misma categoría todos tienen la misma tarifa.
-				$html3 = str_replace('%tarifa_horas%', number_format($sumary[$array_profesionales[$k - 1]]['tarifa'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
-				$html3 = str_replace('%total_horas%', $moneda->fields['simbolo'] . $this->espacio . number_format($resumen_total, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
-
-				$html = str_replace('%RESUMEN_PROFESIONAL_FILAS%', $html3, $html);
+				$html = str_replace('%RESUMEN_PROFESIONAL_FILAS%', implode($rows), $html);
 
 				//cargamos el dato del total del monto en moneda tarifa (dato se calculo en detalle cobro) para mostrar en resumen segun conf
 				global $monto_cobro_menos_monto_contrato_moneda_tarifa;
-
-				// Aumentamos los totales
-				$resumen_total_hrs_trabajadas += $resumen_hrs_trabajadas;
-				$resumen_total_hrs_cobradas += $resumen_hrs_cobradas;
-				$resumen_total_hrs_retainer += $resumen_hrs_retainer;
-				$resumen_total_hrs_descontadas += $resumen_hrs_descontadas;
-				$resumen_total_hrs_incobrables += $resumen_hrs_incobrables;
-				$resumen_total_hh += $resumen_hh;
-				$resumen_total_total += $resumen_total;
 
 				//se muestra el mismo valor que sale en el detalle de cobro
 				if (Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
@@ -718,12 +631,11 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 				// Imprimir el total
 				$html3 = $parser->tags['RESUMEN_PROFESIONAL_TOTAL'];
 				$html3 = str_replace('%glosa%', __('Total'), $html3);
-
-				$html3 = str_replace('%hrs_trabajadas%', ($columna_hrs_trabajadas ? UtilesApp::Hora2HoraMinuto($resumen_total_hrs_cobradas) : ''), $html3);
-				$html3 = str_replace('%hrs_retainer%', ($columna_hrs_retainer ? UtilesApp::Hora2HoraMinuto($resumen_total_hrs_retainer) : ''), $html3);
-				$html3 = str_replace('%hrs_descontadas%', ($columna_hrs_incobrables ? UtilesApp::Hora2HoraMinuto($resumen_total_hrs_incobrables) : ''), $html3);
-				$html3 = str_replace('%hh%', UtilesApp::Hora2HoraMinuto($resumen_total_hh), $html3);
-				$html3 = str_replace('%total%', $moneda->fields['simbolo'] . $this->espacio . number_format($resumen_total_total, $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
+				$html3 = str_replace('%hrs_trabajadas%', ($columna_hrs_trabajadas ? $total['glosa_duracion_cobrada'] : ''), $html3);
+				$html3 = str_replace('%hrs_retainer%', ($columna_hrs_retainer ? $total['glosa_duracion_retainer'] : ''), $html3);
+				$html3 = str_replace('%hrs_descontadas%', ($columna_hrs_incobrables ? $total['glosa_duracion_incobrables'] : ''), $html3);
+				$html3 = str_replace('%hh%', $total['glosa_duracion_tarificada'], $html3);
+				$html3 = str_replace('%total%', $moneda->fields['simbolo'] . $this->espacio . number_format($total['valor_tarificada'], $moneda->fields['cifras_decimales'], $idioma->fields['separador_decimales'], $idioma->fields['separador_miles']), $html3);
 				$html = str_replace('%RESUMEN_PROFESIONAL_TOTAL%', $html3, $html);
 				break;
 
