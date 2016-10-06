@@ -293,14 +293,9 @@ class FacturaPdfDatos extends Objeto {
 		);
 
 		// Segmento Comodines. Solicitados por @gtigre
-		$query_comodines = "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
-		$resp_comodines = mysql_query($query_comodines,$this->sesion->dbh) or Utiles::errorSQL($query_comodines,__FILE__,__LINE__,$this->sesion->dbh);
-
-		while (list($codigo,$glosa) = mysql_fetch_array($resp_comodines)) {
-			if (!$datos[$codigo]) {
-				$datos[$codigo] = $glosa;
-			}
-		}
+		$FacturaPdfComodin = new FacturaPdfComodin($this->sesion, $factura);
+		$comodines = $FacturaPdfComodin->getComodines();
+		$datos = array_merge($datos, $comodines);
 
 		return $datos;
 	}
