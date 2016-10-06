@@ -152,9 +152,9 @@ $pagina->PrintTop($popup);
 			jQuery('#' + campo_cliente).focus();
 			return false;
 		}
-		if (!jQuery('#' + campo_cliente).val()) {
-			alert('<?= __('Ud. debe seleccionar un') . ' ' . __('asunto'); ?>');
-			jQuery('#' + campo_cliente).focus();
+		if (!jQuery('#' + campo_asunto).val()) {
+			alert('<?= __('Debe seleccionar un'). ' ' . __('asunto'); ?>');
+			jQuery('#' + campo_asunto).focus();
 			return false;
 		}
 		if (jQuery('#nombre').val() == '') {
