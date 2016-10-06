@@ -2250,11 +2250,11 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$row = str_replace('%duracion_trabajada%', '', $row);
 					}
 
-					$row = str_replace('%duracion_decimal%', number_format($work['duracion'], $decimales_horas, $separador_decimales, $separador_miles), $row);
+					$row = str_replace('%duracion_decimal%', number_format($work['duracion_cobrada'], $decimales_horas, $separador_decimales, $separador_miles), $row);
 					if ($horas_en_decimal) {
-						$row = str_replace('%duracion%', number_format($work['duracion'], $decimales_horas, ',', ''), $row);
+						$row = str_replace('%duracion%', number_format($work['duracion_cobrada'], $decimales_horas, ',', ''), $row);
 					} else {
-						$row = str_replace('%duracion%', $work['glosa_duracion'], $row);
+						$row = str_replace('%duracion%', $work['glosa_duracion_cobrada'], $row);
 					}
 
 
@@ -2709,11 +2709,11 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				}
 
 				$html = str_replace('%glosa%', __('Total Trabajos'), $html);
-				$html = str_replace('%duracion_decimal%', number_format($totales['duracion'], $decimales_horas, $separador_decimales, $separador_miles), $html);
+				$html = str_replace('%duracion_decimal%', number_format($totales['duracion_cobrada'], $decimales_horas, $separador_decimales, $separador_miles), $html);
 				if ($horas_en_decimal) {
-					$html = str_replace('%duracion%', number_format($totales['duracion'], $decimales_horas, $separador_decimales, $separador_miles), $html);
+					$html = str_replace('%duracion%', number_format($totales['duracion_cobrada'], $decimales_horas, $separador_decimales, $separador_miles), $html);
 				} else {
-					$html = str_replace('%duracion%', $totales['glosa_duracion'], $html);
+					$html = str_replace('%duracion%', $totales['glosa_duracion_cobrada'], $html);
 				}
 
 
