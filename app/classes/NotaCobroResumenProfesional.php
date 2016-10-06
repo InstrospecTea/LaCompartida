@@ -712,7 +712,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 
 				$totales = $this->ChargeData->getTotal();
 				if (is_array($totales)) {
-					if ($totales['duracion_retainer'] > 0 && $this->fields['forma_cobro'] != 'PROPORCIONAL' && ($this->fields['forma_cobro'] != 'FLAT FEE' || Conf::GetConf($this->sesion, 'ResumenProfesionalVial'))) {
+					if ($totales['duracion_retainer'] > 0 && ($this->fields['forma_cobro'] != 'FLAT FEE' || Conf::GetConf($this->sesion, 'ResumenProfesionalVial'))) {
 						$retainer = true;
 					}
 					if (($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') && Conf::GetConf($this->sesion, 'ResumenProfesionalVial')) {
