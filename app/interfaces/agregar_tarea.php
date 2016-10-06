@@ -152,9 +152,9 @@ $pagina->PrintTop($popup);
 			jQuery('#' + campo_cliente).focus();
 			return false;
 		}
-		if (!jQuery('#' + campo_cliente).val()) {
-			alert('<?= __('Ud. debe seleccionar un') . ' ' . __('asunto'); ?>');
-			jQuery('#' + campo_cliente).focus();
+		if (!jQuery('#' + campo_asunto).val()) {
+			alert('<?= __('Debe seleccionar un'). ' ' . __('asunto'); ?>');
+			jQuery('#' + campo_asunto).focus();
 			return false;
 		}
 		if (jQuery('#nombre').val() == '') {
@@ -167,6 +167,11 @@ $pagina->PrintTop($popup);
 				return true;
 			}
 			jQuery('#fecha').focus();
+			return false;
+		}
+		if (jQuery('#id_usuario_revisor').val() == '') {
+			alert('<?= __('Debe ingresar un usuario revisor para la Tarea'); ?>');
+			jQuery('#id_usuario_revisor').focus();
 			return false;
 		}
 		return true;
@@ -220,7 +225,7 @@ echo(Autocompletador::CSS());
 			<td align='right'>
 				<?= __('Cliente'); ?>
 			</td>
-			<td align='left' colspan='3'>
+			<td align='left' colspan='3' style='white-space: nowrap;'>
 				<?php
 				if (Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 					if (Conf::GetConf($sesion, 'CodigoSecundario')) {
@@ -235,14 +240,14 @@ echo(Autocompletador::CSS());
 						echo InputId::Imprimir($sesion, "cliente", "codigo_cliente", "glosa_cliente", "codigo_cliente", $codigo_cliente, "", "CargarSelect('codigo_cliente','codigo_asunto','cargar_asuntos',1);", 320, $codigo_asunto);
 					}
 				}
-				?>
+				?> <?= $req; ?>
 			</td>
 		</tr>
 		<tr>
 			<td align='right'>
 				<?= __('Asunto'); ?>
 			</td>
-			<td align='left' colspan='3'>
+			<td align='left' colspan='3' style='white-space: nowrap;'>
 				<?php
 				if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 					echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
@@ -257,7 +262,7 @@ echo(Autocompletador::CSS());
 			<td align='right'>
 				<?= __('Nombre'); ?>
 			</td>
-			<td align='left' colspan='3'>
+			<td align='left' colspan='3' style='white-space: nowrap;'>
 				<input name='nombre' id='nombre' size='40' value="<?= $Tarea->fields['nombre'] ? $Tarea->fields['nombre'] : '' ?>" /> <?= $req; ?>
 			</td>
 		</tr>
@@ -296,7 +301,7 @@ echo(Autocompletador::CSS());
 										>
 						<?= $i ?>
 						</option>
-						<?}?>
+						<?php }?>
 					</select>
 				</td>
 			<tr>
@@ -325,18 +330,17 @@ echo(Autocompletador::CSS());
 					<?= __('Estado'); ?>
 				</td>
 				<td align='left'>
-					<?= $Form->select('estado', array_combine($Tarea->estados, $Tarea->estados), empty($id_tarea) ? 'Asignada' : $Tarea->fields['estado']); ?>
+					<?= $Form->select('estado', array_combine($Tarea->estados, $Tarea->estados), empty($id_tarea) ? 'Asignada' : $Tarea->fields['estado'], array('empty' => __('Ninguno'))); ?>
 				</td>
 			</tr>
 			<tr>
 				<td align='right'>
 					<?= __('Usuario Revisor'); ?>
 				</td>
-				<td align='left'>
+				<td align='left' style='white-space: nowrap;'>
 					<?=
-					$Form->select('id_usuario_revisor', $usuario_generador->ListarActivos(null, false, $Tarea->fields['usuario_revisor']), $Tarea->fields['usuario_revisor'], array('empty' => __('Ninguno'))
-					);
-					?>
+					$Form->select('id_usuario_revisor', $usuario_generador->ListarActivos(null, false, $Tarea->fields['usuario_revisor']), $Tarea->fields['usuario_revisor']);
+					?> <?= $req; ?>
 				</td>
 				<td align='right'>
 					<?= __('Duración Estimada'); ?>
