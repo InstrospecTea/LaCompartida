@@ -831,37 +831,17 @@ class UtilesApp extends Utiles {
 	var $altura_logo_excel;
 
 	public static function AlturaLogoExcel() {
-		global $sesion;
-		if (isset($altura_logo_excel))
+		if (isset($altura_logo_excel)) {
 			return $altura_logo_excel;
-		// Este código está basado en SpreadsheetExcelWriter de PearPHP.
-		//FFF se pasa el path del logo a la DB $bitmap = Conf::LogoExcel();
+		}
 
-		$bitmap = Conf::GetConf($sesion, 'LogoExcel');
-		if (!$bitmap) {
+		$logo = Conf::read('LogoExcel');
+		if (!$logo) {
 			return 0;
 		}
-		// Open file.
-		$bmp_fd = @fopen($bitmap, "rb");
-		if (!$bmp_fd)
-			return 0; //throw new Exception("Couldn't import $bitmap");
 
-// Slurp the file into a string.
-		$data = fread($bmp_fd, filesize($bitmap));
-		// Check that the file is big enough to be a bitmap.
-		if (strlen($data) <= 0x36)
-			return 0; //throw new Exception("$bitmap doesn't contain enough data.\n");
-
-// The first 2 bytes are used to identify the bitmap.
-		$identity = unpack("A2ident", $data);
-		if ($identity['ident'] != "BM")
-			return 0; //throw new Exception("$bitmap doesn't appear to be a valid bitmap image.\n");
-
-// Remove bitmap data.
-		$data = substr($data, 18);
-		// Read the bitmap width and height.
-		$width_and_height = unpack("V2", substr($data, 0, 8));
-		$altura_logo_excel = $width_and_height[2];
+		$logo_sizes = getimagesize($logo);
+		$altura_logo_excel = $logo_sizes[1];
 
 		// Devolvemos 3/4 de la altura para convertirla de pixeles a puntos.
 		return .75 * $altura_logo_excel;

@@ -36,7 +36,7 @@ class UserToken extends Objeto {
 		$auth_token = '';
 		$Criteria = new Criteria($this->sesion);
 		$result = $Criteria->add_select('auth_token')
-			->add_from(user_token)
+			->add_from('user_token')
 			->add_restriction(CriteriaRestriction::equals('user_id', $user_id))
 			->run();
 		if (is_array($result)) {

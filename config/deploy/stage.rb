@@ -4,7 +4,7 @@ load 'config/cap_notify'
 load 'config/cap_shared'
 load 'config/cap_servers_stage'
 
-mysqlCmd = 'mysql -uroot -pasdwsx2016'
+mysqlCmd = 'mysql -hstagettbc.ccvvg39btzna.us-east-1.rds.amazonaws.com -uadmin -padmin1awdx'
 
 set :home_directory, "/var/www/html"
 set :base_directory, "#{home_directory}/deploys"
