@@ -225,7 +225,7 @@ echo(Autocompletador::CSS());
 			<td align='right'>
 				<?= __('Cliente'); ?>
 			</td>
-			<td align='left' colspan='3'>
+			<td align='left' colspan='3' style='white-space: nowrap;'>
 				<?php
 				if (Conf::GetConf($sesion, 'TipoSelectCliente') == 'autocompletador') {
 					if (Conf::GetConf($sesion, 'CodigoSecundario')) {
@@ -247,7 +247,7 @@ echo(Autocompletador::CSS());
 			<td align='right'>
 				<?= __('Asunto'); ?>
 			</td>
-			<td align='left' colspan='3'>
+			<td align='left' colspan='3' style='white-space: nowrap;'>
 				<?php
 				if (Conf::GetConf($sesion, 'CodigoSecundario')) {
 					echo InputId::Imprimir($sesion, "asunto", "codigo_asunto_secundario", "glosa_asunto", "codigo_asunto_secundario", $codigo_asunto_secundario, "", "CargarSelectCliente(this.value);", 320, $codigo_cliente_secundario);
@@ -262,7 +262,7 @@ echo(Autocompletador::CSS());
 			<td align='right'>
 				<?= __('Nombre'); ?>
 			</td>
-			<td align='left' colspan='3'>
+			<td align='left' colspan='3' style='white-space: nowrap;'>
 				<input name='nombre' id='nombre' size='40' value="<?= $Tarea->fields['nombre'] ? $Tarea->fields['nombre'] : '' ?>" /> <?= $req; ?>
 			</td>
 		</tr>
@@ -337,7 +337,7 @@ echo(Autocompletador::CSS());
 				<td align='right'>
 					<?= __('Usuario Revisor'); ?>
 				</td>
-				<td align='left'>
+				<td align='left' style='white-space: nowrap;'>
 					<?=
 					$Form->select('id_usuario_revisor', $usuario_generador->ListarActivos(null, false, $Tarea->fields['usuario_revisor']), $Tarea->fields['usuario_revisor']);
 					?> <?= $req; ?>
