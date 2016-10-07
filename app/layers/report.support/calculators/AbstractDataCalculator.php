@@ -497,7 +497,11 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	 * @return factor
 	 */
  	public function getFactor() {
- 		return $this->invoiceFactor();
+		$factor = 1;
+		if (Conf::getConf($this->Session, 'NuevoModuloFactura')) {
+			$factor = $this->invoiceFactor();
+		}
+ 		return $factor;
  	}
 
 	/**
