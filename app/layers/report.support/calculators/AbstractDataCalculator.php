@@ -496,12 +496,8 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	 * Factor to apply to heach sum element
 	 * @return factor
 	 */
- 	public function getFactor() {
-		$factor = 1;
-		if (Conf::getConf($this->Session, 'NuevoModuloFactura')) {
-			$factor = $this->invoiceFactor();
-		}
- 		return $factor;
+ 	public function getFactor() {	
+ 		return Conf::getConf($this->Session, 'NuevoModuloFactura') ? $this->invoiceFactor() : 1;
  	}
 
 	/**
