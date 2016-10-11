@@ -1,14 +1,14 @@
 <?php
 /**
- * Agrupador por Glosa cliente:
+ * Agrupador por Glosa cliente para los Gráficos:
  *
  * * Agrupa por: cliente.codigo_cliente
- * * Muestra: cliente.glosa_cliente
+ * * Muestra: cliente.codigo_cliente + cliente.glosa_cliente
  * * Ordena por: cliente.glosa_cliente
  *
- * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Glosa-Cliente
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Glosa-Cliente-Charts
  */
-class GlosaClienteGrouper extends AbstractGrouperTranslator {
+class GlosaClienteChartsGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Obtiene el campo por el cual se agrupará la query
@@ -23,7 +23,8 @@ class GlosaClienteGrouper extends AbstractGrouperTranslator {
 	 * @return String par tabla.campo o alias de función
 	 */
 	function getSelectField() {
-		return 'cliente.glosa_cliente';
+		$client_code = $this->getClientCodeField();
+ 		return "CONCAT($client_code, ' - ', cliente.glosa_cliente)";
 	}
 
 	/**
@@ -41,7 +42,7 @@ class GlosaClienteGrouper extends AbstractGrouperTranslator {
 	 */
 	function translateForCharges(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'glosa_cliente')
+			->add_select($this->getSelectField(), 'glosa_cliente_charts')
 			->add_select($this->getGroupField())
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
@@ -62,7 +63,7 @@ class GlosaClienteGrouper extends AbstractGrouperTranslator {
 	 */
 	function translateForErrands(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'glosa_cliente')
+			->add_select($this->getSelectField(), 'glosa_cliente_charts')
 			->add_select($this->getGroupField())
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
@@ -83,7 +84,7 @@ class GlosaClienteGrouper extends AbstractGrouperTranslator {
 	 */
 	function translateForWorks(Criteria $Criteria) {
 		$Criteria
-			->add_select($this->getSelectField(), 'glosa_cliente')
+			->add_select($this->getSelectField(), 'glosa_cliente_charts')
 			->add_select($this->getGroupField())
 			->add_grouping($this->getGroupField())
 			->add_ordering($this->getOrderField())
