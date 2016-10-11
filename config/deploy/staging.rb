@@ -3,7 +3,7 @@ load 'config/cap_notify'
 load 'config/cap_shared'
 load 'config/cap_servers_staging'
 
-mysqlCmd = "mysql -u root -padmin1awdx"
+mysqlCmd = 'mysql -hstagettbc.ccvvg39btzna.us-east-1.rds.amazonaws.com -uadmin -padmin1awdx'
 
 set :home_directory, "/mnt/disk1"
 set :base_directory, "#{home_directory}/deploys"
