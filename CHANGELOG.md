@@ -2,7 +2,7 @@
 
 ## Hotfix 16.31.1
 Tuesday, October 11th
-* **Fix** [Modificar filtros y tipos de datos](https://github.com/LemontechSA/ttb/pull/1859)
+* **Fix** [Modificar filtros y tipos de datos](https://github.com/LemontechSA/ttb/pull/1865)
 
 ## [Release 16.31.0](https://github.com/LemontechSA/ttb/pull/1852)
 Monday, October 3rd
