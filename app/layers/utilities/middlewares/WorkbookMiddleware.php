@@ -380,7 +380,7 @@ class WorkbookMiddleware {
 	public function setColumn($firstcol, $lastcol, $width, $format = null, $hidden = 0) {
 		$column = PHPExcel_Cell::stringFromColumnIndex($firstcol);
 
-		$this->workSheetObj->getColumnDimension($column)->setWidth($width);
+		$this->workSheetObj->getColumnDimension($column)->setWidth($width * 1.6);
 
 		if (is_numeric($hidden) && $hidden == 1) {
 			$this->workSheetObj->getColumnDimension($column)->setVisible(false);
