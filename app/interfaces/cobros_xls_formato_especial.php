@@ -63,7 +63,6 @@ $b1 = new Buscador($sesion, $query, "Trabajo", $desde, '', $orden);
 $lista = $b1->lista;
 
 $wb = new WorkbookMiddleware();
-$wb->setVersion(8);
 $wb->setCustomColor(35, 220, 255, 220);
 $wb->setCustomColor(36, 255, 255, 220);
 
@@ -239,7 +238,8 @@ $ws->setColumn(0, 0, 2);
 $ws->setColumn($col_asunto, $col_asunto, 30);
 foreach ($col_abogados as $id => $col)
 	$ws->setColumn($col, $col, 12);
-$ws->setColumn($col_total_horas, $col_total, 12);
+$ws->setColumn($col_total_horas, $col_total_horas, 12);
+$ws->setColumn($col_total, $col_total, 12);
 $ws->setZoom(75);
 
 // Escribir encabezado
