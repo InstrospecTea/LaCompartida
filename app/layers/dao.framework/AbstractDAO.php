@@ -9,7 +9,11 @@
  */
 abstract class AbstractDAO extends Objeto implements BaseDAO {
 
+	/**
+	 * @deprecated $sesion
+	 */
 	public $sesion;
+	public $Sesion;
 
 	/**
 	 * Indica a la Clase que al llamar a Write(), creará un registro en la tabla 'log_db'
@@ -17,8 +21,9 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	 */
 	public $log_update = false;
 
-	public function __construct(Sesion $sesion) {
-		$this->sesion = $sesion;
+	public function __construct(Sesion $Sesion) {
+		$this->Sesion = $Sesion;
+		$this->sesion = &$this->Sesion;
 	}
 
 	/**
@@ -156,7 +161,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	public function saveOrUpdate($object, $writeLog = true) {
 		//Llena los defaults de cada entidad.
 		$this->checkClass($object, $this->getClass());
-		$reflected = new ReflectionClass($this->getClass());
 		$id = $object->get($object->getIdentity());
 		//Si el objeto tiene definido un id, entonces hay que actualizar. Si no tiene definido un id, entonces hay
 		//que crear un nuevo registro.
@@ -164,7 +168,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			$object = $this->fillDefaults($object);
 			$object = $this->save($object);
 			if (is_subclass_of($object, 'LoggeableEntity')) {
-				$this->writeLogFromArray('CREAR', $object, $reflected->newInstance());
+				$this->writeLogFromArray('CREAR', $object, $this->newDtoInstance());
 			}
 		} else {
 			$legacy = $this->get($object->get($object->getIdentity()));
@@ -218,8 +222,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 
 	public function get($id, $fields = null) {
 		$criteria = new Criteria($this->sesion);
-		$reflected = new ReflectionClass($this->getClass());
-		$instance = $reflected->newInstance();
+		$instance = $this->newDtoInstance();
 		$this->add_fields($criteria, $fields);
 		$criteria->add_from($instance->getPersistenceTarget());
 		$criteria->add_restriction(CriteriaRestriction::equals($instance->getIdentity(), $id));
@@ -247,19 +250,17 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	 */
 	public function findAll($restrictions = null, $fields = null, $order = null, $limit = null) {
 		$criteria = new Criteria($this->sesion);
-		$reflected = new ReflectionClass($this->getClass());
 
 		$this->add_fields($criteria, $fields);
 		$this->add_restriction($criteria, $restrictions);
 		$this->add_ordering($criteria, $order);
 		$this->add_limits($criteria, $limit);
 
-		$criteria->add_from($reflected->getMethod('getPersistenceTarget')->invoke($reflected->newInstance()));
+		$criteria->add_from($this->newDtoInstance()->getPersistenceTarget());
 		$output = array();
 		$results = $criteria->run();
 		foreach ($results as $result) {
-			$instance = $reflected->newInstance();
-			$instance = $this->encapsulate($result, $instance);
+			$instance = $this->encapsulate($result, $this->newDtoInstance());
 			$output[] = $instance;
 		}
 		return $output;
@@ -312,9 +313,8 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	public function delete($object = null) {
-		$reflected = new ReflectionClass($this->getClass());
 		if (is_subclass_of($object, 'LoggeableEntity')) {
-			$newInstance = $reflected->newInstance();
+			$newInstance = $this->newDtoInstance();
 			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
 			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
 		}
@@ -403,10 +403,9 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 
 	private function findAllRelated(Entity $entity, array $relation, array $relations_filters = array()) {
 		$Criteria = new Criteria($this->sesion);
-		$Reflected = new ReflectionClass($this->getClass());
 		$RelationReflected = new ReflectionClass($relation['class']);
 
-		$Instance = $Reflected->newInstance();
+		$Instance = $this->newDtoInstance();
 		$RelationInstance = $RelationReflected->newInstance();
 
 		$output = array();
@@ -445,8 +444,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	public function newEntity(array $properties = null) {
-		$Reflected = new ReflectionClass($this->getClass());
-		$Instance = $Reflected->newInstance();
+		$Instance = $this->newDtoInstance();
 		if (!is_null($properties)) {
 			$Instance->fillFromArray($properties, true);
 		}
@@ -455,14 +453,17 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 
 	public function count() {
 		$criteria = new Criteria($this->sesion);
-		$reflected = new ReflectionClass($this->getClass());
-
 		$result = $criteria
 			->add_select('COUNT(*)', 'count')
-			->add_from($reflected->getMethod('getPersistenceTarget')->invoke($reflected->newInstance()))
-			->run();
+			->add_from($this->newDtoInstance()->getPersistenceTarget())
+			->first();
 
-		return isset($result[0]['count']) ? (int) $result[0]['count'] : 0;
+		return $result === false ? 0 : (int) $result['count'];
+	}
+
+	protected function newDtoInstance() {
+		$reflected = new ReflectionClass($this->getClass());
+		return $reflected->newInstance();
 	}
 
 }

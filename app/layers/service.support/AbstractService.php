@@ -23,8 +23,7 @@ abstract class AbstractService implements BaseService {
 	public function saveOrUpdate($object, $writeLog = true) {
 		$this->checkNullity($object);
 		$this->checkClass($object, $this->getClass());
-		$daoClass = $this->getDaoLayer();
-		$dao = new $daoClass($this->sesion);
+		$dao = $this->newDao();
 		try {
 			return $dao->saveOrUpdate($object, $writeLog);
 		} catch(CouldNotAddEntityException $ex) {
@@ -41,8 +40,7 @@ abstract class AbstractService implements BaseService {
 	 */
 	public function get($id, $fields = null) {
 		$this->checkNullity($id);
-		$daoClass = $this->getDaoLayer();
-		$dao = new $daoClass($this->sesion);
+		$dao = $this->newDao();
 		try {
 			return $dao->get($id, $fields);
 		} catch(CouldNotFindEntityException $ex) {
@@ -51,8 +49,7 @@ abstract class AbstractService implements BaseService {
 	}
 
 	public function count() {
-		$daoClass = $this->getDaoLayer();
-		$dao = new $daoClass($this->sesion);
+		$dao = $this->newDao();
 		try {
 			return $dao->count();
 		} catch(CouldNotFindEntityException $ex) {
@@ -61,8 +58,7 @@ abstract class AbstractService implements BaseService {
 	}
 
 	public function findAll($restrictions = null, $fields = null, $order = null, $limit = null) {
-		$daoClass = $this->getDaoLayer();
-		$dao = new $daoClass($this->sesion);
+		$dao = $this->newDao();
 		try {
 			return $dao->findAll($restrictions, $fields, $order, $limit);
 		} catch(Exception $ex) {
@@ -82,8 +78,7 @@ abstract class AbstractService implements BaseService {
 	public function delete($object) {
 		$this->checkNullity($object);
 		$this->checkClass($object, $this->getClass());
-		$daoClass = $this->getDaoLayer($this->sesion);
-		$dao = new $daoClass($this->sesion);
+		$dao = $this->newDao();
 		try {
 			$dao->delete($object);
 		} catch(CouldNotDeleteEntityException $ex) {
@@ -135,9 +130,7 @@ abstract class AbstractService implements BaseService {
 	}
 
 	public function getWithRelations($id, array $relations_filters = array()) {
-		$daoClass = $this->getDaoLayer();
-		$dao = new $daoClass($this->sesion);
-
+		$dao = $this->newDao();
 		try {
 			return $dao->getWithRelations($id, $relations_filters);
 		} catch(CouldNotFindEntityException $ex) {
@@ -145,4 +138,8 @@ abstract class AbstractService implements BaseService {
 		}
 	}
 
+	protected function newDao() {
+		$daoClass = $this->getDaoLayer();
+		return new $daoClass($this->sesion);
+	}
 }
