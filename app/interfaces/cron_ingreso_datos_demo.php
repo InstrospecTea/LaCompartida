@@ -1,5 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
+use TTB\Debug;
+
 set_time_limit(0);
 exit('Este script ya no es válido');
 
