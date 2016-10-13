@@ -117,7 +117,17 @@ class FormatMiddleware {
 	 * @param int $top
 	 */
 	public function setTop($top) {
-		$this->top = $top == 1 ? PHPExcel_Style_Border::BORDER_THIN : PHPExcel_Style_Border::BORDER_THICK;
+		switch ($top) {
+			case 0:
+				$this->top = PHPExcel_Style_Border::BORDER_NONE;
+				break;
+			case 1:
+				$this->top = PHPExcel_Style_Border::BORDER_THIN;
+				break;
+			default:
+				$this->top = PHPExcel_Style_Border::BORDER_THICK;
+				break;
+		}
 	}
 
 	/**
@@ -125,7 +135,17 @@ class FormatMiddleware {
 	 * @param int $top
 	 */
 	public function setBottom($bottom) {
-		$this->bottom = $bottom == 1 ? PHPExcel_Style_Border::BORDER_THIN : PHPExcel_Style_Border::BORDER_THICK;
+		switch ($bottom) {
+			case 0:
+				$this->bottom = PHPExcel_Style_Border::BORDER_NONE;
+				break;
+			case 1:
+				$this->bottom = PHPExcel_Style_Border::BORDER_THIN;
+				break;
+			default:
+				$this->bottom = PHPExcel_Style_Border::BORDER_THICK;
+				break;
+		}
 	}
 
 	/**
