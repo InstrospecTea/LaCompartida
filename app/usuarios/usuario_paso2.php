@@ -1067,12 +1067,12 @@ function CargarPermisos() {
 				}
 			});
 
-			jQuery("#REV9").trigger("change");
-			jQuery("#SEC12").trigger("change");
+			jQuery("[name='REV']").trigger("change");
+			jQuery("[name='SEC']").trigger("change");
 		<?php } ?>
 	});
 
-	jQuery("#REV9").on("change", function() {
+	jQuery("[name='REV']").on("change", function() {
 		if (jQuery(this).is(":checked")) {
 			jQuery("#fieldset-usuario_revisor").show();
 		} else {
@@ -1080,7 +1080,7 @@ function CargarPermisos() {
 		};
 	});
 
-	jQuery("#SEC12").on("change", function() {
+	jQuery("[name='SEC']").on("change", function() {
 		if (jQuery(this).is(":checked")) {
 			jQuery("#fieldset-usuarios_secretario").show();
 		} else {

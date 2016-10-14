@@ -2,6 +2,7 @@
 
 require_once dirname(__FILE__) . '/../conf.php';
 
+use TTB\Debug;
 $sesion = new Sesion(null, true);
 $sesion->usuario = new Usuario($sesion, '99511620');
 
