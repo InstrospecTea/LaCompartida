@@ -144,6 +144,30 @@ class UserManager extends AbstractManager implements IUserManager {
 		return $this->calculateHours($Works->toArray());
 	}
 
+	/**
+	 * Obtiene permisos de un usuario
+	 * @param 	string $user_id
+	 * @return 	Array
+	 */
+	public function getPermissions($user_id) {
+		if (empty($user_id) || !is_numeric($user_id)) {
+			throw new InvalidIdentifier;
+		}
+
+		$this->loadService('UserPermission');
+
+		$Permissions = $this->UserPermissionService->findAll(
+			CriteriaRestriction::equals('id_usuario', $user_id),
+			'codigo_permiso'
+		);
+
+		foreach ($Permissions as $key => $value) {
+			$permissions_result[] = $value->get('codigo_permiso');
+		}
+
+		return $permissions_result;
+	}
+
 	private function generateRestrictions($user_id, $init_date, $end_date){
 		$restrictions_array = array(CriteriaRestriction::equals('id_usuario', $user_id));
 
