@@ -1,11 +1,18 @@
 <?php
+
 abstract class AbstractService implements BaseService {
 
+	/**
+	 * @deprecated por convención
+	 * @var Sesion $sesion
+	 */
 	public $sesion;
+	public $Sesion;
 	private $loadedClass = array();
 
-	public function __construct(Sesion $sesion) {
-		$this->sesion = $sesion;
+	public function __construct(Sesion $Sesion) {
+		$this->Sesion = $Sesion;
+		$this->sesion = &$this->Sesion;
 		$this->loadDAO($this->getDaoLayer());
 	}
 
@@ -115,17 +122,17 @@ abstract class AbstractService implements BaseService {
 	 * @param      $classname
 	 * @param null $alias
 	 */
-	protected function loadDAO($classname, $alias = null) {
-		if (!preg_match('/DAO$/', $classname)) {
-			$classname = "{$classname}DAO";
+	protected function loadDAO($class_name, $alias = null) {
+		if (!preg_match('/DAO$/', $class_name)) {
+			$class_name = "{$class_name}DAO";
 		}
 		if (empty($alias)) {
-			$alias = $classname;
+			$alias = $class_name;
 		}
 		if (in_array($alias, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->sesion);
+		$this->{$alias} = $this->newDao();
 		$this->loadedClass[] = $alias;
 	}
 
@@ -139,7 +146,18 @@ abstract class AbstractService implements BaseService {
 	}
 
 	protected function newDao() {
-		$daoClass = $this->getDaoLayer();
-		return new $daoClass($this->sesion);
+		$dao_class = $this->getDaoLayer();
+		if (class_exists($dao_class)) {
+			$instance = new $dao_class($this->Sesion);
+		} else {
+			$instance = $this->newGenericDao($dao_class);
+		}
+		return $instance;
 	}
+
+	private function newGenericDao($name) {
+		$class_name = preg_replace('/(.+)DAO$/', '\1', $name);
+		return new GenericDAO($this->Sesion, $class_name);
+	}
+
 }

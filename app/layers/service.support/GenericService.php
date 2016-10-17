@@ -2,36 +2,24 @@
 
 class GenericService extends AbstractService implements BaseService {
 
-	private $table_name;
-	private $identity_field;
+	private $class_name;
 
 	/**
 	 * Devuelve una servicio generico en base al nombre de la tabla
-	 * @param string $table_name Nombre de la tabla
 	 * @param Sesion $Sesion
-	 * @param string $identity_field nombre del campo id
+	 * @param string $class_name nombre de la clase
 	 */
-	public function __construct($table_name, Sesion $Sesion, $identity_field = null) {
-		$this->sesion = $Sesion;
-		$this->table_name = $table_name;
-		if (is_null($identity_field)) {
-			$identity_field = "id_{$table_name}";
-		}
-		$this->identity_field = $identity_field;
+	public function __construct(Sesion $Sesion, $class_name) {
+		$this->class_name = $class_name;
+		parent::__construct($Sesion);
 	}
 
 	public function getDaoLayer() {
-		throw new Exception(__('Invalid method in GenericService'), 1);
-		;
+		return "{$this->class_name}DAO";
 	}
 
 	public function getClass() {
-		return 'Generic';
-	}
-
-
-	protected function newDao() {
-		return new GenericDAO($this->table_name, $this->sesion, $this->identity_field);
+		return "$this->class_name";
 	}
 
 }

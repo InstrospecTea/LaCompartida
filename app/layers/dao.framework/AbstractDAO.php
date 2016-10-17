@@ -10,7 +10,7 @@
 abstract class AbstractDAO extends Objeto implements BaseDAO {
 
 	/**
-	 * @deprecated $sesion
+	 * @deprecated $sesion por convención
 	 */
 	public $sesion;
 	public $Sesion;
@@ -462,8 +462,19 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	protected function newDtoInstance() {
-		$reflected = new ReflectionClass($this->getClass());
-		return $reflected->newInstance();
+		$dto_class = $this->getClass();
+		if (class_exists($dto_class)) {
+			$instance = new $dto_class();
+		} else {
+			$instance = $this->newGenericDto($dto_class);
+		}
+		return $instance;
+	}
+
+	protected function newGenericDto($name) {
+		$table_name = Utiles::underscoreize($name);
+		$original_table_name = \TTB\Configurations\TableTranslation::original($table_name);
+		return new Generic($original_table_name);
 	}
 
 }

@@ -5,9 +5,9 @@ class Generic extends Entity {
 	private $table_name;
 	private $identity_field;
 
-	public function __construct($table_name, $identity_field) {
+	public function __construct($table_name) {
 		$this->table_name = $table_name;
-		$this->identity_field = $identity_field;
+		$this->identity_field = "id_{$table_name}";
 	}
 	/**
 	 * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
