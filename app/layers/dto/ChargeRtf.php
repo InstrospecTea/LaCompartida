@@ -4,7 +4,7 @@
  * Class Charge
  * Clase que representa un cobro en TheTimeBilling.
  */
-class RtfCharge extends Entity {
+class ChargeRtf extends Entity {
 
 	/**
 	 * Obtiene el nombre de la propiedad que actúa como identidad de la instancia del objeto que hereda a esta clase.
