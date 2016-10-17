@@ -57,7 +57,6 @@ class Trabajo extends Objeto
 		$work = new Work();
 		$work->fillFromArray($this->fields);
 		$work->fillChangedFields($this->changes);
-		$work->fields['descripcion'] = htmlentities($work->fields['descripcion']);
 
 		try {
 			$work = $workService->saveOrUpdate($work, $writeLog);
