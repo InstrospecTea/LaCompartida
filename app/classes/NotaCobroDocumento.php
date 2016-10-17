@@ -1534,8 +1534,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 					    AND trabajo.codigo_asunto = '{$asunto->fields['codigo_asunto']}' {$and}
 					    AND trabajo.id_tramite = 0
 							{$where_horas_cero}
-					ORDER BY {$order_categoria}
-									 trabajo.descripcion";
+					ORDER BY {$order_categoria};";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
 

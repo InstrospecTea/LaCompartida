@@ -2199,8 +2199,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'
 					    AND trabajo.codigo_asunto = '{$asunto->fields['codigo_asunto']}' {$cobrable} {$visible}
 					    AND trabajo.id_tramite = 0 {$where_horas_cero}
-					ORDER BY {$order_categoria}
-									 trabajo.descripcion";
+					ORDER BY {$order_categoria};";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
 

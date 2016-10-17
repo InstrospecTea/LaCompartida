@@ -819,8 +819,7 @@ class NotaCobroDocumentoComun extends NotaCobroConfig {
 					WHERE tramite.id_cobro = '{$this->fields['id_cobro']}'
 					    AND tramite.codigo_asunto = '{$asunto->fields['codigo_asunto']}' {$tramite_cobrable}
 					    AND tramite.fecha BETWEEN '{$this->fields['fecha_ini']} ' AND '{$this->fields['fecha_fin']}'
-					ORDER BY {$order_categoria}
-					         tramite.descripcion;";
+					ORDER BY {$order_categoria};";
 
 				$lista_tramites = new ListaTramites($this->sesion, '', $query_lista_tramites);
 
@@ -1253,8 +1252,7 @@ class NotaCobroDocumentoComun extends NotaCobroConfig {
 							{$and}
 					    AND trabajo.id_tramite = 0
 							{$where_horas_cero}
-					ORDER BY {$order_categoria}
-									 trabajo.descripcion";
+					ORDER BY {$order_categoria}";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
 

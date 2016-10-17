@@ -24,15 +24,15 @@ class OrdenDefectoNotaCobro extends \Database\Migration implements \Database\ITe
 				AND valor_opcion = 1;");
 
 		if ($orden_trabajos == 'TrabajosOrdenarPorCategoriaNombreUsuario') {
-			$order_categoria_trabajos = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, trabajo.fecha, ";
+			$order_categoria_trabajos = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, trabajo.fecha, trabajo.descripcion";
 		} else if ($orden_trabajos == 'TrabajosOrdenarPorCategoriaUsuario') {
-			$order_categoria_trabajos = "prm_categoria_usuario.orden, usuario.id_usuario, trabajo.fecha, ";
+			$order_categoria_trabajos = "prm_categoria_usuario.orden, usuario.id_usuario, trabajo.fecha, trabajo.descripcion";
 		} else if ($separar_por_usuario == 'SepararPorUsuario') {
-			$order_categoria_trabajos = "usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha, ";
+			$order_categoria_trabajos = "usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha, trabajo.descripcion";
 		} else if ($orden_trabajos == 'TrabajosOrdenarPorCategoriaDetalleProfesional') {
-			$order_categoria_trabajos = "usuario.id_categoria_usuario DESC, trabajo.fecha, ";
+			$order_categoria_trabajos = "usuario.id_categoria_usuario DESC, trabajo.fecha, trabajo.descripcion";
 		} else if ($orden_trabajos == 'TrabajosOrdenarPorFechaCategoria') {
-			$order_categoria_trabajos = "usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha, ";
+			$order_categoria_trabajos = "usuario.id_categoria_usuario, usuario.id_usuario, trabajo.fecha, trabajo.descripcion";
 		}
 
 		$orden_tramites = $this->getResultsQuery("SELECT glosa_opcion
@@ -45,13 +45,13 @@ class OrdenDefectoNotaCobro extends \Database\Migration implements \Database\ITe
 		$orden_tramites = $orden_tramites[0]['glosa_opcion'];
 
 		if ($orden_tramites = 'TramitesOrdenarPorCategoriaNombreUsuario') {
-			$order_categoria_tramites = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, tramite.fecha, ";
+			$order_categoria_tramites = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, tramite.fecha, tramite.descripcion";
 		} else if ($orden_tramites = 'TramitesOrdenarPorCategoriaUsuario') {
-			$order_categoria_tramites = "prm_categoria_usuario.orden, usuario.id_usuario, tramite.fecha, ";
+			$order_categoria_tramites = "prm_categoria_usuario.orden, usuario.id_usuario, tramite.fecha, tramite.descripcion";
 		} else if ($orden_tramites = 'TramitesOrdenarPorCategoriaDetalleProfesional') {
-			$order_categoria_tramites = "usuario.id_categoria_usuario DESC, tramite.fecha, ";
+			$order_categoria_tramites = "usuario.id_categoria_usuario DESC, tramite.fecha, tramite.descripcion";
 		} else if ($orden_tramites = 'TramitesOrdenarPorFechaCategoria') {
-			$order_categoria_tramites = "usuario.id_categoria_usuario, usuario.id_usuario, tramite.fecha, ";
+			$order_categoria_tramites = "usuario.id_categoria_usuario, usuario.id_usuario, tramite.fecha, tramite.descripcion";
 		}
 
 		$this->addQueryUp("DELETE
