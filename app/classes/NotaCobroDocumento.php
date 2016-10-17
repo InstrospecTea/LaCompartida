@@ -769,17 +769,19 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 					$fix_decimal = '10';
 				}
 
+				$Numbers_Words = new Numbers_Words();
+
 				if ($lang == 'es') {
 
 					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
 
 					if (empty($total_parte_decimal)) {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'es'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'es'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang);
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang) . ' CON 00/100 CENTAVOS';
 					} else {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'es'));
-						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal * $fix_decimal, 'es'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'es'));
+						$monto_palabra_parte_decimal = strtoupper($Numbers_Words->toWords($total_parte_decimal * $fix_decimal, 'es'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' CON ' . $monto_palabra_parte_decimal . ' ' . 'CENTAVOS';
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang) . ' CON ' . $total_parte_decimal * $fix_decimal . '/100 CENTAVOS';
 					}
@@ -788,12 +790,12 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural_lang'];
 
 					if (empty($total_parte_decimal)) {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'en_US'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'en_US'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang);
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang) . ' CON 00/100 CENTAVOS';
 					} else {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'en_US'));
-						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, 'en_US'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'en_US'));
+						$monto_palabra_parte_decimal = strtoupper($Numbers_Words->toWords($total_parte_decimal, 'en_US'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' WITH ' . $monto_palabra_parte_decimal . ' ' . 'CENTS';
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' WITH ' . $total_parte_decimal * $fix_decimal . '/100 CENTS';
 					}
@@ -1485,24 +1487,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 				}
 
 				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
-
-				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuario es true se ordena por categoria
-				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario')) {
-					$order_categoria = "prm_categoria_usuario.orden, usuario.nombre, usuario.apellido1, usuario.id_usuario, ";
-				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} else if (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-					$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
-				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional')) {
-					$select_categoria = "";
-					$order_categoria = "usuario.id_categoria_usuario DESC, ";
-				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorFechaCategoria')) {
-					$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
-				} else {
-					$select_categoria = "";
-					$join_categoria = "";
-					$order_categoria = "";
-				}
+				$order_categoria = Conf::Read('OrdenTrabajosNotaCobro');
 
 				if (Conf::GetConf($this->sesion, 'MostrarHorasCero')) {
 					if ($this->fields['opc_ver_horas_trabajadas']) {
@@ -1527,28 +1512,30 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
 				$query = "SELECT SQL_CALC_FOUND_ROWS
-									trabajo.duracion_cobrada,
-									trabajo.duracion_retainer,
-									trabajo.descripcion,
-									trabajo.fecha,
-									trabajo.id_usuario,
-									$dato_monto_cobrado as monto_cobrado,
-									trabajo.visible,
-									trabajo.cobrable,
-									trabajo.id_trabajo,
-									trabajo.tarifa_hh,
-									trabajo.codigo_asunto,
-									trabajo.solicitante,
-									CONCAT_WS(' ', nombre, apellido1) as nombre_usuario,
-									usuario.username,
-									trabajo.duracion $select_categoria
-							FROM trabajo
-							LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-							$join_categoria
-							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
-							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-							$and AND trabajo.id_tramite=0 $where_horas_cero
-							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
+								 trabajo.duracion_cobrada,
+					       trabajo.duracion_retainer,
+					       trabajo.descripcion,
+					       trabajo.fecha,
+					       trabajo.id_usuario,
+					       {$dato_monto_cobrado} AS monto_cobrado,
+					       trabajo.visible,
+					       trabajo.cobrable,
+					       trabajo.id_trabajo,
+					       trabajo.tarifa_hh,
+					       trabajo.codigo_asunto,
+					       trabajo.solicitante,
+					       CONCAT_WS(' ', nombre, apellido1) AS nombre_usuario,
+					       usuario.username,
+					       trabajo.duracion,
+								 {$select_categoria}
+					FROM trabajo
+					LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario {$join_categoria}
+					WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'
+					    AND trabajo.codigo_asunto = '{$asunto->fields['codigo_asunto']}' {$and}
+					    AND trabajo.id_tramite = 0
+							{$where_horas_cero}
+					ORDER BY {$order_categoria}
+									 trabajo.descripcion";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
 
@@ -1558,9 +1545,9 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 
 				for ($i = 0; $i < $lista_trabajos->num; $i++) {
 					$trabajo = $lista_trabajos->Get($i);
-					list($ht, $mt, $st) = split(":", $trabajo->fields['duracion']);
-					list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
-					list($h_retainer, $m_retainer, $s_retainer) = split(":", $trabajo->fields['duracion_retainer']);
+					list($ht, $mt, $st) = explode(":", $trabajo->fields['duracion']);
+					list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
+					list($h_retainer, $m_retainer, $s_retainer) = explode(":", $trabajo->fields['duracion_retainer']);
 					$duracion_cobrada_decimal = $h + $m / 60 + $s / 3600;
 					$asunto->fields['trabajos_total_duracion'] += $h * 60 + $m + $s / 60;
 					$asunto->fields['trabajos_total_valor'] += $trabajo->fields['monto_cobrado'];

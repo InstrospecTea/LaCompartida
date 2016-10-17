@@ -2137,26 +2137,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$html = '';
 				$where_horas_cero = '';
 
-				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuarioe s true se ordena por categoria
-				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} elseif (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-					$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
-				} elseif (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional')) {
-					$select_categoria = "";
-					$order_categoria = "usuario.id_categoria_usuario DESC, ";
-				} elseif (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorFechaCategoria')) {
-					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-					$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
-				} else {
-					$select_categoria = "";
-					$order_categoria = "";
-				}
+				$order_categoria = Conf::Read('OrdenTrabajosNotaCobro');
 
 				if (!method_exists('Conf', 'MostrarHorasCero')) {
 					if ($this->fields['opc_ver_horas_trabajadas'])
@@ -2194,34 +2175,32 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				/*
 				 * 	Contenido de filas de seccion trabajo.
 				 */
-				$query = "SELECT SQL_CALC_FOUND_ROWS
-									IF(trabajo.cobrable,trabajo.duracion_cobrada,'00:00:00') as duracion_cobrada,
-									trabajo.duracion_retainer,
-									trabajo.descripcion,
-									trabajo.fecha,
-									trabajo.id_usuario,
-									$dato_monto_cobrado as monto_cobrado,
-									trabajo.visible,
-									trabajo.cobrable,
-									trabajo.id_trabajo,
-									trabajo.tarifa_hh,
-									IF (trabajo.cobrable, trabajo.tarifa_hh * ( TIME_TO_SEC( duracion_cobrada ) / 3600 ),0) as importe,
-									trabajo.codigo_asunto,
-									trabajo.solicitante,
-									$query_categoria_lang
-									CONCAT_WS(' ', nombre, apellido1) as nombre_usuario,
-									trabajo.duracion,
-									usuario.username as username $select_categoria
-							FROM trabajo
-							LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-							LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro
-							LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario
-							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
-							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-							$cobrable
-							$visible
-							AND trabajo.id_tramite=0 $where_horas_cero
-							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
+				$query = "SELECT SQL_CALC_FOUND_ROWS IF(trabajo.cobrable,trabajo.duracion_cobrada, '00:00:00') AS duracion_cobrada,
+					       trabajo.duracion_retainer,
+					       trabajo.descripcion,
+					       trabajo.fecha,
+					       trabajo.id_usuario, {$dato_monto_cobrado} AS monto_cobrado,
+					       trabajo.visible,
+					       trabajo.cobrable,
+					       trabajo.id_trabajo,
+					       trabajo.tarifa_hh,
+					       IF (trabajo.cobrable,
+					           trabajo.tarifa_hh * (TIME_TO_SEC(duracion_cobrada) / 3600),
+					           0) AS importe,
+					      trabajo.codigo_asunto,
+					      trabajo.solicitante, {$query_categoria_lang} CONCAT_WS(' ', nombre, apellido1) AS nombre_usuario,
+					     trabajo.duracion,
+					     usuario.username AS username,
+							 prm_categoria_usuario.id_categoria_usuario
+					FROM trabajo
+					LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
+					LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro
+					LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario
+					WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'
+					    AND trabajo.codigo_asunto = '{$asunto->fields['codigo_asunto']}' {$cobrable} {$visible}
+					    AND trabajo.id_tramite = 0 {$where_horas_cero}
+					ORDER BY {$order_categoria}
+									 trabajo.descripcion";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
 
