@@ -17,8 +17,7 @@ abstract class AbstractService implements BaseService {
 	}
 
 	public function newEntity() {
-		$entity_class = $this->getClass();
-		return new $entity_class;
+		return $this->newDao()->newEntity();
 	}
 
 	/**
