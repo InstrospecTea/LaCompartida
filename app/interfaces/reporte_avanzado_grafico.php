@@ -295,6 +295,17 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 		$labels = mb_detect_encoding($labels, 'UTF-8', true) ? $labels : utf8_encode($labels);
 	});
 
+	$labels_leyend = [];
+	$total = array_sum($datos);
+	foreach ($datos as $key => $value) {
+		$percentage = round(((floatval($value) / $total) * 100), 2);
+		$labels_leyend[] = "{$labels[$key]}: {$value} ({$percentage}%)";
+		$labels_leyend_tooltips[] = [
+			$labels[$key],
+			"{$value} ({$percentage}%)"
+		];
+	}
+
 	$options = [
 		'legend' => [
 			'display' => true,
@@ -308,15 +319,10 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 		'tooltips' => [
 			'mode' => 'label',
 			'callbacks' => [
-				'label' => $labels,
+				'label' => $labels_leyend_tooltips,
 			]
 		]
 	];
-
-	$labels_leyend = [];
-	foreach ($labels as $key => $value) {
-		$labels_leyend[] = $value . ': ' . $datos[$key];
-	}
 
 	$grafico->setNameChart($titulo)
 		->setType('pie')
