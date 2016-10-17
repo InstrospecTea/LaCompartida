@@ -2,8 +2,9 @@
 
 class AbstractManager implements BaseManager {
 
-	public $Sesion;
-	private $loadedClass = array();
+	protected $Sesion;
+
+	use LoadServiceTrait;
 
 	public function __construct(Sesion $Sesion) {
 		$this->Sesion = $Sesion;
@@ -19,24 +20,6 @@ class AbstractManager implements BaseManager {
 	 */
 	protected function loadManager($name, $alias = null) {
 		$classname = "{$name}Manager";
-		if (empty($alias)) {
-			$alias = $classname;
-		}
-		if (in_array($alias, $this->loadedClass)) {
-			return;
-		}
-		$this->{$alias} = new $classname($this->Sesion);
-		$this->loadedClass[] = $alias;
-	}
-
-	/**
-	 * Carga un Servicio al vuelo
-	 * @param string $name
-	 * @param string $alias
-	 * @return type
-	 */
-	protected function loadService($name, $alias = null) {
-		$classname = "{$name}Service";
 		if (empty($alias)) {
 			$alias = $classname;
 		}

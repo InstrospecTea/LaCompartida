@@ -15,8 +15,9 @@ class AbstractBusiness implements BaseBusiness {
 	public $Sesion;
 	public $errors = array();
 	public $infos = array();
-	private $loadedClass = array();
 	protected $transactions = 0;
+
+	use LoadServiceTrait;
 
 	public function __construct(Sesion $Sesion) {
 		$this->sesion = $Sesion;
@@ -76,24 +77,6 @@ class AbstractBusiness implements BaseBusiness {
 			$this->infos[] = $message;
 			return $this->errors;
 		}
-	}
-
-	/**
-	 * Carga un Servicio al vuelo
-	 * @param string $name
-	 * @param string $alias
-	 * @return type
-	 */
-	protected function loadService($name, $alias = null) {
-		$classname = "{$name}Service";
-		if (empty($alias)) {
-			$alias = $classname;
-		}
-		if (in_array($alias, $this->loadedClass)) {
-			return;
-		}
-		$this->{$alias} = new $classname($this->Sesion);
-		$this->loadedClass[] = $alias;
 	}
 
 	/**
