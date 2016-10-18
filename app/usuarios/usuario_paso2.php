@@ -78,7 +78,13 @@ if ($opc == 'edit') {
 
 	$usuario->Edit('alerta_diaria', $alerta_diaria);
 	$usuario->Edit('alerta_semanal', $alerta_semanal);
-	$usuario->Edit('alerta_revisor', $alerta_revisor);
+	if ($alerta_revisor) {
+		if ($_POST['REV']) {
+			$usuario->Edit('alerta_revisor', $alerta_revisor);
+		} else {
+			$usuario->Edit('alerta_revisor', 0);
+		}
+	}
 
 	$usuario->Validaciones($arr1, $pagina, $validaciones_segun_config);
 	$errores = $pagina->GetErrors();
@@ -671,7 +677,7 @@ $tooltip_select = Html::Tooltip("Para seleccionar más de un criterio o quitar la
 					<input type="text" size=10 value="<?php echo $usuario->fields['restriccion_max'] ?>" name="restriccion_max" />
 				</td>
 			</tr>
-			<tr>
+			<tr id="tr-alerta-revisor">
 				<td colspan="5" align="right">
 					<label for="alerta_revisor"><?php echo __('Resumen de horas semanales de abogados revisados') ?></label>
 				</td>
@@ -1075,8 +1081,10 @@ function CargarPermisos() {
 	jQuery("[name='REV']").on("change", function() {
 		if (jQuery(this).is(":checked")) {
 			jQuery("#fieldset-usuario_revisor").show();
+			jQuery("#tr-alerta-revisor").show();
 		} else {
 			jQuery("#fieldset-usuario_revisor").hide();
+			jQuery("#tr-alerta-revisor").hide();
 		};
 	});
 

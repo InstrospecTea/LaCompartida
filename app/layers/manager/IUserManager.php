@@ -28,4 +28,11 @@ interface IUserManager extends BaseManager {
 	 * @return 	String
 	 */
 	public function getHoursWorkedByFilters($user_id, $client_id = null, $areas = null, $categories = null, $init_date = null, $end_date = null);
+
+	/**
+	 * Obtiene permisos de un usuario
+	 * @param 	string $user_id
+	 * @return 	Array
+	 */
+	public function getPermissions($user_id);
 }
