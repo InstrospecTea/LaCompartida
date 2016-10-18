@@ -3,8 +3,8 @@
 /**
  * Class DAOException
  */
-class DAOException extends Exception{
+class DAOException extends PDOException{
 
 
 
-} 
+}

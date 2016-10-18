@@ -312,6 +312,16 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	public function delete($object = null) {
+		$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
+		try {
+		  return deleteOrException($object, $query);
+		}
+		catch (PDOException $e) {
+			Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh)
+		}
+	}
+
+ 	public function deleteOrException($object = null, $query) {
 		$reflected = new ReflectionClass($this->getClass());
 		if (is_subclass_of($object, 'LoggeableEntity')) {
 			$newInstance = $reflected->newInstance();
@@ -319,9 +329,14 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
 		}
 		if ($object->isLoaded()) {
-			$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
-			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-			return true;
+			try {
+				$this->sesion->pdodbh->query($query);
+ 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+        return true;
+  		}
+  		catch (Exception $e) {
+  			throw self::getDAOExceptionOrException($e);
+  		}
 		}
 		return false;
 	}
@@ -465,4 +480,21 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return isset($result[0]['count']) ? (int) $result[0]['count'] : 0;
 	}
 
+	protected static getDAOExceptionOrException(Exception $e){
+ 		$result = $e
+		$message = $e->getMessage()
+ 		if (strstr(message, 'SQLSTATE[')) {
+ 			preg_match('/SQLSTATE\[(\w+)\] \[(\w+)\] (.*)/', $message, $matches);
+
+ 			$SQLSTATE = $matches[1];
+  		$code = $matches[2];
+ 			$message = $matches[3];
+
+ 			// USING AS GUIDE: https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html
+ 			if (in_array($code, [1216, 1217, 1451, 1452])) {
+ 				$result = new ForeignKeyConstraintFailsException($message);
+ 			}
+ 		}
+ 		return $e
+ 	}
 }
