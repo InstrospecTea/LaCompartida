@@ -2596,11 +2596,11 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 					$row = str_replace('%tipo_gasto%', $gasto->fields['tipo_gasto'], $row);
 
 					if (substr($gasto->fields['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
-						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
-						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
+						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($gasto->fields['descripcion'], 42)), $row);
+						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($gasto->fields['descripcion'], 42)), $row);
 					} else {
-						$row = str_replace('%descripcion%', __($gasto->fields['descripcion']), $row);
-						$row = str_replace('%descripcion_b%', __($gasto->fields['descripcion']), $row); #Ojo, este no deber?a existir
+						$row = str_replace('%descripcion%', htmlentities(__($gasto->fields['descripcion'])), $row);
+						$row = str_replace('%descripcion_b%', htmlentities(__($gasto->fields['descripcion'])), $row); #Ojo, este no deber?a existir
 					}
 
 					$row = str_replace('%monto_original%', $cobro_moneda->moneda[$gasto->fields['id_moneda']]['simbolo'] . $this->espacio . number_format($monto_gasto, $cobro_moneda->moneda[$gasto->fields['id_moneda']]['cifras_decimales'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['separador_decimales'], $cobro_moneda->moneda[$gasto->fields['id_moneda']]['separador_miles']), $row);
