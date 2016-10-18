@@ -11,7 +11,7 @@ $pagina->PrintTop();
   @import "//static.thetimebilling.com/css/jquery.dataTables.css";
 </style>
 <script  src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
+<script type="text/javascript" src="//static.thetimebilling.com/tabletools/js/TableTools.js"></script>
 <script type="text/javascript">
 jQuery(document).ready(function() {
   jQuery('#buscar').click(function() {
