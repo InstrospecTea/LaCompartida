@@ -146,17 +146,14 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		$results = array();
 
 		if (!empty($this->WorksCriteria)) {
-			// Debug::pr($this->WorksCriteria->get_plain_query());
 			$results = array_merge($results, $this->WorksCriteria->run());
 		}
 
 		if (!empty($this->ErrandsCriteria)) {
-			// Debug::pr($this->ErrandsCriteria->get_plain_query());
 			$results = array_merge($results, $this->ErrandsCriteria->run());
 		}
 
 		if (!empty($this->ChargesCriteria)) {
-			// Debug::pr($this->ChargesCriteria->get_plain_query());
 			$results = array_merge($results, $this->ChargesCriteria->run());
 		}
 		return $results;
@@ -497,7 +494,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	 * @return factor
 	 */
  	public function getFactor() {
- 		return $this->invoiceFactor();
+ 		return Conf::getConf($this->Session, 'NuevoModuloFactura') ? $this->invoiceFactor() : 1;
  	}
 
 	/**

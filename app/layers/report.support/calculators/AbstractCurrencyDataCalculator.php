@@ -32,7 +32,7 @@ abstract class AbstractCurrencyDataCalculator extends AbstractDataCalculator {
 
 		$currencySource = $this->getCurrencySource();
 
-		if (!Conf::getConf($this->Session, 'NuevoModuloFactura')) {
+		if (!Conf::getConf($this->Session, 'NuevoModuloFactura') && $currencySource == 'factura') {
 			$currencySource = 'documento';
 		}
 

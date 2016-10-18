@@ -210,44 +210,102 @@ $Slim->get('/settings', function () use ($Session) {
 
 	$settings = array();
 
-	if (is_array($Session->arrayconf) && !empty($Session->arrayconf)) {
-		if ($Session->arrayconf['Intervalo']) {
-			array_push($settings, array('code' => 'IncrementalStep', 'value' => $Session->arrayconf['Intervalo']));
-		}
+	if (Conf::read('Intervalo')) {
+		array_push(
+			$settings,
+			array(
+				'code' => 'IncrementalStep',
+				'value' => Conf::read('Intervalo')
+			)
+		);
+	}
 
-		if ($Session->arrayconf['CantidadHorasDia']) {
-			array_push($settings, array('code' => 'TotalDailyTime', 'value' => $Session->arrayconf['CantidadHorasDia']));
-		}
+	if (Conf::read('CantidadHorasDia')) {
+		array_push(
+			$settings,
+			array(
+				'code' => 'TotalDailyTime',
+				'value' => Conf::read('CantidadHorasDia')
+			)
+		);
+	}
 
-		if ($Session->arrayconf['UsarAreaTrabajos']) {
-			array_push($settings, array('code' => 'UseWorkingAreas', 'value' => $Session->arrayconf['UsarAreaTrabajos']));
-		}
+	if (Conf::read('UsarAreaTrabajos')) {
+		array_push(
+			$settings,
+			array(
+				'code' => 'UseWorkingAreas',
+				'value' => Conf::read('UsarAreaTrabajos')
+			)
+		);
+	}
 
-		if ($Session->arrayconf['UsoActividades']) {
-			array_push($settings, array('code' => 'UseActivities', 'value' => $Session->arrayconf['UsoActividades']));
-		}
+	if (Conf::read('UsoActividades')) {
+		array_push(
+			$settings,
+			array(
+				'code' => 'UseActivities',
+				'value' => Conf::read('UsoActividades')
+			)
+		);
+	}
 
-		if ($Session->arrayconf['GuardarTarifaAlIngresoDeHora']) {
-			array_push($settings, array('code' => 'UseWorkRate', 'value' => $Session->arrayconf['GuardarTarifaAlIngresoDeHora']));
-		}
+	if (Conf::read('GuardarTarifaAlIngresoDeHora')) {
+		array_push(
+			$settings,
+			array(
+				'code' => 'UseWorkRate',
+				'value' => Conf::read('GuardarTarifaAlIngresoDeHora')
+			)
+		);
+	}
 
-		if ($Session->arrayconf['OrdenadoPor']) {
-			array_push($settings, array('code' => 'UseRequester', 'value' => $Session->arrayconf['OrdenadoPor']));
-		}
+	if (Conf::read('OrdenadoPor')) {
+		array_push(
+			$settings,
+			array(
+				'code' => 'UseRequester',
+				'value' => Conf::read('OrdenadoPor')
+			)
+		);
+	}
 
-		if ($Session->arrayconf['TodoMayuscula']) {
-			array_push($settings, array('code' => 'UseUppercase', 'value' => $Session->arrayconf['TodoMayuscula']));
-		}
+	if (Conf::read('TodoMayuscula')) {
+		array_push(
+			$settings,
+			array(
+				'code' => 'UseUppercase',
+				'value' => Conf::read('TodoMayuscula')
+			)
+		);
+	}
 
-		if ($Session->arrayconf['PermitirCampoCobrableAProfesional']) {
-			array_push($settings, array('code' => 'AllowBillable', 'value' => $Session->arrayconf['PermitirCampoCobrableAProfesional']));
-		} else {
-			array_push($settings, array('code' => 'AllowBillable', 'value' => 0));
-		}
+	if (Conf::read('PermitirCampoCobrableAProfesional')) {
+		array_push(
+			$settings,
+			array(
+				'code' => 'AllowBillable',
+				'value' => Conf::read('PermitirCampoCobrableAProfesional')
+			)
+		);
+	} else {
+		array_push(
+			$settings,
+			array(
+				'code' => 'AllowBillable',
+				'value' => 0
+			)
+		);
+	}
 
-		if ($Session->arrayconf['MaxDuracionTrabajo']) {
-			array_push($settings, array('code' => 'MaxWorkDuration', 'value' => $Session->arrayconf['MaxDuracionTrabajo']));
-		}
+	if (Conf::read('MaxDuracionTrabajo')) {
+		array_push(
+			$settings,
+			array(
+				'code' => 'MaxWorkDuration',
+				'value' => Conf::read('MaxDuracionTrabajo')
+			)
+		);
 	}
 
 	outputJson($settings);

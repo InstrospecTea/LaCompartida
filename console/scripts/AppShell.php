@@ -1,5 +1,6 @@
 <?php
 
+use TTB\Debug;
 abstract class AppShell {
 
 	public $debug;

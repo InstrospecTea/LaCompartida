@@ -134,9 +134,9 @@ class Reporte {
 
 	public static function mapPeriodos($modulo_factura_activo = true) {
 		$mapping = array(
-			'horas_trabajadas' => array('trabajo'),
-			'horas_cobrables' => array('trabajo'),
-			'horas_visibles' => array('trabajo'),
+			'horas_trabajadas' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'horas_cobrables' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'horas_visibles' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'horas_cobradas' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'horas_facturadas' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'horas_facturadas_contable' => array('facturacion'),
@@ -144,8 +144,8 @@ class Reporte {
 			'horas_por_pagar' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'horas_por_cobrar' => array('trabajo', 'cobro'),
 			'horas_incobrables' => array('trabajo', 'cobro'),
-			'horas_castigadas' => array('trabajo'),
-			'horas_no_cobrables' => array('trabajo'),
+			'horas_castigadas' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
+			'horas_no_cobrables' => array('trabajo', 'cobro', 'emision', 'envio', 'facturacion'),
 			'horas_convenio' => array('trabajo', 'cobro'),
 			'horas_spot' => array('trabajo', 'cobro'),
 			'valor_cobrable' => array('trabajo', 'cobro'),
@@ -287,6 +287,7 @@ class Reporte {
 				$this->id_agrupador[] = "id_grupo_cliente";
 				break;
 			case "glosa_cliente":
+			case "glosa_cliente_charts":
 				$this->id_agrupador[] = "codigo_cliente";
 				break;
 			case "glosa_asunto":
