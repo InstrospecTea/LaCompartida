@@ -1,48 +1,25 @@
 <?php
-require_once dirname(__FILE__) . '/../conf.php';
+require_once dirname(__FILE__).'/../conf.php';
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
-
 $moneda_base = Utiles::MonedaBase($sesion);
-
-
-
 $pagina->titulo = __('Diferencia Liquidaciones Emitidas vs Facturadas');
 $pagina->PrintTop();
-/*$currency=array();
-$querycurrency="select * from prm_moneda";
- $respcurrency = mysql_query($querycurrency, $sesion->dbh);
- $i=0;
-while($fila= mysql_fetch_assoc($respcurrency)) {
-    $currency[++$i]=$fila;
-}
-foreach($currency as $key=>$value) {
-    echo '<br/>'.$currency[$key]['simbolo'].' '.$key;
-    print_r($value);
-
-}*/
 ?>
-    <style type="text/css">
-      @import "//static.thetimebilling.com/css/jquery.dataTables.css";
-
-    </style>
-   <script  src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
-		<script type="text/javascript" src="https://estaticos.thetimebilling.com/tabletools/js/TableTools.js"></script>
-
-
-
-
+<style type="text/css">
+  @import "//static.thetimebilling.com/css/jquery.dataTables.css";
+</style>
+<script  src="//static.thetimebilling.com/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="//static.thetimebilling.com/tabletools/js/TableTools.js"></script>
 <script type="text/javascript">
-
 jQuery(document).ready(function() {
-
-    jQuery('#buscar').click(function() {
+  jQuery('#buscar').click(function() {
   var Fechai=jQuery('#fechai').val();
   var Fechaf=jQuery('#fechaf').val();
   var Todo=jQuery('#todo').is(':checked');
   var Idmoneda=jQuery('#id_moneda').val();
-  var laFuente="ajax/diferencias_liq_fac.php?fechai="+Fechai+"&fechaf="+Fechaf+"&todo="+Todo+"&id_moneda="+Idmoneda;
+  var laFuente="ajax/diferencias_liq_fac.php?fechai="+Fechai+"&fechaf="+Fechaf+"&id_moneda="+Idmoneda;
 	if(typeof(console)!==undefined) console.log(laFuente);
 	jQuery('#diffs').dataTable({ "bDestroy":true});
 
@@ -98,14 +75,14 @@ jQuery(document).ready(function() {
 
 </script>
 
-<div style="margin:auto;padding:10px;border:1px solid #CCC;"><?php echo __('Buscar ' . __('Cobros emitidos') . ' con diferencias entre el monto Emitido y el Facturado');?><br/><br/>
-    <?php echo __('Emitidos entre el')?>
+<div style="margin:auto;padding:10px;border:1px solid #CCC;"><?= __('Buscar '.__('Cobros emitidos').' con diferencias entre el monto Emitido y el Facturado');?><br/><br/>
+    <?= __('Emitidos entre el')?>
     <input type="text" class="fechadiff" id="fechai" style="width:100px;">
-    &nbsp;<?php echo __('y el')?>&nbsp;
+    &nbsp;<?= __('y el')?>&nbsp;
     <input class="fechadiff" type="text" id="fechaf" style="width:100px;">
-    <?php echo __('y desplegar los montos en')?>&nbsp;
-    <?=Html::SelectQuery($sesion,"SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda", "id_moneda", '','', 'la moneda del contrato '); ?>
-     <br/><input id="buscar" value="<?php echo __('Buscar')?>" type="button"/>&nbsp;&nbsp;<input type="checkbox" id="todo" name="todo"> <?php echo __('Incluir liquidaciones saldadas (Gran cantidad de datos)')?>
+    <?= __('y desplegar los montos en')?>&nbsp;
+    <?= Html::SelectQuery($sesion, 'SELECT id_moneda, glosa_moneda FROM prm_moneda ORDER BY id_moneda', 'id_moneda', '', '', 'la moneda del contrato '); ?>
+     <br/><input id="buscar" value="<?= __('Buscar')?>" type="button"/>
 
 <br/>	<br/>
 <?php print_r($moneda->fields); ?>
@@ -113,13 +90,13 @@ jQuery(document).ready(function() {
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="diffs" style="width:920px;display:none;">
 	<thead>
 		<tr>
-			<th width="80px"><?php echo __('Cobro') ?></th>
-			<th width="95px"><?php echo __('Fecha Emitido') ?></th>
+			<th width="80px"><?= __('Cobro') ?></th>
+			<th width="95px"><?= __('Fecha Emitido') ?></th>
 			<th width="0px">idcontrato</th>
-			<th width="330px" style="overflow:hidden;"><?php echo __('Cliente') ?></th>
-			<th width="90px">$ <?php echo __('Emitido') ?></th>
-			<th width="90px">$ <?php echo __('Facturado') ?></th>
-			<th width="85px"><?php echo __('Diferencia') ?></th>
+			<th width="330px" style="overflow:hidden;"><?= __('Cliente') ?></th>
+			<th width="90px">$ <?= __('Emitido') ?></th>
+			<th width="90px">$ <?= __('Facturado') ?></th>
+			<th width="85px"><?= __('Diferencia') ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -127,17 +104,17 @@ jQuery(document).ready(function() {
 	</tbody>
 	<tfoot style="font-size:10px;">
 		<tr>
-			<th><?php echo __('Cobro') ?></th>
-			<th ><?php echo __('Fecha Emitido') ?></th>
+			<th><?= __('Cobro') ?></th>
+			<th ><?= __('Fecha Emitido') ?></th>
 			<th width="0px">idcontrato</th>
-			<th><?php echo __('Cliente') ?></th>
-			<th>$ <?php echo __('Emitido') ?></th>
-			<th width="90px">$ <?php echo __('Facturado') ?></th>
-			<th width="90px"><?php echo __('Diferencia') ?></th>
+			<th><?= __('Cliente') ?></th>
+			<th>$ <?= __('Emitido') ?></th>
+			<th width="90px">$ <?= __('Facturado') ?></th>
+			<th width="90px"><?= __('Diferencia') ?></th>
 		</tr>
 	</tfoot>
 </table>
 
 <?php
-	$pagina->PrintBottom();
+    $pagina->PrintBottom();
 ?>
