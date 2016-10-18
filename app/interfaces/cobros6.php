@@ -52,8 +52,15 @@ if ($opc == 'eliminar_documento') {
 		$query_p = "DELETE from cta_corriente WHERE cta_corriente.documento_pago = '{$id_documento_eliminado}' ";
 		mysql_query($query_p, $sesion->dbh) or Utiles::errorSQL($query_p, __FILE__, __LINE__, $sesion->dbh);
 
-		if ($documento_eliminado->Delete()) {
+		try {
+			$DocumentService = new DocumentService($sesion);
+			$Document = $DocumentService->get($id_documento_eliminado);
+			$DocumentService->deleteOrException($Document);
 			$pagina->AddInfo(__('El documento ha sido eliminado satisfactoriamente'));
+		} catch (ForeignKeyConstraintFailsException $e) {
+  		alert('El documento no pudo ser eliminado, ya que aún tiene facturas o neteos asociados.');
+  	} catch (PDOException $e) {
+			Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		}
 	} else {
 		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {

@@ -317,11 +317,15 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		  return deleteOrException($object, $query);
 		}
 		catch (PDOException $e) {
-			Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh)
+			Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		}
 	}
 
- 	public function deleteOrException($object = null, $query) {
+ 	public function deleteOrException($object = null, $query = null) {
+ 		if ($query = null) {
+ 			$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
+ 		}
+
 		$reflected = new ReflectionClass($this->getClass());
 		if (is_subclass_of($object, 'LoggeableEntity')) {
 			$newInstance = $reflected->newInstance();
@@ -495,6 +499,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
  				$result = new ForeignKeyConstraintFailsException($message);
  			}
  		}
- 		return $e
+ 		return $result
  	}
 }
