@@ -37,7 +37,7 @@ if (is_null($datos)) {
 $labels = [];
 foreach ($datos as $key => $value) {
 	$percentage = round((($value / $total) * 100), 2);
-	$labels[] = "{$key}: {$value} ({$percentage}%)";
+	$labels[] = "{$key}: {$value} Hrs. ({$percentage}%)";
 }
 
 $dataset = new TTB\Graficos\DatasetPie();
