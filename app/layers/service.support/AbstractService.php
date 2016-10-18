@@ -92,6 +92,18 @@ abstract class AbstractService implements BaseService {
 	}
 
 	/**
+	 * @param $object
+	 * @throws ServiceException
+	 */
+	public function deleteOrException($object) {
+		$this->checkNullity($object);
+		$this->checkClass($object, $this->getClass());
+		$daoClass = $this->getDaoLayer($this->sesion);
+		$dao = new $daoClass($this->sesion);
+		$dao->deleteOrException($object);
+	}
+
+	/**
 	 * Comprueba si un objeto es parte de la jerarquía de clases definida en la capa.
 	 * @param $object Objeto que se comprobará.
 	 * @param $className string Jerarquía de clases a la que debe pertenecer.

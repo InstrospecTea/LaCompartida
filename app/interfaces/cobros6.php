@@ -45,34 +45,35 @@ if($opc == 'descargar_ledes'){
 }
 
 if ($opc == 'eliminar_documento') {
-	$documento_eliminado = new Documento($sesion);
-	$documento_eliminado->Load($id_documento_eliminado);
-	if (!$documento_eliminado->fields['es_adelanto']) {
-		$documento_eliminado->EliminarNeteos();
-		$query_p = "DELETE from cta_corriente WHERE cta_corriente.documento_pago = '{$id_documento_eliminado}' ";
-		mysql_query($query_p, $sesion->dbh) or Utiles::errorSQL($query_p, __FILE__, __LINE__, $sesion->dbh);
-
-		try {
+	try {
+		$sesion->pdodbh->beginTransaction();
+		$documento_eliminado = new Documento($sesion);
+		$documento_eliminado->Load($id_documento_eliminado);
+		if (!$documento_eliminado->fields['es_adelanto']) {
+			$documento_eliminado->EliminarNeteos();
 			$DocumentService = new DocumentService($sesion);
 			$Document = $DocumentService->get($id_documento_eliminado);
 			$DocumentService->deleteOrException($Document);
 			$pagina->AddInfo(__('El documento ha sido eliminado satisfactoriamente'));
-		} catch (ForeignKeyConstraintFailsException $e) {
-  		alert('El documento no pudo ser eliminado, ya que aún tiene facturas o neteos asociados.');
-  	} catch (PDOException $e) {
-			Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		}
-	} else {
-		if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
-			$id_neteo = $documento_eliminado->ObtenerIdNeteo($id_cobro);
-			$factura_pago->LoadByNeteoAdelanto($id_neteo);
-			$factura_pago->Eliminar();
 		} else {
-			$documento_eliminado->EliminarNeteo($id_cobro);
+			if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
+				$id_neteo = $documento_eliminado->ObtenerIdNeteo($id_cobro);
+				$factura_pago->LoadByNeteoAdelanto($id_neteo);
+				$factura_pago->Eliminar();
+			} else {
+				$documento_eliminado->EliminarNeteo($id_cobro);
+			}
+			$pagina->AddInfo(__('El pago ha sido eliminado satisfactoriamente'));
 		}
-		$pagina->AddInfo(__('El pago ha sido eliminado satisfactoriamente'));
+		$cobro->CambiarEstadoSegunFacturas();
+		$sesion->pdodbh->commit();
+	} catch (ForeignKeyConstraintFailsException $e) {
+		$sesion->pdodbh->rollBack();
+		$pagina->AddError(__('El documento no pudo ser eliminado, ya que aún tiene facturas o neteos asociados.'));
+	} catch (PDOException $e) {
+		$sesion->pdodbh->rollBack();
+		Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	}
-	$cobro->CambiarEstadoSegunFacturas();
 }
 
 $moneda_total = new Moneda($sesion);

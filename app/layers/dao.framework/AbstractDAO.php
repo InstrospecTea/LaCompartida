@@ -312,20 +312,22 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	public function delete($object = null) {
-		$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
-		try {
-		  return deleteOrException($object, $query);
+    $reflected = new ReflectionClass($this->getClass());
+		if (is_subclass_of($object, 'LoggeableEntity')) {
+			$newInstance = $reflected->newInstance();
+			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
+			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
 		}
-		catch (PDOException $e) {
-			Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		if ($object->isLoaded()) {
+			$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
+			$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+			return true;
 		}
+		return false;
 	}
 
- 	public function deleteOrException($object = null, $query = null) {
- 		if ($query = null) {
- 			$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
- 		}
-
+ 	public function deleteOrException($object = null) {
+ 		$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
 		$reflected = new ReflectionClass($this->getClass());
 		if (is_subclass_of($object, 'LoggeableEntity')) {
 			$newInstance = $reflected->newInstance();
@@ -484,11 +486,11 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return isset($result[0]['count']) ? (int) $result[0]['count'] : 0;
 	}
 
-	protected static getDAOExceptionOrException(Exception $e){
- 		$result = $e
-		$message = $e->getMessage()
- 		if (strstr(message, 'SQLSTATE[')) {
- 			preg_match('/SQLSTATE\[(\w+)\] \[(\w+)\] (.*)/', $message, $matches);
+	protected function getDAOExceptionOrException(Exception $e){
+ 		$result = $e;
+		$message = $e->getMessage();
+ 		if (strstr($message, 'SQLSTATE[')) {
+ 			preg_match('/SQLSTATE\[(\w+)\]\: .*: (\d+) (.*)/', $message, $matches);
 
  			$SQLSTATE = $matches[1];
   		$code = $matches[2];
@@ -499,6 +501,6 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
  				$result = new ForeignKeyConstraintFailsException($message);
  			}
  		}
- 		return $result
+ 		return $result;
  	}
 }
