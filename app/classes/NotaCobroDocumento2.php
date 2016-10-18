@@ -1002,7 +1002,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				while ($hitos = mysql_fetch_array($resp_hitos)) {
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', ($hitos['fecha_cobro'] == 0 ? '' : date('d-m-Y', strtotime($hitos['fecha_cobro']))), $row);
-					$row = str_replace('%descripcion%', $hitos['descripcion'], $row);
+					$row = str_replace('%descripcion%', htmlentities($hitos['descripcion']), $row);
 					$total_hitos = $total_hitos + $hitos['monto_estimado'];
 					$moneda_hitos = $hitos['simbolo'];
 					$estehito = $hitos['thisid'];
@@ -3663,14 +3663,14 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					}
 
 					if (substr($detalle['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
-						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
-						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
+						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($detalle['descripcion']), 42), $row);
+						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($detalle['descripcion']), 42), $row);
 					} else if (substr($gasto->fields['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
-						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
-						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
+						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($gasto->fields['descripcion']), 42), $row);
+						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($gasto->fields['descripcion']), 42), $row);
 					} else {
-						$row = str_replace('%descripcion%', __($detalle['descripcion']), $row);
-						$row = str_replace('%descripcion_b%', __($detalle['descripcion']), $row); #Ojo, este no debería existir
+						$row = str_replace('%descripcion%', htmlentities(__($detalle['descripcion'])), $row);
+						$row = str_replace('%descripcion_b%', htmlentities(__($detalle['descripcion'])), $row); #Ojo, este no debería existir
 					}
 
 					if ($detalle['id_moneda'] != $this->fields['opc_moneda_total'] && Conf::GetConf($this->sesion, 'MontoGastoOriginalSiMonedaDistinta')) {
