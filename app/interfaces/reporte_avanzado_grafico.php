@@ -299,6 +299,7 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato, $id_moneda) {
 	$labels_leyend = [];
 	$total = array_sum($datos);
 	$symbol_datatype = Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda);
+	$symbol_datatype = mb_detect_encoding($symbol_datatype, 'UTF-8', true) ? $symbol_datatype : utf8_encode($symbol_datatype);
 	foreach ($datos as $key => $value) {
 		$percentage = round(((floatval($value) / $total) * 100), 2);
 		$labels_leyend[] = "{$labels[$key]}: {$value} {$symbol_datatype} ({$percentage}%)";
