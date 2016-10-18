@@ -69,7 +69,7 @@ if ($opc == 'eliminar_documento') {
 		$sesion->pdodbh->commit();
 	} catch (ForeignKeyConstraintFailsException $e) {
 		$sesion->pdodbh->rollBack();
-		$pagina->AddError(__('El documento no pudo ser eliminado, ya que aún tiene facturas o neteos asociados.'));
+		$pagina->AddError(__('El documento no pudo ser eliminado, ya que aún tiene facturas asociadas.'));
 	} catch (PDOException $e) {
 		$sesion->pdodbh->rollBack();
 		Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
