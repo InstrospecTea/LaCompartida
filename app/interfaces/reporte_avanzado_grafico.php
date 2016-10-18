@@ -166,7 +166,7 @@ switch ($tipo_grafico) {
 			break;
 		}
 	case 'circular': {
-		graficoTarta($titulo_reporte, $labels, $valores, $tipo_dato);
+		graficoTarta($titulo_reporte, $labels, $valores, $tipo_dato, $id_moneda);
 			break;
 		}
 }
@@ -282,7 +282,8 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 	echo $grafico->getJson();
 }
 
-function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
+function graficoTarta($titulo, $labels, $datos, $tipo_dato, $id_moneda) {
+	global $sesion;
 	$grafico = new TTB\Graficos\Grafico();
 	$dataset = new TTB\Graficos\DatasetPie();
 
@@ -294,6 +295,19 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 	array_walk($labels, function(&$labels) {
 		$labels = mb_detect_encoding($labels, 'UTF-8', true) ? $labels : utf8_encode($labels);
 	});
+
+	$labels_leyend = [];
+	$total = array_sum($datos);
+	$symbol_datatype = Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda);
+	$symbol_datatype = mb_detect_encoding($symbol_datatype, 'UTF-8', true) ? $symbol_datatype : utf8_encode($symbol_datatype);
+	foreach ($datos as $key => $value) {
+		$percentage = round(((floatval($value) / $total) * 100), 2);
+		$labels_leyend[] = "{$labels[$key]}: {$value} {$symbol_datatype} ({$percentage}%)";
+		$labels_leyend_tooltips[] = [
+			$labels[$key],
+			"{$value} {$symbol_datatype} ({$percentage}%)"
+		];
+	}
 
 	$options = [
 		'legend' => [
@@ -308,15 +322,10 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato) {
 		'tooltips' => [
 			'mode' => 'label',
 			'callbacks' => [
-				'label' => $labels,
+				'label' => $labels_leyend_tooltips,
 			]
 		]
 	];
-
-	$labels_leyend = [];
-	foreach ($labels as $key => $value) {
-		$labels_leyend[] = $value . ': ' . $datos[$key];
-	}
 
 	$grafico->setNameChart($titulo)
 		->setType('pie')
