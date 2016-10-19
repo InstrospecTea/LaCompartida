@@ -784,9 +784,9 @@ class NotaCobroDocumentoComun extends NotaCobroConfig {
 				$html = '';
 
 				if ($lang == 'es') {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
+					$select_categoria = "prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 				} else {
-					$select_categoria = ", IFNULL(prm_categoria_usuario.glosa_categoria_lang,prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
+					$select_categoria = "IFNULL(prm_categoria_usuario.glosa_categoria_lang,prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
 				}
 
 				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
@@ -1189,9 +1189,9 @@ class NotaCobroDocumentoComun extends NotaCobroConfig {
 				$where_horas_cero = '';
 
 				if ($lang == 'es') {
-					$select_categoria = ", prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
+					$select_categoria = "prm_categoria_usuario.glosa_categoria AS categoria, prm_categoria_usuario.id_categoria_usuario";
 				} else {
-					$select_categoria = ", IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
+					$select_categoria = "IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria) AS categoria, prm_categoria_usuario.id_categoria_usuario";
 				}
 
 				$join_categoria = "LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario";
@@ -1226,7 +1226,8 @@ class NotaCobroDocumentoComun extends NotaCobroConfig {
 				//Tabla de Trabajos.
 				//se hace select a los visibles y cobrables para diferenciarlos, tambien se selecciona
 				//la duracion retainer.
-				$query = "SELECT SQL_CALC_FOUND_ROWS trabajo.duracion_cobrada,
+				$query = "SELECT SQL_CALC_FOUND_ROWS
+								 trabajo.duracion_cobrada,
 					       trabajo.duracion_retainer,
 					       trabajo.duracion_cobrada-trabajo.duracion_retainer AS duracion_tarificada,
 					       trabajo.descripcion,
@@ -1242,7 +1243,8 @@ class NotaCobroDocumentoComun extends NotaCobroConfig {
 					       trabajo.solicitante,
 								 {$query_categoria_lang} CONCAT_WS(' ', nombre, apellido1) AS nombre_usuario,
 					       trabajo.duracion,
-					       usuario.username AS username {$select_categoria}
+					       usuario.username AS username,
+								 {$select_categoria}
 					FROM trabajo
 					LEFT JOIN usuario ON trabajo.id_usuario = usuario.id_usuario
 					LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro
