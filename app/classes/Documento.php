@@ -468,16 +468,23 @@ class Documento extends Objeto {
 
 	function ListaPagos() {
 		$out = '';
-		$query = "SELECT neteo_documento.id_documento_pago AS id, valor_cobro_honorarios as honorarios, valor_cobro_gastos as gastos, pago_retencion, es_adelanto
-					FROM neteo_documento
-					JOIN documento ON documento.id_documento=neteo_documento.id_documento_pago
-					WHERE neteo_documento.id_documento_cobro ='" . $this->fields['id_documento'] . "'
-				UNION
-					SELECT id_documento AS id, honorarios, subtotal_gastos AS gastos, pago_retencion, es_adelanto
-					FROM documento left join neteo_documento on  documento.id_documento=neteo_documento.id_documento_pago
-					WHERE  tipo_doc !=  'N'
-					AND neteo_documento.id_neteo_documento IS NULL
-					AND id_cobro ='" . $this->fields['id_cobro'] . "'";
+		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
+			// Todos los neteos en donde 'this' figura como documento_cobro
+			$query = "SELECT n.id_documento_pago AS id, n.valor_cobro_honorarios as honorarios, n.valor_cobro_gastos as gastos, d.pago_retencion, d.es_adelanto
+								FROM neteo_documento AS n
+								JOIN documento AS d ON d.id_documento = n.id_documento_pago
+								WHERE n.id_documento_cobro ='" . $this->fields['id_documento'] . "'";
+		}
+		else
+		{
+			// Todos los documentos asociados al cobro de 'this', sin neteo
+			$query = "SELECT d.id_documento AS id, d.honorarios, d.subtotal_gastos AS gastos, d.pago_retencion, d.es_adelanto
+								FROM documento AS d
+								LEFT JOIN neteo_documento AS n ON d.id_documento = n.id_documento_pago
+								WHERE  d.tipo_doc != 'N'
+								AND n.id_neteo_documento IS NULL
+								AND d.id_cobro ='" . $this->fields['id_cobro'] . "'";
+		}
 
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
