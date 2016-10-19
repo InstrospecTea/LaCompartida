@@ -870,9 +870,9 @@ class NotaCobroDocumentoComun extends NotaCobroConfig {
 
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', Utiles::sql2fecha($tramite->fields['fecha'], $idioma->fields['formato_fecha']), $row);
-					$row = str_replace('%descripcion%', ucfirst(stripslashes($tramite->fields['glosa_tramite'] . '<br>' . $tramite->fields['descripcion'])), $row);
-					$row = str_replace('%tramite_glosa%', ucfirst(stripslashes($tramite->fields['glosa_tramite'])), $row);
-					$row = str_replace('%tramite_descripcion%', ucfirst(stripslashes($tramite->fields['descripcion'])), $row);
+					$row = str_replace('%descripcion%', ucfirst(stripslashes(htmlentities($tramite->fields['glosa_tramite']) . '<br>' . htmlentities($tramite->fields['descripcion']))), $row);
+					$row = str_replace('%tramite_glosa%', ucfirst(stripslashes(htmlentities($tramite->fields['glosa_tramite']))), $row);
+					$row = str_replace('%tramite_descripcion%', ucfirst(stripslashes(htmlentities($tramite->fields['descripcion']))), $row);
 
 					$row = str_replace('%solicitante%', $this->fields['opc_ver_solicitante'] ? $tramite->fields['solicitante'] : '', $row);
 
@@ -1391,7 +1391,7 @@ class NotaCobroDocumentoComun extends NotaCobroConfig {
 					$row = $row_tmpl;
 					$row = str_replace('%valor_codigo_asunto%', $trabajo->fields['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $row);
-					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
+					$row = str_replace('%descripcion%', ucfirst(stripslashes(htmlentities($trabajo->fields['descripcion']))), $row);
 					if ($this->fields['estado'] == 'CREADO' || $this->fields['estado'] == 'EN REVISION') {
 						$row = str_replace('%td_id_trabajo%', '<td align="center">%ntrabajo%</td>', $row);
 					} else {
