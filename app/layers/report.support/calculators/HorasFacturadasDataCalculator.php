@@ -22,6 +22,9 @@ class HorasFacturadasDataCalculator extends AbstractInvoiceProportionalDataCalcu
 	 */
 	function getReportWorkQuery(Criteria $Criteria) {
 		$aporte = $this->getInvoiceContribution();
+		if (!Conf::getConf($this->Session, 'NuevoModuloFactura')) {
+			$aporte = 1;
+		}
 		$value = "SUM({$aporte}
 			* TIME_TO_SEC(trabajo.duracion_cobrada)) / 3600";
 

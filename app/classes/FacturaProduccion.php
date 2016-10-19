@@ -695,9 +695,10 @@ public static $configuracion_gastos = array(
 					 JOIN prm_documento_legal ON factura.id_documento_legal = prm_documento_legal.id_documento_legal
 					 JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 					 JOIN cobro ON cobro.id_cobro = factura.id_cobro
+					 JOIN prm_moneda prm_moneda_base ON prm_moneda_base.moneda_base = 1
 					 JOIN cobro_moneda moneda_cobro ON cobro.id_moneda = moneda_cobro.id_moneda AND cobro.id_cobro = moneda_cobro.id_cobro
 					 JOIN cobro_moneda moneda_factura ON factura.id_moneda = moneda_factura.id_moneda AND factura.id_cobro = moneda_factura.id_cobro
-					 JOIN cobro_moneda moneda_base ON moneda_base.moneda_base = 1 AND factura.id_cobro = moneda_base.id_cobro
+					 JOIN cobro_moneda moneda_base ON moneda_base.id_moneda = prm_moneda_base.id_moneda AND factura.id_cobro = moneda_base.id_cobro
 					 JOIN prm_moneda ON moneda_factura.id_moneda = prm_moneda.id_moneda
 				 	 JOIN cobro_moneda moneda_filtro ON moneda_filtro.id_cobro = factura.id_cobro AND moneda_filtro.id_moneda = :currency_id
 					 JOIN prm_moneda prm_moneda_filtro  ON prm_moneda_filtro.id_moneda = moneda_filtro.id_moneda
@@ -760,9 +761,10 @@ public static $configuracion_gastos = array(
 				JOIN cta_cte_fact_mvto AS ccfm2 ON ccfmn.id_mvto_deuda = ccfm2.id_cta_cte_mvto
 				JOIN factura ON ccfm2.id_factura = factura.id_factura
 				JOIN cobro ON cobro.id_cobro = factura.id_cobro
+				JOIN prm_moneda prm_moneda_base ON prm_moneda_base.moneda_base = 1
 				JOIN cobro_moneda moneda_cobro ON cobro.id_moneda = moneda_cobro.id_moneda AND cobro.id_cobro = moneda_cobro.id_cobro
 				JOIN cobro_moneda moneda_factura ON factura.id_moneda = moneda_factura.id_moneda AND factura.id_cobro = moneda_factura.id_cobro
-				JOIN cobro_moneda moneda_base ON moneda_base.moneda_base = 1 AND factura.id_cobro = moneda_base.id_cobro
+				JOIN cobro_moneda moneda_base ON moneda_base.id_moneda = prm_moneda_base.id_moneda AND factura.id_cobro = moneda_base.id_cobro
 				JOIN prm_moneda ON moneda_factura.id_moneda = prm_moneda.id_moneda
 				JOIN cobro_moneda moneda_filtro ON moneda_filtro.id_cobro = factura.id_cobro AND moneda_filtro.id_moneda = :currency_id
 				JOIN prm_moneda prm_moneda_filtro  ON prm_moneda_filtro.id_moneda = moneda_filtro.id_moneda

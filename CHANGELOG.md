@@ -1,7 +1,31 @@
 # Changelog
 
+## Hotfix 16.31.1
+Tuesday, October 11th
+* **Fix** [Modificar filtros y tipos de datos](https://github.com/LemontechSA/ttb/pull/1865)
+
+## [Release 16.31.0](https://github.com/LemontechSA/ttb/pull/1852)
+Monday, October 3rd
+* **Feature** [Reporte avanzado - Sin módulo de facturación](https://github.com/LemontechSA/ttb/pull/1833)
+
+## [Release 16.30.0](https://github.com/LemontechSA/ttb/pull/1848)
+Thursday, September 29th
+* **Feature** [Reporte avanzado - Valor tramites](https://github.com/LemontechSA/ttb/pull/1799)
+
+## Hotfix 16.29.7
+Tuesday, september 27th
+* **Fix** [Fecha inicio de la tarifa CAP se puede dejar en blanco](https://github.com/LemontechSA/ttb/pull/1845)
+
+## Hotfix 16.29.6
+Tuesday, September 27th
+* **Fix** [Duplicidad de gastos](https://github.com/LemontechSA/ttb/pull/1844)
+
+## Hotfix 16.29.5
+Monday, September 26th
+* **Fix** [Agregar prm_moneda como moneda base a la query de pagos y facturas](https://github.com/LemontechSA/ttb/pull/1841)
+
 ## Hotfix 16.29.4
-Monday, september 26th
+Monday, September 26th
 * **Fix** [Diferencia en tarifas en reporte Excel de Horas](https://github.com/LemontechSA/ttb/pull/1840)
 
 ## Hotfix 16.29.3
@@ -32,6 +56,18 @@ Tuesday, September 13th
 Tuesday, August 30th
 * **Feature** [Agrega valor facturado en reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1428)
 * **Feature** [Modificar moneda base](https://github.com/LemontechSA/ttb/pull/1779)
+
+## Hotfix 16.27.7
+Thursday, September 8th
+* **Fix** [Se homologan todos los agrupadores de las columnas en reporte financiero](https://github.com/LemontechSA/ttb/pull/1795)
+
+## Hotfix 16.27.6
+Wednesday, September 7th
+* **Fix** [Cambiar codigo porcentaje Facturación SATCOM](https://github.com/LemontechSA/ttb/pull/1793)
+
+## Hotfix 16.27.5
+Tuesday, September 6th
+* **Feature** [Agrega tag nro_factura_sin_serie](https://github.com/LemontechSA/ttb/pull/1791)
 
 ## Hotfix 16.27.4
 Tuesday, August 30th
