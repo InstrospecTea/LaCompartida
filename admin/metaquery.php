@@ -24,7 +24,9 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 				'rdsdb4.thetimebilling.com',
 				'rdsdb5.thetimebilling.com',
 				'rdsdb6.thetimebilling.com',
-				'rdsvip1.thetimebilling.com'
+				'rdsdb7.thetimebilling.com',
+				'rdsvip1.thetimebilling.com',
+				'rdsvip2.thetimebilling.com'
 			);
 			echo Html::SelectArray($servers, 'dbhost', isset($_POST['dbhost'])? $_POST['dbhost']: Conf::dbHost(),' class="span5" ','','380px');
 			?>
@@ -61,7 +63,7 @@ if (!$sesion->usuario->TienePermiso('SADM')) {
 if (isset($_POST['ejecutar']) && $_POST['ejecutar'] == 'ejecutar') {
 	try {
 		$dbhost = $_POST['dbhost'];
-		$cadenadb = 'mysql:dbname=phpmyadmin;host='.$dbhost;
+		$cadenadb = 'mysql:host='.$dbhost;
 		$sesion->pdodbh2 = new PDO($cadenadb, 'admin', 'admin1awdx');
 		$sesion->pdodbh2->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	} catch (PDOException $e) {
