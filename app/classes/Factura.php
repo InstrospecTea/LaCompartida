@@ -2341,9 +2341,9 @@ class Factura extends Objeto {
 		$query = "SELECT id_cobro FROM factura f {$where}";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		$lista_cobros = "".mysql_fetch_array($resp)[0];
-    while ($row = mysql_fetch_array($resp)) {
-    	$lista_cobros = $lista_cobros.','.$row[0];
-    }
+		while ($row = mysql_fetch_array($resp)) {
+			$lista_cobros = $lista_cobros.','.$row[0];
+		}
 		return $lista_cobros;
 	}
 
