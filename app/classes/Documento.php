@@ -468,7 +468,7 @@ class Documento extends Objeto {
 
 	function ListaPagos() {
 		$out = '';
-		if (Conf::GetConf($this->sesion, 'NuevoModuloFactura')) {
+		if (Conf::read('NuevoModuloFactura')) {
 			// Todos los neteos en donde 'this' figura como documento_cobro
 			$query = "SELECT n.id_documento_pago AS id, n.valor_cobro_honorarios as honorarios, n.valor_cobro_gastos as gastos, d.pago_retencion, d.es_adelanto
 								FROM neteo_documento AS n

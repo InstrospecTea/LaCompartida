@@ -56,7 +56,7 @@ if ($opc == 'eliminar_documento') {
 			$DocumentService->deleteOrException($Document);
 			$pagina->AddInfo(__('El documento ha sido eliminado satisfactoriamente'));
 		} else {
-			if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
+			if (Conf::read('NuevoModuloFactura')) {
 				$id_neteo = $documento_eliminado->ObtenerIdNeteo($id_cobro);
 				$factura_pago->LoadByNeteoAdelanto($id_neteo);
 				$factura_pago->Eliminar();
