@@ -5,6 +5,4 @@
  */
 class DAOException extends PDOException{
 
-
-
 }

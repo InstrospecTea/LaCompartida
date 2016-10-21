@@ -312,7 +312,7 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	public function delete($object = null) {
-    $reflected = new ReflectionClass($this->getClass());
+		$reflected = new ReflectionClass($this->getClass());
 		if (is_subclass_of($object, 'LoggeableEntity')) {
 			$newInstance = $reflected->newInstance();
 			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
@@ -326,8 +326,8 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return false;
 	}
 
- 	public function deleteOrException($object = null) {
- 		$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
+	public function deleteOrException($object = null) {
+		$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
 		$reflected = new ReflectionClass($this->getClass());
 		if (is_subclass_of($object, 'LoggeableEntity')) {
 			$newInstance = $reflected->newInstance();
@@ -337,12 +337,12 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		if ($object->isLoaded()) {
 			try {
 				$this->sesion->pdodbh->query($query);
- 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-        return true;
-  		}
-  		catch (Exception $e) {
-  			throw self::getDAOExceptionOrException($e);
-  		}
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				return true;
+			}
+			catch (Exception $e) {
+				throw self::getDAOExceptionOrException($e);
+			}
 		}
 		return false;
 	}
@@ -487,20 +487,20 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 	}
 
 	protected function getDAOExceptionOrException(Exception $e){
- 		$result = $e;
+		$result = $e;
 		$message = $e->getMessage();
- 		if (strstr($message, 'SQLSTATE[')) {
- 			preg_match('/SQLSTATE\[(\w+)\]\: .*: (\d+) (.*)/', $message, $matches);
+		if (strstr($message, 'SQLSTATE[')) {
+			preg_match('/SQLSTATE\[(\w+)\]\: .*: (\d+) (.*)/', $message, $matches);
 
- 			$SQLSTATE = $matches[1];
-  		$code = $matches[2];
- 			$message = $matches[3];
+			$SQLSTATE = $matches[1];
+			$code = $matches[2];
+			$message = $matches[3];
 
- 			// USING AS GUIDE: https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html
- 			if (in_array($code, [1216, 1217, 1451, 1452])) {
- 				$result = new ForeignKeyConstraintFailsException($message);
- 			}
- 		}
- 		return $result;
- 	}
+			// USING AS GUIDE: https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html
+			if (in_array($code, [1216, 1217, 1451, 1452])) {
+				$result = new ForeignKeyConstraintFailsException($message);
+			}
+		}
+		return $result;
+	}
 }
