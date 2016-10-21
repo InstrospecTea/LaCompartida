@@ -8,7 +8,7 @@ class WorkbookMiddleware {
 	protected $worksheets = [];
 
 	protected $phpExcel;
-	protected $workSheetObj;
+	public $workSheetObj;
 	protected $indexsheet;
 
 	protected $writer = 'Excel2007';
