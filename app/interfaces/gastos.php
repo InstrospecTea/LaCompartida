@@ -417,9 +417,6 @@ if (Conf::GetConf($sesion, 'ExcelGastosDesglosado')) {
 					{ "bSortable": false, "aTargets": [ 2, 3, 4, 11, 12, 13] },
 					{ "bVisible": false, "aTargets": [ 5, 10, 12, 14] },
 <?php
-if (!Conf::GetConf($sesion, 'NumeroGasto')) {
-	echo ' { "bVisible": false, "aTargets": [ 0 ] },';
-}
 
 if (!Conf::GetConf($sesion, 'NumeroOT')) {
 	echo ' { "bVisible": false, "aTargets": [ 2 ] },';
@@ -591,6 +588,10 @@ function Refrescar() {
 						<td align="right"><?php echo __('Cobrado') ?></td>
 						<td align="left">
 							<?php echo $Html->SelectSiNo('cobrado', isset($cobrado) ? $cobrado : $selected_cobrado); ?>
+						</td>
+						<td align="left" nowrap>
+							<?php echo __('Correlativo') ?>&nbsp;
+							<input onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" size="6" name="correlativo" id="correlativo" value="<?php echo $correlativo ?>">
 						</td>
 						<td align="left" nowrap>
 							<?php echo __('id_cobro') ?>&nbsp;
