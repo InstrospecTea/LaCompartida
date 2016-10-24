@@ -30,6 +30,7 @@
 	$tarifas = $tarifas->add_select('id_tarifa')
 										->add_select('glosa_tarifa')
 										->add_from('tarifa')
+										->add_restriction(CriteriaRestriction::equals('YEAR(fecha_creacion)', $por_anho))
 										->run();
 
 	// Creación Hojas por Tarifa

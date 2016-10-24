@@ -111,6 +111,15 @@ if ($opc == 'guardar') {
 $Pagina->titulo = __('Ingreso de Tarifas');
 $Pagina->PrintTop($popup);
 $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
+$Criteria = new Criteria($Sesion);
+$Criteria = $Criteria->add_select('YEAR(MIN(fecha_creacion))', 'fecha_creacion')
+										->add_from('tarifa')
+										->add_restriction(CriteriaRestriction::and_clause(
+											CriteriaRestriction::not_equal('fecha_creacion', '0000-00-00'),
+											CriteriaRestriction::is_not_null('fecha_creacion')
+										))
+										->run();
+$fecha_tarifa = $Criteria[0]['fecha_creacion'];
 ?>
 
 <script type="text/javascript">
@@ -130,6 +139,23 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 		jQuery('#btn_guardar').on('click', function(){
 			jQuery(this).closest('form').submit();
 		})
+
+		jQuery('[name="descarga_tarifa"]').on('change', function() {
+			if (jQuery('[name="descarga_tarifa"]:checked').val() == 1) {
+				jQuery('#por_anho_tr').hide();
+				var onclick = "self.location.href = 'tarifas_xls.php?id_tarifa_edicion=<?= $id_tarifa_edicion ?>&glosa=<?= $tarifa->fields['glosa_tarifa'] ?>'";
+				jQuery('#descargar_excel_tarifas').attr('onclick', onclick);
+			} else {
+				jQuery('#por_anho_tr').show();
+				var onclick = "self.location.href = 'tarifas_clientes.php?por_anho=" + jQuery('[name="por_anho"] option:selected').val() + "'";
+				jQuery('#descargar_excel_tarifas').attr('onclick', onclick);
+			}
+		});
+
+		jQuery('[name="descarga_tarifa"]').trigger('change');
+		jQuery('[name="por_anho"]').on('change', function() {
+			jQuery('[name="descarga_tarifa"]').trigger('change');
+		});
 	});
 
 	function foco(elemento)
@@ -244,7 +270,7 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 				$colspan = 5;
 				?>
 				<td style="text-align:left;vertical-align: middle;"><?php echo __('Tarifa') ?>:&nbsp;</td>
-				<td style="text-align:left;vertical-align: middle;"><?php echo Html::SelectQuery($Sesion, "SELECT * FROM tarifa WHERE tarifa_flat IS NULL ORDER BY glosa_tarifa", "id_tarifa", $tarifa->fields['id_tarifa'], "onchange='cambia_tarifa(this.value)'", "", "120"); ?></td>
+				<td style="text-align:left;vertical-align: middle;"><?php echo Html::SelectQuery($Sesion, "SELECT * FROM tarifa WHERE tarifa_flat IS NULL ORDER BY glosa_tarifa", "id_tarifa", $tarifa->fields['id_tarifa'], "onchange='cambia_tarifa(this.value)'", "", "250"); ?></td>
 				<?php
 			}
 			?>
@@ -256,13 +282,8 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 			<td colspan="<?php echo $colspan ?>" align=right>&nbsp;</td>
 		</tr>
 		<tr>
-			<td colspan="<?php echo $colspan - 1 ?>" align="right" style="text-align:right;" >
-				<input type="button" id="btn_guardar" value='<?php echo __('Guardar') ?>' class=btn > &nbsp;
-				<input type="button" id="fix_tarifas" value='<?php echo __('Completar Tarifas') ?>' class='btn' title="Esta función completará las tarifas faltantes de los profesionales basándose en su categoría, para todas las tarifas" />
-				<input type="button" onclick="self.location.href = 'tarifas_xls.php?id_tarifa_edicion=<?php echo $id_tarifa_edicion ?>&glosa=<?php echo $tarifa->fields['glosa_tarifa'] ?>'" value='<?php echo __('Imprimir tarifas') ?>' class='btn' >
-				<input type="button" onclick="self.location.href = 'tarifas_clientes.php'" value='<?php echo __('Imprimir Todas') ?>' class='btn' title="Exporta todas las tarifas a un excel. Incluye qué contratos estan afectos a cada una" >
-			</td>
-			<td style="text-align:left;vertical-align: middle;width:202px;" >
+			<td colspan="<?php echo $colspan + 1 ?>" align="right" style="text-align:right;" >
+				<input type="button" id="btn_guardar" value='<?php echo __('Guardar') ?>' class="btn" >
 				<input type="button" onclick="CrearTarifa(this.form, '<?php echo $id_tarifa_edicion ?>');" value='<?php echo __('Crear nueva tarifa') ?>' class="btn" title="Crea una nueva tarifa. Active el checkbox inferior para basarse en los datos de la actual">
 				<input type="button" onclick="Eliminar();" value='<?php echo __('Eliminar Tarifa') ?>' class="btn_rojo" >
 			</td>
@@ -277,7 +298,30 @@ $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 			}
 			?>
 			<td colspan="<?php echo $colspan ?>"></td><td  align="left">
-				<input type="checkbox" id="usar_tarifa_previa" value='1' <?php $usar_tarifa_previa ? 'checked' : '' ?> /> <?php echo __('copiando la actual') ?>
+				<label><input type="checkbox" id="usar_tarifa_previa" value='1' <?php $usar_tarifa_previa ? 'checked' : '' ?> /><?php echo __('copiando la actual') ?></label>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="<?php echo $colspan ?>" align=right>&nbsp;</td>
+		</tr>
+		<tr align="right">
+			<td colspan="<?= $colspan + 1 ?>">
+				<button type="button" class="btn" id="descargar_excel_tarifas"><?= __('Descargar Tarifa') ?></button>
+			</td>
+		</tr>
+		<tr align="right">
+			<td colspan="<?= $colspan + 1 ?>">
+				<label><input type="radio" name="descarga_tarifa" value="1" checked="checked"> <?= __('Actual') ?></label>
+				<label title="<?= __('Exporta todas las tarifas según categoría a un Excel. Incluye los contratos que están afectos a cada una.') ?>"><input type="radio" name="descarga_tarifa" value="2"> Por Año</label>
+			</td>
+		</tr>
+		<tr align="right" id="por_anho_tr" style="display:none;">
+			<td colspan="<?= $colspan + 1 ?>">
+				<select name="por_anho">
+					<?php foreach (range($fecha_tarifa, date('Y')) as $year): ?>
+						<option value="<?= $year ?>" <?= $year == date('Y') ? 'selected' : '' ?>><?= $year ?></option>
+					<?php endforeach; ?>
+				</select>
 			</td>
 		</tr>
 		<?php } ?>
