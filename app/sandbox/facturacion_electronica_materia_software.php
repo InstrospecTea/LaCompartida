@@ -2,12 +2,20 @@
 
 require_once(dirname(__FILE__) . '/../conf.php');
 
-$sesion = new Sesion();
-$factura = $factura = new Factura($sesion);
-$factura->Load($_REQUEST['id_factura']);
-$url = 'http://api.contable.pe/api/';
+$Sesion = new Sesion();
 
-$WsFacturacionSatcom = new WsFacturacionMateriaSoftware($url);
-$xml = $WsFacturacionSatcom->emitirFactura($factura);
+$Factura = $Factura = new Factura($Sesion);
+$Factura->Load($_REQUEST['id_factura']);
 
-echo $xml;
+$Estudio = new PrmEstudio($Sesion);
+$Estudio->Load($Factura->fields['id_estudio']);
+
+$WsFacturacionMateriaSoftware = new WsFacturacionMateriaSoftware(
+	$Estudio->GetMetaData('facturacion_electronica_materia_software.Url'),
+	$Estudio->GetMetaData('facturacion_electronica_materia_software.Authorization')
+);
+
+$factura_emitida = $WsFacturacionMateriaSoftware->emitirFactura($Factura);
+
+echo '<div>', $factura_emitida, '</div>';
+echo '<div>', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
