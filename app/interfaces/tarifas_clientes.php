@@ -7,7 +7,7 @@
 	$wb = new WorkbookMiddleware();
 	$wb->setCustomColor ( 35, 220, 255, 220 );
 	$wb->setCustomColor ( 36, 255, 255, 220 );
-	//
+
 	$titulo = $wb->addFormat(array('Size' => 12,
 	                      'VAlign' => 'top',
 	                      'Align' => 'justify',
@@ -30,14 +30,14 @@
 	$tarifas = $tarifas->add_select('id_tarifa')
 										->add_select('glosa_tarifa')
 										->add_from('tarifa')
-										// ->add_restriction(CriteriaRestriction::equals('id_tarifa', 627))
-										// ->add_limit(5, 350)
 										->run();
 
 	// Creación Hojas por Tarifa
 	foreach ($tarifas as $tarifa) {
 		$id_tarifa = $tarifa['id_tarifa'];
 		$titulo_hoja = __('Tarifa') . " {$id_tarifa} " . substr($tarifa['glosa_tarifa'], 0, 15);
+		$exp = [':', '\\', '/', '?', '*', '[', ']'];
+		$titulo_hoja = str_replace($exp, '', $titulo_hoja);
 		$fila_inicial = 2;
 		$columna_fin = 0;
 		$columna_monedas = [];
