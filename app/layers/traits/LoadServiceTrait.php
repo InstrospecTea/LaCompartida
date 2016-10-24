@@ -5,7 +5,7 @@ use TTB\Configurations\TableTranslation as Table;
 trait LoadServiceTrait {
 
 	protected $loadedClass = array();
-	protected $tables;
+
 	/**
 	 * Carga un Servicio al vuelo
 	 * @param string $name
@@ -29,8 +29,6 @@ trait LoadServiceTrait {
 	}
 
 	private function newGeneric($name) {
-		$table_name = Utiles::underscoreize($name);
-		$original_name = Table::original($table_name);
-		return new GenericService($this->Sesion, $name, $original_name);
+		return new GenericService($this->Sesion, $name);
 	}
 }
