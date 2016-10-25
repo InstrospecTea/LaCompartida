@@ -2265,7 +2265,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					}
 					$row = str_replace('%ntrabajo%', $trabajo->fields['id_trabajo'], $row);
 					$row = str_replace('%descripcion%', ucfirst(stripslashes(htmlentities($trabajo->fields['descripcion']))), $row);
-					$row = str_replace('%descripcion_mayus%', strtoupper(htmlentities($trabajo->fields['descripcion'])), $row);
+					$row = str_replace('%descripcion_mayus%', htmlentities(strtoupper($trabajo->fields['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
 					} else {
