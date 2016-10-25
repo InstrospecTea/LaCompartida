@@ -112,14 +112,14 @@ $Pagina->titulo = __('Ingreso de Tarifas');
 $Pagina->PrintTop($popup);
 $active = ' onFocus="foco(this);" onBlur="no_foco(this);" ';
 $Criteria = new Criteria($Sesion);
-$Criteria = $Criteria->add_select('YEAR(MIN(fecha_creacion))', 'fecha_creacion')
+$Criteria = $Criteria->add_select('DISTINCT YEAR(fecha_creacion)', 'fecha_creacion')
 										->add_from('tarifa')
 										->add_restriction(CriteriaRestriction::and_clause(
 											CriteriaRestriction::not_equal('fecha_creacion', '0000-00-00'),
 											CriteriaRestriction::is_not_null('fecha_creacion')
 										))
 										->run();
-$fecha_tarifa = $Criteria[0]['fecha_creacion'];
+$fecha_tarifa = $Criteria;
 ?>
 
 <script type="text/javascript">
@@ -318,8 +318,8 @@ $fecha_tarifa = $Criteria[0]['fecha_creacion'];
 		<tr align="right" id="por_anho_tr" style="display:none;">
 			<td colspan="<?= $colspan + 1 ?>">
 				<select name="por_anho">
-					<?php foreach (range($fecha_tarifa, date('Y')) as $year): ?>
-						<option value="<?= $year ?>" <?= $year == date('Y') ? 'selected' : '' ?>><?= $year ?></option>
+					<?php foreach ($fecha_tarifa as $year): ?>
+						<option value="<?= $year['fecha_creacion'] ?>" <?= $year['fecha_creacion'] == date('Y') ? 'selected' : '' ?>><?= $year['fecha_creacion'] ?></option>
 					<?php endforeach; ?>
 				</select>
 			</td>
