@@ -506,15 +506,16 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$ws->setColumn($col_duracion_cobrable, $col_duracion_cobrable, 1.2 * $PrmExcelCobro->getTamano('duracion_cobrable', 'Listado de trabajos'));
 	$ws->setColumn($col_tarifa_hh, $col_tarifa_hh, 1.5 * $PrmExcelCobro->getTamano('tarifa_hh', 'Listado de trabajos'));
 
+	$ancho_columna_valor_trabajado = $PrmExcelCobro->getTamano('valor_trabajado', 'Listado de trabajos');
 	$ws->setColumn(
 		$col_valor_trabajo,
 		$col_valor_trabajo,
-		$PrmExcelCobro->getTamano('valor_trabajado', 'Listado de trabajos') ? $PrmExcelCobro->getTamano('valor_trabajado', 'Listado de trabajos') : 14
+		$ancho_columna_valor_trabajado ? $ancho_columna_valor_trabajado : 14
 	);
 	$ws->setColumn(
 		$col_valor_trabajo_flat_fee,
 		$col_valor_trabajo_flat_fee,
-		$PrmExcelCobro->getTamano('valor_trabajado', 'Listado de trabajos') ? $PrmExcelCobro->getTamano('valor_trabajado', 'Listado de trabajos') : 14
+		$ancho_columna_valor_trabajado ? $ancho_columna_valor_trabajado : 14
 	);
 
 	$ws->setColumn($col_id_abogado, $col_id_abogado, 0, 0 ,1);
