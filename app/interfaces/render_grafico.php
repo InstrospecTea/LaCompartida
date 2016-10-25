@@ -38,9 +38,31 @@
 						for (var key in response.options.tooltips.callbacks) {
 							(function(text) {
 								response.options.tooltips.callbacks[key] = function(tooltipItem, data){
-									return Array.isArray(tooltipItem) ? text[tooltipItem[0].index] : text[tooltipItem.index];
+									return Array.isArray(tooltipItem) ? text[tooltipItem[0].index][tooltipItem[0].datasetIndex] : text[tooltipItem.index][tooltipItem.datasetIndex];
 								}
 							})(response.options.tooltips.callbacks[key]);
+						}
+					}
+
+					if (typeof response.options != 'undefined' &&
+							typeof response.options.scales != 'undefined') {
+						for (var yAxeskey in response.options.scales.yAxes) {
+							for (var tickskey in response.options.scales.yAxes[yAxeskey].ticks) {
+								(function(text) {
+									var separators = response.options.scales.yAxes[yAxeskey].ticks[tickskey];
+									response.options.scales.yAxes[yAxeskey].ticks[tickskey] = function(value, index, values){
+										if (value % 1 != 0) {
+											value = value.toFixed(1);
+										}
+
+										value = value.toString();
+										value = value.split(/(?=(?:...)*$)/);
+
+										value = value.join(separators.miles);
+										return value;
+									}
+								})(response.options.scales.yAxes[yAxeskey].ticks[tickskey]);
+							}
 						}
 					}
 
