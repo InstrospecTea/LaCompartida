@@ -5,9 +5,7 @@
 	$pagina = new Pagina($sesion);
 
 	$wb = new WorkbookMiddleware();
-
-	$wb->setVersion(8);
-	$wb->send('Carpetas.xls');
+	$wb->send('Carpetas');
 	$wb->setCustomColor(35, 220, 255, 220);
 	$wb->setCustomColor(36, 255, 255, 220);
 

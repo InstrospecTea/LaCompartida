@@ -107,12 +107,9 @@ if (!$id_cobro) {
 $mostrar_resumen_de_profesionales = 1;
 
 if ($guardar_respaldo) {
-	$wb = new WorkbookMiddleware(Conf::ServerDir() . '/respaldos/ResumenCobros' . date('ymdHis') . '.xls');
-	$wb->setVersion(8);
+	$wb = new WorkbookMiddleware(Conf::ServerDir() . '/respaldos/ResumenCobros' . date('ymdHis'));
 } else {
 	$wb = new WorkbookMiddleware();
-	$wb->setVersion(88);
-	// No se hace $wb->send() todavía por si acaso no hay horas en el cobro.
 }
 
 $wb->setCustomColor(35, 220, 255, 220);
@@ -2794,7 +2791,7 @@ if (isset($ws)) {
 	// Se manda el archivo aquí para que no hayan errores de headers al no haber resultados.
 	if (!$guardar_respaldo) {
 		header('Set-Cookie: fileDownload=true; path=/');
-		$wb->send('Resumen de ' . __('cobro') . '_' . $cobro->fields['id_cobro'] . '.xls');
+		$wb->send('Resumen de ' . __('cobro') . '_' . $cobro->fields['id_cobro']);
 	}
 }
 
