@@ -40,6 +40,8 @@
 
 	foreach ($respuesta as $i => $fila) {
 		$tiempo[] = $fila['tiempo'];
+		$tiempo_formateado = Format::number(floatval($fila['tiempo']));
+		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
 		$labels[] = $fila['codigo_asunto'];
 		$fila['glosa_asunto'] = mb_detect_encoding($fila['glosa_asunto'], 'UTF-8', true) === 'UTF-8' ? $fila['glosa_asunto'] : utf8_encode($fila['glosa_asunto']);
 		$glosa_asunto[] = [
@@ -56,6 +58,13 @@
 		return;
 	}
 
+	$LanguageManager = new LanguageManager($sesion);
+	$language = $LanguageManager->getById(1);
+	$separators = [
+		'decimales' => $language->fields['separador_decimales'],
+		'miles' => $language->fields['separador_miles']
+	];
+
 	$dataset = new TTB\Graficos\Dataset();
 
 	$options = [
@@ -64,6 +73,7 @@
 			'mode' => 'label',
 			'callbacks' => [
 				'afterTitle' => $glosa_asunto,
+				'label' => $tiempo_tooltip
 			]
 		],
 		'title' => [
@@ -94,7 +104,8 @@
 						'show' => true
 					],
 					'ticks' => [
-						'beginAtZero' => true
+						'beginAtZero' => true,
+						'callback' => $separators
 					]
 				]
 			]

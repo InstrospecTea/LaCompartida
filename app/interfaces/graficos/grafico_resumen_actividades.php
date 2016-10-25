@@ -37,7 +37,9 @@ if (is_null($datos)) {
 $labels = [];
 foreach ($datos as $key => $value) {
 	$percentage = round((($value / $total) * 100), 2);
-	$labels[] = "{$key}: {$value} Hrs. ({$percentage}%)";
+	$value_formated = Format::number(floatval($value));
+	$labels[] = "{$key}: {$value_formated} Hrs. ({$percentage}%)";
+	$labels_tooltips[] = ["{$key}: {$value_formated} Hrs. ({$percentage}%)"];
 }
 
 $dataset = new TTB\Graficos\DatasetPie();
@@ -61,7 +63,7 @@ $options = [
 	'tooltips' => [
 		'mode' => 'label',
 		'callbacks' => [
-			'label' => $labels,
+			'label' => $labels_tooltips,
 		]
 	]
 ];

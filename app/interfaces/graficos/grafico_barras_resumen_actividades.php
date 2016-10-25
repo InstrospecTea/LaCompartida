@@ -48,6 +48,19 @@ $grafico->setNameChart($titulo)
 	->addDataset($dataset)
 	->addLabels($data['nombres']);
 
+$LanguageManager = new LanguageManager($Sesion);
+
+foreach ($datos as $key => $value) {
+	$leyend_value = Format::number(floatval($value));
+	$language = $LanguageManager->getById(1);
+	$separators = [
+		'decimales' => $language->fields['separador_decimales'],
+		'miles' => $language->fields['separador_miles']
+	];
+
+	$labels_tooltips[] = "{$leyend_value} Hrs.";
+}
+
 $y_axes[] = [
 	'type' => 'linear',
 	'display' => true,
@@ -60,7 +73,8 @@ $y_axes[] = [
 		'show' => true
 	],
 	'ticks' => [
-		'beginAtZero' => true
+		'beginAtZero' => true,
+		'callback' => $separators
 	]
 ];
 
@@ -75,6 +89,17 @@ if ($datos_comparados) {
 		->setHoverBorderColor(39, 174, 96, 1)
 	  ->setData($datos_comparados);
 
+	foreach ($datos_comparados as $key => $value) {
+		$leyend_value = Format::number(floatval($value));
+		$language = $LanguageManager->getById(1);
+		$separators = [
+			'decimales' => $language->fields['separador_decimales'],
+			'miles' => $language->fields['separador_miles']
+		];
+
+		$labels_tooltips_comparado[] = "{$leyend_value} Hrs.";
+	}
+
 	$grafico->addDataset($dataset_comparado);
 	$y_axes[] = [
 		'type' => 'linear',
@@ -88,15 +113,23 @@ if ($datos_comparados) {
 			'show' => true
 		],
 		'ticks' => [
-			'beginAtZero' => true
+			'beginAtZero' => true,
+			'callback' => $separators
 		]
 	];
+}
+
+foreach ($labels_tooltips as $key => $value) {
+	$labels_tooltips_callback[] = [$value, $labels_tooltips_comparado[$key]];
 }
 
 $options = [
 	'responsive' => true,
 	'tooltips' => [
-		'mode' => 'label'
+		'mode' => 'label',
+		'callbacks' => [
+			'label' => $labels_tooltips_callback,
+		]
 	],
 	'title' => [
 		'display' => true,
