@@ -8,7 +8,7 @@ class WorkbookMiddleware {
 	protected $worksheets = [];
 
 	protected $phpExcel;
-	public $workSheetObj;
+	protected $workSheetObj;
 	protected $indexsheet;
 
 	protected $writer = 'Excel2007';
@@ -653,5 +653,13 @@ class WorkbookMiddleware {
 		foreach ($this->local_images as $path) {
 			unlink($path);
 		}
+	}
+
+	/**
+	 * Sets format into a range
+	 *
+	 */
+	public function applyFormat($range, $format) {
+		$this->workSheetObj->getStyle($range)->applyFromArray($format);
 	}
 }

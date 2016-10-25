@@ -68,7 +68,7 @@
 
 	$fila = $fila_inicial + 1;
 	$columna_fin = PHPExcel_Cell::stringFromColumnIndex($columna_fin);
-	$wb->workSheetObj->getStyle("A{$fila}:{$columna_fin}{$fila}")->applyFromArray($cabecera);
+	$wb->applyFormat("A{$fila}:{$columna_fin}{$fila}", $cabecera);
 
 	// Sección Usuarios
 	$usuarios = new Criteria($sesion);
@@ -108,8 +108,8 @@
 	}
 
 	$fila_fin = $fila_inicial + 1;
-	$wb->workSheetObj->getStyle("A{$fila_inicio}:A{$fila_fin}")->applyFromArray($texto);
-	$wb->workSheetObj->getStyle("B{$fila_inicio}:{$columna_fin}{$fila_fin}")->applyFromArray($texto);
+	$wb->applyFormat("A{$fila_inicio}:A{$fila_fin}", $texto);
+	$wb->applyFormat("B{$fila_inicio}:{$columna_fin}{$fila_fin}", $texto);
 
 	// Sección Clientes
 	$clientes = new Criteria($sesion);
@@ -140,7 +140,7 @@
 	$ws->mergeCells($fila_inicial, 1, $fila_inicial, 5);
 
 	$fila = $fila_inicial + 1;
-	$wb->workSheetObj->getStyle("A{$fila}:B{$fila}")->applyFromArray($cabecera);
+	$wb->applyFormat("A{$fila}:B{$fila}", $cabecera);
 
 	$fila_inicio = $fila_inicial + 1;
 	foreach ($clientes_tarifa as $cliente => $asuntos) {
@@ -151,7 +151,7 @@
 	}
 	$fila_fin = $fila_inicial + 1;
 	$columna_fin = PHPExcel_Cell::stringFromColumnIndex(5);
-	$wb->workSheetObj->getStyle("A{$fila_inicio}:{$columna_fin}{$fila_fin}")->applyFromArray($texto);
+	$wb->applyFormat("A{$fila_inicio}:{$columna_fin}{$fila_fin}", $texto);
 
 	$wb->send('Tarifa_'.$glosa.'.xls');
   $wb->close();
