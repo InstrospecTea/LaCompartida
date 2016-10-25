@@ -2338,9 +2338,12 @@ class Factura extends Objeto {
 			$where .= " AND f.serie_documento_legal = '{$serie}'";
 		}
 
-		$query = "SELECT GROUP_CONCAT(id_cobro) , '1' as grupo FROM factura f {$where} GROUP BY grupo";
+		$query = "SELECT id_cobro FROM factura f {$where}";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($lista_cobros, $grupo) = mysql_fetch_array($resp);
+		$lista_cobros = "".mysql_fetch_array($resp)[0];
+		while ($row = mysql_fetch_array($resp)) {
+			$lista_cobros = $lista_cobros.','.$row[0];
+		}
 		return $lista_cobros;
 	}
 

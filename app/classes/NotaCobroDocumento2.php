@@ -892,17 +892,19 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$fix_decimal = '10';
 				}
 
+				$Numbers_Words = new Numbers_Words();
+
 				if ($lang == 'es') {
 
 					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
 
 					if (empty($total_parte_decimal)) {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'es'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'es'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang);
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang) . ' CON 00/100 CENTAVOS';
 					} else {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'es'));
-						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal * $fix_decimal, 'es'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'es'));
+						$monto_palabra_parte_decimal = strtoupper($Numbers_Words->toWords($total_parte_decimal * $fix_decimal, 'es'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' CON ' . $monto_palabra_parte_decimal . ' ' . 'CENTAVOS';
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang) . ' CON ' . $total_parte_decimal * $fix_decimal . '/100 CENTAVOS';
 					}
@@ -911,12 +913,12 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural_lang'];
 
 					if (empty($total_parte_decimal)) {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'en_US'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'en_US'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang);
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang) . ' CON 00/100 CENTAVOS';
 					} else {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'en_US'));
-						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, 'en_US'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'en_US'));
+						$monto_palabra_parte_decimal = strtoupper($Numbers_Words->toWords($total_parte_decimal, 'en_US'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' WITH ' . $monto_palabra_parte_decimal . ' ' . 'CENTS';
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' WITH ' . $total_parte_decimal * $fix_decimal . '/100 CENTS';
 					}
@@ -1002,7 +1004,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				while ($hitos = mysql_fetch_array($resp_hitos)) {
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', ($hitos['fecha_cobro'] == 0 ? '' : date('d-m-Y', strtotime($hitos['fecha_cobro']))), $row);
-					$row = str_replace('%descripcion%', $hitos['descripcion'], $row);
+					$row = str_replace('%descripcion%', htmlentities($hitos['descripcion']), $row);
 					$total_hitos = $total_hitos + $hitos['monto_estimado'];
 					$moneda_hitos = $hitos['simbolo'];
 					$estehito = $hitos['thisid'];
@@ -2137,26 +2139,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$html = '';
 				$where_horas_cero = '';
 
-				//esto funciona por Conf si el metodo del conf OrdenarPorCategoriaUsuarioe s true se ordena por categoria
-				if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} else if (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-					$order_categoria = "prm_categoria_usuario.orden, usuario.id_usuario, ";
-				} elseif (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-					$order_categoria = "usuario.id_categoria_usuario, usuario.id_usuario, ";
-				} elseif (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional')) {
-					$select_categoria = "";
-					$order_categoria = "usuario.id_categoria_usuario DESC, ";
-				} elseif (Conf::GetConf($this->sesion, 'TrabajosOrdenarPorFechaCategoria')) {
-					$select_categoria = ", prm_categoria_usuario.id_categoria_usuario";
-					$order_categoria = "trabajo.fecha, usuario.id_categoria_usuario, usuario.id_usuario, ";
-				} else {
-					$select_categoria = "";
-					$order_categoria = "";
-				}
+				$order_categoria = Conf::Read('OrdenTrabajosNotaCobro');
 
 				if (!method_exists('Conf', 'MostrarHorasCero')) {
 					if ($this->fields['opc_ver_horas_trabajadas'])
@@ -2194,34 +2177,31 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				/*
 				 * 	Contenido de filas de seccion trabajo.
 				 */
-				$query = "SELECT SQL_CALC_FOUND_ROWS
-									IF(trabajo.cobrable,trabajo.duracion_cobrada,'00:00:00') as duracion_cobrada,
-									trabajo.duracion_retainer,
-									trabajo.descripcion,
-									trabajo.fecha,
-									trabajo.id_usuario,
-									$dato_monto_cobrado as monto_cobrado,
-									trabajo.visible,
-									trabajo.cobrable,
-									trabajo.id_trabajo,
-									trabajo.tarifa_hh,
-									IF (trabajo.cobrable, trabajo.tarifa_hh * ( TIME_TO_SEC( duracion_cobrada ) / 3600 ),0) as importe,
-									trabajo.codigo_asunto,
-									trabajo.solicitante,
-									$query_categoria_lang
-									CONCAT_WS(' ', nombre, apellido1) as nombre_usuario,
-									trabajo.duracion,
-									usuario.username as username $select_categoria
-							FROM trabajo
-							LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
-							LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro
-							LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario
-							WHERE trabajo.id_cobro = '" . $this->fields['id_cobro'] . "'
-							AND trabajo.codigo_asunto = '" . $asunto->fields['codigo_asunto'] . "'
-							$cobrable
-							$visible
-							AND trabajo.id_tramite=0 $where_horas_cero
-							ORDER BY $order_categoria trabajo.fecha ASC,trabajo.descripcion";
+				$query = "SELECT SQL_CALC_FOUND_ROWS IF(trabajo.cobrable,trabajo.duracion_cobrada, '00:00:00') AS duracion_cobrada,
+					       trabajo.duracion_retainer,
+					       trabajo.descripcion,
+					       trabajo.fecha,
+					       trabajo.id_usuario, {$dato_monto_cobrado} AS monto_cobrado,
+					       trabajo.visible,
+					       trabajo.cobrable,
+					       trabajo.id_trabajo,
+					       trabajo.tarifa_hh,
+					       IF (trabajo.cobrable,
+					           trabajo.tarifa_hh * (TIME_TO_SEC(duracion_cobrada) / 3600),
+					           0) AS importe,
+					      trabajo.codigo_asunto,
+					      trabajo.solicitante, {$query_categoria_lang} CONCAT_WS(' ', nombre, apellido1) AS nombre_usuario,
+					     trabajo.duracion,
+					     usuario.username AS username,
+							 prm_categoria_usuario.id_categoria_usuario
+					FROM trabajo
+					LEFT JOIN usuario ON trabajo.id_usuario=usuario.id_usuario
+					LEFT JOIN cobro ON cobro.id_cobro = trabajo.id_cobro
+					LEFT JOIN prm_categoria_usuario ON usuario.id_categoria_usuario=prm_categoria_usuario.id_categoria_usuario
+					WHERE trabajo.id_cobro = '{$this->fields['id_cobro']}'
+					    AND trabajo.codigo_asunto = '{$asunto->fields['codigo_asunto']}' {$cobrable} {$visible}
+					    AND trabajo.id_tramite = 0 {$where_horas_cero}
+					ORDER BY {$order_categoria};";
 
 				$lista_trabajos = new ListaTrabajos($this->sesion, '', $query);
 
@@ -2284,8 +2264,8 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$row = str_replace('%td_id_trabajo%', '', $row);
 					}
 					$row = str_replace('%ntrabajo%', $trabajo->fields['id_trabajo'], $row);
-					$row = str_replace('%descripcion%', ucfirst(stripslashes($trabajo->fields['descripcion'])), $row);
-					$row = str_replace('%descripcion_mayus%', strtoupper($trabajo->fields['descripcion']), $row);
+					$row = str_replace('%descripcion%', ucfirst(stripslashes(htmlentities($trabajo->fields['descripcion']))), $row);
+					$row = str_replace('%descripcion_mayus%', strtoupper(htmlentities($trabajo->fields['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
 					} else {
@@ -3663,14 +3643,14 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					}
 
 					if (substr($detalle['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
-						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
-						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
+						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($detalle['descripcion']), 42), $row);
+						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($detalle['descripcion']), 42), $row);
 					} else if (substr($gasto->fields['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
-						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
-						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
+						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($gasto->fields['descripcion']), 42), $row);
+						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($gasto->fields['descripcion']), 42), $row);
 					} else {
-						$row = str_replace('%descripcion%', __($detalle['descripcion']), $row);
-						$row = str_replace('%descripcion_b%', __($detalle['descripcion']), $row); #Ojo, este no debería existir
+						$row = str_replace('%descripcion%', htmlentities(__($detalle['descripcion'])), $row);
+						$row = str_replace('%descripcion_b%', htmlentities(__($detalle['descripcion'])), $row); #Ojo, este no debería existir
 					}
 
 					if ($detalle['id_moneda'] != $this->fields['opc_moneda_total'] && Conf::GetConf($this->sesion, 'MontoGastoOriginalSiMonedaDistinta')) {

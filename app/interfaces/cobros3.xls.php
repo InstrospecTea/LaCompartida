@@ -31,8 +31,7 @@ $mostrar_tarifa_al_profesional = Conf::GetConf($sesion, 'MostrarTarifaAlProfesio
 
 $wb = new WorkbookMiddleware();
 header('Set-Cookie: fileDownload=true; path=/');
-$wb->setVersion(8);
-$wb->send('Revisión de horas.xls');
+$wb->send('Revisión de horas');
 $wb->setCustomColor(35, 220, 255, 220);
 $wb->setCustomColor(36, 255, 255, 220);
 
@@ -186,9 +185,11 @@ $PdfLinea2 = Conf::GetConf($sesion, 'PdfLinea2');
 $info_usr1 = str_replace('<br>', ' - ', $PdfLinea1);
 $ws->write(1, 0, $info_usr1, $encabezado);
 $ws->mergeCells(1, 0, 1, 9);
+$ws->setRow(1, 14);
 $info_usr = str_replace('<br>', ' - ', $PdfLinea2);
 $ws->write(2, 0, utf8_decode($info_usr), $encabezado);
 $ws->mergeCells(2, 0, 2, 9);
+$ws->setRow(2, 14);
 
 $fila_inicial = 4;
 

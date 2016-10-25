@@ -6,8 +6,7 @@
 
 	$wb = new WorkbookMiddleware();
 	header('Set-Cookie: fileDownload=true; path=/');
-	$wb->setVersion(8);
-	$wb->send('Revisión de cobros.xls');
+	$wb->send('Revisión de cobros');
 	$wb->setCustomColor(35, 220, 255, 220);
 	$wb->setCustomColor(36, 255, 255, 220);
 
