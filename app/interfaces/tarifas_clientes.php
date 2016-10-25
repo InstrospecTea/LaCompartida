@@ -57,7 +57,8 @@
 											->add_from('prm_moneda')
 											->add_ordering('id_moneda')
 											->run();
-		$ws->write($fila_inicial, $columna_fin, __('Categoria'));
+
+		$ws->write($fila_inicial, $columna_fin, $listar == 1 ? __('Categoría') : __('Profesional'));
 		$ws->setColumn(0, 0, 70);
 
 		foreach ($monedas as $moneda) {
@@ -70,76 +71,79 @@
 		$columna_fin = PHPExcel_Cell::stringFromColumnIndex($columna_fin);
 		$wb->workSheetObj->getStyle("A{$fila}:{$columna_fin}{$fila}")->applyFromArray($cabecera);
 
-		// Categorías
-		$categorias = new Criteria($sesion);
-		$categorias = $categorias->add_select('categoria_tarifa.id_categoria_usuario')
-													->add_select('TRIM(prm_categoria_usuario.glosa_categoria)', 'glosa_categoria')
-													->add_select('categoria_tarifa.id_moneda')
-													->add_select('categoria_tarifa.tarifa')
-													->add_from('prm_categoria_usuario')
-													->add_inner_join_with('categoria_tarifa', CriteriaRestriction::equals('categoria_tarifa.id_categoria_usuario', 'prm_categoria_usuario.id_categoria_usuario'))
-													->add_restriction(CriteriaRestriction::equals('categoria_tarifa.id_tarifa', $id_tarifa))
-													->add_ordering('glosa_categoria')
-													->run();
+		if ($listar == 1) {
+			// Categorías
+			$categorias = new Criteria($sesion);
+			$categorias = $categorias->add_select('categoria_tarifa.id_categoria_usuario')
+														->add_select('TRIM(prm_categoria_usuario.glosa_categoria)', 'glosa_categoria')
+														->add_select('categoria_tarifa.id_moneda')
+														->add_select('categoria_tarifa.tarifa')
+														->add_from('prm_categoria_usuario')
+														->add_inner_join_with('categoria_tarifa', CriteriaRestriction::equals('categoria_tarifa.id_categoria_usuario', 'prm_categoria_usuario.id_categoria_usuario'))
+														->add_restriction(CriteriaRestriction::equals('categoria_tarifa.id_tarifa', $id_tarifa))
+														->add_ordering('glosa_categoria')
+														->run();
 
-		$categorias_tarifa = [];
+			$categorias_tarifa = [];
 
-		foreach ($categorias as $categoria) {
-			$categorias_tarifa[$categoria['id_categoria_usuario']][] = [
-				'glosa_categoria' => $categoria['glosa_categoria'],
-				'tarifa' => $categoria['tarifa'],
-				'id_moneda' => $categoria['id_moneda']
-			];
-		}
-
-		$fila_inicio = $fila_inicial + 1;
-		foreach ($categorias_tarifa as $categorias) {
-			++$fila_inicial;
 			foreach ($categorias as $categoria) {
-				$ws->write($fila_inicial, 0, $categoria['glosa_categoria']);
-				$ws->write($fila_inicial, $columna_monedas[$categoria['id_moneda']], $categoria['tarifa']);
+				$categorias_tarifa[$categoria['id_categoria_usuario']][] = [
+					'glosa_categoria' => $categoria['glosa_categoria'],
+					'tarifa' => $categoria['tarifa'],
+					'id_moneda' => $categoria['id_moneda']
+				];
+			}
+
+			$fila_inicio = $fila_inicial + 1;
+			foreach ($categorias_tarifa as $categorias) {
+				++$fila_inicial;
+				foreach ($categorias as $categoria) {
+					$ws->write($fila_inicial, 0, $categoria['glosa_categoria']);
+					$ws->write($fila_inicial, $columna_monedas[$categoria['id_moneda']], $categoria['tarifa']);
+				}
+			}
+		} else if ($listar == 2) {
+			// Sección Usuarios
+			$usuarios = new Criteria($sesion);
+			$usuarios = $usuarios->add_select('usuario_tarifa.id_usuario')
+												->add_select("CONCAT_WS(' ', TRIM(usuario.apellido1), TRIM(usuario.apellido2), TRIM(usuario.nombre))", 'nombre_usuario')
+												->add_select("IF(usuario_tarifa.tarifa > 0,usuario_tarifa.tarifa,'')", 'tarifa')
+												->add_select('usuario_tarifa.id_moneda')
+												->add_from('usuario_tarifa')
+												->add_inner_join_with('usuario', CriteriaRestriction::equals('usuario_tarifa.id_usuario', 'usuario.id_usuario'))
+												->add_inner_join_with('usuario_permiso', CriteriaRestriction::equals('usuario_permiso.id_usuario', 'usuario_tarifa.id_usuario'))
+												->add_restriction(CriteriaRestriction::and_clause(
+													CriteriaRestriction::equals('usuario_tarifa.id_tarifa', $id_tarifa),
+													CriteriaRestriction::equals('usuario.visible', 1),
+													CriteriaRestriction::equals('usuario_permiso.codigo_permiso', "'PRO'")
+												))
+												->add_ordering('nombre_usuario')
+												->add_ordering('usuario_tarifa.id_moneda')
+												->run();
+
+			$usuarios_tarifa = [];
+
+			foreach ($usuarios as $usuario) {
+				$usuarios_tarifa[$usuario['id_usuario']][] = [
+					'nombre' => $usuario['nombre_usuario'],
+					'tarifa' => $usuario['tarifa'],
+					'id_moneda' => $usuario['id_moneda']
+				];
+			}
+
+			$fila_inicio = $fila_inicial + 1;
+			foreach ($usuarios_tarifa as $tarifas) {
+				++$fila_inicial;
+				foreach ($tarifas as $tarifa) {
+					$ws->write($fila_inicial, 0, $tarifa['nombre']);
+					$ws->write($fila_inicial, $columna_monedas[$tarifa['id_moneda']], $tarifa['tarifa']);
+				}
 			}
 		}
 
 		$fila_fin = $fila_inicial + 1;
 		$wb->workSheetObj->getStyle("A{$fila_inicio}:A{$fila_fin}")->applyFromArray($texto);
 		$wb->workSheetObj->getStyle("B{$fila_inicio}:{$columna_fin}{$fila_fin}")->applyFromArray($texto);
-
-		// Sección Usuarios
-		// $usuarios = new Criteria($sesion);
-		// $usuarios = $usuarios->add_select('usuario_tarifa.id_usuario')
-		// 									->add_select("CONCAT_WS(' ', TRIM(usuario.apellido1), TRIM(usuario.apellido2), TRIM(usuario.nombre))", 'nombre_usuario')
-		// 									->add_select("IF(usuario_tarifa.tarifa > 0,usuario_tarifa.tarifa,'')", 'tarifa')
-		// 									->add_select('usuario_tarifa.id_moneda')
-		// 									->add_from('usuario_tarifa')
-		// 									->add_inner_join_with('usuario', CriteriaRestriction::equals('usuario_tarifa.id_usuario', 'usuario.id_usuario'))
-		// 									->add_inner_join_with('usuario_permiso', CriteriaRestriction::equals('usuario_permiso.id_usuario', 'usuario_tarifa.id_usuario'))
-		// 									->add_restriction(CriteriaRestriction::and_clause(
-		// 										CriteriaRestriction::equals('usuario_tarifa.id_tarifa', $id_tarifa),
-		// 										CriteriaRestriction::equals('usuario.visible', 1),
-		// 										CriteriaRestriction::equals('usuario_permiso.codigo_permiso', "'PRO'")
-		// 									))
-		// 									->add_ordering('nombre_usuario')
-		// 									->add_ordering('usuario_tarifa.id_moneda')
-		// 									->run();
-		//
-		// $usuarios_tarifa = [];
-		//
-		// foreach ($usuarios as $usuario) {
-		// 	$usuarios_tarifa[$usuario['id_usuario']][] = [
-		// 		'nombre' => $usuario['nombre_usuario'],
-		// 		'tarifa' => $usuario['tarifa'],
-		// 		'id_moneda' => $usuario['id_moneda']
-		// 	];
-		// }
-		//
-		// foreach ($usuarios_tarifa as $tarifas) {
-		// 	++$fila_inicial;
-		// 	foreach ($tarifas as $tarifa) {
-		// 		$ws->write($fila_inicial, 0, $tarifa['nombre']);
-		// 		$ws->write($fila_inicial, $columna_monedas[$tarifa['id_moneda']], $tarifa['tarifa']);
-		// 	}
-		// }
 
 		// Sección Clientes
 		$clientes = new Criteria($sesion);

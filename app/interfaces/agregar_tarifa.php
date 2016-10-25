@@ -142,18 +142,20 @@ $fecha_tarifa = $Criteria;
 
 		jQuery('[name="descarga_tarifa"]').on('change', function() {
 			if (jQuery('[name="descarga_tarifa"]:checked').val() == 1) {
-				jQuery('#por_anho_tr').hide();
+				jQuery('#por_anho_div').hide();
 				var onclick = "self.location.href = 'tarifas_xls.php?id_tarifa_edicion=<?= $id_tarifa_edicion ?>&glosa=<?= $tarifa->fields['glosa_tarifa'] ?>'";
 				jQuery('#descargar_excel_tarifas').attr('onclick', onclick);
 			} else {
-				jQuery('#por_anho_tr').show();
-				var onclick = "self.location.href = 'tarifas_clientes.php?por_anho=" + jQuery('[name="por_anho"] option:selected').val() + "'";
+				jQuery('#por_anho_div').css({display: 'inline-block'});
+				var por_anho = jQuery('[name="por_anho"] option:selected').val();
+				var listar = jQuery('[name="listar"] option:selected').val();
+				var onclick = "self.location.href = 'tarifas_clientes.php?por_anho=" + por_anho + "&listar=" + listar + "'";
 				jQuery('#descargar_excel_tarifas').attr('onclick', onclick);
 			}
 		});
 
 		jQuery('[name="descarga_tarifa"]').trigger('change');
-		jQuery('[name="por_anho"]').on('change', function() {
+		jQuery('[name="por_anho"], [name="listar"]').on('change', function() {
 			jQuery('[name="descarga_tarifa"]').trigger('change');
 		});
 	});
@@ -307,21 +309,19 @@ $fecha_tarifa = $Criteria;
 		<tr align="right">
 			<td colspan="<?= $colspan + 1 ?>">
 				<button type="button" class="btn" id="descargar_excel_tarifas"><?= __('Descargar Tarifa') ?></button>
-			</td>
-		</tr>
-		<tr align="right">
-			<td colspan="<?= $colspan + 1 ?>">
 				<label><input type="radio" name="descarga_tarifa" value="1" checked="checked"> <?= __('Actual') ?></label>
-				<label title="<?= __('Exporta todas las tarifas según categoría a un Excel. Incluye los contratos que están afectos a cada una.') ?>"><input type="radio" name="descarga_tarifa" value="2"> Por Año</label>
-			</td>
-		</tr>
-		<tr align="right" id="por_anho_tr" style="display:none;">
-			<td colspan="<?= $colspan + 1 ?>">
-				<select name="por_anho">
-					<?php foreach ($fecha_tarifa as $year): ?>
-						<option value="<?= $year['fecha_creacion'] ?>" <?= $year['fecha_creacion'] == date('Y') ? 'selected' : '' ?>><?= $year['fecha_creacion'] ?></option>
-					<?php endforeach; ?>
-				</select>
+				<label title="<?= __('Exporta todas las tarifas según categoría a un Excel. Incluye los contratos que están afectos a cada una.') ?>"><input type="radio" name="descarga_tarifa" value="2"><?= __('Por Año') ?></label>
+				<div id="por_anho_div" style="display:none;">
+					<select name="por_anho">
+						<?php foreach ($fecha_tarifa as $year): ?>
+							<option value="<?= $year['fecha_creacion'] ?>" <?= $year['fecha_creacion'] == date('Y') ? 'selected' : '' ?>><?= $year['fecha_creacion'] ?></option>
+						<?php endforeach; ?>
+					</select>
+					<select name="listar">
+						<option value="1" selected="selected"><?= __('Listar Categorías') ?></option>
+						<option value="2"><?= __('Listar Profesionales') ?></option>
+					</select>
+				</div>
 			</td>
 		</tr>
 		<?php } ?>
