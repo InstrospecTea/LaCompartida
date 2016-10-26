@@ -1,6 +1,6 @@
 <?php
 
-abstract class Format {
+class Format {
 
 	static private $currencies = array();
 	static private $languages = array();
