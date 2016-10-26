@@ -134,7 +134,7 @@ $options = [
 	'title' => [
 		'display' => true,
 		'fontSize' => 14,
-		'text' => Encode::utf8(__($titulo))
+		'text' => Convert::utf8(__($titulo))
 	],
 	'scales' => [
 		'xAxes' => [[

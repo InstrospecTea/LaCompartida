@@ -56,7 +56,7 @@
 
 	foreach ($respuesta as $i => $fila) {
 		$asunto[] = $fila['codigo_asunto'];
-		$glosa_asunto[] = [Encode::utf8($fila['glosa_asunto'])];
+		$glosa_asunto[] = [Convert::utf8($fila['glosa_asunto'])];
 		$tiempo[] = $fila['tiempo'];
 		$tiempo_formateado = Format::number(floatval($fila['tiempo']));
 		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];

@@ -55,7 +55,7 @@
 
 	foreach ($respuesta as $i => $value) {
 		$empleado[] = $value['username'];
-		$nombre_empleado[] = [Encode::utf8($value['usuario'])];
+		$nombre_empleado[] = [Convert::utf8($value['usuario'])];
 		$tiempo[] = $value['tiempo'];
 		$tiempo_formateado = Format::number(floatval($value['tiempo']));
 		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];

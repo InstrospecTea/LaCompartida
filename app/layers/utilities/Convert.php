@@ -1,6 +1,6 @@
 <?php
 
-class Encode {
+class Convert {
 	/**
 	 * Convierte cada llave-valor en UTF-8 cuando corresponda, el parámetro
 	 * $encode permite realizar la acción inversa
