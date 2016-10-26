@@ -474,9 +474,7 @@ class Documento extends Objeto {
 								FROM neteo_documento AS n
 								JOIN documento AS d ON d.id_documento = n.id_documento_pago
 								WHERE n.id_documento_cobro ='" . $this->fields['id_documento'] . "'";
-		}
-		else
-		{
+		} else {
 			// Todos los documentos asociados al cobro de 'this', sin neteo
 			$query = "SELECT d.id_documento AS id, d.honorarios, d.subtotal_gastos AS gastos, d.pago_retencion, d.es_adelanto
 								FROM documento AS d
