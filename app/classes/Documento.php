@@ -504,7 +504,7 @@ class Documento extends Objeto {
 
 		$Form = new Form();
 		$Html = &$Form->Html;
-		foreach ($pagos as &$pago) {
+		foreach ($pagos as $pago) {
 			list($id, $honorarios, $gastos, $pago_retencion, $es_adelanto) = array_values($pago);
 			if (!$id) {
 				continue;
