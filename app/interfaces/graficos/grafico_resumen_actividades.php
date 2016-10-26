@@ -37,6 +37,7 @@ if (is_null($datos)) {
 $labels = [];
 foreach ($datos as $key => $value) {
 	$percentage = round((($value / $total) * 100), 2);
+	$percentage = Format::number($percentage);
 	$value_formated = Format::number(floatval($value));
 	$labels[] = "{$key}: {$value_formated} Hrs. ({$percentage}%)";
 	$labels_tooltips[] = ["{$key}: {$value_formated} Hrs. ({$percentage}%)"];

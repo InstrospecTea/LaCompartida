@@ -356,6 +356,7 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato, $id_moneda) {
 
 	foreach ($datos as $key => $value) {
 		$percentage = round(((floatval($value) / $total) * 100), 2);
+		$percentage = Format::number($percentage);
 		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
 			$leyend_value = Format::number(floatval($value));
 		} else {
