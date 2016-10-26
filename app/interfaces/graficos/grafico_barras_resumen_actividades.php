@@ -134,7 +134,7 @@ $options = [
 	'title' => [
 		'display' => true,
 		'fontSize' => 14,
-		'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? __($titulo) : utf8_encode(__($titulo))
+		'text' => Encode::utf8(__($titulo))
 	],
 	'scales' => [
 		'xAxes' => [[

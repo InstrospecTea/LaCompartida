@@ -63,7 +63,7 @@
 
 	foreach ($respuesta as $i => $fila) {
 		$cliente[] = $fila['codigo_cliente'];
-		$glosa_cliente[] = mb_detect_encoding($fila['glosa_cliente'], 'UTF-8', true) === 'UTF-8' ? [$fila['glosa_cliente']] : [utf8_encode($fila['glosa_cliente'])];
+		$glosa_cliente[] = [Encode::utf8($fila['glosa_cliente'])];
 		$tiempo[] = $fila['tiempo'];
 		$tiempo_formateado = Format::number(floatval($fila['tiempo']));
 		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];

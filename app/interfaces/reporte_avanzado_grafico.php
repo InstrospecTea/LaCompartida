@@ -315,7 +315,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		'title' => [
 			'display' => true,
 			'fontSize' => 14,
-			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+			'text' => Encode::utf8($titulo)
 		],
 		'scales' => [
 			'xAxes' => [[
@@ -347,7 +347,7 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato, $id_moneda) {
 	->setHoverBorderColor(255, 255, 255, 0);
 
 	array_walk($labels, function(&$labels) {
-		$labels = mb_detect_encoding($labels, 'UTF-8', true) ? $labels : utf8_encode($labels);
+		$labels = Encode::utf8($labels);
 	});
 
 	$labels_leyend = [];
@@ -377,7 +377,7 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato, $id_moneda) {
 		'title' => [
 			'display' => true,
 			'fontSize' => 14,
-			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+			'text' => Encode::utf8($titulo)
 		],
 		'tooltips' => [
 			'mode' => 'label',
@@ -510,7 +510,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 		'title' => [
 			'display' => true,
 			'fontSize' => 14,
-			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+			'text' => Encode::utf8($titulo)
 		],
 		'scales' => [
 			'yAxes' => $yAxes
@@ -536,7 +536,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 function getDatatypes($datatype, $sesion, $id_currency) {
 	$s_datatype = Reporte::sTipoDato($datatype);
 	$symbol_datatype = Reporte::simboloTipoDato($datatype, $sesion, $id_currency);
-	$symbol_datatype = mb_detect_encoding($symbol_datatype, 'UTF-8', true) ? $symbol_datatype : utf8_encode($symbol_datatype);
+	$symbol_datatype = Encode::utf8($symbol_datatype);
 
 	return array(
 		'datatype' => $s_datatype,

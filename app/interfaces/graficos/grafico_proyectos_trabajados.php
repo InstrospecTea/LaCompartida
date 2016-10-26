@@ -43,7 +43,7 @@
 		$tiempo_formateado = Format::number(floatval($fila['tiempo']));
 		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
 		$labels[] = $fila['codigo_asunto'];
-		$fila['glosa_asunto'] = mb_detect_encoding($fila['glosa_asunto'], 'UTF-8', true) === 'UTF-8' ? $fila['glosa_asunto'] : utf8_encode($fila['glosa_asunto']);
+		$fila['glosa_asunto'] = Encode::utf8($fila['glosa_asunto']);
 		$glosa_asunto[] = [
 			__('Cliente') . ': ' . $fila['codigo_cliente'],
 			__('Asunto')  . ': ' . $fila['glosa_asunto']
@@ -79,7 +79,7 @@
 		'title' => [
 			'display' => true,
 			'fontSize' => 14,
-			'text' => mb_detect_encoding($titulo, 'UTF-8', true) === 'UTF-8' ? $titulo : utf8_encode($titulo)
+			'text' => Encode::utf8($titulo)
 		],
 		'scales' => [
 			'xAxes' => [[
