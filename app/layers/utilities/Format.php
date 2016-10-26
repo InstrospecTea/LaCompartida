@@ -14,7 +14,7 @@ class Format {
 
 		$output = number_format(
 			$number,
-			self::getDecimals($number),
+			self::getLengthDecimals($number),
 			$lenguage->fields['separador_decimales'],
 			$lenguage->fields['separador_miles']
 		);
@@ -53,9 +53,11 @@ class Format {
 		self::$languages[$id_language] = $language;
 	}
 
-	private function getDecimals($number) {
-		$array_number = explode(',', strval($number));
-		return strlen($array_number[1]);
+	private function getLengthDecimals($number) {
+		preg_match("/\d+(?:,|.)(\d+)/", $number, $array_number);
+		$decimals = $array_number[1];
+
+		return $decimals == 0 ? 0 : strlen($decimals);
 	}
 
 }
