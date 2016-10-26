@@ -467,23 +467,45 @@ class Documento extends Objeto {
 	}
 
 	function ListaPagos() {
+		$Criteria = new Criteria($this->sesion);
 		$out = '';
-		$query = "SELECT neteo_documento.id_documento_pago AS id, valor_cobro_honorarios as honorarios, valor_cobro_gastos as gastos, pago_retencion, es_adelanto
-					FROM neteo_documento
-					JOIN documento ON documento.id_documento=neteo_documento.id_documento_pago
-					WHERE neteo_documento.id_documento_cobro ='" . $this->fields['id_documento'] . "'
-				UNION
-					SELECT id_documento AS id, honorarios, subtotal_gastos AS gastos, pago_retencion, es_adelanto
-					FROM documento left join neteo_documento on  documento.id_documento=neteo_documento.id_documento_pago
-					WHERE  tipo_doc !=  'N'
-					AND neteo_documento.id_neteo_documento IS NULL
-					AND id_cobro ='" . $this->fields['id_cobro'] . "'";
-
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+		$pagos;
+		if (Conf::read('NuevoModuloFactura')) {
+			// Todos los neteos en donde 'this' figura como documento_cobro
+			$pagos = $Criteria
+				->add_select('neteo_documento.id_documento_pago', 'id')
+				->add_select('neteo_documento.valor_cobro_honorarios', 'honorarios')
+				->add_select('neteo_documento.valor_cobro_gastos', 'gastos')
+				->add_select('documento.pago_retencion')
+				->add_select('documento.es_adelanto')
+				->add_from('neteo_documento')
+				->add_custom_join_with('documento', 'documento.id_documento = neteo_documento.id_documento_pago', '')
+				->add_restriction(CriteriaRestriction::equals('neteo_documento.id_documento_cobro', $this->fields['id_documento']))
+				->run();
+		} else {
+			// Todos los documentos sin neteo asociados al cobro de 'this',
+			$pagos = $Criteria
+				->add_select('documento.id_documento', 'id')
+				->add_select('documento.honorarios')
+				->add_select('documento.subtotal_gastos', 'gastos')
+				->add_select('documento.pago_retencion')
+				->add_select('documento.es_adelanto')
+				->add_from('documento')
+				->add_left_join_with('neteo_documento', 'documento.id_documento = neteo_documento.id_documento_pago')
+				->add_restriction(
+					CriteriaRestriction::and_clause(
+						CriteriaRestriction::not_equal('documento.tipo_doc', '"N"'),
+						CriteriaRestriction::is_null('neteo_documento.id_neteo_documento'),
+						CriteriaRestriction::equals('documento.id_cobro', $this->fields['id_cobro'])
+					)
+				)
+				->run();
+		}
 
 		$Form = new Form();
 		$Html = &$Form->Html;
-		while (list($id, $honorarios, $gastos, $pago_retencion, $es_adelanto) = mysql_fetch_array($resp)) {
+		foreach ($pagos as &$pago) {
+			list($id, $honorarios, $gastos, $pago_retencion, $es_adelanto) = array_values($pago);
 			if (!$id) {
 				continue;
 			}
