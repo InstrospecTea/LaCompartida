@@ -13,8 +13,8 @@ class Encode {
 			foreach ($data as $key => $value) {
 				// Previene doble codificación
 				unset($data[$key]);
-				$key = self::utf8izar($key, $encode);
-				$data[$key] = self::utf8izar($value, $encode);
+				$key = self::utf8($key, $encode);
+				$data[$key] = self::utf8($value, $encode);
 			}
 		} else if (is_string($data)) {
 			// ^ = XOR = or exclusivo = true && false || false && true
