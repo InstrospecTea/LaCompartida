@@ -591,7 +591,7 @@ function Refrescar() {
 						</td>
 						<td align="left" nowrap>
 							<?php echo __('Correlativo') ?>&nbsp;
-							<input onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" size="6" name="correlativo" id="correlativo" value="<?php echo $correlativo ?>">
+							<input onkeydown="if (event.keyCode == 13)BuscarGastos(this.form, 'buscar')" type="text" size="6" name="id_movimiento" id="id_movimiento" value="<?php echo $id_movimiento ?>">
 						</td>
 						<td align="left" nowrap>
 							<?php echo __('id_cobro') ?>&nbsp;
