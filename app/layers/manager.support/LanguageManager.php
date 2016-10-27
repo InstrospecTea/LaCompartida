@@ -9,9 +9,9 @@ class LanguageManager extends AbstractManager implements BaseManager {
 
 	public function getById($language_id) {
 		try {
-			$language = $this->LanguageService->findFirst(CriteriaRestriction::equals('id_idioma', "'{$language_id}'"));
+			$language = $this->LanguageService->get($language_id);
 		} catch (EntityNotFound $e) {
-			$language = null;
+			$language = $this->LanguageService->newEntity();
 		}
 
 		return $language;

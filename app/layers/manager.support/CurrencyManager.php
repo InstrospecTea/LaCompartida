@@ -33,9 +33,9 @@ class CurrencyManager extends AbstractManager implements BaseManager {
 
 	public function getById($id_currency) {
 		try {
-			$currency = $this->CurrencyService->findFirst(CriteriaRestriction::equals('id_moneda', "'{$id_currency}'"));
+			$currency = $this->CurrencyService->get($id_currency);
 		} catch (EntityNotFound $e) {
-			$currency = null;
+			$currency = $this->CurrencyService->newEntity();
 		}
 
 		return $currency;

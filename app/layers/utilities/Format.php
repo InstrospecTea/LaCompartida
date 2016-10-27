@@ -15,8 +15,8 @@ class Format {
 		$output = number_format(
 			$number,
 			self::getLengthDecimals($number),
-			$lenguage->fields['separador_decimales'],
-			$lenguage->fields['separador_miles']
+			$lenguage->get('separador_decimales'),
+			$lenguage->get('separador_miles')
 		);
 
 		return $output;
@@ -31,9 +31,9 @@ class Format {
 
 		$output = number_format(
 			$number,
-			$currency->fields['cifras_decimales'],
-			$currency->fields['separador_decimales'],
-			$currency->fields['separador_miles']
+			$currency->get('cifras_decimales'),
+			$currency->get('separador_decimales'),
+			$currency->get('separador_miles')
 		);
 
 		return $output;
