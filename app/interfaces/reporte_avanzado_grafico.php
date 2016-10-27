@@ -182,7 +182,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 	$datatypes = getDatatypes($tipo_dato, $sesion, $id_moneda);
 	foreach ($datos as $key => $value) {
 		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
-			$leyend_value = Format::number(floatval($value));
+			$leyend_value = Format::number($value);
 			$language_code = strtolower(UtilesApp::GetConf($sesion, 'Idioma'));
 			$language = $LanguageManager->getByCode($language_code);
 			$separators = [
@@ -190,7 +190,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 				'miles' => $language->get('separador_miles')
 			];
 		} else {
-			$leyend_value = Format::currency(floatval($value), $id_moneda);
+			$leyend_value = Format::currency($value, $id_moneda);
 			$currency = $CurrencyManager->getById($id_moneda);
 			$separators = [
 				'decimales' => $currency->get('separador_decimales'),
@@ -261,7 +261,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		$datatypes = getDatatypes($tipo_dato_comparado, $sesion, $id_moneda);
 		foreach ($datos_comparados as $key => $value) {
 			if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
-				$leyend_value = Format::number(floatval($value));
+				$leyend_value = Format::number($value);
 				$language_code = strtolower(UtilesApp::GetConf($sesion, 'Idioma'));
 				$language = $LanguageManager->getByCode($language_code);
 				$separators = [
@@ -269,7 +269,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 					'miles' => $language->get('separador_miles')
 				];
 			} else {
-				$leyend_value = Format::currency(floatval($value), $id_moneda);
+				$leyend_value = Format::currency($value, $id_moneda);
 				$currency = $CurrencyManager->getById($id_moneda);
 				$separators = [
 					'decimales' => $currency->get('separador_decimales'),
@@ -360,9 +360,9 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato, $id_moneda) {
 		$percentage = round(((floatval($value) / $total) * 100), 2);
 		$percentage = Format::number($percentage);
 		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
-			$leyend_value = Format::number(floatval($value));
+			$leyend_value = Format::number($value);
 		} else {
-			$leyend_value = Format::currency(floatval($value), $id_moneda);
+			$leyend_value = Format::currency($value, $id_moneda);
 		}
 
 		$labels_leyend[] = "{$labels[$key]}: {$leyend_value} {$datatypes['symbol_datatype']} ({$percentage}%)";
@@ -416,7 +416,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 	$datatypes = getDatatypes($tipo_dato, $sesion, $id_moneda);
 	foreach ($datos as $key => $value) {
 		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
-			$leyend_value = Format::number(floatval($value));
+			$leyend_value = Format::number($value);
 			$language_code = strtolower(UtilesApp::GetConf($sesion, 'Idioma'));
 			$language = $LanguageManager->getByCode($language_code);
 			$separators = [
@@ -424,7 +424,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 				'miles' => $language->get('separador_miles')
 			];
 		} else {
-			$leyend_value = Format::currency(floatval($value), $id_moneda);
+			$leyend_value = Format::currency($value, $id_moneda);
 			$currency = $CurrencyManager->getById($id_moneda);
 			$separators = [
 				'decimales' => $currency->get('separador_decimales'),
@@ -445,7 +445,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 	$datatypes_comparado = getDatatypes($tipo_dato_comparado, $sesion, $id_moneda);
 	foreach ($datos_comparados as $key => $value) {
 		if (strcmp($datatypes_comparado['datatype'], 'Hr.') === 0) {
-			$leyend_value = Format::number(floatval($value));
+			$leyend_value = Format::number($value);
 			$language_code = strtolower(UtilesApp::GetConf($sesion, 'Idioma'));
 			$language = $LanguageManager->getByCode($language_code);
 			$separators_comparado = [
@@ -453,7 +453,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 				'miles' => $language->get('separador_miles')
 			];
 		} else {
-			$leyend_value = Format::currency(floatval($value), $id_moneda);
+			$leyend_value = Format::currency($value, $id_moneda);
 			$currency = $CurrencyManager->getById($id_moneda);
 			$separators_comparado = [
 				'decimales' => $currency->get('separador_decimales'),

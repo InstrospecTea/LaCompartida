@@ -51,7 +51,7 @@ $grafico->setNameChart($titulo)
 $LanguageManager = new LanguageManager($Sesion);
 
 foreach ($datos as $key => $value) {
-	$leyend_value = Format::number(floatval($value));
+	$leyend_value = Format::number($value);
 	$language_code = strtolower(UtilesApp::GetConf($Sesion, 'Idioma'));
 	$language = $LanguageManager->getByCode($language_code);
 	$separators = [
@@ -91,7 +91,7 @@ if ($datos_comparados) {
 	  ->setData($datos_comparados);
 
 	foreach ($datos_comparados as $key => $value) {
-		$leyend_value = Format::number(floatval($value));
+		$leyend_value = Format::number($value);
 		$language_code = strtolower(UtilesApp::GetConf($Sesion, 'Idioma'));
 		$language = $LanguageManager->getByCode($language_code);
 		$separators = [

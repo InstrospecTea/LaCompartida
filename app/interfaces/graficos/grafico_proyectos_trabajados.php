@@ -40,7 +40,7 @@
 
 	foreach ($respuesta as $i => $fila) {
 		$tiempo[] = $fila['tiempo'];
-		$tiempo_formateado = Format::number(floatval($fila['tiempo']));
+		$tiempo_formateado = Format::number($fila['tiempo']);
 		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
 		$labels[] = $fila['codigo_asunto'];
 		$fila['glosa_asunto'] = Convert::utf8($fila['glosa_asunto']);

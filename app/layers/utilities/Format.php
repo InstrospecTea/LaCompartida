@@ -18,8 +18,8 @@ class Format {
 		$lenguage = self::$languages[$id_language];
 
 		$output = number_format(
-			$number,
-			self::getLengthDecimals($number),
+			floatval($number),
+			self::getLengthDecimals(floatval($number)),
 			$lenguage->get('separador_decimales'),
 			$lenguage->get('separador_miles')
 		);
@@ -35,7 +35,7 @@ class Format {
 		$currency = self::$currencies[$id_currency];
 
 		$output = number_format(
-			$number,
+			floatval($number),
 			$currency->get('cifras_decimales'),
 			$currency->get('separador_decimales'),
 			$currency->get('separador_miles')

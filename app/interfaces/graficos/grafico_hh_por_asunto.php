@@ -58,7 +58,7 @@
 		$asunto[] = $fila['codigo_asunto'];
 		$glosa_asunto[] = [Convert::utf8($fila['glosa_asunto'])];
 		$tiempo[] = $fila['tiempo'];
-		$tiempo_formateado = Format::number(floatval($fila['tiempo']));
+		$tiempo_formateado = Format::number($fila['tiempo']);
 		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
 		$total_tiempo += $fila['tiempo'];
 	}

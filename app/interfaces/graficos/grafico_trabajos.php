@@ -227,7 +227,7 @@ if (is_null($duracion)) {
 }
 
 foreach ($duracion as $value) {
-	$tiempo_formateado = Format::number(floatval($value));
+	$tiempo_formateado = Format::number($value);
 	$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
 }
 
@@ -272,7 +272,7 @@ if ($comparar) {
 	array_walk($duracion_comparada,'fixNumber');
 
 	foreach ($duracion_comparada as $value) {
-		$tiempo_formateado = Format::number(floatval($value));
+		$tiempo_formateado = Format::number($value);
 		$tiempo_comparado_tooltip[] = ["{$tiempo_formateado} Hrs."];
 	}
 

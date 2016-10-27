@@ -57,7 +57,7 @@
 		$empleado[] = $value['username'];
 		$nombre_empleado[] = [Convert::utf8($value['usuario'])];
 		$tiempo[] = $value['tiempo'];
-		$tiempo_formateado = Format::number(floatval($value['tiempo']));
+		$tiempo_formateado = Format::number($value['tiempo']);
 		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
 		$total_tiempo += $value['tiempo'];
 	}
