@@ -154,6 +154,7 @@ $CellFormat->add('resumen_rentabilidad', [
 ]);
 $CellFormat->add('porcentaje_rentabilidad', [
 	'Size' => 10,
+	'Align' => 'right',
 	'VAlign' => 'top',
 	'Top' => 2,
 	'Right' => 2,
@@ -874,9 +875,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->write($filas, $col_fecha, Utiles::sql2date($trabajo->fields['fecha'], $idioma->fields['formato_fecha']), $CellFormat->get('normal'));
 					if (!$opc_ver_asuntos_separados) {
 						if (UtilesApp::GetConf($sesion, 'TipoCodigoAsunto') == 2) {
-							$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], -3), $CellFormat->get('descripcion'));
+							$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto'], -3), $CellFormat->get('descripcion'));
 						} else {
-							$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto_secundario'], -4), $CellFormat->get('descripcion'));
+							$ws->write($filas, $col_asunto, substr($trabajo->fields['codigo_asunto'], -4), $CellFormat->get('descripcion'));
 						}
 					}
 					$ws->write($filas, $col_descripcion, str_replace("\r", '', stripslashes($trabajo->fields['descripcion'])), $CellFormat->get('descripcion'));
@@ -1012,6 +1013,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$ws->write($filas, $col_tarifa_hh, '', $CellFormat->get('total'));
 				$ws->writeFormula($filas, $col_valor_trabajo, "=SUM($col_formula_valor_trabajo$primera_fila_asunto:$col_formula_valor_trabajo$filas)", $CellFormat->get('moneda_total'));
 				$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, "=SUM($col_formula_valor_trabajo_flat_fee$primera_fila_asunto:$col_formula_valor_trabajo_flat_fee$filas)", $CellFormat->get('moneda_total'));
+				$celda_total_valor_trabajo = Utiles::NumToColumnaExcel($col_valor_trabajo) . ($filas + 1);
+				$celda_total_valor_trabajo_flat_fee = Utiles::NumToColumnaExcel($col_valor_trabajo_flat_fee) . ($filas + 1);
 				$filas += 2;
 			}
 
@@ -1174,12 +1177,20 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->mergeCells($filas, $col_tarifa_hh, $filas, $col_valor_trabajo);
 		$ws->write($filas, $col_tarifa_hh, __('TOTAL POR PACTO:'), $CellFormat->get('resumen_rentabilidad'));
 		$ws->write($filas, $col_valor_trabajo, '', $CellFormat->get('resumen_rentabilidad'));
-		$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, '=' . implode('+', $formula_total_ff), $CellFormat->get('rentabilidad_moneda_total'));
+		if ($opc_ver_asuntos_separados) {
+			$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, '=' . implode('+', $formula_total_ff), $CellFormat->get('rentabilidad_moneda_total'));
+		} else {
+			$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, '=' . $celda_total_valor_trabajo_flat_fee, $CellFormat->get('rentabilidad_moneda_total'));
+		}
 		$filas++;
 		$ws->mergeCells($filas, $col_tarifa_hh, $filas, $col_valor_trabajo);
 		$ws->write($filas, $col_tarifa_hh, __('TOTAL POR HORAS:'), $CellFormat->get('resumen_rentabilidad'));
 		$ws->write($filas, $col_valor_trabajo, '', $CellFormat->get('resumen_rentabilidad'));
-		$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, '=' . implode('+', $formula_total_hh), $CellFormat->get('rentabilidad_moneda_total'));
+		if ($opc_ver_asuntos_separados) {
+			$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, '=' . implode('+', $formula_total_hh), $CellFormat->get('rentabilidad_moneda_total'));
+		} else {
+			$ws->writeFormula($filas, $col_valor_trabajo_flat_fee, '=' . $celda_total_valor_trabajo, $CellFormat->get('rentabilidad_moneda_total'));
+		}
 		$filas++;
 		$ws->mergeCells($filas, $col_tarifa_hh, $filas, $col_valor_trabajo);
 		$ws->write($filas, $col_tarifa_hh, __('Write off / Mark up:'), $CellFormat->get('resumen_rentabilidad'));
