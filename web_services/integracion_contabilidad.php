@@ -1,18 +1,16 @@
-<?
-require_once("lib/nusoap.php");
-require_once("../app/conf.php");
-require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
+<?php
+require_once('../app/conf.php');
 
 apache_setenv("force-response-1.0", "TRUE");
 apache_setenv("downgrade-1.0", "TRUE"); #Esto es lo más importante
 
+if (Conf::read('NuevaLibreriaNusoap')) {
+	require_once('lib2/nusoap.php');
+} else {
+	require_once('lib/nusoap.php');
+}
 
 $ns = "urn:TimeTracking";
-
-#First we must include our NuSOAP library and define the namespace of the service. It is usually recommended that you designate a distinctive URI for each one of your Web services.
-
 
 $server = new soap_server();
 $server->configureWSDL('IntegracionSAPWebServices',$ns);
@@ -627,9 +625,5 @@ function PagoCobro($pagos,$usuario,$password)
 	}
 	return new soap_fault('Client', '','Usuario o contraseña incorrecta.','');
 }
-#Then we invoke the service using the following line of code:
-
 
 $server->service($HTTP_RAW_POST_DATA);
-#In fact, appending "?wsdl" to the end of any PHP NuSOAP server file will dynamically produce WSDL code. Here's how our CanadaTaxCalculator Web service is described using WSDL:
-?>
