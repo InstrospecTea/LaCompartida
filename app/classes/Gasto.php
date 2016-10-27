@@ -445,6 +445,9 @@ class Gasto extends Objeto {
 			$where .= " AND cta_corriente.id_cobro='{$request['id_cobro']}' ";
 		}
 
+		if (!empty($request['id_movimiento'])) {
+			$where .= " AND cta_corriente.id_movimiento='{$request['id_movimiento']}' ";
+		}
 		// Chequeo si alguno de los parametros comienza con ":", ya que puede venir de FacturaProduccion y ser utilizado con PDO->prepare
 		if (strpos($request['fecha1'], ':') === 0) {
 			$fecha1 = $request["fecha1"];
