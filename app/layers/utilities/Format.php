@@ -68,7 +68,7 @@ class Format {
 	private function loadDefaultLanguage() {
 		$Sesion = new Sesion();
 
-		$language_code = strtolower(UtilesApp::GetConf($Sesion, 'Idioma'));
+		$language_code = strtolower(Conf::read('Idioma'));
 		$LanguageManager = new LanguageManager($Sesion);
 		$language = $LanguageManager->getByCode($language_code);
 		$id_language = $language->get('id_idioma');

@@ -183,7 +183,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 	foreach ($datos as $key => $value) {
 		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
 			$leyend_value = Format::number($value);
-			$language_code = strtolower(UtilesApp::GetConf($sesion, 'Idioma'));
+			$language_code = strtolower(Conf::read('Idioma'));
 			$language = $LanguageManager->getByCode($language_code);
 			$separators = [
 				'decimales' => $language->get('separador_decimales'),
@@ -262,7 +262,7 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		foreach ($datos_comparados as $key => $value) {
 			if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
 				$leyend_value = Format::number($value);
-				$language_code = strtolower(UtilesApp::GetConf($sesion, 'Idioma'));
+				$language_code = strtolower(Conf::read('Idioma'));
 				$language = $LanguageManager->getByCode($language_code);
 				$separators = [
 					'decimales' => $language->get('separador_decimales'),
@@ -417,7 +417,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 	foreach ($datos as $key => $value) {
 		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
 			$leyend_value = Format::number($value);
-			$language_code = strtolower(UtilesApp::GetConf($sesion, 'Idioma'));
+			$language_code = strtolower(Conf::read('Idioma'));
 			$language = $LanguageManager->getByCode($language_code);
 			$separators = [
 				'decimales' => $language->get('separador_decimales'),
@@ -446,7 +446,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 	foreach ($datos_comparados as $key => $value) {
 		if (strcmp($datatypes_comparado['datatype'], 'Hr.') === 0) {
 			$leyend_value = Format::number($value);
-			$language_code = strtolower(UtilesApp::GetConf($sesion, 'Idioma'));
+			$language_code = strtolower(Conf::read('Idioma'));
 			$language = $LanguageManager->getByCode($language_code);
 			$separators_comparado = [
 				'decimales' => $language->get('separador_decimales'),

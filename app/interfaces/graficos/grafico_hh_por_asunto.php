@@ -70,7 +70,7 @@
 	}
 
 	$LanguageManager = new LanguageManager($sesion);
-	$language_code = strtolower(UtilesApp::GetConf($sesion, 'Idioma'));
+	$language_code = strtolower(Conf::read('Idioma'));
 	$language = $LanguageManager->getByCode($language_code);
 	$separators = [
 		'decimales' => $language->get('separador_decimales'),
