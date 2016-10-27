@@ -52,10 +52,11 @@ $LanguageManager = new LanguageManager($Sesion);
 
 foreach ($datos as $key => $value) {
 	$leyend_value = Format::number(floatval($value));
-	$language = $LanguageManager->getById(1);
+	$language_code = strtolower(UtilesApp::GetConf($Sesion, 'Idioma'));
+	$language = $LanguageManager->getByCode($language_code);
 	$separators = [
-		'decimales' => $language->fields['separador_decimales'],
-		'miles' => $language->fields['separador_miles']
+		'decimales' => $language->get('separador_decimales'),
+		'miles' => $language->get('separador_miles')
 	];
 
 	$labels_tooltips[] = "{$leyend_value} Hrs.";
@@ -91,10 +92,11 @@ if ($datos_comparados) {
 
 	foreach ($datos_comparados as $key => $value) {
 		$leyend_value = Format::number(floatval($value));
-		$language = $LanguageManager->getById(1);
+		$language_code = strtolower(UtilesApp::GetConf($Sesion, 'Idioma'));
+		$language = $LanguageManager->getByCode($language_code);
 		$separators = [
-			'decimales' => $language->fields['separador_decimales'],
-			'miles' => $language->fields['separador_miles']
+			'decimales' => $language->get('separador_decimales'),
+			'miles' => $language->get('separador_miles')
 		];
 
 		$labels_tooltips_comparado[] = "{$leyend_value} Hrs.";

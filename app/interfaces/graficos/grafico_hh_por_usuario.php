@@ -69,10 +69,11 @@
 	}
 
 	$LanguageManager = new LanguageManager($sesion);
-	$language = $LanguageManager->getById(1);
+	$language_code = strtolower(UtilesApp::GetConf($sesion, 'Idioma'));
+	$language = $LanguageManager->getByCode($language_code);
 	$separators = [
-		'decimales' => $language->fields['separador_decimales'],
-		'miles' => $language->fields['separador_miles']
+		'decimales' => $language->get('separador_decimales'),
+		'miles' => $language->get('separador_miles')
 	];
 
 	$dataset = new TTB\Graficos\Dataset();
