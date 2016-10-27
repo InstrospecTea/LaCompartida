@@ -9,14 +9,16 @@ class SeparadorMilesYDecimalesMoneda extends \Database\Migration implements \Dat
    * @return void
    */
 	function up() {
-		$this->addQueryUp("ALTER TABLE `prm_moneda` ADD COLUMN `separador_miles` CHAR(1) DEFAULT ','");
-		$this->addQueryUp("ALTER TABLE `prm_moneda` ADD COLUMN `separador_decimales` CHAR(1) DEFAULT '.'");
+		$differents = ['USD', 'MXN', 'GBP', 'CHF', 'PEN', 'JPY', 'LPS', 'GTQ', 'NIO'];
 
-		$monedas = $this->getResultsQuery("SELECT * FROM `prm_moneda`");
+		$this->addQueryUp("ALTER TABLE `prm_moneda` ADD COLUMN `separador_miles` CHAR(1) DEFAULT '.'");
+		$this->addQueryUp("ALTER TABLE `prm_moneda` ADD COLUMN `separador_decimales` CHAR(1) DEFAULT ','");
 
-		foreach ($monedas as $value) {
-			if (strcmp($value['codigo'], 'USD') === 0) {
-				$this->addQueryUp("UPDATE `prm_moneda` SET `separador_miles` = '.', `separador_decimales` = ',' WHERE `id_moneda` = {$value['id_moneda']};");
+		$currencies = $this->getResultsQuery("SELECT * FROM `prm_moneda`");
+
+		foreach ($currencies as $value) {
+			if (in_array($value['codigo'], $differents)) {
+				$this->addQueryUp("UPDATE `prm_moneda` SET `separador_miles` = ',', `separador_decimales` = '.' WHERE `id_moneda` = {$value['id_moneda']};");
 			}
 		}
 	}
