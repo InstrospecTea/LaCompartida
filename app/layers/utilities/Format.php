@@ -69,7 +69,7 @@ class Format {
 		$Sesion = new Sesion();
 
 		$language_code = strtolower(UtilesApp::GetConf($Sesion, 'Idioma'));
-		$LanguageManager = new LanguageManager(new Sesion());
+		$LanguageManager = new LanguageManager($Sesion);
 		$language = $LanguageManager->getByCode($language_code);
 		$id_language = $language->get('id_idioma');
 
