@@ -11,7 +11,7 @@ class NotaCobro extends NotaCobroResumenProfesional {
 	protected $detalle_en_asuntos = FALSE;
 	protected $hitos = FALSE;
 	protected $resumen_cap = null;
-
+	protected $ChargeData;
 	var $asuntos = array();
 	var $x_resultados = array();
 
@@ -166,13 +166,14 @@ class NotaCobro extends NotaCobroResumenProfesional {
 		$contrato = new Contrato($this->sesion);
 		$contrato->Load($this->fields['id_contrato']);
 
+		global $x_resultados;
+		$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
+		$this->x_resultados = $x_resultados;
+
 		global $x_detalle_profesional;
 		global $x_resumen_profesional;
 		global $x_factor_ajuste;
 		list( $x_detalle_profesional, $x_resumen_profesional, $x_factor_ajuste ) = $this->DetalleProfesional();
-		global $x_resultados;
-		$x_resultados = UtilesApp::ProcesaCobroIdMoneda($this->sesion, $this->fields['id_cobro']);
-		$this->x_resultados = $x_resultados;
 
 		global $x_cobro_gastos;
 		$x_cobro_gastos = UtilesApp::ProcesaGastosCobro($this->sesion, $this->fields['id_cobro']);
@@ -223,6 +224,7 @@ class NotaCobro extends NotaCobroResumenProfesional {
 		global $masi;
 		$masi = $masivo;
 
+		$this->ChargeData = new ChargeData($this->sesion, $this);
 		$parametros = $this->ParametrosGeneracion();
 		extract($parametros);
 
