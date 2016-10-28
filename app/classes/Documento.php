@@ -467,12 +467,14 @@ class Documento extends Objeto {
 	}
 
 	function ListaPagos() {
-		$Criteria = new Criteria($this->sesion);
+
 		$out = '';
-		$pagos;
-		if (Conf::read('NuevoModuloFactura')) {
-			// Todos los neteos en donde 'this' figura como documento_cobro
-			$pagos = $Criteria
+		$CriteriaNettings = new Criteria($this->sesion);
+		$CriteriaDocs = new Criteria($this->sesion);
+		$CriteriaUnion = new Criteria($this->sesion);
+		$criterias = [];
+		// Todos los neteos en donde 'this' figura como documento_cobro
+		$criterias[] = $CriteriaNettings
 				->add_select('neteo_documento.id_documento_pago', 'id')
 				->add_select('neteo_documento.valor_cobro_honorarios', 'honorarios')
 				->add_select('neteo_documento.valor_cobro_gastos', 'gastos')
@@ -480,11 +482,9 @@ class Documento extends Objeto {
 				->add_select('documento.es_adelanto')
 				->add_from('neteo_documento')
 				->add_custom_join_with('documento', 'documento.id_documento = neteo_documento.id_documento_pago', '')
-				->add_restriction(CriteriaRestriction::equals('neteo_documento.id_documento_cobro', $this->fields['id_documento']))
-				->run();
-		} else {
-			// Todos los documentos sin neteo asociados al cobro de 'this',
-			$pagos = $Criteria
+				->add_restriction(CriteriaRestriction::equals('neteo_documento.id_documento_cobro', $this->fields['id_documento']));
+		// Todos los documentos sin neteos asociados al cobro 'this',
+		$criterias[] = $CriteriaDocs
 				->add_select('documento.id_documento', 'id')
 				->add_select('documento.honorarios')
 				->add_select('documento.subtotal_gastos', 'gastos')
@@ -498,9 +498,16 @@ class Documento extends Objeto {
 						CriteriaRestriction::is_null('neteo_documento.id_neteo_documento'),
 						CriteriaRestriction::equals('documento.id_cobro', $this->fields['id_cobro'])
 					)
-				)
-				->run();
-		}
+				);
+
+		$pagos = $CriteriaUnion
+			->add_select('payment.id','id')
+			->add_select('payment.honorarios','honorarios')
+			->add_select('payment.gastos','gastos')
+			->add_select('payment.pago_retencion','pago_retencion')
+			->add_select('payment.es_adelanto','es_adelanto')
+			->add_from_union_criteria($criterias, 'payment')
+			->run();
 
 		$Form = new Form();
 		$Html = &$Form->Html;
