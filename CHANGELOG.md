@@ -1,7 +1,7 @@
 # Changelog
 
 ## [Release 16.32.0](https://github.com/LemontechSA/ttb/pull/1898)
-Monday, October 28th
+Friday, October 28th
 * **Feature** [Resumen profesional](https://github.com/LemontechSA/ttb/pull/1849)
 
 ## Hotfix 16.31.1
