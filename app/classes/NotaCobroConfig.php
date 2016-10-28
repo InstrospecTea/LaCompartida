@@ -940,7 +940,6 @@ class NotaCobroConfig extends Cobro {
 			'%hh_retainer%' => 'hh_retainer',
 			'%hh%' => 'hh',
 			'%tarifa_horas%' => 'tarifa_horas',
-			'%tarifa_horas_ajustada%' => 'tarifa_horas_ajustada',
 			'%total_horas%' => 'total_horas',
 			'%total_horas_ajustado%' => 'total_horas_ajustado',
 			'%porcentaje_participacion%' => 'porcentaje_participacion',
