@@ -55,8 +55,10 @@
 
 	foreach ($respuesta as $i => $value) {
 		$empleado[] = $value['username'];
-		$nombre_empleado[] = mb_detect_encoding($value['usuario'], 'UTF-8', true) === 'UTF-8' ? $value['usuario'] : utf8_encode($value['usuario']);
+		$nombre_empleado[] = [Convert::utf8($value['usuario'])];
 		$tiempo[] = $value['tiempo'];
+		$tiempo_formateado = Format::number($value['tiempo']);
+		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
 		$total_tiempo += $value['tiempo'];
 	}
 
@@ -66,6 +68,14 @@
 		return;
 	}
 
+	$LanguageManager = new LanguageManager($sesion);
+	$language_code = strtolower(Conf::read('Idioma'));
+	$language = $LanguageManager->getByCode($language_code);
+	$separators = [
+		'decimales' => $language->get('separador_decimales'),
+		'miles' => $language->get('separador_miles')
+	];
+
 	$dataset = new TTB\Graficos\Dataset();
 
 	$options = [
@@ -74,6 +84,7 @@
 			'mode' => 'label',
 			'callbacks' => [
 				'afterTitle' => $nombre_empleado,
+				'label' => $tiempo_tooltip
 			]
 		],
 		'title' => [
@@ -104,7 +115,8 @@
 						'show' => true
 					],
 					'ticks' => [
-						'beginAtZero' => true
+						'beginAtZero' => true,
+						'callback' => $separators
 					]
 				]
 			]

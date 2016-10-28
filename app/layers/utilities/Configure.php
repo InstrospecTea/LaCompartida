@@ -3,7 +3,7 @@
 /**
  * Permite consultar las configuraciones sin pasar todo el tiempo la Sesión
  */
-abstract class Configure {
+class Configure {
 
 	static private $Session;
 
