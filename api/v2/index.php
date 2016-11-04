@@ -179,24 +179,24 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
 	$API->getProjectsOfClient($client_id);
 });
 
-$Slim->get('/contracts/:contract_id/generators', function ($contract_id) use ($Session, $Slim) {
+$Slim->get('/agreements/:agreement_id/generators', function ($agreement_id) use ($Session, $Slim) {
 	$API = new Api\V2\GeneratorAPI($Session, $Slim);
-	$API->getContractGenerators($contract_id);
+	$API->getAgreementGenerators($agreement_id);
 });
 
-$Slim->post('/contracts/:contract_id/generators/:generator_id', function ($contract_id, $generator_id) use ($Session, $Slim) {
+$Slim->post('/agreements/:agreement_id/generators', function ($agreement_id) use ($Session, $Slim) {
 	$API = new Api\V2\GeneratorAPI($Session, $Slim);
-	$API->updateContractGenerator($contract_id, $generator_id);
+	$API->createAgreementGenerator($agreement_id);
 });
 
-$Slim->put('/contracts/:contract_id/generators', function ($contract_id) use ($Session, $Slim) {
+$Slim->put('/agreements/:agreement_id/generators/:generator_id', function ($agreement_id, $generator_id) use ($Session, $Slim) {
 	$API = new Api\V2\GeneratorAPI($Session, $Slim);
-	$API->createContractGenerator($contract_id);
+	$API->updateAgreementGenerator($agreement_id, $generator_id);
 });
 
-$Slim->delete('/contracts/:contract_id/generators/:generator_id', function ($contract_id, $generator_id) use ($Session, $Slim) {
+$Slim->delete('/agreements/:agreement_id/generators/:generator_id', function ($agreement_id, $generator_id) use ($Session, $Slim) {
 	$API = new Api\V2\GeneratorAPI($Session, $Slim);
-	$API->deleteContractGenerator($contract_id, $generator_id);
+	$API->deleteAgreementGenerator($agreement_id, $generator_id);
 });
 
 /**

@@ -4,11 +4,11 @@ class GeneratorManager extends AbstractManager implements IGeneratorManager {
 
 	/**
 	 * Obtiene los generadores de un contrato
-	 * @param 	integer $contract_id
+	 * @param 	integer $agreement_id
 	 * @return 	array
 	 */
-	public function getContractGenerators($contract_id) {
-		if (empty($contract_id) || !is_numeric($contract_id)) {
+	public function getAgreementGenerators($agreement_id) {
+		if (empty($agreement_id) || !is_numeric($agreement_id)) {
 			throw new InvalidIdentifier;
 		}
 
@@ -29,7 +29,7 @@ class GeneratorManager extends AbstractManager implements IGeneratorManager {
 																	CriteriaRestriction::equals('usuario.id_area_usuario', 'prm_area_usuario.id'))
 															->add_inner_join_with('prm_categoria_generador',
 																	CriteriaRestriction::equals('contrato_generador.id_categoria_generador', 'prm_categoria_generador.id_categoria_generador'))
-															->add_restriction(CriteriaRestriction::equals('contrato_generador.id_contrato', $contract_id))
+															->add_restriction(CriteriaRestriction::equals('contrato_generador.id_contrato', $agreement_id))
 															->add_ordering('nombre')
 															->run();
 
@@ -58,7 +58,7 @@ class GeneratorManager extends AbstractManager implements IGeneratorManager {
 	 * @param 	array $generator
 	 * @param 	integer $generator_id
 	 */
-	public function updateContractGenerator($generator, $generator_id) {
+	public function updateAgreementGenerator($generator, $generator_id) {
 		$Update = new InsertCriteria($this->Sesion);
 		$Update = $Update->addPivotWithValue('porcentaje_genera', $generator['percent_generator'])
 											->addPivotWithValue('id_categoria_generador', $generator['category_id'])
@@ -72,11 +72,11 @@ class GeneratorManager extends AbstractManager implements IGeneratorManager {
 	 * Crea un generador de un contrato
 	 * @param 	array $generator
 	 */
-	public function createContractGenerator($generator) {
+	public function createAgreementGenerator($generator) {
 		$Update = new InsertCriteria($this->Sesion);
 		$Update = $Update->addPivotWithValue('porcentaje_genera', $generator['percent_generator'])
 											->addPivotWithValue('id_cliente', $generator['client_id'])
-											->addPivotWithValue('id_contrato', $generator['contract_id'])
+											->addPivotWithValue('id_contrato', $generator['agreement_id'])
 											->addPivotWithValue('id_categoria_generador', $generator['category_id'])
 											->addPivotWithValue('id_usuario', $generator['user_id'])
 											->setTable('contrato_generador')
@@ -88,7 +88,7 @@ class GeneratorManager extends AbstractManager implements IGeneratorManager {
 	 * @param 	integer $generator_id
 	 * @return 	array
 	 */
-	public function deleteContractGenerator($generator_id) {
+	public function deleteAgreementGenerator($generator_id) {
 		$sql = "DELETE FROM `contrato_generador`
 						WHERE `contrato_generador`.`id_contrato_generador`=:generator_id";
 		$Statement = $this->Sesion->pdodbh->prepare($sql);

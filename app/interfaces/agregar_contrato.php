@@ -3303,7 +3303,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				jQuery('document').ready(function() {
 					var $ = jQuery;
 					var auth_token = "<?= $Sesion->auth_token ?>";
-					var generator_url = "<?php echo Conf::RootDir() . '/api/v2/index.php/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
+					var generator_url = "<?php echo Conf::RootDir() . '/api/v2/index.php/agreements/' . $contrato->fields['id_contrato'] . '/generators' ?>";
 					var actionButtons = function(id_contract_generator) {
 						return '<td align="center"  class="border_plomo" style="white-space:nowrap; width: 52px;">\
 							<a data-id="' + id_contract_generator + '" class="fl edit_generator ui-button editar" style="margin: 3px 1px;width: 18px;height: 18px;" title="Modificar Generador" href="javascript:void(0)">&nbsp;</a>\
@@ -3327,14 +3327,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					var loadGeneratorForm = function(state, data) {
 						$('#form_generator_status').val(state);
 						if (state == 'NEW') {
-							$('#id_contract_generator').val('');
+							$('#id_agreement_generator').val('');
 							$('#id_user_generator').val('');
 							$('#percent_generator').val('');
 							$('#category').val('');
 							$('#add_generator').val('Agregar');
 							$('#cancel_generator').val('Cancelar').hide();
 						} else if (state == 'EDIT') {
-							$('#id_contract_generator').val(data.id_contract_generator);
+							$('#id_agreement_generator').val(data.id_agreement_generator);
 							$('#id_user_generator').val(data.id_user_generator);
 							$('#percent_generator').val(data.percent_generator);
 							$('#category').val(data.id_category);
@@ -3379,7 +3379,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						var category_id = $(this).closest('tr').find('.category-data').data('category_value');
 						var generator_id = $(this).data('id');
 						loadGeneratorForm('EDIT', {
-							id_contract_generator: generator_id,
+							id_agreement_generator: generator_id,
 							id_user_generator: user_id,
 							percent_generator: percent,
 							id_category: category_id
@@ -3411,7 +3411,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						var percent = $('#percent_generator').val();
 						var user = $('#id_user_generator').val();
 						var category = $('#category').val();
-						var id_contract_generator = $('#id_contract_generator').val();
+						var id_agreement_generator = $('#id_agreement_generator').val();
 						var form_status = $('#form_generator_status').val();
 						if (percent && user && percent.length > 0) {
 							if (parseInt(percent) < 1 || parseInt(percent) > 100) {
@@ -3421,11 +3421,11 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 							if (form_status == 'EDIT') {
 								$.ajax({
-									url: generator_url + '/' + id_contract_generator,
+									url: generator_url + '/' + id_agreement_generator,
 									headers: {
 										authtoken: auth_token
 									},
-									type: 'POST',
+									type: 'PUT',
 									data: {
 										percent_generator: percent,
 										category_id: category
@@ -3444,7 +3444,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									headers: {
 										authtoken: auth_token
 									},
-									type: 'PUT',
+									type: 'POST',
 									data: {
 										percent_generator: percent,
 										user_id: user,
@@ -3505,7 +3505,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<tr>
 							<td colspan="7">
 								<input type="hidden" id="form_generator_status" value="" />
-								<input type="hidden" id="id_contract_generator" value="" />
+								<input type="hidden" id="id_agreement_generator" value="" />
 								<?php
 								echo $Form->button(__('Agregar') . ' ' . __('Generador'), array('id' => 'add_generator'));
 								echo $Form->button(__('Cancelar'), array('id' => 'cancel_generator'));
