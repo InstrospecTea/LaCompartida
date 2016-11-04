@@ -1615,6 +1615,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 								$row = str_replace('%TRABAJOS_FILAS%', '', $row);
 								$row = str_replace('%TRABAJOS_TOTAL%', '', $row);
 							}
+							$row = str_replace('%DETALLE_PROFESIONAL%', $this->GenerarDocumento2($parser, 'DETALLE_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 						} else if ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1) {
 							$row = str_replace('%espacio_trabajo%', '', $row);
 							$row = str_replace('%DETALLE_PROFESIONAL%', '', $row);
