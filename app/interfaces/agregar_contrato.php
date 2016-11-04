@@ -3467,7 +3467,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			</script>
 
 			<fieldset class="border_plomo tb_base">
-				<legend><?php echo __('Profesionales') . ' ' . __('Generadores') ?></legend>
+				<legend><?php echo __('Profesionales Generadores') ?></legend>
 				<table width="80%" border="0" style="border: 1px solid #BDBDBD;" cellpadding="3" cellspacing="3" id="user_generators_form">
 					<tbody>
 						<tr>
