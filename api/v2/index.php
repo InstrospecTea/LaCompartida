@@ -179,6 +179,26 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
 	$API->getProjectsOfClient($client_id);
 });
 
+$Slim->get('/contracts/:contract_id/generators', function ($contract_id) use ($Session, $Slim) {
+	$API = new Api\V2\GeneratorAPI($Session, $Slim);
+	$API->getContractGenerators($contract_id);
+});
+
+$Slim->post('/contracts/:contract_id/generators/:generator_id', function ($contract_id, $generator_id) use ($Session, $Slim) {
+	$API = new Api\V2\GeneratorAPI($Session, $Slim);
+	$API->updateContractGenerator($contract_id, $generator_id);
+});
+
+$Slim->put('/contracts/:contract_id/generators', function ($contract_id) use ($Session, $Slim) {
+	$API = new Api\V2\GeneratorAPI($Session, $Slim);
+	$API->createContractGenerator($contract_id);
+});
+
+$Slim->delete('/contracts/:contract_id/generators/:generator_id', function ($contract_id, $generator_id) use ($Session, $Slim) {
+	$API = new Api\V2\GeneratorAPI($Session, $Slim);
+	$API->deleteContractGenerator($contract_id, $generator_id);
+});
+
 /**
  * @api {get} /projects Get All Projects
  * @apiName Get Projects

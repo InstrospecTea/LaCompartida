@@ -3302,7 +3302,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			<script type="text/javascript">
 				jQuery('document').ready(function() {
 					var $ = jQuery;
-					var generator_url = "<?php echo Conf::RootDir() . '/api/index.php/clients/' . $cliente->fields['id_cliente'] . '/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
+					var auth_token = "<?= $Sesion->auth_token ?>";
+					var generator_url = "<?php echo Conf::RootDir() . '/api/v2/index.php/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
 					var actionButtons = function(id_contract_generator) {
 						return '<td align="center"  class="border_plomo" style="white-space:nowrap; width: 52px;">\
 							<a data-id="' + id_contract_generator + '" class="fl edit_generator ui-button editar" style="margin: 3px 1px;width: 18px;height: 18px;" title="Modificar Generador" href="javascript:void(0)">&nbsp;</a>\
@@ -3343,8 +3344,12 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					}
 
 					var loadGenerators = function() {
-						$.ajax({ url: generator_url })
-							.done(function(data) {
+						$.ajax({
+							url: generator_url,
+							headers: {
+								authtoken: auth_token
+							}
+						}).done(function(data) {
 								rows = $('<tbody>');
 								header = $("<tr bgcolor='#A3D55C'>")
 								header.append('<td align="left" class="border_plomo"><b><?php echo __('Usuario'); ?></b></td>');
@@ -3388,6 +3393,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						var generator_id = $(this).data('id');
 						$.ajax({
 							url: generator_url + '/' + generator_id,
+							headers: {
+								authtoken: auth_token
+							},
 							type: 'DELETE'
 						}).done(function(data) {
 							loadGenerators();
@@ -3414,6 +3422,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							if (form_status == 'EDIT') {
 								$.ajax({
 									url: generator_url + '/' + id_contract_generator,
+									headers: {
+										authtoken: auth_token
+									},
 									type: 'POST',
 									data: {
 										percent_generator: percent,
@@ -3430,11 +3441,15 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								}
 								$.ajax({
 									url: generator_url,
+									headers: {
+										authtoken: auth_token
+									},
 									type: 'PUT',
 									data: {
 										percent_generator: percent,
 										user_id: user,
-										category_id: category
+										category_id: category,
+										client_id: '<?= $id_cliente ?>'
 									}
 								}).done(function(data) {
 									showAlert('info', 'Profesional agregado con éxito');
