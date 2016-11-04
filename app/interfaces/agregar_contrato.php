@@ -3413,7 +3413,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						var category = $('#category').val();
 						var id_agreement_generator = $('#id_agreement_generator').val();
 						var form_status = $('#form_generator_status').val();
-						if (percent && user && percent.length > 0) {
+						if (percent && user && percent.length > 0 && category) {
 							if (parseInt(percent) < 1 || parseInt(percent) > 100) {
 								showAlert('alerta', 'El porcentaje debe estar entre 1 y 100');
 								return;
@@ -3489,7 +3489,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 																						->run(); ?>
 
 									<select name="category" id="category">
-										<option>Seleccione</option>
+										<option value="">Seleccione</option>
 									<?php foreach ($categorias as $categoria): ?>
 										<option value="<?= $categoria['id_categoria_generador'] ?>"> <?= $categoria['nombre'] ?></option>
 									<?php endforeach; ?>
