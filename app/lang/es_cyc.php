@@ -1081,3 +1081,6 @@ $_LANG['en_Hrs Trabajadas']="Worked Hours";
 // Lang para facturas
 
 $_LANG['Factura No.'] = 'FACTURA DE VENTA NO.';
+
+/* Solicitud Profesionales Generadores */
+$_LANG['Profesionales Generadores'] = 'Tracking Credits';
