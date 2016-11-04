@@ -1585,10 +1585,13 @@ class Contrato extends Objeto {
               usuario.nombre,
               usuario.apellido1,
               usuario.apellido2,
-              porcentaje_genera
+              porcentaje_genera,
+              prm_categoria_generador.nombre as nombre_categoria,
+              contrato_generador.id_categoria_generador as id_categoria
             FROM contrato_generador
             INNER JOIN usuario on contrato_generador.id_usuario = usuario.id_usuario
             INNER JOIN prm_area_usuario on usuario.id_area_usuario = prm_area_usuario.id
+            INNER JOIN prm_categoria_generador on contrato_generador.id_categoria_generador = prm_categoria_generador.id_categoria_generador
             WHERE contrato_generador.id_contrato = :contract_id
             ORDER BY usuario.nombre ASC";
 
@@ -1605,6 +1608,8 @@ class Contrato extends Objeto {
 					'id_usuario' => $generator->id_usuario,
 					'nombre' => $generator->apellido1 . ' ' . $generator->apellido2 . ' ' . $generator->nombre,
 					'porcentaje_genera' => $generator->porcentaje_genera,
+					'nombre_categoria' => $generator->nombre_categoria,
+					'id_categoria' => $generator->id_categoria
 				)
 			);
 		}
@@ -1625,14 +1630,16 @@ class Contrato extends Objeto {
 	/**
 	 * Update a generator of matter
 	 */
-	public static function updateContractGenerator($sesion, $generator_id, $percent_generator) {
+	public static function updateContractGenerator($sesion, $generator_id, $percent_generator, $category_id) {
 		$sql = "UPDATE `contrato_generador`
-            SET `contrato_generador`.`porcentaje_genera` = :percent_generator
+            SET `contrato_generador`.`porcentaje_genera` = :percent_generator,
+            		`contrato_generador`.`id_categoria_generador` = :category_id
             WHERE `contrato_generador`.`id_contrato_generador` = :generator_id";
 
 		$Statement = $sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('percent_generator', $percent_generator);
 		$Statement->bindParam('generator_id', $generator_id);
+		$Statement->bindParam('category_id', $category_id);
 
 		return $Statement->execute();
 	}
@@ -1640,19 +1647,21 @@ class Contrato extends Objeto {
 	/**
 	 * Create a generator of matter
 	 */
-	public static function createContractGenerator($sesion, $client_id, $contract_id, $user_id, $percent_generator) {
+	public static function createContractGenerator($sesion, $client_id, $contract_id, $user_id, $percent_generator, $category_id) {
 		$sql = "INSERT INTO `contrato_generador`
             SET
             	`contrato_generador`.`id_cliente` = :client_id,
             	`contrato_generador`.`id_contrato` = :contract_id,
             	`contrato_generador`.`id_usuario` = :user_id,
-            	`contrato_generador`.`porcentaje_genera` = :percent_generator ";
+            	`contrato_generador`.`porcentaje_genera` = :percent_generator,
+            	`contrato_generador`.`id_categoria_generador` = :category_id ";
 
 		$Statement = $sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('client_id', $client_id);
 		$Statement->bindParam('contract_id', $contract_id);
 		$Statement->bindParam('user_id', $user_id);
 		$Statement->bindParam('percent_generator', $percent_generator);
+		$Statement->bindParam('category_id', $category_id);
 
 		return $Statement->execute();
 	}

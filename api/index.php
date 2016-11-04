@@ -695,7 +695,8 @@ $Slim->post('/clients/:client_id/contracts/:contract_id/generators/:generator_id
 	}
 
 	$percent_generator = $Slim->request()->params('percent_generator');
-	$generator = Contrato::updateContractGenerator($Session, $generator_id, $percent_generator);
+	$category_id = $Slim->request()->params('category_id');
+	$generator = Contrato::updateContractGenerator($Session, $generator_id, $percent_generator, $category_id);
 	outputJson($generator);
 });
 
@@ -708,8 +709,9 @@ $Slim->put('/clients/:client_id/contracts/:contract_id/generators', function ($c
 	}
 	$percent_generator = $Slim->request()->params('percent_generator');
 	$user_id = $Slim->request()->params('user_id');
+	$category_id = $Slim->request()->params('category_id');
 
-	$generator = Contrato::createContractGenerator($Session, $client_id, $contract_id, $user_id, $percent_generator);
+	$generator = Contrato::createContractGenerator($Session, $client_id, $contract_id, $user_id, $percent_generator, $category_id);
 	outputJson($generator);
 });
 
