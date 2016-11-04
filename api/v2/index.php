@@ -179,6 +179,58 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
 	$API->getProjectsOfClient($client_id);
 });
 
+/**
+ * @api {get} /agreements/:agreement_id/generators Get all generators
+ * @apiName Get Generator
+ * @apiVersion 2.0.0
+ * @apiGroup Agreements
+ * @apiDescription Get a list of generatos's agreement
+ *
+ * @apiHeader {String} AUTHTOKEN=136b17e3a34db13c98ec404fa9035796b52cbf8c  Login Token
+ *
+ * @apiParam {Integer} Agreement Id
+ *
+ * @apiSuccess {Integer} id_contrato_generador Agreement Generator Id
+ * @apiSuccess {Integer} id_cliente Client Id
+ * @apiSuccess {Integer} id_contrato Agreement Id
+ * @apiSuccess {String} area_usuario User Area
+ * @apiSuccess {Integer} id_usuario User Id
+ * @apiSuccess {String} nombre Name
+ * @apiSuccess {Integer} porcentaje_genera Percent
+ * @apiSuccess {String} nombre_categoria Category Name
+ * @apiSuccess {Integer} id_categoria Category Id
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     [
+ *       {
+ *         "id_contrato_generador": "1",
+ *         "id_cliente": "3405",
+ *         "id_contrato": "6089",
+ *         "area_usuario": "Corporativo",
+ *         "id_usuario": "171",
+ *         "nombre": "ADARVE  LUZ HELENA",
+ *         "porcentaje_genera": "22",
+ *         "nombre_categoria": "Test",
+ *         "id_categoria": "1"
+ *       },
+ *       ...
+ *       {
+ *     		...
+ *       }
+ *     ]
+ *
+ * @apiError InvalidAgreementId empty or is not numeric
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Invalid Params
+ *     {
+ *       "errors": [
+ *         "code": "InvalidAgreementId",
+ *         "message": "Invalid agreement ID"
+ *       ]
+ *     }
+ */
 $Slim->get('/agreements/:agreement_id/generators', function ($agreement_id) use ($Session, $Slim) {
 	$API = new Api\V2\GeneratorAPI($Session, $Slim);
 	$API->getAgreementGenerators($agreement_id);
