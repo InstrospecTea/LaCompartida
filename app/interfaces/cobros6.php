@@ -46,7 +46,6 @@ if($opc == 'descargar_ledes'){
 
 if ($opc == 'eliminar_documento') {
 	try {
-		$sesion->pdodbh->beginTransaction();
 		$documento_eliminado = new Documento($sesion);
 		$documento_eliminado->Load($id_documento_eliminado);
 		if (!$documento_eliminado->fields['es_adelanto']) {
@@ -66,7 +65,6 @@ if ($opc == 'eliminar_documento') {
 			$pagina->AddInfo(__('El pago ha sido eliminado satisfactoriamente'));
 		}
 		$cobro->CambiarEstadoSegunFacturas();
-		$sesion->pdodbh->commit();
 	} catch (ForeignKeyConstraintFailsException $e) {
 		$sesion->pdodbh->rollBack();
 		$pagina->AddError(__('El documento no pudo ser eliminado, ya que aún tiene pagos asociados.'));
