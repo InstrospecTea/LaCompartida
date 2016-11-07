@@ -23,7 +23,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		];
 	}
 
-	public function emitirFactura(Factura $Factura) {
+	public function emitirFactura(Factura $Factura, Moneda $Moneda) {
 		$factura_emitida = '';
 
 		try {
@@ -32,7 +32,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 				"{$this->url}/documento",
 				[
 					'headers' => $this->getHeaders(),
-					'body' => $this->getBody($Factura)
+					'body' => $this->getBody($Factura, $Moneda)
 				]
 			);
 
@@ -51,53 +51,54 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		return $factura_emitida;
 	}
 
-	private function getBody(&$Factura) {
+	private function getBody(&$Factura, &$Moneda) {
 		$body = [
 			'Cliente' => [
 				'NumeroDeDocumento' => (string) $Factura->fields['numero'],
 				'Nombre' => (string) $Factura->fields['cliente'],
-				'Email' => '',
+				// 'Email' => '',
 				'DireccionCompleta' => utf8_encode("{$Factura->fields['direccion_cliente']}, {$Factura->fields['comuna_cliente']}"),
-				'TipoDocumento' => 0
+				'TipoDocumento' => 6
 			],
-			'IsExportacion' => true,
+			// 'IsExportacion' => true,
 			'ThirdPartyUniqueIdentifier' => (string) $Factura->fields['numero'],
-			'TipoDeCambio' => 0,
+			// 'TipoDeCambio' => 0,
 			'Documento' => [
 				'Serie' => (string) $Factura->fields['serie_documento_legal'],
+				// 'Correlativo' => 1,
 				'TipoDeDocumento' => 10,
-				'Descripcion' => (string) $Factura->fields['glosa']
+				'Descripcion' => (string) substr($Factura->fields['glosa'], 0, 250)
 			],
 			'FechaDeVencimiento' => "{$Factura->fields['fecha_vencimiento']}T00:00:00",
-			'DetraccionPercent' => 0,
-			'TotalDetraccion' => 0,
-			'OverrideTotalValorVentaOperacionesGravadas' => 0,
-			'OverrideTotalValorVentaOperacionesExoneradas' => 0,
-			'OverrideTotalValorVentaOperacionesInafectas' => 0,
-			'OverrideTotalDescuentos' => 0,
-			'OverrideTotalBonificaciones' => 0,
-			'OverrideTotalIGV' => 0,
-			'OverrideTotalISC' => 0,
-			'OverrideTotalGlobal' => 0,
-			'MonedaISOCode' => '',
+			// 'DetraccionPercent' => 0,
+			// 'TotalDetraccion' => 0,
+			// 'OverrideTotalValorVentaOperacionesGravadas' => 0,
+			// 'OverrideTotalValorVentaOperacionesExoneradas' => 0,
+			// 'OverrideTotalValorVentaOperacionesInafectas' => 0,
+			// 'OverrideTotalDescuentos' => 0,
+			// 'OverrideTotalBonificaciones' => 0,
+			// 'OverrideTotalIGV' => 0,
+			// 'OverrideTotalISC' => 0,
+			// 'OverrideTotalGlobal' => 0,
+			'MonedaISOCode' => (string) $Moneda->fields['codigo'],
 			'Items' => [
 				[
 					'IsService' => true,
 					'Codigo' => '',
 					'Descripcion' => (string) utf8_encode($Factura->fields['descripcion']),
-					'DescuentoAmount' => 0,
-					'ValorReferencial' => 0,
+					'DescuentoAmount' => 0.0,
+					// 'ValorReferencial' => 0,
 					'ValorUnitario' => (double) $Factura->fields['monto_neto'],
-					'IGVDeLinea' => 0,
-					'ISCDeLinea' => 0,
-					'PrecioUnitario' => 0,
-					'PrecioUnitarioReferencial' => 0,
+					'IGVDeLinea' => 0.0,
+					'ISCDeLinea' => 0.0,
+					'PrecioUnitario' => (double) $Factura->fields['monto_neto'],
 					'Quantity' => 1,
-					'TipoAfectacionIGV' => 0,
+					'TipoAfectacionIGV' => 10,
 					'TotalConImpuestos' => (double) $Factura->fields['total'],
 					'TotalSinImpuestos' => (double) $Factura->fields['monto_neto'],
-					'Unidad' => '',
-					'LoteID' => ''
+					'Unidad' => 'UN',
+					// 'LoteID' => '',
+					// 'LoteEXP' => ''
 				],
 			]
 		];
