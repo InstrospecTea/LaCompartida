@@ -188,7 +188,7 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
  *
  * @apiHeader {String} AUTHTOKEN=136b17e3a34db13c98ec404fa9035796b52cbf8c  Login Token
  *
- * @apiParam {Integer} agreement_id The :agreement_id corresponds to a agreement id attribute.
+ * @apiParam {Integer} agreement_id The :agreement_id corresponds to an agreement id attribute.
  *
  * @apiSuccess {Integer} id_contrato_generador Agreement Generator Id
  * @apiSuccess {Integer} id_cliente Client Id
