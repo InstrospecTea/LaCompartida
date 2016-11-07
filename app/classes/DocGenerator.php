@@ -417,7 +417,6 @@ class DocGenerator {
 		$this->formatBuffer .= "}\r\n\r\n";
 
 		$this->formatBuffer .= "table.normalTable{\r\n";
-		$this->formatBuffer .= "   mso-style-name: \"Tabela com grade\";\r\n";
 		$this->formatBuffer .= "   mso-tstyle-rowband-size: 0;\r\n";
 		$this->formatBuffer .= "   mso-tstyle-colband-size: 0;\r\n";
 		$this->formatBuffer .= "   border-collapse: collapse;\r\n";
@@ -441,7 +440,6 @@ class DocGenerator {
 		$this->formatBuffer .= "}\r\n\r\n";
 
 		$this->formatBuffer .= "table.tableWithoutGrid{\r\n";
-		$this->formatBuffer .= "   mso-style-name: \"Tabela sem grade\";\r\n";
 		$this->formatBuffer .= "   mso-tstyle-rowband-size: 0;\r\n";
 		$this->formatBuffer .= "   mso-tstyle-colband-size: 0;\r\n";
 		$this->formatBuffer .= "   border-collapse: collapse;\r\n";
@@ -550,5 +548,3 @@ class DocGenerator {
 	}
 
 }
-
-

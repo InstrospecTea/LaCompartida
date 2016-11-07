@@ -225,6 +225,20 @@ if (is_null($duracion)) {
 	echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
 	return;
 }
+
+foreach ($duracion as $value) {
+	$tiempo_formateado = Format::number($value);
+	$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
+}
+
+$LanguageManager = new LanguageManager($sesion);
+$language_code = strtolower(Conf::read('Idioma'));
+$language = $LanguageManager->getByCode($language_code);
+$separators = [
+	'decimales' => $language->get('separador_decimales'),
+	'miles' => $language->get('separador_miles')
+];
+
 $dataset = new TTB\Graficos\Dataset();
 
 $dataset->setLabel(__($titulo_tipo[$tipo_duracion]))
@@ -247,7 +261,8 @@ $y_axes[] = [
 		'show' => true
 	],
 	'ticks' => [
-		'beginAtZero' => true
+		'beginAtZero' => true,
+		'callback' => $separators
 	]
 ];
 
@@ -255,6 +270,11 @@ if ($comparar) {
 	$dataset_comparar = new TTB\Graficos\Dataset();
 
 	array_walk($duracion_comparada,'fixNumber');
+
+	foreach ($duracion_comparada as $value) {
+		$tiempo_formateado = Format::number($value);
+		$tiempo_comparado_tooltip[] = ["{$tiempo_formateado} Hrs."];
+	}
 
 	$dataset_comparar->setLabel(__($titulo_tipo[$tipo_duracion_comparada]))
 		->setBackgroundColor(39, 174, 96, 0.5)
@@ -276,15 +296,23 @@ if ($comparar) {
 			'show' => true
 		],
 		'ticks' => [
-			'beginAtZero' => true
+			'beginAtZero' => true,
+			'callback' => $separators
 		]
 	];
+}
+
+foreach ($tiempo_tooltip as $key => $value) {
+	$labels_tooltips[] = [$value, $tiempo_comparado_tooltip[$key]];
 }
 
 $options = [
 	'responsive' => true,
 	'tooltips' => [
-		'mode' => 'label'
+		'mode' => 'label',
+		'callbacks' => [
+			'label' => $labels_tooltips
+		]
 	],
 	'title' => [
 		'display' => true,

@@ -654,4 +654,12 @@ class WorkbookMiddleware {
 			unlink($path);
 		}
 	}
+
+	/**
+	 * Sets format into a range
+	 *
+	 */
+	public function applyFormat($range, $format) {
+		$this->workSheetObj->getStyle($range)->applyFromArray($format);
+	}
 }

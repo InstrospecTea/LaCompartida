@@ -56,8 +56,10 @@
 
 	foreach ($respuesta as $i => $fila) {
 		$asunto[] = $fila['codigo_asunto'];
-		$glosa_asunto[] = mb_detect_encoding($fila['glosa_asunto'], 'UTF-8', true) === 'UTF-8' ? $fila['glosa_asunto'] : utf8_encode($fila['glosa_asunto']);
+		$glosa_asunto[] = [Convert::utf8($fila['glosa_asunto'])];
 		$tiempo[] = $fila['tiempo'];
+		$tiempo_formateado = Format::number($fila['tiempo']);
+		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
 		$total_tiempo += $fila['tiempo'];
 	}
 
@@ -66,6 +68,15 @@
 		echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
 		return;
 	}
+
+	$LanguageManager = new LanguageManager($sesion);
+	$language_code = strtolower(Conf::read('Idioma'));
+	$language = $LanguageManager->getByCode($language_code);
+	$separators = [
+		'decimales' => $language->get('separador_decimales'),
+		'miles' => $language->get('separador_miles')
+	];
+
 	$dataset = new TTB\Graficos\Dataset();
 
 	$options = [
@@ -74,6 +85,7 @@
 			'mode' => 'label',
 			'callbacks' => [
 				'afterTitle' => $glosa_asunto,
+				'label' => $tiempo_tooltip
 			]
 		],
 		'title' => [
@@ -103,7 +115,8 @@
 					'show' => true
 				],
 				'ticks' => [
-					'beginAtZero' => true
+					'beginAtZero' => true,
+					'callback' => $separators
 				]
 			]]
 		]

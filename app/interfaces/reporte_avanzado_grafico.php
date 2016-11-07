@@ -176,6 +176,31 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 	$grafico = new TTB\Graficos\Grafico();
 	$dataset = new TTB\Graficos\Dataset();
 
+	$LanguageManager = new LanguageManager($sesion);
+	$CurrencyManager = new CurrencyManager($sesion);
+
+	$datatypes = getDatatypes($tipo_dato, $sesion, $id_moneda);
+	foreach ($datos as $key => $value) {
+		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
+			$leyend_value = Format::number($value);
+			$language_code = strtolower(Conf::read('Idioma'));
+			$language = $LanguageManager->getByCode($language_code);
+			$separators = [
+				'decimales' => $language->get('separador_decimales'),
+				'miles' => $language->get('separador_miles')
+			];
+		} else {
+			$leyend_value = Format::currency($value, $id_moneda);
+			$currency = $CurrencyManager->getById($id_moneda);
+			$separators = [
+				'decimales' => $currency->get('separador_decimales'),
+				'miles' => $currency->get('separador_miles')
+			];
+		}
+
+		$labels_tooltips[] = "{$leyend_value} {$datatypes['symbol_datatype']}";
+	}
+
 	$yAxes[] = [
 		'type' => 'linear',
 		'display' => true,
@@ -192,7 +217,8 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 			'labelString' => Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda)
 		],
 		'ticks' => [
-			'beginAtZero' => true
+			'beginAtZero' => true,
+			'callback' => $separators
 		]
 	];
 
@@ -232,6 +258,28 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 
 		$grafico->addDataset($dataset_comparado);
 
+		$datatypes = getDatatypes($tipo_dato_comparado, $sesion, $id_moneda);
+		foreach ($datos_comparados as $key => $value) {
+			if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
+				$leyend_value = Format::number($value);
+				$language_code = strtolower(Conf::read('Idioma'));
+				$language = $LanguageManager->getByCode($language_code);
+				$separators = [
+					'decimales' => $language->get('separador_decimales'),
+					'miles' => $language->get('separador_miles')
+				];
+			} else {
+				$leyend_value = Format::currency($value, $id_moneda);
+				$currency = $CurrencyManager->getById($id_moneda);
+				$separators = [
+					'decimales' => $currency->get('separador_decimales'),
+					'miles' => $currency->get('separador_miles')
+				];
+			}
+
+			$labels_tooltips_comparado[] = "{$leyend_value} {$datatypes['symbol_datatype']}";
+		}
+
 		$yAxes[] = [
 			'type' => 'linear',
 			'display' => $option_display,
@@ -248,20 +296,28 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 				'labelString' => Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda)
 			],
 			'ticks' => [
-				'beginAtZero' => true
+				'beginAtZero' => true,
+				'callback' => $separators
 			]
 		];
+	}
+
+	foreach ($labels_tooltips as $key => $value) {
+		$labels_tooltips_callback[] = [$value, $labels_tooltips_comparado[$key]];
 	}
 
 	$options = [
 		'responsive' => true,
 		'tooltips' => [
-			'mode' => 'label'
+			'mode' => 'label',
+			'callbacks' => [
+				'label' => $labels_tooltips_callback,
+			]
 		],
 		'title' => [
 			'display' => true,
 			'fontSize' => 14,
-			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+			'text' => Convert::utf8($titulo)
 		],
 		'scales' => [
 			'xAxes' => [[
@@ -293,19 +349,26 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato, $id_moneda) {
 	->setHoverBorderColor(255, 255, 255, 0);
 
 	array_walk($labels, function(&$labels) {
-		$labels = mb_detect_encoding($labels, 'UTF-8', true) ? $labels : utf8_encode($labels);
+		$labels = Convert::utf8($labels);
 	});
 
 	$labels_leyend = [];
 	$total = array_sum($datos);
-	$symbol_datatype = Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda);
-	$symbol_datatype = mb_detect_encoding($symbol_datatype, 'UTF-8', true) ? $symbol_datatype : utf8_encode($symbol_datatype);
+	$datatypes = getDatatypes($tipo_dato, $sesion, $id_moneda);
+
 	foreach ($datos as $key => $value) {
 		$percentage = round(((floatval($value) / $total) * 100), 2);
-		$labels_leyend[] = "{$labels[$key]}: {$value} {$symbol_datatype} ({$percentage}%)";
+		$percentage = Format::number($percentage);
+		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
+			$leyend_value = Format::number($value);
+		} else {
+			$leyend_value = Format::currency($value, $id_moneda);
+		}
+
+		$labels_leyend[] = "{$labels[$key]}: {$leyend_value} {$datatypes['symbol_datatype']} ({$percentage}%)";
 		$labels_leyend_tooltips[] = [
 			$labels[$key],
-			"{$value} {$symbol_datatype} ({$percentage}%)"
+			"{$leyend_value} {$datatypes['symbol_datatype']} ({$percentage}%)"
 		];
 	}
 
@@ -317,7 +380,7 @@ function graficoTarta($titulo, $labels, $datos, $tipo_dato, $id_moneda) {
 		'title' => [
 			'display' => true,
 			'fontSize' => 14,
-			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+			'text' => Convert::utf8($titulo)
 		],
 		'tooltips' => [
 			'mode' => 'label',
@@ -342,10 +405,35 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 	$datasetLinea = new TTB\Graficos\DatasetLine();
 	$datasetLineaComparado = new TTB\Graficos\DatasetLine();
 
+	$LanguageManager = new LanguageManager($sesion);
+	$CurrencyManager = new CurrencyManager($sesion);
+
 	$datasetLinea->setLabel(__($tipo_dato))
 		->setType('line')
 		->setYAxisID('y-axis-1')
 		->setData($datos);
+
+	$datatypes = getDatatypes($tipo_dato, $sesion, $id_moneda);
+	foreach ($datos as $key => $value) {
+		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
+			$leyend_value = Format::number($value);
+			$language_code = strtolower(Conf::read('Idioma'));
+			$language = $LanguageManager->getByCode($language_code);
+			$separators = [
+				'decimales' => $language->get('separador_decimales'),
+				'miles' => $language->get('separador_miles')
+			];
+		} else {
+			$leyend_value = Format::currency($value, $id_moneda);
+			$currency = $CurrencyManager->getById($id_moneda);
+			$separators = [
+				'decimales' => $currency->get('separador_decimales'),
+				'miles' => $currency->get('separador_miles')
+			];
+		}
+
+		$labels_leyend[] = "{$leyend_value} {$datatypes['symbol_datatype']}";
+	}
 
 	$datasetLineaComparado->setLabel(__($tipo_dato_comparado))
 		->setType('line')
@@ -353,6 +441,28 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 		->setBackgroundColor(39, 174, 96, 0.5)
 		->setBorderColor(39, 174, 96, 0.8)
 		->setData($datos_comparados);
+
+	$datatypes_comparado = getDatatypes($tipo_dato_comparado, $sesion, $id_moneda);
+	foreach ($datos_comparados as $key => $value) {
+		if (strcmp($datatypes_comparado['datatype'], 'Hr.') === 0) {
+			$leyend_value = Format::number($value);
+			$language_code = strtolower(Conf::read('Idioma'));
+			$language = $LanguageManager->getByCode($language_code);
+			$separators_comparado = [
+				'decimales' => $language->get('separador_decimales'),
+				'miles' => $language->get('separador_miles')
+			];
+		} else {
+			$leyend_value = Format::currency($value, $id_moneda);
+			$currency = $CurrencyManager->getById($id_moneda);
+			$separators_comparado = [
+				'decimales' => $currency->get('separador_decimales'),
+				'miles' => $currency->get('separador_miles')
+			];
+		}
+
+		$labels_leyend_comparado[] = "{$leyend_value} {$datatypes_comparado['symbol_datatype']}";
+	}
 
 	$yAxes[] = [
 		'type' => 'linear',
@@ -371,7 +481,8 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 			'labelString' => Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda)
 		],
 		'ticks' => [
-			'beginAtZero' => true
+			'beginAtZero' => true,
+			'callback' => $separators
 		]
 	];
 
@@ -391,19 +502,30 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 			'labelString' => Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda)
 		],
 		'ticks' => [
-			'beginAtZero' => true
+			'beginAtZero' => true,
+			'callback' => $separators_comparado
 		]
 	];
+
+	foreach ($labels_leyend as $key => $value) {
+		$labels_leyend_callback[] = [$value, $labels_leyend_comparado[$key]];
+	}
 
 	$options = [
 		'title' => [
 			'display' => true,
 			'fontSize' => 14,
-			'text' => mb_detect_encoding($titulo, 'UTF-8', true) ? $titulo : utf8_encode($titulo)
+			'text' => Convert::utf8($titulo)
 		],
 		'scales' => [
 			'yAxes' => $yAxes
-		]
+		],
+		'tooltips' => [
+			'mode' => 'label',
+			'callbacks' => [
+				'label' => $labels_leyend_callback,
+			]
+		],
 	];
 
 	$grafico->setNameChart($titulo)
@@ -414,4 +536,15 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 		->setOptions($options);
 
 	echo $grafico->getJson();
+}
+
+function getDatatypes($datatype, $sesion, $id_currency) {
+	$s_datatype = Reporte::sTipoDato($datatype);
+	$symbol_datatype = Reporte::simboloTipoDato($datatype, $sesion, $id_currency);
+	$symbol_datatype = Convert::utf8($symbol_datatype);
+
+	return array(
+		'datatype' => $s_datatype,
+		'symbol_datatype' => $symbol_datatype
+	);
 }

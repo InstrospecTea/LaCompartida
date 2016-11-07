@@ -1041,7 +1041,7 @@ function funcionTR(& $trabajo) {
 	}
 
 	//$html .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-	$html .= "<td><strong>Desc.</strong></td><td colspan='" . ($desc_colspan + 1) . "' align=left>" . LinkAlTrabajo($trabajo, '#' . $trabajo->fields['id_trabajo']) . "&nbsp;" . stripslashes($trabajo->fields['descripcion']) . "</td>";
+	$html .= "<td><strong>Desc.</strong></td><td colspan='" . ($desc_colspan + 1) . "' align=left>" . LinkAlTrabajo($trabajo, '#' . $trabajo->fields['id_trabajo']) . "&nbsp;" . stripslashes(htmlentities($trabajo->fields['descripcion'])) . "</td>";
 
 	$columna_tarifa = "<td colspan=2 align=center><strong>" . __('Tarifa') . "</strong><br>" . ( $moneda_cobro->fields['id_moneda'] > 0 ? $moneda_cobro->fields['simbolo'] : Utiles::glosa($sesion, $trabajo->fields['id_moneda_contrato'], 'simbolo', 'prm_moneda', 'id_moneda')) . " " . $tarifa . "</td>";
 

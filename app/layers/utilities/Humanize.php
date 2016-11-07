@@ -1,6 +1,6 @@
 <?php
 
-abstract class Humanize {
+class Humanize {
 	/**
 	 * Agrega el texto humanizado a la data
 	 * @param 	string $table_name
