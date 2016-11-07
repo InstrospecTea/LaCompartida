@@ -3303,7 +3303,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				jQuery('document').ready(function() {
 					var $ = jQuery;
 					var auth_token = "<?= $Sesion->auth_token ?>";
-					var generator_url = "<?php echo Conf::RootDir() . '/api/v2/index.php/agreements/' . $contrato->fields['id_contrato'] . '/generators' ?>";
+					var generator_url = "<?php echo Conf::RootDir() . '/api/v2/index.php/agreements/' . $contrato->fields['id_contrato'] ?>";
 					var actionButtons = function(id_contract_generator) {
 						return '<td align="center"  class="border_plomo" style="white-space:nowrap; width: 52px;">\
 							<a data-id="' + id_contract_generator + '" class="fl edit_generator ui-button editar" style="margin: 3px 1px;width: 18px;height: 18px;" title="Modificar Generador" href="javascript:void(0)">&nbsp;</a>\
@@ -3345,7 +3345,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 					var loadGenerators = function() {
 						$.ajax({
-							url: generator_url,
+							url: generator_url + '?joins=generators',
 							headers: {
 								authtoken: auth_token
 							}
@@ -3359,7 +3359,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								header.append('<td align="right" class="border_plomo"><b><?php echo __('Acciones'); ?></b></td>');
 								rows.append(header);
 
-								$.each(data, function(i, generator) {
+								$.each(data['generadores'], function(i, generator) {
 									generator_row = $('<tr>');
 									generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
 									generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
@@ -3392,7 +3392,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						}
 						var generator_id = $(this).data('id');
 						$.ajax({
-							url: generator_url + '/' + generator_id,
+							url: generator_url + '/generators/' + generator_id,
 							headers: {
 								authtoken: auth_token
 							},
@@ -3421,7 +3421,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 							if (form_status == 'EDIT') {
 								$.ajax({
-									url: generator_url + '/' + id_agreement_generator,
+									url: generator_url + '/generators/' + id_agreement_generator,
 									headers: {
 										authtoken: auth_token
 									},
@@ -3440,7 +3440,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									return;
 								}
 								$.ajax({
-									url: generator_url,
+									url: generator_url + '/generators',
 									headers: {
 										authtoken: auth_token
 									},

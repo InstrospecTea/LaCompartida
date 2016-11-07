@@ -227,23 +227,23 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
  *       ]
  *     }
  */
-$Slim->get('/agreements/:agreement_id/generators', function ($agreement_id) use ($Session, $Slim) {
-	$API = new Api\V2\GeneratorAPI($Session, $Slim);
+$Slim->get('/agreements/:agreement_id', function ($agreement_id) use ($Session, $Slim) {
+	$API = new Api\V2\AgreementsAPI($Session, $Slim);
 	$API->getAgreementGenerators($agreement_id);
 });
 
 $Slim->post('/agreements/:agreement_id/generators', function ($agreement_id) use ($Session, $Slim) {
-	$API = new Api\V2\GeneratorAPI($Session, $Slim);
+	$API = new Api\V2\GeneratorsAPI($Session, $Slim);
 	$API->createAgreementGenerator($agreement_id);
 });
 
 $Slim->put('/agreements/:agreement_id/generators/:generator_id', function ($agreement_id, $generator_id) use ($Session, $Slim) {
-	$API = new Api\V2\GeneratorAPI($Session, $Slim);
+	$API = new Api\V2\GeneratorsAPI($Session, $Slim);
 	$API->updateAgreementGenerator($agreement_id, $generator_id);
 });
 
 $Slim->delete('/agreements/:agreement_id/generators/:generator_id', function ($agreement_id, $generator_id) use ($Session, $Slim) {
-	$API = new Api\V2\GeneratorAPI($Session, $Slim);
+	$API = new Api\V2\GeneratorsAPI($Session, $Slim);
 	$API->deleteAgreementGenerator($agreement_id, $generator_id);
 });
 

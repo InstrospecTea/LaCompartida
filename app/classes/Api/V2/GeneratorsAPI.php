@@ -7,19 +7,6 @@ namespace Api\V2;
  */
 class GeneratorsAPI extends AbstractSlimAPI {
 
-	public function getAgreementGenerators($agreement_id) {
-		$this->validateAuthTokenSendByHeaders();
-
-		if (empty($agreement_id) || !is_numeric($agreement_id)) {
-			$this->halt(__('Invalid agreement ID'), 'InvalidAgreementId');
-		}
-
-		$Generator = new \GeneratorManager($this->session);
-		$result = $Generator->getAgreementGenerators($agreement_id);
-
-		$this->outputJson($result);
-	}
-
 	public function updateAgreementGenerator($agreement_id, $generator_id) {
 		$this->validateAuthTokenSendByHeaders();
 
