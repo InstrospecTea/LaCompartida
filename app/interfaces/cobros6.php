@@ -66,7 +66,6 @@ if ($opc == 'eliminar_documento') {
 		}
 		$cobro->CambiarEstadoSegunFacturas();
 	} catch (ForeignKeyConstraintFailsException $e) {
-		$sesion->pdodbh->rollBack();
 		$pagina->AddError(__('El documento no pudo ser eliminado, ya que aún tiene pagos asociados.'));
 	} catch (PDOException $e) {
 		$sesion->pdodbh->rollBack();
