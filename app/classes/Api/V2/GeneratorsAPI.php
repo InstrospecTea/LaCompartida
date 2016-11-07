@@ -5,7 +5,7 @@ namespace Api\V2;
 /**
  * Clase con métodos para Generador (Contratos)
  */
-class GeneratorAPI extends AbstractSlimAPI {
+class GeneratorsAPI extends AbstractSlimAPI {
 
 	public function getAgreementGenerators($agreement_id) {
 		$this->validateAuthTokenSendByHeaders();
