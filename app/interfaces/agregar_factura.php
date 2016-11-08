@@ -616,8 +616,7 @@ $Form->defaultLabel = false;
 						'id_estado',
 						PrmEstadoFactura::getList($sesion),
 						$factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado,
-						['onchange' => 'mostrarAccionesEstado(this.form)', $deshabilita_estado, 'style' => 'width:160px'],
-						false
+						['onchange' => 'mostrarAccionesEstado(this.form)', $deshabilita_estado, 'style' => 'width:160px', 'translate' => false]
 					);
 				?>
 				<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
