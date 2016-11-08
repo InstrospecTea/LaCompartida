@@ -180,11 +180,11 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
 });
 
 /**
- * @api {get} /agreements/:agreement_id/generators Get all generators
- * @apiName Get Generator
+ * @api {get} /agreements/:agreement_id Get agreement data
+ * @apiName Get agreement data
  * @apiVersion 2.0.0
  * @apiGroup Agreements
- * @apiDescription Get a list of generatos's agreement
+ * @apiDescription Get a list of agreement data
  *
  * @apiHeader {String} AUTHTOKEN=136b17e3a34db13c98ec404fa9035796b52cbf8c  Login Token
  *
