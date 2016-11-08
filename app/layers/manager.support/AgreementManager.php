@@ -79,7 +79,7 @@ class AgreementManager extends AbstractManager implements IAgreementManager {
 			$result[$agreement_id]['generators'] = $generators;
 		}
 
-		if (in_array('clients', $embed)) {
+		if (in_array('client', $embed)) {
 			$client = new Criteria($this->Sesion);
 			$client = $client->add_select('cliente.codigo_cliente', 'client_code')
 												->add_select('cliente.glosa_cliente', 'client_gloss')
