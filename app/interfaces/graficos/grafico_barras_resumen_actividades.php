@@ -38,10 +38,30 @@ $y_axes = [];
 $titulo = utf8_decode($_POST['titulo']);
 
 $grafico = new TTB\Graficos\Grafico();
-$dataset = new TTB\Graficos\Dataset();
+if (is_null($datos)) {
+	echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
+	return;
+}
 
+$display['base'] = true;
+$display['comparado'] = true;
+$position['base'] = 'left';
+$position['comparado'] = 'right';
+$id_y['base'] = 'y-axis-1';
+$id_y['comparado'] = 'y-axis-2';
+
+if (max($datos) > max($datos_comparados)) {
+	$display['comparado'] = false;
+	$id_y['comparado'] = 'y-axis-1';
+} else {
+	$display['base'] = false;
+	$position['comparado'] = 'left';
+	$id_y['base'] = 'y-axis-2';
+}
+
+$dataset = new TTB\Graficos\Dataset();
 $dataset->setLabel(__('Horas cobrables'))
-	->setYAxisID('y-axis-1')
+	->setYAxisID($id_y['base'])
 	->setData(array_values($datos));
 
 $grafico->setNameChart($titulo)
@@ -64,8 +84,8 @@ foreach ($datos as $key => $value) {
 
 $y_axes[] = [
 	'type' => 'linear',
-	'display' => true,
-	'position' => 'left',
+	'display' => $display['base'],
+	'position' => $position['base'],
 	'id' => 'y-axis-1',
 	'gridLines' => [
 		'display' => false
@@ -83,7 +103,7 @@ if ($datos_comparados) {
 	$dataset_comparado = new TTB\Graficos\Dataset();
 
 	$dataset_comparado->setLabel(__('Horas trabajadas'))
-		->setYAxisID('y-axis-2')
+		->setYAxisID($id_y['comparado'])
 		->setBackgroundColor(39, 174, 96, 0.5)
 		->setBorderColor(39, 174, 96, 0.8)
 		->setHoverBackgroundColor(39, 174, 96, 0.75)
@@ -105,8 +125,8 @@ if ($datos_comparados) {
 	$grafico->addDataset($dataset_comparado);
 	$y_axes[] = [
 		'type' => 'linear',
-		'display' => false,
-		'position' => 'right',
+		'display' => $display['comparado'],
+		'position' => $position['comparado'],
 		'id' => 'y-axis-2',
 		'gridLines' => [
 			'display' => false
