@@ -3345,7 +3345,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 					var loadGenerators = function() {
 						$.ajax({
-							url: generator_url + '?joins=generators',
+							url: generator_url + '?embed=generators',
 							headers: {
 								authtoken: auth_token
 							}
@@ -3359,13 +3359,13 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								header.append('<td align="right" class="border_plomo"><b><?php echo __('Acciones'); ?></b></td>');
 								rows.append(header);
 
-								$.each(data['generadores'], function(i, generator) {
+								$.each(data['generators'], function(i, generator) {
 									generator_row = $('<tr>');
-									generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
-									generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
-									generator_row.append('<td align="left" class="border_plomo category-data" data-category_value="' + generator.id_categoria + '">' + generator.nombre_categoria + '</td>');
-									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">' + generator.porcentaje_genera + '%</td>');
-									generator_row.append(actionButtons(generator.id_contrato_generador));
+									generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.user_id + '">'+ generator.name + '</td>');
+									generator_row.append('<td align="left" class="border_plomo">' + generator.user_area + '</td>');
+									generator_row.append('<td align="left" class="border_plomo category-data" data-category_value="' + generator.category_generator_id + '">' + generator.category_name + '</td>');
+									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.percent + '">' + generator.percent + '%</td>');
+									generator_row.append(actionButtons(generator.agreement_generator_id));
 									rows.append(generator_row);
 								});
 
