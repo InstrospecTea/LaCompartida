@@ -189,34 +189,48 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
  * @apiHeader {String} AUTHTOKEN=136b17e3a34db13c98ec404fa9035796b52cbf8c  Login Token
  *
  * @apiParam {Integer} agreement_id The :agreement_id corresponds to an agreement id attribute.
+ * @apiParam {String} embed (at least one) A list of embed relations
  *
- * @apiSuccess {Integer} id_contrato_generador Agreement Generator Id
- * @apiSuccess {Integer} id_cliente Client Id
- * @apiSuccess {Integer} id_contrato Agreement Id
- * @apiSuccess {String} area_usuario User Area
- * @apiSuccess {Integer} id_usuario User Id
- * @apiSuccess {String} nombre Name
- * @apiSuccess {Integer} porcentaje_genera Percent
- * @apiSuccess {String} nombre_categoria Category Name
- * @apiSuccess {Integer} id_categoria Category Id
+ * @apiParamExample Params-Example:
+ *     ?embed=generators
+ *     ?embed=generators,clients
+ *     ?embed=generators,clients,projects
+ *     ?embed=projects
+ *
+ * @apiSuccess {Generator} generators If embed=generators is provided, then returns a generator entity
+ * @apiSuccess {Client} client If embed=client is provided, then returns a client entity
+ * @apiSuccess {Project} projects If embed=projects is provided, then returns a project entity
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
- *     [
- *       {
- *         "id_contrato_generador": "1",
- *         "id_cliente": "3405",
- *         "id_contrato": "6089",
- *         "area_usuario": "Corporativo",
- *         "id_usuario": "171",
- *         "nombre": "ADARVE  LUZ HELENA",
- *         "porcentaje_genera": "22",
- *         "nombre_categoria": "Test",
- *         "id_categoria": "1"
- *       }
- *     ]
+ *     {
+ *       "generators": [
+ *         {
+ *           "id_contrato_generador": "1",
+ *           "id_categoria": "2",
+ *           "porcentaje_genera": "1",
+ *           "area_usuario": "Pilot",
+ *           "id_usuario": "18",
+ *           "nombre": "Bodoque Juan Carlos",
+ *           "nombre_categoria": "CQC"
+ *         }
+ *       ],
+ *       "client": [
+ *         {
+ *           "codigo_cliente": "001391",
+ *           "glosa_cliente": "Abogados y Abogados."
+ *         }
+ *       ],
+ *       "projects": [
+ *         {
+ *           "codigo_asunto": "001391-0003",
+ *           "glosa_asunto": "Consulta 007"
+ *         }
+ *       ]
+ *     }
  *
  * @apiError InvalidAgreementId empty or is not numeric
+ * @apiError InvalidEmbed empty
  *
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 400 Invalid Params
@@ -224,6 +238,15 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
  *       "errors": [
  *         "code": "InvalidAgreementId",
  *         "message": "Invalid agreement ID"
+ *       ]
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Invalid Params
+ *     {
+ *       "errors": [
+ *         "code": "InvalidEmbed",
+ *         "message": "Invalid embed I need at least one"
  *       ]
  *     }
  */
