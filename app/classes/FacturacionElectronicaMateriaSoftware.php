@@ -86,67 +86,67 @@ EOF;
 	*/
 	public static function DescargarPdf($hookArg) {
 		$Sesion = new Sesion();
-		$factura = $hookArg['Factura'];
+		$Factura = $hookArg['Factura'];
 
-		$PrmDocumentoLegal = new PrmDocumentoLegal($factura->sesion);
-		$PrmDocumentoLegal->Load($factura->fields['id_documento_legal']);
-		$docName = UtilesApp::slug($PrmDocumentoLegal->fields['glosa']);
-		$name = sprintf('%s_%s.pdf', $docName, $factura->obtenerNumero());
+		$DocumentoLegal = new PrmDocumentoLegal($Factura->sesion);
+		$DocumentoLegal->Load($Factura->fields['id_documento_legal']);
+		$docName = UtilesApp::slug($DocumentoLegal->fields['glosa']);
+		$name = sprintf('%s_%s.pdf', $docName, $Factura->obtenerNumero());
 
 		$Estudio = new PrmEstudio($Sesion);
-		$Estudio->Load($factura->fields['id_estudio']);
+		$Estudio->Load($Factura->fields['id_estudio']);
 
-		$WsFacturacionSatcom = new WsFacturacionSatcom($Estudio->GetMetaData('facturacion_electronica_satcom.Url'));
-		$documento = $WsFacturacionSatcom->obtenerPdf($factura->fields['dte_url_pdf']);
+		$WsFacturacionMateriaSoftware = new WsFacturacionMateriaSoftware(
+			$Estudio->GetMetaData('facturacion_electronica_materia_software.Url'),
+			$Estudio->GetMetaData('facturacion_electronica_materia_software.Authorization')
+		);
+
+		$documento = json_decode($Factura->fields['dte_url_pdf']);
+
+		$pdf = $WsFacturacionMateriaSoftware->GetStatus(
+			$documento->Serie,
+			(int) $documento->Correlativo
+		);
 
 		header("Content-Transfer-Encoding: binary");
 		header("Content-Type: application/pdf");
 		header('Content-Description: File Transfer');
 		header("Content-Disposition: attachment; filename={$name}");
-		echo $documento;
+		echo base64_decode($pdf->PDF);
 		exit;
 	}
 
 	public static function GeneraFacturaElectronica($hookArg) {
 		$Sesion = new Sesion();
-		$factura = $hookArg['Factura'];
+		$Factura = $hookArg['Factura'];
 
-		if (!empty($factura->fields['dte_url_pdf'])) {
-			$hookArg['InvoiceURL'] = $factura->fields['dte_url_pdf'];
+		if (!empty($Factura->fields['dte_url_pdf'])) {
+			$hookArg['InvoiceURL'] = $Factura->fields['dte_url_pdf'];
 		} else {
 			$Estudio = new PrmEstudio($Sesion);
-			$Estudio->Load($factura->fields['id_estudio']);
+			$Estudio->Load($Factura->fields['id_estudio']);
 
-			$factura->fields['Estudio']['RucEmisor'] = $Estudio->GetMetaData('facturacion_electronica_satcom.RucEmisor');
-			$factura->fields['Estudio']['ClaveAcceso'] = $Estudio->GetMetadata('facturacion_electronica_satcom.ClaveAcceso');
-			$factura->fields['Estudio']['Establecimiento'] = $Estudio->GetMetadata('facturacion_electronica_satcom.Establecimiento');
-			$factura->fields['Estudio']['Punto'] = $Estudio->GetMetadata('facturacion_electronica_satcom.Punto');
-
-			$PrmDocumentoLegal = new PrmDocumentoLegal($Sesion);
-			$PrmDocumentoLegal->Load($factura->fields['id_documento_legal']);
-			$factura->fields['PrmDocumentoLegal']['codigo_dte'] = $PrmDocumentoLegal->fields['codigo_dte'];
-			$factura->fields['PrmDocumentoLegal']['glosa'] = $PrmDocumentoLegal->fields['glosa'];
-
-			if (!empty($factura->fields['id_factura_padre'])) {
-				$FacturaPadre = new Factura($Sesion);
-				$FacturaPadre->Load($factura->fields['id_factura_padre']);
-				$factura->fields['FacturaPadre'] = $FacturaPadre->fields;
-			}
+			$Moneda = new Moneda($Sesion);
+			$Moneda->Load($Factura->fields['id_moneda']);
 
 			$WsFacturacionMateriaSoftware = new WsFacturacionMateriaSoftware(
-				$Estudio->GetMetaData('facturacion_electronica_materia_software.Url')
+				$Estudio->GetMetaData('facturacion_electronica_materia_software.Url'),
+				$Estudio->GetMetaData('facturacion_electronica_materia_software.Authorization')
 			);
 
-			$documento = $WsFacturacionMateriaSoftware->emitirFactura($factura);
+			$DocumentoLegal = new PrmDocumentoLegal($Factura->sesion);
+			$DocumentoLegal->Load($Factura->fields['id_documento_legal']);
+
+			$documento = $WsFacturacionMateriaSoftware->documento($Factura, $Moneda, $DocumentoLegal);
 
 			if ($WsFacturacionMateriaSoftware->hasError()) {
 				$hookArg['Error'] = self::parseError($WsFacturacionMateriaSoftware, 'BuildingInvoiceError');
 			} else {
 				try {
-					$factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
-					$factura->Edit('dte_url_pdf', $documento);
-					if ($factura->Write()) {
-						$hookArg['InvoiceURL'] = $documento;
+					$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
+					$Factura->Edit('dte_url_pdf', json_encode($documento));
+					if ($Factura->Write()) {
+						$hookArg['InvoiceURL'] = json_encode($documento);
 					}
 				} catch (Exception $ex) {
 					$hookArg['Error'] = self::parseError($ex, 'BuildingInvoiceError');
@@ -166,8 +166,6 @@ EOF;
 			$error_description = utf8_encode($result->getErrorMessage());
 			$error_log = $error_description;
 		}
-
-		Log::write($error_log, "FacturacionElectronicaSatcom");
 
 		return array(
 			'Code' => $error_code,

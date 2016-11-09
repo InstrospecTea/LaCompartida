@@ -6,6 +6,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 
 	private $default_message_error;
 	private $token;
+	private $body_invoice;
 
 	public function __construct($url, $token) {
 		$this->Client = new \GuzzleHttp\Client();
@@ -13,6 +14,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		$this->url = $url;
 		$this->token = $token;
 		$this->default_message_error = 'Ocurrió un error inesperado con Materia Software: ';
+		$this->body_invoice = null;
 	}
 
 	private function getHeaders() {
@@ -23,21 +25,22 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		];
 	}
 
-	public function emitirFactura(Factura $Factura, Moneda $Moneda) {
-		$factura_emitida = '';
+	public function documento(Factura $Factura, Moneda $Moneda, PrmDocumentoLegal $DocumentoLegal) {
+		$documento = null;
 
 		try {
+			$this->generateBodyInvoice($Factura, $Moneda, $DocumentoLegal);
+
 			$respuesta = $this->Client->request(
 				'POST',
 				"{$this->url}/documento",
 				[
 					'headers' => $this->getHeaders(),
-					'body' => $this->getBody($Factura, $Moneda)
+					'body' => json_encode($this->body_invoice)
 				]
 			);
 
-			$factura_emitida = $respuesta->getBody();
-
+			$documento = json_decode($respuesta->getBody());
 		} catch (GuzzleHttp\Exception\ServerException $e) {
 			$response = $e->getResponse();
 			$json_response = json_decode($response->getBody()->getContents());
@@ -45,14 +48,38 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		} catch(GuzzleHttp\Exception\ClientException $e) {
 			$response = $e->getResponse();
 			$json_response = json_decode($response->getBody()->getContents());
-			$this->setError(1, $this->default_message_error . $json_response->ExceptionMessage);
+			$this->setError(2, $this->default_message_error . $json_response->ExceptionMessage);
 		}
 
-		return $factura_emitida;
+		return $documento;
 	}
 
-	private function getBody(&$Factura, &$Moneda) {
-		$body = [
+	public function GetStatus($serie, $correlativo) {
+		$documento = null;
+
+		try {
+			$respuesta = $this->Client->request(
+				'GET',
+				"{$this->url}/documento/GetStatus?serie={$serie}&correlativo={$correlativo}",
+				['headers' => $this->getHeaders()]
+			);
+
+			$documento = json_decode($respuesta->getBody());
+		} catch (GuzzleHttp\Exception\ServerException $e) {
+			$response = $e->getResponse();
+			$json_response = json_decode($response->getBody()->getContents());
+			$this->setError(1, $this->default_message_error . $json_response->ExceptionMessage);
+		} catch(GuzzleHttp\Exception\ClientException $e) {
+			$response = $e->getResponse();
+			$json_response = json_decode($response->getBody()->getContents());
+			$this->setError(2, $this->default_message_error . $json_response->ExceptionMessage);
+		}
+
+		return $documento;
+	}
+
+	private function generateBodyInvoice(&$Factura, &$Moneda, &$DocumentoLegal) {
+		$this->body_invoice = [
 			'Cliente' => [
 				'NumeroDeDocumento' => (string) $Factura->fields['numero'],
 				'Nombre' => (string) $Factura->fields['cliente'],
@@ -66,8 +93,8 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 			'Documento' => [
 				'Serie' => (string) $Factura->fields['serie_documento_legal'],
 				// 'Correlativo' => 1,
-				'TipoDeDocumento' => 10,
-				'Descripcion' => (string) substr($Factura->fields['glosa'], 0, 250)
+				'TipoDeDocumento' => (int) $DocumentoLegal->fields['codigo_dte'],
+				'Descripcion' => (string) utf8_encode(substr($Factura->fields['glosa'], 0, 250))
 			],
 			'FechaDeVencimiento' => "{$Factura->fields['fecha_vencimiento']}T00:00:00",
 			// 'DetraccionPercent' => 0,
@@ -102,20 +129,9 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 				],
 			]
 		];
-
-		TTB\Debug::pr(json_encode($body, JSON_PRETTY_PRINT));
-
-		return json_encode($body);
 	}
 
-	public function obtenerPdf($id_comprobante) {
-		$pdf = '';
-
-		try {
-		} catch(Exception $ex) {
-			$this->setError(1, $this->default_message_error);
-		}
-
-		return $pdf;
+	public function getBodyInvoice() {
+		return $this->body_invoice;
 	}
 }

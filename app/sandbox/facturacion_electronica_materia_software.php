@@ -13,12 +13,33 @@ $Estudio->Load($Factura->fields['id_estudio']);
 $Moneda = new Moneda($Sesion);
 $Moneda->Load($Factura->fields['id_moneda']);
 
+$DocumentoLegal = new PrmDocumentoLegal($Sesion);
+$DocumentoLegal->Load($Factura->fields['id_documento_legal']);
+
 $WsFacturacionMateriaSoftware = new WsFacturacionMateriaSoftware(
 	$Estudio->GetMetaData('facturacion_electronica_materia_software.Url'),
 	$Estudio->GetMetaData('facturacion_electronica_materia_software.Authorization')
 );
 
-$factura_emitida = $WsFacturacionMateriaSoftware->emitirFactura($Factura, $Moneda);
+$documento = $WsFacturacionMateriaSoftware->documento(
+	$Factura,
+	$Moneda,
+	$DocumentoLegal
+);
 
-echo '<div>', $factura_emitida, '</div>';
-echo '<div>', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
+TTB\Debug::pr(json_encode($WsFacturacionMateriaSoftware->getBodyInvoice(), JSON_PRETTY_PRINT));
+
+// $pdf = $WsFacturacionMateriaSoftware->GetStatus(
+// 	$documento->Serie,
+// 	(int) $documento->Correlativo
+// );
+
+// echo "<div>Invoice: {$documento->Serie} {$documento->Correlativo}</div>";
+// echo '<div>Code: ', $WsFacturacionMateriaSoftware->getErrorCode(), '</div>';
+// echo '<div>Message: ', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
+
+// header("Content-Transfer-Encoding: binary");
+// header("Content-Type: application/pdf");
+// header('Content-Description: File Transfer');
+// header("Content-Disposition: attachment; filename={$documento->Serie}-{$documento->Correlativo}.pdf");
+// echo base64_decode($pdf->PDF);
