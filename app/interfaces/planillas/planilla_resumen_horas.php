@@ -125,8 +125,6 @@ $ws->write($offset_filas, $offset_columnas + 11, __('Margen bruto'), $formato_ti
 $ws->write($offset_filas, $offset_columnas + 12, __('Porcentaje margen'), $formato_titulo_5);
 
 $fila = $offset_filas;
-$ids = array();
-$i = 0;
 
 $meses = array(__("Enero"), __("Febrero"), __("Marzo"), __("Abril"), __("Mayo"), __("Junio"), __("Julio"), __("Agosto"), __("Septiembre"), __("Octubre"), __("Noviembre"), __("Diciembre"));
 
