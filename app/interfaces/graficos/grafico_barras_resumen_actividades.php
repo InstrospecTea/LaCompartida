@@ -60,13 +60,13 @@ if (max($datos) > max($datos_comparados)) {
 }
 
 $dataset = new TTB\Graficos\Dataset();
-$dataset->setLabel(__('Horas cobrables'))
+$dataset->setLabel($labels[0])
 	->setYAxisID($id_y['base'])
 	->setData(array_values($datos));
 
-$grafico->setNameChart($titulo)
-	->addDataset($dataset)
-	->addLabels($data['nombres']);
+$grafico->setNameChart(__($titulo))
+	->addLabels($data['nombres'])
+	->addDataset($dataset);
 
 $LanguageManager = new LanguageManager($Sesion);
 
@@ -102,7 +102,7 @@ $y_axes[] = [
 if ($datos_comparados) {
 	$dataset_comparado = new TTB\Graficos\Dataset();
 
-	$dataset_comparado->setLabel(__('Horas trabajadas'))
+	$dataset_comparado->setLabel($labels[1])
 		->setYAxisID($id_y['comparado'])
 		->setBackgroundColor(39, 174, 96, 0.5)
 		->setBorderColor(39, 174, 96, 0.8)
@@ -123,6 +123,7 @@ if ($datos_comparados) {
 	}
 
 	$grafico->addDataset($dataset_comparado);
+
 	$y_axes[] = [
 		'type' => 'linear',
 		'display' => $display['comparado'],
