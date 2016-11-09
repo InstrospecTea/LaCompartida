@@ -34,7 +34,6 @@ $wb->setCustomColor(36, 255, 255, 220);
 $wb->setCustomColor(40, 204, 204, 255);
 $wb->setCustomColor(41, 192, 192, 192);
 $wb->setCustomColor(42, 255, 204, 0);
-$ws->setRow(2, 14);
 
 // Formatos para distintos tipos de celdas
 $formato_titulo_1 = $wb->addFormat(array('FgColor' => '35', 'Size' => 12, 'VAlign' => 'top', 'Align' => 'justify', 'Bold' => '1', 'Locked' => 1, 'Border' => 1, 'Color' => 'black'));
@@ -73,6 +72,7 @@ $ws = $wb->addWorksheet(__("Reporte financiero"));
 $ws->setInputEncoding('utf-8');
 $ws->fitToPages(1, 0);
 $ws->setZoom(80);
+$ws->setRow(2, 14);
 
 // Imprimir encabezado
 $ws->write($offset_filas, $offset_columnas, __("Reporte financiero"), $formato_encabezado);
