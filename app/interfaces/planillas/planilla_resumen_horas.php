@@ -124,9 +124,6 @@ $ws->write($offset_filas, $offset_columnas + 10, __('Costo por hora trabajada'),
 $ws->write($offset_filas, $offset_columnas + 11, __('Margen bruto'), $formato_titulo_5);
 $ws->write($offset_filas, $offset_columnas + 12, __('Porcentaje margen'), $formato_titulo_5);
 
-// Número de columnas para rellenar con ceros al final, 5 de horas y 1 de valor cobrado
-$numero_columnas_a_llenar = 8;
-
 $fila = $offset_filas;
 $ids = array();
 $i = 0;
