@@ -2118,6 +2118,7 @@ HTML;
 	 * @param mixed $data Arreglo o string a modificar
 	 * @param boolean $encode encode (true) o decode (false)
 	 * @return mixed
+	 * @deprecated Utilizar Convert::utf8()
 	 */
 	public static function utf8izar($data, $encode = true) {
 		if (is_array($data)) {

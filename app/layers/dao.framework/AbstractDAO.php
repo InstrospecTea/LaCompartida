@@ -326,6 +326,27 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return false;
 	}
 
+	public function deleteOrException($object = null) {
+		$query = "DELETE FROM {$object->getPersistenceTarget()} WHERE {$object->getIdentity()} = {$object->get($object->getIdentity())}";
+		$reflected = new ReflectionClass($this->getClass());
+		if (is_subclass_of($object, 'LoggeableEntity')) {
+			$newInstance = $reflected->newInstance();
+			$newInstance->set($object->getIdentity(), $object->get($object->getIdentity()));
+			$this->writeLogFromArray('ELIMINAR', $newInstance, $object);
+		}
+		if ($object->isLoaded()) {
+			try {
+				$this->sesion->pdodbh->query($query);
+				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
+				return true;
+			}
+			catch (Exception $e) {
+				throw self::getDAOExceptionOrException($e);
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Comprueba si un objeto es parte de la jerarquía de clases definida en la capa.
 	 * @param $object Objeto que se comprobará.
@@ -465,4 +486,21 @@ abstract class AbstractDAO extends Objeto implements BaseDAO {
 		return isset($result[0]['count']) ? (int) $result[0]['count'] : 0;
 	}
 
+	protected function getDAOExceptionOrException(Exception $e){
+		$result = $e;
+		$message = $e->getMessage();
+		if (strstr($message, 'SQLSTATE[')) {
+			preg_match('/SQLSTATE\[(\w+)\]\: .*: (\d+) (.*)/', $message, $matches);
+
+			$SQLSTATE = $matches[1];
+			$code = $matches[2];
+			$message = $matches[3];
+
+			// USING AS GUIDE: https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html
+			if (in_array($code, [1216, 1217, 1451, 1452])) {
+				$result = new ForeignKeyConstraintFailsException($message);
+			}
+		}
+		return $result;
+	}
 }

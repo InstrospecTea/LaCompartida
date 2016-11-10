@@ -40,8 +40,10 @@
 
 	foreach ($respuesta as $i => $fila) {
 		$tiempo[] = $fila['tiempo'];
+		$tiempo_formateado = Format::number($fila['tiempo']);
+		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
 		$labels[] = $fila['codigo_asunto'];
-		$fila['glosa_asunto'] = mb_detect_encoding($fila['glosa_asunto'], 'UTF-8', true) === 'UTF-8' ? $fila['glosa_asunto'] : utf8_encode($fila['glosa_asunto']);
+		$fila['glosa_asunto'] = Convert::utf8($fila['glosa_asunto']);
 		$glosa_asunto[] = [
 			__('Cliente') . ': ' . $fila['codigo_cliente'],
 			__('Asunto')  . ': ' . $fila['glosa_asunto']
@@ -56,6 +58,14 @@
 		return;
 	}
 
+	$LanguageManager = new LanguageManager($sesion);
+	$language_code = strtolower(Conf::read('Idioma'));
+	$language = $LanguageManager->getByCode($language_code);
+	$separators = [
+		'decimales' => $language->get('separador_decimales'),
+		'miles' => $language->get('separador_miles')
+	];
+
 	$dataset = new TTB\Graficos\Dataset();
 
 	$options = [
@@ -64,12 +74,13 @@
 			'mode' => 'label',
 			'callbacks' => [
 				'afterTitle' => $glosa_asunto,
+				'label' => $tiempo_tooltip
 			]
 		],
 		'title' => [
 			'display' => true,
 			'fontSize' => 14,
-			'text' => mb_detect_encoding($titulo, 'UTF-8', true) === 'UTF-8' ? $titulo : utf8_encode($titulo)
+			'text' => Convert::utf8($titulo)
 		],
 		'scales' => [
 			'xAxes' => [[
@@ -94,7 +105,8 @@
 						'show' => true
 					],
 					'ticks' => [
-						'beginAtZero' => true
+						'beginAtZero' => true,
+						'callback' => $separators
 					]
 				]
 			]
