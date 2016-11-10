@@ -831,8 +831,11 @@ class UsuarioExt extends Usuario {
 		$criteria->add_select('U.id_usuario')
 				->add_select("CONCAT_WS(' ', U.apellido1, U.apellido2, ', ', U.nombre)", 'nombre')
 				->add_from('usuario U')
-				->add_restriction(CriteriaRestriction::equals('U.visible', 1))
-				->add_restriction(CriteriaRestriction::equals('U.activo', 1))
+				->add_restriction(CriteriaRestriction::or_clause(array(
+						CriteriaRestriction::equals('U.activo', 1),
+						CriteriaRestriction::equals('U.visible', 1)
+					)
+				))
 		 		->add_ordering('U.apellido1, U.apellido2, U.nombre');
 
 		if ($tipo == 1) {
