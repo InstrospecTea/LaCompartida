@@ -34,6 +34,12 @@ class NotaCobro extends NotaCobroResumenProfesional {
 		$this->espacio = $valorsinespacio;
 	}
 
+	public function Load($id_cobro) {
+		$result = parent::Load($id_cobro);
+		$this->ChargeData = new ChargeData($this->sesion, $this);
+		return $result;
+	}
+
 	function NuevoRegistro() {
 		return array(
 			'descripcion' => 'Nueva nota de cobro',
@@ -224,7 +230,6 @@ class NotaCobro extends NotaCobroResumenProfesional {
 		global $masi;
 		$masi = $masivo;
 
-		$this->ChargeData = new ChargeData($this->sesion, $this);
 		$parametros = $this->ParametrosGeneracion();
 		extract($parametros);
 
