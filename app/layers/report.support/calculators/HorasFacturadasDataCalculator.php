@@ -63,4 +63,7 @@ class HorasFacturadasDataCalculator extends AbstractInvoiceProportionalDataCalcu
 		$Criteria = null;
 	}
 
+	protected function needsInvoices() {
+		return true;
+	}
 }
