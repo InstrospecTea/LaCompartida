@@ -6,6 +6,9 @@ class FacturacionElectronicaMateriaSoftware extends FacturacionElectronica {
 		$Sesion = new Sesion();
 		global $pagina, $numero, $RUT_cliente, $cliente;
 
+		if (empty($numero)) {
+			$pagina->AddError(__('Debe ingresar') . ' ' . __('Número'));
+		}
 		if (empty($RUT_cliente)) {
 			$pagina->AddError(__('Debe ingresar') . ' ' . __('ROL/RUT'));
 		}
