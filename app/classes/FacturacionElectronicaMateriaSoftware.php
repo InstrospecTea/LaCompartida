@@ -6,11 +6,6 @@ class FacturacionElectronicaMateriaSoftware extends FacturacionElectronica {
 		$Sesion = new Sesion();
 		global $pagina, $numero, $RUT_cliente, $cliente;
 
-		if (empty($numero)) {
-			$pagina->AddError(__('Debe ingresar') . ' ' . __('Número'));
-		} else if (strlen($numero) < 9) {
-			$pagina->AddError(__('El Número del documento debe ser mayor a 9 dígitos.'));
-		}
 		if (empty($RUT_cliente)) {
 			$pagina->AddError(__('Debe ingresar') . ' ' . __('ROL/RUT'));
 		}
