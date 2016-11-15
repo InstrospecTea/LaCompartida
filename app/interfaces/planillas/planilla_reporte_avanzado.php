@@ -5,7 +5,7 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 
 $agrupadores = explode('-', $vista);
-
+var_dump($_REQUEST);exit;
 $datos = array();
 $datos[] = $tipo_dato;
 if ($comparar) {
@@ -17,9 +17,13 @@ $resultado = array();
 if ($filtros_check) {
 	$clientes = null;
 	$usuarios = null;
+	$grupo_clientes = null;
 
 	if ($check_clientes) {
 		$clientes = $clientesF;
+	}
+	if ($check_grupo_clientes) {
+		$grupo_clientes = $grupo_clientesF;
 	}
 	if ($check_profesionales) {
 		$usuarios = $usuariosF;
@@ -55,7 +59,7 @@ if ($comparar) {
 
 foreach ($datos as $dato) {
 	$reporte[$dato] = new Reporte($sesion);
-	$filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
+	$filtros = compact('clientes', 'grupo_clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 		'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
 		'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
 	$reporte[$dato]->setFiltros($filtros);
