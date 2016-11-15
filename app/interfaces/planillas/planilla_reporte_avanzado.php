@@ -5,7 +5,6 @@ $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 
 $agrupadores = explode('-', $vista);
-var_dump($_REQUEST);exit;
 $datos = array();
 $datos[] = $tipo_dato;
 if ($comparar) {
