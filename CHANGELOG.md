@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.33.0](https://github.com/LemontechSA/ttb/pull/1915)
+Wednesday, November 16th
+* **Feature** [Migración a PHP5.6](https://github.com/LemontechSA/ttb/pull/1233)
+
 ## [Release 16.32.0](https://github.com/LemontechSA/ttb/pull/1898)
 Friday, October 28th
 * **Feature** [Resumen profesional](https://github.com/LemontechSA/ttb/pull/1849)
