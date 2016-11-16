@@ -31,14 +31,14 @@ class UtilesApp extends Utiles {
 		}
 	}
 
-	public static function ObtenerContratoPrincipal ($sesion, $codigo_asunto) {
-			$codigo_cliente = explode("-",$codigo_asunto);
-			$consulta = "SELECT id_contrato FROM cliente WHERE codigo_cliente = '{$codigo_cliente[0]}'";
-			$respuesta = mysql_query($consulta, $sesion->dbh);
-			list($id_contrato) = mysql_fetch_array($respuesta);
+  public static function ObtenerContratoPrincipal ($sesion, $codigo_asunto) {
+      $codigo_cliente = explode("-",$codigo_asunto);
+      $consulta = "SELECT id_contrato FROM cliente WHERE codigo_cliente = '{$codigo_cliente[0]}'";
+      $respuesta = mysql_query($consulta, $sesion->dbh);
+      list($id_contrato) = mysql_fetch_array($respuesta);
 
-			return $id_contrato;
-	}
+      return $id_contrato;
+  }
 
 	public static function GetSimboloMonedaBase($sesion) {
 		$querypreparar = "select simbolo from prm_moneda where moneda_base=1 limit 0,1";
@@ -253,7 +253,7 @@ class UtilesApp extends Utiles {
 
 	#obtener el formato de la fecha segun un query, o el seteado en el idioma por defecto
 
-	function ObtenerFormatoFecha($sesion, $query = "") {
+	public static function ObtenerFormatoFecha($sesion, $query = "") {
 		if (strlen($query) > 0) { //si tiene query para intentar obtener el idioma según asunto, cobro, u otro ejecutamos query
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 			if (mysql_num_rows($resp) > 0) {
@@ -277,7 +277,7 @@ class UtilesApp extends Utiles {
 	 * @param int $id_carta
 	 * @return array $margenes
 	 */
-	function ObtenerMargenesCarta($sesion, $id_carta) {
+	public static function ObtenerMargenesCarta($sesion, $id_carta) {
 		$margenes = array();
 		$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina FROM carta WHERE id_carta ='$id_carta' LIMIT 1";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -289,7 +289,7 @@ class UtilesApp extends Utiles {
 		return $margenes;
 	}
 
-	function ObtenerMargenesFactura($sesion, $id_template) {
+	public static function ObtenerMargenesFactura($sesion, $id_template) {
 		$margenes = array();
 		if (UtilesApp::ExisteCampo('papel', 'factura_rtf', $sesion)) {
 			$query = "SELECT margen_superior, margen_derecho, margen_inferior, margen_izquierdo, margen_encabezado, margen_pie_de_pagina, papel FROM factura_rtf WHERE id_tipo ='$id_template' LIMIT 1";
@@ -308,14 +308,14 @@ class UtilesApp extends Utiles {
 
 	####################### Formato carta #############################
 
-	function TemplateCarta(&$sesion, $id_carta = 1) {
+	public static function TemplateCarta(&$sesion, $id_carta = 1) {
 		$query = "SELECT formato FROM carta WHERE id_carta='$id_carta'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function TemplateCartaCSS(&$sesion, $id_carta = 1) {
+	public static function TemplateCartaCSS(&$sesion, $id_carta = 1) {
 		$query = "SELECT formato_css FROM carta WHERE id_carta='$id_carta'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
@@ -364,14 +364,14 @@ class UtilesApp extends Utiles {
 
 	####################### Formato carta factura pago ######################
 
-	function TemplateFacturaPago(&$sesion, $id_factura_pago_formato = 1) {
+	public static function TemplateFacturaPago(&$sesion, $id_factura_pago_formato = 1) {
 		$query = "SELECT factura_pago_template FROM factura_pago_rtf WHERE id_formato='$id_factura_pago_formato'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function TemplateFacturaPagoCSS(&$sesion, $id_factura_pago_formato = 1) {
+	public static function TemplateFacturaPagoCSS(&$sesion, $id_factura_pago_formato = 1) {
 		$query = "SELECT factura_pago_css FROM factura_pago_rtf WHERE id_formato='$id_factura_pago_formato'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
@@ -380,63 +380,63 @@ class UtilesApp extends Utiles {
 
 	###################### Formato cobro #######################
 
-	function TemplateCobro(&$sesion, $id_formato = 1) {
+	public static function TemplateCobro(&$sesion, $id_formato = 1) {
 		$query = "SELECT cobro_template FROM cobro_rtf WHERE id_formato='$id_formato'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function CSSCobro(&$sesion, $id_formato = 1) {
+	public static function CSSCobro(&$sesion, $id_formato = 1) {
 		$query = "SELECT cobro_css FROM cobro_rtf WHERE id_formato='$id_formato'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function FormatoCobroFila($sesion, $id_formato = 1) {
+	public static function FormatoCobroFila($sesion, $id_formato = 1) {
 		$query = "SELECT formato_cobro_fila FROM cobro_rtf WHERE id_formato = '$id_formato'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function FormatoCobroAsunto($sesion, $id_formato = 1) {
+	public static function FormatoCobroAsunto($sesion, $id_formato = 1) {
 		$query = "SELECT formato_cobro_asunto FROM cobro_rtf WHERE id_formato = '$id_formato'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function FormatoCobroFilaProf($sesion, $id_formato = 1) {
+	public static function FormatoCobroFilaProf($sesion, $id_formato = 1) {
 		$query = "SELECT formato_cobro_fila_prof FROM cobro_rtf WHERE id_formato = '$id_formato'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function FormatoCobro($sesion, $id_formato = 1) {
+	public static function FormatoCobro($sesion, $id_formato = 1) {
 		$query = "SELECT formato_cobro FROM cobro_rtf WHERE id_formato = '$id_formato'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function FormatoCobroFilaGastos($sesion, $id_formato = 1) {
+	public static function FormatoCobroFilaGastos($sesion, $id_formato = 1) {
 		$query = "SELECT formato_cobro_fila_gasto FROM cobro_rtf WHERE id_formato = '$id_formato'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function FormatoCobroFilaMovimientos($sesion, $id_formato = 1) {
+	public static function FormatoCobroFilaMovimientos($sesion, $id_formato = 1) {
 		$query = "SELECT formato_cobro_fila_movimiento FROM cobro_rtf WHERE id_formato = '$id_formato'";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		if (list($format) = mysql_fetch_array($resp))
 			return $format;
 	}
 
-	function GenerarSemana($id_usuario, $semana) {
+	public static function GenerarSemana($id_usuario, $semana) {
 		global $sesion;
 
 		if (!$id_usuario)
@@ -489,7 +489,7 @@ class UtilesApp extends Utiles {
 		}
 	}
 
-	function DiferenciaDbAplicacionEnSegundos(&$sesion) {
+	public static function DiferenciaDbAplicacionEnSegundos(&$sesion) {
 		$query = "SELECT NOW()";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list($ahora) = mysql_fetch_array($resp);
@@ -506,14 +506,14 @@ class UtilesApp extends Utiles {
 	  Reemplaza , por . para numero
 	 */
 
-	function PonerPuntoNumeros($valor) {
+	public static function PonerPuntoNumeros($valor) {
 		if (strlen($valor) > 0) {
 			$valor = str_replace(',', '.', $valor);
 			return $valor;
 		}
 	}
 
-	function CantidadDiasHabiles($fecha_ini, $fecha_fin) {
+	public static function CantidadDiasHabiles($fecha_ini, $fecha_fin) {
 		$fecha1 = strtotime($fecha_ini);
 		$fecha2 = strtotime($fecha_fin);
 
@@ -531,7 +531,7 @@ class UtilesApp extends Utiles {
 	  HTML 2 (F)PDF
 	 */
 
-	function Html2Pdf($html) {
+	public static function Html2Pdf($html) {
 		echo($html);
 		exit();
 	}
@@ -541,7 +541,7 @@ class UtilesApp extends Utiles {
 	  todos los montos_descontados(monto real en pesos) de cada gasto ingresado
 	 */
 
-	function TotalCuentaCorriente(&$sesion, $where = '1', $cobrable = 1, $array = false) {
+	public static function TotalCuentaCorriente(&$sesion, $where = '1', $cobrable = 1, $array = false) {
 
 		return Gasto::TotalCuentaCorriente($sesion, $where, $cobrable, $array);
 	}
@@ -550,7 +550,7 @@ class UtilesApp extends Utiles {
 	  La cuenta del cliente funciona sólo sumando los montos asociados al cliente
 	 */
 
-	function TotalCuentaCliente(&$sesion, $codigo_cliente = '') {
+	public static function TotalCuentaCliente(&$sesion, $codigo_cliente = '') {
 		$where = 1;
 		if ($codigo_cliente != '')
 			$where .= " AND codigo_cliente = '$codigo_cliente' ";
@@ -564,7 +564,7 @@ class UtilesApp extends Utiles {
 	}
 
 	//Funcion que transforma Time de mysql en tiempo x,xx
-	function Time2Decimal($duracion) {
+	public static function Time2Decimal($duracion) {
 		if (!empty($duracion)) {
 			list($h, $m, $s) = explode(':', $duracion);
 			$minutos = ($h * 60) + $m;
@@ -585,7 +585,7 @@ class UtilesApp extends Utiles {
 	}
 
 	//Función que revisa contraseñas de web services
-	function VerificarPasswordWebServices($usuario, $password) {
+	public static function VerificarPasswordWebServices($usuario, $password) {
 		if ($usuario == Conf::UsuarioWS())
 			if ($password == Conf::PasswordWS())
 				return true;
@@ -593,7 +593,7 @@ class UtilesApp extends Utiles {
 	}
 
 	// Transforma el formato de las horas, aproximando para que 23.999 sea 24:00 en vez de 23:00.
-	function Hora2HoraMinuto($hora) {
+	public static function Hora2HoraMinuto($hora) {
 		$h = (int) $hora;
 		$m = round(60 * ($hora - $h));
 		if ($m == 60) {
@@ -604,7 +604,7 @@ class UtilesApp extends Utiles {
 	}
 
 	// En Excel los tiempos se guardan como números donde 1 equivale a 24 horas.
-	function tiempoExcelASQL($tiempo, $ingresado_via_decimales = false) {
+	public static function tiempoExcelASQL($tiempo, $ingresado_via_decimales = false) {
 		$tiempo = str_replace(',', '.', $tiempo);
 		if ($ingresado_via_decimales) {
 			$h = (int) ($tiempo);
@@ -622,7 +622,7 @@ class UtilesApp extends Utiles {
 		return sprintf("%02d:%02d:00", $h, $m);
 	}
 
-	function generarFacturaPDF($id_factura, $sesion) {
+	public static function generarFacturaPDF($id_factura, $sesion) {
 		require_once Conf::ServerDir() . '/../app/fpdf/fpdf.php';
 
 		$query = "SELECT fecha,
@@ -790,7 +790,7 @@ class UtilesApp extends Utiles {
 		return false;
 	}
 
-	function ArregloMeses() {
+	public static function ArregloMeses() {
 		$meses = array();
 		$meses[1] = "Enero";
 		$meses[2] = "Febrero";
@@ -830,38 +830,18 @@ class UtilesApp extends Utiles {
 	// Asumiendo que el logo no cambia durante la ejecución, podemos tener precalculada su altura para no tener que leer el archivo cada vez.
 	var $altura_logo_excel;
 
-	function AlturaLogoExcel() {
-		global $sesion;
-		if (isset($altura_logo_excel))
+	public static function AlturaLogoExcel() {
+		if (isset($altura_logo_excel)) {
 			return $altura_logo_excel;
-		// Este código está basado en SpreadsheetExcelWriter de PearPHP.
-		//FFF se pasa el path del logo a la DB $bitmap = Conf::LogoExcel();
+		}
 
-		$bitmap = Conf::GetConf($sesion, 'LogoExcel');
-		if (!$bitmap) {
+		$logo = Conf::read('LogoExcel');
+		if (!$logo) {
 			return 0;
 		}
-		// Open file.
-		$bmp_fd = @fopen($bitmap, "rb");
-		if (!$bmp_fd)
-			return 0; //throw new Exception("Couldn't import $bitmap");
 
-// Slurp the file into a string.
-		$data = fread($bmp_fd, filesize($bitmap));
-		// Check that the file is big enough to be a bitmap.
-		if (strlen($data) <= 0x36)
-			return 0; //throw new Exception("$bitmap doesn't contain enough data.\n");
-
-// The first 2 bytes are used to identify the bitmap.
-		$identity = unpack("A2ident", $data);
-		if ($identity['ident'] != "BM")
-			return 0; //throw new Exception("$bitmap doesn't appear to be a valid bitmap image.\n");
-
-// Remove bitmap data.
-		$data = substr($data, 18);
-		// Read the bitmap width and height.
-		$width_and_height = unpack("V2", substr($data, 0, 8));
-		$altura_logo_excel = $width_and_height[2];
+		$logo_sizes = getimagesize($logo);
+		$altura_logo_excel = $logo_sizes[1];
 
 		// Devolvemos 3/4 de la altura para convertirla de pixeles a puntos.
 		return .75 * $altura_logo_excel;
@@ -1064,7 +1044,7 @@ HTML;
 	}
 
 	//Calcula cambio de moneda
-	function CambiarMoneda($monto_ini, $tipo_cambio1 = 1, $decimales1 = 0, $tipo_cambio2 = 1, $decimales2 = 0, $conv_string = true) {
+	public static function CambiarMoneda($monto_ini, $tipo_cambio1 = 1, $decimales1 = 0, $tipo_cambio2 = 1, $decimales2 = 0, $conv_string = true) {
 		if ($monto_ini == NULL || $monto_ini == '' || !is_numeric($monto_ini)) {
 			$monto_ini = (double) 0;
 		}
@@ -1086,7 +1066,7 @@ HTML;
 		return $resultado;
 	}
 
-	function ProcesaCobroIdMoneda($sesion, $id_cobro, $arr_monto = array(), $id_moneda = 0, $carga_documento = true, $soloegreso = false) {
+	public static function ProcesaCobroIdMoneda($sesion, $id_cobro, $arr_monto = array(), $id_moneda = 0, $carga_documento = true, $soloegreso = false) {
 
 		// Se llama a la funcion que procesa los gatos
 
@@ -1912,7 +1892,7 @@ HTML;
 		return $resultados;
 	}
 
-	function obtener_navegador() {
+	public static function obtener_navegador() {
 		$iexp = $_SERVER[HTTP_USER_AGENT];
 		if (strstr($iexp, "MSIE")) {
 			$xnavegador_usado = 'IE';
@@ -1923,8 +1903,8 @@ HTML;
 		return $xnavegador_usado;
 	}
 
-	function glosaHora2Minuto($glosa_hora) {
-		list($xhh, $xmm) = split(":", $glosa_hora);
+	public static function glosaHora2Minuto($glosa_hora) {
+		list($xhh, $xmm) = explode(":", $glosa_hora);
 		//validar  hora y min que senan positivos
 		$m = (int) $xmm;
 		$h = (int) $xhh;
@@ -1942,8 +1922,8 @@ HTML;
 		return $total_min;
 	}
 
-	function PrintMenuDisenoNuevoPrototype($sesion, $url_actual) {
-		$actual = split('\?', $url_actual);
+	public static function PrintMenuDisenoNuevoPrototype($sesion, $url_actual) {
+		$actual = explode('\?', $url_actual);
 		$url_actual = $actual[0];
 		$bitmodfactura = Conf::GetConf($sesion, 'NuevoModuloFactura');
 		switch ($url_actual) {
@@ -2138,6 +2118,7 @@ HTML;
 	 * @param mixed $data Arreglo o string a modificar
 	 * @param boolean $encode encode (true) o decode (false)
 	 * @return mixed
+	 * @deprecated Utilizar Convert::utf8()
 	 */
 	public static function utf8izar($data, $encode = true) {
 		if (is_array($data)) {
@@ -2274,41 +2255,54 @@ HTML;
 		}
 	}
 
-	public static function UploadToS3($name, $file, $contentType = 'application/octet-stream') {
-		require_once dirname(__FILE__) . '/../../backups/AWSSDKforPHP/sdk.class.php';
-
-		$s3 = new AmazonS3(array(
-			'key' => 'AKIAIQYFL5PYVQKORTBA',
-			'secret' => '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'
-		));
-
+	/**
+	 * Sube un archivo a S3, en el bucket de uploads,
+	 * relativo al subdominio (S3_UPLOAD_BUCKET/sub_domain/...)
+	 * @param string $name nombre del archivo junto con su ruta relativa <i>(/ruta/relativa/al/archivo.txt)</i>
+	 * @param string $path_file ruta absoluta del archivo
+	 * @param string $content_type
+	 * @return string URL del archivo en S3
+	 */
+	public static function UploadFileToS3($name, $path_file, $content_type = 'application/octet-stream') {
+		$S3 = new S3(S3_UPLOAD_BUCKET);
 		$name = SUBDOMAIN . $name;
-
-		$response = $s3->create_object(S3_UPLOAD_BUCKET, $name, array(
-			'body' => $file,
-			'acl' => AmazonS3::ACL_PUBLIC,
-			'contentType' => $contentType,
-			'headers' => array('content-disposition' => 'attachment')
+		$response = $S3->uploadFile($name, $path_file, array(
+			'ACL' => 'public-read',
+			'ContentType' => $content_type,
+			'ContentDisposition' => 'attachment'
 		));
-
-		if ($response->isOK()) {
-			return $s3->get_object_url(S3_UPLOAD_BUCKET, $name);
-		}
-
-		return '';
+		return empty($response['ObjectURL']) ? '' : $response['ObjectURL'];
 	}
 
-	public static function FileExistS3($name) {
-		require_once dirname(__FILE__) . '/../../backups/AWSSDKforPHP/sdk.class.php';
-
-		$s3 = new AmazonS3(array(
-			'key' => 'AKIAIQYFL5PYVQKORTBA',
-			'secret' => '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'
-		));
-
+	/**
+	 * Sube un archivo a S3, en el bucket de uploads,
+	 * relativo al subdominio (S3_UPLOAD_BUCKET/sub_domain/...)
+	 * @param string $name nombre del archivo junto con su ruta relativa <i>(/ruta/relativa/al/archivo.txt)</i>
+	 * @param string $file_content contenido del archivo
+	 * @param string $content_type
+	 * @return string URL del archivo en S3
+	 */
+	public static function UploadFileContentsToS3($name, $file_content, $content_type = 'application/octet-stream') {
+		$S3 = new S3(S3_UPLOAD_BUCKET);
 		$name = SUBDOMAIN . $name;
+		$response = $S3->putFileContents($name, $file_content, array(
+			'ACL' => 'public-read',
+			'ContentType' => $content_type,
+			'ContentDisposition' => 'attachment'
+		));
+		return empty($response['ObjectURL']) ? '' : $response['ObjectURL'];
+	}
 
-		return $s3->if_object_exists(S3_UPLOAD_BUCKET, $name);
+	/**
+	 * Verifica la existencia de un archivo en S3, en el bucket de uploads,
+	 * relativo al subdominio (S3_UPLOAD_BUCKET/sub_domain/...)
+	 * @param string $relative_file_path Ruta relativa del archivo
+	 * @return type
+	 */
+	public static function FileExistS3($relative_file_path) {
+		$name = SUBDOMAIN . $relative_file_path;
+		$S3 = new S3(S3_UPLOAD_BUCKET);
+		return $S3->fileExists($name);
 	}
 
 	/**
@@ -2396,7 +2390,7 @@ HTML;
 	 * @param type $digitos_hora
 	 * @return type
 	 */
-	function Decimal2GlosaHora($horaDecimal, $digitos_hora = 1) {
+	public static function Decimal2GlosaHora($horaDecimal, $digitos_hora = 1) {
 
 		$horaDecimalAbsoluto = abs($horaDecimal);
 		$h = (int) ($horaDecimalAbsoluto);
@@ -2409,5 +2403,4 @@ HTML;
 		$hm = sprintf("%0{$digitos_hora}d", $h) . ':' . sprintf('%02d', $m);
 		return ($horaDecimal < 0 ? '-' : '') . $hm;
 	}
-
 }

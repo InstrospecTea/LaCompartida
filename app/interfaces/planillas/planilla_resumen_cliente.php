@@ -1,6 +1,4 @@
 <?php
-
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
 require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
 require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
@@ -11,8 +9,6 @@ require_once Conf::ServerDir() . '/classes/Cobro.php';
 $sesion = new Sesion(array('REP'));
 $fila_debug = 20;
 $pagina = new Pagina($sesion);
-
-set_time_limit(300);
 
 $moneda = new Moneda($sesion);
 $moneda->Load($id_moneda);
@@ -27,7 +23,7 @@ if ($moneda->fields['cifras_decimales'] == 0) {
 $simbolo_moneda = $moneda->fields['simbolo'];
 
 // ARMANDO XLS
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 $wb->send("Planilla montos facturados.xls");
 
@@ -123,7 +119,7 @@ for ($x = 3; $x < 14; $x++) {
 }
 
 $filas++;
-$glosa_comparacion = __(" Los montos facturados se comparan con el monto THH segun ");
+$glosa_comparacion = __(" Los montos facturados se comparan con el monto THH según ");
 
 if ($tarifa == 'monto_thh') {
 	$glosa_comparacion .= __("tarifa del cliente");
@@ -136,8 +132,8 @@ $ws1->mergeCells($filas, 1, $filas, 13);
 
 $filas += 3;
 
-list($x_anio_ini, $x_mes_ini, $x_dia_ini) = split('-', $fecha_ini);
-list($x_anio_fin, $x_mes_fin, $x_dia_fin) = split('-', $fecha_fin);
+list($x_anio_ini, $x_mes_ini, $x_dia_ini) = explode('-', $fecha_ini);
+list($x_anio_fin, $x_mes_fin, $x_dia_fin) = explode('-', $fecha_fin);
 
 // MESES
 for ($i = 0; $i <= ($periodo_final - $periodo_inicial); $i++) {

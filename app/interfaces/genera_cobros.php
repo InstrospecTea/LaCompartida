@@ -106,6 +106,13 @@ if (Conf::GetConf($sesion, 'OcultarCobrosTotalCeroGeneracion')) {
 	$cobrosencero_chk = true;
 }
 
+if (!$cobros->Loaded()) {
+	$cobros->setFieldsNew('cobro');
+}
+
+if (!$contrato->Loaded()) {
+	$contrato->setFieldsNew('contrato');
+}
 ?>
 
 <script type="text/javascript">
@@ -320,7 +327,7 @@ if ($opc == 'buscar') {
 								<?php if (Conf::GetConf($sesion, 'TipoGeneracionMasiva') == 'contrato') { ?>
 									var data = {
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
-										'form': <?php echo json_encode($_POST);?>,
+										'form': <?php echo json_encode(UtilesApp::utf8izar($_POST)); ?>,
 										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
@@ -333,7 +340,7 @@ if ($opc == 'buscar') {
 								<?php } else { ?>
 									var data = {
 										'solo': jQuery('[name="radio_generacion"]:checked').val(),
-										'form': <?php echo json_encode($_POST); ?>,
+										'form': <?php echo json_encode(UtilesApp::utf8izar($_POST)); ?>,
 										'cobrosencero': jQuery('#cobrosencero_generacion').is(':checked') ? 1 : 0
 									};
 									jQuery.post(root_dir + '/app/ProcessLock/exec/<?php echo Cobro::PROCESS_NAME; ?>', data, function(reply) {
@@ -1316,10 +1323,11 @@ function funcionTR(& $contrato) {
 		for ($z = 0; $z < $lista_cobros->num; $z++) {
 			$cobro = $lista_cobros->Get($z);
 			$idioma_cobro = new Objeto($sesion, '', '', 'prm_idioma', 'codigo_idioma');
-			if ($cobro->fields['codigo_idioma'] != '')
+			if ($cobro->fields['codigo_idioma'] != '') {
 				$idioma_cobro->Load($cobro->fields['codigo_idioma']);
-			else
+			} else {
 				$idioma_cobro->Load(strtolower(Conf::GetConf($sesion, 'Idioma')));
+			}
 			$total_horas = $cobros->TotalHorasCobro($cobro->fields['id_cobro']);
 			$texto_horas = $cobro->fields['fecha_ini'] != '0000-00-00' ? __('desde') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_ini'], $formato_fecha, "-") . ' ' . __('hasta') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-") : __('hasta') . ' ' . Utiles::sql2fecha($cobro->fields['fecha_fin'], $formato_fecha, "-");
 

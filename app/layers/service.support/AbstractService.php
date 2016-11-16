@@ -1,17 +1,23 @@
 <?php
+
 abstract class AbstractService implements BaseService {
 
+	/**
+	 * @deprecated por convención
+	 * @var Sesion $sesion
+	 */
 	public $sesion;
+	public $Sesion;
 	private $loadedClass = array();
 
-	public function __construct(Sesion $sesion) {
-		$this->sesion = $sesion;
+	public function __construct(Sesion $Sesion) {
+		$this->Sesion = $Sesion;
+		$this->sesion = &$this->Sesion;
 		$this->loadDAO($this->getDaoLayer());
 	}
 
 	public function newEntity() {
-		$entity_class = $this->getClass();
-		return new $entity_class;
+		return $this->newDao()->newEntity();
 	}
 
 	/**
@@ -23,8 +29,7 @@ abstract class AbstractService implements BaseService {
 	public function saveOrUpdate($object, $writeLog = true) {
 		$this->checkNullity($object);
 		$this->checkClass($object, $this->getClass());
-		$daoClass = $this->getDaoLayer();
-		$dao = new $daoClass($this->sesion);
+		$dao = $this->newDao();
 		try {
 			return $dao->saveOrUpdate($object, $writeLog);
 		} catch(CouldNotAddEntityException $ex) {
@@ -41,8 +46,7 @@ abstract class AbstractService implements BaseService {
 	 */
 	public function get($id, $fields = null) {
 		$this->checkNullity($id);
-		$daoClass = $this->getDaoLayer();
-		$dao = new $daoClass($this->sesion);
+		$dao = $this->newDao();
 		try {
 			return $dao->get($id, $fields);
 		} catch(CouldNotFindEntityException $ex) {
@@ -51,8 +55,7 @@ abstract class AbstractService implements BaseService {
 	}
 
 	public function count() {
-		$daoClass = $this->getDaoLayer();
-		$dao = new $daoClass($this->sesion);
+		$dao = $this->newDao();
 		try {
 			return $dao->count();
 		} catch(CouldNotFindEntityException $ex) {
@@ -61,8 +64,7 @@ abstract class AbstractService implements BaseService {
 	}
 
 	public function findAll($restrictions = null, $fields = null, $order = null, $limit = null) {
-		$daoClass = $this->getDaoLayer();
-		$dao = new $daoClass($this->sesion);
+		$dao = $this->newDao();
 		try {
 			return $dao->findAll($restrictions, $fields, $order, $limit);
 		} catch(Exception $ex) {
@@ -82,13 +84,24 @@ abstract class AbstractService implements BaseService {
 	public function delete($object) {
 		$this->checkNullity($object);
 		$this->checkClass($object, $this->getClass());
-		$daoClass = $this->getDaoLayer($this->sesion);
-		$dao = new $daoClass($this->sesion);
+		$dao = $this->newDao();
 		try {
 			$dao->delete($object);
 		} catch(CouldNotDeleteEntityException $ex) {
 			throw new ServiceException($ex);
 		}
+	}
+
+	/**
+	 * @param $object
+	 * @throws ServiceException
+	 */
+	public function deleteOrException($object) {
+		$this->checkNullity($object);
+		$this->checkClass($object, $this->getClass());
+		$daoClass = $this->getDaoLayer($this->sesion);
+		$dao = new $daoClass($this->sesion);
+		$dao->deleteOrException($object);
 	}
 
 	/**
@@ -120,29 +133,42 @@ abstract class AbstractService implements BaseService {
 	 * @param      $classname
 	 * @param null $alias
 	 */
-	protected function loadDAO($classname, $alias = null) {
-		if (!preg_match('/DAO$/', $classname)) {
-			$classname = "{$classname}DAO";
+	protected function loadDAO($class_name, $alias = null) {
+		if (!preg_match('/DAO$/', $class_name)) {
+			$class_name = "{$class_name}DAO";
 		}
 		if (empty($alias)) {
-			$alias = $classname;
+			$alias = $class_name;
 		}
 		if (in_array($alias, $this->loadedClass)) {
 			return;
 		}
-		$this->{$alias} = new $classname($this->sesion);
+		$this->{$alias} = $this->newDao();
 		$this->loadedClass[] = $alias;
 	}
 
 	public function getWithRelations($id, array $relations_filters = array()) {
-		$daoClass = $this->getDaoLayer();
-		$dao = new $daoClass($this->sesion);
-
+		$dao = $this->newDao();
 		try {
 			return $dao->getWithRelations($id, $relations_filters);
 		} catch(CouldNotFindEntityException $ex) {
 			throw new ServiceException($ex);
 		}
+	}
+
+	protected function newDao() {
+		$dao_class = $this->getDaoLayer();
+		if (class_exists($dao_class)) {
+			$instance = new $dao_class($this->Sesion);
+		} else {
+			$instance = $this->newGenericDao($dao_class);
+		}
+		return $instance;
+	}
+
+	private function newGenericDao($name) {
+		$class_name = preg_replace('/(.+)DAO$/', '\1', $name);
+		return new GenericDAO($this->Sesion, $class_name);
 	}
 
 }

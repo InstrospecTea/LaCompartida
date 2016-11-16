@@ -906,7 +906,7 @@ function LinkAlTrabajo(& $trabajo, $texto = '') {
 }
 
 function SplitDuracion($time) {
-	list($h, $m, $s) = split(":", $time);
+	list($h, $m, $s) = explode(":", $time);
 	if ($h > 0 || $s > 0) {
 		return $h . ":" . $m;
 	}
@@ -919,6 +919,8 @@ function funcionTR(& $trabajo) {
 	global $p_profesional;
 	global $select_usuario;
 	static $i = 0;
+	$html = '';
+	$total_horas = 0;
 
 	$moneda_cobro = new Moneda($sesion);
 	if ($trabajo->fields['id_cobro'] > 0) {
@@ -992,7 +994,7 @@ function funcionTR(& $trabajo) {
 		}
 	} else {
 		if (Conf::GetConf($sesion, 'TipoIngresoHoras') == 'decimal') {
-			list($duracion_trabajada, $duracion_cobrada) = split('<br>', $trabajo->fields['duracion']);
+			list($duracion_trabajada, $duracion_cobrada) = explode('<br>', $trabajo->fields['duracion']);
 			$duracion = UtilesApp::Time2Decimal($duracion_trabajada) . "<br>" . UtilesApp::Time2Decimal($duracion_cobrada);
 		}
 	}
@@ -1039,7 +1041,7 @@ function funcionTR(& $trabajo) {
 	}
 
 	//$html .= "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
-	$html .= "<td><strong>Desc.</strong></td><td colspan='" . ($desc_colspan + 1) . "' align=left>" . LinkAlTrabajo($trabajo, '#' . $trabajo->fields['id_trabajo']) . "&nbsp;" . stripslashes($trabajo->fields['descripcion']) . "</td>";
+	$html .= "<td><strong>Desc.</strong></td><td colspan='" . ($desc_colspan + 1) . "' align=left>" . LinkAlTrabajo($trabajo, '#' . $trabajo->fields['id_trabajo']) . "&nbsp;" . stripslashes(htmlentities($trabajo->fields['descripcion'])) . "</td>";
 
 	$columna_tarifa = "<td colspan=2 align=center><strong>" . __('Tarifa') . "</strong><br>" . ( $moneda_cobro->fields['id_moneda'] > 0 ? $moneda_cobro->fields['simbolo'] : Utiles::glosa($sesion, $trabajo->fields['id_moneda_contrato'], 'simbolo', 'prm_moneda', 'id_moneda')) . " " . $tarifa . "</td>";
 

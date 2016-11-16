@@ -1,5 +1,4 @@
 <?php
-	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
 
 	$sesion = new Sesion(array('REP'));
@@ -16,7 +15,7 @@
 	if ($xls) {
 		$moneda_base = Utiles::MonedaBase($sesion);
 		#ARMANDO XLS
-		$wb = new Spreadsheet_Excel_Writer();
+		$wb = new WorkbookMiddleware();
 
 		$wb->setCustomColor(35, 220, 255, 220);
 		$wb->setCustomColor(36, 255, 255, 220);

@@ -1,19 +1,14 @@
 <?php
 
 require_once dirname(__FILE__) . '/../../conf.php';
-require_once(Conf::RutaGraficos());
-
-require_once Conf::ServerDir() . '/../app/interfaces/graficos/GraficoBarras.php';
-
 
 $Sesion = new Sesion();
 
-
-$data = UtilesApp::utf8izar(json_decode(base64_decode($_GET['datos']), true), false);
-$data_compara = empty($_GET['datos_compara']) ? false : UtilesApp::utf8izar(json_decode(base64_decode($_GET['datos_compara']), true), false);
+$data = UtilesApp::utf8izar(json_decode(base64_decode($datos), true), false);
+$data_compara = empty($datos_compara) ? false : UtilesApp::utf8izar(json_decode(base64_decode($datos_compara), true), false);
+$labels = UtilesApp::utf8izar(json_decode(base64_decode($labels), true), false);
 
 $datos = array_combine($data['nombres'], $data['tiempo']);
-$datos_compara = array_combine($data_compara['nombres'], $data_compara['tiempo']);
 
 function dort_desc($a, $b) {
 	return $a < $b;
@@ -21,7 +16,7 @@ function dort_desc($a, $b) {
 uasort($datos, 'dort_desc');
 
 if ($datos_compara) {
-	$labels = explode(',', $_GET['labels']);
+	$datos_compara = array_combine($data_compara['nombres'], $data_compara['tiempo']);
 	$datos_comparados = array();
 	foreach ($datos as $key => $value) {
 		$datos_comparados[] = $datos_compara[$key];
@@ -38,57 +33,124 @@ foreach ($nombres as $d) {
 	}
 }
 
-$estimado_ampliacion = 0;
-$cantidad_datos = count($datos);
+$y_axes = [];
 
-if ($cantidad_datos > 20) {
-	$estimado_ampliacion = 18 * ($cantidad_datos - 20);
+$titulo = utf8_decode($_POST['titulo']);
+
+$grafico = new TTB\Graficos\Grafico();
+$dataset = new TTB\Graficos\Dataset();
+
+$dataset->setLabel(__('Horas cobrables'))
+	->setYAxisID('y-axis-1')
+	->setData(array_values($datos));
+
+$grafico->setNameChart($titulo)
+	->addDataset($dataset)
+	->addLabels($data['nombres']);
+
+$LanguageManager = new LanguageManager($Sesion);
+
+foreach ($datos as $key => $value) {
+	$leyend_value = Format::number($value);
+	$language_code = strtolower(Conf::read('Idioma'));
+	$language = $LanguageManager->getByCode($language_code);
+	$separators = [
+		'decimales' => $language->get('separador_decimales'),
+		'miles' => $language->get('separador_miles')
+	];
+
+	$labels_tooltips[] = "{$leyend_value} Hrs.";
 }
 
-# Create a XY object
-$c = new XYChart(700 + $estimado_ampliacion, 400);
+$y_axes[] = [
+	'type' => 'linear',
+	'display' => true,
+	'position' => 'left',
+	'id' => 'y-axis-1',
+	'gridLines' => [
+		'display' => false
+	],
+	'labels' => [
+		'show' => true
+	],
+	'ticks' => [
+		'beginAtZero' => true,
+		'callback' => $separators
+	]
+];
 
-$margen_horizontal = $cantidad_datos * 4;
-$margen_vertical = 0;
-foreach ($data['nombres'] as $label) {
-	if (strlen($label) * 4 > $margen_vertical) {
-		$margen_vertical = strlen($label) * 4;
+if ($datos_comparados) {
+	$dataset_comparado = new TTB\Graficos\Dataset();
+
+	$dataset_comparado->setLabel(__('Horas trabajadas'))
+		->setYAxisID('y-axis-2')
+		->setBackgroundColor(39, 174, 96, 0.5)
+		->setBorderColor(39, 174, 96, 0.8)
+		->setHoverBackgroundColor(39, 174, 96, 0.75)
+		->setHoverBorderColor(39, 174, 96, 1)
+	  ->setData($datos_comparados);
+
+	foreach ($datos_comparados as $key => $value) {
+		$leyend_value = Format::number($value);
+		$language_code = strtolower(Conf::read('Idioma'));
+		$language = $LanguageManager->getByCode($language_code);
+		$separators = [
+			'decimales' => $language->get('separador_decimales'),
+			'miles' => $language->get('separador_miles')
+		];
+
+		$labels_tooltips_comparado[] = "{$leyend_value} Hrs.";
 	}
+
+	$grafico->addDataset($dataset_comparado);
+	$y_axes[] = [
+		'type' => 'linear',
+		'display' => false,
+		'position' => 'right',
+		'id' => 'y-axis-2',
+		'gridLines' => [
+			'display' => false
+		],
+		'labels' => [
+			'show' => true
+		],
+		'ticks' => [
+			'beginAtZero' => true,
+			'callback' => $separators
+		]
+	];
 }
 
-# Add a title box using 15 pts Times Bold Italic font and metallic pink background
-# color
-$textBoxObj = $c->addTitle($titulo, 'timesb.ttf', 15);
-$textBoxObj->setBackground(metalColor(0xA7DF60));
-$c->setPlotArea(35 + $margen_horizontal, 40, 590 - $margen_horizontal + $estimado_ampliacion, 310 - $margen_vertical);
-
-
-$c->yAxis->setTitle($labels[0]);
-//Cuando se compara se usan dos set de Valores para los mismos Labels
-if ($datos_compara) {
-	$c->yAxis2->setTitle($labels[1]);
-
-	$c->yAxis->setColors(0x000000, 0x000000, 0xD00000);
-	$c->yAxis2->setColors(0x000000, 0x000000, 0x0000D0);
-
-	$layer = $c->addBarLayer2(Side, 0);
-
-	$layer->addDataSet(array_values($datos), 0xff4400, "1");
-	$layer->addDataSet($datos_comparados, 0x4400ff, '2');
-
-	$layer->setAggregateLabelStyle('arial.ttf', 9, 0x000000);
-
-	$c->xAxis->setTickOffset(0.5);
-} else {
-	$layer = $c->addBarLayer3(array_values($datos), $colores, $titulo);
-	$layer->setAggregateLabelStyle('arialbd.ttf', 8, $layer->yZoneColor(0, 0xcc3300, 0x3333ff));
+foreach ($labels_tooltips as $key => $value) {
+	$labels_tooltips_callback[] = [$value, $labels_tooltips_comparado[$key]];
 }
-$labelsObj = $c->xAxis->setLabels($nombres);
-$labelsObj->setFontStyle('arialbd.ttf');
-$labelsObj->setFontAngle(45);
 
-$c->setYAxisOnRight(true);
-$c->yAxis->setLabelStyle('arialbd.ttf');
+$options = [
+	'responsive' => true,
+	'tooltips' => [
+		'mode' => 'label',
+		'callbacks' => [
+			'label' => $labels_tooltips_callback,
+		]
+	],
+	'title' => [
+		'display' => true,
+		'fontSize' => 14,
+		'text' => Convert::utf8(__($titulo))
+	],
+	'scales' => [
+		'xAxes' => [[
+			'display' => true,
+			'gridLines' => [
+				'display' => false
+			],
+			'labels' => [
+				'show' => true,
+			]
+		]],
+		'yAxes' => $y_axes
+	]
+];
 
-header('Content-type: image/png');
-print($c->makeChart2(PNG));
+$grafico->setOptions($options);
+echo $grafico->getJson();

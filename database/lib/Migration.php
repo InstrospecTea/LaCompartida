@@ -4,10 +4,10 @@ namespace Database;
 
 use \PDO;
 use \PDOException;
-use \Database\Conf as MigrationConfig;
+use \Database\Config as MigrationConfig;
 use \Database\MigrationMailing;
-use \TTB\Utiles;
 use \UtilesApp;
+use \Utiles;
 
 class Migration {
 
@@ -25,7 +25,6 @@ class Migration {
 		$this->root_directory = __BASEDIR__;
 		$this->files_ignore = array('..', '.', '.gitkeep');
 		$this->debug = false;
-
 		$dsn = "mysql:dbname={$this->getDatabaseName()};host={$this->getHostName()}";
 		$this->Database = new PDO($dsn, MigrationConfig::get('user_name'), MigrationConfig::get('password'));
 		$this->Database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

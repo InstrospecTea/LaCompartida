@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -13,7 +13,7 @@
 		$orden = "fecha DESC";
 
 	$query = "SELECT SQL_CALC_FOUND_ROWS *, cta_corriente.egreso, cta_corriente.codigo_cliente
-				FROM cta_corriente 
+				FROM cta_corriente
 				LEFT JOIN asunto USING(codigo_asunto)
 				LEFT JOIN usuario ON usuario.id_usuario=cta_corriente.id_usuario
 				LEFT JOIN prm_moneda ON cta_corriente.id_moneda=prm_moneda.id_moneda

@@ -407,9 +407,40 @@ if (!$popup) {
 			margin-left:6px;
 			width:110px;
 		}
+		.chart-legend li {
+			list-style-type: none;
+			margin: 5px;
+			display: inline-block;
+    	text-align: left;
+			width: 125px;
+		}
+		.chart-legend li span {
+			display: inline-block;
+			width: 12px;
+			height: 12px;
+			margin-right: 5px;
+		}
+		@media print {
+    	.no-print, .no-print * {
+        display: none !important;
+    	}
+    	body {
+    		/*Propiedad para forzar la impresion de los gráficos de fondo*/
+    		-webkit-print-color-adjust: exact;
+    	}
+		}
+		#botonera {
+			margin: 10px;
+			text-align: right;
+		}
+		.botones_gaficos {
+			margin: 4px;
+		}
 	</style>
 
-	<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/reporte_avanzado.js"></script>
+	<?= $Form->Html->script(Conf::RootDir() . '/app/js/reporte_avanzado.js'); ?>
+	<?= $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js'); ?>
+
 	<script type="text/javascript">
 		var tipos_moneda = <?php echo json_encode(array_values(Reporte::getTiposMoneda())); ?>;
 		var selector_periodos = <?php echo json_encode($selector_periodos); ?>;
@@ -1242,10 +1273,10 @@ if (!$popup) {
 									<?php
 									echo $Form->icon_button(__('Planilla'), 'code', array('name' => 'runreporte', 'id' => 'runreporte', 'class' => 'submit_buttons', 'rel' => 'planilla'));
 									echo $Form->icon_button(__('Excel'), 'xls', array('name' => 'excel', 'id' => 'excel', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'excel');", 'class' => 'submit_buttons', 'rel' => 'excel'));
-									echo $Form->icon_button(__('Dispersión'), 'icon-chart', array('name' => 'dispersion', 'id' => 'dispersion', 'title' => 'Genera la Planilla como un Documento Excel.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'dispersion');", 'class' => 'submit_buttons', 'rel' => 'dispersion'));
+									echo $Form->icon_button(__('Dispersión'), 'icon-chart', array('name' => 'dispersion', 'id' => 'dispersion', 'title' => 'Genera la Planilla como un Documento Excel.', 'class' => 'submit_buttons', 'rel' => 'dispersion'));
 									echo $Form->icon_button(__('Tabla'), 'icon-table', array('name' => 'tabla', 'id' => 'tabla', 'title' => 'Genera un Documento Excel con una tabla cruzada.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'tabla');", 'class' => 'submit_buttons', 'rel' => 'tabla'));
-									echo $Form->icon_button(__('Barras'), 'icon-bar', array('name' => 'barras', 'id' => 'barras', 'title' => 'Despliega un Gr·fico de Barras, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'barra');", 'class' => 'submit_buttons', 'rel' => 'barras'));
-									echo $Form->icon_button(__('Gráfico Torta'), 'pie-chart', array('name' => 'circular', 'id' => 'circular', 'title' => 'Despliega un Gráfico de Torta, usando el primer Agrupador.', 'onclick' => "Generar(jQuery('#formulario').get(0), 'circular');", 'class' => 'submit_buttons', 'rel' => 'torta'));
+									echo $Form->icon_button(__('Barras'), 'icon-bar', array('name' => 'barras', 'id' => 'barras', 'title' => 'Despliega un Gr·fico de Barras, usando el primer Agrupador.', 'class' => 'submit_buttons', 'rel' => 'barras'));
+									echo $Form->icon_button(__('Gráfico Torta'), 'pie-chart', array('name' => 'circular', 'id' => 'circular', 'title' => 'Despliega un Gráfico de Torta, usando el primer Agrupador.', 'class' => 'submit_buttons', 'rel' => 'torta'));
 									echo $Form->script();
 									?>
 								</td>
@@ -1271,9 +1302,9 @@ if (!$popup) {
 											</td>
 											<td>
 												<span class="submit_options barras torta dispersion" id="limite_check" <?php if (!isset($orden_barras_max2min) && isset($tipo_dato)) echo 'style= "display: none; "'; ?>>
-													<input type="checkbox" name="limitar" id="limite_checkbox" value="1" <?php echo $limitar ? 'checked="checked"' : '' ?> />
+													<input type="checkbox" name="limitar" id="limite_checkbox" value="1" checked="checked" />
 													<label for="limite_checkbox"><?php echo __('y mostrar sólo') ?></label> &nbsp;
-													<input type="text" name="limite" value="<?php echo $limite ? $limite : '5' ?>" id="limite" size="2" maxlength="2" /> &nbsp;
+													<input type="text" name="limite" value="<?= $limite ? $limite : '15' ?>" id="limite" size="2" maxlength="2" /> &nbsp;
 													<?php echo __("resultados superiores") ?>
 												</span>
 											</td>
@@ -1296,12 +1327,12 @@ if (!$popup) {
 </form>
 
 <?php if ($opc && $opc != 'nuevo_reporte' && $opc != 'eliminar_reporte') { ?>
-	<div class="resizable" id="iframereporte">
+	<div class="resizable" id="iframereporte" style="width: 90% !important;">
 		<div class="divloading">&nbsp;</div>
 		<iframe  class="resizableframe" onload="iframelista();" name="planilla" id="planilla" src="<?php echo $url_iframe; ?>" frameborder="0" style="display:none; width:730px; height:<?php echo $alto; ?>px;"></iframe>
 	</div>
 <?php } else { ?>
-	<div class="resizable" id="iframereporte"></div>
+	<div class="resizable" id="iframereporte" style="width: 90% !important;"></div>
 <?php } ?>
 
 <?php

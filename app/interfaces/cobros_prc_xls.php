@@ -1,11 +1,9 @@
 <?php
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
-
-
 $Sesion = new Sesion(array('ADM', 'COB'));
 set_time_limit(400);
 ini_set("memory_limit", "1024M");
+
 $where_cobro = ' 1 ';
 
 if ($id_cobro) {
@@ -54,105 +52,104 @@ if ($id_cobro) {
 $mostrar_resumen_de_profesionales = 1;
 
 if ($guardar_respaldo) {
-	$wb = new Spreadsheet_Excel_Writer(Conf::ServerDir() . '/respaldos/ResumenCobros' . date('ymdHis') . '.xls');
-	$wb->setVersion(8);
+	$wb = new WorkbookMiddleware(Conf::ServerDir() . '/respaldos/ResumenCobros' . date('ymdHis') . '.xls');
 } else {
-	$wb = new Spreadsheet_Excel_Writer();
-	$wb->setVersion(8);
+	$wb = new WorkbookMiddleware();
 	// No se hace $wb->send() todavía por si acaso no hay horas en el cobro.
 }
 $wb->setCustomColor(35, 220, 255, 220);
 $wb->setCustomColor(36, 255, 255, 220);
 $wb->setCustomColor(37, 255, 255, 0);
+$wb->setCustomColor(55, 150, 150, 150);
 
 
 //--------------- Definamos los formatos generales, los que quedan constante por todo el documento -------------
 
-$formato_encabezado = & $wb->addFormat(array('Size' => 8,
+$formato_encabezado = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'middle',
 						'Align' => 'left',
 						'Bold' => 1,
 						'Color' => 'black'));
-$formato_encabezado_derecha = & $wb->addFormat(array('Size' => 8,
+$formato_encabezado_derecha = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'middle',
 						'Align' => 'right',
 						'Bold' => 1,
 						'Color' => 'black'));
-$formato_encabezado_center = & $wb->addFormat(array('Size' => 8,
+$formato_encabezado_center = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'middle',
 						'Align' => 'center',
 						'Bold' => 1,
 						'Color' => 'black'));
-$formato_tiempo = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'middle',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_tiempo2 = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo2 = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_tiempo2_centrado = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo2_centrado = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Align' => 'center',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_tiempo_total = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo_total = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Bold' => '1',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_tiempo_total_tabla = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo_total_tabla = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Bold' => '1',
 						'Top' => '1',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_tiempo_total_tabla_centrado = & $wb->addFormat(array('Size' => 8,
+$formato_tiempo_total_tabla_centrado = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Align' => 'center',
 						'Bold' => '1',
 						'Top' => '1',
 						'Color' => 'black',
 						'NumFormat' => '[h]:mm'));
-$formato_total = & $wb->addFormat(array('Size' => 8,
+$formato_total = & $wb->addFormat(array('Size' => 10,
 						'VAlign' => 'top',
 						'Bold' => 1,
 						'Top' => 1,
 						'Color' => 'black'));
-$formato_resumen_text = & $wb->addFormat(array('Size' => 8,
+$formato_resumen_text = & $wb->addFormat(array('Size' => 10,
 						'Valign' => 'top',
 						'Bold' => '1',
 						'Align' => 'left',
 						'Color' => 'black',
 						'TextWrap' => 1));
 $letra_chica = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'left',
 						'Italic' => 1
 				));
 $letra_chica_derecha = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'right',
 						'Italic' => 1
 				));
 $letra_chica_bold = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'left',
 						'Bold' => 1,
 						'Italic' => 1
 				));
 $letra_chica_bold_derecha = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'right',
 						'Bold' => 1,
 						'Italic' => 1
 				));
 $letra_chica_underline = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'left',
 						'Bold' => 1,
@@ -160,41 +157,41 @@ $letra_chica_underline = &$wb->addFormat(array(
 						'Underline' => 1
 				));
 $letra_chica_bottomgrid = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
-						'Bottom' => '2',
+						'Bottom' => '1',
 						'Align' => 'left',
 						'Italic' => 1
 				));
 $letra_chica_derecha_bottomgrid = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
-						'Bottom' => '2',
+						'Bottom' => '1',
 						'Align' => 'right',
 						'Italic' => 1
 				));
 $letra_encabezado_lista = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'left',
 						'FgColor' => '55',
 						'Bold' => 1
 				));
 $letra_datos_lista = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'left',
 						'TextWrap' => 1
 				));
 $letra_encabezado_lista_centrado = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'center',
 						'FgColor' => '55',
 						'Bold' => 1
 				));
 $letra_datos_lista_centrado = &$wb->addFormat(array(
-						'Size' => 8,
+						'Size' => 10,
 						'Valign' => 'top',
 						'Align' => 'center',
 						'TextWrap' => 1
@@ -339,7 +336,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$ff = str_replace('%m', 'MM', $ff);
 	$ff = str_replace('%y', 'YY', $ff);
 	$ff = str_replace('%Y', 'YY', $ff);
-	$formato_fecha = & $wb->addFormat(array('Size' => 8,
+	$formato_fecha = & $wb->addFormat(array('Size' => 10,
 							'Valign' => 'top',
 							'Color' => 'black'));
 	$formato_fecha->setNumFormat($ff);
@@ -369,12 +366,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$Cliente->LoadByCodigo($Cobro->fields['codigo_cliente']);
 
 	// ----------------- Define formatos specificos dentro del cobro ------------------
-	$formato_moneda_gastos = & $wb->addFormat(array('Size' => 8,
+	$formato_moneda_gastos = & $wb->addFormat(array('Size' => 10,
 							'VAlign' => 'top',
 							'Align' => 'right',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
-	$formato_moneda_gastos_total = & $wb->addFormat(array('Size' => 8,
+	$formato_moneda_gastos_total = & $wb->addFormat(array('Size' => 10,
 							'VAlign' => 'top',
 							'Align' => 'right',
 							'Bold' => 1,
@@ -411,32 +408,32 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$decimales_total = '';
 	}
 	$formato_moneda = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'top',
 							'Align' => 'right',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda2 = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda2_centrado = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'center',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda_total = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Bold' => '1',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales_total"));
 	$formato_moneda_tabla = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Top' => '1',
@@ -444,7 +441,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda_tabla_centrado = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'center',
 							'Top' => '1',
@@ -452,7 +449,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda_total_tabla = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Top' => '1',
@@ -460,13 +457,13 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales_total"));
 	$formato_monto = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Color' => 'black',
 							'NumFormat' => "#,###,0$decimales"));
 	$formato_total = & $wb->addFormat(array(
-							'Size' => 8,
+							'Size' => 10,
 							'VAlign' => 'middle',
 							'Align' => 'right',
 							'Bold' => '1',
@@ -496,7 +493,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$filas = 9;
 
 	// Agregar la imagen del logo
-	if (UtilesApp::GetConf($sesion, 'LogoExcel') && file_exists(UtilesApp::GetConf($sesion, 'LogoExcel'))) {
+	if (Conf::GetConf($sesion, 'LogoExcel')) {
 		$ws->insertBitmap(0, 0, UtilesApp::GetConf($sesion, 'LogoExcel'), 0, 0, 1, 1.2);
 	}
 
@@ -528,6 +525,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$filas += 1;
 
 	$ws->write($filas, $col_id_trabajo, $arraylang['descripcion_del_asunto']['Resumen'][$lang], $letra_chica_underline);
+	$row_description = $filas;
 	$filas += 1;
 
 	$glosa_asuntos = array();
@@ -661,8 +659,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$filas += 1;
 
 	for ($i = 0; $i <= $filas; $i++) {
-		$ws->setRow($i, '11.25');
+		$ws->setRow($i, 11.25);
 	}
+	$ws->setRow($row_description, 18);
 
 	if ($Cobro->fields['opc_ver_profesional']) {
 		//Hoja Resumen
@@ -715,14 +714,12 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->write($filas, $columna_importe, '', $formato_encabezado);
 		$filas += 1;
 		$ws->mergeCells($filas, 0, $filas, 4);
-
 		$ws->write(
 			$filas,
 			$columna_categoria,
 			"{$arraylang['periodo']['Listado de trabajos'][$lang]} {$fecha_ini_titulo} {$arraylang['periodo_al']['Listado de trabajos'][$lang]} {$Cobro->fields['fecha_fin']}",
 			$formato_encabezado_center
 		);
-
 		$ws->write($filas, $columna_abogado, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_hora, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_tarifa, '', $formato_encabezado_center);
@@ -857,7 +854,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				$ws->writeNumber($filas, $columna_tarifa, $tarifa_abogado, $formato_moneda);
 
 				$duracion = $trabajo->fields['duracion_cobrada'];
-				list($h, $m) = split(':', $duracion);
+				list($h, $m) = explode(':', $duracion);
 				$duracion = $h / 24 + $m / (24 * 60);
 				$ws->writeNumber($filas, $columna_hora, $duracion, $formato_tiempo2_centrado);
 
@@ -865,7 +862,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				if ($Cobro->fields['opc_ver_valor_hh_flat_fee'] == 0 &&
 								($Cobro->fields['forma_cobro'] == 'RETAINER' || $Cobro->fields['forma_cobro'] == 'PROPORCIONAL')) {
 					$duracion_tarificada = $trabajo->fields['duracion_tarificada'];
-					list($ht, $mt) = split(':', $duracion_tarificada);
+					list($ht, $mt) = explode(':', $duracion_tarificada);
 					$duracion_tarificada = $ht / 24 + $m / (24 * 60);
 					$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2_centrado);
 				}
@@ -1112,7 +1109,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 
 				$duracion = $trabajo->fields['duracion_cobrada'];
-				list($h, $m) = split(':', $duracion);
+				list($h, $m) = explode(':', $duracion);
 				$duracion = $h / 24 + $m / (24 * 60);
 				$ws->writeNumber($filas, $columna_hora, $duracion, $formato_tiempo2_centrado);
 
@@ -1120,7 +1117,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 				if ($Cobro->fields['opc_ver_valor_hh_flat_fee'] == 0 &&
 								($Cobro->fields['forma_cobro'] == 'RETAINER' || $Cobro->fields['forma_cobro'] == 'PROPORCIONAL')) {
 					$duracion_tarificada = $trabajo->fields['duracion_tarificada'];
-					list($ht, $mt) = split(':', $duracion_tarificada);
+					list($ht, $mt) = explode(':', $duracion_tarificada);
 					$duracion_tarificada = $ht / 24 + $mt / (24 * 60);
 					$ws->writeNumber($filas, $columna_hora_tarificada, $duracion_tarificada, $formato_tiempo2_centrado);
 				}

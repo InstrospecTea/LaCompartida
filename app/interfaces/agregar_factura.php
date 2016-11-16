@@ -26,6 +26,10 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		}
 	}
 
+	if (!$factura->Loaded()) {
+		$factura->setFieldsNew('factura');
+	}
+
 	if ($id_cobro > 0) {
 		$cobro = new Cobro($sesion);
 		$cobro->Load($id_cobro);
@@ -81,7 +85,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 
 	if ($opcion == "anular") {
 		$data = array('Factura' => $factura);
-		$Slim->applyHook('hook_anula_factura_electronica', &$data);
+		$Slim->applyHook('hook_anula_factura_electronica', $data);
 		$error = $data['Error'];
 		if (!is_null($error)) {
 			$pagina->AddError($error['Message'] ? $error['Message'] : __($error['Code']));
@@ -259,7 +263,7 @@ if ($opcion == "guardar") {
 		} else {
 			if ($mensaje_accion == 'anulado') {
 				$data_anular = array('Factura' => $factura);
-				($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_anula_factura_electronica', &$data_anular) : false;
+				($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_anula_factura_electronica', $data_anular) : false;
 				$error_message = $data_anular['Error'];
 				echo "<!-- {$error_message} -->";
 				if (!is_null($error_message)) {

@@ -1,7 +1,6 @@
 <?php
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
-
+set_time_limit(0);
 $tini = time();
 $fechactual = date('Ymd');
 
@@ -23,8 +22,6 @@ if ($AtacheSecundarioSoloAsunto) {
 										WHERE id_encargado IS NULL;");
 }
 
-set_time_limit(3600);
-
 if ($xls) {
 	header('Set-Cookie: fileDownload=true; path=/');
 	$mp = new \TTB\Mixpanel();
@@ -39,7 +36,7 @@ if ($xls) {
 
 	$moneda_base = Utiles::MonedaBase($sesion);
 	#ARMANDO XLS
-	$wb = new Spreadsheet_Excel_Writer();
+	$wb = new WorkbookMiddleware();
 
 	$wb->setCustomColor(35, 220, 255, 220);
 	$wb->setCustomColor(36, 255, 255, 220);
@@ -363,13 +360,7 @@ if ($xls) {
 		$codigo_asunto_secundario_sep = "";
 	}
 
-	$update1 = "UPDATE trabajo INNER JOIN cobro c ON trabajo.id_cobro = c.id_cobro SET trabajo.estadocobro = c.estado WHERE c.fecha_touch >= trabajo.fecha_touch;";
-	$update2 = "UPDATE cta_corriente INNER JOIN cobro c ON cta_corriente.id_cobro = c.id_cobro SET cta_corriente.estadocobro = c.estado WHERE c.fecha_touch >= cta_corriente.fecha_touch;";
-	$update3 = "UPDATE tramite INNER JOIN cobro c ON tramite.id_cobro = c.id_cobro SET tramite.estadocobro = c.estado WHERE c.fecha_touch >= tramite.fecha_touch ;";
-	$resp = mysql_query($update1, $sesion->dbh);
-	$resp = mysql_query($update2, $sesion->dbh);
-	$resp = mysql_query($update3, $sesion->dbh);
-
+	
 	ReporteContrato::QueriesPrevias($sesion);
 	$ReporteContrato = new ReporteContrato($sesion, false, $separar_asuntos, $fecha1, $fecha2, $AtacheSecundarioSoloAsunto);
 

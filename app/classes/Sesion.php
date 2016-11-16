@@ -97,41 +97,4 @@ class Sesion extends \Sesion {
 		}
 	}
 
-
-	/**
-	 * Lee un valor  desde $_SESSION
-	 * @param $key
-	 * @return null
-	 */
-	public function read($key) {
-		return $this->has($key) ? $_SESSION[$key] : null;
-	}
-
-	/**
-	 * Escribe un valor en $_SESSION
-	 * @param type $key
-	 * @param type $value
-	 */
-	public function write($key, $value) {
-		$_SESSION[$key] = $value;
-	}
-
-
-	/**
-	 * Verifica existencia de un valor en $_SESSION
-	 * @param $key
-	 * @return bool
-	 */
-	public function has($key) {
-		return isset($_SESSION[$key]) && !is_null($_SESSION[$key]);
-	}
-
-	/**
-	 * Elimina un valor desde $_SESSION
-	 * @param type $key
-	 */
-	public function drop($key) {
-		unset($_SESSION[$key]);
-	}
-
 }

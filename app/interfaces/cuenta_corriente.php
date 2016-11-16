@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -20,9 +20,9 @@
 		$orden = "fecha DESC";
 
     #se seleccioanan todos los movimientos
-	$query = "SELECT SQL_CALC_FOUND_ROWS * , fecha,ingreso,egreso,id_moneda, descripcion, id_movimiento 
-				FROM cta_corriente 
-				WHERE codigo_cliente = '$codigo_cliente' ";  
+	$query = "SELECT SQL_CALC_FOUND_ROWS * , fecha,ingreso,egreso,id_moneda, descripcion, id_movimiento
+				FROM cta_corriente
+				WHERE codigo_cliente = '$codigo_cliente' ";
 
 	$x_pag = 20;
 
@@ -42,13 +42,13 @@
 
 <input type=button value="<?=__('Ingresar provisión para gastos')?>" onclick="self.location='ingreso_provision.php?codigo_cliente=<?= $codigo_cliente ?>';"><input type=button value="<?=__('Cancelar')?>" onclick="history.back(-1)">
 
-<?
-    function Opciones(& $fila)
+<?php
+   function Opciones(& $fila)
     {
 		$id_gasto = $fila->fields['id_movimiento'];
 		if($id_gasto > 0)
 			return "<a target=\"_parent\" href=gastos.php?id_gasto=$id_gasto><img src='".Conf::ImgDir()."/editar_on.gif' border=0 title=Editar actividad></a>";
-        
+
     }
     function Nombre(& $fila)
     {

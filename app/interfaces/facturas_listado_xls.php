@@ -1,21 +1,9 @@
 <?php
-
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Sesion.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../fw/classes/Buscador.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Cobro.php';
-require_once Conf::ServerDir() . '/../app/classes/Funciones.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
-require_once Conf::ServerDir() . '/../app/classes/Asunto.php';
-require_once Conf::ServerDir() . '/../app/classes/Contrato.php';
-require_once Conf::ServerDir() . '/../app/classes/Factura.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
 set_time_limit(0);
-ini_set("memory_limit", "256M");
+ini_set('memory_limit', '1024M');
 $where_cobro = ' 1 ';
 
 //void Worksheet::setLandscape();
@@ -162,7 +150,7 @@ if ($lista_suntos_liquidar->num == 0) {
 $fecha_actual = date('Y-m-d');
 
 // Crear y preparar planilla
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 // Enviar headers a la pagina
 $wb->send(__('Documentos tributarios') . ' ' . $fecha_actual . '.xls');
 

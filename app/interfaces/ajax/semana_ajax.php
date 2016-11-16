@@ -179,10 +179,10 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 
 		$duracion = $lista->Get($i)->fields['duracion'];
 		if ((UtilesApp::GetConf($sesion, 'TipoIngresoHoras') == 'decimal')) {
-			list($hh, $mm, $ss) = split(":", $duracion);
+			list($hh, $mm, $ss) = explode(":", $duracion);
 			$duracion = UtilesApp::Time2Decimal($duracion);
 		} else {
-			list($hh, $mm, $ss) = split(":", $duracion);
+			list($hh, $mm, $ss) = explode(":", $duracion);
 			$duracion = "$hh:$mm";
 		}
 		$fecha = $lista->Get($i)->fields['fecha'];
@@ -284,7 +284,7 @@ $horas_mes_consulta = UtilesApp::GetConf($sesion, 'UsarHorasMesConsulta');
 <?php
 
 function SplitDuracion($time) {
-	list($h, $m, $s) = split(":", $time);
+	list($h, $m, $s) = explode(":", $time);
 	return $h . ":" . $m;
 }
 

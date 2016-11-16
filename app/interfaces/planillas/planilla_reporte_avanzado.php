@@ -1,6 +1,4 @@
 <?php
-
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
 
 $sesion = new Sesion(array('REP'));
@@ -64,8 +62,7 @@ foreach ($datos as $dato) {
 	$reporte[$dato]->Query();
 	$resultado[$dato] = $reporte[$dato]->toArray();
 }
-
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 /* FORMATOS */
 $wb->setCustomColor(35, 220, 255, 220);
@@ -204,8 +201,6 @@ $ws1->write($fila, 1, $hoy, $titulo);
 $ws1->write($fila, 2, '');
 $ws1->mergeCells($fila, 1, $fila, 2);
 
-
-
 $columna = 0;
 
 $fila += 2;
@@ -230,7 +225,7 @@ function extender($fila, $columna, $filas, $valor = '') {
 }
 
 function fila_col($fila, $col) {
-	return Spreadsheet_Excel_Writer::rowcolToCell($fila, $col);
+	return PHPExcel_Cell::stringFromColumnIndex($col).($fila + 1);
 }
 
 function total($fila, $columna, $valor, $tipo_dato) {

@@ -57,7 +57,7 @@ Class FacturacionElectronica {
 
 	}
 
-	public static function GeneraFacturaElectronica() {
+	public static function GeneraFacturaElectronica(&$hookArg) {
 
 	}
 

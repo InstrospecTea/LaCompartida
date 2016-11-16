@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
@@ -6,7 +6,7 @@
 	$sesion = new Sesion();
 	$pedazo = utf8_decode($_POST['glosa_asunto']);
 	$codigo_cliente = $_REQUEST['codigo_cliente'];
-	
+
 	if(!$pedazo)
 	{
 		$query = "SELECT DISTINCT SUBSTRING(codigo_asunto, 6, 4) AS codigo_asunto
@@ -45,9 +45,9 @@
 					ORDER BY glosa_asunto
 					LIMIT 10";
 		}
-	
+
 	}
-	
+
 	else
 	{
 		if( $codigo_cliente != '0')
@@ -69,11 +69,11 @@
 					LIMIT 10";
 		}
 	}
-	
+
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	echo '<ul>';
 	if( mysql_num_rows ( $resp ) > 0 )
-	{		
+	{
 		$hay_resultados = false;
 		while(list($codigo_asunto, $glosa_asunto) = mysql_fetch_array($resp))
 			{
@@ -84,5 +84,5 @@
 			echo "<li id='cualquiera'>".__('Cualquiera')."</li>";
 	}
 	echo '</ul>';
-	
+
 ?>

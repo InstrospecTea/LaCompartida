@@ -26,17 +26,18 @@ mysql -u root -p$MYSQL_ROOT_PASS timetracking < /vagrant/ttb/vagrant/database.ex
 # Apache
 
 # TTB Clasic tiene su codigo con encodign ISO-8859-1
-echo "AddDefaultCharset ISO-8859-1" >> /etc/apache2/conf.d/charset
-echo "AddCharset ISO-8859-1 .iso8859-1 .latin1" >> /etc/apache2/conf.d/charset
+echo "AddDefaultCharset ISO-8859-1" >> /etc/apache2/conf-available/charset.conf
+echo "AddCharset ISO-8859-1 .iso8859-1 .latin1" >> /etc/apache2/conf-available/charset.conf
+sed -i '166 s/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
 # PHP
 
 # Todas las siguentes configuraciones son necesarias
 sed -i "s/html_errors = Off/html_errors = On/" /etc/php5/apache2/php.ini
-sed -i "s/short_open_tag = Off/short_open_tag = On/g" /etc/php5/apache2/php.ini
-sed -i 's/;default_charset = "iso-8859-1"/default_charset = "iso-8859-1"/g' /etc/php5/apache2/php.ini
+sed -i 's/default_charset = "UTF-8"/default_charset = "iso-8859-1"/g' /etc/php5/apache2/php.ini
 sed -i "s/error_reporting = E_ALL & ~E_DEPRECATED/error_reporting = E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR/g" /etc/php5/apache2/php.ini
-sed -i "s/register_globals = Off/register_globals = On/g" /etc/php5/apache2/php.ini
+sed -i "s/; max_input_vars = 100/max_input_vars = 5000/g" /etc/php5/apache2/php.ini
+service apache2 restart
 
 # Configuracion local de la conexion a la base de datos
 if [ ! -f /vagrant/ttb/app/miconf.php ]; then
@@ -48,17 +49,16 @@ fi
 
 # Instalar vendors
 cd /vagrant/ttb && /usr/local/bin/composer install
-
-# Bibliotecas pear para TTB Clasic
-pear install Numbers_Words-0.16.4
-pear install Spreadsheet_Excel_Writer-beta
-pear install OLE-0.5
-
-# Instalar wkhtmltopdf
-apt-get update
-apt-get install libfontenc1 libxfont1 xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils fontconfig libxrender1 -y
-wget http://download.gna.org/wkhtmltopdf/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-precise-i386.deb -P /tmp
-dpkg -i /tmp/wkhtmltox-0.12.2.1_linux-precise-i386.deb
+composer dump-autoload --optimize
 
 # Actualizar la base de datos de ejemplo
 curl -I "http://localhost/ttb/app/update.php?hash=c85ef9997e6a30032a765a20ee69630b"
+
+# Instalar wkhtmltopdf
+apt-get update
+apt-get install libfontenc1 libxfont1 xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils -y
+cd /tmp ; wget http://download.gna.org/wkhtmltopdf/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-jessie-amd64.deb
+dpkg -i wkhtmltox-0.12.2.1_linux-jessie-amd64.deb
+
+# Corrige config de AWS
+cp /vagrant/ttb/backups/AWSSDKforPHP/config-sample.inc.php /vagrant/ttb/backups/AWSSDKforPHP/config.inc.php

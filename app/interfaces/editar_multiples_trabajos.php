@@ -12,10 +12,10 @@
 		$where_query_listado_completo = mysql_real_escape_string($where_query_listado_completo);
 		$where_query_listado_completo = str_replace("\'","'",$where_query_listado_completo);
 		$where_query_listado_completo = str_replace(";","",$where_query_listado_completo);
-		$where_query_listado_completo = ereg_replace("[dD][rR][oO][pP]","",$where_query_listado_completo);
-		$where_query_listado_completo = ereg_replace("[dD][eE][lL][eE][tT][eE]","",$where_query_listado_completo);
-		$where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][bB][lL][eE]","",$where_query_listado_completo);
-		$where_query_listado_completo = ereg_replace("[aA][lL][tT][eE][rR][ ]*[tT][aA][bB][lL][eE]","",$where_query_listado_completo);
+		$where_query_listado_completo = preg_replace("/[dD][rR][oO][pP]/","",$where_query_listado_completo);
+		$where_query_listado_completo = preg_replace("/[dD][eE][lL][eE][tT][eE]/","",$where_query_listado_completo);
+		$where_query_listado_completo = preg_replace("/[aA][lL][tT][eE][rR][ ]*[tT][aA][bB][lL][eE]/","",$where_query_listado_completo);
+		$where_query_listado_completo = preg_replace("/[aA][lL][tT][eE][rR][ ]*[tT][aA][bB][lL][eE]/","",$where_query_listado_completo);
 
 		if($where_query_listado_completo) {
 			$query_listado_completo = "SELECT trabajo.id_trabajo
@@ -172,7 +172,7 @@
 			$query = "SELECT DISTINCT codigo_cliente
 					FROM trabajo
 						JOIN asunto ON asunto.codigo_asunto = trabajo.codigo_asunto
-					WHERE id_trabajo IN ($ids_csv)";
+					WHERE id_trabajo IN ({$ids_csv})";
 			$codigos = $sesion->pdodbh->query($query)->fetchAll(PDO::FETCH_COLUMN);
 			if(count($codigos) == 1){
 				$valores_default['codigo_cliente'] = $codigos[0];
@@ -580,7 +580,7 @@ if(Conf::GetConf($sesion,'TipoSelectCliente')=='autocompletador')
 	$pagina->PrintBottom($popup);
 	function SplitDuracion($time)
 	{
-		list($h,$m,$s) = split(":",$time);
+		list($h,$m,$s) = explode(":",$time);
 		return $h.":".$m;
 	}
 	function Substring($string)

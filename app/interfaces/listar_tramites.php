@@ -276,15 +276,18 @@ for ($x = 0; $x < $lista_tramites->num; $x++) {
 	$ids_listado_tramites.="t" . $tramite->fields['id_tramite'];
 }
 if ($orden == "") {
+
 	$orden = Conf::GetConf($sesion,'OrdenRevisarTramites');
 
 	// Se intenta seguir la lógica de negocio anterior.
 	if ($orden != "cliente.glosa_cliente ASC, tramite.fecha ASC") {
+
 		if ($opc_orden == 'edit') {
 			$orden = "tramite.fecha_modificacion DESC";
 		} else {
 			$orden = "tramite.fecha DESC, tramite.descripcion";
 		}
+
 	}
 }
 
@@ -328,6 +331,7 @@ $b->color_mouse_over = "#bcff5c";
 $b->funcionTR = "funcionTR";
 
 if ($excel) {
+
 	$b1 = new Buscador($sesion, $query, "Trabajo", $desde, '', $orden);
 	$lista = $b1->lista;
 
@@ -719,7 +723,7 @@ function Opciones(& $tramite) {
 }
 
 function SplitDuracion($time) {
-	list($h, $m, $s) = split(":", $time);
+	list($h, $m, $s) = explode(":", $time);
 	if ($h > 0 || $s > 0) {
 		return $h . ":" . $m;
 	}
@@ -754,7 +758,7 @@ function funcionTR(& $tramite) {
 		$tarifa = $tramite->fields['tarifa_tramite'];
 	}
 
-	list($h, $m, $s) = split(":", $tramite->fields['duracion_defecto']);
+	list($h, $m, $s) = explode(":", $tramite->fields['duracion_defecto']);
 
 	$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 	$total = round($tarifa, 2);

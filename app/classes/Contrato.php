@@ -152,7 +152,7 @@ class Contrato extends Objeto {
 			'opc_mostrar_tramites_no_cobrables'
 	);
 
-	function Contrato($sesion, $fields = "", $params = "") {
+	function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "contrato";
 		$this->campo_id = "id_contrato";
 		$this->sesion = $sesion;
@@ -833,7 +833,7 @@ class Contrato extends Objeto {
 		$this->escalonadas['monto_fijo'] = 0;
 
 		$moneda_contrato = new Moneda($this->sesion);
-		$moneda_contrato->Load($this->fields['id_moneda']);
+		$moneda_contrato->Load(isset($this->fields['id_moneda']) ? $this->fields['id_moneda'] : null);
 
 		// Contador escalonadas $moneda_escalonada->Load( $this->escalondas[$x_escalonada]['id_moneda'] );
 		$moneda_escalonada = new Moneda($this->sesion);
@@ -881,19 +881,19 @@ class Contrato extends Objeto {
 
 		$this->escalonadas[$i2]['tiempo_inicial'] = $tiempo_inicial;
 		$this->escalonadas[$i2]['tiempo_final'] = '';
-		$this->escalonadas[$i2]['id_tarifa'] = $this->fields['esc' . $i . '_id_tarifa'];
-		$this->escalonadas[$i2]['id_moneda'] = $this->fields['esc' . $i . '_id_moneda'];
+		$this->escalonadas[$i2]['id_tarifa'] = isset($this->fields['esc' . $i . '_id_tarifa']) ? $this->fields['esc' . $i . '_id_tarifa'] : null;
+		$this->escalonadas[$i2]['id_moneda'] = isset($this->fields['esc' . $i . '_id_moneda']) ? $this->fields['esc' . $i . '_id_moneda'] : null;
 
 		$moneda_escalonada->Load($this->escalondas[$i2]['id_moneda']);
 
 		$this->escalonadas[$i2]['monto'] = UtilesApp::CambiarMoneda(
-			$this->fields['esc' . $i . '_monto'],
+			isset($this->fields['esc' . $i . '_monto']) ? $this->fields['esc' . $i . '_monto'] : null,
 			$moneda_escalonada->fields['tipo_cambio'],
 			$moneda_escalonada->fields['cifras_decimales'],
 			$moneda_contrato->fields['tipo_cambio'],
 			$moneda_contrato->fields['cifras_decimales']
 		);
-		$this->escalonadas[$i2]['descuento'] = $this->fields['esc' . $i . '_descuento'];
+		$this->escalonadas[$i2]['descuento'] = isset($this->fields['esc' . $i . '_descuento']) ? $this->fields['esc' . $i . '_descuento'] : null;
 
 		if (!empty($this->escalonadas[$i2]['monto'])) {
 			$this->escalonadas[$i2]['escalonada_tarificada'] = 0;
@@ -931,7 +931,7 @@ class Contrato extends Objeto {
 			if ($trabajo->fields['cobrable']) {
 				// Revisa duración de la hora y suma duracion que sobro del trabajo anterior,
 				// si es que se cambió de escalonada
-				list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
+				list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
 				$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 				$duracion_trabajo = $duracion;
 

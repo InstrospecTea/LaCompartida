@@ -75,5 +75,4 @@ for ($i = 0; $i < $lista_parametros->num; $i++) {
 
 </form>
 <?php
-$pagina->PrintBottom();
-?>
+	$pagina->PrintBottom();

@@ -1,7 +1,6 @@
 <?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/funciones/funciones.php';
-require_once Conf::ServerDir().'/../fw/tablas/funciones_mantencion_tablas.php';
 $sesion = new Sesion('');
 $pagina = new Pagina($sesion);
 $pagina->titulo = __('Mantención de facturación');
@@ -194,7 +193,7 @@ return;
 
 
 </style>
-<?
+<?php
 	$tooltip_agregar = __('Haga clic sobre esta imagen para ingresar una nueva fila a esta tabla.');
 	 if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) )
 			{
@@ -225,7 +224,7 @@ return;
 	<tr>
 		<td align=center colspan=2>
 			<br>
-			<? if($tabla != "") echo( Tabla($sesion, $tabla) ); ?>
+			<?php if($tabla != "") echo( Tabla($sesion, $tabla) ); ?>
 			<br>
 		</td>
 	</tr>
@@ -233,6 +232,6 @@ return;
 		<td align=center colspan=2><input type=submit value=Guardar /></td>
 	</tr>
 </table>
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

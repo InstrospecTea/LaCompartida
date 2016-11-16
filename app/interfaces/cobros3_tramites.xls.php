@@ -1,14 +1,11 @@
 <?php
-	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../conf.php';
 
 	$sesion = new Sesion(array('REV', 'ADM', 'PRO'));
 	$pagina = new Pagina($sesion);
 
-	$wb = new Spreadsheet_Excel_Writer();
-
-	$wb->setVersion(8);
-	$wb->send('Revisión de cobros.xls');
+	$wb = new WorkbookMiddleware();
+	$wb->send('Revisión de cobros');
 	$wb->setCustomColor(35, 220, 255, 220);
 	$wb->setCustomColor(36, 255, 255, 220);
 

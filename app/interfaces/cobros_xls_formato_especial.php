@@ -1,10 +1,6 @@
 <?php
 
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Utiles.php';
-require_once Conf::ServerDir() . '/../app/classes/UtilesApp.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 
 $sesion = new Sesion(array('ADM', 'COB'));
 $pagina = new Pagina($sesion);
@@ -66,8 +62,7 @@ $orden = "cliente.glosa_cliente, contrato.id_contrato, asunto.glosa_asunto, trab
 $b1 = new Buscador($sesion, $query, "Trabajo", $desde, '', $orden);
 $lista = $b1->lista;
 
-$wb = new Spreadsheet_Excel_Writer();
-$wb->setVersion(8);
+$wb = new WorkbookMiddleware();
 $wb->setCustomColor(35, 220, 255, 220);
 $wb->setCustomColor(36, 255, 255, 220);
 
@@ -95,10 +90,8 @@ $formato_titulo_arriba = & $wb->addFormat(array('Size' => 12,
 			'VAlign' => 'vcenter',
 			'Align' => 'center',
 			'Bold' => 1,
-			'Locked' => 1,
-			'Top' => 1,
-			'Left' => 1,
-			'Right' => 1,
+			'Border' => 1,
+			'Bottom' => 0,
 			'FgColor' => '35',
 			'Color' => 'black',
 			'FontFamily' => 'Calibri'));
@@ -106,10 +99,8 @@ $formato_titulo_abajo = & $wb->addFormat(array('Size' => 12,
 			'VAlign' => 'vcenter',
 			'Align' => 'center',
 			'Bold' => 1,
-			'Locked' => 1,
-			'Left' => 1,
-			'Right' => 1,
-			'Bottom' => 1,
+			'Border' => 1,
+			'Top' => 0,
 			'FgColor' => '35',
 			'Color' => 'black',
 			'FontFamily' => 'Calibri'));
@@ -172,9 +163,8 @@ if ($cifras_decimales > 0) {
 $formato_moneda_titulo = & $wb->addFormat(array('Size' => 12,
 			'VAlign' => 'vcenter',
 			'Align' => 'center',
-			'Left' => 1,
-			'Right' => 1,
-			'Bottom' => 1,
+			'Border' => 1,
+			'Top' => 0,
 			'Color' => 'black',
 			'FgColor' => '35',
 			'Bold' => 1,
@@ -243,7 +233,8 @@ $ws->setColumn(0, 0, 2);
 $ws->setColumn($col_asunto, $col_asunto, 30);
 foreach ($col_abogados as $id => $col)
 	$ws->setColumn($col, $col, 12);
-$ws->setColumn($col_total_horas, $col_total, 12);
+$ws->setColumn($col_total_horas, $col_total_horas, 12);
+$ws->setColumn($col_total, $col_total, 12);
 $ws->setZoom(75);
 
 // Escribir encabezado
@@ -351,7 +342,7 @@ for ($i = 0; $i < $lista->num; ++$i) {
 	// Aumentamos los totales del asunto actual.
 	$nombre_asunto = $trabajo->fields['glosa_asunto'];
 	$duracion_cobrada = $trabajo->fields['duracion_cobrada'];
-	list($h, $m) = split(':', $duracion_cobrada);
+	list($h, $m) = explode(':', $duracion_cobrada);
 	$duracion_cobrada = $h / 24 + $m / (24 * 60);
 	$horas_abogado[$trabajo->fields['id_usuario']] += $duracion_cobrada;
 

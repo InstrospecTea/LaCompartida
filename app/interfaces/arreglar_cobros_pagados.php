@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 
@@ -39,7 +39,7 @@
 		Arreglar
 	</th>
 </tr>
-<?
+<?php
 	$sel = " SELECT cobro.id_cobro, cobro.codigo_cliente, cobro.estado, documento.id_documento, documento.saldo_honorarios, documento.saldo_gastos
 FROM cobro
 JOIN documento ON (documento.id_cobro = cobro.id_cobro AND documento.tipo_doc = 'N')  HAVING
@@ -76,7 +76,7 @@ cobro.estado = 'PAGADO' AND (documento.saldo_honorarios >0 OR documento.saldo_ga
 			<a href= 'javascript:void(0);' onclick="nuovaFinestra('Agregar Pago',730,580,'ingresar_documento_pago_automatico.php?id_cobro=<?=$id_cobro?>&codigo_cliente=<?=$codigo_cliente?>&popup=1&popup=1&contitulo=true', 'top=100, left=155');">Arreglar</a>
 		</td>
 	</tr>
-<?
+<?php
 	}
 ?>
 
@@ -86,6 +86,6 @@ cobro.estado = 'PAGADO' AND (documento.saldo_honorarios >0 OR documento.saldo_ga
 <a href="?">Buscar problemas</a>
 <br><br>
 
-<?
+<?php
 	$pagina->PrintBottom();
 ?>

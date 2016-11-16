@@ -11,16 +11,16 @@ if(!$_SERVER['HTTPS']) die();
 include '../app/conf.php';
  #DEFAULT db connection settings
  # --- WARNING! --- if you set defaults - always recommended to set $ACCESS_PWD to protect your db!
- 	
 
-	
-	
-	
+
+
+
+
  $DBDEF=array(
- 'user'=>DBUSER,#required
- 'pwd'=>DBPASS, #required
- 'db'=>DBNAME,  #optional, default DB
- 'host'=>DBHOST,#optional
+ 'user'=>Conf::dbUser(),#required
+ 'pwd'=>Conf::dbPass(), #required
+ 'db'=>Conf::dbName(),  #optional, default DB
+ 'host'=>Conf::dbHost(),#optional
  'port'=>3306,#optional
 'chset'=>"ISO-8859-1",#optional, default charset
  );
@@ -97,7 +97,7 @@ include '../app/conf.php';
 
  if (db_connect('nodie')){
     $time_start=microtime_float();
-   
+
     if ($_REQUEST['phpinfo']){
        ob_start();phpinfo();$sqldr='<div style="font-size:130%">'.ob_get_clean().'</div>';
     }else{
@@ -126,7 +126,7 @@ include '../app/conf.php';
      }
     }
     $time_all=ceil((microtime_float()-$time_start)*10000)/10000;
-   
+
     print_screen();
  }else{
     print_cfg();
@@ -166,7 +166,7 @@ function display_select($sth,$q){
 
  $reccount=mysql_num_rows($sth);
  $fields_num=mysql_num_fields($sth);
- 
+
  $w="width='100%' ";
  if ($is_sht || $is_shd) {$w='';
    $url='?'.$xurl."&db=$dbn";
@@ -301,7 +301,7 @@ function after_load(){
 function chkall(cab){
  var e=document.DF.elements;
  if (e!=null){
-  var cl=e.length;                   
+  var cl=e.length;
   for (i=0;i<cl;i++){var m=e[i];if(m.checked!=null && m.type=="checkbox"){m.checked=cab.checked}}
  }
 }
@@ -321,7 +321,7 @@ function sht(f){
 <div class="inv">
 <a href="http://phpminiadmin.sourceforge.net/" target="_blank"><b>phpMiniAdmin <?php echo $VERSION?></b></a>
 <?php if ($_SESSION['is_logged'] && $dbh){ ?>
- | 
+ |
 <a href="?<?php echo $xurl?>&q=show+databases">Databases</a>: <select name="db" onChange="frefresh()"><option value='*'> - select/refresh -</option><option value=''> - show all -</option><?php echo get_db_select($dbn)?></select>
 <?php if($dbn){ $z=" &#183;<a href='$self?$xurl&db=$dbn"; ?>
 <?php echo $z?>&q=show+tables'>show tables</a>
@@ -329,7 +329,7 @@ function sht(f){
 <?php echo $z?>&shex=1'>export</a>
 <?php echo $z?>&shim=1'>import</a>
 <?php } ?>
- | <a href="?showcfg=1">Settings</a> 
+ | <a href="?showcfg=1">Settings</a>
 <?php } ?>
 <?php if ($GLOBALS['ACCESS_PWD']){?> | <a href="?<?php echo $xurl?>&logoff=1">Logoff</a> <?php }?>
  | <a href="?phpinfo=1">phpinfo</a>
@@ -533,9 +533,9 @@ function sel($arr,$n,$sel=''){
 }
 
 function microtime_float(){
- list($usec,$sec)=explode(" ",microtime()); 
- return ((float)$usec+(float)$sec); 
-} 
+ list($usec,$sec)=explode(" ",microtime());
+ return ((float)$usec+(float)$sec);
+}
 
 ############################
 # $pg=int($_[0]);     #current page
@@ -561,7 +561,7 @@ function make_List_Navigation($pg, $all, $PP, $ptpl, $show_all=''){
 
   if($sp>0){
     $pname=pen($sp-1,$ptpl);
-    $res.="<a href='$pname'>$w[0]</a>";       
+    $res.="<a href='$pname'>$w[0]</a>";
     $res.=$sep;
   }
   for($p_p=$sp;$p_p<$allp && $p_p<$sp+5;$p_p++){
@@ -570,17 +570,17 @@ function make_List_Navigation($pg, $all, $PP, $ptpl, $show_all=''){
      $pname=pen($p_p,$ptpl);
      if($last_s>$all){
        $last_s=$all;
-     }      
+     }
      if($p_p==$pg){
         $res.="<b>$first_s..$last_s</b>";
      }else{
         $res.="<a href='$pname'>$first_s..$last_s</a>";
-     }       
+     }
      if($p_p+1<$allp) $res.=$sep;
   }
   if($sp+5<$allp){
     $pname=pen($sp+5,$ptpl);
-    $res.="<a href='$pname'>$w[1]</a>";       
+    $res.="<a href='$pname'>$w[1]</a>";
   }
   $res.=" <br/>\n";
 
@@ -588,13 +588,13 @@ function make_List_Navigation($pg, $all, $PP, $ptpl, $show_all=''){
     $pname=pen($pg-1,$ptpl);
     $res.="<a href='$pname'>$w[2]</a> $n|$n ";
     $pname=pen(0,$ptpl);
-    $res.="<a href='$pname'>$w[4]</a>";   
+    $res.="<a href='$pname'>$w[4]</a>";
   }
   if($pg>0 && $pg+1<$allp) $res.=$sep;
   if($pg+1<$allp){
     $pname=pen($pg+1,$ptpl);
-    $res.="<a href='$pname'>$w[3]</a>";    
-  }    
+    $res.="<a href='$pname'>$w[3]</a>";
+  }
   if ($show_all) $res.=" <b>($w[5] - $all)</b> ";
 
   return $res;

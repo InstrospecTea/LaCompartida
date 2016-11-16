@@ -6,12 +6,12 @@
  * * Muestra: cliente.glosa_cliente
  * * Ordena por: cliente.glosa_cliente
  *
- * M√°s info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Glosa-Cliente
+ * M·s info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Glosa-Cliente
  */
 class GlosaClienteGrouper extends AbstractGrouperTranslator {
 
 	/**
-	 * Obtiene el campo por el cual se agrupar√° la query
+	 * Obtiene el campo por el cual se agrupar· la query
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
@@ -19,16 +19,16 @@ class GlosaClienteGrouper extends AbstractGrouperTranslator {
 	}
 
 	/**
-	 * Obtiene el campo de grupo que se devolver√° en el SELECT de la query
-	 * @return String par tabla.campo o alias de funci√≥n
+	 * Obtiene el campo de grupo que se devolver· en el SELECT de la query
+	 * @return String par tabla.campo o alias de funciÛn
 	 */
 	function getSelectField() {
 		return 'cliente.glosa_cliente';
 	}
 
 	/**
-	 * Obtiene el campo de grupo por el cual se ordenar√° la query
-	 * @return String par tabla.campo o alias de funci√≥n
+	 * Obtiene el campo de grupo por el cual se ordenar· la query
+	 * @return String par tabla.campo o alias de funciÛn
 	 */
 	function getOrderField() {
 		return 'cliente.glosa_cliente';
@@ -36,7 +36,7 @@ class GlosaClienteGrouper extends AbstractGrouperTranslator {
 
 	/**
 	 * Traduce los keys de agrupadores a campos para la query de Cobros
-	 * Glosa del cliente de cada asunto incluido en la liquidaci√≥n
+	 * Glosa del cliente de cada asunto incluido en la liquidaciÛn
 	 * @return void
 	 */
 	function translateForCharges(Criteria $Criteria) {
@@ -56,8 +56,8 @@ class GlosaClienteGrouper extends AbstractGrouperTranslator {
 	}
 
 	/**
-	 * Traduce los keys de agrupadores a campos para la query de Tr√°mites
-	 * Glosa del cliente del asunto del tr√°mite
+	 * Traduce los keys de agrupadores a campos para la query de Tr·mites
+	 * Glosa del cliente del asunto del tr·mite
 	 * @return void
 	 */
 	function translateForErrands(Criteria $Criteria) {

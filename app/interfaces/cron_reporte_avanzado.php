@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once dirname(__FILE__).'/../classes/AlertaCron.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
@@ -21,13 +21,13 @@
 			case 2:
 				return __('Martes');
 			case 3:
-				return __('MiÃ©rcoles');
+				return __('Miércoles');
 			case 4:
 				return __('Jueves');
 			case 5:
 				return __('Viernes');
 			case 6:
-				return __('SÃ¡bado');
+				return __('Sábado');
 		}
 		return __('Domingo');
 	}
@@ -119,11 +119,11 @@
 		$campo_fecha = $args['campo_fecha'];
 		$email = 1;
 
-		$ver = __("Cargar versiÃ³n actualizada de este reporte en el sistema:")." ";
+		$ver = __("Cargar versión actualizada de este reporte en el sistema:")." ";
 		$ver .= "<a href=".Conf::Server().Conf::Rootdir()."/app/interfaces/reporte_avanzado.php?mis_reportes_elegido=".$args['reporte'].' >Reporte</a> ';
 		$ver .= "<a href=".Conf::Server().Conf::Rootdir()."/app/interfaces/reporte_avanzado_planilla.php?tipo_dato=".$tipo_dato."&vista=".$vista."&id_moneda=".$id_moneda."&prop=".$prop."&clientes=&usuarios=&fecha_ini=".$fecha_ini."&fecha_fin=".$fecha_fin."&campo_fecha=".$campo_fecha."&tipo_dato_comparado=".$tipo_dato_comparado.' >Planilla</a> ';
 		$ver .= "<a href=".Conf::Server().Conf::Rootdir()."/app/interfaces/reporte_avanzado_grafico.php?tipo_grafico=barras&tipo_dato=".$tipo_dato."&vista=".$vista."&id_moneda=".$id_moneda."&prop=".$prop."&clientes=&usuarios=&fecha_ini=".$fecha_ini."&fecha_fin=".$fecha_fin."&campo_fecha=".$campo_fecha."&tipo_dato_comparado=".$tipo_dato_comparado.' >Barras</a> <br>';
-		$ver .= "<i>(requiere sesiÃ³n iniciada en el navegador)</i>";
+		$ver .= "<i>(requiere sesión iniciada en el navegador)</i>";
 
 		ob_start();
 			require Conf::ServerDir().'/../app/interfaces/reporte_avanzado_planilla.php';
@@ -213,7 +213,7 @@
 						if($segun_reporte_encontrado == 'corte')
 							$campo_fecha_usado = __('fecha de corte del cobro');
 						if($segun_reporte_encontrado == 'emision')
-							$campo_fecha_usado = __('fecha de emisiÃ³n del cobro');
+							$campo_fecha_usado = __('fecha de emisión del cobro');
 
 						$args['fecha_ini'] = $mes_pasado_ini;
 						$args['fecha_fin'] = $mes_pasado_fin;
@@ -234,14 +234,14 @@
 						$s = __("Estimado/a")." ".$nombre_pila.":";
 						$s .= "<br />&nbsp;&nbsp;&nbsp;".__("El reporte")." '".$nombre_reporte_encontrado."' ";
 
-						$s .= __("se ha generado para el periodo del ").$args['fecha_ini']." ".__("al")." ".$args['fecha_fin']." (".__("segÃºn fecha del")." ".$campo_fecha_usado.").";
+						$s .= __("se ha generado para el periodo del ").$args['fecha_ini']." ".__("al")." ".$args['fecha_fin']." (".__("según fecha del")." ".$campo_fecha_usado.").";
 
-						$periodicidad = __('dÃ­a')." ".str_pad($envio_reporte_encontrado, 2, '0', STR_PAD_LEFT)." ".__('del mes')." ";
+						$periodicidad = __('día')." ".str_pad($envio_reporte_encontrado, 2, '0', STR_PAD_LEFT)." ".__('del mes')." ";
 						if($datos[2] == 'semanal')
 								$periodicidad = dia_semana($envio_reporte_encontrado);
 
 						/* Periodo */
-						$s .= "<br />&nbsp;&nbsp;&nbsp;".__("Este reporte estÃ¡ configurado para enviarse cada")." ".$periodicidad.".";
+						$s .= "<br />&nbsp;&nbsp;&nbsp;".__("Este reporte está configurado para enviarse cada")." ".$periodicidad.".";
 
 						$s .= $out;
 

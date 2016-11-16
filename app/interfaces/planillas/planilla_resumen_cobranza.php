@@ -1,11 +1,8 @@
 <?php
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
-
+set_time_limit(0);
 $sesion = new Sesion(array('REP'));
 //Revisa el Conf si esta permitido
-
-set_time_limit(300);
 
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
@@ -15,8 +12,7 @@ $Html = new \TTB\Html;
 if ($xls) {
 	$moneda_base = Utiles::MonedaBase($sesion);
 	#ARMANDO XLS
-	$wb = new Spreadsheet_Excel_Writer();
-	//$wb->setVersion(8); //esto permite mas de 255 caracteres por celda, pero se corta en los acentos y muestra un error en excel 2010
+	$wb = new WorkbookMiddleware();
 
 	$wb->setCustomColor(35, 220, 255, 220);
 	$wb->setCustomColor(36, 255, 255, 220);
@@ -100,21 +96,15 @@ if ($xls) {
 				FROM prm_moneda
 				ORDER BY id_moneda';
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+	$Moneda = new Moneda($sesion);
 	while (list($id_moneda, $simbolo_moneda, $cifras_decimales) = mysql_fetch_array($resp)) {
-		if ($cifras_decimales > 0) {
-			$decimales = '.';
-			while ($cifras_decimales-- > 0) {
-				$decimales .= '0';
-			}
-		} else {
-			$decimales = '';
-		}
+		$formato = $Moneda->getExcelFormat($id_moneda);
 		$formatos_moneda[$id_moneda] = & $wb->addFormat(array('Size' => 11,
 					'VAlign' => 'top',
 					'Align' => 'right',
 					'Border' => '1',
 					'Color' => 'black',
-					'NumFormat' => "[$$simbolo_moneda] #,###,0$decimales"));
+					'NumFormat' => $formato));
 	}
 
 	$ws1 = & $wb->addWorksheet(__('Facturacion'));
@@ -125,17 +115,7 @@ if ($xls) {
 	$ws1->setLandscape();
 	$ws1->freezePanes(array(0, 3));
 
-	$ws2 = & $wb->addWorksheet(__('Historial'));
-	$ws2->setInputEncoding('utf-8');
-	$ws2->fitToPages(2, 5);
-	$ws2->setZoom(75);
-	$ws2->hideGridlines();
-	$ws2->setLandscape();
-	$filas2 = 1;
-	$col2_fecha = 1;
-	$col2_comentario = 2;
-	$ws2->setColumn($col2_fecha, $col2_fecha, 17);
-	$ws2->setColumn($col2_comentario, $col2_comentario, 40);
+	$hoja_historial = [];
 
 	// Definir los números de las columnas
 	// El orden que tienen en esta sección es el que mantienen en la planilla.
@@ -580,9 +560,6 @@ if ($xls) {
 		// Calcular gastos
 		$gastos = 0;
 
-
-
-
 		$cobro_moneda = new CobroMoneda($sesion);
 		$cobro_moneda->Load($cobro['id_cobro']);
 
@@ -840,22 +817,18 @@ if ($xls) {
 
 		if ($cobro['estado'] != 'CREADO' && $cobro['estado'] != 'EN REVISION') {
 			$comentario = "";
-			$query_historial = "SELECT fecha, comentario FROM cobro_historial WHERE id_cobro=" . $cobro['id_cobro'];
+			$query_historial = "SELECT fecha, comentario FROM cobro_historial WHERE id_cobro = {$cobro['id_cobro']}";
 			$resp_historial = mysql_query($query_historial, $sesion->dbh) or Utiles::errorSQL($query_historial, __FILE__, __LINE__, $sesion->dbh);
-
-			$ws2->mergeCells($filas2, $col2_fecha, $filas2, $col2_comentario);
-			$ws2->write($filas2, $col2_fecha, __("Historial Cobro") . " " . $cobro['id_cobro'] . ' (' . $cobro['glosa_cliente'] . ')', $titulo_filas);
-			++$filas2;
-			$ws2->write($filas2, $col2_fecha, __('Fecha'), $titulo_filas);
-			$ws2->write($filas2, $col2_comentario, __('Comentario'), $titulo_filas);
-			++$filas2;
+			$detalle_historial = [];
 			while ($historial = mysql_fetch_array($resp_historial)) {
-				$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, '-') . ": " . $historial['comentario'] . "\n";
-				$ws2->write($filas2, $col2_fecha, Utiles::sql2fecha($historial['fecha'], $formato_fecha, '-'), $fecha);
-				$ws2->write($filas2, $col2_comentario, $historial['comentario'], $txt_opcion);
-				++$filas2;
+				$comentario .= Utiles::sql2fecha($historial['fecha'], $formato_fecha, '-') . ": {$historial['comentario']}\n";
+				$detalle_historial[] = [
+					'fecha' => Utiles::sql2fecha($historial['fecha'], $formato_fecha, '-'),
+					'comentario' => $historial['comentario']
+				];
 			}
-			++$filas2;
+			$titulo = __("Historial Cobro") . " {$cobro['id_cobro']} ({$cobro['glosa_cliente']})";
+			$hoja_historial[$titulo] = $detalle_historial;
 			$ws1->writeNote($filas, $col_estado, $comentario);
 		}
 
@@ -884,6 +857,36 @@ if ($xls) {
 		$ws1->mergeCells($filas, $col_numero_cobro, $filas, $col_fecha_pago);
 		$ws1->write($filas, $col_numero_cobro, __('No se encontraron resultados'), $encabezado);
 	}
+
+	// Hoja Historial
+	$fila = 1;
+	$col_fecha = 1;
+	$col_comentario = 2;
+	$ws2 = & $wb->addWorksheet(__('Historial'));
+	$ws2->setInputEncoding('utf-8');
+	$ws2->fitToPages(2, 5);
+	$ws2->setZoom(75);
+	$ws2->hideGridlines();
+	$ws2->setLandscape();
+	$ws2->setColumn($col_fecha, $col_fecha, 17);
+	$ws2->setColumn($col_comentario, $col_comentario, 44);
+
+	foreach ($hoja_historial as $titulo => $historial) {
+		$ws2->write($fila, $col_fecha, $titulo, $titulo_filas);
+		$ws2->write($fila, $col_comentario, '', $titulo_filas);
+		$ws2->mergeCells($fila, $col_fecha, $fila, $col_comentario);
+		++$fila;
+		$ws2->write($fila, $col_fecha, __('Fecha'), $titulo_filas);
+		$ws2->write($fila, $col_comentario, __('Comentario'), $titulo_filas);
+		++$fila;
+		foreach ($historial as $detalle) {
+			$ws2->write($fila, $col_fecha, $detalle['fecha'], $fecha);
+			$ws2->write($fila, $col_comentario, $detalle['comentario'], $txt_opcion);
+			++$fila;
+		}
+		++$fila;
+	}
+
 	$wb->send("planilla_liquidaciones.xls");
 	$wb->close();
 	exit;
@@ -1053,7 +1056,6 @@ $pagina->PrintTop();
 	</table>
 </form>
 <script type="text/javascript">
-
 	function Rangos(obj, form) {
 		if (obj.checked) {
 			jQuery('#periodo').hide();

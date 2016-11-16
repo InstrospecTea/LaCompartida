@@ -894,17 +894,19 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$fix_decimal = '10';
 				}
 
+				$Numbers_Words = new Numbers_Words();
+
 				if ($lang == 'es') {
 
 					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural'];
 
 					if (empty($total_parte_decimal)) {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'es'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'es'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang);
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang) . ' CON 00/100 CENTAVOS';
 					} else {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'es'));
-						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal * $fix_decimal, 'es'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'es'));
+						$monto_palabra_parte_decimal = strtoupper($Numbers_Words->toWords($total_parte_decimal * $fix_decimal, 'es'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' CON ' . $monto_palabra_parte_decimal . ' ' . 'CENTAVOS';
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang) . ' CON ' . $total_parte_decimal * $fix_decimal . '/100 CENTAVOS';
 					}
@@ -913,12 +915,12 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$glosa_moneda_plural_lang = $moneda_total->fields['glosa_moneda_plural_lang'];
 
 					if (empty($total_parte_decimal)) {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'en_US'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'en_US'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang);
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang) . ' CON 00/100 CENTAVOS';
 					} else {
-						$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, 'en_US'));
-						$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, 'en_US'));
+						$monto_palabra_parte_entera = strtoupper($Numbers_Words->toWords($total_parte_entera, 'en_US'));
+						$monto_palabra_parte_decimal = strtoupper($Numbers_Words->toWords($total_parte_decimal, 'en_US'));
 						$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' WITH ' . $monto_palabra_parte_decimal . ' ' . 'CENTS';
 						$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' WITH ' . $total_parte_decimal * $fix_decimal . '/100 CENTS';
 					}
@@ -1004,7 +1006,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				while ($hitos = mysql_fetch_array($resp_hitos)) {
 					$row = $row_tmpl;
 					$row = str_replace('%fecha%', ($hitos['fecha_cobro'] == 0 ? '' : date('d-m-Y', strtotime($hitos['fecha_cobro']))), $row);
-					$row = str_replace('%descripcion%', $hitos['descripcion'], $row);
+					$row = str_replace('%descripcion%', htmlentities($hitos['descripcion']), $row);
 					$total_hitos = $total_hitos + $hitos['monto_estimado'];
 					$moneda_hitos = $hitos['simbolo'];
 					$estehito = $hitos['thisid'];
@@ -1613,6 +1615,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 								$row = str_replace('%TRABAJOS_FILAS%', '', $row);
 								$row = str_replace('%TRABAJOS_TOTAL%', '', $row);
 							}
+							$row = str_replace('%DETALLE_PROFESIONAL%', $this->GenerarDocumento2($parser, 'DETALLE_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 						} else if ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1) {
 							$row = str_replace('%espacio_trabajo%', '', $row);
 							$row = str_replace('%DETALLE_PROFESIONAL%', '', $row);
@@ -2124,7 +2127,6 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$total_works = count($works);
 				for ($i = 0; $i < $total_works; ++$i) {
 					$work = $works[$i];
-
 					$row = $row_tmpl;
 					$row = str_replace('%valor_codigo_asunto%', $work['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($work['fecha'], $idioma->fields['formato_fecha']), $row);
@@ -2134,8 +2136,8 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$row = str_replace('%td_id_trabajo%', '', $row);
 					}
 					$row = str_replace('%ntrabajo%', $work['id_trabajo'], $row);
-					$row = str_replace('%descripcion%', ucfirst(stripslashes($work['descripcion'])), $row);
-					$row = str_replace('%descripcion_mayus%', strtoupper($work['descripcion']), $row);
+					$row = str_replace('%descripcion%', ucfirst(stripslashes(htmlentities($work['descripcion']))), $row);
+					$row = str_replace('%descripcion_mayus%', htmlentities(strtoupper($work['descripcion'])), $row);
 					if ($this->fields['opc_ver_solicitante']) {
 						$row = str_replace('%td_solicitante%', '<td align="left">%solicitante%</td>', $row);
 					} else {
@@ -2343,9 +2345,9 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							$encabezado_trabajos_categoria = '';
 						}
 					} else if (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-						$trabajo_siguiente = $lista_trabajos->Get($i + 1);
-						if (!empty($trabajo_siguiente->fields['nombre_usuario'])) {
-							if ($work['nombre_usuario'] != $trabajo_siguiente->fields['nombre_usuario']) {
+						$next_work = $works[$i + 1];
+						if (!empty($next_work['nombre_usuario'])) {
+							if ($work['nombre_usuario'] != $next_work['nombre_usuario']) {
 								$html3 = $parser->tags['TRABAJOS_TOTAL'];
 								$html3 = str_replace('%glosa%', __('Subtotal'), $html3);
 								$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
@@ -2392,8 +2394,8 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 								$total_trabajos_categoria .= $html3;
 
 								// Permite a TRABAJOS_ENCABEZADO poner el nombre correcto reutilizando la lógica
-								$this->siguiente['nombre_usuario'] = $trabajo_siguiente->fields['nombre_usuario'];
-								$this->siguiente['tarifa_usuario'] = $trabajo_siguiente->fields['tarifa_hh'];
+								$this->siguiente['nombre_usuario'] = $next_work['nombre_usuario'];
+								$this->siguiente['tarifa_usuario'] = $next_work['tarifa_hh'];
 								$encabezado_trabajos_categoria .= $this->GenerarDocumento2($parser, 'TRABAJOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
 
 								$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria . $encabezado_trabajos_categoria, $row);
@@ -3437,14 +3439,14 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					}
 
 					if (substr($detalle['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
-						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
-						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($detalle['descripcion'], 42), $row);
+						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($detalle['descripcion']), 42), $row);
+						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($detalle['descripcion']), 42), $row);
 					} else if (substr($gasto->fields['descripcion'], 0, 41) == 'Saldo aprovisionado restante tras Cobro #') {
-						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
-						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . substr($gasto->fields['descripcion'], 42), $row);
+						$row = str_replace('%descripcion%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($gasto->fields['descripcion']), 42), $row);
+						$row = str_replace('%descripcion_b%', __('Saldo aprovisionado restante tras Cobro #') . htmlentities(substr($gasto->fields['descripcion']), 42), $row);
 					} else {
-						$row = str_replace('%descripcion%', __($detalle['descripcion']), $row);
-						$row = str_replace('%descripcion_b%', __($detalle['descripcion']), $row); #Ojo, este no debería existir
+						$row = str_replace('%descripcion%', htmlentities(__($detalle['descripcion'])), $row);
+						$row = str_replace('%descripcion_b%', htmlentities(__($detalle['descripcion'])), $row); #Ojo, este no debería existir
 					}
 
 					if ($detalle['id_moneda'] != $this->fields['opc_moneda_total'] && Conf::GetConf($this->sesion, 'MontoGastoOriginalSiMonedaDistinta')) {
@@ -3648,7 +3650,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 	  $documents = explode(',', $this->fields['documento']);
 	  foreach ($documents as $document) {
 	    preg_match('/(\w{2}) (\d+\-)?(\d+) ?([^ ]+)? ?/', $document, $match);
-	    $results[] = trim(\TTB\Utiles::interpolate($match, '{1} {3} {4}'));
+	    $results[] = trim(Utiles::interpolate($match, '{1} {3} {4}'));
 	  }
 
 	  return implode(', ', $results);

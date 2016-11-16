@@ -1,17 +1,12 @@
-<?
-	require_once 'Spreadsheet/Excel/Writer.php';
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
-	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-	require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 	$sesion = new Sesion(array('ADM', 'COB'));
 	$pagina = new Pagina($sesion);
 
-	$wb = new Spreadsheet_Excel_Writer();
-
+	$wb = new WorkbookMiddleware();
 	header('Set-Cookie: fileDownload=true; path=/');
-	$wb->setVersion(8);
-	$wb->send('Revisión de cobros.xls');
+	$wb->send('Revisión de cobros');
 	$wb->setCustomColor(35, 220, 255, 220);
 	$wb->setCustomColor(36, 255, 255, 220);
 
@@ -206,21 +201,25 @@
 		}
 		$contrato=$trabajo->fields['id_contrato'];
 		//se escriben las filas
+		if (!isset($ws1)) {
+			$ws1 =& $wb->addWorksheet($paginas . ' ' . substr($trabajo->fields['glosa_cliente'], 0, 20));
+		}
 		$ws1->write($fila_inicial, $col_fecha, Utiles::sql2date($trabajo->fields[fecha], "%d-%m-%Y"), $tex);
 		$ws1->write($fila_inicial, $col_asunto, $trabajo->fields['glosa_asunto'], $tex);
 		$ws1->write($fila_inicial, $col_id_cobro, $trabajo->fields['id_cobro']?$trabajo->fields['id_cobro']:'', $tex);
 		$text_descripcion = addslashes($trabajo->fields['descripcion']);
 
 		$ws1->write($fila_inicial, $col_descripcion, $text_descripcion, $tex);
-		if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
+		if (Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema')) {
 			$ws1->write($fila_inicial, $col_abogado, $trabajo->fields['username'], $tex);
-		else
+		} else {
 			$ws1->write($fila_inicial, $col_abogado, $trabajo->fields['nombre'].' '.$trabajo->fields['apellido1'], $tex);
-		list($duracion, $duracion_cobrada)= split('<br>', $trabajo->fields[duracion]);
-		list($h, $m)= split(':', $duracion);
+		}
+		list($duracion, $duracion_cobrada)= explode('<br>', $trabajo->fields[duracion]);
+		list($h, $m) = explode(':', $duracion);
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
 		$ws1->writeNumber($fila_inicial, $col_duracion_trabajada, $tiempo_excel, $time_format);
-		list($h, $m)= split(':', $duracion_cobrada);
+		list($h, $m) = explode(':', $duracion_cobrada);
 		$tiempo_excel = $h/(24)+ $m/(24*60); //Excel cuenta el tiempo en días
 		$ws1->writeNumber($fila_inicial, $col_duracion_cobrable, $tiempo_excel, $time_format);
 

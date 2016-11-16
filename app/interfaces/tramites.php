@@ -118,6 +118,7 @@
 	}
 	$pagina->titulo = __('Trámites');
 $pagina->PrintTop( $popup );
+
 ?>
 
 

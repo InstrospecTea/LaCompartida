@@ -1,9 +1,9 @@
 <?php
-
-require_once "GraficoBarras.php";
-require_once "../../../fw/classes/Sesion.php";
+require_once dirname(__FILE__).'/../../conf.php';
 
 $sesion = new Sesion();
+$Criteria = new Criteria($sesion);
+
 $total_tiempo = 0;
 $where = '1';
 $join = '';
@@ -148,7 +148,7 @@ for ($i = 0; $fila = mysql_fetch_assoc($resp); $i++) {
 }
 
 if ($i > 0) {
-	$duracion[$i] = $total_duracion / $i;
+	$duracion[$i] = strval($total_duracion / $i);
 	$periodo[$i] = 'Promedio Periodo';
 }
 
@@ -161,35 +161,49 @@ if ($comparar) {
 	}
 
 	if ($k > 0) {
-		$duracion_comparada[$k] = $total_duracion_comparada / $k;
+		$duracion_comparada[$k] = strval($total_duracion_comparada / $k);
 	}
 }
 
-$cant_meses = count($periodo) -1;
-
-#Create a XYChart object of size 300 x 240 pixels
-$c = new GraficoBarras();
-
-#Add a title to the chart using 10 pt Arial font
 if ($tipo_reporte == 'trabajos_por_empleado') {
-	$title = __('Horas trabajadas por ') . str_replace('-', ' ', $nombre);
+	$Criteria
+		->add_select("CONCAT_WS(' ',nombre, apellido1, apellido2)", 'nombre')
+		->add_from('usuario')
+		->add_restriction(
+				CriteriaRestriction::equals('id_usuario', $id_usuario)
+			)
+		->add_limit(1, 0);
+
+	try{
+		$nombre = $Criteria->run();
+	} catch(Exception $e) {
+		error_log('Error al ejecutar la SQL');
+	}
+
+	$title = __('Horas trabajadas por ') . str_replace('-', ' ', $nombre[0]['nombre']);
 }
 
 if ($tipo_reporte == 'trabajos_por_cliente') {
-	$title = __('Horas trabajadas para ') . str_replace('-', ' ', $nombre);
+	$Criteria
+		->add_select("glosa_cliente", 'nombre')
+		->add_from('cliente')
+		->add_restriction(
+			CriteriaRestriction::equals('codigo_cliente', $codigo_cliente)
+		)
+		->add_limit(1, 0);
+
+	try{
+		$nombre = $Criteria->run();
+	} catch(Exception $e) {
+		error_log('Error al ejecutar la SQL');
+	}
+
+	$title = __('Horas trabajadas para ') . str_replace('-', ' ', $nombre[0]['nombre']);
 }
 
 if ($tipo_reporte == 'trabajos_por_estudio') {
 	$title = __('Horas trabajadas');
 }
-
-$c->Titulo($title);
-
-#Add a title to the y-axis
-$c->Ejes(__("Periodo"), __("Horas"));
-
-#Set the x axis labels
-$c->Labels($periodo);
 
 function fixNumber(&$valor) {
 	$valor = number_format($valor,2,'.','');
@@ -203,22 +217,121 @@ $titulo_tipo = array(
 	'cobrada' => __("Horas No cobradas")
 );
 
-$barLayerObj = $c->addBarLayer2(Side, 1);
-
 array_walk($duracion,'fixNumber');
 
-$barLayerObj->AddDataSet( $duracion, 0xFF3300, $titulo_tipo[$tipo_duracion] . ': ' . number_format($total_duracion,2) . ' en ' . $cant_meses . ' meses');
-$barLayerObj->setBorderColor(-1, 1);
-$barLayerObj->setAggregateLabelStyle("arialbd.ttf", 8, 0x000);
+$y_axes = [];
+$grafico = new TTB\Graficos\Grafico();
+if (is_null($duracion)) {
+	echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
+	return;
+}
+
+foreach ($duracion as $value) {
+	$tiempo_formateado = Format::number($value);
+	$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
+}
+
+$LanguageManager = new LanguageManager($sesion);
+$language_code = strtolower(Conf::read('Idioma'));
+$language = $LanguageManager->getByCode($language_code);
+$separators = [
+	'decimales' => $language->get('separador_decimales'),
+	'miles' => $language->get('separador_miles')
+];
+
+$dataset = new TTB\Graficos\Dataset();
+
+$dataset->setLabel(__($titulo_tipo[$tipo_duracion]))
+	->setYAxisID('y-axis-1')
+	->setData($duracion);
+
+$grafico->setNameChart($title)
+	->addDataset($dataset)
+	->addLabels($periodo);
+
+$y_axes[] = [
+	'type' => 'linear',
+	'display' => true,
+	'position' => 'left',
+	'id' => 'y-axis-1',
+	'gridLines' => [
+		'display' => false
+	],
+	'labels' => [
+		'show' => true
+	],
+	'ticks' => [
+		'beginAtZero' => true,
+		'callback' => $separators
+	]
+];
 
 if ($comparar) {
+	$dataset_comparar = new TTB\Graficos\Dataset();
 
 	array_walk($duracion_comparada,'fixNumber');
 
-	$barLayerObj->addDataSet( $duracion_comparada, 0x33FF00, $titulo_tipo[$tipo_duracion_comparada] . ': ' . number_format($total_duracion_comparada,2) . ' en ' . $cant_meses . ' meses', 2);
-	$barLayerObj->setBorderColor(-1, 1);
-	$barLayerObj->setAggregateLabelStyle("arialbd.ttf", 8, 0x000);
+	foreach ($duracion_comparada as $value) {
+		$tiempo_formateado = Format::number($value);
+		$tiempo_comparado_tooltip[] = ["{$tiempo_formateado} Hrs."];
+	}
+
+	$dataset_comparar->setLabel(__($titulo_tipo[$tipo_duracion_comparada]))
+		->setBackgroundColor(39, 174, 96, 0.5)
+		->setBorderColor(39, 174, 96, 0.8)
+		->setHoverBackgroundColor(39, 174, 96, 0.75)
+		->setHoverBorderColor(39, 174, 96, 1)
+	  ->setData($duracion_comparada);
+
+	$grafico->addDataset($dataset_comparar);
+	$y_axes[] = [
+		'type' => 'linear',
+		'display' => false,
+		'position' => 'right',
+		'id' => 'y-axis-2',
+		'gridLines' => [
+			'display' => false
+		],
+		'labels' => [
+			'show' => true
+		],
+		'ticks' => [
+			'beginAtZero' => true,
+			'callback' => $separators
+		]
+	];
 }
 
-#output the chart
-$c->Imprimir();
+foreach ($tiempo_tooltip as $key => $value) {
+	$labels_tooltips[] = [$value, $tiempo_comparado_tooltip[$key]];
+}
+
+$options = [
+	'responsive' => true,
+	'tooltips' => [
+		'mode' => 'label',
+		'callbacks' => [
+			'label' => $labels_tooltips
+		]
+	],
+	'title' => [
+		'display' => true,
+		'fontSize' => 14,
+		'text' => utf8_encode($title)
+	],
+	'scales' => [
+		'xAxes' => [[
+			'display' => true,
+			'gridLines' => [
+				'display' => false
+			],
+			'labels' => [
+				'show' => true,
+			]
+		]],
+		'yAxes' => $y_axes
+	]
+];
+
+$grafico->setOptions($options);
+echo $grafico->getJson();

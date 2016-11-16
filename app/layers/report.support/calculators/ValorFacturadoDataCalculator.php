@@ -85,4 +85,7 @@ class ValorFacturadoDataCalculator extends AbstractInvoiceProportionalDataCalcul
 			->add_restriction(CriteriaRestriction::in('cobro.estado', array('EMITIDO', 'FACTURADO', 'ENVIADO AL CLIENTE', 'PAGO PARCIAL', 'PAGADO')));
 	}
 
+	protected function needsInvoices() {
+		return true;
+	}
 }

@@ -1,8 +1,11 @@
 {
-	"name": "ttb",
-	"dependencies": {
-		"jquery-file-download": "1.4.4",
-		"jquery-mask-plugin": "1.14.0",
-		"unslider": "2.0.3"
+  "name": "ttb",
+  "dependencies": {
+    "jspdf": "1.0.272",
+    "html2canvas": "0.4.1",
+    "jquery-file-download": "1.4.4",
+    "jquery-mask-plugin": "1.14.0",
+    "chart.js": "npm:chart.js#2.2.1",
+    "unslider": "2.0.3"
   }
 }

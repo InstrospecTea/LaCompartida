@@ -1,12 +1,9 @@
 <?php
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
 
 $sesion = new Sesion(array('REP'));
 $pagina = new Pagina($sesion);
 $formato_fecha = UtilesApp::ObtenerFormatoFecha($sesion);
-
-set_time_limit(3600);
 
 if ($xls) {
 	$criteria = new Criteria($sesion);
@@ -91,7 +88,7 @@ if ($xls) {
 	$resultado = $criteria->run();
 
 	// Creating a workbook
-	$workbook = new Spreadsheet_Excel_Writer();
+	$workbook = new WorkbookMiddleware();
 
 	// sending HTTP headers
 	$workbook->send("planilla_reporte_hitos.xls");
@@ -137,7 +134,7 @@ if ($xls) {
 	$worksheet->setColumn(11, 11, 15);
 	$worksheet->setColumn(12, 12, 20);
 
-	$worksheet->writeString(1, 0, _('Reporte Hitos'), $titulo);
+	$worksheet->writeString(1, 0, __('Reporte Hitos'), $titulo);
 
 	$celda_fecha_creacion = 2;
 	$celda_periodo_reporte = 3;

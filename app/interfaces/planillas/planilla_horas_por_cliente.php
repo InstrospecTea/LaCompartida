@@ -1,10 +1,5 @@
-<?
-    require_once 'Spreadsheet/Excel/Writer.php';
+<?php
     require_once dirname(__FILE__).'/../../conf.php';
-    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-    require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
     $sesion = new Sesion( array('REP') );
     $pagina = new Pagina( $sesion );
@@ -18,7 +13,7 @@
                 GROUP BY asunto.codigo_cliente";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
 
-    $wb = new Spreadsheet_Excel_Writer();
+    $wb = new WorkbookMiddleware();
 
     $wb->setCustomColor(35, 220, 255, 220);
     $wb->setCustomColor(36, 255, 255, 220);

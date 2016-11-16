@@ -52,6 +52,7 @@ $_LANG['Adelanto'] = 'Adiantamento';
 $_LANG['Adelantos'] = 'Adiantamentos';
 $_LANG['adelanto'] = 'adiantamento';
 $_LANG['adelantos'] = 'adiantamentos';
+$_LANG['N° Documento'] = 'N° Documento';
 
 // Clientes
 $_LANG['Nombre Cliente'] = 'Nome do Cliente';
@@ -1252,3 +1253,9 @@ $_LANG['Thu'] = 'Qui';
 $_LANG['Fri'] = 'Sex';
 $_LANG['Sat'] = 'Sáb';
 $_LANG['Sun'] = 'Dom';
+
+$_LANG['Horas trabajadas por asunto'] = 'Horas trabalhadas por assunto';
+$_LANG['Horas trabajadas por cliente'] = 'Horas trabalhadas por cliente';
+$_LANG['Horas trabajadas por empleado'] = 'Horas trabalhadas por colaborador';
+$_LANG['Horas trabajadas por usuario'] = 'Horas trabalhadas por colaborador';
+$_LANG['Cobros pendientes'] = 'Liquidações pendentes';

@@ -1,4 +1,4 @@
-<?
+<?php
 
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Lista.php';
@@ -7,7 +7,7 @@ require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 class Carpeta extends Objeto
 {
-	
+
 	function Carpeta($sesion, $fields = "", $params = "")
 	{
 		$this->tabla = "carpeta";
@@ -15,7 +15,7 @@ class Carpeta extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 	}
-  
+
   function LoadByCodigo($codigo)
   {
     $query = "SELECT id_carpeta FROM carpeta WHERE codigo_carpeta='$codigo'";
@@ -33,7 +33,7 @@ class Carpeta extends Objeto
 	  $codigo_carpeta=$codigo+1;
 	  return $codigo_carpeta;
 	}
-	
+
 	function Eliminar()
 	{
 		$query = "DELETE FROM carpeta WHERE codigo_carpeta = '".$this->fields['codigo_carpeta']."'";

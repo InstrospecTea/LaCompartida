@@ -1,4 +1,4 @@
-<? 
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../app/implementacion/0_instrucciones_y_configuraciones.php';
@@ -6,12 +6,12 @@
 	require_once Conf::ServerDir().'/../app/classes/Cliente.php';
 	require_once Conf::ServerDir().'/../app/classes/Documento.php';
 	$sesion = new Sesion();
-	
+
 	ini_set("memory_limit","128M");
-		
+
 	$query = "SELECT id_cobro FROM cobro";
 	$resp = mysql_query($query,$sesion->dbh) or Utiles::errorSQL($query,$sesion->dbh);
-	
+
 	while( list($id_cobro) = mysql_fetch_array($resp) )
 	{
 		$query = "SELECT
@@ -33,7 +33,7 @@
 		}
 
 	}
-	
-	
-	
+
+
+
 ?>

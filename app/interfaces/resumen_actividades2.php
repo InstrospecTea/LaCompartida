@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -269,7 +269,7 @@ a:link
 	color: #797268;
 }
 </style>
-<?
+<?php
 	}
 	else	#Style de impresion
 	{
@@ -395,14 +395,14 @@ td
 	vertical-align:top;
 }
 </style>
-<?
+<?php
 }
 ?>
 <form method=post name=formulario action="" id=formulario autocomplete='off'>
 <input type=hidden name=opc id=opc value='print'>
 <input type=hidden name=horas_sql id=horas_sql value='<?=$horas_sql ? $horas_sql : 'hr_trabajadas' ?>'/>
 <input type=hidden name=ver id=ver value=''>
-<?
+<?php
 if(!$popup)
 {
 ?>
@@ -411,7 +411,7 @@ if(!$popup)
 	<div class="floating" id="calendar"></div>
 </div>
 <!-- Fin calendario DIV -->
-<?
+<?php
 $hoy = date("Y-m-d");
 ?>
 <table class="tb_base border_plomo" style="width:730px;" cellpadding="0" cellspacing="3">
@@ -430,15 +430,15 @@ $hoy = date("Y-m-d");
 	  <td rowspan="2" align=left>
 	  	<?=Html::SelectQuery($sesion,"SELECT usuario.id_usuario, CONCAT_WS(' ',usuario.apellido1,usuario.apellido2,',',usuario.nombre) AS nombre FROM usuario JOIN usuario_permiso USING(id_usuario) WHERE usuario.visible = 1 AND usuario_permiso.codigo_permiso='PRO' ORDER BY nombre ASC", "usuarios[]",$usuarios,"class=\"selectMultiple\" multiple size=6 ","","200"); ?>	  </td>
 	  <td rowspan="2" align=left>
-	  	<?
-                   if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists( 'Conf','CodigoSecundario' ) && Conf::CodigoSecundario() ) )
+	  	<?php
+                  if( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'CodigoSecundario') ) || ( method_exists( 'Conf','CodigoSecundario' ) && Conf::CodigoSecundario() ) )
 	  			echo Html::SelectQuery($sesion,"SELECT codigo_cliente_secundario AS codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]",$clientes,"class=\"selectMultiple\" multiple size=6 ","","200");
 	 			 else
 	 			 	echo Html::SelectQuery($sesion,"SELECT codigo_cliente, glosa_cliente AS nombre FROM cliente WHERE activo=1 ORDER BY nombre ASC", "clientes[]",$clientes,"class=\"selectMultiple\" multiple size=6 ","","200");
 	 		?>
 	 	</td>
 	 	<!-- PERIODOS -->
-<?
+<?php
 	 	if(!$fecha_mes)
 	 		$fecha_mes = date('m');
 ?>
@@ -458,14 +458,14 @@ $hoy = date("Y-m-d");
 		  	    	<option value='11' <?=$fecha_mes==11 ? 'selected':'' ?>><?=__('Noviembre') ?></option>
 		  	    	<option value='12' <?=$fecha_mes==12 ? 'selected':'' ?>><?=__('Diciembre') ?></option>
 		  	    </select>
-<?
+<?php
 		  	    if(!$fecha_anio)
 		  	    	$fecha_anio = date('Y');
 ?>
 		  	    <select name="fecha_anio" style='width:55px'>
-		  	    	<? for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
+		  	    	<?php for($i=(date('Y')-5);$i < (date('Y')+5);$i++){ ?>
 		  	    	<option value='<?=$i?>' <?=$fecha_anio == $i ? 'selected' : '' ?>><?=$i ?></option>
-		  	    	<? } ?>
+		  	    	<?php } ?>
 		  	    </select>
 			</div>
 			<div id=periodo_rango style='display:<?=$rango ? 'inline' : 'none' ?>;'>
@@ -479,7 +479,7 @@ $hoy = date("Y-m-d");
 			</div>
 		</td>
 	</tr>
-<?
+<?php
 	if(!$tipo)
 		$tipo = 'Profesional';
              switch($tipo):
@@ -582,7 +582,7 @@ $hoy = date("Y-m-d");
 	</tr>
 </table>
 <br>
-<?
+<?php
 }
 /*
 echo '<pre>';
@@ -2319,7 +2319,7 @@ Calendar.setup(
 	}
 );
 </script>
-<?
+<?php
 //En el caso de que la opcion sea imprimir se imprime al final.
 if($popup)
 {

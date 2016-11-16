@@ -16,7 +16,7 @@ class AutocompletadorAsunto {
 	 * @param boolean $forceMatch Fueza al autucompletador a elejir un item de la lista, default TRUE.
 	 * @return string Html del autocompletador.
 	 */
-	public function ImprimirSelector($Sesion, $codigo_asunto = '', $codigo_asunto_secundario = '', $glosa_asunto = '', $width = 320, $oncambio = '', $forceMatch = true) {
+	public static function ImprimirSelector($Sesion, $codigo_asunto = '', $codigo_asunto_secundario = '', $glosa_asunto = '', $width = 320, $oncambio = '', $forceMatch = true) {
 		$Form = new Form;
 		$Html = new \TTB\Html;
 		self::$forceMatch = $forceMatch;
@@ -58,7 +58,7 @@ class AutocompletadorAsunto {
 		return null;
 	}
 
-	public function Javascript($Sesion) {
+	public static function Javascript($Sesion) {
 		$Html = new \TTB\Html;
 		$id_usuario = (int) $Sesion->usuario->fields['id_usuario'];
 		$codigo_secundario = Conf::GetConf($Sesion, 'CodigoSecundario');

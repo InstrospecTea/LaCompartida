@@ -1,6 +1,5 @@
 <?php
 
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
 
 $Sesion = new Sesion(array('REP'));
@@ -9,7 +8,7 @@ set_time_limit(0);
 $moneda_base = Utiles::MonedaBase($Sesion);
 
 // ARMANDO XLS
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 if ($moneda_base['cifras_decimales'] == 0) {
 	$string_decimales = "";
@@ -416,7 +415,7 @@ function Print_Prof(& $ws1, $td) {
 		$arr_col = array();
 
 		foreach ($r['labels_col'] as $id_col => $column) {
-			$mes_anyo = split('-', $column['nombre']);
+			$mes_anyo = explode('-', $column['nombre']);
 			$fecha = mktime(0, 0, 0, $mes_anyo[0], 1, $mes_anyo[1]);
 			$arr_col[$fecha] = array('id' => $id_col, 'fecha' => $fecha);
 		}

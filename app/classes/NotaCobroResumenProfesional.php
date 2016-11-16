@@ -206,7 +206,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 				$descontado = false;
 				$flatfee = false;
 				$incobrables = false;
-				$sumary = $this->ChargeData->getSumary($asunto->fields['codigo_asunto']);
+				$sumary = $this->ChargeData->getSumary();
 				$totales = $this->ChargeData->getTotal();
 
 				if (is_array($totales)) {

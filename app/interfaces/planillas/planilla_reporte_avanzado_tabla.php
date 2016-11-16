@@ -1,6 +1,4 @@
 <?php
-
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../../conf.php';
 
 $sesion = new Sesion(array('REP'));
@@ -51,7 +49,7 @@ $reporte->Query();
 
 $r = $reporte->toCross();
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 $wb->send('Planilla Horas por Cliente.xls');
 

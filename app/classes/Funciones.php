@@ -51,7 +51,7 @@ class Funciones {
 		return $html;
 	}
 
-	function TrabajoTarifa($sesion, $id_trabajo, $id_moneda) {
+	public static function TrabajoTarifa($sesion, $id_trabajo, $id_moneda) {
 		$query = "SELECT valor FROM trabajo_tarifa WHERE id_trabajo = '$id_trabajo' AND id_moneda = '$id_moneda' ";
 		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 		list( $valor ) = mysql_fetch_array($resp);
@@ -60,7 +60,7 @@ class Funciones {
 
 	#retorna la tarifa para un cierto usuario, una cierta moneda y un cierto cliente. Si el cliente = "", es la tarifa por defecto para todos los clientes
 
-	function Tarifa($sesion, $id_usuario, $id_moneda, $codigo_asunto = "", $id_tarifa = "") {
+	public static function Tarifa($sesion, $id_usuario, $id_moneda, $codigo_asunto = "", $id_tarifa = "") {
 		if ($id_tarifa == "") {
 			$query = "SELECT
 						contrato.id_tarifa
@@ -84,7 +84,7 @@ class Funciones {
 		return empty($arreglo['tarifa']) ? 0 : $arreglo['tarifa'];
 	}
 
-	function TramiteTarifa($sesion, $id_tramite_tipo, $id_moneda, $codigo_asunto, $id_tramite_tarifa = "") {
+	public static function TramiteTarifa($sesion, $id_tramite_tipo, $id_moneda, $codigo_asunto, $id_tramite_tarifa = "") {
 		if ($id_tramite_tarifa == "") {
 			$query = "SELECT contrato.id_tramite_tarifa FROM asunto JOIN contrato ON asunto.id_contrato=contrato.id_contrato WHERE asunto.codigo_asunto = '$codigo_asunto' ";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
@@ -120,7 +120,7 @@ class Funciones {
 
 	#Retorna la tarifa estandar para un cierto usuario y una cierta moneda.
 
-	function TarifaDefecto($sesion, $id_usuario, $id_moneda) {
+	public static function TarifaDefecto($sesion, $id_usuario, $id_moneda) {
 		$query = "SELECT tarifa FROM usuario_tarifa JOIN tarifa ON (usuario_tarifa.id_tarifa = tarifa.id_tarifa)
 								WHERE id_usuario=$id_usuario AND id_moneda='$id_moneda'  AND
 								tarifa.tarifa_defecto = '1' ";
@@ -131,7 +131,7 @@ class Funciones {
 
 	#Retorna la tarifa estandar para un cierto usuario y una cierta moneda.
 
-	function TramiteTarifaDefecto($sesion, $id_tramite_tipo, $id_moneda) {
+	public static function TramiteTarifaDefecto($sesion, $id_tramite_tipo, $id_moneda) {
 		$query = "SELECT tarifa FROM tramite_valor JOIN tramite_tarifa ON (tramite_valor.id_tramite_tarifa = tramite_tarifa.id_tramite_tarifa)
 								WHERE id_tramite_tipo=$id_tramite_tipo AND id_moneda='$id_moneda'  AND
 								tramite_tarifa.tarifa_defecto = '1' ";
@@ -141,7 +141,7 @@ class Funciones {
 	}
 
 	//Elige la Mejor Tarifa Estandar (la de moneda igual al cobro, o de no existir, la maxima conversión de otra moneda)
-	function MejorTarifa($sesion, $id_usuario, $id_moneda, $id_cobro) {
+	public static function MejorTarifa($sesion, $id_usuario, $id_moneda, $id_cobro) {
 		$query = "SELECT u_t.tarifa as tarifa, u_t.tarifa * c_m.tipo_cambio / moneda_de_cobro.tipo_cambio as tarifa_convertida, u_t.id_moneda as id_moneda
 						FROM usuario_tarifa AS u_t
 								JOIN tarifa AS t ON (u_t.id_tarifa = t.id_tarifa)
@@ -169,7 +169,7 @@ class Funciones {
 	}
 
 	//Elige la Mejor Tarifa Estandar (la de moneda igual al cobro, o de no existir, la maxima conversión de otra moneda)
-	function MejorTramiteTarifa($sesion, $id_tramite_tipo, $id_moneda, $id_cobro) {
+	public static function MejorTramiteTarifa($sesion, $id_tramite_tipo, $id_moneda, $id_cobro) {
 		$query = "SELECT t_v.tarifa as tarifa, t_v.tarifa * c_m.tipo_cambio / moneda_de_cobro.tipo_cambio as tarifa_convertida, t_v.id_moneda as id_moneda
 						FROM tramite_valor AS t_v
 								JOIN tramite_tarifa AS t ON (t_v.id_tramite_tarifa = t.id_tramite_tarifa)

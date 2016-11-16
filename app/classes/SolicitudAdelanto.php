@@ -359,8 +359,7 @@ La solicitud de adelanto N° {$this->fields['id_solicitud_adelanto']},
 se encuentra disponible para su retiro.
 BODY;
 
-			$utiles = new Utiles;
-			return $utiles->EnviarMail($this->sesion, $correo_solicitante, $subject, $body);
+			return Utiles::EnviarMail($this->sesion, $correo_solicitante, $subject, $body);
 		}
 
 		return false;
@@ -414,7 +413,7 @@ BODY;
 				'EnIngles' => (setlocale(LC_ALL, 'english')) ? strftime('%B %d, %Y', strtotime($this->fields['fecha'])) : '',
 			),
 			'Descripcion' => $this->fields['descripcion'],
-			'MontoSolicitado' => UtilesApp::PrintFormatoMoneda(&$this->sesion, $this->fields['monto'], $this->fields['id_moneda']),
+			'MontoSolicitado' => UtilesApp::PrintFormatoMoneda($this->sesion, $this->fields['monto'], $this->fields['id_moneda']),
 			'Cliente' => $this->Cliente()->FillTemplate(),
 			'Solicitante' => $this->Solicitante()->FillTemplate()
 		);

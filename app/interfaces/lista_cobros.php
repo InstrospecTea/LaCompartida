@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
     require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -92,7 +92,7 @@
 function Refrescar()
 {
 //todo if $motivo=="cobros",$motivo=="horas"
-<?
+<?php
 	if($desde)
 		echo "var pagina_desde = '&desde=".$desde."';";
 	else
@@ -168,7 +168,7 @@ document.observe('dom:loaded', function() {
 //]]>
 
 </script>
-<?
+<?php
 	if(!$no_mostrar_filtros)
 	{
 ?>
@@ -243,7 +243,7 @@ document.observe('dom:loaded', function() {
 </table>
 </fieldset>
 </form>
-<?
+<?php
 	}
 	if($opc == "buscar" || $opc == "eliminar")
 		$b->Imprimir();
@@ -292,7 +292,7 @@ Calendar.setup(
 	}
 );
 </script>
-<?
-    echo(InputId::Javascript($sesion));
+<?php
+   echo(InputId::Javascript($sesion));
     $pagina->PrintBottom($popup);
 ?>

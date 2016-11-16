@@ -1,10 +1,5 @@
-<?
-    require_once 'Spreadsheet/Excel/Writer.php';
+<?php
     require_once dirname(__FILE__).'/../../conf.php';
-    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-    require_once Conf::ServerDir().'/../app/classes/Debug.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 
     $sesion = new Sesion( array('REP') );
 
@@ -23,7 +18,7 @@
 	$meses[10]='Noviembre';
 	$meses[11]='Diciembre';
 
-	list($tmp,$mes_ini,$tmp) = split('-',$fechaini);
+	list($tmp,$mes_ini,$tmp) = explode('-',$fechaini);
 	for($i=0;$i<=$periodos;$i++)
    	{
             $hrs_secobra[$i] = 0;
@@ -75,7 +70,7 @@
 
 
 	#ARMANDO XLS
-	$wb = new Spreadsheet_Excel_Writer();
+	$wb = new WorkbookMiddleware();
 
     $wb->send("Planilla Resumen horas-usuarios.xls");
 

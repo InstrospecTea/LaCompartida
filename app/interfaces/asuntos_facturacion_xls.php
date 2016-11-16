@@ -1,13 +1,11 @@
 <?php
-
 ini_set('max_execution_time', 300);
 
 require_once dirname(__FILE__) . '/../conf.php';
-require_once 'Spreadsheet/Excel/Writer.php';
 
 $sesion = new Sesion(array('REV', 'ADM'));
 
-$wb = new Spreadsheet_Excel_Writer();
+$wb = new WorkbookMiddleware();
 
 $wb->setCustomColor(35, 0, 255, 255);
 $wb->setCustomColor(36, 255, 255, 0);
