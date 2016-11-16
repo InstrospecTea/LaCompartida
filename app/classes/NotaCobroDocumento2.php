@@ -2345,9 +2345,9 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							$encabezado_trabajos_categoria = '';
 						}
 					} else if (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-						$trabajo_siguiente = $lista_trabajos->Get($i + 1);
-						if (!empty($trabajo_siguiente->fields['nombre_usuario'])) {
-							if ($work['nombre_usuario'] != $trabajo_siguiente->fields['nombre_usuario']) {
+						$next_work = $works[$i + 1];
+						if (!empty($next_work['nombre_usuario'])) {
+							if ($work['nombre_usuario'] != $next_work['nombre_usuario']) {
 								$html3 = $parser->tags['TRABAJOS_TOTAL'];
 								$html3 = str_replace('%glosa%', __('Subtotal'), $html3);
 								$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
@@ -2394,8 +2394,8 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 								$total_trabajos_categoria .= $html3;
 
 								// Permite a TRABAJOS_ENCABEZADO poner el nombre correcto reutilizando la lógica
-								$this->siguiente['nombre_usuario'] = $trabajo_siguiente->fields['nombre_usuario'];
-								$this->siguiente['tarifa_usuario'] = $trabajo_siguiente->fields['tarifa_hh'];
+								$this->siguiente['nombre_usuario'] = $next_work['nombre_usuario'];
+								$this->siguiente['tarifa_usuario'] = $next_work['tarifa_hh'];
 								$encabezado_trabajos_categoria .= $this->GenerarDocumento2($parser, 'TRABAJOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
 
 								$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria . $encabezado_trabajos_categoria, $row);
