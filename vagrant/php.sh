@@ -1,7 +1,7 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 
-apt-get install -y php5 php5-curl php-pear libapache2-mod-php5 php5-mysql php5-xdebug
+apt-get -y install php5 php5-curl php-pear libapache2-mod-php5 php5-mysql php5-xdebug
 
 # Configuracion de PHP
 cat > $(find /etc/php5 -name xdebug.ini) << EOF

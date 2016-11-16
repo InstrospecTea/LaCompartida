@@ -58,7 +58,7 @@ namespace :bower do
   desc "Setup bower dir and install"
   task :setup do
     run "mkdir -p #{shared_path}/bower_components"
-    run "echo '{\"directory\" : \"#{shared_path}/bower_components\"}' > #{release_path}/.bowerrc"
+    run "echo '{\"directory\" : \"#{shared_path}/bower_components\", \"resolvers\": [\"bower-npm-resolver\"]}' > #{release_path}/.bowerrc"
     bower.install
     bower.update_symlinks
   end

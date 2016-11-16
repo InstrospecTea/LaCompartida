@@ -24,15 +24,15 @@ switch ($_REQUEST['accion']) {
 			$Pagina->AddError($Template->error);
 		}
 		break;
-	
+
 	case 'test':
 		$detected_fields = $Template->LoadDocumento()->GetTags();
 		break;
-		
+
 	case 'descargar':
 		$Template->Download("Template_{$Template->fields['id_template']}", array());
 		break;
-	
+
 	case 'upload':
 		$Template->Fill($_REQUEST, true);
 		if ($_FILES['documento']['size'] > 0) {
@@ -65,17 +65,21 @@ function Opciones(& $fila) {
 
 	$boton_test = '<a href="templates.php?accion=test&id_template=' . $fila->fields['id_template'] . '" title="Testear Template">'
 		. '<img src="' . Conf::ImgDir() . '/check_nuevo.gif" border="0" alt="Descargar Solicitud" /></a>';
-	
+
 	$boton_descargar = '<a href="templates.php?accion=descargar&id_template=' . $fila->fields['id_template'] . '" title="Descargar Template">'
 		. '<img src="' . Conf::ImgDir() . '/doc.gif" border="0" alt="Descargar Solicitud" /></a>';
-	
+
 	$boton_editar = '<a href="templates.php?id_template=' . $fila->fields['id_template'] . '" title="Editar Template">'
 		. '<img src="' . Conf::ImgDir() . '/editar_on.gif" border="0" alt="Descargar Solicitud" /></a>';
-	
+
 	$boton_eliminar = '';/* '<a href="javascript:void(0);" onclick="if (confirm(\'¿'. __('Está seguro de eliminar la') . ' ' . __('solicitud de adelanto') . '?\')) EliminaSolicitudAdelanto(' . $fila->fields['id_solicitud_adelanto'] . ');">'
 		. '<img src="' . Conf::ImgDir() . '/cruz_roja_nuevo.gif" border="0" alt="Eliminar" /></a>';*/
-	
+
 	return "$boton_test $boton_descargar $boton_editar $boton_eliminar";
+}
+
+if (!$Template->Loaded()) {
+	$Template->setFieldsNew('template');
 }
 
 ?>

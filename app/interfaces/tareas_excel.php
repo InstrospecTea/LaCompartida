@@ -1,14 +1,14 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
 	require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/../app/classes/Debug.php';
-	
+
 	require_once Conf::ServerDir().'/../app/classes/TareaBuscador.php';
 	require_once Conf::ServerDir().'/../fw/classes/BuscadorExcel.php';
-	
+
 	require_once Conf::ServerDir().'/classes/Tarea.php';
 	require_once Conf::ServerDir().'/classes/InputId.php';
 	require_once Conf::ServerDir().'/classes/UtilesApp.php';
@@ -53,7 +53,7 @@
 				$orden = " tarea.codigo_cliente ASC, tarea.codigo_asunto ASC, ";
 			else if($opciones['orden'] == 'Estado')
 				$orden = " tarea.estado ASC, ";
-			
+
 			$orden .= " tarea.fecha_entrega ASC ";
 
 			$query = Tarea::query($opciones,$id_usuario);
@@ -68,7 +68,7 @@
 
 			$b->AgregarEncabezado('glosa_cliente',__('Cliente'));
 			$b->AgregarEncabezado('glosa_asunto',__('Asunto'));
-			
+
 			if( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaUsernameEnTodoElSistema') )
 			{
 				$b->AgregarEncabezado('username_encargado',__('Responsable'));
@@ -81,7 +81,7 @@
 				$b->AgregarEncabezado('revisor',__('Revisor'));
 				$b->AgregarEncabezado('generador',__('Mandante'));
 			}
-			
+
 			function Fecha(&$fila)
 			{
 				$fecha = Utiles::sql2date($fila->fields['fecha_entrega'],'%d-%m-%y');

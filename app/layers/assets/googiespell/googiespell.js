@@ -56,7 +56,7 @@ GoogieSpell.prototype.getDefaultLang  = function() {
 
 GoogieSpell.prototype.defaultOptions  = function(opts) {
     return {
-        lang: opts.lang || GOOGIE_DEFAULT_LANG,
+        lang: opts.lang || GOOGIE_DEFAULT_LANG,
         img_dir: opts.img_dir || '/images/',
         server_url: (opts.server_url || '/spell') + '?lang=',
         org_lang_to_word: opts.org_lang_to_word || {"en": "English", "es": "Espa&#241;ol"},

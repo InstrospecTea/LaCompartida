@@ -1,9 +1,8 @@
 <?php
 require_once dirname(__FILE__) . '/../conf.php';
-require_once('Numbers/Words.php');
 
 class FacturaPdfDatos extends Objeto {
-	function FacturaPdfDatos($sesion, $fields = '', $params = '') {
+	function __construct($sesion, $fields = '', $params = '') {
 		$this->tabla = 'factura_pdf_datos';
 		$this->campo_id = 'id_dato';
 		$this->guardar_fecha = false;
@@ -73,7 +72,7 @@ class FacturaPdfDatos extends Objeto {
 		}
 
 		$Cliente = new Cliente($this->sesion);
-		$Cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
+    	$Cliente->LoadByCodigo($cobro->fields['codigo_cliente']);
 
 		$chargingBusiness = new ChargingBusiness($this->sesion);
 		$coiningBusiness = new CoiningBusiness($this->sesion);
@@ -90,8 +89,10 @@ class FacturaPdfDatos extends Objeto {
 
 		$glosa_moneda_plural = __($arreglo_monedas[$factura->fields['id_moneda']]['glosa_moneda_plural']);
 
+		$NumbersWords = new Numbers_Words();
+
 		$con = __('CON');
-		$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($monto_parte_entera, $codigo));
+		$monto_palabra_parte_entera = strtoupper($NumbersWords->toWords($monto_parte_entera, $codigo));
 		$monto_total_palabra_fix = "{$monto_palabra_parte_entera} {$glosa_moneda_plural}";
 
 		if (empty($monto_parte_decimal)) {
@@ -100,7 +101,7 @@ class FacturaPdfDatos extends Objeto {
 			$centavos = __('CENTAVOS');
 			$fix_decimal = strlen($monto_parte_decimal) == 2 ? 1 : 10;
 			$monto_parte_decimal *= $fix_decimal;
-			$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($monto_parte_decimal, $codigo));
+			$monto_palabra_parte_decimal = strtoupper($NumbersWords->toWords($monto_parte_decimal, $codigo));
 			$monto_total_palabra_fix .= " {$con} {$monto_palabra_parte_decimal} {$centavos}";
 			$monto_parte_decimal_fix = str_pad($monto_parte_decimal, 2, '0', STR_PAD_LEFT);
 		}
@@ -178,12 +179,12 @@ class FacturaPdfDatos extends Objeto {
 			'lugar' => UtilesApp::GetConf($this->sesion, 'LugarFacturacion'),
 			'id_cobro' => $factura->fields['id_cobro'],
 			'nota_factura' => $condicion_pago,
-			'desc_subtotal_honorarios' => __('SUBTOTAL') .  ' ' . _('HONORARIOS'),
-			'desc_descuento_honorarios' => __('DESCUENTO') .  ' ' . _('HONORARIOS'),
+			'desc_subtotal_honorarios' => __('SUBTOTAL') .  ' ' . __('HONORARIOS'),
+			'desc_descuento_honorarios' => __('DESCUENTO') .  ' ' . __('HONORARIOS'),
 			'desc_glosa_factura' => __('Descripción Glosa'),
 			'glosa_factura' => $factura->fields['glosa'],
 			'desc_encargado_comercial' => __('Encargado Comercial'),
-			'encargado_comercial' => $factura->ObtenerEncargadoComercialUsername(),
+			'encargado_comercial' => $factura->ObtenerEncargadoComercialUsername($factura->fields['id_contrato']),
 			'descripcion_honorarios' => $factura->fields['descripcion'],
 			'descripcion_gastos_con_iva' => $factura->fields['descripcion_subtotal_gastos'],
 			'descripcion_gastos_sin_iva' => $factura->fields['descripcion_subtotal_gastos_sin_impuesto'],
@@ -292,14 +293,9 @@ class FacturaPdfDatos extends Objeto {
 		);
 
 		// Segmento Comodines. Solicitados por @gtigre
-		$query_comodines = "SELECT codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_PDF'";
-		$resp_comodines = mysql_query($query_comodines,$this->sesion->dbh) or Utiles::errorSQL($query_comodines,__FILE__,__LINE__,$this->sesion->dbh);
-
-		while (list($codigo,$glosa) = mysql_fetch_array($resp_comodines)) {
-			if (!$datos[$codigo]) {
-				$datos[$codigo] = $glosa;
-			}
-		}
+		$FacturaPdfComodin = new FacturaPdfComodin($this->sesion, $factura);
+		$comodines = $FacturaPdfComodin->getComodines();
+		$datos = array_merge($datos, $comodines);
 
 		return $datos;
 	}

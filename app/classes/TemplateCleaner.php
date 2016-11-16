@@ -1,15 +1,15 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 require_once Conf::ServerDir().'/../app/classes/Debug.php';
 
 class TemplateCleaner
 {
-	function LimpiarParser( $html ) 
+	function LimpiarParser( $html )
 	{
 		$pedazos = array();
 		$charset = str_split($html);
-		
+
 		$letra_anterior = '';
 		$limitadores = 1;
 		foreach($charset as $index => $letra)

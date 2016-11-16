@@ -1623,14 +1623,17 @@ class Factura extends Objeto {
 				//Code name normalization
 				if ($lang == 'en') {
 					$code = 'en_US';
+
+					$NumbersWords = new Numbers_Words();
+
 					list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
-					$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, $code));
-					$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, $code));
+					$monto_palabra_parte_entera = strtoupper($NumbersWords->toWords($total_parte_entera, $code));
+					$monto_palabra_parte_decimal = strtoupper($NumbersWords->toWords($total_parte_decimal, $code));
 					$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' . __('CON') . ' ' . $monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
 					$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' ' . (empty($total_parte_decimal) ? '00' : $total_parte_decimal) . '/100 ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8');
 				} else {
-					$monto_total_palabra = mb_strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
-					$monto_total_palabra_cero_cien = mb_strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang, true));
+					$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+					$monto_total_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang, true));
 				}
 
 				if ($mostrar_honorarios) {
@@ -2335,9 +2338,12 @@ class Factura extends Objeto {
 			$where .= " AND f.serie_documento_legal = '{$serie}'";
 		}
 
-		$query = "SELECT GROUP_CONCAT(id_cobro) , '1' as grupo FROM factura f {$where} GROUP BY grupo";
+		$query = "SELECT id_cobro FROM factura f {$where}";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($lista_cobros, $grupo) = mysql_fetch_array($resp);
+		$lista_cobros = "".mysql_fetch_array($resp)[0];
+		while ($row = mysql_fetch_array($resp)) {
+			$lista_cobros = $lista_cobros.','.$row[0];
+		}
 		return $lista_cobros;
 	}
 

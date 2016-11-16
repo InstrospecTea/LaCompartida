@@ -1,4 +1,4 @@
-<?
+<?php
 #Variables $_REQUEST
 #fname : nombre del archivo
 #frequire : direccion del reporte

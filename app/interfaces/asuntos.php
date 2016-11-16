@@ -77,7 +77,7 @@ $Form = new Form;
 		});
 
 		jQuery('.logdialog_btn').click(function() {
-			var auth_token = "<?= $_SESSION['AUTHTOKEN'] ?>";
+			var auth_token = "<?= $Sesion->auth_token ?>";
 			var url_api = '<?= Conf::RootDir() ?>/api/v2/logs';
 
 			jQuery('#json_to_table').empty();
@@ -507,7 +507,7 @@ function Opciones(& $fila) {
 }
 
 function SplitDuracion($time) {
-	list($h, $m, $s) = split(":", $time);
+	list($h, $m, $s) = explode(":", $time);
 	if ($h > 0 || $s > 0 || $m > 0) {
 		return $h . ":" . $m;
 	}

@@ -187,7 +187,7 @@ function CrearTarifa( from, id )
 	text-align:right;
 }
 </style>
-<? if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
+<?php if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 		echo "<table width=\"90%\" class=\"tb_base\"><tr><td align=\"center\">"; ?>
 <form name=formulario id=formulario method=post action='' autocomplete="off">
 	<input type="hidden" name='id_tarifa_edicion' value='<?=$tarifa->fields['id_tarifa']?>' />
@@ -197,7 +197,7 @@ function CrearTarifa( from, id )
 	<input type="hidden" name="glosa_tarifa" value="<?php echo $tarifa->fields['glosa_tarifa']; ?>" />
 	<table width='95%' border="0" cellpadding="0" cellspacing="0">
 		<tr>
-<?
+<?php
 	$colspan=3;
 
 	if($tarifa->fields['id_tarifa'])
@@ -205,7 +205,7 @@ function CrearTarifa( from, id )
 		$colspan=2;
 ?>
 
-<?
+<?php
 	}
 ?>
 			<td width="200"> <?=__('Nombre')?>: <?php echo $tarifa->fields['glosa_tarifa']; ?> </td>
@@ -226,7 +226,7 @@ function CrearTarifa( from, id )
 
 
 
-<?
+<?php
 /* self.location.href= */
 	######## MONEDAS #########
 	$lista_monedas = new ListaObjetos($sesion,'',"SELECT * from prm_moneda Order by id_moneda ASC");
@@ -414,10 +414,10 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 	<?=$td_tarifas ?>
 </table>
 </form>
-<? if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
+<?php if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 			echo "</td></tr></table>"; ?>
 <br>
-<? }
+<?php }
 	else
 	 { ?>
 <table width='100%' border="1" style='border-top: 1px solid #454545; border-right: 1px solid #454545; border-left:1px solid #454545;	border-bottom:none' cellpadding="3" cellspacing="3" id='tbl_tarifa'>
@@ -437,9 +437,9 @@ if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo
 	<?=$td_tarifas ?>
 </table>
 </form>
-<? if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
+<?php if( ( ( method_exists('Conf','GetConf') && Conf::GetConf($sesion,'UsaDisenoNuevo') ) || ( method_exists('Conf','UsaDisenoNuevo') && Conf::UsaDisenoNuevo() ) ) )
 			echo "</td></tr></table>"; ?>
 <br>
-<? }
+<?php }
 	$pagina->PrintBottom($popup);
 ?>

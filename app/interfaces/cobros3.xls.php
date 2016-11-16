@@ -1,5 +1,4 @@
 <?php
-require_once 'Spreadsheet/Excel/Writer.php';
 require_once dirname(__FILE__) . '/../conf.php';
 $sesion = new Sesion(array('REV', 'ADM', 'PRO'));
 // Defino los permisos validos
@@ -30,11 +29,9 @@ if ($p_profesional->fields['permitido']) {
 // Le muestro la tarifa cuando tiene el Conf, es profesional no revisor
 $mostrar_tarifa_al_profesional = Conf::GetConf($sesion, 'MostrarTarifaAlProfesional') && $profesionalpermitido && !$revisorpermitido;
 
-$wb = new Spreadsheet_Excel_Writer();
-
+$wb = new WorkbookMiddleware();
 header('Set-Cookie: fileDownload=true; path=/');
-$wb->setVersion(8);
-$wb->send('Revisión de horas.xls');
+$wb->send('Revisión de horas');
 $wb->setCustomColor(35, 220, 255, 220);
 $wb->setCustomColor(36, 255, 255, 220);
 
@@ -188,9 +185,11 @@ $PdfLinea2 = Conf::GetConf($sesion, 'PdfLinea2');
 $info_usr1 = str_replace('<br>', ' - ', $PdfLinea1);
 $ws->write(1, 0, $info_usr1, $encabezado);
 $ws->mergeCells(1, 0, 1, 9);
+$ws->setRow(1, 14);
 $info_usr = str_replace('<br>', ' - ', $PdfLinea2);
 $ws->write(2, 0, utf8_decode($info_usr), $encabezado);
 $ws->mergeCells(2, 0, 2, 9);
+$ws->setRow(2, 14);
 
 $fila_inicial = 4;
 
@@ -312,8 +311,8 @@ for ($i = 0; $i < $lista->num; $i++) {
         $ws->write($fila_inicial + $i, $col_solicitante, $trabajo->fields['solicitante'], $tex);
     }
 
-    list($duracion, $duracion_cobrada) = split('<br>', $trabajo->fields['duracion']);
-    list($h, $m) = split(':', $duracion);
+    list($duracion, $duracion_cobrada) = explode('<br>', $trabajo->fields['duracion']);
+    list($h, $m) = explode(':', $duracion);
     $duracion_decimal = number_format($h + $m / 60, 1, '.', '');
     $tiempo_excel_duracion = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días
 
@@ -331,7 +330,7 @@ for ($i = 0; $i < $lista->num; $i++) {
         if ($trabajo->fields['cobrable'] == 0) {
             $duracion_cobrada = '0:00';
         }
-        list($h, $m) = split(':', $duracion_cobrada);
+        list($h, $m) = explode(':', $duracion_cobrada);
 
         $duracion_cobrada_decimal = number_format($h + $m / 60, 1, '.', '');
         $tiempo_excel_duracion_cobrada = $h / (24) + $m / (24 * 60); //Excel cuenta el tiempo en días

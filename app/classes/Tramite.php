@@ -15,7 +15,9 @@ class Tramite extends Objeto
 		$this->sesion = $sesion;
 		$this->fields = $fields;
 
-		if( $this->fields['duracion']=='00:00:00' ) $this->fields['duracion']='-';
+		if (isset($this->fields['duracion']) && $this->fields['duracion'] == '00:00:00') {
+			$this->fields['duracion'] = '-';
+		}
 	}
 
 	function GuardarHistorial($queryHistorial) {

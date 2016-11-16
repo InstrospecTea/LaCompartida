@@ -1,16 +1,15 @@
 <?php
-require_once dirname(__FILE__) . '/../conf.php';
-require_once Conf::ServerDir() . '/../fw/classes/Lista.php';
-require_once Conf::ServerDir() . '/../fw/classes/Objeto.php';
-require_once Conf::ServerDir() . '/../app/classes/Debug.php';
 
 class Archivo extends Objeto {
 
-	function Archivo($sesion, $fields = "", $params = "") {
+	public $editable_fields = ['archivo_nombre', 'archivo_tipo', 'archivo_data', 'archivo_s3'];
+
+	public function __construct($sesion, $fields = "", $params = "") {
 		$this->tabla = "archivo";
 		$this->campo_id = "id_archivo";
 		$this->sesion = $sesion;
 		$this->fields = $fields;
+		$this->setFieldsAllowNull();
 	}
 
 	function Check() {
@@ -39,18 +38,10 @@ class Archivo extends Objeto {
 	}
 
 	function LoadById($id_archivo) {
-		$query = "SELECT id_archivo FROM archivo WHERE id_archivo='$id_archivo' LIMIT 1";
-		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		list($id) = mysql_fetch_array($resp);
-		return $this->Load($id);
+		return $this->Load($id_archivo);
 	}
 
 	function Upload($codigo_cliente, $id_contrato, $archivo_anexo = '') {
-		$archivo_subir = $archivo_anexo['tmp_name'];
-		$subir = fopen($archivo_subir, 'r');
-		$contenido = fread($subir, filesize($archivo_subir));
-		fclose($subir);
-
 		$nombre = $archivo_anexo['name'];
 		$archivoname = UtilesApp::slug(substr($nombre, 0, strpos($nombre, '.')));
 		$archivoext = substr($nombre, stripos($nombre, '.'));
@@ -62,7 +53,7 @@ class Archivo extends Objeto {
 			return false;
 		}
 
-		$url_s3 = UtilesApp::UploadToS3($name, $contenido, $archivo_anexo['type']);
+		$url_s3 = UtilesApp::UploadFileToS3($name, $archivo_anexo['tmp_name'], $archivo_anexo['type']);
 		$this->Edit('archivo_nombre', $archivo_anexo['name']);
 		$this->Edit('data_tipo', $archivo_anexo['type']);
 

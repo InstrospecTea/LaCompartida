@@ -19,24 +19,24 @@ $nombre_cliente = $cliente->fields['glosa_cliente'];
 $pagina->titulo = __('Emitir') . " " . __('Cobro') . __(' :: Selección de trámites #').$id_cobro.__(' ').$nombre_cliente;
 
 if($cobro->fields['estado'] != 'CREADO' && $cobro->fields['estado'] != 'EN REVISION'){
-	$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");	
+	$pagina->Redirect("cobros6.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
 }
 
 $cobro->Edit('etapa_cobro','2');
 $cobro->Write();
 
 if($opc=="siguiente"){
-	
+
 	if(!empty($cobro->fields['incluye_gastos'])) {
 		$pagina->Redirect("cobros4.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
 	} else {
 		$pagina->Redirect("cobros5.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
 	}
-		
+
 } else if($opc=="anterior"){
 	$pagina->Redirect("cobros3.php?id_cobro=".$id_cobro."&popup=1&contitulo=true");
 }
-	
+
 $cobro->LoadAsuntos();
 
 $comma_separated = implode("','", $cobro->asuntos);
@@ -63,7 +63,7 @@ $pagina->PrintTop($popup);
 
     <input type="hidden" name="opc">
     <input type="hidden" name="id_cobro" value=<?php echo $id_cobro?>>
-	
+
 	<?php $pagina->PrintPasos($sesion,6,'',$id_cobro, $cobro->fields['incluye_gastos'], $cobro->fields['incluye_honorarios']); ?>
 
 	<table width="100%">
@@ -71,15 +71,15 @@ $pagina->PrintTop($popup);
 			<td align="left">
 				<input type="button" class="btn" value="<?php echo __('<< Anterior')?>" onclick="this.form.opc.value = 'anterior'; this.form.submit();">
 			</td>
-			
+
 			<td align="center">&nbsp;</td>
-			
+
 			<td align="right">
 				<input type="button" class="btn" value="<?php echo __('Siguiente >>')?>" onclick="this.form.opc.value = 'siguiente'; this.form.submit();">
 			</td>
 		</tr>
     </table>
-	
+
  	<table width="100%">
 		<tr>
 			<td class="cvs" align="center" colspan="2">
@@ -87,9 +87,9 @@ $pagina->PrintTop($popup);
 			</td>
 		</tr>
 	</table>
-	
+
 </form>
-		
+
 <?php echo  InputId::Javascript($sesion);
 echo '<script src="guardar_campo_trabajo.js"></script>';
 
@@ -105,23 +105,23 @@ function funcionTR(& $tramite)
 		$color = "#dddddd";
 	} else {
 		$color = "#ffffff";
-	}	
+	}
 
     $img_dir = Conf::ImgDir();
     $tarifa = Funciones::TramiteTarifa($sesion, $trabajo->fields['id_tramite_tipo'],$trabajo->fields['id_moneda_asunto'],$trabajo->fields['codigo_asunto']);
-	
-	list($h,$m,$s) = split(":",$trabajo->fields['duracion_cobrada']);
-	
+
+	list($h,$m,$s) = explode(":",$trabajo->fields['duracion_cobrada']);
+
 	$duracion = $h + ($m > 0 ? ($m / 60) :'0');
     $total = round($tarifa, 2);
     $dur_cob = "$h:$m";
-	
-	list($h,$m,$s) = split(":",$trabajo->fields['duracion']); 
-    
+
+	list($h,$m,$s) = explode(":",$trabajo->fields['duracion']);
+
 	$dur = "$h:$m";
 	$formato_fecha = "%d/%m/%y";
 	$fecha = Utiles::sql2fecha($trabajo->fields[fecha],$formato_fecha);
-	
+
 	$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";
 	$html .= "<td colspan=9><strong>".$glosa_tramite."</strong></td></tr>";
  	$html .= "<tr bgcolor=$color style=\"border-right: 1px solid #409C0B; border-left: 1px solid #409C0B;\">";

@@ -29,7 +29,7 @@ class CronAnulaDTE extends Cron {
 		foreach ($listado->datos as $f) {
 			if (!$f->DTEAnulado()) {
 				$data = array('Factura' => $f);
-				$res = ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_anula_factura_electronica', &$data) : false;
+				$res = ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_anula_factura_electronica', $data) : false;
 				$error = $data['Error'];
 				$numero = $f->fields['id_factura'];
 				if (!is_null($error)) {

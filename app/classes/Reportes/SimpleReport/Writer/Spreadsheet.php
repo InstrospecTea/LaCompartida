@@ -1,7 +1,5 @@
 <?php
 
-require_once 'Spreadsheet/Excel/Writer.php';
-
 class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 	/**
@@ -73,7 +71,7 @@ class SimpleReport_Writer_Spreadsheet implements SimpleReport_Writer_IWriter {
 
 			if (!$parent_writer) {
 				if (empty($this->xls)) {
-					$this->xls = new Spreadsheet_Excel_Writer();
+					$this->xls = new WorkbookMiddleware();
 					$this->xls->send("$filename.xls");
 				}
 				// Crear worksheet

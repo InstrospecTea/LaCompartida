@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -13,7 +13,7 @@
 	$id_usuario = $sesion->usuario->fields['id_usuario'];
 
 	if($fecha1 != '')
-		$pagina->Redirect("planillas/planilla_resumen_abogado.php?fecha_ini=$fecha1&fecha_fin=$fecha2");	
+		$pagina->Redirect("planillas/planilla_resumen_abogado.php?fecha_ini=$fecha1&fecha_fin=$fecha2");
 	$pagina->titulo = __('Reporte Facturación clientes');
 	$pagina->PrintTop();
 ?>
@@ -60,7 +60,7 @@
 	</tr>
 
 </table>
-	
+
 </form>
 
 <script type="text/javascript">
@@ -79,7 +79,7 @@ setDateDefecto();
 // ->
 </script>
 
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>

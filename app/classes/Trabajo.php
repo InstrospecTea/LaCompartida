@@ -252,7 +252,7 @@ class Trabajo extends Objeto
 	}
 
 	// Función que entrega false si supera las 23:59 horas trabajadas un usuario en un dia
-	function CantHorasDia($duracion_trabajo, $dia, $id_usuario, $sesion) {
+	static function CantHorasDia($duracion_trabajo, $dia, $id_usuario, $sesion) {
 		list($h, $m, $s) = explode(':', $duracion_trabajo);
 		$total_minutos = ($h * 60) + $m;
 
@@ -285,27 +285,48 @@ class Trabajo extends Objeto
 	}
 
 	static function ActualizarConExcel($archivo_data, $sesion, $lang = 'es') {
-		/*
-		Los campos que pueden ser modificados son:
-			fecha
-			solicitante (es opcional que aparezca en el excel)
-			descripción
-			duración cobrable
-		*/
+		/**
+		 * Los campos que pueden ser modificados son:
+		 *	fecha
+		 *	solicitante (es opcional que aparezca en el excel)
+		 *	descripción
+		 *	duración cobrable
+		 */
+
 		$PrmExcelCobro = new PrmExcelCobro($sesion);
 
 		$ingresado_por_decimales = false;
 
-		if (UtilesApp::GetConf($sesion,'TipoIngresoHoras') == 'decimal') {
+		if (Conf::read('TipoIngresoHoras') == 'decimal') {
 			$ingresado_por_decimales = true;
 		}
-		if (!$archivo_data["tmp_name"]) {
+
+		if (!$archivo_data['tmp_name']) {
 			return __('Debe seleccionar un archivo a subir.');
 		}
-		require_once Conf::ServerDir().'/classes/ExcelReader.php';
 
-		$excel = new Spreadsheet_Excel_Reader();
-		if (!$excel->read($archivo_data["tmp_name"])) {
+		try {
+			$objPHPExcel = PHPExcel_IOFactory::load($archivo_data['tmp_name']);
+			$sheets = [];
+			foreach ($objPHPExcel->getWorksheetIterator() as $worksheet) {
+				$_sheet = $objPHPExcel->getIndex($worksheet);
+				$_cell = 0;
+				$_column = 0;
+				$sheets[$_sheet] = ['cells' => [], 'numRows' => []];
+				foreach ($worksheet->getRowIterator() as $row) {
+					$cellIterator = $row->getCellIterator();
+					foreach ($cellIterator as $cell) {
+						$_cell = $cell->getRow();
+						$_column = $cell->columnIndexFromString($cell->getColumn());
+						if (!is_null($cell->getValue())) {
+							$sheets[$_sheet]['cells'][$_cell][$_column] = utf8_decode($cell->getValue());
+						}
+					}
+				}
+				$sheets[$_sheet]['numRows'] = $_cell;
+				$sheets[$_sheet]['numCols'] = $_column;
+			}
+		} catch (PHPExcel_Reader_Exception $e) {
 			return __('Error, el archivo no se puede leer, intente nuevamente.');
 		}
 
@@ -328,14 +349,16 @@ class Trabajo extends Objeto
 		$col_asunto = 23;
 
 		// Encontrar en qué fila están los títulos.
-		$fila_base=1;
-		while(!($excel->sheets[0]['cells'][$fila_base][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang)
-					&& in_array(trim($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini]),array('Dia','Día','Day','Month','Mes')) )
-					&& $fila_base<$excel->sheets[0]['numRows']) {
+		$fila_base = 1;
+
+		while(!($sheets[0]['cells'][$fila_base][$col_id_trabajo] == $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang)
+					&& in_array(trim($sheets[0]['cells'][$fila_base][$col_fecha_ini]),array('Dia','Día','Day','Month','Mes')) )
+					&& $fila_base<$sheets[0]['numRows']) {
 			++$fila_base;
 		}
+
 		//Paso de ubicación ini,med,fin (2,3,4) a glosa dia,mes,anyo (2,3,4)-> español (3,2,4)->inglés
-		if (in_array(trim($excel->sheets[0]['cells'][$fila_base][$col_fecha_ini]), array('Dia', 'Día', 'Day'))) {
+		if (in_array(trim($sheets[0]['cells'][$fila_base][$col_fecha_ini]), array('Dia', 'Día', 'Day'))) {
 			$col_fecha_dia = $col_fecha_ini;
 			$col_fecha_mes = $col_fecha_med;
 		} else {
@@ -358,8 +381,8 @@ class Trabajo extends Objeto
 		$nombre_abogado_es = Utiles::glosa($sesion, 'abogado', 'glosa_es', 'prm_excel_cobro', 'nombre_interno');
 		$nombre_abogado_en = Utiles::glosa($sesion, 'abogado', 'glosa_en', 'prm_excel_cobro', 'nombre_interno');
 
-		for ($i = 1; $i <= $excel->sheets[0]['numCols']; $i++) {
-			$nombre_columna = $excel->sheets[0]['cells'][$fila_base][$i];
+		for ($i = 1; $i <= $sheets[0]['numCols']; $i++) {
+			$nombre_columna = $sheets[0]['cells'][$fila_base][$i];
 
 			if (is_null($nombre_columna) || empty($nombre_columna)) {
 				continue;
@@ -417,7 +440,7 @@ class Trabajo extends Objeto
 		$id_trabajo_prm = $PrmExcelCobro->getGlosa('id_trabajo', 'Listado de trabajos', $lang);
 
 		// Leemos todas las hojas
-		foreach ($excel->sheets as $hoja) {
+		foreach ($sheets as $hoja) {
 			if ($hoja['cells'][1][$col_id_trabajo] == $id_trabajo_prm ||
 					$hoja['cells'][2][$col_id_trabajo] == $id_trabajo_prm ||
 					$hoja['cells'][3][$col_id_trabajo] == $id_trabajo_prm ||
@@ -444,7 +467,7 @@ class Trabajo extends Objeto
 
 			$cobro = new Cobro($sesion);
 			if (! $cobro->Load($id_cobro)) {
-				return __('El cobro') . ' ' . _('que intenta modificar no se encuentra en el sistema') . '.';
+				return __('El cobro') . ' ' . __('que intenta modificar no se encuentra en el sistema') . '.';
 			}
 			$cobro->LoadAsuntos();
 			$continuar = false;
@@ -533,8 +556,8 @@ class Trabajo extends Objeto
 					$mensajes .= "No se puede modificar el trabajo $id_trabajo ($descripcion) porque el $nombre_abogado_es ingresado no existe.<br />";
 					continue;
 				}
-				// Excel guarda la duración como número, donde 1 es un día.
 
+				// Excel guarda la duración como número, donde 1 es un día.
 				$duracion_cobrable = UtilesApp::tiempoExcelASQL($hoja['cells'][$fila][$col_duracion_cobrable], $ingresado_por_decimales);
 				if ($duracion_cobrable != '00:00:00') {
 					$cobrable = 1;
@@ -587,14 +610,15 @@ class Trabajo extends Objeto
 				// Tratamos de cargar el trabajo antes de los cambios.
 				$trabajo_original = new Trabajo($sesion);
 				$trabajo_original->Load($id_trabajo);
+
 				// Si no existe el original o no hay cambios ignoramos la línea.
 				if (($id_trabajo > 0 && !$trabajo_original)
 						|| ($trabajo_original->fields['fecha'] == $fecha
 						&& ($col_solicitante == 23 || $trabajo_original->fields['solicitante'] == $solicitante)
-						&& ($col_duracion_trabajada == 23 || $trabajo_original->fields['duracion'] == $duracion_trabajada )
-						&& $trabajo_original->fields['descripcion'] == $descripcion
+						&& ($col_duracion_trabajada == 23 || $trabajo_original->fields['duracion'] == $duracion_trabajada)
+						&& trim($trabajo_original->fields['descripcion']) == trim($descripcion)
 						&& (($col_asunto == 23 && $codigo_asunto_escondido == '') || $trabajo_original->fields['codigo_asunto'] == $codigo_asunto)
-						&& ($trabajo_original->fields['duracion_cobrada'] == $duracion_cobrable || $trabajo_original->fields['duracion_cobrada'] == '' && $duracion_cobrable=='00:00:00')
+						&& !$trabajo_original->isUpdateableChargeableDuration($duracion_cobrable)
 						&& $trabajo_original->fields['id_usuario'] == $usuario->fields['id_usuario']
 						&& $trabajo_original->fields['id_cobro'] == $id_cobro)) {
 					continue;
@@ -705,6 +729,29 @@ class Trabajo extends Objeto
 				return "$mensajes$num_modificados trabajos actualizados.<br/>$num_insertados trabajos agregados.";
 			}
 		}
+	}
+
+	/**
+	 * El método retorna `true` cuando es necesario actualizar la duración
+	 * cobrable del trabajo
+	 */
+	public function isUpdateableChargeableDuration($duracion_cobrable) {
+		if ($this->fields['duracion_cobrada'] == $duracion_cobrable) {
+			return false;
+		}
+
+		if ($this->fields['duracion_cobrada'] == '' && $duracion_cobrable == '00:00:00') {
+			return false;
+		}
+
+		// Por defecto en el excel se asigna '00:00:00' a los trabajos no cobrables
+		// Pero el trabajo puede tener un valor distinto a cero en la base de datos
+		// No hay que sobre escribir en estos casos
+		if ($this->fields['cobrable'] == '0' && $duracion_cobrable == '00:00:00') {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

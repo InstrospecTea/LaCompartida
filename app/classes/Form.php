@@ -6,7 +6,6 @@ require_once dirname(__FILE__) . '/../../app/conf.php';
  */
 class Form {
 
-	public $Utiles;
 	public $Html;
 	public $defaultLabel = true;
 	protected $scripts = array();
@@ -14,7 +13,6 @@ class Form {
 	protected $image_path = '//static.thetimebilling.com/images/';
 
 	public function __construct() {
-		$this->Utiles = new \TTB\Utiles();
 		$this->Html = new \TTB\Html();
 	}
 
@@ -122,7 +120,7 @@ class Form {
 			$attrs['label'] = false;
 		}
 		if ($attrs['label'] === true) {
-			$label = $this->Utiles->humanize($name);
+			$label = Utiles::humanize($name);
 		} else if ($attrs['label'] !== false) {
 			$label = $attrs['label'];
 		}
@@ -187,7 +185,7 @@ class Form {
 		$label = null;
 
 		if ($attrs['label'] === true) {
-			$label = $this->Utiles->humanize($name);
+			$label = Utiles::humanize($name);
 		} else if ($attrs['label'] !== false) {
 			$label = $attrs['label'];
 		}
@@ -214,7 +212,7 @@ class Form {
 		$label = null;
 
 		if ($attrs['label'] === true) {
-			$label = $this->Utiles->humanize($name);
+			$label = Utiles::humanize($name);
 		} else if ($attrs['label'] !== false) {
 			$label = $attrs['label'];
 		}
@@ -255,7 +253,7 @@ class Form {
 			$_attrs = array();
 			if (is_array($label)) {
 				$_attrs = $label;
-				$label = empty($_attrs['label']) ? $this->Utiles->humanize($name) : $_attrs['label'];
+				$label = empty($_attrs['label']) ? Utiles::humanize($name) : $_attrs['label'];
 				unset($_attrs['label']);
 			}
 			$attrs = array('label' => $this->defaultLabel) + $_attrs;
@@ -284,7 +282,7 @@ class Form {
 		$label = null;
 
 		if ($attrs['label'] === true) {
-			$label = $this->Utiles->humanize($name);
+			$label = Utiles::humanize($name);
 		} else if ($attrs['label'] !== false) {
 			$label = $attrs['label'];
 		}
@@ -317,7 +315,7 @@ class Form {
 			$_attrs = array();
 			if (is_array($label)) {
 				$_attrs = $label;
-				$label = empty($_attrs['label']) ? $this->Utiles->pascalize($name) : $_attrs['label'];
+				$label = empty($_attrs['label']) ? Utiles::pascalize($name) : $_attrs['label'];
 				unset($_attrs['label']);
 			}
 			$attrs = array('label' => $this->defaultLabel) + $_attrs;

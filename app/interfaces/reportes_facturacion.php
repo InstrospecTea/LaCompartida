@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
     require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -57,8 +57,8 @@
 
 </form>
 
-<?
-    echo(InputId::Javascript($sesion));
+<?php
+   echo(InputId::Javascript($sesion));
     $pagina->PrintBottom();
 ?>
 

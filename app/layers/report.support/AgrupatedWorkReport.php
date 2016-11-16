@@ -289,10 +289,10 @@ class AgrupatedWorkReport extends AbstractReport implements IAgrupatedWorkReport
 
 	private function getTitle() {
 		if ($this->parameters['agrupationType'] == 'lawyer') {
-			return _('LISTA DE') . ' ' . _('COBRO') . ' ' . _('POR ABOGADO');
+			return __('LISTA DE') . ' ' . __('COBRO') . ' ' . __('POR ABOGADO');
 		} else {
 			$group_by_partner = $this->parameters['group_by_partner'];
-			return _('LISTA DE') . ' ' . _('COBRO') . ' ' . _('POR CLIENTE') . ($group_by_partner ? ' ' . __('SOCIO A CARGO') : '');
+			return __('LISTA DE') . ' ' . __('COBRO') . ' ' . __('POR CLIENTE') . ($group_by_partner ? ' ' . __('SOCIO A CARGO') : '');
 		}
 	}
 

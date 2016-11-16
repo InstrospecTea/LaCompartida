@@ -1,7 +1,9 @@
 <?php
+
 $args = getopt('', array('script:', 'domain:', 'subdir:', 'data:', 'debug'));
 
 if (!isset($args['script'])) {
+	listScripts();
 	exit("use: console script_name [--domain=dev] [--subdir=ttb] [--data='json_data'] [--debug]\n");
 }
 
@@ -24,8 +26,7 @@ require __BASEDIR__ . '/app/conf.php';
 require __DIR__ . '/scripts/AppShell.php';
 require __DIR__ . "/scripts/{$args['script']}.php";
 
-$Utiles = new \TTB\Utiles;
-$class_name = $Utiles->pascalize($args['script']);
+$class_name = Utiles::pascalize($args['script']);
 
 $script = new $class_name;
 
@@ -39,3 +40,15 @@ if (isset($args['data'])) {
 
 $script->debug = isset($args['debug']);
 $script->main();
+
+function listScripts() {
+	echo "Script names:\n";
+	echo "=============\n";
+	$files = scandir(dirname(__FILE__) . '/scripts');
+	foreach ($files as $file) {
+		if ($file !== 'AppShell.php' && preg_match('/\.php$/i', $file)) {
+			echo preg_replace('/^([^\.]+).*$/', '$1', $file) . "\n";
+		}
+	}
+	echo "\n";
+}

@@ -287,6 +287,7 @@ class Reporte {
 				$this->id_agrupador[] = "id_grupo_cliente";
 				break;
 			case "glosa_cliente":
+			case "glosa_cliente_charts":
 				$this->id_agrupador[] = "codigo_cliente";
 				break;
 			case "glosa_asunto":

@@ -583,7 +583,7 @@ class ReporteContrato extends Contrato {
 				AND incluye_honorarios = $incluye_honorarios";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 		while (list($id_cobro) = mysql_fetch_array($resp)) {
-			#Se ingresa la anotaci√≥n en el historial
+			#Se ingresa la anotaciÛn en el historial
 			$his = new Observacion($this->sesion);
 			$his->Edit('fecha', date('Y-m-d H:i:s'));
 			$his->Edit('comentario', "COBRO ELIMINADO (OTRO BORRADOR)");
@@ -905,7 +905,7 @@ class ReporteContrato extends Contrato {
 		return array(0, $moneda, $id_moneda, intval($cantidad_asuntos), $monto_hh_contrato, $X, $Y, $monto_hh_asunto, $x, $y);
 	}
 
-	// Cargar informaci√≥n de escalonadas a un objeto
+	// Cargar informaciÛn de escalonadas a un objeto
 	function CargarEscalonadas() {
 		$this->escalonadas = array();
 		$this->escalonadas['num'] = 0;
@@ -1001,8 +1001,8 @@ class ReporteContrato extends Contrato {
 			$duracion_retainer_trabajo = 0;
 
 			if ($trabajo->fields['cobrable']) {
-				// Revisa duraci√≥n de la hora y suma duracion que sobro del trabajo anterior, si es que se cambi√≥ de escalonada
-				list($h, $m, $s) = split(":", $trabajo->fields['duracion_cobrada']);
+				// Revisa duraciÛn de la hora y suma duracion que sobro del trabajo anterior, si es que se cambiÛ de escalonada
+				list($h, $m, $s) = explode(":", $trabajo->fields['duracion_cobrada']);
 				$duracion = $h + ($m > 0 ? ($m / 60) : '0');
 				$duracion_trabajo = $duracion;
 
@@ -1021,7 +1021,7 @@ class ReporteContrato extends Contrato {
 					$cobro_total_duracion += $duracion_escalonada_actual;
 
 					if (!empty($this->escalonadas[$x_escalonada]['id_tarifa'])) {
-						// Busca la tarifa seg√∫n abogado y definici√≥n de la escalonada
+						// Busca la tarifa seg˙n abogado y definiciÛn de la escalonada
 						$tarifa_estandar = UtilesApp::CambiarMoneda(
 										Funciones::TarifaDefecto($this->sesion, $trabajo->fields['id_usuario'], $this->escalonadas[$x_escalonada]['id_moneda']), $moneda_escalonada->fields['tipo_cambio'], $moneda_escalonada->fields['cifras_decimales'], $moneda_contrato->fields['tipo_cambio'], $moneda_contrato->fields['cifras_decimales']
 						);
@@ -1268,7 +1268,7 @@ GROUP BY  $bagrupador";
 			}
 
 			$query .= " WHERE " . $this->campo_id . "='" . $this->fields[$this->campo_id] . "'";
-			if ($do_update) { //Solo en caso de que se haya modificado alg√∫n campo
+			if ($do_update) { //Solo en caso de que se haya modificado alg˙n campo
 				$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 				//Guarda ultimo cambio en la tabla historial de modificaciones
@@ -1279,7 +1279,7 @@ GROUP BY  $bagrupador";
 																																										" . (!empty($this->fields['id_usuario_responsable']) ? $this->fields['id_usuario_responsable'] : "NULL" ) . " )";
 				$resp3 = mysql_query($query3, $this->sesion->dbh) or Utiles::errorSQL($query3, __FILE__, __LINE__, $this->sesion->dbh);
 			}
-			else //Retorna true ya que si no quiere hacer update la funci√≥n corri√≥ bien
+			else //Retorna true ya que si no quiere hacer update la funciÛn corriÛ bien
 				return true;
 		}
 		else {
@@ -1318,27 +1318,27 @@ GROUP BY  $bagrupador";
 					$CorreosModificacionAdminDatos = '';
 				}
 				if ($CorreosModificacionAdminDatos != '') {
-					// En caso de cambiar a avisar a m√°s de un encargado editar el query y cambiar el if() por while()
+					// En caso de cambiar a avisar a m·s de un encargado editar el query y cambiar el if() por while()
 					$query = "SELECT CONCAT_WS(' ', nombre, apellido1, apellido2) as nombre, email FROM usuario WHERE activo=1 AND id_usuario=" . $this->fields['id_usuario_responsable'];
 					$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 					if (list($nombre, $email) = mysql_fetch_array($resp)) {
 						$email .= ',' . $CorreosModificacionAdminDatos;
 
-						$subject = 'Creaci√≥n de contrato';
+						$subject = 'CreaciÛn de contrato';
 
 						// Obtener el nombre del cliente asociado al contrato.
 						$query2 = 'SELECT glosa_cliente FROM cliente WHERE codigo_cliente=' . $this->fields['codigo_cliente'];
 						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
 						list($nombre_cliente) = mysql_fetch_array($resp2);
 
-						// Revisar si el contrato est√° asociado a alg√∫n asunto.
+						// Revisar si el contrato est· asociado a alg˙n asunto.
 						$query2 = 'SELECT glosa_asunto FROM asunto WHERE id_contrato_indep =' . $this->fields['id_contrato'];
 						$resp2 = mysql_query($query2, $this->sesion->dbh) or Utiles::errorSQL($query2, __FILE__, __LINE__, $this->sesion->dbh);
 						if (list($glosa_asunto) = mysql_fetch_array($resp2))
 							$asunto_contrato = ' asociado al asunto ' . $glosa_asunto;
 						else
 							$asunto_contrato = '';
-						$mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el d√≠a " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
+						$mensaje = "Estimado " . $nombre . ": \r\n   El contrato del cliente " . $nombre_cliente . $asunto_contrato . " ha sido creado por " . $this->sesion->usuario->fields['nombre'] . ' ' . $this->sesion->usuario->fields['apellido1'] . ' ' . $this->sesion->usuario->fields['apellido2'] . " el dÌa " . date('d-m-Y') . " a las " . date('H:i') . " en el sistema de Time & Billing.";
 
 						Utiles::Insertar($this->sesion, $subject, $mensaje, $email, $nombre, false);
 					}
@@ -1360,7 +1360,7 @@ GROUP BY  $bagrupador";
 	}
 
 	/**
-	 * Elimina los registros asociados a los trabajos, gastos y tr√°mites de la tabla olap_liquidaciones
+	 * Elimina los registros asociados a los trabajos, gastos y tr·mites de la tabla olap_liquidaciones
 	 * @return void
 	 */
 	function cleanOlap() {

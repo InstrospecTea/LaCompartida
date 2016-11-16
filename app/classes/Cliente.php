@@ -617,6 +617,27 @@ class Cliente extends Objeto {
 			echo "Error: {$e} {$criteria->__toString()}";
 		}
 
+		$criteria = new Criteria($this->sesion);
+		$criteria->add_select('COUNT(*)', 'cobros_pendientes')
+			->add_from('cobro_pendiente')
+			->add_left_join_with(
+				'contrato',
+				CriteriaRestriction::equals('cobro_pendiente.id_contrato', 'contrato.id_contrato')
+			)
+			->add_restriction(
+				CriteriaRestriction::equals('contrato.codigo_cliente', "'{$this->fields['codigo_cliente']}'")
+			);
+
+		try {
+			$result = $criteria->run();
+			if ($result[0]['cobros_pendientes'] > 0) {
+				$this->error = __('No se puede eliminar un') . ' ' . __('cliente') . ' ' . __('que tiene') . ' ' . __('Cobros pendientes');
+				return false;
+			}
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+
 		$query = "DELETE modificaciones_contrato FROM modificaciones_contrato JOIN contrato USING(id_contrato) WHERE contrato.codigo_cliente = '" . $this->fields['codigo_cliente'] . "'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 

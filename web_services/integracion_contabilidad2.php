@@ -1,18 +1,16 @@
-<?
-require_once("lib/nusoap.php");
-require_once("../app/conf.php");
-require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-require_once Conf::ServerDir().'/../app/classes/UtilesApp.php';
+<?php
+require_once('../app/conf.php');
 
 apache_setenv("force-response-1.0", "TRUE");
 apache_setenv("downgrade-1.0", "TRUE"); #Esto es lo más importante
 
+if (Conf::read('NuevaLibreriaNusoap')) {
+	require_once('lib2/nusoap.php');
+} else {
+	require_once('lib/nusoap.php');
+}
 
 $ns = "urn:TimeTracking";
-
-#First we must include our NuSOAP library and define the namespace of the service. It is usually recommended that you designate a distinctive URI for each one of your Web services.
-
 
 $server = new soap_server();
 $server->configureWSDL('IntegracionSAPWebServices',$ns);
@@ -195,7 +193,7 @@ function ListaClientesModificados($fecha_ini,$fecha_fin=0,$usuario,$password)
 							contrato.factura_direccion,mon.glosa_moneda as moneda,
 							contrato.direccion_contacto,contrato.id_moneda,contrato.id_usuario_responsable,
 							IF((contrato.fecha_creacion NOT BETWEEN '$fecha_ini' AND '$fecha_fin'),'0','1') as creado
-							FROM cliente 
+							FROM cliente
 							INNER JOIN contrato ON contrato.id_contrato=cliente.id_contrato
 							LEFT JOIN grupo_cliente as gru ON gru.id_grupo_cliente=cliente.id_grupo_cliente
 							LEFT JOIN prm_moneda as mon ON mon.id_moneda=contrato.id_moneda
@@ -218,7 +216,7 @@ function ListaClientesModificados($fecha_ini,$fecha_fin=0,$usuario,$password)
 			$cliente['bloqueado'] = $temp['bloqueado'];
 			array_push($lista_clientes,$cliente);
 		}
-		
+
 		return new soapval('lista_clientes','ListaClientes',$lista_clientes);
 	}
 	return new soap_fault('Client', '','Usuario o contraseña incorrecta.','');
@@ -251,7 +249,7 @@ function ListaAsuntosModificados($fecha_ini,$fecha_fin=0,$usuario,$password)
 			$asunto['creado'] = $temp['creado'];
 			array_push($lista_asuntos,$asunto);
 		}
-		
+
 		return new soapval('lista_asuntos','ListaAsuntos',$lista_asuntos);
 	}
 	return new soap_fault('Client', '','Usuario o contraseña incorrecta.','');
@@ -325,7 +323,7 @@ function ListaCobrosEmitidos($usuario,$password)
 											carta.descripcion as glosa_carta,
 											cobro.documento
 											FROM cobro
-											JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=1 
+											JOIN cobro_moneda ON cobro_moneda.id_cobro=cobro.id_cobro AND cobro_moneda.id_moneda=1
 											LEFT JOIN prm_moneda ON prm_moneda.id_moneda=cobro.id_moneda
 											LEFT JOIN prm_moneda as prm_moneda_total ON prm_moneda.id_moneda=cobro.opc_moneda_total
 											LEFT JOIN carta ON carta.id_carta=cobro.id_carta
@@ -363,8 +361,8 @@ function ListaCobrosEmitidos($usuario,$password)
 
 			$cobro['glosa_carta'] = $temp['glosa_carta'];
 			$cobro['numero_factura'] = $temp['documento'];
-			$query_duraciones = "SELECT 
-														SUM( TIME_TO_SEC( trabajo.duracion_cobrada ) ) /3600 AS horas_cobrables, 
+			$query_duraciones = "SELECT
+														SUM( TIME_TO_SEC( trabajo.duracion_cobrada ) ) /3600 AS horas_cobrables,
 														trabajo.id_usuario, trabajo.codigo_asunto
 														FROM trabajo
 														WHERE trabajo.id_cobro = ".$temp['id_cobro']."
@@ -376,14 +374,14 @@ function ListaCobrosEmitidos($usuario,$password)
 			{
 				$usuario_cobro['id_usuario'] = $temp2['id_usuario'];
 				$usuario_cobro['horas'] = $temp2['horas_cobrables'] ? number_format($temp2['horas_cobrables'],2,'.','') : 0;
-				
+
 				array_push($usuarios_cobro,$usuario_cobro);
 			}
 			$cobro['ListaUsuariosCobro'] = $usuarios_cobro;
 
 			array_push($lista_cobros,$cobro);
 		}
-		
+
 		return new soapval('lista_cobros_emitidos','ListaCobros',$lista_cobros);
 	}
 	return new soap_fault('Client', '','Usuario o contraseña incorrecta.','');
@@ -405,9 +403,5 @@ function ResultadoIngresoCobro($DocEntry,$id_cobro,$usuario,$password)
 	$ok='ok';
 	return $ok;
 }
-#Then we invoke the service using the following line of code:
-
 
 $server->service($HTTP_RAW_POST_DATA);
-#In fact, appending "?wsdl" to the end of any PHP NuSOAP server file will dynamically produce WSDL code. Here's how our CanadaTaxCalculator Web service is described using WSDL: 
-?>

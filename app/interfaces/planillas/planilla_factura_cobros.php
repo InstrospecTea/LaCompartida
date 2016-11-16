@@ -1,16 +1,9 @@
-<?
-    require_once 'Spreadsheet/Excel/Writer.php';
-    require_once dirname(__FILE__).'/../../conf.php';
-    require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
-    require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
-    require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
-    require_once Conf::ServerDir().'/../app/classes/Debug.php';
-		require_once Conf::ServerDir().'/classes/Cobro.php';
+<?php
+	require_once dirname(__FILE__).'/../../conf.php';
 
-    $sesion = new Sesion( array('REP') );
+	$sesion = new Sesion( array('REP') );
+	$pagina = new Pagina( $sesion );
 
-    $pagina = new Pagina( $sesion );
-	
 	$meses[0]='Enero';
     $meses[1]='Febrero';
     $meses[2]='Marzo';
@@ -24,9 +17,9 @@
     $meses[10]='Noviembre';
     $meses[11]='Diciembre';
 
-	
+
 	#ARMANDO XLS
-    $wb = new Spreadsheet_Excel_Writer();
+    $wb = new WorkbookMiddleware();
 
     $wb->send("Planilla montos facturados.xls");
 
@@ -60,7 +53,7 @@
                                 'Border' => 1,
                                 'Locked' => 1,
                                 'Color' => 'black'));
-	
+
 	$formato_moneda =& $wb->addFormat(array('Size' => 11,
                                 'VAlign' => 'top',
                                 'Align' => 'justify',
@@ -93,7 +86,7 @@
     $ws1->mergeCells( $filas, 2, $filas, 13 );
     $ws1->write($filas,2,$anio,$txt_opcion);
     for($x=3;$x<14;$x++)
-        $ws1->write($filas, $x, '', $txt_opcion);	
+        $ws1->write($filas, $x, '', $txt_opcion);
 
 	$filas +=4;
 
@@ -119,7 +112,7 @@
 		$filas +=1;
 		$total_clientes += 1;
         $ws1->write($filas,1,$glosa,$titulo_filas);
-		
+
 		#MES X MES
 		for($z=1;$z<13;$z++)
 		{
@@ -139,7 +132,7 @@
 			$sresp = mysql_query($squery, $sesion->dbh) or Utiles::errorSQL($squery,__FILE__,__LINE__,$sesion->dbh);
 			if(list($codigo_cliente,$monto) = mysql_fetch_array($sresp))
 			{
-				$ws1->write($filas,$z+1,$monto,$formato_moneda);	
+				$ws1->write($filas,$z+1,$monto,$formato_moneda);
 			}
 			else
 			{
@@ -151,7 +144,7 @@
 	#TOTALES
 	$fila_inicial = ($filas - $total_clientes)+2;
 	$filas +=1;
-	
+
 	if($total_clientes >0)
 	{
 		$ws1->write($filas,1,__('Total'),$titulo_filas);

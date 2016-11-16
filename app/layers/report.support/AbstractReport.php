@@ -38,15 +38,13 @@ abstract class AbstractReport implements BaseReport {
 			require_once $fileHelper;
 		}
 		foreach ($this->helpers as $helper) {
-			$file = LAYER_PATH . $this->helpersPath . "/helpers/{$helper}.php";
+			$class_name = is_array($helper) ? $helper[0] : $helper;
+			$alias = is_array($helper) ? $helper[1] : null;
+			$file = LAYER_PATH . $this->helpersPath . "/helpers/{$class_name}.php";
 			if (is_readable($file)) {
 				require_once $file;
 			}
-			if (is_array($helper)) {
-				$this->loadModel($helper[0], $helper[1]);
-			} else {
-				$this->loadModel($helper);
-			}
+			$this->loadModel($class_name, $alias);
 		}
 	}
 

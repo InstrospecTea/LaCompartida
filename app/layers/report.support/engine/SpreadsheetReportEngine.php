@@ -1,13 +1,11 @@
 <?php
 
-require_once 'Spreadsheet/Excel/Writer.php';
-
 class SpreadsheetReportEngine extends AbstractReportEngine implements ISpreadsheetReportEngine {
 
 	public $engine;
 
 	public function __construct() {
-		$this->engine = new Spreadsheet_Excel_Writer();
+		$this->engine = new WorkbookMiddleware();
 	}
 
 	protected function configurateReport() {

@@ -1,11 +1,8 @@
 <?php
-	require_once 'Spreadsheet/Excel/Writer.php';
 	require_once dirname(__FILE__).'/../../conf.php';
-
+	set_time_limit(0);
 	$sesion = new Sesion(array('REP'));
 	//Revisa el Conf si esta permitido
-
-	set_time_limit(300);
 
 	$pagina = new Pagina($sesion);
 	$Form = new Form($sesion);
@@ -15,8 +12,8 @@
 		$filas = 0;
 		$espacio = 3;
 
-		#ARMANDO XLS
-		$wb = new Spreadsheet_Excel_Writer();
+		//ARMANDO XLS
+		$wb = new WorkbookMiddleware();
 
 		$wb->setCustomColor(35, 220, 255, 220);
 		$wb->setCustomColor(36, 255, 255, 220);
@@ -163,8 +160,9 @@
 
 		$col_grafico_alerta = array();
 		$grafico = 20;
-		for($i=0;$i<$grafico;$i++)
+		for($i=0;$i<$grafico;$i++) {
 			$col_grafico_alerta[$i] = $indice_columnas++;
+		}
 		$col_grafico = $col_grafico_alerta[0];
 
 		$col_deglose = $indice_columnas++;
@@ -190,8 +188,9 @@
 		{
 			global $ws1;
 			$ws1->write($fila,$col_ini,$txt,$formato);
-			for($i=$col_ini+1; $i<=$col_fin; $i++)
-				$ws1->write($fila,$i,'',$formato);
+			for($i=$col_ini+1; $i<=$col_fin; $i++) {
+				$ws1->write($fila, $i, '', $formato);
+			}
 			$ws1->mergeCells($fila, $col_ini, $fila, $col_fin);
 		}
 
@@ -200,8 +199,9 @@
 		setCol($col_asuntos,28);
 		setCol($col_encargado_comercial,24);
 		setCol($col_glosa_alerta,24);
-		for($i=0;$i<$grafico;$i++)
-			setCol($col_grafico_alerta[$i],2);
+		for($i=0;$i<$grafico;$i++) {
+			setCol($col_grafico_alerta[$i], 2);
+		}
 
 		setCol($col_deglose,18);
 		setCol($col_monto,15);
@@ -249,8 +249,9 @@
 		}
 
 		$where_alerta = '';
-		if($filtrar_contrato != 'todo')
+		if($filtrar_contrato != 'todo') {
 			$where_alerta = ' AND (contrato.limite_monto > 0 OR contrato.limite_hh > 0 OR contrato.alerta_hh > 0 OR contrato.alerta_monto > 0)';
+		}
 
 		++$filas;
 		$query = "SELECT contrato.id_contrato,
@@ -276,14 +277,17 @@
 		function addAlerta(&$res,$codigo_cliente,$glosa_cliente,$id_contrato,$contrato,$asuntos,$encargado,$alerta)
 		{
 			global $espacio;
-			if($alerta==null)
+			if($alerta==null) {
 				return 0;
+			}
 
 			//Creo el cliente
-			if(!isset($res[$codigo_cliente]))
-				$res[$codigo_cliente] = array('glosa'=>$glosa_cliente,'filas'=>0,'contratos'=>array());
-			if(!isset($res[$codigo_cliente]['contratos'][$id_contrato]))
-				$res[$codigo_cliente]['contratos'][$id_contrato] = array('glosa'=>$contrato,'asuntos'=>$asuntos,'encargado'=>$encargado,'filas'=>0,'alertas'=>array());
+			if(!isset($res[$codigo_cliente])) {
+				$res[$codigo_cliente] = array('glosa' => $glosa_cliente, 'filas' => 0, 'contratos' => array());
+			}
+			if(!isset($res[$codigo_cliente]['contratos'][$id_contrato])) {
+				$res[$codigo_cliente]['contratos'][$id_contrato] = array('glosa' => $contrato, 'asuntos' => $asuntos, 'encargado' => $encargado, 'filas' => 0, 'alertas' => array());
+			}
 
 			$res[$codigo_cliente]['contratos'][$id_contrato]['alertas'][] = $alerta;
 			//Cada fila ocupa $espacio filas
@@ -294,9 +298,11 @@
 		{
 			global $grafico,$filtrar_contrato;
 
-			if($filtrar_contrato == 'en_alerta')
-				if($tope > $monto)
+			if($filtrar_contrato == 'en_alerta') {
+				if ($tope > $monto) {
 					return null;
+				}
+			}
 
 			$alerta = array();
 			$alerta['glosa'] = $tipo;
@@ -396,18 +402,23 @@
 
 					//Grafico monto
 					$f = $formato_grafico_monto;
-					if($alerta['monto'] > $alerta['tope'])
+					if($alerta['monto'] > $alerta['tope']) {
 						$f = $formato_grafico_monto_sobrepasado;
-					for($k = 0; $k<$alerta['grafico_monto'];$k++)
-						$ws1->write($filas_contrato+$j*$espacio,$col_grafico+$k,'',$f);
-					if($alerta['grafico_monto'])
-						$ws1->mergeCells($filas_contrato+$j*$espacio,$col_grafico,$filas_contrato+$j*$espacio,$col_grafico+$k-1);
+					}
+					for($k = 0; $k<$alerta['grafico_monto'];$k++) {
+						$ws1->write($filas_contrato + $j * $espacio, $col_grafico + $k, '', $f);
+					}
+					if($alerta['grafico_monto']) {
+						$ws1->mergeCells($filas_contrato + $j * $espacio, $col_grafico, $filas_contrato + $j * $espacio, $col_grafico + $k - 1);
+					}
 
 					//Grafico alerta
-					for($k = 0; $k<$alerta['grafico_tope'];$k++)
-						$ws1->write($filas_contrato+$j*$espacio+1,$col_grafico+$k,'',$formato_grafico_alerta);
-					if($alerta['grafico_tope'])
-						$ws1->mergeCells($filas_contrato+$j*$espacio+1,$col_grafico,$filas_contrato+$j*$espacio+1,$col_grafico+$k-1);
+					for($k = 0; $k<$alerta['grafico_tope'];$k++) {
+						$ws1->write($filas_contrato + $j * $espacio + 1, $col_grafico + $k, '', $formato_grafico_alerta);
+					}
+					if($alerta['grafico_tope']) {
+						$ws1->mergeCells($filas_contrato + $j * $espacio + 1, $col_grafico, $filas_contrato + $j * $espacio + 1, $col_grafico + $k - 1);
+					}
 
 					//Deglose
 					$ws1->write($filas_contrato+$j*$espacio,$col_deglose,__('Ingresado:'),$txt_right);
@@ -508,7 +519,7 @@
 	</tr>
 </table>
 </form>
-<?
+<?php
 	echo(InputId::Javascript($sesion));
 	$pagina->PrintBottom();
 ?>

@@ -6,30 +6,29 @@
  * * Muestra: cobro.forma_cobro o Indefinido
  * * Ordena por: cobro.forma_cobro o Indefinido
  *
- * M√°s info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Forma-Cobro
+ * M·s info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Agrupador:-Forma-Cobro
  */
 class FormaCobroGrouper extends AbstractGrouperTranslator {
 
 	/**
-	 * Obtiene el campo por el cual se agrupar√° la query
+	 * Obtiene el campo por el cual se agrupar· la query
 	 * @return String Campo por el que se agrupa en par tabla.campo o alias
 	 */
 	function getGroupField() {
-		$undefined = $this->getUndefinedField();
-		return "IFNULL(cobro.forma_cobro, {$undefined})";
+		return "IFNULL(cobro.forma_cobro, contrato.forma_cobro)";
 	}
 
 	/**
-	 * Obtiene el campo de grupo que se devolver√° en el SELECT de la query
-	 * @return String par tabla.campo o alias de funci√≥n
+	 * Obtiene el campo de grupo que se devolver· en el SELECT de la query
+	 * @return String par tabla.campo o alias de funciÛn
 	 */
 	function getSelectField() {
 		return $this->getGroupField();
 	}
 
 	/**
-	 * Obtiene el campo de grupo por el cual se ordenar√° la query
-	 * @return String par tabla.campo o alias de funci√≥n
+	 * Obtiene el campo de grupo por el cual se ordenar· la query
+	 * @return String par tabla.campo o alias de funciÛn
 	 */
 	function getOrderField() {
 		return $this->getGroupField();
@@ -50,8 +49,8 @@ class FormaCobroGrouper extends AbstractGrouperTranslator {
 	}
 
 	/**
-	 * Traduce los keys de agrupadores a campos para la query de Tr√°mites
-	 * Forma de cobro del tr√°mite
+	 * Traduce los keys de agrupadores a campos para la query de Tr·mites
+	 * Forma de cobro del tr·mite
 	 * @return void
 	 */
 	function translateForErrands(Criteria $Criteria) {

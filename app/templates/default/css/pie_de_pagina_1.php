@@ -1,4 +1,4 @@
-<?
+<?php
 require_once dirname(__FILE__).'/../../../conf.php';
 require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 
@@ -45,15 +45,15 @@ xmlns="http://www.w3.org/TR/REC-html40">
 </div>
 
 <div style='mso-element:header' id=h1>
-<? 
-// Busca html de header y pie de pagina 
+<?php
+// Busca html de header y pie de pagina
 if( $id_formato != '' )
 	$where = " WHERE id_formato = '$id_formato' ";
 else
 	$where = " WHERE 1=2";
-$query = "SELECT html_header, html_pie FROM cobro_rtf $where"; 
-$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh); 
-list($html_header, $html_pie) = mysql_fetch_array($resp); 
+$query = "SELECT html_header, html_pie FROM cobro_rtf $where";
+$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query,__FILE__,__LINE__,$sesion->dbh);
+list($html_header, $html_pie) = mysql_fetch_array($resp);
 
 if (empty($lang)) $lang = 'es';
 require_once Conf::ServerDir() . "/lang/$lang.php";
@@ -62,18 +62,18 @@ $html_pie = str_replace('%texto_fono%', __('Fono'), $html_pie);
 $html_pie = str_replace('%texto_piso%', __('Piso'), $html_pie);
 $html_pie = str_replace('%texto_cuarto%', __('4to'), $html_pie);
 
-// reemplacar anchores 
-$html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header); 
+// reemplacar anchores
+$html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header);
 
-?> 
+?>
 
-<p class=MsoHeader align=center style='text-align:center'> 
-	<? echo $html_header; ?> 
-</p> 
+<p class=MsoHeader align=center style='text-align:center'>
+	<?php echo $html_header; ?>
+</p>
 
-</div> 
+</div>
 
-<div style='mso-element:endnote-separator' id=es> 
+<div style='mso-element:endnote-separator' id=es>
 
 <p class=MsoNormal><span style='mso-special-character:footnote-separator'><![if !supportFootnotes]>
 
@@ -95,12 +95,12 @@ $html_header = str_replace('%img_dir%', Conf::ImgDir(), $html_header);
 
 <div style='mso-element:footer' id=f1>
 
-<?
+<?php
 $html_pie = str_replace('%img_dir%', Conf::ImgDir(), $html_pie);
 ?>
 <div class=MsoFooter align=center style='text-align:center'>
 	<span style='mso-no-proof:yes;'>
-		<? echo $html_pie; ?>
+		<?php echo $html_pie; ?>
 	</span>
 </div>
 

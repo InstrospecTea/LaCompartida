@@ -31,6 +31,16 @@ class CurrencyManager extends AbstractManager implements BaseManager {
 		return $currency;
 	}
 
+	public function getById($id_currency) {
+		try {
+			$currency = $this->CurrencyService->get($id_currency);
+		} catch (EntityNotFound $e) {
+			$currency = $this->CurrencyService->newEntity();
+		}
+
+		return $currency;
+	}
+
 	public function update(Entity $currency) {
 		return $this->CurrencyService->saveOrUpdate($currency);
 	}

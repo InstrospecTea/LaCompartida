@@ -17,9 +17,7 @@ if ($tipo_dato_comparado) {
 	$titulo_reporte = __('Gráfico de') . ' ' . __($tipo_dato) . ' ' . __('en vista por') . ' ' . __($agrupadores[0]);
 }
 
-$datos_grafico = '';
 $total = 0;
-
 
 if (!$filtros_check) {
 	$fecha_ultimo_dia = date('t', mktime(0, 0, 0, $fecha_mes, 5, $fecha_anio));
@@ -60,6 +58,11 @@ $dato = $tipo_dato;
 $filtros = compact('clientes', 'usuarios', 'tipos_asunto', 'areas_asunto',
 	'areas_usuario', 'categorias_usuario', 'encargados', 'estado_cobro',
 	'fecha_ini', 'fecha_fin', 'campo_fecha', 'dato', 'vista', 'prop', 'id_moneda');
+
+if ($filtros['vista'] == 'glosa_cliente') {
+	$filtros['vista'] = 'glosa_cliente_charts';
+}
+
 $reporte->setFiltros($filtros);
 $reporte->Query();
 $r = $reporte->toBars();
@@ -85,8 +88,6 @@ if ($tipo_dato_comparado) {
 		arsort($r);
 	}
 
-	$datos_grafico .= "&compara=1&unidadC=" . $tipo_dato_comparado;
-
 	$valores_comparados = array();
 	foreach ($r as $id => $fila) {
 		if (is_array($fila)) {
@@ -105,7 +106,7 @@ $valores = array();
 $labels = array();
 foreach ($r as $id => $fila) {
 	if (is_array($fila)) {
-		$labels[] = urlencode($fila['label']);
+		$labels[] = substr($fila['label'], 0, 16);
 		$valores[] = str_replace(',', '.', $fila['valor']);
 		$existen_datos = true;
 	}
@@ -146,15 +147,6 @@ if ($limite) {
 	}
 }
 
-foreach ($labels as $label) {
-	$datos_grafico .= "&n[]=" . ($label);
-}
-
-$datos_grafico .= "&t=" . implode(',', $valores);
-
-if ($tipo_dato_comparado) {
-	$datos_grafico .= "&c=" . implode(',', $valores_comparados);
-}
 
 $html_info = '<style type="text/css">
 		@media print {
@@ -166,32 +158,393 @@ $html_info = '<style type="text/css">
 
 switch ($tipo_grafico) {
 	case 'barras': {
-			$datos_grafico .= "&p=" . $r['promedio'];
-			$url = "graficos/barras_reporte_avanzado.php?titulo=" . $titulo_reporte . $datos_grafico . "&unidad=" . $tipo_dato . "&moneda=" . $id_moneda;
-			$elemento = "<iframe name=planilla id=planilla src='$url'  frameborder=0 width=720px height=460px></iframe>";
+		graficoBarras($titulo_reporte, $labels, $valores, $valores_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda);
 			break;
 		}
 	case 'dispersion': {
-			$url = "graficos/dispersion_reporte_avanzado.php?titulo=" . $titulo_reporte . $datos_grafico . "&unidad=" . $tipo_dato . "&moneda=" . $id_moneda;
-			$elemento .= "<iframe name=planilla id=planilla src='$url'  frameborder=0 width=720px height=560px></iframe> ";
+		graficoLinea($titulo_reporte, $labels, $valores, $valores_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda);
 			break;
 		}
 	case 'circular': {
-			$url = "graficos/circular_reporte_avanzado.php?titulo=" . $titulo_reporte . $datos_grafico . "&unidad=" . $tipo_dato . "&moneda=" . $id_moneda;
-			$elemento .= "<img name=planilla id=planilla src='$url' alt='' />";
+		graficoTarta($titulo_reporte, $labels, $valores, $tipo_dato, $id_moneda);
 			break;
 		}
 }
 
-$html_info .= "<div id='print_link' align=right>";
-$html_info .= "<a href='javascript:void(0)' onclick='window.print()'>" . __('Imprimir') . "</a> | ";
-$html_info .= "<a href='$url" . '&imp_pdf=1' . "'>" . __('Guardar PDF') . "</a>";
-$html_info .= "</div>";
+function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
+	global $sesion;
+	$grafico = new TTB\Graficos\Grafico();
+	$dataset = new TTB\Graficos\Dataset();
 
-$html_info .= $elemento;
+	$LanguageManager = new LanguageManager($sesion);
+	$CurrencyManager = new CurrencyManager($sesion);
 
-if (!$existen_datos) {
-	$html_info = " <h2> No se existen Datos del Tipo elegido para este Periodo. </h2> ";
+	$datatypes = getDatatypes($tipo_dato, $sesion, $id_moneda);
+	foreach ($datos as $key => $value) {
+		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
+			$leyend_value = Format::number($value);
+			$language_code = strtolower(Conf::read('Idioma'));
+			$language = $LanguageManager->getByCode($language_code);
+			$separators = [
+				'decimales' => $language->get('separador_decimales'),
+				'miles' => $language->get('separador_miles')
+			];
+		} else {
+			$leyend_value = Format::currency($value, $id_moneda);
+			$currency = $CurrencyManager->getById($id_moneda);
+			$separators = [
+				'decimales' => $currency->get('separador_decimales'),
+				'miles' => $currency->get('separador_miles')
+			];
+		}
+
+		$labels_tooltips[] = "{$leyend_value} {$datatypes['symbol_datatype']}";
+	}
+
+	$yAxes[] = [
+		'type' => 'linear',
+		'display' => true,
+		'position' => 'left',
+		'id' => 'y-axis-1',
+		'gridLines' => [
+			'display' => false
+		],
+		'labels' => [
+			'show' => true
+		],
+		'scaleLabel' =>[
+			'display' => true,
+			'labelString' => Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda)
+		],
+		'ticks' => [
+			'beginAtZero' => true,
+			'callback' => $separators
+		]
+	];
+
+	$dataset->setType('bar')
+		->setLabel(__($tipo_dato))
+		->setYAxisID('y-axis-1')
+		->setData($datos);
+
+	$grafico->setNameChart($titulo)
+		->addDataset($dataset)
+		->addLabels($labels);
+
+	if ($datos_comparados) {
+		if (strcmp(Reporte::sTipoDato($tipo_dato), Reporte::sTipoDato($tipo_dato_comparado)) !== 0) {
+			$option_display = true;
+			$dataset_comparado = new TTB\Graficos\DatasetLine();
+			$dataset_comparado->setType('line')
+			->setYAxisID('y-axis-2')
+			->setLabel(__($tipo_dato_comparado))
+			->setBackgroundColor(39, 174, 96, 0.5)
+			->setBorderColor(39, 174, 96, 0.8)
+			->setPointHoverBackgroundColor(39, 174, 96, 0.75)
+			->setPointHoverBorderColor(39, 174, 96, 1)
+		  ->setData($datos_comparados);
+		} else {
+			$option_display = false;
+			$dataset_comparado = new TTB\Graficos\Dataset();
+			$dataset_comparado->setType('bar')
+			->setYAxisID('y-axis-2')
+			->setLabel(__($tipo_dato_comparado))
+			->setBackgroundColor(39, 174, 96, 0.5)
+			->setBorderColor(39, 174, 96, 0.8)
+			->setHoverBackgroundColor(39, 174, 96, 0.75)
+			->setHoverBorderColor(39, 174, 96, 1)
+			->setData($datos_comparados);
+		}
+
+		$grafico->addDataset($dataset_comparado);
+
+		$datatypes = getDatatypes($tipo_dato_comparado, $sesion, $id_moneda);
+		foreach ($datos_comparados as $key => $value) {
+			if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
+				$leyend_value = Format::number($value);
+				$language_code = strtolower(Conf::read('Idioma'));
+				$language = $LanguageManager->getByCode($language_code);
+				$separators = [
+					'decimales' => $language->get('separador_decimales'),
+					'miles' => $language->get('separador_miles')
+				];
+			} else {
+				$leyend_value = Format::currency($value, $id_moneda);
+				$currency = $CurrencyManager->getById($id_moneda);
+				$separators = [
+					'decimales' => $currency->get('separador_decimales'),
+					'miles' => $currency->get('separador_miles')
+				];
+			}
+
+			$labels_tooltips_comparado[] = "{$leyend_value} {$datatypes['symbol_datatype']}";
+		}
+
+		$yAxes[] = [
+			'type' => 'linear',
+			'display' => $option_display,
+			'position' => 'right',
+			'id' => 'y-axis-2',
+			'gridLines' => [
+				'display' => false
+			],
+			'labels' => [
+				'show' => true
+			],
+			'scaleLabel' =>[
+				'display' => true,
+				'labelString' => Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda)
+			],
+			'ticks' => [
+				'beginAtZero' => true,
+				'callback' => $separators
+			]
+		];
+	}
+
+	foreach ($labels_tooltips as $key => $value) {
+		$labels_tooltips_callback[] = [$value, $labels_tooltips_comparado[$key]];
+	}
+
+	$options = [
+		'responsive' => true,
+		'tooltips' => [
+			'mode' => 'label',
+			'callbacks' => [
+				'label' => $labels_tooltips_callback,
+			]
+		],
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => Convert::utf8($titulo)
+		],
+		'scales' => [
+			'xAxes' => [[
+				'display' => true,
+				'gridLines' => [
+					'display' => false
+				],
+				'labels' => [
+					'show' => true,
+				]
+			]],
+			'yAxes' => $yAxes
+		]
+	];
+
+	$grafico->setOptions($options);
+
+	echo $grafico->getJson();
 }
 
-echo $html_info;
+function graficoTarta($titulo, $labels, $datos, $tipo_dato, $id_moneda) {
+	global $sesion;
+	$grafico = new TTB\Graficos\Grafico();
+	$dataset = new TTB\Graficos\DatasetPie();
+
+	$dataset->setData(array_values($datos))
+	->setLabel(__('Resumen actividades profesionales'))
+	->setBorderColor(255, 255, 255, 0)
+	->setHoverBorderColor(255, 255, 255, 0);
+
+	array_walk($labels, function(&$labels) {
+		$labels = Convert::utf8($labels);
+	});
+
+	$labels_leyend = [];
+	$total = array_sum($datos);
+	$datatypes = getDatatypes($tipo_dato, $sesion, $id_moneda);
+
+	foreach ($datos as $key => $value) {
+		$percentage = round(((floatval($value) / $total) * 100), 2);
+		$percentage = Format::number($percentage);
+		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
+			$leyend_value = Format::number($value);
+		} else {
+			$leyend_value = Format::currency($value, $id_moneda);
+		}
+
+		$labels_leyend[] = "{$labels[$key]}: {$leyend_value} {$datatypes['symbol_datatype']} ({$percentage}%)";
+		$labels_leyend_tooltips[] = [
+			$labels[$key],
+			"{$leyend_value} {$datatypes['symbol_datatype']} ({$percentage}%)"
+		];
+	}
+
+	$options = [
+		'legend' => [
+			'display' => true,
+			'position' => 'bottom'
+		],
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => Convert::utf8($titulo)
+		],
+		'tooltips' => [
+			'mode' => 'label',
+			'callbacks' => [
+				'label' => $labels_leyend_tooltips,
+			]
+		]
+	];
+
+	$grafico->setNameChart($titulo)
+		->setType('pie')
+		->addLabels($labels_leyend)
+		->addDataset($dataset)
+		->setOptions($options);
+
+	echo $grafico->getJson();
+}
+
+function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $tipo_dato_comparado, $id_moneda) {
+	global $sesion;
+	$grafico = new TTB\Graficos\Grafico();
+	$datasetLinea = new TTB\Graficos\DatasetLine();
+	$datasetLineaComparado = new TTB\Graficos\DatasetLine();
+
+	$LanguageManager = new LanguageManager($sesion);
+	$CurrencyManager = new CurrencyManager($sesion);
+
+	$datasetLinea->setLabel(__($tipo_dato))
+		->setType('line')
+		->setYAxisID('y-axis-1')
+		->setData($datos);
+
+	$datatypes = getDatatypes($tipo_dato, $sesion, $id_moneda);
+	foreach ($datos as $key => $value) {
+		if (strcmp($datatypes['datatype'], 'Hr.') === 0) {
+			$leyend_value = Format::number($value);
+			$language_code = strtolower(Conf::read('Idioma'));
+			$language = $LanguageManager->getByCode($language_code);
+			$separators = [
+				'decimales' => $language->get('separador_decimales'),
+				'miles' => $language->get('separador_miles')
+			];
+		} else {
+			$leyend_value = Format::currency($value, $id_moneda);
+			$currency = $CurrencyManager->getById($id_moneda);
+			$separators = [
+				'decimales' => $currency->get('separador_decimales'),
+				'miles' => $currency->get('separador_miles')
+			];
+		}
+
+		$labels_leyend[] = "{$leyend_value} {$datatypes['symbol_datatype']}";
+	}
+
+	$datasetLineaComparado->setLabel(__($tipo_dato_comparado))
+		->setType('line')
+		->setYAxisID('y-axis-2')
+		->setBackgroundColor(39, 174, 96, 0.5)
+		->setBorderColor(39, 174, 96, 0.8)
+		->setData($datos_comparados);
+
+	$datatypes_comparado = getDatatypes($tipo_dato_comparado, $sesion, $id_moneda);
+	foreach ($datos_comparados as $key => $value) {
+		if (strcmp($datatypes_comparado['datatype'], 'Hr.') === 0) {
+			$leyend_value = Format::number($value);
+			$language_code = strtolower(Conf::read('Idioma'));
+			$language = $LanguageManager->getByCode($language_code);
+			$separators_comparado = [
+				'decimales' => $language->get('separador_decimales'),
+				'miles' => $language->get('separador_miles')
+			];
+		} else {
+			$leyend_value = Format::currency($value, $id_moneda);
+			$currency = $CurrencyManager->getById($id_moneda);
+			$separators_comparado = [
+				'decimales' => $currency->get('separador_decimales'),
+				'miles' => $currency->get('separador_miles')
+			];
+		}
+
+		$labels_leyend_comparado[] = "{$leyend_value} {$datatypes_comparado['symbol_datatype']}";
+	}
+
+	$yAxes[] = [
+		'type' => 'linear',
+		'display' => true,
+		'position' => 'left',
+		'stacked' => true,
+		'id' => 'y-axis-1',
+		'gridLines' => [
+			'display' => false
+		],
+		'labels' => [
+			'show' => true
+		],
+		'scaleLabel' =>[
+			'display' => true,
+			'labelString' => Reporte::simboloTipoDato($tipo_dato, $sesion, $id_moneda)
+		],
+		'ticks' => [
+			'beginAtZero' => true,
+			'callback' => $separators
+		]
+	];
+
+	$yAxes[] = [
+		'type' => 'linear',
+		'display' => true,
+		'position' => 'right',
+		'id' => 'y-axis-2',
+		'gridLines' => [
+			'display' => false
+		],
+		'labels' => [
+			'show' => true
+		],
+		'scaleLabel' =>[
+			'display' => true,
+			'labelString' => Reporte::simboloTipoDato($tipo_dato_comparado, $sesion, $id_moneda)
+		],
+		'ticks' => [
+			'beginAtZero' => true,
+			'callback' => $separators_comparado
+		]
+	];
+
+	foreach ($labels_leyend as $key => $value) {
+		$labels_leyend_callback[] = [$value, $labels_leyend_comparado[$key]];
+	}
+
+	$options = [
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => Convert::utf8($titulo)
+		],
+		'scales' => [
+			'yAxes' => $yAxes
+		],
+		'tooltips' => [
+			'mode' => 'label',
+			'callbacks' => [
+				'label' => $labels_leyend_callback,
+			]
+		],
+	];
+
+	$grafico->setNameChart($titulo)
+		->setType('line')
+		->addLabels($labels)
+		->addDataset($datasetLinea)
+		->addDataset($datasetLineaComparado)
+		->setOptions($options);
+
+	echo $grafico->getJson();
+}
+
+function getDatatypes($datatype, $sesion, $id_currency) {
+	$s_datatype = Reporte::sTipoDato($datatype);
+	$symbol_datatype = Reporte::simboloTipoDato($datatype, $sesion, $id_currency);
+	$symbol_datatype = Convert::utf8($symbol_datatype);
+
+	return array(
+		'datatype' => $s_datatype,
+		'symbol_datatype' => $symbol_datatype
+	);
+}

@@ -194,7 +194,7 @@ PasswordStrength::PrintCSS("180px");
 								correos no deseados.
 								<br /><br />
 								Dependiendo del proveedor de correo o software que está usando, será necesario agregar a
-								<strong><?php echo Conf::GetConf($Sesion, 'UsernameMail'); ?></strong> a su lista de contactos o a
+								<strong><?= Conf::emailSender(); ?></strong> a su lista de contactos o a
 								la "lista aceptada" de correos, también puede marcar que el mail de <strong>TimeBilling</strong> no
 								es <strong>spam</strong>.
 							</td>

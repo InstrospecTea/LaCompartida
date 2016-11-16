@@ -1,6 +1,6 @@
-<?
+<?php
 	require_once dirname(__FILE__).'/../conf.php';
-	
+
 	require_once Conf::ServerDir().'/interfaces/excel/components/reader.php';
 	require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
 	require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
@@ -8,7 +8,7 @@
 	require_once Conf::ServerDir().'/../fw/classes/Html.php';
 	require_once Conf::ServerDir().'/classes/UsuarioExt.php';
 	require_once Conf::ServerDir().'/classes/Migracion.php';
-	
+
 	require_once Conf::ServerDir().'/classes/Excel.php';
 	require_once Conf::ServerDir().'/../fw/classes/Buscador.php';
 
@@ -33,7 +33,7 @@
 		}
 		$e = new Excel($sesion,$nombre_archivo,$insertar,$id_usuario);
 		$e->LeerTodo();
-		
+
 		switch($tipo_dato) {
 			case 'usuario': $migracion->Query2ObjetoUsuario($e->datos,'excel'); break;
 			case 'cliente': $migracion->Query2ObjetosCliente($e->datos,'excel'); break;

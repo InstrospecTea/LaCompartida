@@ -927,4 +927,102 @@ jQuery(document).ready(function() {
 		selector = '.submit_options.' + el.attr('rel');
 		jQuery(selector).show();
 	});
+
+	jQuery('#barras').on('click', function() {
+		render_chart('barras');
+
+});
+
+	jQuery('#circular').on('click', function() {
+		render_chart('circular');
+	});
+
+	jQuery('#dispersion').on('click', function() {
+		render_chart('dispersion');
+	});
+
+	function render_chart(type_chart){
+		var vista = [];
+		jQuery('#agrupadores select:visible').each(function(i) {
+			vista[i] = jQuery(this).val();
+		});
+		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="' + type_chart +'" />');
+		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista.toString().replace(',', '-') + '" />');
+
+		var charts_data = [{
+			'url': 'reporte_avanzado_grafico.php',
+			'data': jQuery('#formulario').serialize()
+		}];
+		graphic.render('#iframereporte', charts_data);
+	}
+
+	jQuery(document).on('click', '#btn_imprimir', function() {
+		var oldClassDropLine = document.getElementById('droplinetabs1').className;
+		var oldClassFdMenus = document.getElementById('fd_menu_grey').className;
+		var oldClassZenbox = document.getElementById('zenbox_tab').className;
+
+		document.getElementById('droplinetabs1').className += ' no-print';
+		document.getElementById('fd_menu_grey').className += ' no-print';
+		document.getElementById('zenbox_tab').className += ' no-print';
+
+		window.print();
+
+		document.getElementById('droplinetabs1').className = oldClassDropLine;
+		document.getElementById('fd_menu_grey').className = oldClassFdMenus;
+		document.getElementById('zenbox_tab').className = oldClassZenbox;
+	});
+
+	jQuery(document).on('click', '#btn_pdf', function() {
+		html2canvas(document.getElementById('iframereporte'), {
+			onrendered: function (canvas) {
+				var doc = new jsPDF();
+				doc.addImage(canvas.toDataURL('image/png'), 'png', -10, 0);
+				doc.save('grafico_reporte_avanzado.pdf');
+			}
+		});
+	});
+
+	function agregarCanvas(id, contenedor, leyenda) {
+		leyenda = leyenda || false;
+
+		var div = document.createElement('div');
+		var canvas = document.createElement('canvas');
+		var botonera = document.createElement('div');
+		var imprimir = document.createElement('button');
+		var pdf = document.createElement('button');
+
+		canvas.width = 600;
+		canvas.height = 400;
+		canvas.style.margin = '10px';
+		canvas.id = 'grafico_' + id;
+
+		botonera.id = 'botonera';
+
+		imprimir.id = 'btn_imprimir';
+		imprimir.className = 'botones_gaficos';
+		imprimir.appendChild(document.createTextNode('Imprimir'));
+		botonera.appendChild(imprimir);
+
+		pdf.id = 'btn_pdf';
+		pdf.className = 'botones_gaficos';
+		pdf.appendChild(document.createTextNode('PDF'));
+		botonera.appendChild(pdf);
+
+		div.id = 'contenedor_grafico_' + id;
+		div.className = 'contenedorCanvas';
+
+		div.appendChild(document.createElement('h3'));
+		div.appendChild(botonera);
+		div.appendChild(canvas);
+
+		if (leyenda) {
+			var divLeyenda = document.createElement('div');
+			divLeyenda.id = 'leyenda';
+			divLeyenda.className = 'chart-legend';
+
+			div.appendChild(divLeyenda);
+		}
+
+		contenedor.append(div);
+	}
 });

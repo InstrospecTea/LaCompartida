@@ -234,12 +234,13 @@ if ($accion == "consistencia_cliente_asunto") {
 			  LEFT JOIN usuario_tarifa AS ut ON ( ut.id_moneda = c.id_moneda AND ut.id_usuario = u.id_usuario AND co.id_tarifa = ut.id_tarifa )
 			WHERE c.id_cobro = {$id_cobro} AND ( ut.tarifa = 0 OR ut.tarifa = '' OR ut.tarifa IS NULL)";
 	}
+
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
 	$respuesta = array();
 	while ($fila = mysql_fetch_assoc($resp)) {
 		$respuesta[] = $fila;
 	}
-	echo json_encode($respuesta);
+	echo json_encode(UtilesApp::utf8izar($respuesta));
 } else if ($accion == 'set_duracion_defecto') {
 	$query = "SELECT duracion_defecto, trabajo_si_no_defecto FROM tramite_tipo WHERE id_tramite_tipo = '{$id}'";
 	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);

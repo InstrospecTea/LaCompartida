@@ -356,7 +356,7 @@ for ($j = 0; $j < $lista_suntos_liquidar->num; $j++) {
 	}
 
 	$tipo_cambio = sprintf('0%.f', $tipo_cambio);
-	$codigo_factura = split('-', $codigo_factura);
+	$codigo_factura = explode('-', $codigo_factura);
 	if (count($codigo_factura) > 1) {
 		$codigo_factura = $codigo_factura[0] . '-' . sprintf('%d', $codigo_factura[1]);
 	} else {

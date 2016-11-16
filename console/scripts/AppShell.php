@@ -1,9 +1,11 @@
 <?php
 
+use TTB\Debug;
 abstract class AppShell {
 
 	public $debug;
 	public $data;
+	private $loadedClass = array();
 	private $time_start;
 
 	protected $Session;
@@ -23,7 +25,7 @@ abstract class AppShell {
 	 * @param string $text
 	 */
 	public function out($text) {
-		echo "{$text}\n";
+		Debug::pr($text);
 	}
 
 	/**

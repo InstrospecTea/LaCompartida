@@ -1,79 +1,135 @@
 <?php
+	require_once dirname(__FILE__).'/../../conf.php';
 
-require_once "GraficoBarras.php";
-require_once "../../../fw/classes/Sesion.php";
-require_once "../../../fw/classes/Utiles.php";
+	$sesion = new Sesion();
+	$Criteria = new Criteria($sesion);
 
-$sesion = new Sesion();
+	if (is_array($usuarios)) {
+		$Criteria->add_restriction(
+			CriteriaRestriction::in('trabajo.id_usuario', $usuarios)
+		);
+	}
 
-$Criteria = new Criteria($sesion);
+	if($solo_activos) {
+		$Criteria->add_restriction(
+			CriteriaRestriction::equals('usuario.activo ', 1)
+		);
+	}
 
-if (!empty($usuarios)) {
-	$Criteria->add_restriction(
-		CriteriaRestriction::in('trabajo.id_usuario', explode(',', $usuarios))
-	);
-}
+	if(is_array($clientes)) {
+		$Criteria->add_restriction(
+			CriteriaRestriction::in('cliente.codigo_cliente', $clientes)
+		);
+	}
 
-if($solo_activos) {
-	$Criteria->add_restriction(
-		CriteriaRestriction::equals('usuario.activo ', 1)
-	);
-}
+	$total_tiempo = 0;
 
-if(!empty($clientes)) {
-	$Criteria->add_restriction(
-		CriteriaRestriction::in('cliente.codigo_cliente', explode(',', $clientes))
-	);
-}
-
-$total_tiempo = 0;
-
-$Criteria
-	->add_select('asunto.codigo_asunto')
-	->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
-	->add_from('trabajo')
-	->add_inner_join_with(
+	$Criteria
+		->add_select('asunto.codigo_asunto')
+		->add_select('asunto.glosa_asunto')
+		->add_select('SUM(TIME_TO_SEC(duracion))/3600', 'tiempo')
+		->add_from('trabajo')
+		->add_inner_join_with(
 			'usuario',
 			CriteriaRestriction::equals('usuario.id_usuario', 'trabajo.id_usuario')
 		)
-	->add_inner_join_with(
+		->add_inner_join_with(
 			'asunto',
 			CriteriaRestriction::equals('asunto.codigo_asunto', 'trabajo.codigo_asunto')
 		)
-	->add_inner_join_with(
+		->add_inner_join_with(
 			'cliente',
 			CriteriaRestriction::equals('cliente.codigo_cliente', 'asunto.codigo_cliente')
 		)
-	->add_restriction(
-			CriteriaRestriction::between('trabajo.fecha', "'{$fecha_ini}'", "'{$fecha_fin}'")
+		->add_restriction(
+			CriteriaRestriction::between('trabajo.fecha', "'" . Utiles::fecha2sql($fecha_ini) . "'", "'" . Utiles::fecha2sql($fecha_fin) . "'")
 		)
-	->add_grouping('asunto.codigo_asunto')
-	->add_ordering('tiempo', 'DESC')
-	->add_limit(14, 0);
+		->add_grouping('asunto.codigo_asunto')
+		->add_ordering('tiempo', 'DESC')
+		->add_limit(14, 0);
 
-$resp = $Criteria->run();
+	try {
+		$respuesta = $Criteria->run();
+	} catch(Exception $e) {
+		error_log('Error al ejecutar la SQL');
+	}
 
-foreach ($resp as $i => $fila) {
-	$asunto[$i] = $fila[codigo_asunto];
-	$tiempo[$i] = $fila[tiempo];
-	$total_tiempo += $fila[tiempo];
-}
+	foreach ($respuesta as $i => $fila) {
+		$asunto[] = $fila['codigo_asunto'];
+		$glosa_asunto[] = [Convert::utf8($fila['glosa_asunto'])];
+		$tiempo[] = $fila['tiempo'];
+		$tiempo_formateado = Format::number($fila['tiempo']);
+		$tiempo_tooltip[] = ["{$tiempo_formateado} Hrs."];
+		$total_tiempo += $fila['tiempo'];
+	}
 
-#Create a XYChart object of size 300 x 240 pixels
-$c = new GraficoBarras();
+	$grafico = new TTB\Graficos\Grafico();
+	if (is_null($tiempo)) {
+		echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
+		return;
+	}
 
-#Add a title to the chart using 10 pt Arial font
-$c->Titulo(sprintf("Horas trabajadas por %s / %s - %s (Sólo 14 más relevantes)", __('asunto'), Utiles::sql2date($fecha_ini), Utiles::sql2date($fecha_fin) ));
+	$LanguageManager = new LanguageManager($sesion);
+	$language_code = strtolower(Conf::read('Idioma'));
+	$language = $LanguageManager->getByCode($language_code);
+	$separators = [
+		'decimales' => $language->get('separador_decimales'),
+		'miles' => $language->get('separador_miles')
+	];
 
-#Add a title to the y-axis
-$c->Ejes(__('Asunto'),"Horas");
+	$dataset = new TTB\Graficos\Dataset();
 
-#Set the x axis labels
-$c->Labels($asunto);
+	$options = [
+		'responsive' => true,
+		'tooltips' => [
+			'mode' => 'label',
+			'callbacks' => [
+				'afterTitle' => $glosa_asunto,
+				'label' => $tiempo_tooltip
+			]
+		],
+		'title' => [
+			'display' => true,
+			'fontSize' => 14,
+			'text' => __('Horas trabajadas por asunto')
+		],
+		'scales' => [
+			'xAxes' => [[
+				'display' => true,
+				'gridLines' => [
+					'display' => false
+				],
+				'labels' => [
+					'show' => true,
+				]
+			]],
+			'yAxes' => [[
+				'type' => 'linear',
+				'display' => true,
+				'position' => 'left',
+				'id' => 'y-axis-1',
+				'gridLines' => [
+					'display' => false
+				],
+				'labels' => [
+					'show' => true
+				],
+				'ticks' => [
+					'beginAtZero' => true,
+					'callback' => $separators
+				]
+			]]
+		]
+	];
 
-$c->layer->addDataSet($tiempo, 0xff8080,__('Horas trabajadas').': '.$total_tiempo);
-#$layer->addDataSet($terminados, 0x80ff80, "Terminadas");
+	$dataset->setType('bar')
+		->setYAxisID('y-axis-1')
+		->setLabel(__('Horas trabajadas por asunto'))
+		->setData($tiempo);
 
-#output the chart
-$c->Imprimir();
-?>
+	$grafico->setNameChart(__('Horas trabajadas por asunto'))
+		->addDataset($dataset)
+		->setOptions($options)
+		->addLabels($asunto);
+
+	echo $grafico->getJson();

@@ -578,6 +578,19 @@ $agrupadores = explode('-', $vista);
 			display: none;
 		}
 	}
+	.chart-legend li {
+		list-style-type: none;
+		margin: 5px;
+		display: inline-block;
+		text-align: left;
+		width: 125px;
+	}
+	.chart-legend li span {
+		display: inline-block;
+		width: 12px;
+		height: 12px;
+		margin-right: 5px;
+	}
 </style>
 
 <?php if (!$popup) { ?>
@@ -715,11 +728,11 @@ $agrupadores = explode('-', $vista);
 					</tr>
 					<tr>
 						<td align="left"><input type="checkbox" name="area_y_categoria" id="area_y_categoria" value="1" <?php echo $area_y_categoria ? 'checked="checked"' : '' ?> onclick="Categorias(this, this.form);" title="Seleccionar área y categoría" />&nbsp;<span style="font-size:9px"><label for="area_y_categoria"><?php echo __('Seleccionar área y categoría') ?></label</span></td>
-						<td align=right>&nbsp;</td>
-						<td align=left colspan=2>
-							<input type=button class=btn value="<?php echo __('Generar planilla') ?>" onclick="Generar(this.form, 'print')" />
-							<input type=button class=btn value="<?php echo __('Imprimir') ?>" onclick="Generar(this.form, 'op');">
-							<input type=button class=btn value="<?php echo __('Generar Gráfico') ?>" onclick="Generar(this.form, 'grafico');">
+						<td align="right">&nbsp;</td>
+						<td align="left" colspan="2">
+							<input type="button" class="btn" value="<?php echo __('Generar planilla') ?>" onclick="Generar(this.form, 'print')" />
+							<input type="button" class="btn" value="<?php echo __('Imprimir') ?>" onclick="Generar(this.form, 'op');">
+							<input type="button" class="btn" value="<?php echo __('Generar Gráfico') ?>" onclick="Generar(this.form, 'grafico');">
 						</td>
 					</tr>
 					<tr>
@@ -1070,6 +1083,7 @@ if ($opc == 'print' || $popup) {
 			</tr>
 		</tbody>
 	</table>
+
 	<table border="1" cellpadding="3" class="planilla" id="tabla_planilla_2" width="100%">
 	</tbody>
 	<?php
@@ -1393,11 +1407,7 @@ if ($opc == 'print' || $popup) {
 }
 
 if ($opc == 'grafico') {
-	if (Conf::GetConf($sesion, 'UsaUsernameEnTodoElSistema')) {
-		$letra_profesional = 'profesional';
-	} else {
-		$letra_profesional = 'username';
-	}
+	$letra_profesional = Conf::read('UsaUsernameEnTodoElSistema') ? 'profesional' : 'username';
 
 	########## VER GRAFICO ##########
 	$titulo_reporte = __('Gráfico de') . ' ' . __($horas_sql) . ' ' . __('en vista por') . ' ' . $desc;
@@ -1483,20 +1493,38 @@ if ($opc == 'grafico') {
 
 	$datos_grafico['nombres'] = UtilesApp::utf8izar($datos_grafico['nombres']);
 	$datos_grafico_compara['nombres'] = UtilesApp::utf8izar($datos_grafico_compara['nombres']);
-
-	$datos = urlencode(base64_encode(json_encode($datos_grafico)));
+	$datos = base64_encode(json_encode($datos_grafico));
 	$datosC = '';
 	$grafico = 'grafico_resumen_actividades';
 	if ($tipo_dato_comparado) {
 		$grafico = 'grafico_barras_resumen_actividades';
-		$datosC = '&datos_compara=' . urlencode(base64_encode(json_encode($datos_grafico_compara)));
-		$datosC .= '&labels=' . urlencode(implode(',', $labels));
+		$datosC = base64_encode(json_encode($datos_grafico_compara));
+		$labels = base64_encode(json_encode($labels));
 	}
 
-	$html_info .= "<img src='graficos/{$grafico}.php?titulo=" . $titulo_reporte . '&datos=' . $datos . $datosC . "' alt='grafico' />";
-	echo $html_info;
+	echo '<div id="contenedor_graficos"></div>';
+	echo $Form->Html->script(Conf::RootDir() . '/app/layers/assets/js/graphic.js');
 }
 ?>
+<script type="text/javascript">
+	var titulo = '<?php echo $titulo_reporte; ?>';
+	var datos = '<?php echo $datos; ?>';
+	var datos_compara = '<?php echo $datosC; ?>';
+	var labels = '<?php echo $labels; ?>';
+
+	var url = 'graficos/<?php echo $grafico; ?>.php'
+	var charts_data = [{
+		'url': url,
+		'data': {
+			'datos': datos,
+			'titulo': titulo,
+			'datos_compara': datos_compara,
+			'labels': labels
+		}
+	}];
+	graphic.render('#contenedor_graficos', charts_data);
+</script>
+
 <script>
 	Calendar.setup(
 			{

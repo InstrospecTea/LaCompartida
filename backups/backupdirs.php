@@ -1,57 +1,47 @@
 #!/usr/bin/php
 <?php
-if (file_exists(dirname(__FILE__) . '/AWSSDKforPHP/sdk.class.php')) {
-	require_once dirname(__FILE__) . '/AWSSDKforPHP/sdk.class.php';
-} else {
-	require_once 'AWSSDKforPHP/sdk.class.php';
+
+require_once dirname(__FILE__) . '/autoload.php';
+require_once dirname(__FILE__) . '/../app/conf.php';
+
+$base_dir = '/var/www/virtual';
+if (!$gestor = opendir($base_dir)) {
+	echo "No se encuentra el directorio '$base_dir'.\n";
+	return;
 }
 
-if (!is_dir('/var/www/cache/S3')) {
-	mkdir('/var/www/cache/S3', 0755);
+$symlinks = [];
+
+while (false !== ($directory = readdir($gestor))) {
+	if (in_array($directory, array('.', '..', 'thetimebilling.com', 'fk.lemontech.cl', 'p1.lemontech.cl', 'cuponix.cl'))) {
+		continue;
+	}
+
+	$path = "$base_dir/{$directory}/htdocs";
+	if (is_link($path)) {
+		echo "vhost {$directory} is symlink\n";
+		$destino = readlink($path);
+		$symlinks[$path] = $destino;
+	} else if (is_dir($path) && $vhost = opendir($path)) {
+		echo "vhost $directory is dir\n";
+		while (false !== ($symlink = readdir($vhost))) {
+			if (in_array($symlink, array('.', '..', 'bk', 'update'))) {
+				continue;
+			}
+			$symlink_completo = "{$path}/{$symlink}";
+			if (is_link($symlink_completo)) {
+				$destino = readlink($symlink_completo);
+				$symlinks[$symlink_completo] = $destino;
+			}
+		}
+		closedir($vhost);
+	}
 }
-
-$S3sdk = new AmazonS3(array(
-	'key' => 'AKIAJDGKILFBFXH3Y2UA',
-	'secret' => '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',
-	'default_cache_config' => '/var/www/cache/S3')
-);
-
-$arraysymlinks = array();
-if ($gestor = opendir('/var/www/virtual/')) {
-        while (false !== ($entrada = readdir($gestor))) {
-                if (!in_array($entrada, array('.', '..', 'thetimebilling.com', 'fk.lemontech.cl', 'p1.lemontech.cl', 'cuponix.cl'))) {
-					if (is_link('/var/www/virtual/'.$entrada."/htdocs")) {
-						echo "vhost $entrada is symlink\n";
-                        $destino = readlink('/var/www/virtual/'.$entrada."/htdocs");
-                        $arraysymlinks['symlinks']['/var/www/virtual/'.$entrada."/htdocs"] = $destino;
-					} else  if (is_dir('/var/www/virtual/' . $entrada . '/htdocs') && $vhost = opendir('/var/www/virtual/' . $entrada . '/htdocs')) {
-					        echo "vhost $entrada is dir\n";
-                                while (false !== ($symlink = readdir($vhost))) {
-                                        if (!in_array($symlink, array('.', '..', 'bk', 'update'))) {
-                                                $symlinkcompleto = "/var/www/virtual/" . $entrada . "/htdocs/" . $symlink;
-                                                if (is_link($symlinkcompleto)) {
-                                                        $destino = readlink($symlinkcompleto);
-                                                        $arraysymlinks['symlinks'][$symlinkcompleto] = $destino;
-                                                } else if (is_dir($symlinkcompleto)) {
-                                                        $arraysymlinks['directorio'][$symlinkcompleto] = $symlinkcompleto;
-                                                }
-                                        }
-                                }
-                        closedir($vhost);
-                    }
-                }
-        }
-        closedir($gestor);
-}
+closedir($gestor);
 
 
 
-$crearobject = $S3sdk->create_object(
-	'TTBfiles',
-	'directorios.json',
-	array('body' => json_encode($arraysymlinks['symlinks']))
-);
+$S3 = new S3('TTBfiles');
+$S3->getFileContent('directorios.json', json_encode($symlinks));
 
-echo '<pre>';
-print_r($arraysymlinks);
-echo '</pre>';
+print_r($symlinks);

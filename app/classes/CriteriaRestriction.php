@@ -238,7 +238,7 @@ class CriteriaRestriction {
 	 * @param type $result_false
 	 * @return \CriteriaRestriction
 	 */
-	public function if_clause($condition, $result_true, $result_false) {
+	public static function if_clause($condition, $result_true, $result_false) {
 		return new CriteriaRestriction("IF({$condition}, {$result_true}, {$result_false})");
 	}
 
@@ -248,7 +248,7 @@ class CriteriaRestriction {
 	 * @param string $result
 	 * @return \CriteriaRestriction
 	 */
-	public function ifnull($column, $result) {
+	public static function ifnull($column, $result) {
 		return new CriteriaRestriction("IFNULL({$column}, {$result})");
 	}
 }

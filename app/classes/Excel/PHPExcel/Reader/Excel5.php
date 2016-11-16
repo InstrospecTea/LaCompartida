@@ -5023,22 +5023,9 @@ class PHPExcel_Reader_Excel5 implements PHPExcel_Reader_IReader
 		// offset: 2; size: sz
 		$formulaData = substr($formulaStructure, 2, $sz);
 
-		// for debug: dump the formula data
-		//echo '<xmp>';
-		//echo 'size: ' . $sz . "\n";
-		//echo 'the entire formula data: ';
-		//Debug::dump($formulaData);
-		//echo "\n----\n";
-
 		// offset: 2 + sz; size: variable (optional)
 		if (strlen($formulaStructure) > 2 + $sz) {
 			$additionalData = substr($formulaStructure, 2 + $sz);
-
-			// for debug: dump the additional data
-			//echo 'the entire additional data: ';
-			//Debug::dump($additionalData);
-			//echo "\n----\n";
-
 		} else {
 			$additionalData = '';
 		}

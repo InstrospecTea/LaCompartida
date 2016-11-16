@@ -1,5 +1,5 @@
-<?
-    require_once dirname(__FILE__).'/../conf.php';
+<?php
+   require_once dirname(__FILE__).'/../conf.php';
     require_once Conf::ServerDir().'/../fw/classes/Sesion.php';
     require_once Conf::ServerDir().'/../fw/classes/Pagina.php';
     require_once Conf::ServerDir().'/../fw/classes/Utiles.php';
@@ -17,8 +17,8 @@
 
 	if($id_usuario != '' && $opcion == 'desplegar')
 	{
-		list($a1,$m1,$d1) = split("-", $fecha1);
-        list($a2,$m2,$d2) = split("-", $fecha2);
+		list($a1,$m1,$d1) = explode("-", $fecha1);
+        list($a2,$m2,$d2) = explode("-", $fecha2);
         $fechaini=$a1."-". $m1 ."-01";
         $fechafin=$a2."-". $m2."-01";
         $periodos = ceil(($m2-$m1 + 12*($a2-$a1)));
@@ -76,7 +76,7 @@
 
 </form>
 
-<?
-    echo(InputId::Javascript($sesion));
+<?php
+   echo(InputId::Javascript($sesion));
     $pagina->PrintBottom();
 ?>
