@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.1
+Wednesday, November 16th
+* **Fix** [Modificar tamaño fuente para Excel especial PRC](https://github.com/LemontechSA/ttb/pull/1916)
+
 ## [Release 16.33.0](https://github.com/LemontechSA/ttb/pull/1915)
 Wednesday, November 16th
 * **Feature** [Migración a PHP5.6](https://github.com/LemontechSA/ttb/pull/1233)
