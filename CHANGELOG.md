@@ -1,7 +1,7 @@
 # Changelog
 ## Horfix 16.33.2
 Thursday, November 17th
-* **Fix** [Eliminar http](https://github.com/LemontechSA/ttb/pull/1921)
+* **Fix** [Eliminar http](https://github.com/LemontechSA/ttb/pull/1922)
 
 ## Hotfix 16.33.1
 Wednesday, November 16th
