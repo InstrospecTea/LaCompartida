@@ -7,7 +7,7 @@
  * * Trámites: El cliente al que pertenece el asunto del trámite.
  * * Trabajos: El cliente al que pertenece el asunto del trabajo.
  *
- * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Filtro:-Cliente
+ * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Filtro:-Grupo-Cliente
  *
  */
 class GrupoClientesFilter extends AbstractUndependantFilterTranslator {
