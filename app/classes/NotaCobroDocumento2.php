@@ -2415,7 +2415,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
 							$categoria_duracion_minutos = round($categoria_duracion_minutos % 60);
 
-							$html3 = str_replace('%duracion%', 'i weas' . sprintf('%02d:%02d', $categoria_duracion_horas, $categoria_duracion_minutos), $html3);
+							$html3 = str_replace('%duracion%', sprintf('%02d:%02d', $categoria_duracion_horas, $categoria_duracion_minutos), $html3);
 
 							if ($this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION' && Conf::GetConf($this->sesion, 'NoImprimirValorTrabajo')) {
 								$html3 = str_replace('%valor%', '', $html3);
