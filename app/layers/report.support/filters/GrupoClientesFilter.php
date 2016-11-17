@@ -3,9 +3,9 @@
  * Filtro por grupo cliente:
  *
  * * Filtra por:
- * * Cobros: El cliente al que pertenecen los asuntos del cobro.
- * * Trámites: El cliente al que pertenece el asunto del trámite.
- * * Trabajos: El cliente al que pertenece el asunto del trabajo.
+ * * Cobros: El cliente al que pertenecen los asuntos del cobro según el Grupo-Cliente.
+ * * Trámites: El cliente al que pertenece el asunto del trámite según el Grupo-Cliente.
+ * * Trabajos: El cliente al que pertenece el asunto del trabajo según el Grupo-Cliente.
  *
  * Más info en: https://github.com/LemontechSA/ttb/wiki/Reporte-Filtro:-Grupo-Cliente
  *
