@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.4
+Friday, November 18th
+* **Fix** [Agrega filtro por Grupo Cliente en Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1926)
+
 ## Hotfix 16.33.3
 Friday, November 18th
 * **Fix** [Corrige suma de horas por categoría](https://github.com/LemontechSA/ttb/pull/1925)

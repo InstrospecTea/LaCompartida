@@ -348,6 +348,7 @@ class Reporte {
 			'fecha_fin' => Utiles::fecha2sql($this->rango['fecha_fin']),
 			'usuarios' => $this->sanitizeArray($this->parametros['usuarios']),
 			'clientes' => $this->sanitizeArray($this->parametros['clientes']),
+			'grupo_clientes' => $this->sanitizeArray($this->parametros['grupo_clientes']),
 			'tipo_asunto' => $this->sanitizeArray($this->parametros['tipos_asunto']),
 			'area_asunto' => $this->sanitizeArray($this->parametros['areas_asunto']),
 			'area_usuario' => $this->sanitizeArray($this->parametros['areas_usuario']),
