@@ -13,6 +13,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	 */
 	private $allowedFilters = array(
 		'clientes',
+		'grupo_clientes',
 		'usuarios',
 		'tipos_asunto',
 		'areas_asunto',
