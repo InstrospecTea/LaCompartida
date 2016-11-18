@@ -1,4 +1,9 @@
 # Changelog
+
+## Hotfix 16.33.3
+Friday, November 18th
+* **Fix** [Corrige suma de horas por categoría](https://github.com/LemontechSA/ttb/pull/1925)
+
 ## Horfix 16.33.2
 Thursday, November 17th
 * **Fix** [Eliminar http](https://github.com/LemontechSA/ttb/pull/1922)
