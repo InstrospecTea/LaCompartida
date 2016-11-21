@@ -52,6 +52,7 @@ $_LANG['Adelanto'] = 'Adiantamento';
 $_LANG['Adelantos'] = 'Adiantamentos';
 $_LANG['adelanto'] = 'adiantamento';
 $_LANG['adelantos'] = 'adiantamentos';
+$_LANG['N° Documento'] = 'N° Documento';
 
 // Clientes
 $_LANG['Nombre Cliente'] = 'Nome do Cliente';

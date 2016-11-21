@@ -1560,7 +1560,6 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$totales['tiempo_descontado_real'] = 0;
 						$totales['valor'] = 0;
 						$categoria_duracion_horas = 0;
-						$categoria_duracion_minutos = 0;
 						$categoria_valor = 0;
 						$total_trabajos_categoria = '';
 						$encabezado_trabajos_categoria = '';
@@ -1615,6 +1614,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 								$row = str_replace('%TRABAJOS_FILAS%', '', $row);
 								$row = str_replace('%TRABAJOS_TOTAL%', '', $row);
 							}
+							$row = str_replace('%DETALLE_PROFESIONAL%', $this->GenerarDocumento2($parser, 'DETALLE_PROFESIONAL', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto), $row);
 						} else if ($this->fields['opc_mostrar_asuntos_cobrables_sin_horas'] == 1) {
 							$row = str_replace('%espacio_trabajo%', '', $row);
 							$row = str_replace('%DETALLE_PROFESIONAL%', '', $row);
@@ -1739,7 +1739,6 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$totales['tiempo_descontado_real'] = 0;
 					$totales['valor'] = 0;
 					$categoria_duracion_horas = 0;
-					$categoria_duracion_minutos = 0;
 					$categoria_valor = 0;
 					$total_trabajos_categoria = '';
 					$encabezado_trabajos_categoria = '';
@@ -1856,7 +1855,6 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$asunto->LoadByCodigo($this->asuntos[$k]);
 
 					$categoria_duracion_horas = 0;
-					$categoria_duracion_minutos = 0;
 					$categoria_valor = 0;
 					$total_trabajos_categoria = '';
 					$encabezado_trabajos_categoria = '';
@@ -2114,8 +2112,6 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				break;
 
 			case 'TRABAJOS_FILAS':
-				global $categoria_duracion_horas;
-				global $categoria_duracion_minutos;
 				global $categoria_valor;
 
 				$row_tmpl = $html;
@@ -2124,8 +2120,10 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$works = $this->ChargeData->getWorks($asunto->fields['codigo_asunto']);
 
 				$total_works = count($works);
+				$categoria_duracion = 0;
 				for ($i = 0; $i < $total_works; ++$i) {
 					$work = $works[$i];
+					$categoria_duracion_horas += $work['duracion_cobrada'];
 					$row = $row_tmpl;
 					$row = str_replace('%valor_codigo_asunto%', $work['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($work['fecha'], $idioma->fields['formato_fecha']), $row);
@@ -2282,14 +2280,12 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$row = str_replace('%valor_siempre%', number_format($work['monto_cobrado'], $moneda->fields['cifras_decimales'], $separador_decimales, $separador_miles), $row);
 
 					if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario')) {
-						$work = $works[$i + 1];
-						if (!empty($work['id_categoria_usuario'])) {
-							if ($work['id_categoria_usuario'] != $work['id_categoria_usuario']) {
+						$next_work = $works[$i + 1];
+						if (!empty($next_work['id_categoria_usuario'])) {
+							if ($work['id_categoria_usuario'] != $next_work['id_categoria_usuario']) {
 								$html3 = $parser->tags['TRABAJOS_TOTAL'];
 								$html3 = str_replace('%glosa%', __('Total'), $html3);
-								$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
-								$categoria_duracion_minutos = round($categoria_duracion_minutos % 60);
-								$html3 = str_replace('%duracion%', sprintf('%02d:%02d', $categoria_duracion_horas, $categoria_duracion_minutos), $html3);
+								$html3 = str_replace('%duracion%', Utiles::Decimal2GlosaHora($categoria_duracion_horas), $html3);
 								$html3 = str_replace('%duracion_trabajada%', sprintf('%02d:%02d', floor($categoria_duracion_trabajada), round(($categoria_duracion_trabajada * 60) % 60)), $html3);
 								$html3 = str_replace('%duracion_descontada%', sprintf('%02d:%02d', floor($categoria_duracion_descontada), round(($categoria_duracion_descontada * 60) % 60)), $html3);
 
@@ -2305,12 +2301,11 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 								$total_trabajos_categoria .= $html3;
 
 								// Permite a TRABAJOS_ENCABEZADO poner la categoría correcta reutilizando la lógica
-								$this->siguiente['categoria_abogado'] = $work['categoria'];
+								$this->siguiente['categoria_abogado'] = $next_work['categoria'];
 								$encabezado_trabajos_categoria .= $this->GenerarDocumento2($parser, 'TRABAJOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
 
 								$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria . $encabezado_trabajos_categoria, $row);
 								$categoria_duracion_horas = 0;
-								$categoria_duracion_minutos = 0;
 								$categoria_valor = 0;
 								$total_trabajos_categoria = '';
 								$encabezado_trabajos_categoria = '';
@@ -2320,10 +2315,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						} else {
 							$html3 = $parser->tags['TRABAJOS_TOTAL'];
 							$html3 = str_replace('%glosa%', __('Total'), $html3);
-							$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
-							$categoria_duracion_minutos = round($categoria_duracion_minutos % 60);
-
-							$html3 = str_replace('%duracion%', sprintf('%02d:%02d', $categoria_duracion_horas, $categoria_duracion_minutos), $html3);
+							$html3 = str_replace('%duracion%', Utiles::Decimal2GlosaHora($categoria_duracion_horas), $html3);
 							$html3 = str_replace('%duracion_trabajada%', sprintf('%02d:%02d', floor($categoria_duracion_trabajada), round(($categoria_duracion_trabajada * 60) % 60)), $html3);
 							$html3 = str_replace('%duracion_descontada%', sprintf('%02d:%02d', floor($categoria_duracion_descontada), round(($categoria_duracion_descontada * 60) % 60)), $html3);
 
@@ -2338,20 +2330,17 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							$total_trabajos_categoria .= $html3;
 							$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria, $row);
 							$categoria_duracion_horas = 0;
-							$categoria_duracion_minutos = 0;
 							$categoria_valor = 0;
 							$total_trabajos_categoria = '';
 							$encabezado_trabajos_categoria = '';
 						}
 					} else if (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
-						$trabajo_siguiente = $lista_trabajos->Get($i + 1);
-						if (!empty($trabajo_siguiente->fields['nombre_usuario'])) {
-							if ($work['nombre_usuario'] != $trabajo_siguiente->fields['nombre_usuario']) {
+						$next_work = $works[$i + 1];
+						if (!empty($next_work['nombre_usuario'])) {
+							if ($work['nombre_usuario'] != $next_work['nombre_usuario']) {
 								$html3 = $parser->tags['TRABAJOS_TOTAL'];
 								$html3 = str_replace('%glosa%', __('Subtotal'), $html3);
-								$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
-								$categoria_duracion_minutos = round($categoria_duracion_minutos % 60);
-								$html3 = str_replace('%duracion%', sprintf('%02d:%02d', $categoria_duracion_horas, $categoria_duracion_minutos), $html3);
+								$html3 = str_replace('%duracion%', Utiles::Decimal2GlosaHora($categoria_duracion_horas), $html3);
 
 								if (Conf::GetConf($this->sesion, 'NoImprimirValorTrabajo') && $this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION') {
 									$html3 = str_replace('%valor%', '', $html3);
@@ -2393,13 +2382,12 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 								$total_trabajos_categoria .= $html3;
 
 								// Permite a TRABAJOS_ENCABEZADO poner el nombre correcto reutilizando la lógica
-								$this->siguiente['nombre_usuario'] = $trabajo_siguiente->fields['nombre_usuario'];
-								$this->siguiente['tarifa_usuario'] = $trabajo_siguiente->fields['tarifa_hh'];
+								$this->siguiente['nombre_usuario'] = $next_work['nombre_usuario'];
+								$this->siguiente['tarifa_usuario'] = $next_work['tarifa_hh'];
 								$encabezado_trabajos_categoria .= $this->GenerarDocumento2($parser, 'TRABAJOS_ENCABEZADO', $parser_carta, $moneda_cliente_cambio, $moneda_cli, $lang, $html2, $idioma, $cliente, $moneda, $moneda_base, $trabajo, $profesionales, $gasto, $totales, $tipo_cambio_moneda_total, $asunto);
 
 								$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria . $encabezado_trabajos_categoria, $row);
 								$categoria_duracion_horas = 0;
-								$categoria_duracion_minutos = 0;
 								$categoria_duracion_trabajada = 0;
 								$categoria_duracion_descontada = 0;
 								$categoria_valor = 0;
@@ -2411,10 +2399,8 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						} else {
 							$html3 = $parser->tags['TRABAJOS_TOTAL'];
 							$html3 = str_replace('%glosa%', __('Subtotal'), $html3);
-							$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
-							$categoria_duracion_minutos = round($categoria_duracion_minutos % 60);
 
-							$html3 = str_replace('%duracion%', 'i weas' . sprintf('%02d:%02d', $categoria_duracion_horas, $categoria_duracion_minutos), $html3);
+							$html3 = str_replace('%duracion%', Utiles::Decimal2GlosaHora($categoria_duracion_horas), $html3);
 
 							if ($this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION' && Conf::GetConf($this->sesion, 'NoImprimirValorTrabajo')) {
 								$html3 = str_replace('%valor%', '', $html3);
@@ -2459,7 +2445,6 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 							$total_trabajos_categoria .= $html3;
 							$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria, $row);
 							$categoria_duracion_horas = 0;
-							$categoria_duracion_minutos = 0;
 							$categoria_duracion_trabajada = 0;
 							$categoria_duracion_descontada = 0;
 							$categoria_valor = 0;

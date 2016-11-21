@@ -1,5 +1,25 @@
 # Changelog
 
+## Hotfix 16.33.4
+Friday, November 18th
+* **Fix** [Agrega filtro por Grupo Cliente en Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1926)
+
+## Hotfix 16.33.3
+Friday, November 18th
+* **Fix** [Corrige suma de horas por categoría](https://github.com/LemontechSA/ttb/pull/1925)
+
+## Horfix 16.33.2
+Thursday, November 17th
+* **Fix** [Eliminar http](https://github.com/LemontechSA/ttb/pull/1922)
+
+## Hotfix 16.33.1
+Wednesday, November 16th
+* **Fix** [Modificar tamaño fuente para Excel especial PRC](https://github.com/LemontechSA/ttb/pull/1916)
+
+## [Release 16.33.0](https://github.com/LemontechSA/ttb/pull/1915)
+Wednesday, November 16th
+* **Feature** [Migración a PHP5.6](https://github.com/LemontechSA/ttb/pull/1233)
+
 ## [Release 16.32.0](https://github.com/LemontechSA/ttb/pull/1898)
 Friday, October 28th
 * **Feature** [Resumen profesional](https://github.com/LemontechSA/ttb/pull/1849)
