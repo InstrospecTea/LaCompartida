@@ -2225,20 +2225,20 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 						$row = str_replace('%duracion_decimal_trabajada%', number_format($work['duracion'], $decimales_horas, $separador_decimales, $separador_miles), $row);
 						if ($horas_en_decimal) {
 							$row = str_replace('%duracion_trabajada%', number_format($work['duracion'], $decimales_horas, ',', ''), $row);
-							$row = str_replace('%duracion_descontada%', number_format($work['duracion_retainer'], $decimales_horas, ',', ''), $row);
+							$row = str_replace('%duracion_descontada%', number_format($work['duracion_descontada'], $decimales_horas, ',', ''), $row);
 						} else {
 							$row = str_replace('%duracion_trabajada%', $work['glosa_duracion'], $row);
-							$row = str_replace('%duracion_descontada%', $work['glosa_duracion_retainer'], $row);
+							$row = str_replace('%duracion_descontada%', $work['glosa_duracion_descontada'], $row);
 						}
 						$row = str_replace('%duracion_decimal_descontada%', number_format($work['duracion_descontada'], $decimales_horas, $separador_decimales, $separador_miles), $row);
 					} else if ($this->fields['opc_ver_horas_trabajadas']) {
 						$row = str_replace('%duracion_decimal_trabajada%', number_format($work['duracion'], $decimales_horas, $separador_decimales, $separador_miles), $row);
 						if ($horas_en_decimal) {
 							$row = str_replace('%duracion_trabajada%', number_format($work['duracion'], $decimales_horas, ',', ''), $row);
-							$row = str_replace('%duracion_descontada%', number_format($work['duracion_retainer'], $decimales_horas, ',', ''), $row);
+							$row = str_replace('%duracion_descontada%', number_format($work['duracion_descontada'], $decimales_horas, ',', ''), $row);
 						} else {
 							$row = str_replace('%duracion_trabajada%', $work['glosa_duracion'], $row);
-							$row = str_replace('%duracion_descontada%', $work['glosa_duracion_retainer'], $row);
+							$row = str_replace('%duracion_descontada%', $work['glosa_duracion_descontada'], $row);
 						}
 						$row = str_replace('%duracion_decimal_descontada%', number_format($work['duracion_descontada'], 1, $separador_decimales, $separador_miles), $row);
 					} else {
