@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.5
+Monday, November 21st
+* **Fix** [Corrige calculo impuesto_cyc](https://github.com/LemontechSA/ttb/pull/1927)
+
 ## Hotfix 16.33.4
 Friday, November 18th
 * **Fix** [Agrega filtro por Grupo Cliente en Reporte Avanzado](https://github.com/LemontechSA/ttb/pull/1926)
