@@ -2123,6 +2123,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				for ($i = 0; $i < $total_works; ++$i) {
 					$work = $works[$i];
 					$categoria_duracion_horas += $work['duracion_cobrada'];
+					$categoria_valor += round($work['importe'], $decimales_moneda);
 					$row = $row_tmpl;
 					$row = str_replace('%valor_codigo_asunto%', $work['codigo_asunto'], $row);
 					$row = str_replace('%fecha%', Utiles::sql2fecha($work['fecha'], $idioma->fields['formato_fecha']), $row);

@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.6
+Monday, November 21st
+* **Fix** [Se calcula la variable $categoria_valor sumando el importe de cada trabajo.](https://github.com/LemontechSA/ttb/pull/1931)
+
 ## Hotfix 16.33.5
 Monday, November 21st
 * **Fix** [Corrige calculo impuesto_cyc](https://github.com/LemontechSA/ttb/pull/1927)
