@@ -651,12 +651,11 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$descuento_cyc = $x_resultados['descuento'][$this->fields['opc_moneda_total']];
 
 				if (Conf::GetConf($this->sesion, 'CalculacionCyC')) {
-					$impuestos_cyc_approximacion = number_format(($subtotal_en_moneda_cyc - $descuento_cyc) * ($this->fields['porcentaje_impuesto'] / 100), $decimales_moneda, $separador_decimales, $separador_miles);
+					$impuestos_cyc = ($subtotal_en_moneda_cyc - $descuento_cyc) * ($this->fields['porcentaje_impuesto'] / 100);
 				} else {
-					$impuestos_cyc_approximacion = $x_resultados['impuesto'][$this->fields['opc_moneda_total']];
+					$impuestos_cyc = $x_resultados['impuesto'][$this->fields['opc_moneda_total']];
 				}
 
-				$impuestos_cyc = $impuestos_cyc_approximacion;
 
 				$html = str_replace('%valor_honorarios_cyc%', $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($subtotal_en_moneda_cyc - $descuento_cyc, $decimales_moneda_total, $idoma->fields['separador_decimales'], $separador_miles), $html);
 				$html = str_replace('%valor_honorarios_monedabase%', $this->fields['opc_moneda_total'] == $this->fields['id_moneda'] ? '' : $cobro_moneda->moneda[$this->fields['opc_moneda_total']]['simbolo'] . $this->espacio . number_format($total_en_moneda, $cobro_moneda->moneda[$this->fields['moneda_total']]['cifras_decimales'], $separador_decimales, $separador_miles), $html);
