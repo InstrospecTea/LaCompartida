@@ -1,7 +1,7 @@
 # Changelog
 
 ## Hotfix 16.33.5
-Monday, November 21th
+Monday, November 21st
 * **Fix** [Corrige calculo impuesto_cyc](https://github.com/LemontechSA/ttb/pull/1927)
 
 ## Hotfix 16.33.4
