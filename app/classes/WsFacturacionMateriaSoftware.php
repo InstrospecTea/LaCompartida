@@ -88,7 +88,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 				'TipoDocumento' => 6
 			],
 			// 'IsExportacion' => true,
-			'ThirdPartyUniqueIdentifier' => (string) $Factura->fields['numero'],
+			'ThirdPartyUniqueIdentifier' => (string) $Factura->fields['id_factura'],
 			// 'TipoDeCambio' => 0,
 			'Documento' => [
 				'Serie' => (string) $Factura->fields['serie_documento_legal'],
@@ -116,7 +116,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 					'DescuentoAmount' => 0.0,
 					// 'ValorReferencial' => 0,
 					'ValorUnitario' => (double) $Factura->fields['monto_neto'],
-					'IGVDeLinea' => 0.0,
+					'IGVDeLinea' => (float) $Factura->fields['iva'],
 					'ISCDeLinea' => 0.0,
 					'PrecioUnitario' => (double) $Factura->fields['monto_neto'],
 					'Quantity' => 1,
