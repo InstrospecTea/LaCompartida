@@ -210,9 +210,6 @@ class Trabajo extends Objeto
 	}
 
 	function ActualizarTrabajoTarifa($id_moneda, $valor, $id_trabajo = '', $valor_estandar) {
-		if (empty($id_moneda)) {
-			return false;
-		}
 		if ($id_trabajo == '') {
 			$id_trabajo = $this->fields['id_trabajo'];
 		}
