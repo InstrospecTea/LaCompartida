@@ -1071,8 +1071,10 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('costo_hh', $tarifa_hh_estandar);
 					$trabajo->Edit('tarifa_hh_estandar', $tarifa_hh_estandar);
 					$trabajo->Edit('duracion_retainer', $duracion_retainer_trabajo);
-					$trabajo->Write();
+					$trabajo->Write(false);
 				} else {
+					$trabajo->Edit('id_moneda', $this->fields['id_moneda']);
+					$trabajo->Write(false);
 					continue;
 				}
 			}
