@@ -2,7 +2,7 @@
 
 ## Hotfix 16.33.7
 Martes, 22 de Noviembre
-* **Fix** [Error SQL en liquidación N°18684](https://github.com/LemontechSA/ttb/pull/1932)
+* **Fix** [Error SQL en liquidación N°18684](https://github.com/LemontechSA/ttb/pull/1933)
 
 ## Hotfix 16.33.6
 Monday, November 21st
