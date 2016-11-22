@@ -4,7 +4,7 @@ class FacturacionElectronicaMateriaSoftware extends FacturacionElectronica {
 
 	public static function ValidarFactura() {
 		$Sesion = new Sesion();
-		global $pagina, $numero, $RUT_cliente, $cliente;
+		global $pagina, $numero, $RUT_cliente, $cliente, $id_estado, $factura;
 
 		if (empty($numero)) {
 			$pagina->AddError(__('Debe ingresar') . ' ' . __('Número'));
@@ -14,6 +14,13 @@ class FacturacionElectronicaMateriaSoftware extends FacturacionElectronica {
 		}
 		if (empty($cliente)) {
 			$pagina->AddError(__('Debe ingresar') . ' ' . __('Raz&oacute;n Social Cliente'));
+		}
+		if (!empty($id_estado) && $id_estado == '5' && !empty($factura)) {
+			$dias = abs((strtotime($factura->fields['fecha']) - strtotime(date('Y-m-d'))) / 86400);
+			// El plazo máximo para anular facturas es de 7 días
+			if ($dias > 7) {
+				$pagina->AddError(__('El plazo máximo para anular facturas electrónicas es de 7 días calendario'));
+			}
 		}
 	}
 
@@ -150,6 +157,28 @@ EOF;
 					$hookArg['Error'] = self::parseError($ex, 'BuildingInvoiceError');
 				}
 			}
+		}
+
+		return $hookArg;
+	}
+
+	public static function AnulaFacturaElectronica($hookArg) {
+		$Sesion = new Sesion();
+		$Factura = $hookArg['Factura'];
+
+		if (!$Factura->DTEFirmado() && !$Factura->DTEProcesandoAnular()) {
+			return $hookArg;
+		}
+
+		$documento = json_decode($Factura->fields['dte_url_pdf']);
+
+		$documento_anulado = $WsFacturacionMateriaSoftware->PutAnular(
+			$documento->Serie,
+			(int) $documento->Correlativo
+		);
+
+		if ($WsFacturacionMateriaSoftware->hasError()) {
+			$hookArg['Error'] = self::parseError($WsFacturacionMateriaSoftware, 'CancelGeneratedInvoiceError');
 		}
 
 		return $hookArg;

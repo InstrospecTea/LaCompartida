@@ -42,3 +42,9 @@ $Slim->hook('hook_genera_factura_electronica', function($hookArg) {
 		$hookArg
 	);
 });
+
+$Slim->hook('hook_anula_factura_electronica', function($hookArg) {
+	return FacturacionElectronicaMateriaSoftware::AnulaFacturaElectronica(
+		$hookArg
+	);
+});

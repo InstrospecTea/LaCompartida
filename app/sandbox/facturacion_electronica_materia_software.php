@@ -29,14 +29,23 @@ $documento = $WsFacturacionMateriaSoftware->documento(
 
 TTB\Debug::pr(json_encode($WsFacturacionMateriaSoftware->getBodyInvoice(), JSON_PRETTY_PRINT));
 
+// $documento = json_decode($Factura->fields['dte_url_pdf']);
+
+$documento_anulado = $WsFacturacionMateriaSoftware->PutAnular(
+	$documento->Serie,
+	(int) $documento->Correlativo
+);
+
+TTB\Debug::pr(json_encode($documento_anulado, JSON_PRETTY_PRINT));
+
 // $pdf = $WsFacturacionMateriaSoftware->GetStatus(
 // 	$documento->Serie,
 // 	(int) $documento->Correlativo
 // );
 
-// echo "<div>Invoice: {$documento->Serie} {$documento->Correlativo}</div>";
-// echo '<div>Code: ', $WsFacturacionMateriaSoftware->getErrorCode(), '</div>';
-// echo '<div>Message: ', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
+echo "<div>Invoice: {$documento->Serie} {$documento->Correlativo}</div>";
+echo '<div>Code: ', $WsFacturacionMateriaSoftware->getErrorCode(), '</div>';
+echo '<div>Message: ', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
 
 // header("Content-Transfer-Encoding: binary");
 // header("Content-Type: application/pdf");

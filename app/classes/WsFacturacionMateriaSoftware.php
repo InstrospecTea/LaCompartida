@@ -78,6 +78,30 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		return $documento;
 	}
 
+	public function PutAnular($serie, $correlativo) {
+		$documento = null;
+
+		try {
+			$respuesta = $this->Client->request(
+				'PUT',
+				"{$this->url}/documento/PutAnular?serie={$serie}&correlativo={$correlativo}",
+				['headers' => $this->getHeaders()]
+			);
+
+			$documento = json_decode($respuesta->getBody());
+		} catch (GuzzleHttp\Exception\ServerException $e) {
+			$response = $e->getResponse();
+			$json_response = json_decode($response->getBody()->getContents());
+			$this->setError(1, $this->default_message_error . $json_response->ExceptionMessage);
+		} catch(GuzzleHttp\Exception\ClientException $e) {
+			$response = $e->getResponse();
+			$json_response = json_decode($response->getBody()->getContents());
+			$this->setError(2, $this->default_message_error . $json_response->ExceptionMessage);
+		}
+
+		return $documento;
+	}
+
 	private function generateBodyInvoice(&$Factura, &$Moneda, &$DocumentoLegal) {
 		$this->body_invoice = [
 			'Cliente' => [
