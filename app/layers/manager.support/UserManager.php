@@ -168,6 +168,45 @@ class UserManager extends AbstractManager implements IUserManager {
 		return $permissions_result;
 	}
 
+	public function reviewsUser($reviewer_user_id, $reviewed_user_id) {
+		if (empty($reviewer_user_id) || !is_numeric($reviewer_user_id) ||
+			  empty($reviewed_user_id) || !is_numeric($reviewed_user_id)) {
+			throw new InvalidIdentifier;
+		}
+
+		$criteria = new Criteria($this->Sesion);
+		$criteria->add_select('id_revisor, id_revisado')
+			->add_from('usuario_revisor')
+	 		->add_restriction(CriteriaRestriction::equals('id_revisor', $reviewer_user_id))
+	 		->add_restriction(CriteriaRestriction::equals('id_revisado', $reviewed_user_id));
+		try {
+			$result = $criteria->run();
+			return count($result) > 0;
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
+	public function isGlobalReviewer($user_id) {
+		if (empty($user_id) || !is_numeric($user_id)) {
+			throw new InvalidIdentifier;
+		}
+
+		$is_reviewer = in_array('REV', $this->getPermissions($user_id));
+		if (!$is_reviewer) return false;
+
+		$criteria = new Criteria($this->Sesion);
+		$criteria->add_select('id_revisor, id_revisado')
+				->add_from('usuario_revisor')
+		 		->add_restriction(CriteriaRestriction::equals('id_revisor', $user_id));
+		try {
+			$result = $criteria->run();
+			return count($result) == 0;
+		} catch (Exception $e) {
+			echo "Error: {$e} {$criteria->__toString()}";
+		}
+	}
+
 	private function generateRestrictions($user_id, $init_date, $end_date){
 		$restrictions_array = array(CriteriaRestriction::equals('id_usuario', $user_id));
 
