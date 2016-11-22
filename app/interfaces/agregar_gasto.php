@@ -48,18 +48,11 @@ $logged_user_can_save = true;
 if ($gasto->Loaded()){
 	$UserManager = new UserManager($sesion);
 	$logged_user_id = $sesion->usuario->fields['id_usuario'];
-	# var_dump("logged_user_id: ".$logged_user_id);
 	$expense_creator_user_id = $gasto->fields['id_usuario'];
-	# var_dump("expense_creator_user_id: ".$expense_creator_user_id);
-
-	# var_dump('Es autor: '.(($logged_user_id == $expense_creator_user_id)?'true':'false'));
-	# var_dump('Es revisor del autor: '.(($UserManager->reviewsUser($logged_user_id, $expense_creator_user_id))?'true':'false'));
-	# var_dump('Es revisor global: '.(($UserManager->isGlobalReviewer($logged_user_id))?'true':'false'));
 	$logged_user_can_save = ($logged_user_id == $expense_creator_user_id) ||
 												  ($UserManager->isGlobalReviewer($logged_user_id)) ||
 												  ($UserManager->reviewsUser($logged_user_id, $expense_creator_user_id));
 }
-var_dump('Permiso de escritura: '.($logged_user_can_save?'true':'false'));
 if ($opcion == "guardar") {
 	if (!$logged_user_can_save) {
 		$info = 'No se ha podido guardar los cambios. Permiso denegado.';
