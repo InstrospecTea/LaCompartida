@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.7
+Martes, 22 de Noviembre
+* **Fix** [Error SQL en liquidación N°18684](https://github.com/LemontechSA/ttb/pull/1932)
+
 ## Hotfix 16.33.6
 Monday, November 21st
 * **Fix** [Se calcula la variable $categoria_valor sumando el importe de cada trabajo.](https://github.com/LemontechSA/ttb/pull/1931)
