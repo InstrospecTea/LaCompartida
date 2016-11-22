@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.8
+Tuesday, November 22nd
+* **Fix** [Falla descarga Excel horas](https://github.com/LemontechSA/ttb/pull/1936)
+
 ## Hotfix 16.33.7
 Tuesday, November 22nd
 * **Fix** [Error SQL en liquidación N°18684](https://github.com/LemontechSA/ttb/pull/1933)
