@@ -106,7 +106,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		$this->body_invoice = [
 			'Cliente' => [
 				'NumeroDeDocumento' => (string) $Factura->fields['numero'],
-				'Nombre' => (string) $Factura->fields['cliente'],
+				'Nombre' => (string) utf8_encode($Factura->fields['cliente']),
 				// 'Email' => '',
 				'DireccionCompleta' => utf8_encode("{$Factura->fields['direccion_cliente']}, {$Factura->fields['comuna_cliente']}"),
 				'TipoDocumento' => 6
