@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.10
+Wednesday, November 23rd
+* **Fix** [Se le asigna duracion_descontada a horas_descontadas y glosa_horas_descontadas de cada trabajo.](https://github.com/LemontechSA/ttb/pull/1940)
+
 ## Hotfix 16.33.9
 Wednesday, November 23rd
 * **Fix** [Valor Cobrado por Hora](https://github.com/LemontechSA/ttb/pull/1938)
