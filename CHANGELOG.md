@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.9
+Wednesday, November 23rd
+* **Fix** [Valor Cobrado por Hora](https://github.com/LemontechSA/ttb/pull/1938)
+
 ## Hotfix 16.33.8
 Tuesday, November 22nd
 * **Fix** [Falla descarga Excel horas](https://github.com/LemontechSA/ttb/pull/1936)
