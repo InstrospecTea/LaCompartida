@@ -105,7 +105,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 	private function generateBodyInvoice(&$Factura, &$Moneda, &$DocumentoLegal) {
 		$this->body_invoice = [
 			'Cliente' => [
-				'NumeroDeDocumento' => (string) $Factura->fields['numero'],
+				'NumeroDeDocumento' => (string) $Factura->fields['RUT_cliente'],
 				'Nombre' => (string) utf8_encode($Factura->fields['cliente']),
 				// 'Email' => '',
 				'DireccionCompleta' => utf8_encode("{$Factura->fields['direccion_cliente']}, {$Factura->fields['comuna_cliente']}"),
