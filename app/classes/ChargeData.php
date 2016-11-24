@@ -206,7 +206,7 @@ class ChargeData {
 			->add_restriction(Restriction::equals('trabajo.id_cobro', $this->get('id_cobro')))
 			->add_restriction(Restriction::equals('trabajo.id_tramite', '0'));
 
-		if (!Conf::GetConf($this->Sesion, 'MostrarHorasCero')) {
+		if (!Conf::read('MostrarHorasCero')) {
 			$field = $this->opt('ver_horas_trabajadas') ? 'duracion' : 'duracion_cobrada';
 			$Criteria->add_restriction(Restriction::greater_than("trabajo.{$field}", "'0000-00-00 00:00:00'"));
 		}
@@ -260,17 +260,17 @@ class ChargeData {
 	 * @return Criteria
 	 */
 	protected function scopeUserCategory(Criteria $Criteria) {
- 		if (Conf::GetConf($this->Sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario') || Conf::GetConf($this->Sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
+ 		if (Conf::read('OrdenarPorCategoriaNombreUsuario') || Conf::read('OrdenarPorCategoriaUsuario')) {
  			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
  				->add_ordering('prm_categoria_usuario.orden')
  				->add_ordering('usuario.id_usuario');
- 		} else if (Conf::GetConf($this->Sesion, 'SepararPorUsuario')) {
+ 		} else if (Conf::read('SepararPorUsuario')) {
  			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
  				->add_ordering('usuario.id_categoria_usuario')
  				->add_ordering('usuario.id_usuario');
- 		} else if (Conf::GetConf($this->Sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional')) {
+ 		} else if (Conf::read('OrdenarPorCategoriaDetalleProfesional')) {
  			$Criteria->add_ordering('usuario.id_categoria_usuario', 'DESC');
- 		} else if (Conf::GetConf($this->Sesion, 'TrabajosOrdenarPorFechaCategoria')) {
+ 		} else if (Conf::read('OrdenarPorFechaCategoria')) {
  			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
  				->add_ordering('trabajo.fecha')
  				->add_ordering('usuario.id_categoria_usuario')
@@ -284,7 +284,8 @@ class ChargeData {
  		} else {
  			$Criteria->add_select('IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria)', 'categoria');
  		}
-
+		pr(Conf::read('OrdenarPorFechaCategoria'));
+pr("$Criteria");
  		return $Criteria;
  	}
 
