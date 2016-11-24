@@ -3231,7 +3231,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$html = str_replace('%horas_mb%', number_format($total['duracion_tarificada'], 1, $separador_decimales, $separador_miles), $html);
 				}
 
-				$honorarios = $flatfee ? $total['flatfee'] : $total['valor_tarificada'];
+				$honorarios = $flatfee ? $this->fields['monto_subtotal'] : $total['valor_tarificada'];
 				$html = str_replace('%total_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($honorarios, $moneda->fields['cifras_decimales'], $separador_decimales, $separador_miles), $html);
 				if ($this->fields['forma_cobro'] == 'FLAT FEE') {
 					$html = str_replace('%horas%', number_format($total['duracion_cobrada'], 1, $separador_decimales, $separador_miles), $html);
