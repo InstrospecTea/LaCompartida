@@ -284,8 +284,6 @@ class ChargeData {
  		} else {
  			$Criteria->add_select('IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria)', 'categoria');
  		}
-		pr(Conf::read('OrdenarPorFechaCategoria'));
-pr("$Criteria");
  		return $Criteria;
  	}
 
