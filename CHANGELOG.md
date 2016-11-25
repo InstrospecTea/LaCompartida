@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.13
+Friday, November 25th
+* **Fix** [Se ajusta ancho de columnas según petición de PRC para sus Excel](https://github.com/LemontechSA/ttb/pull/1945)
+
 ## Hotfix 16.33.12
 Friday, November 25th
 * **Fix** [Agregar tabla contrato a query por defecto de cobro en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1942)
