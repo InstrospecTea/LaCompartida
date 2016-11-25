@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.12
+Friday, November 25th
+* **Fix** [Agregar tabla contrato a query por defecto de cobro en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1942)
+
 ## Hotfix 16.33.11
 Thursday, November 24th
 * **Fix** [Corrección formato moneda](https://github.com/LemontechSA/ttb/pull/1941)
