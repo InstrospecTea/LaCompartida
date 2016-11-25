@@ -168,6 +168,13 @@ class UserManager extends AbstractManager implements IUserManager {
 		return $permissions_result;
 	}
 
+	/**
+	 * Indica si el usuario $reviewer_user_id está registrado en la tabla usuario_revisor
+	 * como revisor del usuario $reviewed_user_id
+	 * @param 	string $reviewer_user_id
+	 * @param 	string $reviewed_user_id
+	 * @return 	Boolean
+	 */
 	public function reviewsUser($reviewer_user_id, $reviewed_user_id) {
 		if (empty($reviewer_user_id) || !is_numeric($reviewer_user_id) ||
 			  empty($reviewed_user_id) || !is_numeric($reviewed_user_id)) {
@@ -187,6 +194,11 @@ class UserManager extends AbstractManager implements IUserManager {
 		}
 	}
 
+	/**
+	 * Indica si el usuario $user_id es un revisor global
+	 * @param 	string $user_id
+	 * @return 	Boolean
+	 */
 	public function isGlobalReviewer($user_id) {
 		if (empty($user_id) || !is_numeric($user_id)) {
 			throw new InvalidIdentifier;

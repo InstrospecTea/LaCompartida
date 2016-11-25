@@ -57,8 +57,7 @@ if ($opcion == "guardar") {
 	if (!$logged_user_can_save) {
 		$info = 'No se ha podido guardar los cambios. Permiso denegado.';
 		$pagina->AddInfo($info);
-	}
-	else {
+	} else {
 		if (!$codigo_cliente && $codigo_cliente_secundario) {
 			$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario = '$codigo_cliente_secundario'";
 			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
