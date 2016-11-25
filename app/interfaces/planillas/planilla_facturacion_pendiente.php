@@ -81,58 +81,29 @@ if ($xls) {
 	$mostrar_encargado_secundario = Conf::GetConf($sesion, 'EncargadoSecundario');
 	$formatos_moneda = array();
 	foreach ($arreglo_monedas as $id_m => $m) {
-		$cifras_decimales = $m['cifras_decimales'];
-		if ($cifras_decimales > 0) {
-			$decimales = '.';
-			while ($cifras_decimales-- > 0) {
-				$decimales .= '0';
-			}
-		} else {
-			$decimales = '';
-		}
+		$formato = $moneda->getExcelFormat($id_m);
 		$formatos_moneda[$id_m] = & $wb->addFormat(array('Size' => 11,
 					'VAlign' => 'top',
 					'Align' => 'right',
 					'Border' => '1',
 					'Color' => 'black',
-					'NumFormat' => "[$" . $m['simbolo'] . "] #,###,0$decimales"));
-	}
+					'NumFormat' => $formato));
 
-	$formatos_moneda_tc = array();
-	foreach ($arreglo_monedas as $id_m => $m) {
-		$cifras_decimales = $m['cifras_decimales'];
-		if ($cifras_decimales > 0) {
-			$decimales = '.';
-			while ($cifras_decimales-- > 0) {
-				$decimales .= '0';
-			}
-		} else {
-			$decimales = '';
-		}
 		$formatos_moneda_tc[$id_m] = & $wb->addFormat(array('Size' => 11,
 					'VAlign' => 'top',
 					'Align' => 'right',
 					'Border' => '1',
 					'Color' => 'black',
-					'NumFormat' => "[$" . $m['simbolo'] . "] #,###,0.00"));
+					'NumFormat' => $formato));
 	}
 
-	$cifras_decimales = $moneda_base['cifras_decimales'];
-
-	if ($cifras_decimales > 0) {
-		$decimales = '.';
-		while ($cifras_decimales-- > 0) {
-			$decimales .= '0';
-		}
-	} else {
-		$decimales = '';
-	}
+	$formato = $moneda->getExcelFormat($moneda_base['id_moneda']);
 	$formato_moneda_base_rojo = & $wb->addFormat(array('Size' => 11,
 				'VAlign' => 'top',
 				'Align' => 'right',
 				'Border' => 1,
 				'Color' => 'red',
-				'NumFormat' => '[$' . $moneda_base['simbolo'] . "] #,###,0$decimales"));
+				'NumFormat' => $formato));
 
 	$ws1 = & $wb->addWorksheet(__('Facturacion'));
 	$ws1->setInputEncoding('utf-8');
@@ -360,7 +331,7 @@ if ($xls) {
 		$codigo_asunto_secundario_sep = "";
 	}
 
-	
+
 	ReporteContrato::QueriesPrevias($sesion);
 	$ReporteContrato = new ReporteContrato($sesion, false, $separar_asuntos, $fecha1, $fecha2, $AtacheSecundarioSoloAsunto);
 

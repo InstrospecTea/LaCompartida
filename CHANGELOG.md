@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.11
+Thursday, November 24th
+* **Fix** [Corrección formato moneda](https://github.com/LemontechSA/ttb/pull/1941)
+
 ## Hotfix 16.33.10
 Wednesday, November 23rd
 * **Fix** [Se le asigna duracion_descontada a horas_descontadas y glosa_horas_descontadas de cada trabajo.](https://github.com/LemontechSA/ttb/pull/1940)
