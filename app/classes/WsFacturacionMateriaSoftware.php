@@ -25,11 +25,11 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		];
 	}
 
-	public function documento(Factura $Factura, Moneda $Moneda, PrmDocumentoLegal $DocumentoLegal) {
+	public function documento(Factura $Factura, Moneda $Moneda, PrmDocumentoLegal $DocumentoLegal, Contrato $Contrato) {
 		$documento = null;
 
 		try {
-			$this->generateBodyInvoice($Factura, $Moneda, $DocumentoLegal);
+			$this->generateBodyInvoice($Factura, $Moneda, $DocumentoLegal, $Contrato);
 
 			$respuesta = $this->Client->request(
 				'POST',
@@ -102,14 +102,14 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		return $documento;
 	}
 
-	private function generateBodyInvoice(&$Factura, &$Moneda, &$DocumentoLegal) {
+	private function generateBodyInvoice(&$Factura, &$Moneda, &$DocumentoLegal, &$Contrato) {
 		$this->body_invoice = [
 			'Cliente' => [
 				'NumeroDeDocumento' => (string) $Factura->fields['RUT_cliente'],
 				'Nombre' => (string) utf8_encode($Factura->fields['cliente']),
 				// 'Email' => '',
 				'DireccionCompleta' => utf8_encode("{$Factura->fields['direccion_cliente']}, {$Factura->fields['comuna_cliente']}"),
-				'TipoDocumento' => 6
+				'TipoDocumento' => $Contrato->fields['extranjero'] == '1' ? 0 : 6
 			],
 			// 'IsExportacion' => true,
 			'ThirdPartyUniqueIdentifier' => (string) $Factura->fields['id_factura'],
@@ -144,7 +144,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 					'ISCDeLinea' => 0.0,
 					'PrecioUnitario' => (double) $Factura->fields['total'],
 					'Quantity' => 1,
-					'TipoAfectacionIGV' => 10,
+					'TipoAfectacionIGV' => $Contrato->fields['extranjero'] == '1' ? 40 :10,
 					'TotalConImpuestos' => (double) $Factura->fields['total'],
 					'TotalSinImpuestos' => (double) $Factura->fields['subtotal'],
 					'Unidad' => 'UN',

@@ -139,10 +139,16 @@ EOF;
 				$Estudio->GetMetaData('facturacion_electronica_materia_software.Authorization')
 			);
 
-			$DocumentoLegal = new PrmDocumentoLegal($Factura->sesion);
+			$DocumentoLegal = new PrmDocumentoLegal($Sesion);
 			$DocumentoLegal->Load($Factura->fields['id_documento_legal']);
 
-			$documento = $WsFacturacionMateriaSoftware->documento($Factura, $Moneda, $DocumentoLegal);
+			$Cobro = new Cobro($Sesion);
+			$Cobro->Load($Factura->fields['id_cobro']);
+
+			$Contrato = new Contrato($Sesion);
+			$Contrato->Load($Cobro->fields['id_contrato']);
+
+			$documento = $WsFacturacionMateriaSoftware->documento($Factura, $Moneda, $DocumentoLegal, $Contrato);
 
 			if ($WsFacturacionMateriaSoftware->hasError()) {
 				$hookArg['Error'] = self::parseError($WsFacturacionMateriaSoftware, 'BuildingInvoiceError');
