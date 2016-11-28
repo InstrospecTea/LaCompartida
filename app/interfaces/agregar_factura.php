@@ -612,7 +612,14 @@ $Form->defaultLabel = false;
 				<?php
 					$deshabilita_estado = ($factura->fields['anulado'] == 1 && ($factura->DTEAnulado() || $factura->DTEProcesandoAnular())) ? 'disabled' : '';
 				?>
-				<?php echo $Form->select('id_estado', PrmEstadoFactura::getList($sesion), $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, array('onchange' => 'mostrarAccionesEstado(this.form)', $deshabilita_estado, 'style' => 'width:160px') ); ?>
+				<?php
+					echo $Form->select(
+						'id_estado',
+						PrmEstadoFactura::getList($sesion),
+						$factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado,
+						['onchange' => 'mostrarAccionesEstado(this.form)', $deshabilita_estado, 'style' => 'width:160px', 'translate' => false]
+					);
+				?>
 				<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
 				<?php
 						if (!empty($factura->fields['fecha_anulacion'])) {
