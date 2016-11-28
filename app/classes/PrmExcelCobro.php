@@ -20,7 +20,7 @@ class PrmExcelCobro extends Objeto {
 	 * @return int
 	 */
 	public function getTamano($internal_name, $group) {
-		return (int) $this->getFieldValue($group, $internal_name, 'tamano');
+		return $this->getFieldValue($group, $internal_name, 'tamano');
 	}
 
 	/**

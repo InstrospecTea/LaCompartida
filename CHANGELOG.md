@@ -1,5 +1,29 @@
 # Changelog
 
+## Hotfix 16.33.13
+Friday, November 25th
+* **Fix** [Se ajusta ancho de columnas según petición de PRC para sus Excel](https://github.com/LemontechSA/ttb/pull/1945)
+
+## Hotfix 16.33.12
+Friday, November 25th
+* **Fix** [Agregar tabla contrato a query por defecto de cobro en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1942)
+
+## Hotfix 16.33.11
+Thursday, November 24th
+* **Fix** [Corrección formato moneda](https://github.com/LemontechSA/ttb/pull/1941)
+
+## Hotfix 16.33.10
+Wednesday, November 23rd
+* **Fix** [Se le asigna duracion_descontada a horas_descontadas y glosa_horas_descontadas de cada trabajo.](https://github.com/LemontechSA/ttb/pull/1940)
+
+## Hotfix 16.33.9
+Wednesday, November 23rd
+* **Fix** [Valor Cobrado por Hora](https://github.com/LemontechSA/ttb/pull/1938)
+
+## Hotfix 16.33.8
+Tuesday, November 22nd
+* **Fix** [Falla descarga Excel horas](https://github.com/LemontechSA/ttb/pull/1936)
+
 ## Hotfix 16.33.7
 Tuesday, November 22nd
 * **Fix** [Error SQL en liquidación N°18684](https://github.com/LemontechSA/ttb/pull/1933)

@@ -331,6 +331,12 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 				'cobro.id_cobro',
 				'tramite.id_cobro'
 			)
+		)->add_left_join_with(
+			'contrato',
+			CriteriaRestriction::equals(
+				'contrato.id_contrato',
+				'cobro.id_contrato'
+			)
 		);
 
 		$this->addInvoiceToQuery($Criteria);

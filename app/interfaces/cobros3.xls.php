@@ -251,29 +251,29 @@ for ($i = 0; $i < $lista->num; $i++) {
     $moneda_defecto->Load($moneda_base);
 
     // Redefinimos el formato de la moneda, para que sea consistente con la cifra.
-    $simbolo_moneda = $moneda_total->fields['simbolo'];
+    $simbolo_moneda = Convert::utf8($moneda_total->fields['simbolo']);
     $cifras_decimales = $moneda_total->fields['cifras_decimales'];
 
     $money_format = & $wb->addFormat(array(
-		'Size' => 11,
-		'VAlign' => 'top',
-		'Align' => 'justify',
-		'Border' => 1,
-		'Color' => 'black',
-		'NumFormat' => "\"{$simbolo_moneda}\" #,##0" . ($cifras_decimales ? '.' . str_repeat('0', $cifras_decimales) : '')
-	));
+			'Size' => 11,
+			'VAlign' => 'top',
+			'Align' => 'justify',
+			'Border' => 1,
+			'Color' => 'black',
+			'NumFormat' => "\"{$simbolo_moneda}\" #,##0" . ($cifras_decimales ? '.' . str_repeat('0', $cifras_decimales) : '')
+		));
 
-	$simbolo_moneda_defecto = $moneda_defecto->fields['simbolo'];
+		$simbolo_moneda_defecto = Convert::utf8($moneda_defecto->fields['simbolo']);
     $cifras_decimales_defecto = $moneda_defecto->fields['cifras_decimales'];
 
     $default_money_format = & $wb->addFormat(array(
-		'Size' => 11,
-		'VAlign' => 'top',
-		'Align' => 'justify',
-		'Border' => 1,
-		'Color' => 'black',
-		'NumFormat' => "\"{$simbolo_moneda_defecto}\" #,##0" . ($cifras_decimales_defecto ? '.' . str_repeat('0', $cifras_decimales_defecto) : '')
-	));
+			'Size' => 11,
+			'VAlign' => 'top',
+			'Align' => 'justify',
+			'Border' => 1,
+			'Color' => 'black',
+			'NumFormat' => "\"{$simbolo_moneda_defecto}\" #,##0" . ($cifras_decimales_defecto ? '.' . str_repeat('0', $cifras_decimales_defecto) : '')
+		));
 
     if (Conf::GetConf($sesion, 'ColumnaIdYCodigoAsuntoAExcelRevisarHoras')) {
         $ws->write($fila_inicial + $i, $col_id_trabajo, $trabajo->fields['id_trabajo'], $tex);

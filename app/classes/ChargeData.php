@@ -221,12 +221,12 @@ class ChargeData {
 		$Criteria = $this->scopeChargeable($Criteria);
 
 		$this->works = $Criteria->run();
-
 		foreach ($this->works as $i => $work) {
 			$work['duracion'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion']);
 			$work['duracion_cobrada'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion_cobrada']);
 			$work['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion_retainer']);
 			$work['duracion_descontada'] = $work['duracion'] - $work['duracion_cobrada'] - $work['duracion_incobrables'];
+			$work['glosa_duracion_descontada'] = Utiles::Decimal2GlosaHora($work['duracion_descontada']);
 			$work['flatfee'] = 0;
 
 			if ($this->get('forma_cobro') == 'PROPORCIONAL') {
