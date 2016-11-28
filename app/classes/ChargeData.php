@@ -220,7 +220,6 @@ class ChargeData {
 		$Criteria = $this->scopeUserCategory($Criteria);
 		$Criteria = $this->scopeChargeable($Criteria);
 
-		var_dump($Criteria->get_plain_query());
 		$this->works = $Criteria->run();
 		foreach ($this->works as $i => $work) {
 			$work['duracion'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion']);
