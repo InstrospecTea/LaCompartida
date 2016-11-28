@@ -3069,7 +3069,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 			case 'PROFESIONAL_TOTAL': //GenerarDocumento2
 				$retainer = false;
 				$descontado = false;
-				$flatfee = false;
+				$flatfee = ($this->fields['forma_cobro'] == 'FLAT FEE');
 
 				$total = $this->ChargeData->getTotal($asunto->fields['codigo_asunto']);
 				if (!empty($total)) {
@@ -3081,9 +3081,6 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					}
 					if ($total['duracion_descontada'] > 0) {
 						$descontado = true;
-					}
-					if ($total['flatfee'] > 0) {
-						$flatfee = true;
 					}
 				}
 
@@ -3231,9 +3228,10 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 					$html = str_replace('%horas_mb%', number_format($total['duracion_tarificada'], 1, $separador_decimales, $separador_miles), $html);
 				}
 
-				$honorarios = $flatfee ? $total['flatfee'] : $total['valor_tarificada'];
+				$honorarios = $flatfee ? $this->fields['monto_subtotal'] : $total['valor_tarificada'];
+				$horas = $flatfee ? $total['duracion_cobrada'] : $total['duracion_tarificada'];
 				$html = str_replace('%total_honorarios%', $moneda->fields['simbolo'] . $this->espacio . number_format($honorarios, $moneda->fields['cifras_decimales'], $separador_decimales, $separador_miles), $html);
-				$html = str_replace('%horas%', number_format($total['duracion_tarificada'], 1, $separador_decimales, $separador_miles), $html);
+				$html = str_replace('%horas%', number_format($horas, 1, $separador_decimales, $separador_miles), $html);
 
 				break;
 

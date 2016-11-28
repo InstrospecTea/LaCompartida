@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.14
+Monday, November 28th
+* **Fix** [Se le asigna duracion_cobrada a %horas% si el cobro es flat fee](https://github.com/LemontechSA/ttb/pull/1946)
+
 ## Hotfix 16.33.13
 Friday, November 25th
 * **Fix** [Se ajusta ancho de columnas según petición de PRC para sus Excel](https://github.com/LemontechSA/ttb/pull/1945)
