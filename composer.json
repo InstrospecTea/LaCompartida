@@ -2,7 +2,7 @@
 	"require": {
 		"twig/twig": "1.*",
 		"mikehaertl/phpwkhtmltopdf": "2.0.1",
-		"guzzle/guzzle": "~3.3.0",
+		"guzzlehttp/guzzle": "6.2.2",
 		"aws/aws-sdk-php": "2.*",
 		"nesbot/carbon": "1.14",
 		"pear/pear": "dev-master",

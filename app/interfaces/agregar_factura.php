@@ -11,6 +11,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 } else { //ELSE (no es WEBSERVICE)
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
+
 	$DocumentoLegalNumero = new DocumentoLegalNumero($sesion);
 	$factura = new Factura($sesion);
 	$prm_codigo = new PrmCodigo($sesion);
