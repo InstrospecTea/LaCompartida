@@ -16,6 +16,12 @@ $Moneda->Load($Factura->fields['id_moneda']);
 $DocumentoLegal = new PrmDocumentoLegal($Sesion);
 $DocumentoLegal->Load($Factura->fields['id_documento_legal']);
 
+$Cobro = new Cobro($Sesion);
+$Cobro->Load($Factura->fields['id_cobro']);
+
+$Contrato = new Contrato($Sesion);
+$Contrato->Load($Cobro->fields['id_contrato']);
+
 $WsFacturacionMateriaSoftware = new WsFacturacionMateriaSoftware(
 	$Estudio->GetMetaData('facturacion_electronica_materia_software.Url'),
 	$Estudio->GetMetaData('facturacion_electronica_materia_software.Authorization')
@@ -24,28 +30,29 @@ $WsFacturacionMateriaSoftware = new WsFacturacionMateriaSoftware(
 $documento = $WsFacturacionMateriaSoftware->documento(
 	$Factura,
 	$Moneda,
-	$DocumentoLegal
+	$DocumentoLegal,
+	$Contrato
 );
 
-TTB\Debug::pr(json_encode($WsFacturacionMateriaSoftware->getBodyInvoice(), JSON_PRETTY_PRINT));
+// TTB\Debug::pr(json_encode($WsFacturacionMateriaSoftware->getBodyInvoice(), JSON_PRETTY_PRINT));
 
 // $documento = json_decode($Factura->fields['dte_url_pdf']);
 
-$documento_anulado = $WsFacturacionMateriaSoftware->PutAnular(
-	$documento->Serie,
-	(int) $documento->Correlativo
-);
-
-TTB\Debug::pr(json_encode($documento_anulado, JSON_PRETTY_PRINT));
+// $documento_anulado = $WsFacturacionMateriaSoftware->PutAnular(
+// 	$documento->Serie,
+// 	(int) $documento->Correlativo
+// );
+//
+// TTB\Debug::pr(json_encode($documento_anulado, JSON_PRETTY_PRINT));
 
 // $pdf = $WsFacturacionMateriaSoftware->GetStatus(
 // 	$documento->Serie,
 // 	(int) $documento->Correlativo
 // );
 
-echo "<div>Invoice: {$documento->Serie} {$documento->Correlativo}</div>";
-echo '<div>Code: ', $WsFacturacionMateriaSoftware->getErrorCode(), '</div>';
-echo '<div>Message: ', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
+// echo "<div>Invoice: {$documento->Serie} {$documento->Correlativo}</div>";
+// echo '<div>Code: ', $WsFacturacionMateriaSoftware->getErrorCode(), '</div>';
+// echo '<div>Message: ', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
 
 // header("Content-Transfer-Encoding: binary");
 // header("Content-Type: application/pdf");
