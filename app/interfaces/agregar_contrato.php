@@ -1741,6 +1741,16 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<input type="text" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ? $contrato->fields['rut'] : $factura_rut ?>" size="30" maxlength="50" />
 					</td>
 				</tr>
+
+				<tr>
+					<td align="right" width='20%'>
+						<?= __('Extranjero') ?>
+					</td>
+					<td align="left" colspan="3">
+						<input type="checkbox" name="extranjero" id="extranjero" value="1" <?= $contrato->fields['extranjero'] == '1' ? 'checked="checked"' : '' ?> />
+					</td>
+				</tr>
+
 				<tr>
 					<td align="right" colspan="1">
 						<?php echo __('Razón Social') . $obligatorios('factura_razon_social'); ?>
