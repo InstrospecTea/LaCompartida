@@ -1,5 +1,12 @@
 # Changelog
 
+## [Release 16.34.0](https://github.com/LemontechSA/ttb/pull/1949)
+Monday, November 28th
+* **Feature** [Facturación Electrónica Materia Software](https://github.com/LemontechSA/ttb/pull/1907)
+* **Feature** [Problemas con edición de estado de factura y/o documento legal](https://github.com/LemontechSA/ttb/pull/1908)
+* **Feature** [Reemplazar widget de zendesk](https://github.com/LemontechSA/ttb/pull/1929)
+* **Feature** [Restringir modulo de gastos](https://github.com/LemontechSA/ttb/pull/1937)
+
 ## Hotfix 16.33.16
 Monday, November 28th
 * **Fix** [Se ajusta ancho de columnas según petición de PRC para sus Excel, exclusivo Windows](https://github.com/LemontechSA/ttb/pull/1948)
