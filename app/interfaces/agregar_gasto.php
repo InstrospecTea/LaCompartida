@@ -55,7 +55,7 @@ if ($gasto->Loaded()){
 }
 if ($opcion == "guardar") {
 	if (!$logged_user_can_save) {
-		$info = 'No se ha podido guardar los cambios. Permiso denegado.';
+		$info = __('No se han podido guardar los cambios').'. '.__('Acceso denegado').'.';
 		$pagina->AddInfo($info);
 	} else {
 		if (!$codigo_cliente && $codigo_cliente_secundario) {
