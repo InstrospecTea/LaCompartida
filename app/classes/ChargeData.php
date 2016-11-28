@@ -268,8 +268,6 @@ class ChargeData {
  			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
  				->add_ordering('usuario.id_categoria_usuario')
  				->add_ordering('usuario.id_usuario');
- 		} else if (Conf::read('OrdenarPorCategoriaDetalleProfesional')) {
- 			$Criteria->add_ordering('usuario.id_categoria_usuario', 'DESC');
  		} else if (Conf::read('OrdenarPorFechaCategoria')) {
  			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
  				->add_ordering('trabajo.fecha')
