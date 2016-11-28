@@ -3,7 +3,7 @@ $sesion = new Sesion();
 ?>
 <div id="footer" style="clear:both;display:block;">
 	&nbsp;
-		<script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.20151207051013.js"></script>
+		<script type="text/javascript" src="//static.thetimebilling.com/js/newbottom.20161121092348.js"></script>
 		<link rel="stylesheet" type="text/css" href="//static.thetimebilling.com/css/chosen.min.css" />
 		<script type="text/javascript" src="//static.thetimebilling.com/js/chosen.jquery.min.js"></script>
 		<script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/public/js/vendors.js?<?php echo UtilesApp::obtenerVersion()?>"></script>
@@ -265,6 +265,11 @@ if (!empty($notificaciones)) {
 
 ?>
 <script type="text/javascript" src="<?php echo Conf::RootDir(); ?>/app/js/google_analytics.js"></script>
+
+<!-- Start of lemontech Zendesk Widget script -->
+<script>/*<![CDATA[*/window.zEmbed||function(e,t){var n,o,d,i,s,a=[],r=document.createElement("iframe");window.zEmbed=function(){a.push(arguments)},window.zE=window.zE||window.zEmbed,r.src="javascript:false",r.title="",r.role="presentation",(r.frameElement||r).style.cssText="display: none",d=document.getElementsByTagName("script"),d=d[d.length-1],d.parentNode.insertBefore(r,d),i=r.contentWindow,s=i.document;try{o=s}catch(e){n=document.domain,r.src='javascript:var d=document.open();d.domain="'+n+'";void(0);',o=s}o.open()._l=function(){var o=this.createElement("script");n&&(this.domain=n),o.id="js-iframe-async",o.src=e,this.t=+new Date,this.zendeskHost=t,this.zEQueue=a,this.body.appendChild(o)},o.write('<body onload="document._l();">'),o.close()}("https://assets.zendesk.com/embeddable_framework/main.js","lemontech.zendesk.com");
+/*]]>*/</script>
+<!-- End of lemontech Zendesk Widget script -->
 
 <?php if (!empty($sesion)) { /*?>
 <script type="application/javascript" src="//widget.letsta.lk/beta/widget/script/112.js"></script>
