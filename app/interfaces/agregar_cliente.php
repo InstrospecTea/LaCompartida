@@ -173,6 +173,7 @@ if ($opcion == "guardar") {
 		$cliente->Edit("desglose_referencia", $desglose_referencia);
 		$cliente->Edit("id_cliente_referencia", (!empty($id_cliente_referencia) && $id_cliente_referencia != '-1' ) ? $id_cliente_referencia : "NULL" );
 		$cliente->Edit('fecha_inicio_contrato', Utiles::fecha2sql($fecha_inicio_contrato));
+		$cliente->Edit('extranjero', (int) $extranjero);
 
 		if ($cliente->Write()) {
 
@@ -628,6 +629,19 @@ if (!$cliente->Loaded()) {
 						<label for  class="activo">
 							<input type='checkbox' name='activo' id="activo" value='1' <?php echo $cliente->fields['activo'] == 1 ? 'checked="checked"' : !$id_cliente ? 'checked="checked"' : ''  ?>/>
 							&nbsp;<?php echo __('Los clientes inactivos no aparecen en los listados.') ?>
+						</label>
+					</div>
+				</td>
+			</tr>
+
+			<tr class="controls controls-row ">
+				<td class="ar">
+					<div class="span2"><?= __('Extranjero') ?></div>
+				</td>
+				<td class="al">
+					<div class="span4">
+						<label for  class="activo">
+							<input type="checkbox" name="extranjero" id="extranjero" value="1" <?= $cliente->fields['extranjero'] == 1 ? 'checked="checked"' : '' ?>/>
 						</label>
 					</div>
 				</td>
