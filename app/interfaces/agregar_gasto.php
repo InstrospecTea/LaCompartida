@@ -3,7 +3,6 @@ require_once dirname(__FILE__) . '/../conf.php';
 
 $sesion = new Sesion(array('OFI'));
 
-
 $pagina = new Pagina($sesion);
 $id_usuario = isset($id_usuario) ? $id_usuario : $sesion->usuario->fields['id_usuario'];
 
@@ -45,151 +44,165 @@ if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) {
 	}
 }
 
+$logged_user_can_save = true;
+if ($gasto->Loaded()){
+	$UserManager = new UserManager($sesion);
+	$logged_user_id = $sesion->usuario->fields['id_usuario'];
+	$expense_creator_user_id = $gasto->fields['id_usuario'];
+	$logged_user_can_save = ($logged_user_id == $expense_creator_user_id) ||
+												  ($UserManager->isGlobalReviewer($logged_user_id)) ||
+												  ($UserManager->reviewsUser($logged_user_id, $expense_creator_user_id));
+}
 if ($opcion == "guardar") {
-	if (!$codigo_cliente && $codigo_cliente_secundario) {
-		$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario = '$codigo_cliente_secundario'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		list($codigo_cliente) = mysql_fetch_array($resp);
-	}
-
-	if (!$codigo_asunto && $codigo_asunto_secundario) {
-		$query = "SELECT codigo_asunto FROM asunto WHERE codigo_asunto_secundario = '$codigo_asunto_secundario'";
-		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-		list($codigo_asunto) = mysql_fetch_array($resp);
-	}
-
-	// Buscar cliente según asunto seleccionado para revisar consistencia ...
-	$query = "SELECT codigo_cliente FROM asunto WHERE codigo_asunto = '$codigo_asunto'";
-	$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
-	list($codigo_cliente_segun_asunto) = mysql_fetch_array($resp);
-
-	if ($codigo_cliente_segun_asunto != $codigo_cliente) {
-		$pagina->AddError("El asunto seleccionado no corresponde al cliente seleccionado.");
-	}
-
-	// Solo cuando el gasto sea nuevo valido que el asunto se encuentre activo
-	if (!empty($id_gasto) || $id_gasto == 0) {
-		$asunto = new Asunto($sesion);
-		$asunto->LoadByCodigo($codigo_asunto);
-
-		if (!$asunto->fields['activo']) {
-			$pagina->AddError('Debe seleccionar un ' . __('Asunto') . ' activo');
+	if (!$logged_user_can_save) {
+		$info = __('No se han podido guardar los cambios').'. '.__('Acceso denegado').'.';
+		$pagina->AddInfo($info);
+	} else {
+		if (!$codigo_cliente && $codigo_cliente_secundario) {
+			$query = "SELECT codigo_cliente FROM cliente WHERE codigo_cliente_secundario = '$codigo_cliente_secundario'";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			list($codigo_cliente) = mysql_fetch_array($resp);
 		}
-	}
 
-	$errores = $pagina->GetErrors();
+		if (!$codigo_asunto && $codigo_asunto_secundario) {
+			$query = "SELECT codigo_asunto FROM asunto WHERE codigo_asunto_secundario = '$codigo_asunto_secundario'";
+			$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+			list($codigo_asunto) = mysql_fetch_array($resp);
+		}
 
-	if (empty($errores)) {
-		if ($_POST['cobrable'] == 1) {
-			$gasto->Edit("cobrable", 1);
-		} else {
-			if (Conf::GetConf($sesion, 'UsarGastosCobrable')) {
-				$gasto->Edit("cobrable", "0");
-			} else {
-				$gasto->Edit("cobrable", "1");
+		// Buscar cliente según asunto seleccionado para revisar consistencia ...
+		$query = "SELECT codigo_cliente FROM asunto WHERE codigo_asunto = '$codigo_asunto'";
+		$resp = mysql_query($query, $sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $sesion->dbh);
+		list($codigo_cliente_segun_asunto) = mysql_fetch_array($resp);
+
+		if ($codigo_cliente_segun_asunto != $codigo_cliente) {
+			$pagina->AddError("El asunto seleccionado no corresponde al cliente seleccionado.");
+		}
+
+		// Solo cuando el gasto sea nuevo valido que el asunto se encuentre activo
+		if (!empty($id_gasto) || $id_gasto == 0) {
+			$asunto = new Asunto($sesion);
+			$asunto->LoadByCodigo($codigo_asunto);
+
+			if (!$asunto->fields['activo']) {
+				$pagina->AddError('Debe seleccionar un ' . __('Asunto') . ' activo');
 			}
 		}
 
-		/**
-		 *  Si el gasto se considera con IVA,
-		 *  se calcula en base al porcentaje impuesto gasto
-		 *  del cobro
-		 */
-		if (!Conf::GetConf($sesion, 'UsarGastosConSinImpuesto')) {
-			$con_impuesto = 1;
-		}
+		$errores = $pagina->GetErrors();
 
-		$gasto->Edit("con_impuesto", $con_impuesto == 1 ? "SI" : "NO");
+		if (empty($errores)) {
+			if ($_POST['cobrable'] == 1) {
+				$gasto->Edit("cobrable", 1);
+			} else {
+				if (Conf::GetConf($sesion, 'UsarGastosCobrable')) {
+					$gasto->Edit("cobrable", "0");
+				} else {
+					$gasto->Edit("cobrable", "1");
+				}
+			}
 
-		$monto = str_replace(',', '.', $monto);
-		if ($prov == 'true') {
-			$gasto->Edit("ingreso", $monto);
-			$gasto->Edit("monto_cobrable", $monto);
-		} else if ($prov == 'false') {
-			if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {
-				if ($monto <= 0) {
-					$gasto->Edit("egreso", $monto_cobrable);
+			/**
+			 *  Si el gasto se considera con IVA,
+			 *  se calcula en base al porcentaje impuesto gasto
+			 *  del cobro
+			 */
+			if (!Conf::GetConf($sesion, 'UsarGastosConSinImpuesto')) {
+				$con_impuesto = 1;
+			}
+
+			$gasto->Edit("con_impuesto", $con_impuesto == 1 ? "SI" : "NO");
+
+			$monto = str_replace(',', '.', $monto);
+			if ($prov == 'true') {
+				$gasto->Edit("ingreso", $monto);
+				$gasto->Edit("monto_cobrable", $monto);
+			} else if ($prov == 'false') {
+				if (Conf::GetConf($sesion, 'UsaMontoCobrable')) {
+					if ($monto <= 0) {
+						$gasto->Edit("egreso", $monto_cobrable);
+					} else {
+						$gasto->Edit("egreso", $monto);
+					}
+
+					if ($monto_cobrable >= 0) {
+						$monto_cobrable = str_replace(',', '.', $monto_cobrable);
+						$gasto->Edit("monto_cobrable", $monto_cobrable);
+					} else {
+						$gasto->Edit("monto_cobrable", $monto);
+					}
 				} else {
 					$gasto->Edit("egreso", $monto);
-				}
-
-				if ($monto_cobrable >= 0) {
-					$monto_cobrable = str_replace(',', '.', $monto_cobrable);
-					$gasto->Edit("monto_cobrable", $monto_cobrable);
-				} else {
 					$gasto->Edit("monto_cobrable", $monto);
 				}
-			} else {
-				$gasto->Edit("egreso", $monto);
-				$gasto->Edit("monto_cobrable", $monto);
 			}
-		}
 
-		$gasto->Edit("fecha", Utiles::fecha2sql($fecha));
-		$gasto->Edit("id_usuario", !empty($id_usuario) ? $id_usuario : "NULL");
-		$gasto->Edit("descripcion", $descripcion);
-		$gasto->Edit("id_glosa_gasto", (!empty($glosa_gasto) && $glosa_gasto != -1) ? $glosa_gasto : "NULL");
-		$gasto->Edit("id_moneda", $id_moneda);
-		$gasto->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "NULL");
-		$gasto->Edit("codigo_asunto", $codigo_asunto ? $codigo_asunto : "NULL");
-		$gasto->Edit("codigo_gasto", $codigo_gasto ? $codigo_gasto : "NULL");
-		$gasto->Edit("id_usuario_orden", (!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
-		$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
-		$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
-		$gasto->Edit("cuenta_gasto", $cuenta_gasto ? $cuenta_gasto : "NULL");
-		$gasto->Edit("detraccion", $detraccion ? $detraccion : "NULL");
+			$gasto->Edit("fecha", Utiles::fecha2sql($fecha));
+			$gasto->Edit("id_usuario", !empty($id_usuario) ? $id_usuario : "NULL");
+			$gasto->Edit("descripcion", $descripcion);
+			$gasto->Edit("id_glosa_gasto", (!empty($glosa_gasto) && $glosa_gasto != -1) ? $glosa_gasto : "NULL");
+			$gasto->Edit("id_moneda", $id_moneda);
+			$gasto->Edit("codigo_cliente", $codigo_cliente ? $codigo_cliente : "NULL");
+			$gasto->Edit("codigo_asunto", $codigo_asunto ? $codigo_asunto : "NULL");
+			$gasto->Edit("codigo_gasto", $codigo_gasto ? $codigo_gasto : "NULL");
+			$gasto->Edit("id_usuario_orden", (!empty($id_usuario_orden) && $id_usuario_orden != -1) ? $id_usuario_orden : "NULL");
+			$gasto->Edit("id_cta_corriente_tipo", $id_cta_corriente_tipo ? $id_cta_corriente_tipo : "NULL");
+			$gasto->Edit("numero_documento", $numero_documento ? $numero_documento : "NULL");
+			$gasto->Edit("cuenta_gasto", $cuenta_gasto ? $cuenta_gasto : "NULL");
+			$gasto->Edit("detraccion", $detraccion ? $detraccion : "NULL");
 
-		if ($id_tipo_documento_asociado) {
-			$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado);
-		}
-
-		if (Conf::GetConf($sesion, 'FacturaAsociadaCodificada')) {
-			$numero_factura_asociada = $pre_numero_factura_asociada . '-' . $post_numero_factura_asociada;
-		}
-
-		$gasto->Edit("codigo_factura_gasto", $numero_factura_asociada ? $numero_factura_asociada : "NULL");
-		$gasto->Edit("fecha_factura", $fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "NULL");
-		$gasto->Edit("numero_ot", $numero_ot ? $numero_ot : "NULL");
-
-		if ($elimina_ingreso != '') {
-			if (!$ingreso->EliminaIngreso($id_gasto)) {
-				$ingreso_eliminado = '<br>' . __('El ingreso no pudo ser eliminado ya que existen otros gastos asociados.');
+			if ($id_tipo_documento_asociado) {
+				$gasto->Edit("id_tipo_documento_asociado", $id_tipo_documento_asociado);
 			}
-		}
 
-		//$gasto->Edit('id_movimiento_pago', NULL);
+			if (Conf::GetConf($sesion, 'FacturaAsociadaCodificada')) {
+				$numero_factura_asociada = $pre_numero_factura_asociada . '-' . $post_numero_factura_asociada;
+			}
 
-		// Ha cambiado el asunto del gasto se setea id_cobro NULL
-		if ($cambio_asunto) {
-			$gasto->Edit('id_cobro', 'NULL');
-		}
+			$gasto->Edit("codigo_factura_gasto", $numero_factura_asociada ? $numero_factura_asociada : "NULL");
+			$gasto->Edit("fecha_factura", $fecha_factura_asociada ? Utiles::fecha2sql($fecha_factura_asociada) : "NULL");
+			$gasto->Edit("numero_ot", $numero_ot ? $numero_ot : "NULL");
 
-		$gasto->Edit('id_proveedor', $id_proveedor ? $id_proveedor : NULL);
-		$gasto->Edit('estado_pago', !empty($estado_pago) ? $estado_pago : NULL);
-		if (Conf::GetConf($sesion, 'OrdenadoPor')) {
-			$gasto->Edit('solicitante', $solicitante ? addslashes($solicitante) : null);
-		}
+			if ($elimina_ingreso != '') {
+				if (!$ingreso->EliminaIngreso($id_gasto)) {
+					$ingreso_eliminado = '<br>' . __('El ingreso no pudo ser eliminado ya que existen otros gastos asociados.');
+				}
+			}
 
-		if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) {
-			if (Gasto::VerificaIdentificador($sesion, $autoincrementable, $id_gasto) == "1"){
-				$info = 'No se ha podido guardar los cambios debido a que el identificador ingresado ya está en uso, por favor asigne otro.';
-				$pagina->AddInfo($info);
-			} else {
-				if (empty($gasto->fields['nro_seguimiento'])) {
-					Gasto::ActualizaUltimoIdentificador($sesion, $id_gasto, $autoincrementable);
+			//$gasto->Edit('id_movimiento_pago', NULL);
+
+			// Ha cambiado el asunto del gasto se setea id_cobro NULL
+			if ($cambio_asunto) {
+				$gasto->Edit('id_cobro', 'NULL');
+			}
+
+			$gasto->Edit('id_proveedor', $id_proveedor ? $id_proveedor : NULL);
+			$gasto->Edit('estado_pago', !empty($estado_pago) ? $estado_pago : NULL);
+			if (Conf::GetConf($sesion, 'OrdenadoPor')) {
+				$gasto->Edit('solicitante', $solicitante ? addslashes($solicitante) : null);
+			}
+
+			if (Conf::GetConf($sesion, 'AñadeAutoincrementableGasto')) {
+				if (Gasto::VerificaIdentificador($sesion, $autoincrementable, $id_gasto) == "1"){
+					$info = 'No se ha podido guardar los cambios debido a que el identificador ingresado ya está en uso, por favor asigne otro.';
+					$pagina->AddInfo($info);
 				} else {
-					if ($autoincrementable != $gasto->fields['nro_seguimiento'] ) {
+					if (empty($gasto->fields['nro_seguimiento'])) {
 						Gasto::ActualizaUltimoIdentificador($sesion, $id_gasto, $autoincrementable);
+					} else {
+						if ($autoincrementable != $gasto->fields['nro_seguimiento'] ) {
+							Gasto::ActualizaUltimoIdentificador($sesion, $id_gasto, $autoincrementable);
+						}
+					}
+					$gasto->Edit("nro_seguimiento", $autoincrementable ? $autoincrementable : "NULL");
+					if ($gasto->Write()) {
+						$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
 					}
 				}
-				$gasto->Edit("nro_seguimiento", $autoincrementable ? $autoincrementable : "NULL");
+			} else {
 				if ($gasto->Write()) {
 					$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
 				}
-			}
-		} else {
-			if ($gasto->Write()) {
-				$pagina->AddInfo($txt_tipo . ' ' . __('Guardado con éxito.') . ' ' . $ingreso_eliminado);
 			}
 		}
 	}
@@ -772,9 +785,10 @@ $Form = new Form;
 		<tr>
 			<td></td>
 		</tr>
+
 		<tr>
 			<td align="right">
-				<?php echo $Form->icon_submit(__('Guardar'), 'save'); ?>
+				<?php if ($logged_user_can_save) { echo $Form->icon_submit(__('Guardar'), 'save'); } ?>
 			</td>
 			<td align="left">
 				<?php echo $Form->icon_button(__('Cancelar'), 'exit', array('onclick' => 'window.close();')); ?>
