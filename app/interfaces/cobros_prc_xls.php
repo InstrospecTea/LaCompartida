@@ -492,11 +492,11 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$ws->fitToPages(1, 0); // para dejar que todo cuadre en una hoja horizontalmente
 	$ws->centerHorizontally(1); // para dejar centrado horizontalmente
 
-	$ws->setColumn($col_id_trabajo, $col_id_trabajo, 17.2);
-	$ws->setColumn($col_fecha, $col_fecha, 17.2);
-	$ws->setColumn($col_abogado, $col_abogado, 17.2);
-	$ws->setColumn($col_descripcion, $col_descripcion, 17.2);
-	$ws->setColumn($col_tarificable_hh, $col_tarificable_hh, 17.2);
+	$ws->setColumn($col_id_trabajo, $col_id_trabajo, 11.5);
+	$ws->setColumn($col_fecha, $col_fecha, 11.5);
+	$ws->setColumn($col_abogado, $col_abogado, 11.5);
+	$ws->setColumn($col_descripcion, $col_descripcion, 11.5);
+	$ws->setColumn($col_tarificable_hh, $col_tarificable_hh, 11.5);
 	$filas = 9;
 
 	// Agregar la imagen del logo
@@ -889,22 +889,22 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		}
 		//seteamos el ancho y columnas ocultas segun corresponda
 
-		$ws->setColumn($columna_abogado, $columna_abogado, 35.8);
-		$ws->setColumn($columna_hora, $columna_hora, 9.6);
+		$ws->setColumn($columna_abogado, $columna_abogado, 23.9);
+		$ws->setColumn($columna_hora, $columna_hora, 6.4);
 		if (!$Cobro->fields['opc_ver_profesional_categoria'] == 1) {
 			$ws->setColumn($columna_categoria, $columna_categoria, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_categoria, $columna_categoria, 16.1);
+			$ws->setColumn($columna_categoria, $columna_categoria, 10.7);
 		}
 		if (!$Cobro->fields['opc_ver_profesional_tarifa'] == 1) {
 			$ws->setColumn($columna_tarifa, $columna_tarifa, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_tarifa, $columna_tarifa, 10.6);
+			$ws->setColumn($columna_tarifa, $columna_tarifa, 7.1);
 		}
 		if (!$Cobro->fields['opc_ver_profesional_importe'] == 1) {
 			$ws->setColumn($columna_importe, $columna_importe, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_importe, $columna_importe, 13.7);
+			$ws->setColumn($columna_importe, $columna_importe, 9.2);
 		}
 	}
 
@@ -1139,34 +1139,34 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							$col_formula_hora_tarificada, $columna_importe, $col_formula_importe, $formato_moneda_tabla, true);
 		}
 
-		$ws->setColumn($columna_fecha, $columna_fecha, 10);
-		$ws->setColumn($columna_abogado, $columna_abogado, 27.1);
+		$ws->setColumn($columna_fecha, $columna_fecha, 6.7);
+		$ws->setColumn($columna_abogado, $columna_abogado, 18);
 
 		if (!$Cobro->fields['opc_ver_detalles_por_hora_categoria'] == 1) {
 			$ws->setColumn($columna_categoria, $columna_categoria, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_categoria, $columna_categoria, 11.8);
+			$ws->setColumn($columna_categoria, $columna_categoria, 7.9);
 		}
 
 		$ws->setColumn($columna_descripcion, $columna_descripcion, 40);
-		$ws->setColumn($columna_hora, $columna_hora, 8.5);
+		$ws->setColumn($columna_hora, $columna_hora, 5.6);
 
 		if (!$Cobro->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
 			$ws->setColumn($columna_sigla, $columna_sigla, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_sigla, $columna_sigla, 12.8);
+			$ws->setColumn($columna_sigla, $columna_sigla, 8.5);
 		}
 
 		if (!$Cobro->fields['opc_ver_detalles_por_hora_tarifa'] == 1) {
 			$ws->setColumn($columna_tarifa, $columna_tarifa, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_tarifa, $columna_tarifa, 11.7);
+			$ws->setColumn($columna_tarifa, $columna_tarifa, 7.8);
 		}
 
 		if (!$Cobro->fields['opc_ver_detalles_por_hora_importe'] == 1) {
 			$ws->setColumn($columna_importe, $columna_importe, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_importe, $columna_importe, 13.9);
+			$ws->setColumn($columna_importe, $columna_importe, 9.3);
 		}
 	}
 
@@ -1226,7 +1226,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$ws->write($filas, $columna_gastos_fecha, $arraylang['fecha']['Listado de gastos'][$lang], $letra_encabezado_lista);
 
 			$ws->write($filas, $columna_gastos_descripcion, $arraylang['descripcion']['Listado de gastos'][$lang], $letra_encabezado_lista);
-			$ws->write($filas, $columna_gastos_montos, $arraylang['monto']['Listado de gastos'][$lang] . ' ' . $CobroMoneda->moneda[$Cobro->fields['opc_moneda_total']]['simbolo'], $letra_encabezado_lista);
+			$ws->write($filas, $columna_gastos_montos, $arraylang['monto']['Listado de gastos'][$lang] . ' ' . $CobroMoneda->moneda[$Cobro->fields['opc_moneda_total']]['simbolo'], $letra_encabezado_lista_centrado);
 			++$filas;
 		}
 		$ws->freezePanes(array($filas, 0));
@@ -1273,7 +1273,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 				$ws->write($filas, $columna_gastos_fecha, $arraylang['fecha']['Listado de gastos'][$lang], $letra_encabezado_lista);
 				$ws->write($filas, $columna_gastos_descripcion, $arraylang['descripcion']['Listado de gastos'][$lang], $letra_encabezado_lista);
-				$ws->write($filas, $columna_gastos_montos, $arraylang['monto']['Listado de gastos'][$lang] . ' ' . $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo'], $letra_encabezado_lista);
+				$ws->write($filas, $columna_gastos_montos, $arraylang['monto']['Listado de gastos'][$lang] . ' ' . $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo'], $letra_encabezado_lista_centrado);
 				++$filas;
 				$fila_inicio_gastos = $filas + 1;
 			}
@@ -1301,9 +1301,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$ws->writeFormula($filas, $columna_gastos_montos, "=SUM($col_formula_gastos_montos$fila_inicio:$col_formula_gastos_montos$filas)/2", $formato_moneda_total_tabla);
 		}
 
-		$ws->setColumn($columna_gastos_fecha, $columna_gastos_fecha, 9.6);
-		$ws->setColumn($columna_gastos_descripcion, $columna_gastos_descripcion, 75);
-		$ws->setColumn($columna_gastos_montos, $columna_gastos_montos, 12.8);
+		$ws->setColumn($columna_gastos_fecha, $columna_gastos_fecha, 6.4);
+		$ws->setColumn($columna_gastos_descripcion, $columna_gastos_descripcion, 50);
+		$ws->setColumn($columna_gastos_montos, $columna_gastos_montos, 8.5);
 	}
 }
 // fin bucle cobros
