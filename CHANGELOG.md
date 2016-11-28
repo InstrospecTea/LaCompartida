@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.16
+Monday, November 28th
+* **Fix** [Se ajusta ancho de columnas según petición de PRC para sus Excel, exclusivo Windows](https://github.com/LemontechSA/ttb/pull/1948)
+
 ## Hotfix 16.33.15
 Monday, November 28th
 * **Fix** [Se cambia el nombre de las conf de TrabajosOrdenarPorXX a OrdenarPorXX](https://github.com/LemontechSA/ttb/pull/1947)
