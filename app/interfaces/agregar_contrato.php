@@ -1747,6 +1747,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?= __('Extranjero') ?>
 					</td>
 					<td align="left" colspan="3">
+						<input type="hidden" name="extranjero" value="0"/>
 						<input type="checkbox" name="extranjero" id="extranjero" value="1" <?= $contrato->fields['extranjero'] == '1' ? 'checked="checked"' : '' ?> />
 					</td>
 				</tr>
