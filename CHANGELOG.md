@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.33.15
+Monday, November 28th
+* **Fix** [Se cambia el nombre de las conf de TrabajosOrdenarPorXX a OrdenarPorXX](https://github.com/LemontechSA/ttb/pull/1947)
+
 ## Hotfix 16.33.14
 Monday, November 28th
 * **Fix** [Se le asigna duracion_cobrada a %horas% si el cobro es flat fee](https://github.com/LemontechSA/ttb/pull/1946)
