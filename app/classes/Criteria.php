@@ -357,7 +357,10 @@ class Criteria {
 	 * @throws Exception
 	 */
 	public function add_ordering($order_entity, $ordering_criteria = 'ASC') {
-
+		if(preg_match('/ +(ASC|DESC) *$/', strtoupper($order_entity),$matches)) {
+			$order_entity = substr($order_entity, 0, -strlen($matches[0]));
+			$ordering_criteria = $matches[1];
+		}
 		if ($ordering_criteria == 'ASC' || $ordering_criteria == 'DESC') {
 			$order = $order_entity.' '.$ordering_criteria;
 			if (!in_array($order, $this->ordering_clauses)) {

@@ -276,8 +276,7 @@ class ChargeData {
  				->add_ordering('usuario.id_categoria_usuario')
  				->add_ordering('usuario.id_usuario');
  		} else {
- 			$Criteria->add_ordering('trabajo.fecha', 'ASC')
- 				->add_ordering('trabajo.descripcion');
+ 			$Criteria->add_ordering(Conf::read('OrdenResumenProfesional'));
  		}
  		if ($this->get('codigo_idioma') == 'es') {
  			$Criteria->add_select('prm_categoria_usuario.glosa_categoria', 'categoria');
