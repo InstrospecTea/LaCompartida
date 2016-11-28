@@ -220,6 +220,7 @@ class ChargeData {
 		$Criteria = $this->scopeUserCategory($Criteria);
 		$Criteria = $this->scopeChargeable($Criteria);
 
+		var_dump($Criteria->get_plain_query());
 		$this->works = $Criteria->run();
 		foreach ($this->works as $i => $work) {
 			$work['duracion'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion']);
@@ -260,22 +261,9 @@ class ChargeData {
 	 * @return Criteria
 	 */
 	protected function scopeUserCategory(Criteria $Criteria) {
- 		if (Conf::read('OrdenarPorCategoriaNombreUsuario') || Conf::read('OrdenarPorCategoriaUsuario')) {
- 			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
- 				->add_ordering('prm_categoria_usuario.orden')
- 				->add_ordering('usuario.id_usuario');
- 		} else if (Conf::read('SepararPorUsuario')) {
- 			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
- 				->add_ordering('usuario.id_categoria_usuario')
- 				->add_ordering('usuario.id_usuario');
- 		} else if (Conf::read('OrdenarPorFechaCategoria')) {
- 			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
- 				->add_ordering('trabajo.fecha')
- 				->add_ordering('usuario.id_categoria_usuario')
- 				->add_ordering('usuario.id_usuario');
- 		} else {
- 			$Criteria->add_ordering(Conf::read('OrdenResumenProfesional'));
- 		}
+		$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario');
+ 		$Criteria->add_ordering(Conf::read('OrdenResumenProfesional'));
+
  		if ($this->get('codigo_idioma') == 'es') {
  			$Criteria->add_select('prm_categoria_usuario.glosa_categoria', 'categoria');
  		} else {
