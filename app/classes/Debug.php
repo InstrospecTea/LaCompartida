@@ -2,11 +2,10 @@
 
 namespace TTB;
 /**
- * Class Debug
- * Para escribir Debugs que solo sean visible para usuario Admin Lemontech
- */
+* Class Debug
+* Para escribir Debugs que solo sean visible para usuario Admin Lemontech
+*/
 class Debug {
-
 	static $pr_template;
 
 	/**
@@ -29,5 +28,4 @@ class Debug {
 		}
 		return self::$pr_template;
 	}
-
 }

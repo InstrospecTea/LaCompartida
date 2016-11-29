@@ -139,6 +139,8 @@ $_LANG['Saldo del cobro'] = "Invoice balance";
 $_LANG['Solicitado Por'] = "Requested By";
 $_LANG['Ordenado Por'] = "Name of Client";
 $_LANG['Estimado'] = "Dear";
+$_LANG['No se han podido guardar los cambios'] = "Changes could not be save";
+$_LANG['Acceso denegado'] = "Access denied";
 
 #MONEDAS
 $_LANG['Tipos de Cambio'] = "Exchange Rates";
