@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.34.1
+Tuesday, November 29th
+* **Fix** [Eliminar GuzzleHttp y ocupar curl](https://github.com/LemontechSA/ttb/pull/1950)
+
 ## [Release 16.34.0](https://github.com/LemontechSA/ttb/pull/1949)
 Monday, November 28th
 * **Feature** [Facturación Electrónica Materia Software](https://github.com/LemontechSA/ttb/pull/1907)

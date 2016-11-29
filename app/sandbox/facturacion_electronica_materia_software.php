@@ -42,17 +42,17 @@ $documento = $WsFacturacionMateriaSoftware->documento(
 // 	$documento->Serie,
 // 	(int) $documento->Correlativo
 // );
-//
+
 // TTB\Debug::pr(json_encode($documento_anulado, JSON_PRETTY_PRINT));
+//
+// echo "<div>Invoice: {$documento->Serie} {$documento->Correlativo}</div>";
+// echo '<div>Code: ', $WsFacturacionMateriaSoftware->getErrorCode(), '</div>';
+// echo '<div>Message: ', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
 
 // $pdf = $WsFacturacionMateriaSoftware->GetStatus(
 // 	$documento->Serie,
 // 	(int) $documento->Correlativo
 // );
-
-// echo "<div>Invoice: {$documento->Serie} {$documento->Correlativo}</div>";
-// echo '<div>Code: ', $WsFacturacionMateriaSoftware->getErrorCode(), '</div>';
-// echo '<div>Message: ', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
 
 // header("Content-Transfer-Encoding: binary");
 // header("Content-Type: application/pdf");
