@@ -9,8 +9,6 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 	private $body_invoice;
 
 	public function __construct($url, $token) {
-		$this->Client = new \GuzzleHttp\Client();
-
 		$this->url = $url;
 		$this->token = $token;
 		$this->default_message_error = 'Ocurrió un error inesperado con Materia Software: ';
@@ -19,36 +17,21 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 
 	private function getHeaders() {
 		return [
-			'content-type' => 'application/json',
-			'Accept' => 'application/json',
-			'Authorization' => $this->token
+			'Accept: application/json',
+			'Content-Type: application/json',
+			"Authorization: {$this->token}"
 		];
 	}
 
 	public function documento(Factura $Factura, Moneda $Moneda, PrmDocumentoLegal $DocumentoLegal, Contrato $Contrato) {
-		$documento = null;
+		$this->generateBodyInvoice($Factura, $Moneda, $DocumentoLegal, $Contrato);
 
-		try {
-			$this->generateBodyInvoice($Factura, $Moneda, $DocumentoLegal, $Contrato);
+		$response = $this->sendData('POST', "{$this->url}/documento", json_encode($this->body_invoice));
+		$documento = json_decode($response);
 
-			$respuesta = $this->Client->request(
-				'POST',
-				"{$this->url}/documento",
-				[
-					'headers' => $this->getHeaders(),
-					'body' => json_encode($this->body_invoice)
-				]
-			);
-
-			$documento = json_decode($respuesta->getBody());
-		} catch (GuzzleHttp\Exception\ServerException $e) {
-			$response = $e->getResponse();
-			$json_response = json_decode($response->getBody()->getContents());
-			$this->setError(1, $this->default_message_error . $json_response->ExceptionMessage);
-		} catch(GuzzleHttp\Exception\ClientException $e) {
-			$response = $e->getResponse();
-			$json_response = json_decode($response->getBody()->getContents());
-			$this->setError(2, $this->default_message_error . $json_response->ExceptionMessage);
+		// ocurrió un error
+		if (isset($documento->Message)) {
+			$this->setCurlError($documento);
 		}
 
 		return $documento;
@@ -57,46 +40,24 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 	public function GetStatus($serie, $correlativo) {
 		$documento = null;
 
-		try {
-			$respuesta = $this->Client->request(
-				'GET',
-				"{$this->url}/documento/GetStatus?serie={$serie}&correlativo={$correlativo}",
-				['headers' => $this->getHeaders()]
-			);
+		$response = $this->sendData('GET', "{$this->url}/documento/GetStatus?serie={$serie}&correlativo={$correlativo}");
+		$documento = json_decode($response);
 
-			$documento = json_decode($respuesta->getBody());
-		} catch (GuzzleHttp\Exception\ServerException $e) {
-			$response = $e->getResponse();
-			$json_response = json_decode($response->getBody()->getContents());
-			$this->setError(1, $this->default_message_error . $json_response->ExceptionMessage);
-		} catch(GuzzleHttp\Exception\ClientException $e) {
-			$response = $e->getResponse();
-			$json_response = json_decode($response->getBody()->getContents());
-			$this->setError(2, $this->default_message_error . $json_response->ExceptionMessage);
+		// ocurrió un error
+		if (isset($documento->Message)) {
+			$this->setCurlError($documento);
 		}
 
 		return $documento;
 	}
 
 	public function PutAnular($serie, $correlativo) {
-		$documento = null;
+		$response = $this->sendData('PUT', "{$this->url}/documento/PutAnular?serie={$serie}&correlativo={$correlativo}");
+		$documento = json_decode($response);
 
-		try {
-			$respuesta = $this->Client->request(
-				'PUT',
-				"{$this->url}/documento/PutAnular?serie={$serie}&correlativo={$correlativo}",
-				['headers' => $this->getHeaders()]
-			);
-
-			$documento = json_decode($respuesta->getBody());
-		} catch (GuzzleHttp\Exception\ServerException $e) {
-			$response = $e->getResponse();
-			$json_response = json_decode($response->getBody()->getContents());
-			$this->setError(1, $this->default_message_error . $json_response->ExceptionMessage);
-		} catch(GuzzleHttp\Exception\ClientException $e) {
-			$response = $e->getResponse();
-			$json_response = json_decode($response->getBody()->getContents());
-			$this->setError(2, $this->default_message_error . $json_response->ExceptionMessage);
+		// ocurrió un error
+		if (isset($documento->Message)) {
+			$this->setCurlError($documento);
 		}
 
 		return $documento;
@@ -157,5 +118,35 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 
 	public function getBodyInvoice() {
 		return $this->body_invoice;
+	}
+
+	private function sendData($method, $url, $post = '') {
+		$ch = curl_init($url);
+
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+
+		if ($method == 'POST') {
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+		}
+
+		$response = curl_exec($ch);
+		curl_close($ch);
+
+		return $response;
+	}
+
+	private function setCurlError($response) {
+		// Error de servicio (como se genera el request)
+		if (isset($response->MessageDetail)) {
+			$this->setError(1, $this->default_message_error . $response->MessageDetail);
+		}
+
+		// Error de consumo (regla de negocio)
+		if (isset($response->ExceptionMessage)) {
+			$this->setError(2, $this->default_message_error . $response->ExceptionMessage);
+		}
 	}
 }
