@@ -366,7 +366,6 @@ class Criteria {
 			$order = $order_entity.' '.$ordering_criteria;
 			if (!in_array($order, $this->ordering_clauses)) {
 				$this->ordering_clauses[] = $order;
-				var_dump($order);
 			}
 		} else {
 			throw new Exception('Criteria dice: El criterio de orden que se pretende establecer no corresponde al lenguaje SQL. Esperado "ASC" o "DESC", obtenido "'. $ordering_criteria. '".');
