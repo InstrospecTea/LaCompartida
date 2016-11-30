@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.35.1
+Wednesday, November 30th
+* **Fix** [Fix nota crédito sin monto en FacturaciónCL](https://github.com/LemontechSA/ttb/pull/1955)
+
 ## [Release 16.35.0](https://github.com/LemontechSA/ttb/pull/1953)
 Tuesday, November 29th
 * **Fix** [Error en formato de excel de rentabilidad de una liquidación](https://github.com/LemontechSA/ttb/pull/1894)
