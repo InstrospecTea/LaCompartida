@@ -191,7 +191,7 @@ class ChargeData {
 		$this->works = $this->getWorksOrdererBy();
 	}
 
-	public function getWorksOrdererBy($sql_order_by = '') {
+	public function getWorksOrdererBy($sql_order_by = 'trabajo.fecha ASC,  trabajo.descripcion ASC') {
 		$time_format = '%k:%i';
 		$Criteria = new Criteria($this->Sesion);
 		$Criteria->add_from('trabajo')
