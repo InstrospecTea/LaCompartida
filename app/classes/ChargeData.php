@@ -118,6 +118,28 @@ class ChargeData {
 	}
 
 	/**
+	 * Devuelve todos los trabajos del cobro o de un asunto en particular, ordenados según se indique
+	 * @param string $matter_code
+	 * @param string $sql_order_by
+	 * @return array
+	 */
+	public function getWorksByMatterOrderedBy($matter_code = null, $sql_order_by) {
+		if (is_null($matter_code)) {
+			return $this->getWorksOrdererBy($sql_order_by);
+		}
+
+		$matter_works = array();
+		$works = $this->getWorksOrdererBy($sql_order_by);
+		$total_works = count($works);
+		for ($i = 0; $i < $total_works; ++$i) {
+			if ($works[$i]['codigo_asunto'] == $matter_code) {
+				$matter_works[] = $works[$i];
+			}
+		}
+		return $matter_works;
+	}
+
+	/**
 	 * verifica si tiene el cobro o un asunto en particular
 	 * @param string $matter_code
 	 * @return array

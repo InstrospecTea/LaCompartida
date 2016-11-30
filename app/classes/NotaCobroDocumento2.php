@@ -2116,7 +2116,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$row_tmpl = $html;
 				$html = '';
 
-				$works = $this->ChargeData->getWorks($asunto->fields['codigo_asunto']);
+				$works = $this->ChargeData->getWorksByMatterOrderedBy($asunto->fields['codigo_asunto'], Conf::read('OrdenTrabajosNotaCobro'));
 
 				$total_works = count($works);
 				$categoria_duracion = 0;
