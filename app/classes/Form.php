@@ -41,7 +41,7 @@ class Form {
 	 * @return string HTML que contiene el selector
 	 */
 	public function select($name, $options, $selected = null, array $attrs = array()) {
-		$attrs += array('empty' => '', 'escape' => true);
+		$attrs += array('empty' => '', 'translate' => true);
 		if (empty($attrs['name']) && !empty($name)) {
 			$attrs['name'] = $name;
 		}
@@ -53,8 +53,8 @@ class Form {
 			$html_options .= $this->Html->tag('option', $attrs['empty'], array('value' => ''));
 		}
 		unset($attrs['empty']);
-		$html_options .= $this->options($options, $selected, $attrs['escape']);
-		unset($attrs['escape']);
+		$html_options .= $this->options($options, $selected, $attrs['translate']);
+		unset($attrs['translate']);
 
 		$select = $this->Html->tag('select', $html_options, $attrs);
 		return $select;
@@ -66,11 +66,11 @@ class Form {
 	 * @param type $selected
 	 * @return type
 	 */
-	public function options($options, $selected, $escape = true) {
+	public function options($options, $selected, $translate = true) {
 		$html = '';
 		foreach ($options as $value => $text) {
 			if (is_array($text)) {
-				$html_options = $this->options($text, null, $escape);
+				$html_options = $this->options($text, null, $translate);
 				$html .= $this->Html->tag('optgroup', $html_options, array('label' => $value));
 			} else {
 				$op_attr = array(
@@ -85,7 +85,7 @@ class Form {
 						$op_attr['selected'] = true;
 					}
 				}
-				$html .= $this->Html->tag('option', $escape ? __($text) : $text, $op_attr);
+				$html .= $this->Html->tag('option', $translate ? __($text) : $text, $op_attr);
 			}
 		}
 		return $html;

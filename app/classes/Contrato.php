@@ -149,7 +149,8 @@ class Contrato extends Objeto {
 			'id_estudio',
 			'emitir_liquidacion_al_generar',
 			'enviar_liquidacion_al_generar',
-			'opc_mostrar_tramites_no_cobrables'
+			'opc_mostrar_tramites_no_cobrables',
+			'extranjero'
 	);
 
 	function __construct($sesion, $fields = "", $params = "") {

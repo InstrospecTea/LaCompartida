@@ -1,5 +1,44 @@
 # Changelog
 
+## [Release 16.35.0](https://github.com/LemontechSA/ttb/pull/1953)
+Tuesday, November 29th
+* **Fix** [Error en formato de excel de rentabilidad de una liquidación](https://github.com/LemontechSA/ttb/pull/1894)
+
+## Hotfix 16.34.1
+Tuesday, November 29th
+* **Fix** [Eliminar GuzzleHttp y ocupar curl](https://github.com/LemontechSA/ttb/pull/1950)
+
+## [Release 16.34.0](https://github.com/LemontechSA/ttb/pull/1949)
+Monday, November 28th
+* **Feature** [Facturación Electrónica Materia Software](https://github.com/LemontechSA/ttb/pull/1907)
+* **Feature** [Problemas con edición de estado de factura y/o documento legal](https://github.com/LemontechSA/ttb/pull/1908)
+* **Feature** [Reemplazar widget de zendesk](https://github.com/LemontechSA/ttb/pull/1929)
+* **Feature** [Restringir modulo de gastos](https://github.com/LemontechSA/ttb/pull/1937)
+
+## Hotfix 16.33.16
+Monday, November 28th
+* **Fix** [Se ajusta ancho de columnas según petición de PRC para sus Excel, exclusivo Windows](https://github.com/LemontechSA/ttb/pull/1948)
+
+## Hotfix 16.33.15
+Monday, November 28th
+* **Fix** [Se cambia el nombre de las conf de TrabajosOrdenarPorXX a OrdenarPorXX](https://github.com/LemontechSA/ttb/pull/1947)
+
+## Hotfix 16.33.14
+Monday, November 28th
+* **Fix** [Se le asigna duracion_cobrada a %horas% si el cobro es flat fee](https://github.com/LemontechSA/ttb/pull/1946)
+
+## Hotfix 16.33.13
+Friday, November 25th
+* **Fix** [Se ajusta ancho de columnas según petición de PRC para sus Excel](https://github.com/LemontechSA/ttb/pull/1945)
+
+## Hotfix 16.33.12
+Friday, November 25th
+* **Fix** [Agregar tabla contrato a query por defecto de cobro en reporte avanzado](https://github.com/LemontechSA/ttb/pull/1942)
+
+## Hotfix 16.33.11
+Thursday, November 24th
+* **Fix** [Corrección formato moneda](https://github.com/LemontechSA/ttb/pull/1941)
+
 ## Hotfix 16.33.10
 Wednesday, November 23rd
 * **Fix** [Se le asigna duracion_descontada a horas_descontadas y glosa_horas_descontadas de cada trabajo.](https://github.com/LemontechSA/ttb/pull/1940)

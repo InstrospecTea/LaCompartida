@@ -448,6 +448,14 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 							'Bold' => '1',
 							'Color' => 'black',
 							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
+	$formato_moneda_tabla_derecha = & $wb->addFormat(array(
+							'Size' => 8,
+							'VAlign' => 'middle',
+							'Align' => 'right',
+							'Top' => '1',
+							'Bold' => '1',
+							'Color' => 'black',
+							'NumFormat' => "[$$simbolo_moneda_total] #,###,0$decimales"));
 	$formato_moneda_total_tabla = & $wb->addFormat(array(
 							'Size' => 8,
 							'VAlign' => 'middle',
@@ -474,7 +482,6 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 	$arraylang = Utiles::FetchAllExcelCobro($Sesion, 'prm_excel_cobro');
 
-
 	//Hoja Liquidación
 	$nombre_pagina = ++$numero_pagina . ' ';
 	$ws = &$wb->addWorksheet($arraylang['liquidacion']['Encabezado'][$lang]);
@@ -485,11 +492,11 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 	$ws->fitToPages(1, 0); // para dejar que todo cuadre en una hoja horizontalmente
 	$ws->centerHorizontally(1); // para dejar centrado horizontalmente
 
-	$ws->setColumn($col_id_trabajo, $col_id_trabajo, 15);
-	$ws->setColumn($col_fecha, $col_fecha, 15);
-	$ws->setColumn($col_abogado, $col_abogado, 15);
-	$ws->setColumn($col_descripcion, $col_descripcion, 15);
-	$ws->setColumn($col_tarificable_hh, $col_tarificable_hh, 15);
+	$ws->setColumn($col_id_trabajo, $col_id_trabajo, 11.5);
+	$ws->setColumn($col_fecha, $col_fecha, 11.5);
+	$ws->setColumn($col_abogado, $col_abogado, 11.5);
+	$ws->setColumn($col_descripcion, $col_descripcion, 11.5);
+	$ws->setColumn($col_tarificable_hh, $col_tarificable_hh, 11.5);
 	$filas = 9;
 
 	// Agregar la imagen del logo
@@ -707,8 +714,8 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$fecha_ini_titulo = !empty($works[0]) ? $works[0]->get('fecha') : '';
 		}
 		$ws->mergeCells($filas, 0, $filas, 4);
-		$ws->write($filas, $columna_categoria, $arraylang['titulo_resumen']['Encabezado'][$lang], $formato_encabezado_center);
-		$ws->write($filas, $columna_abogado, '', $formato_encabezado);
+		$ws->write($filas, $columna_abogado, $arraylang['titulo_resumen']['Encabezado'][$lang], $formato_encabezado_center);
+		$ws->write($filas, $columna_categoria, '', $formato_encabezado);
 		$ws->write($filas, $columna_hora, '', $formato_encabezado);
 		$ws->write($filas, $columna_tarifa, '', $formato_encabezado);
 		$ws->write($filas, $columna_importe, '', $formato_encabezado);
@@ -716,11 +723,11 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		$ws->mergeCells($filas, 0, $filas, 4);
 		$ws->write(
 			$filas,
-			$columna_categoria,
+			$columna_abogado,
 			"{$arraylang['periodo']['Listado de trabajos'][$lang]} {$fecha_ini_titulo} {$arraylang['periodo_al']['Listado de trabajos'][$lang]} {$Cobro->fields['fecha_fin']}",
 			$formato_encabezado_center
 		);
-		$ws->write($filas, $columna_abogado, '', $formato_encabezado_center);
+		$ws->write($filas, $columna_categoria, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_hora, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_tarifa, '', $formato_encabezado_center);
 		$ws->write($filas, $columna_importe, '', $formato_encabezado_center);
@@ -876,28 +883,28 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			// Cuando muestre tarifa proporcional no muestro horas tarificadas
 			if ($Cobro->fields['opc_ver_valor_hh_flat_fee'] == 0 &&
 							($Cobro->fields['forma_cobro'] == 'RETAINER' || $Cobro->fields['forma_cobro'] == 'PROPORCIONAL')) {
-				$ws->writeFormula($filas, $columna_hora_tarificada, "=SUM($col_formula_hora_tarificada" . ($fila_inicial + 1) . ":$col_formula_hora_tarificada" . ($filas) . ")", $formato_tiempo_total_tabla_centrado);
+				$ws->writeFormula($filas, $columna_hora_tarificada, "=SUM($col_formula_hora_tarificada" . ($fila_inicial + 1) . ":$col_formula_hora_tarificada" . ($filas) . ")", $formato_moneda_tabla_derecha);
 			}
-			$ws->writeFormula($filas, $columna_importe, "=SUM($col_formula_importe" . ($fila_inicial + 1) . ":$col_formula_importe" . ($filas) . ")", $formato_moneda_tabla_centrado);
+			$ws->writeFormula($filas, $columna_importe, "=SUM($col_formula_importe" . ($fila_inicial + 1) . ":$col_formula_importe" . ($filas) . ")", $formato_moneda_tabla_derecha);
 		}
 		//seteamos el ancho y columnas ocultas segun corresponda
 
-		$ws->setColumn($columna_abogado, $columna_abogado, 32);
-		$ws->setColumn($columna_hora, $columna_hora, 8);
+		$ws->setColumn($columna_abogado, $columna_abogado, 23.9);
+		$ws->setColumn($columna_hora, $columna_hora, 6.4);
 		if (!$Cobro->fields['opc_ver_profesional_categoria'] == 1) {
 			$ws->setColumn($columna_categoria, $columna_categoria, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_categoria, $columna_categoria, 14);
+			$ws->setColumn($columna_categoria, $columna_categoria, 10.7);
 		}
 		if (!$Cobro->fields['opc_ver_profesional_tarifa'] == 1) {
 			$ws->setColumn($columna_tarifa, $columna_tarifa, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_tarifa, $columna_tarifa, 9);
+			$ws->setColumn($columna_tarifa, $columna_tarifa, 7.1);
 		}
 		if (!$Cobro->fields['opc_ver_profesional_importe'] == 1) {
 			$ws->setColumn($columna_importe, $columna_importe, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_importe, $columna_importe, 12);
+			$ws->setColumn($columna_importe, $columna_importe, 9.2);
 		}
 	}
 
@@ -1038,7 +1045,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$asunto_actual = $trabajo->fields['codigo_asunto'];
 
 					if ($fila_inicial_asunto) {
-						subtotal_profesional($ws, $filas, $columna_hora, $col_formula_hora, $fila_inicial_asunto, $formato_tiempo_total_tabla, $Cobro, $columna_hora_tarificada,
+						subtotal_profesional($ws, $filas, $columna_hora, $col_formula_hora, $fila_inicial_asunto, $formato_tiempo_total_tabla_centrado, $Cobro, $columna_hora_tarificada,
 										$col_formula_hora_tarificada, $columna_importe, $col_formula_importe, $formato_moneda_tabla);
 						$filas++;
 					}
@@ -1046,10 +1053,6 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 					$ws->write($filas, 0, $trabajo->fields['codigo_asunto'], $formato_encabezado);
 					$ws->write($filas, 2, $trabajo->fields['glosa_asunto'], $formato_encabezado);
 					$filas += 2;
-
-
-
-
 
 					$ws->write($filas, $columna_fecha, $arraylang['fecha']['Listado de trabajos'][$lang], $letra_encabezado_lista_centrado);
 					$ws->write($filas, $columna_sigla, $arraylang['sigla']['Listado de trabajos'][$lang], $letra_encabezado_lista_centrado);
@@ -1127,42 +1130,43 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 				$filas += 2;
 			}
-			subtotal_profesional($ws, $filas, $columna_hora, $col_formula_hora, $fila_inicial_asunto, $formato_tiempo_total_tabla, $Cobro, $columna_hora_tarificada,
+			subtotal_profesional($ws, $filas, $columna_hora, $col_formula_hora, $fila_inicial_asunto, $formato_tiempo_total_tabla_centrado, $Cobro, $columna_hora_tarificada,
 							$col_formula_hora_tarificada, $columna_importe, $col_formula_importe, $formato_moneda_tabla);
 			$filas += 3;
 
 			$ws->write($filas, $columna_hora - 1, __('Total'), $formato_encabezado);
-			subtotal_profesional($ws, $filas, $columna_hora, $col_formula_hora, $fila_inicial, $formato_tiempo_total_tabla, $Cobro, $columna_hora_tarificada,
+			subtotal_profesional($ws, $filas, $columna_hora, $col_formula_hora, $fila_inicial, $formato_tiempo_total_tabla_centrado, $Cobro, $columna_hora_tarificada,
 							$col_formula_hora_tarificada, $columna_importe, $col_formula_importe, $formato_moneda_tabla, true);
 		}
 
-		$ws->setColumn($columna_abogado, $columna_abogado, 23);
+		$ws->setColumn($columna_fecha, $columna_fecha, 6.7);
+		$ws->setColumn($columna_abogado, $columna_abogado, 18);
 
 		if (!$Cobro->fields['opc_ver_detalles_por_hora_categoria'] == 1) {
 			$ws->setColumn($columna_categoria, $columna_categoria, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_categoria, $columna_categoria, 9);
+			$ws->setColumn($columna_categoria, $columna_categoria, 7.9);
 		}
 
 		$ws->setColumn($columna_descripcion, $columna_descripcion, 40);
-		$ws->setColumn($columna_hora, $columna_hora, 7);
+		$ws->setColumn($columna_hora, $columna_hora, 5.6);
 
 		if (!$Cobro->fields['opc_ver_detalles_por_hora_iniciales'] == 1) {
 			$ws->setColumn($columna_sigla, $columna_sigla, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_sigla, $columna_sigla, 11);
+			$ws->setColumn($columna_sigla, $columna_sigla, 8.5);
 		}
 
 		if (!$Cobro->fields['opc_ver_detalles_por_hora_tarifa'] == 1) {
 			$ws->setColumn($columna_tarifa, $columna_tarifa, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_tarifa, $columna_tarifa, 10);
+			$ws->setColumn($columna_tarifa, $columna_tarifa, 7.8);
 		}
 
 		if (!$Cobro->fields['opc_ver_detalles_por_hora_importe'] == 1) {
 			$ws->setColumn($columna_importe, $columna_importe, 0, 0, 1);
 		} else {
-			$ws->setColumn($columna_importe, $columna_importe, 12);
+			$ws->setColumn($columna_importe, $columna_importe, 9.3);
 		}
 	}
 
@@ -1203,13 +1207,13 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 		}
 
 		$ws->mergeCells($filas, 0, $filas, 3);
-		$ws->write($filas, $columna_gastos_fecha, '', $formato_encabezado);
-		$ws->write($filas, $columna_gastos_descripcion, $arraylang['titulo_gastos']['Encabezado'][$lang], $formato_encabezado_center);
+		$ws->write($filas, $columna_gastos_fecha, $arraylang['titulo_gastos']['Encabezado'][$lang], $formato_encabezado_center);
+		$ws->write($filas, $columna_gastos_descripcion, '', $formato_encabezado);
 		$ws->write($filas, $columna_gastos_montos, '', $formato_encabezado);
 		$filas += 1;
 		$ws->mergeCells($filas, 0, $filas, 3);
-		$ws->write($filas, $columna_gastos_fecha, '', $formato_encabezado);
-		$ws->write($filas, $columna_gastos_descripcion, $arraylang['periodo']['Listado de trabajos'][$lang] . ' ' . $fecha_ini_titulo . $arraylang['periodo_al']['Listado de trabajos'][$lang] . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
+		$ws->write($filas, $columna_gastos_fecha, $arraylang['periodo']['Listado de trabajos'][$lang] . ' ' . $fecha_ini_titulo . $arraylang['periodo_al']['Listado de trabajos'][$lang] . $Cobro->fields['fecha_fin'], $formato_encabezado_center);
+		$ws->write($filas, $columna_gastos_descripcion, '', $formato_encabezado);
 		$ws->write($filas, $columna_gastos_montos, '', $formato_encabezado);
 		$filas += 2;
 		$ws->write($filas, $columna_inicial, $arraylang['cliente']['Listado de trabajos'][$lang] . $Cliente->fields['glosa_cliente'], $formato_encabezado);
@@ -1222,7 +1226,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$ws->write($filas, $columna_gastos_fecha, $arraylang['fecha']['Listado de gastos'][$lang], $letra_encabezado_lista);
 
 			$ws->write($filas, $columna_gastos_descripcion, $arraylang['descripcion']['Listado de gastos'][$lang], $letra_encabezado_lista);
-			$ws->write($filas, $columna_gastos_montos, $arraylang['monto']['Listado de gastos'][$lang] . ' ' . $CobroMoneda->moneda[$Cobro->fields['opc_moneda_total']]['simbolo'], $letra_encabezado_lista);
+			$ws->write($filas, $columna_gastos_montos, $arraylang['monto']['Listado de gastos'][$lang] . ' ' . $CobroMoneda->moneda[$Cobro->fields['opc_moneda_total']]['simbolo'], $letra_encabezado_lista_centrado);
 			++$filas;
 		}
 		$ws->freezePanes(array($filas, 0));
@@ -1269,7 +1273,7 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 
 				$ws->write($filas, $columna_gastos_fecha, $arraylang['fecha']['Listado de gastos'][$lang], $letra_encabezado_lista);
 				$ws->write($filas, $columna_gastos_descripcion, $arraylang['descripcion']['Listado de gastos'][$lang], $letra_encabezado_lista);
-				$ws->write($filas, $columna_gastos_montos, $arraylang['monto']['Listado de gastos'][$lang] . ' ' . $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo'], $letra_encabezado_lista);
+				$ws->write($filas, $columna_gastos_montos, $arraylang['monto']['Listado de gastos'][$lang] . ' ' . $CobroMoneda->moneda[$Cobro->fields['id_moneda']]['simbolo'], $letra_encabezado_lista_centrado);
 				++$filas;
 				$fila_inicio_gastos = $filas + 1;
 			}
@@ -1297,9 +1301,9 @@ while (list($id_cobro) = mysql_fetch_array($resp)) {
 			$ws->writeFormula($filas, $columna_gastos_montos, "=SUM($col_formula_gastos_montos$fila_inicio:$col_formula_gastos_montos$filas)/2", $formato_moneda_total_tabla);
 		}
 
-		$ws->setColumn($columna_gastos_fecha, $columna_gastos_fecha, 8);
+		$ws->setColumn($columna_gastos_fecha, $columna_gastos_fecha, 6.4);
 		$ws->setColumn($columna_gastos_descripcion, $columna_gastos_descripcion, 50);
-		$ws->setColumn($columna_gastos_montos, $columna_gastos_montos, 11);
+		$ws->setColumn($columna_gastos_montos, $columna_gastos_montos, 8.5);
 	}
 }
 // fin bucle cobros
