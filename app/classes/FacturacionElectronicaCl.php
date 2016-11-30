@@ -425,6 +425,14 @@ EOF;
 				 */
 				'razon'	=> $Factura->fields['dte_razon_referencia'],
 			);
+
+			if (empty($arrayFactura['detalle'])) {
+				$arrayFactura['detalle'][] = array(
+					'descripcion' => $Factura->fields['dte_razon_referencia'],
+					'cantidad' => 1,
+					'precio_unitario' => 0
+				);
+			}
 		} else if ($Factura->fields['id_documento_referencia'] > 0) {
 			$FacturaPadre = new Factura($Sesion);
 			$FacturaPadre->Load($Factura->fields['id_factura_padre']);
