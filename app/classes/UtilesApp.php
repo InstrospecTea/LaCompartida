@@ -232,7 +232,7 @@ class UtilesApp extends Utiles {
 		}
 	}
 
-	public static function cuentaregistros($tabla, $sesion, $sesion = null) {
+	public static function cuentaregistros($tabla, $sesion) {
 
 		$registros = mysql_query("select count(*)  from $tabla", $sesion->dbh);
 		if (!$registros):
