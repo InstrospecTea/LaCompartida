@@ -142,13 +142,14 @@ EOF;
 			$DocumentoLegal = new PrmDocumentoLegal($Sesion);
 			$DocumentoLegal->Load($Factura->fields['id_documento_legal']);
 
-			$Cobro = new Cobro($Sesion);
-			$Cobro->Load($Factura->fields['id_cobro']);
+			$TipoDocumentoIdentidad = new PrmTipoDocumentoIdentidad($Sesion);
+			$TipoDocumentoIdentidad->Load($Factura->fields['id_tipo_documento_identidad']);
 
-			$Contrato = new Contrato($Sesion);
-			$Contrato->Load($Cobro->fields['id_contrato']);
+			if (!$TipoDocumentoIdentidad->loaded()) {
+				$TipoDocumentoIdentidad->loadByDteCode(6); // Buscar por codigo_dte de RUC
+			}
 
-			$documento = $WsFacturacionMateriaSoftware->documento($Factura, $Moneda, $DocumentoLegal, $Contrato);
+			$documento = $WsFacturacionMateriaSoftware->documento($Factura, $Moneda, $DocumentoLegal, $TipoDocumentoIdentidad);
 
 			if ($WsFacturacionMateriaSoftware->hasError()) {
 				$hookArg['Error'] = self::parseError($WsFacturacionMateriaSoftware, 'BuildingInvoiceError');

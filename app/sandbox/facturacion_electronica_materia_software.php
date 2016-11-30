@@ -16,11 +16,12 @@ $Moneda->Load($Factura->fields['id_moneda']);
 $DocumentoLegal = new PrmDocumentoLegal($Sesion);
 $DocumentoLegal->Load($Factura->fields['id_documento_legal']);
 
-$Cobro = new Cobro($Sesion);
-$Cobro->Load($Factura->fields['id_cobro']);
+$TipoDocumentoIdentidad = new PrmTipoDocumentoIdentidad($Sesion);
+$TipoDocumentoIdentidad->Load($Factura->fields['id_tipo_documento_identidad']);
 
-$Contrato = new Contrato($Sesion);
-$Contrato->Load($Cobro->fields['id_contrato']);
+if (!$TipoDocumentoIdentidad->loaded()) {
+	$TipoDocumentoIdentidad->loadByDteCode(6); // Buscar por codigo_dte de RUC
+}
 
 $WsFacturacionMateriaSoftware = new WsFacturacionMateriaSoftware(
 	$Estudio->GetMetaData('facturacion_electronica_materia_software.Url'),
@@ -31,7 +32,7 @@ $documento = $WsFacturacionMateriaSoftware->documento(
 	$Factura,
 	$Moneda,
 	$DocumentoLegal,
-	$Contrato
+	$TipoDocumentoIdentidad
 );
 
 // TTB\Debug::pr(json_encode($WsFacturacionMateriaSoftware->getBodyInvoice(), JSON_PRETTY_PRINT));
