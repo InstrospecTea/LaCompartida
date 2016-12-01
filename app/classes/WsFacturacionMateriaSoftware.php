@@ -23,8 +23,8 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		];
 	}
 
-	public function documento(Factura $Factura, Moneda $Moneda, PrmDocumentoLegal $DocumentoLegal, Contrato $Contrato) {
-		$this->generateBodyInvoice($Factura, $Moneda, $DocumentoLegal, $Contrato);
+	public function documento(Factura $Factura, Moneda $Moneda, PrmDocumentoLegal $DocumentoLegal, PrmTipoDocumentoIdentidad $TipoDocumentoIdentidad) {
+		$this->generateBodyInvoice($Factura, $Moneda, $DocumentoLegal, $TipoDocumentoIdentidad);
 
 		$response = $this->sendData('POST', "{$this->url}/documento", json_encode($this->body_invoice));
 		$documento = json_decode($response);
@@ -63,14 +63,14 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		return $documento;
 	}
 
-	private function generateBodyInvoice(&$Factura, &$Moneda, &$DocumentoLegal, &$Contrato) {
+	private function generateBodyInvoice(&$Factura, &$Moneda, &$DocumentoLegal, &$TipoDocumentoIdentidad) {
 		$this->body_invoice = [
 			'Cliente' => [
 				'NumeroDeDocumento' => (string) $Factura->fields['RUT_cliente'],
 				'Nombre' => (string) utf8_encode($Factura->fields['cliente']),
 				// 'Email' => '',
 				'DireccionCompleta' => utf8_encode("{$Factura->fields['direccion_cliente']}, {$Factura->fields['comuna_cliente']}"),
-				'TipoDocumento' => $Contrato->fields['extranjero'] == '1' ? 0 : 6
+				'TipoDocumento' => $TipoDocumentoIdentidad->fields['codigo_dte']
 			],
 			// 'IsExportacion' => true,
 			'ThirdPartyUniqueIdentifier' => (string) $Factura->fields['id_factura'],
@@ -105,7 +105,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 					'ISCDeLinea' => 0.0,
 					'PrecioUnitario' => (double) $Factura->fields['total'],
 					'Quantity' => 1,
-					'TipoAfectacionIGV' => $Contrato->fields['extranjero'] == '1' ? 40 :10,
+					'TipoAfectacionIGV' => $Factura->fields['iva'] == 0 && $TipoDocumentoIdentidad->fields['codigo_dte'] == '0' ? 40 : 10,
 					'TotalConImpuestos' => (double) $Factura->fields['total'],
 					'TotalSinImpuestos' => (double) $Factura->fields['subtotal'],
 					'Unidad' => 'UN',

@@ -116,6 +116,11 @@ class Migration {
 			return;
 		}
 		$Statement = $this->Database->prepare($query);
+
+		if ($this->debug) {
+			echo "\n$query\n";
+		}
+
 		$Statement->execute();
 	}
 
