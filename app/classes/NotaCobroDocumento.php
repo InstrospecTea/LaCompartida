@@ -1371,9 +1371,14 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 
 				if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 					$html = str_replace('%td_retainer%', '<td width="80" align="center">%duracion_retainer%</td>', $html);
+					$html = str_replace('%td_duracion_tarificada%', '<td width="80" align="center">%duracion_tarificada%</td>', $html);
 					$html = str_replace('%duracion_retainer%', __('Duración Retainer'), $html);
+					$html = str_replace('%duracion_tarificada%', __('Duración Tarificada'), $html);
 				} else {
 					$html = str_replace('%td_retainer%', '', $html);
+					$html = str_replace('%duracion_retainer%', '', $html);
+					$html = str_replace('%td_duracion_tarificada%', '', $html);
+					$html = str_replace('%duracion_tarificada%', '', $html);
 				}
 
 				if ($this->fields['forma_cobro'] == 'FLAT FEE') {
@@ -1554,6 +1559,8 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 					$categoria_duracion_horas+=round($h);
 					$categoria_duracion_minutos+=round($m);
 					$categoria_valor+=$trabajo->fields['monto_cobrado'];
+					$duracion_decimal_retainer = $h_retainer + $m_retainer / 60 + $s_retainer / 3600;
+					$duracion_decimal_tarificada = ($h - $h_retainer) + ($m - $m_retainer) / 60 + ($s - $s_retainer) / 3600;
 
 					if (!isset($profesionales[$trabajo->fields['nombre_usuario']])) {
 						$profesionales[$trabajo->fields['nombre_usuario']] = array();
@@ -1691,9 +1698,19 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 
 					if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 						$row = str_replace('%td_retainer%', '<td width="80" align="center">%duracion_retainer%</td>', $row);
-						$row = str_replace('%duracion_retainer%', $h_retainer . ':' . sprintf("%02d", $m_retainer), $row);
+						$row = str_replace('%td_duracion_tarificada%', '<td align="center">%duracion_tarificada%</td>', $row);
+						if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
+							$row = str_replace('%duracion_retainer%', number_format($duracion_decimal_retainer, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $row);
+							$row = str_replace('%duracion_tarificada%', number_format($duracion_decimal_tarificada, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $row);
+						} else {
+							$row = str_replace('%duracion_retainer%', $h_retainer . ':' . sprintf("%02d", $m_retainer), $row);
+							$row = str_replace('%duracion_tarificada%', ($h - $h_retainer) . ':' . sprintf("%02d", ($m - $m_retainer)), $row);
+						}
 					} else {
 						$row = str_replace('%td_retainer%', '', $row);
+						$row = str_replace('%duracion_retainer%', '', $row);
+						$row = str_replace('%td_duracion_tarificada%', '', $row);
+						$row = str_replace('%duracion_tarificada%', '%duracion%', $row);
 					}
 
 					if ($this->fields['forma_cobro'] == 'FLAT FEE') {
@@ -1924,6 +1941,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 				$horas_cobrables = floor(($asunto->fields['trabajos_total_duracion']) / 60);
 				$minutos_cobrables = sprintf("%02d", $asunto->fields['trabajos_total_duracion'] % 60);
 				$duracion_retainer_total = ($asunto->fields['trabajos_total_duracion_retainer']) / 60;
+				$duracion_tarificada_total = ($asunto->fields['trabajos_total_duracion'] / 60) - ($asunto->fields['trabajos_total_duracion_retainer'] / 60);
 				$minutos_decimal = $minutos_cobrables / 60;
 				$duracion_decimal = $horas_cobrables + $minutos_decimal;
 
@@ -1934,7 +1952,6 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 
 				$horas_retainer = floor(($asunto->fields['trabajos_total_duracion_retainer']) / 60);
 				$minutos_retainer = sprintf("%02d", $asunto->fields['trabajos_total_duracion_retainer'] % 60);
-
 				if (($minutos_trabajado - $minutos_cobrables) < 0) {
 					$horas_descontadas = $horas_trabajado - $horas_cobrables - 1;
 					$minutos_descontadas = $minutos_trabajado - $minutos_cobrables + 60;
@@ -1957,6 +1974,25 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 				} else {
 					$html = str_replace('%td_retainer%', '', $html);
 				}
+
+				if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
+					$html = str_replace('%td_retainer%', '<td align="center">%duracion_retainer%</td>', $html);
+					$html = str_replace('%td_duracion_tarificada%', '<td align="center">%duracion_tarificada%</td>', $html);
+					if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
+						$html = str_replace('%duracion_retainer%', number_format($duracion_retainer_total, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $html);
+						$html = str_replace('%duracion_tarificada%', number_format($duracion_tarificada_total, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $html);
+					} else {
+						$html = str_replace('%duracion_retainer%', Utiles::Decimal2GlosaHora($duracion_retainer_total), $html);
+						$html = str_replace('%duracion_tarificada%', Utiles::Decimal2GlosaHora($duracion_tarificada_total), $html);
+					}
+				} else {
+					$html = str_replace('%td_retainer%', '', $html);
+					$html = str_replace('%duracion_retainer%', '', $html);
+					$html = str_replace('%td_duracion_tarificada%', '', $html);
+					$html = str_replace('%duracion_tarificada%', '%duracion%', $html);
+				}
+
+
 
 				if ($this->fields['forma_cobro'] == 'FLAT FEE') {
 					$html = str_replace('%duracion_decimal_trabajada%', '', $html);
