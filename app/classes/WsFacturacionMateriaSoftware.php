@@ -19,7 +19,8 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		return [
 			'Accept: application/json',
 			'Content-Type: application/json',
-			"Authorization: {$this->token}"
+			"Authorization: {$this->token}",
+			"Content-Length: 0"
 		];
 	}
 
