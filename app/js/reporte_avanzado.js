@@ -1,3 +1,15 @@
+function actualizarAgrupadoresVista() {
+	var $agrupadores_array = jQuery('.agrupador:visible');
+	var agrupadores_vista = '';
+
+	jQuery.each($agrupadores_array, function(key, value){
+		agrupadores_vista += jQuery(value).val() + '-'
+	});
+
+	agrupadores_vista = agrupadores_vista.slice(0,-1)
+	jQuery('#vista').val(agrupadores_vista);
+}
+
 function FormFiltersText(data) {
 	var filters = {
 		'check_clientes': 'clientesF',
@@ -371,12 +383,14 @@ function CargarReporte() {
 function Agrupadores(num) {
 	var numero_agrupadores = parseInt(jQuery('#numero_agrupadores').val());
 	numero_agrupadores += num;
+
 	if (numero_agrupadores < 1) {
 		numero_agrupadores = 1;
 	}
 	if (numero_agrupadores > 6) {
 		numero_agrupadores = 6;
 	}
+
 	jQuery('#numero_agrupadores').val(numero_agrupadores);
 	for (var i = 0; i < 6; ++i) {
 		var selector = jQuery('#span_agrupador_' + i);
@@ -388,6 +402,7 @@ function Agrupadores(num) {
 	}
 	RevisarTabla();
 	ActualizarNuevoReporte();
+	actualizarAgrupadoresVista();
 }
 
 function setFieldsValues(data) {
@@ -651,14 +666,8 @@ function Generar(form, valor) {
 	var ajax = false;
 	jQuery('#' + form_id + ' [name="opc"]').val(valor);
 
-	var value = jQuery('#agrupador_0').val();
-
 	var numero_agrupadores = jQuery('#numero_agrupadores').val();
 
-	for (i = 1; i < numero_agrupadores; ++i) {
-		value += '-' + jQuery('#agrupador_' + i).val();
-	}
-	jQuery('#vista').val(value);
 	switch (valor) {
 		case 'pdf':
 			action = 'html_to_pdf.php?frequire=reporte_avanzado.php&popup=1';
@@ -828,6 +837,7 @@ function HabilitaTiposDeDatos ()  {
 }
 
 jQuery(document).ready(function() {
+	actualizarAgrupadoresVista();
 	if (jQuery('#comparar').is(':checked')) {
 		jQuery('#tabla, #dispersion').css('display', 'inline-block').show();
 	} else {
@@ -850,14 +860,9 @@ jQuery(document).ready(function() {
 		} else {
 			jQuery('#tipo_dato_comparado').attr('disabled', 'disabled');
 		}
-		jQuery('#vista').val("");
-		var vista = [];
-		jQuery('#agrupadores select:visible').each(function(i) {
-			vista[i] = jQuery(this).val();
-		});
+
 		jQuery('#iframereporte').html('<div class="divloading">&nbsp;</div>');
 
-		jQuery('#vista').val(vista.join('-'));
 		jQuery.post('reporte_avanzado_planilla.php?ajax=1&vista=' + jQuery('#vista').val(), jQuery('#formulario').serialize(), function(data) {
 			jQuery('#iframereporte').html(data);
 		});
@@ -943,16 +948,15 @@ jQuery(document).ready(function() {
 	});
 
 	function render_chart(type_chart){
-		var vista = [];
-		jQuery('#agrupadores select:visible').each(function(i) {
-			vista[i] = jQuery(this).val();
-		});
 		jQuery('#formulario').append('<input type="hidden" name="tipo_grafico" value="' + type_chart +'" />');
-		jQuery('#formulario').append('<input type="hidden" name="vista" value="' + vista.toString().replace(',', '-') + '" />');
+
+		var data = '';
+		data += jQuery('#formulario').serialize();
+		data += '&' + jQuery('#vista').serialize();
 
 		var charts_data = [{
 			'url': 'reporte_avanzado_grafico.php',
-			'data': jQuery('#formulario').serialize()
+			'data': data
 		}];
 		graphic.render('#iframereporte', charts_data);
 	}
