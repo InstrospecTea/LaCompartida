@@ -77,7 +77,7 @@ class FacturacionElectronicaNubox extends FacturacionElectronica {
 			echo "<tr>";
 			echo "<td align='right'>Referencia</td>";
 			echo "<td align='left' colspan='3'>";
-			echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_CL_REF' ORDER BY glosa ASC", "dte_codigo_referencia", $factura->fields['dte_codigo_referencia'], "", "Sleccione", "300");
+			echo Html::SelectQuery($Sesion, "SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = 'PRM_FACTURA_CL_REF' ORDER BY glosa ASC", "dte_codigo_referencia", $factura->fields['dte_codigo_referencia'], "", "Seleccione", "300");
 			echo "</td>";
 			echo "</tr>";
 

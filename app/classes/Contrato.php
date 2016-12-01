@@ -1335,6 +1335,10 @@ class Contrato extends Objeto {
 		if (isset($this->extra_fields['factura_rut']) && $this->extra_fields['factura_rut'] != '') {
 			$this->Edit('rut', $this->extra_fields['factura_rut']);
 		}
+
+		if (isset($this->fields['id_tipo_documento_identidad']) && empty($this->fields['id_tipo_documento_identidad'])) {
+			$this->Edit('id_tipo_documento_identidad', 'NULL');
+		}
 	}
 
 	//La funcion Write chequea que el objeto se pueda escribir al llamar a la funcion Check()

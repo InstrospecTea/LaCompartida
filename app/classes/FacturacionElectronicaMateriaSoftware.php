@@ -43,6 +43,28 @@ class FacturacionElectronicaMateriaSoftware extends FacturacionElectronica {
 		return $hookArg;
 	}
 
+	public static function InsertaMetodoPago() {
+		global $factura, $contrato, $buscar_padre, $codigo_tipo_doc;
+		$Sesion = new Sesion();
+		if ($buscar_padre) {
+			$grupo = $codigo_tipo_doc == 'NC' ? 'PRM_FACT_MS_REF_NC' : 'PRM_FACT_MS_REF_ND';
+			echo "<tr>";
+			echo "<td align='right'>Referencia</td>";
+			echo "<td align='left' colspan='3'>";
+			echo Html::SelectQuery(
+				$Sesion,
+				"SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = '{$grupo}' ORDER BY glosa ASC",
+				"dte_codigo_referencia",
+				$factura->fields['dte_codigo_referencia'],
+				"",
+				null,
+				"300"
+			);
+			echo "</td>";
+			echo "</tr>";
+		}
+	}
+
 	public static function InsertaJSFacturaElectronica() {
 		$BotonDescargarHTML = self::BotonDescargarHTML('0');
 		echo <<<EOF

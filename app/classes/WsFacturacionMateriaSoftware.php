@@ -114,6 +114,27 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 				],
 			]
 		];
+
+		if (!empty($Factura->fields['id_factura_padre'])) {
+			$FacturaPadre = new Factura($Factura->sesion);
+			$FacturaPadre->Load($Factura->fields['id_factura_padre']);
+
+			if ($FacturaPadre->loaded() && !empty($FacturaPadre->fields['dte_url_pdf'])) {
+				$documento = json_decode($FacturaPadre->fields['dte_url_pdf']);
+				$this->body_invoice['Documento']['OriginalDocumentSerie'] = $documento->Serie;
+				$this->body_invoice['Documento']['OriginalDocumentCorrelativo'] = $documento->Correlativo;
+			}
+		}
+
+		$Referencia = new PrmCodigo($Factura->sesion);
+		$Referencia->LoadById($Factura->fields['dte_codigo_referencia']);
+		$codigoReferencia = $Referencia->Loaded() ? $Referencia->fields['codigo'] : '01';
+
+		if ($DocumentoLegal->fields['codigo'] == 'NC') {
+			$this->body_invoice['Documento']['NotaDeCreditoTypeCode'] = $codigoReferencia;
+		} else if ($DocumentoLegal->fields['codigo'] == 'ND') {
+			$this->body_invoice['Documento']['NotaDeDebitoTypeCode'] = $codigoReferencia;
+		}
 	}
 
 	public function getBodyInvoice() {

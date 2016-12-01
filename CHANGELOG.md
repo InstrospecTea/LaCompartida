@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.36.1
+Thursday, December 1st
+* **Feature** [Códigos de Referencia](https://github.com/LemontechSA/ttb/pull/1959)
+
 ## [Release 16.36.0](https://github.com/LemontechSA/ttb/pull/1958)
 Wednesday, November 30th
 * **Feature** [Orden Resumen Profesional](https://github.com/LemontechSA/ttb/pull/1951)
