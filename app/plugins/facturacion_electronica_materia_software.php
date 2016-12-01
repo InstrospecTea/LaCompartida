@@ -11,25 +11,11 @@ require_once dirname(__FILE__) . '/../conf.php';
 $clase = 'FacturacionElectronicaMateriaSoftware';
 $Slim = Slim::getInstance('default', true);
 
-$Slim->hook(
-	'hook_factura_javascript_after',
-	[$clase, 'InsertaJSFacturaElectronica']
-);
-
-$Slim->hook(
-	'hook_validar_factura',
-	[$clase, 'ValidarFactura']
-);
-
-$Slim->hook(
-	'hook_cobro6_javascript_after',
-	[$clase, 'InsertaJSFacturaElectronica']
-);
-
-$Slim->hook(
-	'hook_descargar_pdf_factura_electronica',
-	[$clase, 'DescargarPdf']
-);
+$Slim->hook('hook_factura_javascript_after', [$clase, 'InsertaJSFacturaElectronica']);
+$Slim->hook('hook_validar_factura', [$clase, 'ValidarFactura']);
+$Slim->hook('hook_cobro6_javascript_after', [$clase, 'InsertaJSFacturaElectronica']);
+$Slim->hook('hook_descargar_pdf_factura_electronica', [$clase, 'DescargarPdf']);
+$Slim->hook('hook_factura_metodo_pago', array($clase, 'InsertaMetodoPago'));
 
 $Slim->hook('hook_cobros7_botones_after', function($hookArg) {
 	return FacturacionElectronicaMateriaSoftware::AgregarBotonFacturaElectronica(
