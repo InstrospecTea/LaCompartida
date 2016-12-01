@@ -150,7 +150,7 @@ class Contrato extends Objeto {
 			'emitir_liquidacion_al_generar',
 			'enviar_liquidacion_al_generar',
 			'opc_mostrar_tramites_no_cobrables',
-			'extranjero'
+			'id_tipo_documento_identidad'
 	);
 
 	function __construct($sesion, $fields = "", $params = "") {
@@ -1334,6 +1334,10 @@ class Contrato extends Objeto {
 
 		if (isset($this->extra_fields['factura_rut']) && $this->extra_fields['factura_rut'] != '') {
 			$this->Edit('rut', $this->extra_fields['factura_rut']);
+		}
+
+		if (isset($this->fields['id_tipo_documento_identidad']) && empty($this->fields['id_tipo_documento_identidad'])) {
+			$this->Edit('id_tipo_documento_identidad', 'NULL');
 		}
 	}
 

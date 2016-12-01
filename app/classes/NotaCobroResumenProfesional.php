@@ -206,8 +206,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 				$descontado = false;
 				$flatfee = false;
 				$incobrables = false;
-				$sumary = $this->ChargeData->getSumary();
-				$totales = $this->ChargeData->getTotal();
+				list($sumary, $totales) = $this->ChargeData->getSumaryAndTotalOrderedBy(Conf::read('OrdenResumenProfesional'));
 
 				if (is_array($totales)) {
 					if ($totales['duracion_retainer'] > 0 && ($this->fields['forma_cobro'] != 'FLAT FEE' || ( Conf::GetConf($this->sesion, 'ResumenProfesionalVial') ) )) {
