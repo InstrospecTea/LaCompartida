@@ -38,7 +38,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		if (empty($id_contrato)) {
 			$id_contrato = $cobro->fields['id_contrato'];
 		}
-		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto', 'id_usuario_responsable'));
+		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto', 'id_usuario_responsable', 'id_tipo_documento_identidad'));
 	}
 
 	if ($cobro->Loaded() && empty($codigo_cliente)) {
@@ -717,7 +717,15 @@ $Form->defaultLabel = false;
 			<?php if (Conf::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
 				<td align="right"><?php echo __('Doc. Identidad'); ?></td>
 				<td align="left" colspan="3">
-					<?php echo Html::SelectQuery($sesion, "SELECT id_tipo_documento_identidad, glosa FROM prm_tipo_documento_identidad", "tipo_documento_identidad", $factura->fields['id_tipo_documento_identidad'], "", " ", 150); ?>
+					<?= Html::SelectQuery(
+							$sesion,
+							"SELECT id_tipo_documento_identidad, glosa FROM prm_tipo_documento_identidad",
+							"tipo_documento_identidad",
+							$factura->loaded() ? $factura->fields['id_tipo_documento_identidad'] : $contrato->fields['id_tipo_documento_identidad'],
+							"",
+							" ",
+							150
+						); ?>
 					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="30" maxlength="50" />
 				</td>
 			<?php } else { ?>

@@ -150,7 +150,7 @@ class Contrato extends Objeto {
 			'emitir_liquidacion_al_generar',
 			'enviar_liquidacion_al_generar',
 			'opc_mostrar_tramites_no_cobrables',
-			'extranjero'
+			'id_tipo_documento_identidad'
 	);
 
 	function __construct($sesion, $fields = "", $params = "") {

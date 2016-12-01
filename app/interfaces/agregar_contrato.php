@@ -1734,24 +1734,29 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			</legend>
 			<table id='datos_factura' style='display:<?php echo $show ?>'>
 				<tr>
-					<td align="right" width='20%'>
-						<?php echo __('ROL/RUT') . $obligatorios('factura_rut'); ?>
-					</td>
-					<td align="left" colspan="3">
-						<input type="text" name="factura_rut" id="rut" value="<?php echo $contrato->fields['rut'] ? $contrato->fields['rut'] : $factura_rut ?>" size="30" maxlength="50" />
-					</td>
+						<td align="right" width='20%'>
+							<?php if (Conf::read('TipoDocumentoIdentidadFacturacion')) { ?>
+								<?php echo __('Doc. Identidad'); ?>
+							<?php } else { ?>
+								<?php echo __('ROL/RUT') . $obligatorios('factura_rut'); ?>
+							<?php } ?>
+						</td>
+						<td align="left" colspan="3">
+							<?php if (Conf::read('TipoDocumentoIdentidadFacturacion')) { ?>
+								<?= Html::SelectQuery(
+										$Sesion,
+										"SELECT id_tipo_documento_identidad, glosa FROM prm_tipo_documento_identidad",
+										'id_tipo_documento_identidad',
+										$contrato->fields['id_tipo_documento_identidad'],
+										'',
+										' ',
+										150
+									);
+								?>
+							<?php } ?>
+							<input type="text" name="factura_rut" id="rut" value="<?= $contrato->fields['rut'] ? $contrato->fields['rut'] : $factura_rut ?>" size="30" maxlength="50" />
+						</td>
 				</tr>
-
-				<tr>
-					<td align="right" width='20%'>
-						<?= __('Extranjero') ?>
-					</td>
-					<td align="left" colspan="3">
-						<input type="hidden" name="extranjero" value="0"/>
-						<input type="checkbox" name="extranjero" id="extranjero" value="1" <?= $contrato->fields['extranjero'] == '1' ? 'checked="checked"' : '' ?> />
-					</td>
-				</tr>
-
 				<tr>
 					<td align="right" colspan="1">
 						<?php echo __('Razón Social') . $obligatorios('factura_razon_social'); ?>

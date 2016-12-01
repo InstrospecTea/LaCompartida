@@ -1,5 +1,10 @@
 # Changelog
 
+## [Release 16.36.0](https://github.com/LemontechSA/ttb/pull/1958)
+Wednesday, November 30th
+* **Feature** [Orden Resumen Profesional](https://github.com/LemontechSA/ttb/pull/1951)
+* **Feature** [Facturación tipo documento](https://github.com/LemontechSA/ttb/pull/1954)
+
 ## Hotfix 16.35.1
 Wednesday, November 30th
 * **Fix** [Fix nota crédito sin monto en FacturaciónCL](https://github.com/LemontechSA/ttb/pull/1955)
