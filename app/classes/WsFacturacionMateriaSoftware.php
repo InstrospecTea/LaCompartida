@@ -19,8 +19,7 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		return [
 			'Accept: application/json',
 			'Content-Type: application/json',
-			"Authorization: {$this->token}",
-			"Content-Length: 0"
+			"Authorization: {$this->token}"
 		];
 	}
 
@@ -144,6 +143,12 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 
 	private function sendData($method, $url, $post = '') {
 		$ch = curl_init($url);
+
+		$headers = $this->getHeaders();
+
+		if ($method == 'PUT') {
+			array_push($headers, 'Content-Length: 0');
+		}
 
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
