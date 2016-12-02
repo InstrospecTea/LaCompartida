@@ -35,7 +35,7 @@ $documento = $WsFacturacionMateriaSoftware->documento(
 	$TipoDocumentoIdentidad
 );
 
-// TTB\Debug::pr(json_encode($WsFacturacionMateriaSoftware->getBodyInvoice(), JSON_PRETTY_PRINT));
+TTB\Debug::pr(json_encode($WsFacturacionMateriaSoftware->getBodyInvoice(), JSON_PRETTY_PRINT));
 
 // $documento = json_decode($Factura->fields['dte_url_pdf']);
 
@@ -45,10 +45,10 @@ $documento = $WsFacturacionMateriaSoftware->documento(
 // );
 
 // TTB\Debug::pr(json_encode($documento_anulado, JSON_PRETTY_PRINT));
-//
-// echo "<div>Invoice: {$documento->Serie} {$documento->Correlativo}</div>";
-// echo '<div>Code: ', $WsFacturacionMateriaSoftware->getErrorCode(), '</div>';
-// echo '<div>Message: ', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
+
+echo "<div>Invoice: {$documento->Serie} {$documento->Correlativo}</div>";
+echo '<div>Code: ', $WsFacturacionMateriaSoftware->getErrorCode(), '</div>';
+echo '<div>Message: ', $WsFacturacionMateriaSoftware->getErrorMessage(), '</div>';
 
 // $pdf = $WsFacturacionMateriaSoftware->GetStatus(
 // 	$documento->Serie,
