@@ -139,11 +139,6 @@ class ChargeData {
 		return $this->matter_sumary[$matter_code];
 	}
 
-	public function getSumaryAndTotalOrderedBy($sql_order_by) {
-		$works = $this->getWorksOrdererBy($sql_order_by);
-		return $this->getSumaryAndTotal($works);
-	}
-
 	public function getSumaryByCategory() {
 		$this->sumaryByCategory();
 		return $this->category_sumary;
@@ -184,15 +179,10 @@ class ChargeData {
 		return $this->get("opc_{$opt}") == 1;
 	}
 
-
 	/**
 	 * Cartga todos los trabajos del cobro
 	 */
 	protected function loadWorks() {
-		$this->works = $this->getWorksOrdererBy();
-	}
-
-	public function getWorksOrdererBy($sql_order_by = 'trabajo.fecha ASC,  trabajo.descripcion ASC') {
 		$time_format = '%k:%i';
 		$Criteria = new Criteria($this->Sesion);
 		$Criteria->add_from('trabajo')
@@ -231,10 +221,8 @@ class ChargeData {
 		$Criteria = $this->scopeUserCategory($Criteria);
 		$Criteria = $this->scopeChargeable($Criteria);
 
-		$Criteria->add_ordering($sql_order_by);
-
-		$works = $Criteria->run();
-		foreach ($works as $i => $work) {
+		$this->works = $Criteria->run();
+		foreach ($this->works as $i => $work) {
 			$work['duracion'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion']);
 			$work['duracion_incobrables'] = $work['cobrable'] ? 0 : $work['duracion'];
 			$work['glosa_duracion_incobrables'] = $work['cobrable'] ? 0 : $work['glosa_duracion'];
@@ -265,9 +253,8 @@ class ChargeData {
 				$work['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($work['duracion_retainer']);
 			}
 
-			$works[$i] = $work;
+			$this->works[$i] = $work;
 		}
-		return $works;
 	}
 
 	/**
@@ -276,7 +263,25 @@ class ChargeData {
 	 * @return Criteria
 	 */
 	protected function scopeUserCategory(Criteria $Criteria) {
-		$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario');
+		if (Conf::read('OrdenarPorCategoriaNombreUsuario') || Conf::read('OrdenarPorCategoriaUsuario')) {
+			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
+ 				->add_ordering('prm_categoria_usuario.orden')
+ 				->add_ordering('usuario.id_usuario');
+		} else if (Conf::read('SepararPorUsuario')) {
+			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
+				->add_ordering('usuario.id_categoria_usuario')
+				->add_ordering('usuario.id_usuario');
+		} else if (Conf::read('OrdenarPorCategoriaDetalleProfesional')) {
+			$Criteria->add_ordering('usuario.id_categoria_usuario', 'DESC');
+		} else if (Conf::read('OrdenarPorFechaCategoria')) {
+			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
+				->add_ordering('trabajo.fecha')
+				->add_ordering('usuario.id_categoria_usuario')
+				->add_ordering('usuario.id_usuario');
+		} else {
+			$Criteria->add_ordering('trabajo.fecha', 'ASC')
+				->add_ordering('trabajo.descripcion');
+ 		}
  		if ($this->get('codigo_idioma') == 'es') {
  			$Criteria->add_select('prm_categoria_usuario.glosa_categoria', 'categoria');
  		} else {
@@ -315,7 +320,8 @@ class ChargeData {
 		return $Criteria;
 	}
 
-	protected function getSumaryAndTotal($works) {
+	protected function makeSumaryAndTotal() {
+		$works = $this->getWorks();
 		$professionals = array();
 		$sumary = array();
 		$totals = array();
@@ -433,12 +439,9 @@ class ChargeData {
 			$totals[$key]['glosa_flatfee'] = Utiles::Decimal2GlosaHora($data['flatfee']);
 		}
 
-		return array($sumary, $totals, $professionals);
-	}
-
-	protected function makeSumaryAndTotal() {
-		$works = $this->getWorks();
-		list($this->sumary, $this->totals, $this->matter_sumary) = $this->getSumaryAndTotal($works);
+		$this->sumary = $sumary;
+		$this->totals = $totals;
+		$this->matter_sumary = $professionals;
 		$this->sumary_and_totals = true;
 	}
 
