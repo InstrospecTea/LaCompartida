@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.36.5
+Friday, December 2nd
+* **Fix** [Materia Software - Anulación factura y modificación de validación en RUC](https://github.com/LemontechSA/ttb/pull/1966)
+
 ## Hotfix 16.36.4
 Friday, December 2nd
 * **Fix** [Se revierte el feature/TTBC-4356](https://github.com/LemontechSA/ttb/pull/1965)
