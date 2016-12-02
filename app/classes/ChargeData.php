@@ -384,6 +384,7 @@ class ChargeData {
 
 			if (empty($sumary[$user_id])) {
 				$sumary[$user_id] = $this->base_data;
+				$sumary[$user_id]['id_usuario'] = $work['id_usuario'];
 				$sumary[$user_id]['id_categoria_usuario'] = $work['id_categoria_usuario'];
 				$sumary[$user_id]['glosa_categoria'] = $work['categoria'];
 				$sumary[$user_id]['orden_categoria'] = $work['orden_categoria'];
