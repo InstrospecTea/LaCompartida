@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.36.2
+Friday, December 2nd
+* **Feature** [Anular Factura Materia Software](https://github.com/LemontechSA/ttb/pull/1962)
+
 ## Hotfix 16.36.1
 Thursday, December 1st
 * **Feature** [Códigos de Referencia](https://github.com/LemontechSA/ttb/pull/1959)

@@ -179,6 +179,7 @@ EOF;
 				try {
 					$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 					$Factura->Edit('dte_url_pdf', json_encode($documento));
+					$Factura->Edit('dte_estado', Factura::$estados_dte['Firmado']);
 					if ($Factura->Write()) {
 						$hookArg['InvoiceURL'] = json_encode($documento);
 					}
@@ -195,6 +196,14 @@ EOF;
 		$Sesion = new Sesion();
 		$Factura = $hookArg['Factura'];
 
+		$Estudio = new PrmEstudio($Sesion);
+		$Estudio->Load($Factura->fields['id_estudio']);
+
+		$WsFacturacionMateriaSoftware = new WsFacturacionMateriaSoftware(
+			$Estudio->GetMetaData('facturacion_electronica_materia_software.Url'),
+			$Estudio->GetMetaData('facturacion_electronica_materia_software.Authorization')
+		);
+
 		if (!$Factura->DTEFirmado() && !$Factura->DTEProcesandoAnular()) {
 			return $hookArg;
 		}
@@ -206,8 +215,22 @@ EOF;
 			(int) $documento->Correlativo
 		);
 
-		if ($WsFacturacionMateriaSoftware->hasError()) {
-			$hookArg['Error'] = self::parseError($WsFacturacionMateriaSoftware, 'CancelGeneratedInvoiceError');
+		if (!$WsFacturacionMateriaSoftware->hasError()) {
+			try {
+				$estado_dte = Factura::$estados_dte['Anulado'];
+				$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
+				$Factura->Edit('dte_estado', $estado_dte);
+				$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
+				$Factura->Write();
+			} catch (Exception $ex) {
+				$hookArg['Error'] = self::ParseError($ex, 'SaveCanceledInvoiceError');
+			}
+		} else {
+			$hookArg['Error'] = self::ParseError($WsFacturacionMateriaSoftware, 'CancelGeneratedInvoiceError');
+			$mensaje = "Usted ha solicitado anular un Documento Tributario. Este proceso puede tardar y mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
+			$Factura->Edit('dte_estado', Factura::$estados_dte['ProcesoAnular']);
+			$Factura->Edit('dte_estado_descripcion', $mensaje);
+			$Factura->Write();
 		}
 
 		return $hookArg;
