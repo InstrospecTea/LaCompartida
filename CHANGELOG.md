@@ -2,6 +2,10 @@
 
 ## Hotfix 16.36.2
 Friday, December 2nd
+* **Feature** [Se corrige scopeChargeable() poniendo las condiciones correctamente según las opciones de impresión](https://github.com/LemontechSA/ttb/pull/1964)
+
+## Hotfix 16.36.2
+Friday, December 2nd
 * **Feature** [Anular Factura Materia Software](https://github.com/LemontechSA/ttb/pull/1962)
 
 ## Hotfix 16.36.1
