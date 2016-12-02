@@ -13,6 +13,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	 */
 	private $allowedFilters = array(
 		'clientes',
+		'grupo_clientes',
 		'usuarios',
 		'tipos_asunto',
 		'areas_asunto',
@@ -330,6 +331,12 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 				'cobro.id_cobro',
 				'tramite.id_cobro'
 			)
+		)->add_left_join_with(
+			'contrato',
+			CriteriaRestriction::equals(
+				'contrato.id_contrato',
+				'cobro.id_contrato'
+			)
 		);
 
 		$this->addInvoiceToQuery($Criteria);
@@ -450,6 +457,9 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 	 * @param Criteria $Criteria [description]
 	 */
 	function addInvoiceToQuery(Criteria $Criteria) {
+		if (!$this->needsInvoices()) {
+			return;
+		}
 		$criterias = $this->getInvoiceCriterias();
 
 		$Criteria->add_custom_join_with_union_criteria($criterias, 'factura',
@@ -463,6 +473,9 @@ abstract class AbstractDataCalculator implements IDataCalculator {
  	 * @return [type] [description]
  	 */
 	public function invoiceFactor() {
+		if (!$this->needsInvoices()) {
+			return 1;
+		}
 		$criterias = $this->getInvoiceCriterias();
 		$queries = array();
 
@@ -632,4 +645,7 @@ abstract class AbstractDataCalculator implements IDataCalculator {
 		return false;
 	}
 
+	protected function needsInvoices() {
+		return ($this->filtersFields['campo_fecha'] == 'facturacion');
+	}
 }

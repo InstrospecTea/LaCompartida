@@ -15,8 +15,10 @@ class AbstractBusiness implements BaseBusiness {
 	public $Sesion;
 	public $errors = array();
 	public $infos = array();
-	private $loadedClass = array();
 	protected $transactions = 0;
+
+	use LoadServiceTrait;
+	use LoadManagerTrait;
 
 	public function __construct(Sesion $Sesion) {
 		$this->sesion = $Sesion;
@@ -79,24 +81,6 @@ class AbstractBusiness implements BaseBusiness {
 	}
 
 	/**
-	 * Carga un Servicio al vuelo
-	 * @param string $name
-	 * @param string $alias
-	 * @return type
-	 */
-	protected function loadService($name, $alias = null) {
-		$classname = "{$name}Service";
-		if (empty($alias)) {
-			$alias = $classname;
-		}
-		if (in_array($alias, $this->loadedClass)) {
-			return;
-		}
-		$this->{$alias} = new $classname($this->Sesion);
-		$this->loadedClass[] = $alias;
-	}
-
-	/**
 	 * Carga un Negocio al vuelo
 	 * @param string $name
 	 * @param string $alias
@@ -142,24 +126,6 @@ class AbstractBusiness implements BaseBusiness {
 	 */
 	protected function loadReport($name, $alias = null) {
 		$classname = "{$name}Report";
-		if (empty($alias)) {
-			$alias = $classname;
-		}
-		if (in_array($alias, $this->loadedClass)) {
-			return;
-		}
-		$this->{$alias} = new $classname($this->Sesion);
-		$this->loadedClass[] = $alias;
-	}
-
-	/**
-	 * Carga un Manager al vuelo
-	 * @param string $name
-	 * @param string $alias
-	 * @return type
-	 */
-	protected function loadManager($name, $alias = null) {
-		$classname = "{$name}Manager";
 		if (empty($alias)) {
 			$alias = $classname;
 		}

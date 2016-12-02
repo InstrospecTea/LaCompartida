@@ -11,6 +11,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 } else { //ELSE (no es WEBSERVICE)
 	$sesion = new Sesion(array('COB'));
 	$pagina = new Pagina($sesion);
+
 	$DocumentoLegalNumero = new DocumentoLegalNumero($sesion);
 	$factura = new Factura($sesion);
 	$prm_codigo = new PrmCodigo($sesion);
@@ -37,7 +38,7 @@ if ($desde_webservice && UtilesApp::VerificarPasswordWebServices($usuario, $pass
 		if (empty($id_contrato)) {
 			$id_contrato = $cobro->fields['id_contrato'];
 		}
-		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto', 'id_usuario_responsable'));
+		$contrato->Load($id_contrato, array('glosa_contrato', 'rut', 'factura_ciudad', 'factura_comuna', 'factura_codigopostal', 'factura_direccion', 'factura_giro', 'factura_razon_social', 'region_cliente', 'id_estudio', 'email_contacto', 'id_usuario_responsable', 'id_tipo_documento_identidad'));
 	}
 
 	if ($cobro->Loaded() && empty($codigo_cliente)) {
@@ -611,7 +612,14 @@ $Form->defaultLabel = false;
 				<?php
 					$deshabilita_estado = ($factura->fields['anulado'] == 1 && ($factura->DTEAnulado() || $factura->DTEProcesandoAnular())) ? 'disabled' : '';
 				?>
-				<?php echo $Form->select('id_estado', PrmEstadoFactura::getList($sesion), $factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado, array('onchange' => 'mostrarAccionesEstado(this.form)', $deshabilita_estado, 'style' => 'width:160px') ); ?>
+				<?php
+					echo $Form->select(
+						'id_estado',
+						PrmEstadoFactura::getList($sesion),
+						$factura->fields['id_estado'] ? $factura->fields['id_estado'] : $id_estado,
+						['onchange' => 'mostrarAccionesEstado(this.form)', $deshabilita_estado, 'style' => 'width:160px', 'translate' => false]
+					);
+				?>
 				<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_factura_dte_estado') : false; ?>
 				<?php
 						if (!empty($factura->fields['fecha_anulacion'])) {
@@ -709,7 +717,15 @@ $Form->defaultLabel = false;
 			<?php if (Conf::GetConf($sesion, 'TipoDocumentoIdentidadFacturacion')) { ?>
 				<td align="right"><?php echo __('Doc. Identidad'); ?></td>
 				<td align="left" colspan="3">
-					<?php echo Html::SelectQuery($sesion, "SELECT id_tipo_documento_identidad, glosa FROM prm_tipo_documento_identidad", "tipo_documento_identidad", $factura->fields['id_tipo_documento_identidad'], "", " ", 150); ?>
+					<?= Html::SelectQuery(
+							$sesion,
+							"SELECT id_tipo_documento_identidad, glosa FROM prm_tipo_documento_identidad",
+							"tipo_documento_identidad",
+							$factura->loaded() ? $factura->fields['id_tipo_documento_identidad'] : $contrato->fields['id_tipo_documento_identidad'],
+							"",
+							" ",
+							150
+						); ?>
 					<input type="text" name="RUT_cliente" value="<?php echo $factura->loaded() ? $factura->fields['RUT_cliente'] : $contrato->fields['rut']; ?>" id="RUT_cliente" size="30" maxlength="50" />
 				</td>
 			<?php } else { ?>

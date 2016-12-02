@@ -1,6 +1,7 @@
 function FormFiltersText(data) {
 	var filters = {
 		'check_clientes': 'clientesF',
+		'check_grupo_clientes': 'grupo_clientesF',
 		'check_profesionales': 'usuariosF',
 		'check_encargados': 'encargados',
 		'check_area_prof': 'areas',
@@ -99,9 +100,9 @@ function dialogoReporte(title, buttons) {
 function serializeFormulario() {
 	var incluir = ['agrupador[0]', 'agrupador[1]', 'agrupador[2]', 'agrupador[3]', 'agrupador[4]', 'agrupador[5]',
 		'numero_agrupadores', 'areas', 'areas_asunto', 'campo_fecha', 'categorias', 'tipos_asunto',
-		'check_area_asunto', 'check_area_prof', 'check_cat_prof', 'check_clientes', 'check_encargados',
+		'check_area_asunto', 'check_area_prof', 'check_cat_prof', 'check_clientes', 'check_grupo_clientes', 'check_encargados',
 		'check_estado_cobro', 'check_moneda_contrato', 'check_profesionales', 'check_tipo_asunto',
-		'clientesF', 'codigo_contrato', 'comparar', 'encargados', 'estado_cobro', 'prop',
+		'clientesF', 'grupo_clientesF', 'codigo_contrato', 'comparar', 'encargados', 'estado_cobro', 'prop',
 		'moneda_contrato', 'tipo_dato', 'tipo_dato_check', 'tipo_dato_comparado',
 		'tipo_asunto', 'usuariosF', 'usuarios', 'clientes', 'fecha_corta', 'nuevo_reporte_segun', 'id_moneda', 'limitar', 'limite', 'agrupar'];
 
@@ -343,7 +344,7 @@ function CargarReporte() {
 			}
 		}
 	} else {
-		var filtros_avanzados = ['check_area_asunto', 'check_area_prof', 'check_cat_prof', 'check_clientes', 'check_encargados', 'check_estado_cobro', 'check_moneda_contrato', 'check_profesionales', 'check_tipo_asunto'];
+		var filtros_avanzados = ['check_area_asunto', 'check_area_prof', 'check_cat_prof', 'check_clientes', 'check_grupo_clientes', 'check_encargados', 'check_estado_cobro', 'check_moneda_contrato', 'check_profesionales', 'check_tipo_asunto'];
 		var showFullFiltros = false;
 		var json_reporte = reporte.data('reporte').replace(/'/g, '"')
 		var datos = jQuery.parseJSON(json_reporte);

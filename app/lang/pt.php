@@ -52,6 +52,9 @@ $_LANG['Adelanto'] = 'Adiantamento';
 $_LANG['Adelantos'] = 'Adiantamentos';
 $_LANG['adelanto'] = 'adiantamento';
 $_LANG['adelantos'] = 'adiantamentos';
+$_LANG['N° Documento'] = 'N° Documento';
+$_LANG['No se han podido guardar los cambios'] = "Não foi possível salvar as alterações";
+$_LANG['Acceso denegado'] = "Acesso negado";
 
 // Clientes
 $_LANG['Nombre Cliente'] = 'Nome do Cliente';

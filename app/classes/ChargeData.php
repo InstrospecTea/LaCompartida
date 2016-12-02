@@ -70,8 +70,9 @@ class ChargeData {
 		foreach ($headers as $header) {
 			$ths[] = $Html->th($header);
 		}
+
 		$trs[] = $Html->tr(implode('', $ths));
-		$totales = array('valor_tarificada' => 0, 'monto_cobrado' => 0);
+		$totales = array('valor_tarificada' => 0, 'monto_cobrado' => 0, 'duracion' => 0, 'duracion_cobrada' => 0, 'duracion_incobrables' => 0);
 		$currency_columns = array_keys($totales);
 		foreach ($data as $row) {
 			$tds = array();
@@ -191,8 +192,8 @@ class ChargeData {
 			->add_select('trabajo.descripcion')
 			->add_select('trabajo.fecha')
 			->add_select('trabajo.id_usuario')
-			->add_select('trabajo.visible')
 			->add_select('trabajo.cobrable')
+			->add_select('trabajo.visible')
 			->add_select('trabajo.id_trabajo')
 			->add_select('trabajo.tarifa_hh')
 			->add_select('IF(trabajo.cobrable, trabajo.tarifa_hh * (TIME_TO_SEC(trabajo.duracion_cobrada) / 3600 ), 0)', 'importe')
@@ -206,7 +207,7 @@ class ChargeData {
 			->add_restriction(Restriction::equals('trabajo.id_cobro', $this->get('id_cobro')))
 			->add_restriction(Restriction::equals('trabajo.id_tramite', '0'));
 
-		if (!Conf::GetConf($this->Sesion, 'MostrarHorasCero')) {
+		if (!Conf::read('MostrarHorasCero')) {
 			$field = $this->opt('ver_horas_trabajadas') ? 'duracion' : 'duracion_cobrada';
 			$Criteria->add_restriction(Restriction::greater_than("trabajo.{$field}", "'0000-00-00 00:00:00'"));
 		}
@@ -221,12 +222,15 @@ class ChargeData {
 		$Criteria = $this->scopeChargeable($Criteria);
 
 		$this->works = $Criteria->run();
-
 		foreach ($this->works as $i => $work) {
 			$work['duracion'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion']);
+			$work['duracion_incobrables'] = $work['cobrable'] ? 0 : $work['duracion'];
+			$work['glosa_duracion_incobrables'] = $work['cobrable'] ? 0 : $work['glosa_duracion'];
+
 			$work['duracion_cobrada'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion_cobrada']);
 			$work['duracion_retainer'] = Utiles::GlosaHora2Multiplicador($work['glosa_duracion_retainer']);
 			$work['duracion_descontada'] = $work['duracion'] - $work['duracion_cobrada'] - $work['duracion_incobrables'];
+			$work['glosa_duracion_descontada'] = Utiles::Decimal2GlosaHora($work['duracion_descontada']);
 			$work['flatfee'] = 0;
 
 			if ($this->get('forma_cobro') == 'PROPORCIONAL') {
@@ -235,8 +239,7 @@ class ChargeData {
 			} else  if ($this->get('forma_cobro') == 'ESCALONADA') {
 				$work['monto_cobrado_escalonada'] = $work['monto_cobrado'];
 			}
-			// WHY?: los incobrables
-			//$work['duracion_tarificada'] = $sumary[$user_id]['duracion_cobrada'] - $sumary[$user_id]['duracion_incobrables'];
+
 			$work['duracion_tarificada'] = max($work['duracion_cobrada'] - $work['duracion_retainer'], 0);
 			$work['valor_tarificada'] = $work['duracion_tarificada'] * $work['tarifa_hh'];
 
@@ -260,31 +263,30 @@ class ChargeData {
 	 * @return Criteria
 	 */
 	protected function scopeUserCategory(Criteria $Criteria) {
- 		if (Conf::GetConf($this->Sesion, 'TrabajosOrdenarPorCategoriaNombreUsuario') || Conf::GetConf($this->Sesion, 'TrabajosOrdenarPorCategoriaUsuario')) {
- 			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
+		if (Conf::read('OrdenarPorCategoriaNombreUsuario') || Conf::read('OrdenarPorCategoriaUsuario')) {
+			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
  				->add_ordering('prm_categoria_usuario.orden')
  				->add_ordering('usuario.id_usuario');
- 		} else if (Conf::GetConf($this->Sesion, 'SepararPorUsuario')) {
- 			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
- 				->add_ordering('usuario.id_categoria_usuario')
- 				->add_ordering('usuario.id_usuario');
- 		} else if (Conf::GetConf($this->Sesion, 'TrabajosOrdenarPorCategoriaDetalleProfesional')) {
- 			$Criteria->add_ordering('usuario.id_categoria_usuario', 'DESC');
- 		} else if (Conf::GetConf($this->Sesion, 'TrabajosOrdenarPorFechaCategoria')) {
- 			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
- 				->add_ordering('trabajo.fecha')
- 				->add_ordering('usuario.id_categoria_usuario')
- 				->add_ordering('usuario.id_usuario');
- 		} else {
- 			$Criteria->add_ordering('trabajo.fecha', 'ASC')
- 				->add_ordering('trabajo.descripcion');
+		} else if (Conf::read('SepararPorUsuario')) {
+			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
+				->add_ordering('usuario.id_categoria_usuario')
+				->add_ordering('usuario.id_usuario');
+		} else if (Conf::read('OrdenarPorCategoriaDetalleProfesional')) {
+			$Criteria->add_ordering('usuario.id_categoria_usuario', 'DESC');
+		} else if (Conf::read('OrdenarPorFechaCategoria')) {
+			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
+				->add_ordering('trabajo.fecha')
+				->add_ordering('usuario.id_categoria_usuario')
+				->add_ordering('usuario.id_usuario');
+		} else {
+			$Criteria->add_ordering('trabajo.fecha', 'ASC')
+				->add_ordering('trabajo.descripcion');
  		}
  		if ($this->get('codigo_idioma') == 'es') {
  			$Criteria->add_select('prm_categoria_usuario.glosa_categoria', 'categoria');
  		} else {
  			$Criteria->add_select('IFNULL(prm_categoria_usuario.glosa_categoria_lang, prm_categoria_usuario.glosa_categoria)', 'categoria');
  		}
-
  		return $Criteria;
  	}
 
@@ -294,27 +296,27 @@ class ChargeData {
 	 * @return Criteria
 	 */
 	protected function scopeChargeable(Criteria $Criteria) {
-		if ($this->opt('ver_horas_trabajadas')) {
-			$Criteria->add_restriction(Restriction::equals('trabajo.cobrable', '1'));
-		}
-
-		if (!$this->opt('ver_cobrable')) {
-			return $Criteria->add_restriction(Restriction::equals('trabajo.visible', '1'));
-		}
-
-		return $Criteria->add_restriction(
-			Restriction::or_clause(
-				Restriction::and_clause(
-					Restriction::equals('trabajo.cobrable', '0'),
-					Restriction::equals('trabajo.visible', '0')
-				),
-				Restriction::and_clause(
-					Restriction::equals('trabajo.cobrable', '1'),
-					Restriction::equals('trabajo.visible', '1')
-				)
+		$conditions = [
+			Restriction::and_clause(
+				Restriction::equals('trabajo.cobrable', 1),
+				Restriction::equals('trabajo.visible', 1)
 			)
-		);
+		];
 
+		if ($this->opt('ver_horas_trabajadas')) {
+			$conditions[] = Restriction::and_clause(
+				Restriction::equals('trabajo.cobrable', 0),
+				Restriction::equals('trabajo.visible', 1)
+			);
+		}
+
+		if ($this->opt('ver_cobrable')) {
+			$conditions[] = Restriction::and_clause(
+				Restriction::equals('trabajo.cobrable', 0),
+				Restriction::equals('trabajo.visible', 0)
+			);
+		}
+		$Criteria->add_restriction(Restriction::or_clause($conditions));
 		return $Criteria;
 	}
 
@@ -332,9 +334,6 @@ class ChargeData {
 			if (empty($professionals[$matter_code])) {
 				$professionals[$matter_code] = array();
 			}
-
-			// WHY?
-			//$work['duracion_incobrables'] = $this->doubtfulDuration($matter_code, $user_id);
 
 			$works[$i] = $work;
 

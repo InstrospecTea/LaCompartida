@@ -27,6 +27,7 @@ $directorios = array(
 	'/app/layers/service.support/',
 	'/app/layers/service/',
 	'/app/layers/service/exceptions/',
+	'/app/layers/traits/',
 	'/app/layers/utilities/',
 	'/app/layers/utilities/twig/',
 	'/app/layers/utilities/middlewares/',

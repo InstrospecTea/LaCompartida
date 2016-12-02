@@ -439,9 +439,9 @@ else
 				<td align=left>
 <?php
 if (Conf::GetConf($Sesion, 'SelectMultipleFacturasPago')) {
-	echo $Form->select('id_estado[]', PrmEstadoFactura::getList($Sesion), $id_estado, array('multiple' => 'multiple', 'size' => '5', 'onchange' => 'mostrarAccionesEstado(this.form)', 'style' => 'width:190px', 'empty' => __('Cualquiera'), 'escape' => false));
+	echo $Form->select('id_estado[]', PrmEstadoFactura::getList($Sesion), $id_estado, array('multiple' => 'multiple', 'size' => '5', 'onchange' => 'mostrarAccionesEstado(this.form)', 'style' => 'width:190px', 'empty' => __('Cualquiera'), 'translate' => false));
 } else {
-	echo $Form->select('id_estado', PrmEstadoFactura::getList($Sesion), $id_estado, array('onchange' => 'mostrarAccionesEstado(this.form)', 'style' => 'width:150px', 'empty' => __('Cualquiera'), 'escape' => false));
+	echo $Form->select('id_estado', PrmEstadoFactura::getList($Sesion), $id_estado, array('onchange' => 'mostrarAccionesEstado(this.form)', 'style' => 'width:150px', 'empty' => __('Cualquiera'), 'translate' => false));
 }
 ?>
 				</td>
@@ -593,4 +593,3 @@ if ($opc == 'buscar') {
 
 
 $pagina->PrintBottom();
-
