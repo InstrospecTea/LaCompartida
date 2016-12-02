@@ -35,16 +35,16 @@ $documento = $WsFacturacionMateriaSoftware->documento(
 	$TipoDocumentoIdentidad
 );
 
-TTB\Debug::pr(json_encode($WsFacturacionMateriaSoftware->getBodyInvoice(), JSON_PRETTY_PRINT));
+// TTB\Debug::pr(json_encode($WsFacturacionMateriaSoftware->getBodyInvoice(), JSON_PRETTY_PRINT));
 
 // $documento = json_decode($Factura->fields['dte_url_pdf']);
 
-// $documento_anulado = $WsFacturacionMateriaSoftware->PutAnular(
-// 	$documento->Serie,
-// 	(int) $documento->Correlativo
-// );
+$documento_anulado = $WsFacturacionMateriaSoftware->getanular(
+	$documento->Serie,
+	(int) $documento->Correlativo
+);
 
-// TTB\Debug::pr(json_encode($documento_anulado, JSON_PRETTY_PRINT));
+TTB\Debug::pr(json_encode($documento_anulado, JSON_PRETTY_PRINT));
 
 echo "<div>Invoice: {$documento->Serie} {$documento->Correlativo}</div>";
 echo '<div>Code: ', $WsFacturacionMateriaSoftware->getErrorCode(), '</div>';
