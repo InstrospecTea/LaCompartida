@@ -43,6 +43,28 @@ class FacturacionElectronicaMateriaSoftware extends FacturacionElectronica {
 		return $hookArg;
 	}
 
+	public static function InsertaMetodoPago() {
+		global $factura, $contrato, $buscar_padre, $codigo_tipo_doc;
+		$Sesion = new Sesion();
+		if ($buscar_padre) {
+			$grupo = $codigo_tipo_doc == 'NC' ? 'PRM_FACT_MS_REF_NC' : 'PRM_FACT_MS_REF_ND';
+			echo "<tr>";
+			echo "<td align='right'>Referencia</td>";
+			echo "<td align='left' colspan='3'>";
+			echo Html::SelectQuery(
+				$Sesion,
+				"SELECT id_codigo, glosa FROM prm_codigo WHERE grupo = '{$grupo}' ORDER BY glosa ASC",
+				"dte_codigo_referencia",
+				$factura->fields['dte_codigo_referencia'],
+				"",
+				null,
+				"300"
+			);
+			echo "</td>";
+			echo "</tr>";
+		}
+	}
+
 	public static function InsertaJSFacturaElectronica() {
 		$BotonDescargarHTML = self::BotonDescargarHTML('0');
 		echo <<<EOF
@@ -142,13 +164,14 @@ EOF;
 			$DocumentoLegal = new PrmDocumentoLegal($Sesion);
 			$DocumentoLegal->Load($Factura->fields['id_documento_legal']);
 
-			$Cobro = new Cobro($Sesion);
-			$Cobro->Load($Factura->fields['id_cobro']);
+			$TipoDocumentoIdentidad = new PrmTipoDocumentoIdentidad($Sesion);
+			$TipoDocumentoIdentidad->Load($Factura->fields['id_tipo_documento_identidad']);
 
-			$Contrato = new Contrato($Sesion);
-			$Contrato->Load($Cobro->fields['id_contrato']);
+			if (!$TipoDocumentoIdentidad->loaded()) {
+				$TipoDocumentoIdentidad->loadByDteCode(6); // Buscar por codigo_dte de RUC
+			}
 
-			$documento = $WsFacturacionMateriaSoftware->documento($Factura, $Moneda, $DocumentoLegal, $Contrato);
+			$documento = $WsFacturacionMateriaSoftware->documento($Factura, $Moneda, $DocumentoLegal, $TipoDocumentoIdentidad);
 
 			if ($WsFacturacionMateriaSoftware->hasError()) {
 				$hookArg['Error'] = self::parseError($WsFacturacionMateriaSoftware, 'BuildingInvoiceError');
@@ -156,6 +179,7 @@ EOF;
 				try {
 					$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 					$Factura->Edit('dte_url_pdf', json_encode($documento));
+					$Factura->Edit('dte_estado', Factura::$estados_dte['Firmado']);
 					if ($Factura->Write()) {
 						$hookArg['InvoiceURL'] = json_encode($documento);
 					}
@@ -172,6 +196,14 @@ EOF;
 		$Sesion = new Sesion();
 		$Factura = $hookArg['Factura'];
 
+		$Estudio = new PrmEstudio($Sesion);
+		$Estudio->Load($Factura->fields['id_estudio']);
+
+		$WsFacturacionMateriaSoftware = new WsFacturacionMateriaSoftware(
+			$Estudio->GetMetaData('facturacion_electronica_materia_software.Url'),
+			$Estudio->GetMetaData('facturacion_electronica_materia_software.Authorization')
+		);
+
 		if (!$Factura->DTEFirmado() && !$Factura->DTEProcesandoAnular()) {
 			return $hookArg;
 		}
@@ -183,8 +215,22 @@ EOF;
 			(int) $documento->Correlativo
 		);
 
-		if ($WsFacturacionMateriaSoftware->hasError()) {
-			$hookArg['Error'] = self::parseError($WsFacturacionMateriaSoftware, 'CancelGeneratedInvoiceError');
+		if (!$WsFacturacionMateriaSoftware->hasError()) {
+			try {
+				$estado_dte = Factura::$estados_dte['Anulado'];
+				$Factura->Edit('dte_fecha_anulacion', date('Y-m-d H:i:s'));
+				$Factura->Edit('dte_estado', $estado_dte);
+				$Factura->Edit('dte_estado_descripcion', __(Factura::$estados_dte_desc[$estado_dte]));
+				$Factura->Write();
+			} catch (Exception $ex) {
+				$hookArg['Error'] = self::ParseError($ex, 'SaveCanceledInvoiceError');
+			}
+		} else {
+			$hookArg['Error'] = self::ParseError($WsFacturacionMateriaSoftware, 'CancelGeneratedInvoiceError');
+			$mensaje = "Usted ha solicitado anular un Documento Tributario. Este proceso puede tardar y mientras esto ocurre, anularemos la factura en Time Billing para que usted pueda volver a generar el documento correctamente.";
+			$Factura->Edit('dte_estado', Factura::$estados_dte['ProcesoAnular']);
+			$Factura->Edit('dte_estado_descripcion', $mensaje);
+			$Factura->Write();
 		}
 
 		return $hookArg;

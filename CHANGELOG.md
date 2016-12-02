@@ -1,5 +1,30 @@
 # Changelog
 
+## Hotfix 16.36.4
+Friday, December 2nd
+* **Fix** [Se revierte el feature/TTBC-4356](https://github.com/LemontechSA/ttb/pull/1965)
+
+## Hotfix 16.36.3
+Friday, December 2nd
+* **Fix** [Se corrige scopeChargeable() poniendo las condiciones correctamente según las opciones de impresión](https://github.com/LemontechSA/ttb/pull/1964)
+
+## Hotfix 16.36.2
+Friday, December 2nd
+* **Feature** [Anular Factura Materia Software](https://github.com/LemontechSA/ttb/pull/1962)
+
+## Hotfix 16.36.1
+Thursday, December 1st
+* **Feature** [Códigos de Referencia](https://github.com/LemontechSA/ttb/pull/1959)
+
+## [Release 16.36.0](https://github.com/LemontechSA/ttb/pull/1958)
+Wednesday, November 30th
+* **Feature** [Orden Resumen Profesional](https://github.com/LemontechSA/ttb/pull/1951)
+* **Feature** [Facturación tipo documento](https://github.com/LemontechSA/ttb/pull/1954)
+
+## Hotfix 16.35.1
+Wednesday, November 30th
+* **Fix** [Fix nota crédito sin monto en FacturaciónCL](https://github.com/LemontechSA/ttb/pull/1955)
+
 ## [Release 16.35.0](https://github.com/LemontechSA/ttb/pull/1953)
 Tuesday, November 29th
 * **Fix** [Error en formato de excel de rentabilidad de una liquidación](https://github.com/LemontechSA/ttb/pull/1894)
