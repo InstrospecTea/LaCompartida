@@ -838,6 +838,7 @@ function HabilitaTiposDeDatos ()  {
 
 jQuery(document).ready(function() {
 	actualizarAgrupadoresVista();
+	jQuery('.agrupador').on('change', actualizarAgrupadoresVista);
 	if (jQuery('#comparar').is(':checked')) {
 		jQuery('#tabla, #dispersion').css('display', 'inline-block').show();
 	} else {
