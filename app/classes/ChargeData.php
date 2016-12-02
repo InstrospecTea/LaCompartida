@@ -117,29 +117,6 @@ class ChargeData {
 		$this->matters[$matter_code] = $works;
 		return $this->matters[$matter_code];
 	}
-
-	/**
-	 * Devuelve todos los trabajos del cobro o de un asunto en particular, ordenados según se indique
-	 * @param string $matter_code
-	 * @param string $sql_order_by
-	 * @return array
-	 */
-	public function getWorksByMatterOrderedBy($matter_code = null, $sql_order_by) {
-		if (is_null($matter_code)) {
-			return $this->getWorksOrdererBy($sql_order_by);
-		}
-
-		$matter_works = array();
-		$works = $this->getWorksOrdererBy($sql_order_by);
-		$total_works = count($works);
-		for ($i = 0; $i < $total_works; ++$i) {
-			if ($works[$i]['codigo_asunto'] == $matter_code) {
-				$matter_works[] = $works[$i];
-			}
-		}
-		return $matter_works;
-	}
-
 	/**
 	 * verifica si tiene el cobro o un asunto en particular
 	 * @param string $matter_code
@@ -223,6 +200,8 @@ class ChargeData {
 			->add_select('trabajo.solicitante')
 			->add_select("CONCAT_WS(' ', nombre, apellido1)", 'nombre_usuario')
 			->add_select('usuario.username')
+			->add_select('prm_categoria_usuario.orden', 'orden_categoria')
+			->add_select('prm_categoria_usuario.id_categoria_usuario', 'id_categoria_usuario')
 			->add_left_join_with('usuario', Restriction::equals('trabajo.id_usuario', 'usuario.id_usuario'))
 			//->add_left_join_with('cobro', Restriction::equals('cobro.id_cobro', 'trabajo.id_cobro'))
 			->add_left_join_with('prm_categoria_usuario', Restriction::equals('usuario.id_categoria_usuario', 'prm_categoria_usuario.id_categoria_usuario'))
@@ -285,19 +264,14 @@ class ChargeData {
 	 * @return Criteria
 	 */
 	protected function scopeUserCategory(Criteria $Criteria) {
-		if (Conf::read('OrdenarPorCategoriaNombreUsuario') || Conf::read('OrdenarPorCategoriaUsuario')) {
-			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
- 				->add_ordering('prm_categoria_usuario.orden')
+		if (Conf::read('OrdenarPorCategoriaUsuario')) {
+			$Criteria->add_ordering('prm_categoria_usuario.orden')
  				->add_ordering('usuario.id_usuario');
 		} else if (Conf::read('SepararPorUsuario')) {
-			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
-				->add_ordering('usuario.id_categoria_usuario')
+			$Criteria->add_ordering('usuario.id_categoria_usuario')
 				->add_ordering('usuario.id_usuario');
-		} else if (Conf::read('OrdenarPorCategoriaDetalleProfesional')) {
-			$Criteria->add_ordering('usuario.id_categoria_usuario', 'DESC');
 		} else if (Conf::read('OrdenarPorFechaCategoria')) {
-			$Criteria->add_select('prm_categoria_usuario.id_categoria_usuario')
-				->add_ordering('trabajo.fecha')
+			$Criteria->add_ordering('trabajo.fecha')
 				->add_ordering('usuario.id_categoria_usuario')
 				->add_ordering('usuario.id_usuario');
 		} else {
@@ -412,6 +386,8 @@ class ChargeData {
 				$sumary[$user_id] = $this->base_data;
 				$sumary[$user_id]['id_categoria_usuario'] = $work['id_categoria_usuario'];
 				$sumary[$user_id]['glosa_categoria'] = $work['categoria'];
+				$sumary[$user_id]['orden_categoria'] = $work['orden_categoria'];
+				$sumary[$user_id]['id_categoria_usuario'] = $work['id_categoria_usuario'];
 				$sumary[$user_id]['nombre_usuario'] = $work['nombre_usuario'];
 				$sumary[$user_id]['username'] = $work['username'];
 				$sumary[$user_id]['tarifa'] = $work['tarifa_hh'];
