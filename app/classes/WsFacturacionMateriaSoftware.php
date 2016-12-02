@@ -51,8 +51,8 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		return $documento;
 	}
 
-	public function PutAnular($serie, $correlativo) {
-		$response = $this->sendData('PUT', "{$this->url}/documento/PutAnular?serie={$serie}&correlativo={$correlativo}");
+	public function getanular($serie, $correlativo) {
+		$response = $this->sendData('GET', "{$this->url}/documento/getanular?serie={$serie}&correlativo={$correlativo}");
 		$documento = json_decode($response);
 
 		// ocurrió un error
@@ -143,12 +143,6 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 
 	private function sendData($method, $url, $post = '') {
 		$ch = curl_init($url);
-
-		$headers = $this->getHeaders();
-
-		if ($method == 'PUT') {
-			array_push($headers, 'Content-Length: 0');
-		}
 
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);

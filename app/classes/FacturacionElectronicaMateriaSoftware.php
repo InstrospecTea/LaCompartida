@@ -4,14 +4,16 @@ class FacturacionElectronicaMateriaSoftware extends FacturacionElectronica {
 
 	public static function ValidarFactura() {
 		$Sesion = new Sesion();
-		global $pagina, $numero, $RUT_cliente, $cliente, $id_estado, $factura;
+		global $pagina, $numero, $RUT_cliente, $cliente, $id_estado, $factura, $tipo_documento_identidad;
 
 		if (empty($numero)) {
 			$pagina->AddError(__('Debe ingresar') . ' ' . __('Número'));
 		}
-		if (empty($RUT_cliente)) {
-			$pagina->AddError(__('Debe ingresar') . ' ' . __('ROL/RUT'));
+
+		if ($tipo_documento_identidad != 3 && empty($RUT_cliente)) {
+			$pagina->AddError(__('Debe ingresar') . ' ' . __('Doc. Identidad'));
 		}
+
 		if (empty($cliente)) {
 			$pagina->AddError(__('Debe ingresar') . ' ' . __('Raz&oacute;n Social Cliente'));
 		}
@@ -210,7 +212,7 @@ EOF;
 
 		$documento = json_decode($Factura->fields['dte_url_pdf']);
 
-		$documento_anulado = $WsFacturacionMateriaSoftware->PutAnular(
+		$documento_anulado = $WsFacturacionMateriaSoftware->getanular(
 			$documento->Serie,
 			(int) $documento->Correlativo
 		);
