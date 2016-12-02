@@ -1,8 +1,12 @@
 # Changelog
 
+## Hotfix 16.36.4
+Friday, December 2nd
+* **Fix** [Se revierte el feature/TTBC-4356](https://github.com/LemontechSA/ttb/pull/1965)
+
 ## Hotfix 16.36.3
 Friday, December 2nd
-* **Feature** [Se corrige scopeChargeable() poniendo las condiciones correctamente según las opciones de impresión](https://github.com/LemontechSA/ttb/pull/1964)
+* **Fix** [Se corrige scopeChargeable() poniendo las condiciones correctamente según las opciones de impresión](https://github.com/LemontechSA/ttb/pull/1964)
 
 ## Hotfix 16.36.2
 Friday, December 2nd
