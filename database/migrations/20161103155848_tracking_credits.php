@@ -16,7 +16,7 @@ class TrackingCredits extends \Database\Migration implements \Database\ITemplate
 			  PRIMARY KEY (`id_categoria_generador`)
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1;");
 
-		$this->addQueryUp('ALTER TABLE `contrato_generador` ADD `id_categoria_generador` INT  UNSIGNED  NOT NULL  AFTER `porcentaje_genera`;');
+		$this->addQueryUp('ALTER TABLE `contrato_generador` ADD `id_categoria_generador` INT  UNSIGNED  NULL  AFTER `porcentaje_genera`;');
 		$this->addQueryUp('ALTER TABLE `contrato_generador` ADD CONSTRAINT `contrato_generador_fk_id_categoria_generador` FOREIGN KEY (`id_categoria_generador`) REFERENCES `prm_categoria_generador` (`id_categoria_generador`);');
 
 		$this->addQueryUp("INSERT INTO `prm_mantencion_tablas` (`nombre_tabla`, `glosa_tabla`, `info_tabla`) VALUES ('prm_categoria_generador', 'Categoría Profesionales Generadores', NULL);");
