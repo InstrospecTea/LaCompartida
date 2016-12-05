@@ -3470,7 +3470,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										percent_generator: percent,
 										user_id: user,
 										category_id: category,
-										client_id: '<?= $id_cliente ?>'
+										client_id: "<?= $cliente->fields['id_cliente'] ?>"
 									}
 								}).done(function(data) {
 									showAlert('info', 'Profesional agregado con éxito');
