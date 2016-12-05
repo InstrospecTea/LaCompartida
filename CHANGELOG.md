@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.36.6
+Monday, December 5th
+* **Feature** [Cambio de folio en facturas electrónicas emitidas en Materia Software](https://github.com/LemontechSA/ttb/pull/1968)
+
 ## Hotfix 16.36.5
 Friday, December 2nd
 * **Fix** [Materia Software - Anulación factura y modificación de validación en documento legal](https://github.com/LemontechSA/ttb/pull/1966)
