@@ -786,9 +786,6 @@ $_LANG['Gastos c/ IVA'] = 'Expenses (plus VAT)';
 $_LANG['Gastos s/ IVA'] = 'Expenses (without VAT)';
 $_LANG['Invoice No.'] = 'INVOICE OF SALE';
 
-
-
-
 /* Especiales AGUILAR CASTILLO LOVE */
 $_LANG['Resumen Nota de Cobro ACL'] = 'Debit Note Summary';
 $_LANG['Nota de Cobro ACL'] = 'Debit Note';
@@ -812,3 +809,6 @@ $_LANG['Categoría'] = "Category";
 $_LANG['Dirección'] = 'Address';
 $_LANG['Importe'] = 'Fees';
 $_LANG['Importes'] = 'Fees';
+
+/* Solicitud Profesionales Generadores */
+$_LANG['Profesionales Generadores'] = 'Tracking Credits';

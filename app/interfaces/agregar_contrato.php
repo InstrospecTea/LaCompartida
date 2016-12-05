@@ -3318,7 +3318,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			<script type="text/javascript">
 				jQuery('document').ready(function() {
 					var $ = jQuery;
-					var generator_url = "<?php echo Conf::RootDir() . '/api/index.php/clients/' . $cliente->fields['id_cliente'] . '/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
+					var auth_token = "<?= $Sesion->auth_token ?>";
+					var generator_url = "<?php echo Conf::RootDir() . '/api/v2/index.php/agreements/' . $contrato->fields['id_contrato'] ?>";
 					var actionButtons = function(id_contract_generator) {
 						return '<td align="center"  class="border_plomo" style="white-space:nowrap; width: 52px;">\
 							<a data-id="' + id_contract_generator + '" class="fl edit_generator ui-button editar" style="margin: 3px 1px;width: 18px;height: 18px;" title="Modificar Generador" href="javascript:void(0)">&nbsp;</a>\
@@ -3342,37 +3343,45 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					var loadGeneratorForm = function(state, data) {
 						$('#form_generator_status').val(state);
 						if (state == 'NEW') {
-							$('#id_contract_generator').val('');
+							$('#id_agreement_generator').val('');
 							$('#id_user_generator').val('');
 							$('#percent_generator').val('');
+							$('#category').val('');
 							$('#add_generator').val('Agregar');
 							$('#cancel_generator').val('Cancelar').hide();
 						} else if (state == 'EDIT') {
-							$('#id_contract_generator').val(data.id_contract_generator);
+							$('#id_agreement_generator').val(data.id_agreement_generator);
 							$('#id_user_generator').val(data.id_user_generator);
 							$('#percent_generator').val(data.percent_generator);
+							$('#category').val(data.id_category);
 							$('#add_generator').val('Modificar');
 							$('#cancel_generator').val('Cancelar').show();
 						}
 					}
 
 					var loadGenerators = function() {
-						$.ajax({ url: generator_url })
-							.done(function(data) {
+						$.ajax({
+							url: generator_url + '?embed=generators',
+							headers: {
+								authtoken: auth_token
+							}
+						}).done(function(data) {
 								rows = $('<tbody>');
 								header = $("<tr bgcolor='#A3D55C'>")
 								header.append('<td align="left" class="border_plomo"><b><?php echo __('Usuario'); ?></b></td>');
 								header.append('<td align="left" class="border_plomo"><b><?php echo __('Área Usuario'); ?></b></td>');
+								header.append('<td align="left" class="border_plomo"><b><?php echo __('Categoría'); ?></b></td>');
 								header.append('<td align="right" class="border_plomo"><b><?php echo __('Porcentaje Genera'); ?></b></td>');
 								header.append('<td align="right" class="border_plomo"><b><?php echo __('Acciones'); ?></b></td>');
 								rows.append(header);
 
-								$.each(data, function(i, generator) {
+								$.each(data['generators'], function(i, generator) {
 									generator_row = $('<tr>');
-									generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
-									generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
-									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">' + generator.porcentaje_genera + '%</td>');
-									generator_row.append(actionButtons(generator.id_contrato_generador));
+									generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.user_id + '">'+ generator.name + '</td>');
+									generator_row.append('<td align="left" class="border_plomo">' + generator.user_area + '</td>');
+									generator_row.append('<td align="left" class="border_plomo category-data" data-category_value="' + generator.category_generator_id + '">' + generator.category_name + '</td>');
+									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.percent + '">' + generator.percent + '%</td>');
+									generator_row.append(actionButtons(generator.agreement_generator_id));
 									rows.append(generator_row);
 								});
 
@@ -3383,11 +3392,13 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					$(document).on('click', '.edit_generator', function() {
 						var percent = $(this).closest('tr').find('.percent-data').data('percent_value');
 						var user_id = $(this).closest('tr').find('.user-data').data('user_id');
+						var category_id = $(this).closest('tr').find('.category-data').data('category_value');
 						var generator_id = $(this).data('id');
 						loadGeneratorForm('EDIT', {
-							id_contract_generator: generator_id,
+							id_agreement_generator: generator_id,
 							id_user_generator: user_id,
-							percent_generator: percent
+							percent_generator: percent,
+							id_category: category_id
 						});
 					});
 
@@ -3397,7 +3408,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						}
 						var generator_id = $(this).data('id');
 						$.ajax({
-							url: generator_url + '/' + generator_id,
+							url: generator_url + '/generators/' + generator_id,
+							headers: {
+								authtoken: auth_token
+							},
 							type: 'DELETE'
 						}).done(function(data) {
 							loadGenerators();
@@ -3412,9 +3426,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 					$('#add_generator').click(function() {
 						var percent = $('#percent_generator').val();
 						var user = $('#id_user_generator').val();
-						var id_contract_generator = $('#id_contract_generator').val();
+						var category = $('#category').val();
+						var id_agreement_generator = $('#id_agreement_generator').val();
 						var form_status = $('#form_generator_status').val();
-						if (percent && user && percent.length > 0) {
+						if (percent && user && percent.length > 0 && category) {
 							if (parseInt(percent) < 1 || parseInt(percent) > 100) {
 								showAlert('alerta', 'El porcentaje debe estar entre 1 y 100');
 								return;
@@ -3422,9 +3437,15 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 							if (form_status == 'EDIT') {
 								$.ajax({
-									url: generator_url + '/' + id_contract_generator,
-									type: 'POST',
-									data: {percent_generator: percent}
+									url: generator_url + '/generators/' + id_agreement_generator,
+									headers: {
+										authtoken: auth_token
+									},
+									type: 'PUT',
+									data: {
+										percent_generator: percent,
+										category_id: category
+									}
 								}).done(function(data) {
 									loadGeneratorForm('NEW', {});
 									loadGenerators();
@@ -3435,11 +3456,16 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									return;
 								}
 								$.ajax({
-									url: generator_url,
-									type: 'PUT',
+									url: generator_url + '/generators',
+									headers: {
+										authtoken: auth_token
+									},
+									type: 'POST',
 									data: {
 										percent_generator: percent,
-										user_id:user
+										user_id: user,
+										category_id: category,
+										client_id: '<?= $id_cliente ?>'
 									}
 								}).done(function(data) {
 									showAlert('info', 'Profesional agregado con éxito');
@@ -3457,7 +3483,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			</script>
 
 			<fieldset class="border_plomo tb_base">
-				<legend><?php echo __('Profesionales') . ' ' . __('Generadores') ?></legend>
+				<legend><?php echo __('Profesionales Generadores') ?></legend>
 				<table width="80%" border="0" style="border: 1px solid #BDBDBD;" cellpadding="3" cellspacing="3" id="user_generators_form">
 					<tbody>
 						<tr>
@@ -3468,14 +3494,34 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_user_generator', '', '', 'Seleccione', '200px'); ?>
 							</td>
 							<td>
+								<?php echo __('Categoría') ?>
+							</td>
+							<td>
+								<?php
+									$categorias = new Criteria($Sesion);
+									$categorias = $categorias->add_select('id_categoria_generador')
+																						->add_select('nombre')
+																						->add_from('prm_categoria_generador')
+																						->run(); ?>
+
+									<select name="category" id="category">
+										<option value="">Seleccione</option>
+									<?php foreach ($categorias as $categoria): ?>
+										<option value="<?= $categoria['id_categoria_generador'] ?>"> <?= $categoria['nombre'] ?></option>
+									<?php endforeach; ?>
+									</select>
+							</td>
+							<td>
 								<?php echo __('Porcentaje Genera'); ?>:
 							</td>
 							<td>
 								<input type="text" size="6" class="text_box" name='percent_generator' id="percent_generator" value="" style="border: 1px solid rgb(204, 204, 204);">
 							</td>
-							<td>
+						</tr>
+						<tr>
+							<td colspan="7">
 								<input type="hidden" id="form_generator_status" value="" />
-								<input type="hidden" id="id_contract_generator" value="" />
+								<input type="hidden" id="id_agreement_generator" value="" />
 								<?php
 								echo $Form->button(__('Agregar') . ' ' . __('Generador'), array('id' => 'add_generator'));
 								echo $Form->button(__('Cancelar'), array('id' => 'cancel_generator'));
