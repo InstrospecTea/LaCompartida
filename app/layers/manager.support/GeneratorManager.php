@@ -11,6 +11,7 @@ class GeneratorManager extends AbstractManager implements IGeneratorManager {
 		$Update = new InsertCriteria($this->Sesion);
 		$Update = $Update->addPivotWithValue('porcentaje_genera', $generator['percent_generator'])
 											->addPivotWithValue('id_categoria_generador', $generator['category_id'])
+											->addPivotWithValue('id_usuario', $generator['user_id'])
 											->addRestriction(CriteriaRestriction::equals('id_contrato_generador', $generator_id))
 											->setTable('contrato_generador')
 											->update()

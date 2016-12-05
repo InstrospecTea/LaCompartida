@@ -23,6 +23,7 @@ class GeneratorsAPI extends AbstractSlimAPI {
 
 		$generator['percent_generator'] = $params['percent_generator'];
 		$generator['category_id'] = $params['category_id'];
+		$generator['user_id'] = $params['user_id'];
 
 		$Generator = new \GeneratorManager($this->session);
 		$Generator->updateAgreementGenerator($generator, $generator_id);
