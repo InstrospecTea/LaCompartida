@@ -316,6 +316,20 @@ if (!$contrato->Loaded()) {
 }
 ?>
 <script type="text/javascript">
+	<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']): ?>
+	var showAlert = function(type, message) {
+		var alert_html = '<div id="generator_message"><table width="70%" class="' + type + '">\
+			<tbody><tr>\
+				<td valign="top" align="left" style="font-size: 12px;">\
+				' + message + '</td>\
+			</tr></tbody>\
+		</table></br></div>';
+		jQuery('#user_generators_form').before(alert_html);
+		setTimeout(function(){
+			jQuery('#generator_message').remove()
+		}, 5000);
+	};
+	<?php endif; ?>
 
 	function ValidarContrato(form) {
 
@@ -1223,6 +1237,41 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 	function RevisarTarifas(tarifa, moneda, f, desde_combo)
 	{
+		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']): ?>
+			/* Valida que la suma de las CRC y PMC no supere el 100% */
+			var error = false;
+			var crc_user = false;
+			var total_crc_pmc_percent = 0;
+			jQuery('.category-data').each(function() {
+				var percent_row = parseInt(jQuery.trim(jQuery(this).parent().find('.percent-data').data('percent_value')));
+				var category_name = jQuery.trim(jQuery(this).html()).toUpperCase();
+
+				if (category_name == 'CRC' || category_name == 'PMC') {
+					total_crc_pmc_percent += percent_row;
+				};
+
+				if (category_name == 'CRC') {
+					crc_user = true;
+				};
+			});
+
+			if (!crc_user) {
+				showAlert('alerta', "<?= __('Debe haber al menos un profesional con categoría CRC.') ?>");
+				jQuery('#percent_generator').focus();
+				error = true;
+			};
+
+			if (total_crc_pmc_percent != 100) {
+				showAlert('alerta', "<?= __('La suma de las categorías CRC y PMC debe sumar 100%.') ?>");
+				jQuery('#percent_generator').focus();
+				error = true;
+			};
+
+			if (error) {
+				return false;
+			}
+		<?php endif; ?>
+
 		var ejecutar = true;
 
 		if ( !desde_combo )
@@ -3332,19 +3381,6 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						</td>';
 					};
 
-					var showAlert = function(type, message) {
-						var alert_html = '<div id="generator_message"><table width="70%" class="' + type + '">\
-							<tbody><tr>\
-								<td valign="top" align="left" style="font-size: 12px;">\
-								' + message + '</td>\
-							</tr></tbody>\
-						</table></br></div>';
-						$('#user_generators_form').before(alert_html);
-						setTimeout(function(){
-							$('#generator_message').remove()
-						}, 3000);
-					};
-
 					var loadGeneratorForm = function(state, data) {
 						$('#form_generator_status').val(state);
 						if (state == 'NEW') {
@@ -3445,17 +3481,98 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 
 					$('#add_generator').click(function() {
-						var percent = $('#percent_generator').val();
+						var percent = parseInt($('#percent_generator').val());
 						var user = $('#id_user_generator').val();
-						var category = $('#category').val();
+						var $category = $('#category');
+						var category = $category.val();
 						var id_agreement_generator = $('#id_agreement_generator').val();
 						var form_status = $('#form_generator_status').val();
-						if (percent && user && percent.length > 0 && category) {
-							if (parseInt(percent) < 1 || parseInt(percent) > 100) {
-								showAlert('alerta', 'El porcentaje debe estar entre 1 y 100');
-								return;
-							}
+						var error = false;
+						var category_name = $.trim($category.find('option:selected').html()).toUpperCase();
 
+						/* Valida porcentajes permitidos para REC */
+						if ($.trim($category.find('option:selected').html()) == 'REC' && (percent < 10 || percent > 100)) {
+							showAlert('alerta', "<?= __('El porcentaje para la categiría REC debe estar entre 10% y 100%.') ?>");
+							error = true;
+						};
+
+						/* Valida que el mismo usuario no tenga REC y CRC al mismo tiempo */
+						if (category_name == 'CRC' || category_name == 'REC') {
+							var change_category = true;
+							$('td[data-user_id="' + user + '"]').each(function() {
+								var category_name_user = $.trim($(this).parent().find('.category-data').html()).toUpperCase();
+								var id = $(this).parent().find('.edit_generator').data('id');
+
+								if (id_agreement_generator != id) {
+									if (category_name_user == 'REC' && category_name == 'CRC' ||
+											category_name_user == 'CRC' && category_name == 'REC') {
+										change_category = false;
+									};
+								};
+							});
+
+							if (!change_category) {
+								showAlert('alerta', "<?= __('El mismo profesional no puede pertenecer a la categiría REC y CRC al mismo tiempo.') ?>");
+								error = true;
+							};
+						};
+
+						/* Valida que la suma de las REC no supere el 100% */
+						if ($.trim($category.find('option:selected').html()) == 'REC') {
+							var total_rec_percent = 0;
+							$('.category-data').each(function() {
+								var percent_row = parseInt($.trim($(this).parent().find('.percent-data').data('percent_value')));
+								var category_name = $.trim($(this).html()).toUpperCase();
+								var id = $(this).parent().find('.edit_generator').data('id');
+
+								if (category_name == 'REC' && id_agreement_generator != id) {
+									total_rec_percent += percent_row;
+								};
+							});
+
+							total_rec_percent += percent;
+
+							if (total_rec_percent > 100) {
+								showAlert('alerta', "<?= __('La suma de la categoría REC debe estar entre 10% y 100%.') ?>");
+								$('#percent_generator').focus();
+								error = true;
+							}
+						};
+
+						/* Valida que la suma de las CRC y PMC no supere el 100% */
+						if ($.trim($category.find('option:selected').html()) == 'PMC' ||
+								$.trim($category.find('option:selected').html()) == 'CRC') {
+							var total_crc_pmc_percent = 0;
+							$('.category-data').each(function() {
+								var percent_row = parseInt($.trim($(this).parent().find('.percent-data').data('percent_value')));
+								var category_name = $.trim($(this).html()).toUpperCase();
+								var id = $(this).parent().find('.edit_generator').data('id');
+
+								if ((category_name == 'CRC' || category_name == 'PMC') && id_agreement_generator != id) {
+									total_crc_pmc_percent += percent_row;
+								};
+							});
+
+							total_crc_pmc_percent += percent;
+
+							if (total_crc_pmc_percent > 100) {
+								showAlert('alerta', "<?= __('La suma de las categorías CRC y PMC debe sumar 100%.') ?>");
+								$('#percent_generator').focus();
+								error = true;
+							}
+						};
+
+						if (percent < 1 || percent > 100) {
+							showAlert('alerta', "<?= __('El porcentaje debe estar entre 1 y 100.') ?>");
+							$('#percent_generator').focus();
+							error = true;
+						};
+
+						if (error) {
+							return false;
+						};
+
+						if (percent && user && category) {
 							if (form_status == 'EDIT') {
 								$.ajax({
 									url: generator_url + '/generators/' + id_agreement_generator,
@@ -3465,17 +3582,15 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									type: 'PUT',
 									data: {
 										percent_generator: percent,
-										category_id: category
+										category_id: category,
+										user_id: user
 									}
 								}).done(function(data) {
+									showAlert('info', 'Profesional editado con éxito');
 									loadGeneratorForm('NEW', {});
 									loadGenerators();
 								});
 							} else if (form_status == 'NEW') {
-								if ($('td[data-user_id="' + user + '"]').length > 0) {
-									showAlert('alerta', 'El profesional ya existe, favor agregue otro o modifíquelo desde el listado');
-									return;
-								}
 								$.ajax({
 									url: generator_url + '/generators',
 									headers: {
