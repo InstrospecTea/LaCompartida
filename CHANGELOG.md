@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.36.8
+Monday, December 5th
+* **Fix** [Se crea ArraySorter::orderBy para ordenar arreglos](https://github.com/LemontechSA/ttb/pull/1972)
+
 ## Hotfix 16.36.7
 Monday, December 5th
 * **Fix** [Generar plantilla usando multiples agrupadores](https://github.com/LemontechSA/ttb/pull/1969)

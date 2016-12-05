@@ -206,7 +206,7 @@ class NotaCobroResumenProfesional extends NotaCobroDocumento2 {
 				$descontado = false;
 				$flatfee = false;
 				$incobrables = false;
-				$sumary = $this->ChargeData->getSumary();
+				$sumary = ArraySorter::orderBy($this->ChargeData->getSumary(), Conf::read('OrdenResumenProfesional'));
  				$totales = $this->ChargeData->getTotal();
 
 				if (is_array($totales)) {
