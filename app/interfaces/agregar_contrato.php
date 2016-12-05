@@ -3314,12 +3314,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		<!-- ASOCIAR DOC LEGALES -->
 
 		<!-- Modulo de  producción-->
-		<?php
-		$Asunto = new Asunto($Sesion);
-		$Asunto->Load($id_asunto);
-		?>
-
-		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']) { ?>
+		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $contrato->Loaded()) { ?>
 			<script type="text/javascript">
 				jQuery('document').ready(function() {
 					var $ = jQuery;
