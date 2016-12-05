@@ -3391,6 +3391,22 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								});
 
 								$('#user_generators_result').html(rows);
+
+								$('#percent_generator').keydown(function(e) {
+									if ((e.keyCode < 48 || e.keyCode > 57) &&
+											(e.keyCode < 37 || e.keyCode > 40) &&
+											(e.keyCode != 9) &&
+											(e.keyCode != 8)) {
+										e.preventDefault();
+									}
+								});
+
+								$('#percent_generator').blur(function() {
+									$input = $(this);
+									if ($input.val() > 100) {
+										$input.val(100);
+									}
+								});
 							});
 					};
 
@@ -3520,7 +3536,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								<?php echo __('Porcentaje Genera'); ?>:
 							</td>
 							<td>
-								<input type="text" size="6" class="text_box" name='percent_generator' id="percent_generator" value="" style="border: 1px solid rgb(204, 204, 204);">
+								<input type="text" size="6" class="text_box" name='percent_generator' id="percent_generator" value="" style="border: 1px solid rgb(204, 204, 204);" maxlength="3">
 							</td>
 						</tr>
 						<tr>
