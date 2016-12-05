@@ -73,6 +73,7 @@ class AgreementManager extends AbstractManager implements IAgreementManager {
 																->add_inner_join_with('prm_categoria_generador',
 																		CriteriaRestriction::equals('contrato_generador.id_categoria_generador', 'prm_categoria_generador.id_categoria_generador'))
 																->add_restriction(CriteriaRestriction::equals('contrato_generador.id_contrato', $agreement_id))
+																->add_ordering('category_name')
 																->add_ordering('name')
 																->run();
 
