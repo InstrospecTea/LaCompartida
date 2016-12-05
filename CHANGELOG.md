@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.36.7
+Monday, December 5th
+* **Fix** [Generar plantilla usando multiples agrupadores](https://github.com/LemontechSA/ttb/pull/1969)
+
 ## Hotfix 16.36.6
 Monday, December 5th
 * **Feature** [Cambio de folio en facturas electrónicas emitidas en Materia Software](https://github.com/LemontechSA/ttb/pull/1968)
