@@ -13,7 +13,8 @@ class TrackingCredits extends \Database\Migration implements \Database\ITemplate
 			"CREATE TABLE `prm_categoria_generador` (
 			  `id_categoria_generador` int(11) unsigned NOT NULL AUTO_INCREMENT,
 			  `nombre` varchar(20) NOT NULL DEFAULT '',
-			  PRIMARY KEY (`id_categoria_generador`)
+			  PRIMARY KEY (`id_categoria_generador`),
+			  UNIQUE INDEX (`nombre`)
 			) ENGINE=InnoDB DEFAULT CHARSET=latin1;");
 
 		$this->addQueryUp('ALTER TABLE `contrato_generador` ADD `id_categoria_generador` INT  UNSIGNED  NULL  AFTER `porcentaje_genera`;');
