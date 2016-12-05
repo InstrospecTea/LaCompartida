@@ -2116,7 +2116,7 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 				$row_tmpl = $html;
 				$html = '';
 
-				$works = UtilesApp::order_by($this->ChargeData->getWorks($asunto->fields['codigo_asunto']), Conf::read('OrdenTrabajosNotaCobro'));
+				$works = ArraySorter::orderBy($this->ChargeData->getWorks($asunto->fields['codigo_asunto']), Conf::read('OrdenTrabajosNotaCobro'));
 
 				$total_works = count($works);
 				$categoria_duracion = 0;
