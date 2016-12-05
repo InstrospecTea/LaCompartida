@@ -4,14 +4,16 @@ class FacturacionElectronicaMateriaSoftware extends FacturacionElectronica {
 
 	public static function ValidarFactura() {
 		$Sesion = new Sesion();
-		global $pagina, $numero, $RUT_cliente, $cliente, $id_estado, $factura;
+		global $pagina, $numero, $RUT_cliente, $cliente, $id_estado, $factura, $tipo_documento_identidad;
 
 		if (empty($numero)) {
 			$pagina->AddError(__('Debe ingresar') . ' ' . __('Número'));
 		}
-		if (empty($RUT_cliente)) {
-			$pagina->AddError(__('Debe ingresar') . ' ' . __('ROL/RUT'));
+
+		if ($tipo_documento_identidad != 3 && empty($RUT_cliente)) {
+			$pagina->AddError(__('Debe ingresar') . ' ' . __('Doc. Identidad'));
 		}
+
 		if (empty($cliente)) {
 			$pagina->AddError(__('Debe ingresar') . ' ' . __('Raz&oacute;n Social Cliente'));
 		}
@@ -177,11 +179,26 @@ EOF;
 				$hookArg['Error'] = self::parseError($WsFacturacionMateriaSoftware, 'BuildingInvoiceError');
 			} else {
 				try {
+					$correlativo = (int) $documento->Correlativo;
+					$nuevo_numero = self::LiberaNumeroFactura($Factura, $correlativo);
+
+					$Factura->Edit('numero', $correlativo);
 					$Factura->Edit('dte_fecha_creacion', date('Y-m-d H:i:s'));
 					$Factura->Edit('dte_url_pdf', json_encode($documento));
 					$Factura->Edit('dte_estado', Factura::$estados_dte['Firmado']);
+
 					if ($Factura->Write()) {
 						$hookArg['InvoiceURL'] = json_encode($documento);
+
+						$DocumentoLegalNumero = new DocumentoLegalNumero($Factura->sesion);
+						$nuevo_ultimo = $DocumentoLegalNumero->UltimoNumeroSerieEstudio($Factura->fields['id_documento_legal'], $Factura->fields['serie_documento_legal'], $Factura->fields['id_estudio']);
+						if ($nuevo_ultimo < $correlativo) {
+							$Factura->GuardarNumeroDocLegal($Factura->fields['id_documento_legal'], $correlativo, $Factura->fields['serie_documento_legal'], $Factura->fields['id_estudio']);
+						}
+
+						if ($nuevo_numero !== false) {
+							$hookArg['Alerta'] = __('La Factura')  . " #{$correlativo} " . __('cambio a') . " #{$nuevo_numero}";
+						}
 					}
 				} catch (Exception $ex) {
 					$hookArg['Error'] = self::parseError($ex, 'BuildingInvoiceError');
@@ -210,7 +227,7 @@ EOF;
 
 		$documento = json_decode($Factura->fields['dte_url_pdf']);
 
-		$documento_anulado = $WsFacturacionMateriaSoftware->PutAnular(
+		$documento_anulado = $WsFacturacionMateriaSoftware->getanular(
 			$documento->Serie,
 			(int) $documento->Correlativo
 		);
@@ -250,6 +267,29 @@ EOF;
 			'Code' => $error_code,
 			'Message' => $error_description
 		);
+	}
+
+	public static function LiberaNumeroFactura(Factura $Factura, $numero) {
+		$id_documento_legal = $Factura->fields['id_documento_legal'];
+		$serie = $Factura->fields['serie_documento_legal'];
+		$id_estudio = $Factura->fields['id_estudio'];
+
+		if (!$Factura->ExisteNumeroDocLegal($id_documento_legal, $numero, $serie, $id_estudio)) {
+			return false;
+		}
+
+		$fields = array('id_factura', 'numero');
+		$FacturaCambio = new Factura($Factura->sesion);
+		$FacturaCambio->LoadByNumero($numero, $serie, $id_documento_legal, $id_estudio, $fields);
+
+		$DocumentoLegalNumero = new DocumentoLegalNumero($Factura->sesion);
+		$nuevo_numero = $DocumentoLegalNumero->UltimoNumeroSerieEstudio($id_documento_legal, $serie, $id_estudio);
+		$FacturaCambio->Edit('numero', $nuevo_numero);
+		$FacturaCambio->Write();
+
+		$FacturaCambio->GuardarNumeroDocLegal($id_documento_legal, $nuevo_numero, $serie, $id_estudio);
+
+		return $nuevo_numero;
 	}
 
 }
