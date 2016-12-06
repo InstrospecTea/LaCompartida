@@ -21,6 +21,9 @@ function Descarga_Planilla_Resumen_Facturacion() {
 	if ($_GET['planilla']) {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 		$SimpleReport = new SimpleReport($sesion);
+		if ($orden == '') {
+			$orden = false;
+		}
 		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
 		,$tipo_documento_legal_buscado
 		, $codigo_cliente,$codigo_cliente_secundario
@@ -103,4 +106,3 @@ function Descarga_Planilla_Resumen_Facturacion() {
 		$writer->save(__('Facturas'));
 	}
 }
-
