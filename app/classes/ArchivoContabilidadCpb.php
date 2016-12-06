@@ -22,7 +22,7 @@ class ArchivoContabilidadCpb {
 		$tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario,
 		$codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio,
 		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social,
-		$descripcion_factura, $serie, $desde_asiento_contable;
+		$descripcion_factura, $serie, $desde_asiento_contable, $codigo_contrato;
 
 		self::$Session = new \TTB\Sesion();
 
@@ -35,7 +35,7 @@ class ArchivoContabilidadCpb {
 			$tipo_documento_legal_buscado = explode(',', $pdl['ids']);
 		}
 
-		$results = $factura->DatosReporte(false, $where, $numero, $fecha1, $fecha2, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable, null);
+		$results = $factura->DatosReporte(false, $where, $numero, $fecha1, $fecha2, $tipo_documento_legal_buscado, $codigo_cliente, $codigo_cliente_secundario, $codigo_asunto, $codigo_asunto_secundario, $id_contrato, $id_estudio, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable, null, $codigo_contrato);
 
 		$total_results = count($results);
 		$documents = array();
@@ -329,10 +329,10 @@ class ArchivoContabilidadCpb {
 				'extras' => array('width' => 13)
 			),
 			array('field' => 'banco', 'title' => 'banco', 'extras' => array('width' => 10)),
-			array('field' => 'No Operaci?n', 'title' => 'No Operaci?n', 'extras' => array('width' => 10)),
+			array('field' => 'No Operación', 'title' => 'No Operación', 'extras' => array('width' => 10)),
 			array('field' => 'fecha2', 'title' => 'fecha', 'extras' => array('width' => 10)),
 			array('field' => 'factura_padre_fecha', 'title' => 'Fecha Factura Ref', 'extras' => array('width' => 10)),
-			array('field' => 'factura_padre_numero', 'title' => 'N?mero Factura Ref', 'extras' => array('width' => 10)),
+			array('field' => 'factura_padre_numero', 'title' => 'Número Factura Ref', 'extras' => array('width' => 10)),
 			array('field' => 'factura_padre_tipo_cambio', 'title' => 'Tipo Cambio Ref', 'extras' => array('width' => 10)),
 			array('field' => 'porcentaje_impuesto', 'title' => 'Porc. ' . __('IVA'), 'extras' => array('width' => 10)),
 		);
@@ -559,7 +559,7 @@ class ArchivoContabilidadCpb {
 				$areas['u'][$id_usuario] = $total;
 			}
 		} else if (round($total, 2) < 0) {
-			// Correcci?n decimal por redondeo
+			// Corrección decimal por redondeo
 			reset($areas['a']);
 			$count = self::dividir(abs($total), 0.01);
 			for ($x = 0; $x < $count; ++$x) {
