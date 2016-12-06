@@ -252,10 +252,10 @@ class ChargeData {
 				$work['valor_tarificada'] = 0;
 				$work['flatfee'] = $work['duracion_cobrada'];
 				$work['duracion_tarificada'] = 0;
-				$work['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($work['duracion_tarificada']);
 				$work['duracion_retainer'] = $work['duracion_cobrada'];
 				$work['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($work['duracion_retainer']);
 			}
+			$work['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($work['duracion_tarificada']);
 
 			$this->works[$i] = $work;
 		}
