@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.37.0](https://github.com/LemontechSA/ttb/pull/1975)
+Tuesday, December 6th
+* **Feature** [Horas Tarificadas en Detalle Trabajo](https://github.com/LemontechSA/ttb/pull/1960)
+
 ## Hotfix 16.36.9
 Tuesday, December 6th
 * **Fix** [Se agregan campos en loadWorks para soportar valores en config OrdenTrabajosNotaCobro](https://github.com/LemontechSA/ttb/pull/1974)
