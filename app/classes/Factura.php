@@ -2534,6 +2534,12 @@ class Factura extends Objeto {
 			}
 			if ($tipo_documento_legal_buscado) {
 				$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
+				if (is_array($tipo_documento_legal_buscado)) {
+					$array_documento_legal = implode(',', $tipo_documento_legal_buscado);
+					$where .= " AND factura.id_documento_legal IN ($array_documento_legal) ";
+				} else {
+					$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
+				}
 			}
 
 			if ($codigo_cliente) {
