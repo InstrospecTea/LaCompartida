@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.36.9
+Tuesday, December 6th
+* **Fix** [Se agregan campos en loadWorks para soportar valores en config OrdenTrabajosNotaCobro](https://github.com/LemontechSA/ttb/pull/1974)
+
 ## Hotfix 16.36.8
 Monday, December 5th
 * **Fix** [Se crea ArraySorter::orderBy para ordenar arreglos](https://github.com/LemontechSA/ttb/pull/1972)
