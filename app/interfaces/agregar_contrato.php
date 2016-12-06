@@ -1241,13 +1241,18 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			/* Valida que la suma de las CRC y PMC no supere el 100% */
 			var error = false;
 			var crc_user = false;
-			var total_crc_pmc_percent = 0;
+			var total_pmc_percent = 0;
+			var total_crc_percent = 0;
 			jQuery('.category-data').each(function() {
 				var percent_row = parseInt(jQuery.trim(jQuery(this).parent().find('.percent-data').data('percent_value')));
 				var category_name = jQuery.trim(jQuery(this).html()).toUpperCase();
 
-				if (category_name == 'CRC' || category_name == 'PMC') {
-					total_crc_pmc_percent += percent_row;
+				if (category_name == 'CRC') {
+					total_crc_percent += percent_row;
+				};
+
+				if (category_name == 'PMC') {
+					total_pmc_percent += percent_row;
 				};
 
 				if (category_name == 'CRC') {
@@ -1261,8 +1266,14 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 				error = true;
 			};
 
-			if (total_crc_pmc_percent != 100) {
-				showAlert('alerta', "<?= __('La suma de las categorías CRC y PMC debe sumar 100%.') ?>");
+			if (total_pmc_percent != 100) {
+				showAlert('alerta', "<?= __('La suma de la categoría PMC debe sumar 100%.') ?>");
+				jQuery('#percent_generator').focus();
+				error = true;
+			};
+
+			if (total_crc_percent != 100) {
+				showAlert('alerta', "<?= __('La suma de la categoría CRC debe sumar 100%.') ?>");
 				jQuery('#percent_generator').focus();
 				error = true;
 			};
@@ -3479,7 +3490,6 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						loadGeneratorForm('NEW', {});
 					});
 
-
 					$('#add_generator').click(function() {
 						var percent = parseInt($('#percent_generator').val());
 						var user = $('#id_user_generator').val();
@@ -3517,6 +3527,15 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							};
 						};
 
+						/* Valida que el porcentaje de REC sea 25, 50, 75 ó 100 */
+						if ($.trim($category.find('option:selected').html()) == 'REC') {
+							if (percent != 25 && percent != 50 && percent != 75 && percent != 100) {
+								showAlert('alerta', "<?= __('El porcentaje de REC debe ser 25%, 50%, 75% ó 100%') ?>");
+								$('#percent_generator').focus();
+								error = true;
+							};
+						};
+
 						/* Valida que la suma de las REC no supere el 100% */
 						if ($.trim($category.find('option:selected').html()) == 'REC') {
 							var total_rec_percent = 0;
@@ -3539,24 +3558,45 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							}
 						};
 
-						/* Valida que la suma de las CRC y PMC no supere el 100% */
-						if ($.trim($category.find('option:selected').html()) == 'PMC' ||
-								$.trim($category.find('option:selected').html()) == 'CRC') {
-							var total_crc_pmc_percent = 0;
+						/* Valida que la suma de PMC no supere el 100% */
+						if ($.trim($category.find('option:selected').html()) == 'PMC') {
+							var total_pmc_percent = 0;
 							$('.category-data').each(function() {
 								var percent_row = parseInt($.trim($(this).parent().find('.percent-data').data('percent_value')));
 								var category_name = $.trim($(this).html()).toUpperCase();
 								var id = $(this).parent().find('.edit_generator').data('id');
 
-								if ((category_name == 'CRC' || category_name == 'PMC') && id_agreement_generator != id) {
-									total_crc_pmc_percent += percent_row;
+								if (category_name == 'PMC' && id_agreement_generator != id) {
+									total_pmc_percent += percent_row;
 								};
 							});
 
-							total_crc_pmc_percent += percent;
+							total_pmc_percent += percent;
 
-							if (total_crc_pmc_percent > 100) {
-								showAlert('alerta', "<?= __('La suma de las categorías CRC y PMC debe sumar 100%.') ?>");
+							if (total_pmc_percent > 100) {
+								showAlert('alerta', "<?= __('La suma de la categoría PMC debe sumar 100%.') ?>");
+								$('#percent_generator').focus();
+								error = true;
+							}
+						};
+
+						/* Valida que la suma de CRC no supere el 100% */
+						if ($.trim($category.find('option:selected').html()) == 'CRC') {
+							var total_crc_percent = 0;
+							$('.category-data').each(function() {
+								var percent_row = parseInt($.trim($(this).parent().find('.percent-data').data('percent_value')));
+								var category_name = $.trim($(this).html()).toUpperCase();
+								var id = $(this).parent().find('.edit_generator').data('id');
+
+								if (category_name == 'CRC' && id_agreement_generator != id) {
+									total_crc_percent += percent_row;
+								};
+							});
+
+							total_crc_percent += percent;
+
+							if (total_crc_percent > 100) {
+								showAlert('alerta', "<?= __('La suma de la categoría CRC debe sumar 100%.') ?>");
 								$('#percent_generator').focus();
 								error = true;
 							}
