@@ -364,11 +364,6 @@ class Factura extends Objeto {
 		array(
 			'field' => 'glosa',
 			'title' => 'Glosa'
-		),
-		array(
-			'field' => 'glosa_asunto',
-			'title' => 'Glosa Asunto',
-			'visible' => false
 		)
 	);
 
@@ -1623,17 +1618,14 @@ class Factura extends Objeto {
 				//Code name normalization
 				if ($lang == 'en') {
 					$code = 'en_US';
-
-					$NumbersWords = new Numbers_Words();
-
 					list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
-					$monto_palabra_parte_entera = strtoupper($NumbersWords->toWords($total_parte_entera, $code));
-					$monto_palabra_parte_decimal = strtoupper($NumbersWords->toWords($total_parte_decimal, $code));
+					$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, $code));
+					$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, $code));
 					$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' . __('CON') . ' ' . $monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
 					$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' ' . (empty($total_parte_decimal) ? '00' : $total_parte_decimal) . '/100 ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8');
 				} else {
-					$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
-					$monto_total_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang, true));
+					$monto_total_palabra = mb_strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+					$monto_total_palabra_cero_cien = mb_strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang, true));
 				}
 
 				if ($mostrar_honorarios) {
@@ -2338,12 +2330,9 @@ class Factura extends Objeto {
 			$where .= " AND f.serie_documento_legal = '{$serie}'";
 		}
 
-		$query = "SELECT id_cobro FROM factura f {$where}";
+		$query = "SELECT GROUP_CONCAT(id_cobro) , '1' as grupo FROM factura f {$where} GROUP BY grupo";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		$lista_cobros = "".mysql_fetch_array($resp)[0];
-		while ($row = mysql_fetch_array($resp)) {
-			$lista_cobros = $lista_cobros.','.$row[0];
-		}
+		list($lista_cobros, $grupo) = mysql_fetch_array($resp);
 		return $lista_cobros;
 	}
 
@@ -2533,7 +2522,6 @@ class Factura extends Objeto {
 				$codigo_cliente = $cliente->fields['codigo_cliente'];
 			}
 			if ($tipo_documento_legal_buscado) {
-				$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
 				if (is_array($tipo_documento_legal_buscado)) {
 					$array_documento_legal = implode(',', $tipo_documento_legal_buscado);
 					$where .= " AND factura.id_documento_legal IN ($array_documento_legal) ";
@@ -2658,9 +2646,7 @@ class Factura extends Objeto {
 								, contrato.email_contacto as email_contacto
 								, cobro.estado as estado_cobro
 								, prm_documento_legal.glosa as glosa_doc_legal
-								, factura.dte_url_pdf as dte_url_pdf
-								, factura.glosa
-								, asunto.glosa_asunto";
+								, factura.glosa";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (
@@ -3117,23 +3103,6 @@ class Factura extends Objeto {
 		$resp_tipo_cambio = mysql_query($query_moneda_tipo_cambio, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_tipo_cambio, __FILE__, __LINE__, $this->sesion->dbh);
 		list( $tipo_cambio_moneda ) = mysql_fetch_array($resp_tipo_cambio);
 		return $tipo_cambio_moneda;
-	}
-
-	public function Eliminar()
-	{
-
-		// eliminar los movimientos y monedas de la factura
-		$CtaCteFactMvto = new CtaCteFactMvto($this->sesion);
-		$CtaCteFactMvto->LoadByFactura($this->fields['id_factura']);
-
-		$CtaCteFactMoneda = new CtaCteFactMoneda($this->sesion);
-		$CtaCteFactMoneda->Load($CtaCteFactMvto->fields['id_cta_cte_fact_mvto']);
-
-		$CtaCteFactMoneda->Delete();
-		$CtaCteFactMvto->Delete();
-		$this->Delete();
-
-		return true;
 	}
 
 }
