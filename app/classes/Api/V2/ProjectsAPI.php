@@ -15,6 +15,7 @@ class ProjectsAPI extends AbstractSlimAPI {
 		array('client_id' => 'id_cliente'),
 		array('project_area_id' => 'id_area_proyecto'),
 		array('project_type_id' => 'id_tipo_asunto'),
+		array('agreement_id' => 'id_contrato'),
 		array('language_code' => 'codigo_idioma'),
 		array('language_name' => 'glosa_idioma'),
 		array('created_at' => 'fecha_creacion'),

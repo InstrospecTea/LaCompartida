@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.38.3
+Wednesday, December 7th
+* **Fix** [Se agrega campo `id_contrato` en API/Projects](https://github.com/LemontechSA/ttb/pull/1984)
+
 ## Hotfix 16.38.2
 Wednesday, December 7th
 * **Fix** [Corrige uso de tasa de cambio en liquidaciones](https://github.com/LemontechSA/ttb/pull/1983)
