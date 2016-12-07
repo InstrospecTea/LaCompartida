@@ -316,6 +316,20 @@ if (!$contrato->Loaded()) {
 }
 ?>
 <script type="text/javascript">
+	<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']): ?>
+	var showAlert = function(type, message) {
+		var alert_html = '<div id="generator_message"><table width="70%" class="' + type + '">\
+			<tbody><tr>\
+				<td valign="top" align="left" style="font-size: 12px;">\
+				' + message + '</td>\
+			</tr></tbody>\
+		</table></br></div>';
+		jQuery('#user_generators_form').before(alert_html);
+		setTimeout(function(){
+			jQuery('#generator_message').remove()
+		}, 5000);
+	};
+	<?php endif; ?>
 
 	function ValidarContrato(form) {
 
@@ -1223,6 +1237,52 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 	function RevisarTarifas(tarifa, moneda, f, desde_combo)
 	{
+		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']): ?>
+			/* Valida que la suma de las CRC y PMC no supere el 100% */
+			var error = false;
+			var crc_user = false;
+			var total_pmc_percent = 0;
+			var total_crc_percent = 0;
+			jQuery('.category-data').each(function() {
+				var percent_row = parseInt(jQuery.trim(jQuery(this).parent().find('.percent-data').data('percent_value')));
+				var category_name = jQuery.trim(jQuery(this).html()).toUpperCase();
+
+				if (category_name == 'CRC') {
+					total_crc_percent += percent_row;
+				};
+
+				if (category_name == 'PMC') {
+					total_pmc_percent += percent_row;
+				};
+
+				if (category_name == 'CRC') {
+					crc_user = true;
+				};
+			});
+
+			if (!crc_user) {
+				showAlert('alerta', "<?= __('Debe haber al menos un profesional con categoría CRC.') ?>");
+				jQuery('#percent_generator').focus();
+				error = true;
+			};
+
+			if (total_pmc_percent != 100) {
+				showAlert('alerta', "<?= __('La suma de la categoría PMC debe sumar 100%.') ?>");
+				jQuery('#percent_generator').focus();
+				error = true;
+			};
+
+			if (total_crc_percent != 100) {
+				showAlert('alerta', "<?= __('La suma de la categoría CRC debe sumar 100%.') ?>");
+				jQuery('#percent_generator').focus();
+				error = true;
+			};
+
+			if (error) {
+				return false;
+			}
+		<?php endif; ?>
+
 		var ejecutar = true;
 
 		if ( !desde_combo )
@@ -3314,11 +3374,17 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		<!-- ASOCIAR DOC LEGALES -->
 
 		<!-- Modulo de  producción-->
-		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $contrato->Loaded()) { ?>
+		<?php
+		$Asunto = new Asunto($Sesion);
+		$Asunto->Load($id_asunto);
+		?>
+
+		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']) { ?>
 			<script type="text/javascript">
 				jQuery('document').ready(function() {
 					var $ = jQuery;
-					var generator_url = "<?php echo Conf::RootDir() . '/api/index.php/clients/' . $cliente->fields['id_cliente'] . '/contracts/' . $contrato->fields['id_contrato'] . '/generators' ?>";
+					var auth_token = "<?= $Sesion->auth_token ?>";
+					var generator_url = "<?php echo Conf::RootDir() . '/api/v2/index.php/agreements/' . $contrato->fields['id_contrato'] ?>";
 					var actionButtons = function(id_contract_generator) {
 						return '<td align="center"  class="border_plomo" style="white-space:nowrap; width: 52px;">\
 							<a data-id="' + id_contract_generator + '" class="fl edit_generator ui-button editar" style="margin: 3px 1px;width: 18px;height: 18px;" title="Modificar Generador" href="javascript:void(0)">&nbsp;</a>\
@@ -3326,68 +3392,83 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						</td>';
 					};
 
-					var showAlert = function(type, message) {
-						var alert_html = '<div id="generator_message"><table width="70%" class="' + type + '">\
-							<tbody><tr>\
-								<td valign="top" align="left" style="font-size: 12px;">\
-								' + message + '</td>\
-							</tr></tbody>\
-						</table></br></div>';
-						$('#user_generators_form').before(alert_html);
-						setTimeout(function(){
-							$('#generator_message').remove()
-						}, 3000);
-					};
-
 					var loadGeneratorForm = function(state, data) {
 						$('#form_generator_status').val(state);
 						if (state == 'NEW') {
-							$('#id_contract_generator').val('');
+							$('#id_agreement_generator').val('');
 							$('#id_user_generator').val('');
 							$('#percent_generator').val('');
+							$('#category').val('');
 							$('#add_generator').val('Agregar');
 							$('#cancel_generator').val('Cancelar').hide();
 						} else if (state == 'EDIT') {
-							$('#id_contract_generator').val(data.id_contract_generator);
+							$('#id_agreement_generator').val(data.id_agreement_generator);
 							$('#id_user_generator').val(data.id_user_generator);
 							$('#percent_generator').val(data.percent_generator);
+							$('#category').val(data.id_category);
 							$('#add_generator').val('Modificar');
 							$('#cancel_generator').val('Cancelar').show();
 						}
 					}
 
 					var loadGenerators = function() {
-						$.ajax({ url: generator_url })
-							.done(function(data) {
+						$.ajax({
+							url: generator_url + '?embed=generators',
+							headers: {
+								authtoken: auth_token
+							}
+						}).done(function(data) {
 								rows = $('<tbody>');
 								header = $("<tr bgcolor='#A3D55C'>")
 								header.append('<td align="left" class="border_plomo"><b><?php echo __('Usuario'); ?></b></td>');
 								header.append('<td align="left" class="border_plomo"><b><?php echo __('Área Usuario'); ?></b></td>');
+								header.append('<td align="left" class="border_plomo"><b><?php echo __('Categoría'); ?></b></td>');
 								header.append('<td align="right" class="border_plomo"><b><?php echo __('Porcentaje Genera'); ?></b></td>');
 								header.append('<td align="right" class="border_plomo"><b><?php echo __('Acciones'); ?></b></td>');
 								rows.append(header);
 
-								$.each(data, function(i, generator) {
+								$.each(data['generators'], function(i, generator) {
 									generator_row = $('<tr>');
-									generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.id_usuario + '">'+ generator.nombre + '</td>');
-									generator_row.append('<td align="left" class="border_plomo">' + generator.area_usuario + '</td>');
-									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.porcentaje_genera + '">' + generator.porcentaje_genera + '%</td>');
-									generator_row.append(actionButtons(generator.id_contrato_generador));
+									generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.user_id + '">'+ generator.name + '</td>');
+									generator_row.append('<td align="left" class="border_plomo">' + generator.user_area + '</td>');
+									generator_row.append('<td align="left" class="border_plomo category-data" data-category_value="' + generator.category_generator_id + '">' + generator.category_name + '</td>');
+									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.percent + '">' + generator.percent + '%</td>');
+									generator_row.append(actionButtons(generator.agreement_generator_id));
 									rows.append(generator_row);
 								});
 
 								$('#user_generators_result').html(rows);
+
+								$('#percent_generator').keydown(function(e) {
+									if ((e.keyCode < 48 || e.keyCode > 57) &&
+											(e.keyCode < 37 || e.keyCode > 40) &&
+											(e.keyCode < 96 || e.keyCode > 105) &&
+											(e.keyCode != 9) &&
+											(e.keyCode != 8) ||
+											e.shiftKey) {
+										e.preventDefault();
+									}
+								});
+
+								$('#percent_generator').blur(function() {
+									$input = $(this);
+									if ($input.val() > 100) {
+										$input.val(100);
+									}
+								});
 							});
 					};
 
 					$(document).on('click', '.edit_generator', function() {
 						var percent = $(this).closest('tr').find('.percent-data').data('percent_value');
 						var user_id = $(this).closest('tr').find('.user-data').data('user_id');
+						var category_id = $(this).closest('tr').find('.category-data').data('category_value');
 						var generator_id = $(this).data('id');
 						loadGeneratorForm('EDIT', {
-							id_contract_generator: generator_id,
+							id_agreement_generator: generator_id,
 							id_user_generator: user_id,
-							percent_generator: percent
+							percent_generator: percent,
+							id_category: category_id
 						});
 					});
 
@@ -3397,7 +3478,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						}
 						var generator_id = $(this).data('id');
 						$.ajax({
-							url: generator_url + '/' + generator_id,
+							url: generator_url + '/generators/' + generator_id,
+							headers: {
+								authtoken: auth_token
+							},
 							type: 'DELETE'
 						}).done(function(data) {
 							loadGenerators();
@@ -3408,38 +3492,158 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						loadGeneratorForm('NEW', {});
 					});
 
-
 					$('#add_generator').click(function() {
-						var percent = $('#percent_generator').val();
+						var percent = parseInt($('#percent_generator').val());
 						var user = $('#id_user_generator').val();
-						var id_contract_generator = $('#id_contract_generator').val();
+						var $category = $('#category');
+						var category = $category.val();
+						var id_agreement_generator = $('#id_agreement_generator').val();
 						var form_status = $('#form_generator_status').val();
-						if (percent && user && percent.length > 0) {
-							if (parseInt(percent) < 1 || parseInt(percent) > 100) {
-								showAlert('alerta', 'El porcentaje debe estar entre 1 y 100');
-								return;
-							}
+						var error = false;
+						var category_name = $.trim($category.find('option:selected').html()).toUpperCase();
 
+						/* Valida porcentajes permitidos para REC */
+						if ($.trim($category.find('option:selected').html()) == 'REC' && (percent < 10 || percent > 100)) {
+							showAlert('alerta', "<?= __('El porcentaje para la categiría REC debe estar entre 10% y 100%.') ?>");
+							error = true;
+						};
+
+						/* Valida que el mismo usuario no tenga REC y CRC al mismo tiempo */
+						if (category_name == 'CRC' || category_name == 'REC') {
+							var change_category = true;
+							$('td[data-user_id="' + user + '"]').each(function() {
+								var category_name_user = $.trim($(this).parent().find('.category-data').html()).toUpperCase();
+								var id = $(this).parent().find('.edit_generator').data('id');
+
+								if (id_agreement_generator != id) {
+									if (category_name_user == 'REC' && category_name == 'CRC' ||
+											category_name_user == 'CRC' && category_name == 'REC') {
+										change_category = false;
+									};
+								};
+							});
+
+							if (!change_category) {
+								showAlert('alerta', "<?= __('El mismo profesional no puede pertenecer a la categiría REC y CRC al mismo tiempo.') ?>");
+								error = true;
+							};
+						};
+
+						/* Valida que el porcentaje de REC sea 25, 50, 75 ó 100 */
+						if ($.trim($category.find('option:selected').html()) == 'REC') {
+							if (percent != 25 && percent != 50 && percent != 75 && percent != 100) {
+								showAlert('alerta', "<?= __('El porcentaje de REC debe ser 25%, 50%, 75% ó 100%') ?>");
+								$('#percent_generator').focus();
+								error = true;
+							};
+						};
+
+						/* Valida que la suma de las REC no supere el 100% */
+						if ($.trim($category.find('option:selected').html()) == 'REC') {
+							var total_rec_percent = 0;
+							$('.category-data').each(function() {
+								var percent_row = parseInt($.trim($(this).parent().find('.percent-data').data('percent_value')));
+								var category_name = $.trim($(this).html()).toUpperCase();
+								var id = $(this).parent().find('.edit_generator').data('id');
+
+								if (category_name == 'REC' && id_agreement_generator != id) {
+									total_rec_percent += percent_row;
+								};
+							});
+
+							total_rec_percent += percent;
+
+							if (total_rec_percent > 100) {
+								showAlert('alerta', "<?= __('La suma de la categoría REC debe estar entre 10% y 100%.') ?>");
+								$('#percent_generator').focus();
+								error = true;
+							}
+						};
+
+						/* Valida que la suma de PMC no supere el 100% */
+						if ($.trim($category.find('option:selected').html()) == 'PMC') {
+							var total_pmc_percent = 0;
+							$('.category-data').each(function() {
+								var percent_row = parseInt($.trim($(this).parent().find('.percent-data').data('percent_value')));
+								var category_name = $.trim($(this).html()).toUpperCase();
+								var id = $(this).parent().find('.edit_generator').data('id');
+
+								if (category_name == 'PMC' && id_agreement_generator != id) {
+									total_pmc_percent += percent_row;
+								};
+							});
+
+							total_pmc_percent += percent;
+
+							if (total_pmc_percent > 100) {
+								showAlert('alerta', "<?= __('La suma de la categoría PMC debe sumar 100%.') ?>");
+								$('#percent_generator').focus();
+								error = true;
+							}
+						};
+
+						/* Valida que la suma de CRC no supere el 100% */
+						if ($.trim($category.find('option:selected').html()) == 'CRC') {
+							var total_crc_percent = 0;
+							$('.category-data').each(function() {
+								var percent_row = parseInt($.trim($(this).parent().find('.percent-data').data('percent_value')));
+								var category_name = $.trim($(this).html()).toUpperCase();
+								var id = $(this).parent().find('.edit_generator').data('id');
+
+								if (category_name == 'CRC' && id_agreement_generator != id) {
+									total_crc_percent += percent_row;
+								};
+							});
+
+							total_crc_percent += percent;
+
+							if (total_crc_percent > 100) {
+								showAlert('alerta', "<?= __('La suma de la categoría CRC debe sumar 100%.') ?>");
+								$('#percent_generator').focus();
+								error = true;
+							}
+						};
+
+						if (percent < 1 || percent > 100) {
+							showAlert('alerta', "<?= __('El porcentaje debe estar entre 1 y 100.') ?>");
+							$('#percent_generator').focus();
+							error = true;
+						};
+
+						if (error) {
+							return false;
+						};
+
+						if (percent && user && category) {
 							if (form_status == 'EDIT') {
 								$.ajax({
-									url: generator_url + '/' + id_contract_generator,
-									type: 'POST',
-									data: {percent_generator: percent}
+									url: generator_url + '/generators/' + id_agreement_generator,
+									headers: {
+										authtoken: auth_token
+									},
+									type: 'PUT',
+									data: {
+										percent_generator: percent,
+										category_id: category,
+										user_id: user
+									}
 								}).done(function(data) {
+									showAlert('info', 'Profesional editado con éxito');
 									loadGeneratorForm('NEW', {});
 									loadGenerators();
 								});
 							} else if (form_status == 'NEW') {
-								if ($('td[data-user_id="' + user + '"]').length > 0) {
-									showAlert('alerta', 'El profesional ya existe, favor agregue otro o modifíquelo desde el listado');
-									return;
-								}
 								$.ajax({
-									url: generator_url,
-									type: 'PUT',
+									url: generator_url + '/generators',
+									headers: {
+										authtoken: auth_token
+									},
+									type: 'POST',
 									data: {
 										percent_generator: percent,
-										user_id:user
+										user_id: user,
+										category_id: category,
+										client_id: "<?= $cliente->fields['id_cliente'] ?>"
 									}
 								}).done(function(data) {
 									showAlert('info', 'Profesional agregado con éxito');
@@ -3457,7 +3661,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 			</script>
 
 			<fieldset class="border_plomo tb_base">
-				<legend><?php echo __('Profesionales') . ' ' . __('Generadores') ?></legend>
+				<legend><?php echo __('Profesionales Generadores') ?></legend>
 				<table width="80%" border="0" style="border: 1px solid #BDBDBD;" cellpadding="3" cellspacing="3" id="user_generators_form">
 					<tbody>
 						<tr>
@@ -3468,14 +3672,34 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_user_generator', '', '', 'Seleccione', '200px'); ?>
 							</td>
 							<td>
+								<?php echo __('Categoría') ?>
+							</td>
+							<td>
+								<?php
+									$categorias = new Criteria($Sesion);
+									$categorias = $categorias->add_select('id_categoria_generador')
+																						->add_select('nombre')
+																						->add_from('prm_categoria_generador')
+																						->run(); ?>
+
+									<select name="category" id="category">
+										<option value="">Seleccione</option>
+									<?php foreach ($categorias as $categoria): ?>
+										<option value="<?= $categoria['id_categoria_generador'] ?>"> <?= $categoria['nombre'] ?></option>
+									<?php endforeach; ?>
+									</select>
+							</td>
+							<td>
 								<?php echo __('Porcentaje Genera'); ?>:
 							</td>
 							<td>
-								<input type="text" size="6" class="text_box" name='percent_generator' id="percent_generator" value="" style="border: 1px solid rgb(204, 204, 204);">
+								<input type="text" size="6" class="text_box" name='percent_generator' id="percent_generator" value="" style="border: 1px solid rgb(204, 204, 204);" maxlength="3">
 							</td>
-							<td>
+						</tr>
+						<tr>
+							<td colspan="7">
 								<input type="hidden" id="form_generator_status" value="" />
-								<input type="hidden" id="id_contract_generator" value="" />
+								<input type="hidden" id="id_agreement_generator" value="" />
 								<?php
 								echo $Form->button(__('Agregar') . ' ' . __('Generador'), array('id' => 'add_generator'));
 								echo $Form->button(__('Cancelar'), array('id' => 'cancel_generator'));

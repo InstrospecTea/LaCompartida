@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.38.0](https://github.com/LemontechSA/ttb/pull/1978)
+Tuesday, December 6th
+* **Feature** [Tracking Credits](https://github.com/LemontechSA/ttb/pull/1967)
+
 ## [Release 16.37.0](https://github.com/LemontechSA/ttb/pull/1975)
 Tuesday, December 6th
 * **Feature** [Horas Tarificadas en Detalle Trabajo](https://github.com/LemontechSA/ttb/pull/1960)
