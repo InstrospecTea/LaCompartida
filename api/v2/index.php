@@ -273,7 +273,7 @@ $Slim->delete('/agreements/:agreement_id/generators/:generator_id', function ($a
 /**
  * @api {get} /projects Get All Projects
  * @apiName Get Projects
- * @apiVersion 2.0.0
+ * @apiVersion 2.0.1
  * @apiGroup Projects
  * @apiDescription Gets a list of all projects.
  *
@@ -290,6 +290,7 @@ $Slim->delete('/agreements/:agreement_id/generators/:generator_id', function ($a
  * @apiSuccess {Integer} client_id Id of parent client
  * @apiSuccess {Integer} project_area_id Projects' Area
  * @apiSuccess {Integer} project_type_id Projects' Type
+ * @apiSuccess {Integer} agreement_id Agreements' Id
  * @apiSuccess {String} language_code Language code of Project
  * @apiSuccess {String} language_name Language name of Project
  * @apiSuccess {String} created_at Creation date
