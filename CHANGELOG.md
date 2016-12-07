@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.38.1
+Wednesday, December 7th
+* **Fix** [Asigna charset ISO-8859-1 a twig](https://github.com/LemontechSA/ttb/pull/1979)
+
 ## [Release 16.38.0](https://github.com/LemontechSA/ttb/pull/1978)
 Tuesday, December 6th
 * **Feature** [Tracking Credits](https://github.com/LemontechSA/ttb/pull/1967)
