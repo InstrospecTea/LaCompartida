@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.38.2
+Wednesday, December 7th
+* **Fix** [Corrige uso de tasa de cambio en liquidaciones](https://github.com/LemontechSA/ttb/pull/1909)
+
 ## Hotfix 16.38.1
 Wednesday, December 7th
 * **Fix** [Asigna charset ISO-8859-1 a twig](https://github.com/LemontechSA/ttb/pull/1979)
