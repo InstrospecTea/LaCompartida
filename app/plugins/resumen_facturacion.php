@@ -103,7 +103,7 @@ function Descarga_Planilla_Resumen_Facturacion() {
 		usort($resumen, "ordenaresumen");
 		$SimpleReport->LoadResults($resumen);
 
-		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Excel');
+		$writer = SimpleReport_IOFactory::createWriter($SimpleReport, 'Spreadsheet');
 		$writer->save(__('Facturas'));
 	}
 }
