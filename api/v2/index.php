@@ -149,13 +149,13 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
  *      {
  *         "id": 1,
  *         "code": "0001-0001",
- *         "name": "Asesorías Generales",
+ *         "name": "AsesorÃ­as Generales",
  *         "active": 1,
  *         "client_id": 1,
  *         "project_area_id": 1,
  *         "project_type_id": 1,
  *         "language_code": "es",
- *         "language_name": "Español"
+ *         "language_name": "EspaÃ±ol"
  *         "created_at": "2014-06-03 11:58:38",
  *         "updated_at": "2014-06-03 11:58:38",
  *         "currency_code": "COLP"
@@ -273,7 +273,7 @@ $Slim->delete('/agreements/:agreement_id/generators/:generator_id', function ($a
 /**
  * @api {get} /projects Get All Projects
  * @apiName Get Projects
- * @apiVersion 2.0.0
+ * @apiVersion 2.0.1
  * @apiGroup Projects
  * @apiDescription Gets a list of all projects.
  *
@@ -290,6 +290,7 @@ $Slim->delete('/agreements/:agreement_id/generators/:generator_id', function ($a
  * @apiSuccess {Integer} client_id Id of parent client
  * @apiSuccess {Integer} project_area_id Projects' Area
  * @apiSuccess {Integer} project_type_id Projects' Type
+ * @apiSuccess {Integer} agreement_id Agreements' Id
  * @apiSuccess {String} language_code Language code of Project
  * @apiSuccess {String} language_name Language name of Project
  * @apiSuccess {String} created_at Creation date
@@ -302,13 +303,14 @@ $Slim->delete('/agreements/:agreement_id/generators/:generator_id', function ($a
  *      {
  *         "id": 1,
  *         "code": "0001-0001",
- *         "name": "Asesorías Generales",
+ *         "name": "AsesorÃ­as Generales",
  *         "active": 1,
  *         "client_id": 1,
  *         "project_area_id": 1,
  *         "project_type_id": 1,
+ *         "agreement_id": 1,
  *         "language_code": "es",
- *         "language_name": "Español",
+ *         "language_name": "EspaÃ±ol",
  *         "created_at": "2014-06-03 11:58:38",
  *         "updated_at": "2014-06-03 11:58:38",
  *         "currency_code": "COLP"
@@ -467,13 +469,13 @@ $Slim->get('/users/:id', function ($id) use ($Session, $Slim) {
  *         "project": {
  *           "id": 2,
  *           "code": "0001-0002",
- *           "name": "Asesorías Financieras",
+ *           "name": "AsesorÃ­as Financieras",
  *           "active": 1,
  *           "client_id": 1,
  *           "project_area_id": 1,
  *           "project_type_id": 1,
  *           "language_code": "es",
- *           "language_name": "Español"
+ *           "language_name": "EspaÃ±ol"
  *         }
  *       }
  *     ]
