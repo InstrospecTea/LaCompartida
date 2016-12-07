@@ -308,6 +308,14 @@ class Cliente extends Objeto {
 				'width' => 10
 			)
 		),
+		array(
+			'field' => 'descuento',
+			'visible' => false,
+			'title' => 'Descuento',
+			'extras' => array(
+				'width' => 10
+			)
+		),
 	);
 
 	function Cliente($sesion, $fields = "", $params = "") {
@@ -745,6 +753,9 @@ class Cliente extends Objeto {
 			->add_select('contrato.direccion_contacto')
 			->add_select('contrato.forma_cobro')
 			->add_select('contrato.monto')
+			->add_select("IF( contrato.tipo_descuento = 'VALOR', contrato.descuento, CONCAT(contrato.porcentaje_descuento,'%' ) )", 'descuento')
+			->add_select('contrato.tipo_descuento')
+			->add_select('contrato.porcentaje_descuento')
 			->add_select('prm_pais.nombre', 'nombre_pais')
 			->add_select('prm_cliente_referencia.glosa_cliente_referencia')
 			->add_select('tarifa.glosa_tarifa')
