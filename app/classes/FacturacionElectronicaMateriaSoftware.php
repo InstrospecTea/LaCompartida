@@ -26,6 +26,18 @@ class FacturacionElectronicaMateriaSoftware extends FacturacionElectronica {
 		}
 	}
 
+	public static function validarGenerarFactura($Factura) {
+		$error = '';
+
+		// El plazo máximo para emitir facturas es de 7 días
+		$dias = abs((strtotime($Factura->fields['fecha']) - strtotime(date('Y-m-d'))) / 86400);
+		if ($dias > 7) {
+			$error = __('El plazo máximo para emitir facturas electrónicas es de 7 días calendario');
+		}
+
+		return $error;
+	}
+
 	public static function BotonDescargarHTML($id_factura) {
 		$img_dir = Conf::ImgDir();
 		$Html = self::getHtml();
@@ -148,6 +160,16 @@ EOF;
 	public static function GeneraFacturaElectronica($hookArg) {
 		$Sesion = new Sesion();
 		$Factura = $hookArg['Factura'];
+
+		$validar_generar_factura = self::validarGenerarFactura($Factura);
+
+		if (!empty($validar_generar_factura)) {
+			$hookArg['Error'] = [
+				'Code' => 'BuildingInvoiceError',
+				'Message' => $validar_generar_factura
+			];
+			return $hookArg;
+		}
 
 		if (!empty($Factura->fields['dte_url_pdf'])) {
 			$hookArg['InvoiceURL'] = $Factura->fields['dte_url_pdf'];
