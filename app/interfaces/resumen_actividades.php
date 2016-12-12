@@ -156,7 +156,7 @@ if (isset($_POST['horas_sql'])) {
 	if ($_POST['horas_sql'] == 'horas_trabajadas_cobrables') {
 		$tipo_dato = 'horas_trabajadas';
 		$tipo_dato_comparado = 'horas_visibles';
-		$labels = array(__('Horas Trabajadas'), __('Horas Cobrables'));
+		$labels = array(__('horas_trabajadas'), __('horas_cobrables'));
 	} else {
 		$tipo_dato = $_POST['horas_sql'];
 		$tipo_dato_comparado = '';

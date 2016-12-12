@@ -105,10 +105,12 @@ class Grafico {
 					'options' => $this->options
 				];
 			} else {
-				return $this->getJsonError(1, 'Debe agregar labels para generar el JSON');
+				error_log('Debe agregar labels para generar el JSON del gráfico');
+				return $this->getJsonError(__('No existen datos para generar el gráfico'));
 			}
 		} else {
-			return $this->getJsonError(2, 'Debe agregar al menos un Dataset para generar el JSON');
+			error_log('Debe agregar al menos un Dataset para generar el JSON del gráfico');
+			return $this->getJsonError(__('No existen datos para generar el gráfico'));
 		}
 		return json_encode($json);
 	}
@@ -117,10 +119,9 @@ class Grafico {
 	 * Obtiene JSON de error.
 	 * @return JSON
 	 */
-	public function getJsonError($code, $message) {
+	public function getJsonError($message) {
 		$json = [
 			'error' => [
-				'code' => $code,
 				'message' => $this->isUTF8($message) ? $message : utf8_encode($message)
 			]
 		];

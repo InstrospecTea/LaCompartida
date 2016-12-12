@@ -201,10 +201,42 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		$labels_tooltips[] = "{$leyend_value} {$datatypes['symbol_datatype']}";
 	}
 
+	$same_datatype = true;
+	if (strcmp(Reporte::sTipoDato($tipo_dato), Reporte::sTipoDato($tipo_dato_comparado)) !== 0) {
+		$same_datatype = false;
+	}
+
+	$display['base'] = true;
+	$display['comparado'] = true;
+	$position['base'] = 'left';
+	$position['comparado'] = 'right';
+	$id_y['base'] = 'y-axis-1';
+	$id_y['comparado'] = 'y-axis-2';
+
+	if ($same_datatype) {
+		if (max($datos) > max($datos_comparados)) {
+			$display['comparado'] = false;
+			$id_y['comparado'] = 'y-axis-1';
+		} else {
+			$display['base'] = false;
+			$position['comparado'] = 'left';
+			$id_y['base'] = 'y-axis-2';
+		}
+	}
+
+	$dataset->setType('bar')
+		->setLabel(__($tipo_dato))
+		->setYAxisID($id_y['base'])
+		->setData($datos);
+
+	$grafico->setNameChart($titulo)
+		->addDataset($dataset)
+		->addLabels($labels);
+
 	$yAxes[] = [
 		'type' => 'linear',
-		'display' => true,
-		'position' => 'left',
+		'display' => $display['base'],
+		'position' => $position['base'],
 		'id' => 'y-axis-1',
 		'gridLines' => [
 			'display' => false
@@ -222,39 +254,26 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 		]
 	];
 
-	$dataset->setType('bar')
-		->setLabel(__($tipo_dato))
-		->setYAxisID('y-axis-1')
-		->setData($datos);
-
-	$grafico->setNameChart($titulo)
-		->addDataset($dataset)
-		->addLabels($labels);
-
 	if ($datos_comparados) {
-		if (strcmp(Reporte::sTipoDato($tipo_dato), Reporte::sTipoDato($tipo_dato_comparado)) !== 0) {
-			$option_display = true;
+		if (!$same_datatype) {
 			$dataset_comparado = new TTB\Graficos\DatasetLine();
 			$dataset_comparado->setType('line')
-			->setYAxisID('y-axis-2')
 			->setLabel(__($tipo_dato_comparado))
-			->setBackgroundColor(39, 174, 96, 0.5)
-			->setBorderColor(39, 174, 96, 0.8)
 			->setPointHoverBackgroundColor(39, 174, 96, 0.75)
-			->setPointHoverBorderColor(39, 174, 96, 1)
-		  ->setData($datos_comparados);
+			->setPointHoverBorderColor(39, 174, 96, 1);
 		} else {
-			$option_display = false;
 			$dataset_comparado = new TTB\Graficos\Dataset();
 			$dataset_comparado->setType('bar')
-			->setYAxisID('y-axis-2')
+			->setHoverBackgroundColor(39, 174, 96, 0.75)
+			->setHoverBorderColor(39, 174, 96, 1);
+		}
+
+		$dataset_comparado
+			->setYAxisID($id_y['comparado'])
 			->setLabel(__($tipo_dato_comparado))
 			->setBackgroundColor(39, 174, 96, 0.5)
 			->setBorderColor(39, 174, 96, 0.8)
-			->setHoverBackgroundColor(39, 174, 96, 0.75)
-			->setHoverBorderColor(39, 174, 96, 1)
 			->setData($datos_comparados);
-		}
 
 		$grafico->addDataset($dataset_comparado);
 
@@ -282,8 +301,8 @@ function graficoBarras($titulo, $labels, $datos, $datos_comparados, $tipo_dato, 
 
 		$yAxes[] = [
 			'type' => 'linear',
-			'display' => $option_display,
-			'position' => 'right',
+			'display' => $display['comparado'],
+			'position' => $position['comparado'],
 			'id' => 'y-axis-2',
 			'gridLines' => [
 				'display' => false
@@ -408,9 +427,32 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 	$LanguageManager = new LanguageManager($sesion);
 	$CurrencyManager = new CurrencyManager($sesion);
 
+	$same_datatype = true;
+	if (strcmp(Reporte::sTipoDato($tipo_dato), Reporte::sTipoDato($tipo_dato_comparado)) !== 0) {
+		$same_datatype = false;
+	}
+
+	$display['base'] = true;
+	$display['comparado'] = true;
+	$position['base'] = 'left';
+	$position['comparado'] = 'right';
+	$id_y['base'] = 'y-axis-1';
+	$id_y['comparado'] = 'y-axis-2';
+
+	if ($same_datatype) {
+		if (max($datos) > max($datos_comparados)) {
+			$display['comparado'] = false;
+			$id_y['comparado'] = 'y-axis-1';
+		} else {
+			$display['base'] = false;
+			$position['comparado'] = 'left';
+			$id_y['base'] = 'y-axis-2';
+		}
+	}
+
 	$datasetLinea->setLabel(__($tipo_dato))
 		->setType('line')
-		->setYAxisID('y-axis-1')
+		->setYAxisID($id_y['base'])
 		->setData($datos);
 
 	$datatypes = getDatatypes($tipo_dato, $sesion, $id_moneda);
@@ -437,7 +479,7 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 
 	$datasetLineaComparado->setLabel(__($tipo_dato_comparado))
 		->setType('line')
-		->setYAxisID('y-axis-2')
+		->setYAxisID($id_y['comparado'])
 		->setBackgroundColor(39, 174, 96, 0.5)
 		->setBorderColor(39, 174, 96, 0.8)
 		->setData($datos_comparados);
@@ -466,9 +508,8 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 
 	$yAxes[] = [
 		'type' => 'linear',
-		'display' => true,
-		'position' => 'left',
-		'stacked' => true,
+		'display' => $display['base'],
+		'position' => $position['base'],
 		'id' => 'y-axis-1',
 		'gridLines' => [
 			'display' => false
@@ -488,8 +529,8 @@ function graficoLinea($titulo, $labels, $datos, $datos_comparados, $tipo_dato, $
 
 	$yAxes[] = [
 		'type' => 'linear',
-		'display' => true,
-		'position' => 'right',
+		'display' => $display['comparado'],
+		'position' => $position['comparado'],
 		'id' => 'y-axis-2',
 		'gridLines' => [
 			'display' => false
