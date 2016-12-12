@@ -716,8 +716,7 @@ class Cliente extends Objeto {
 			$wheres[] = "cliente.fecha_creacion >= '" . Utiles::fecha2sql($fecha1) . "'";
 		}
 		if (!empty($fecha2)) {
-			$fecha2_mas_un_dia = date('d-m-Y', strtotime($fecha2 .' +1 day'));
-			$wheres[] = "cliente.fecha_creacion < '" . Utiles::fecha2sql($fecha2_mas_un_dia) . "'";
+			$wheres[] = "cliente.fecha_creacion < DATE_ADD('" . Utiles::fecha2sql($fecha2) . "', INTERVAL 1 DAY)";
 		}
 		if ($solo_activos == 1) {
 			$wheres[] = "cliente.activo = 1 ";
