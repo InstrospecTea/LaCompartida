@@ -78,7 +78,7 @@
 			if (responses[0].error != null) {
 				var h3 = document.createElement('h3');
 				h3.style = 'text-align: center; font-family: Tahoma, Arial, Geneva, sans-serif;';
-				h3.innerText = 'No exiten datos para generar el gráfico';
+				h3.innerText = responses[0].error.message;
 
 				jQuery('#contenedor_graficos').append(h3);
 				return;

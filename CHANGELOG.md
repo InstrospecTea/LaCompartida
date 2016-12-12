@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.38.6
+Monday, December 12th
+* **Feature** [Mejora gráficos comparados (eje Y)](https://github.com/LemontechSA/ttb/pull/1989)
+
 ## Hotfix 16.38.5
 Monday, December 12th
 * **Fix** [Se corrige cota superior de fecha_creacion para Planilla_Clientes.xls](https://github.com/LemontechSA/ttb/pull/1988)
