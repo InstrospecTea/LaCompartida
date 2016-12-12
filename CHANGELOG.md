@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 16.38.5
+Monday, December 12th
+* **Fix** [Se corrige cota superior de fecha_creacion para Planilla_Clientes.xls](https://github.com/LemontechSA/ttb/pull/1988)
+
+## Hotfix 16.38.4
+Friday, December 9th
+* **Feature** [El plazo máximo para emitir facturas electrónicas es de 7 días calendario en Facturación Materia Software](https://github.com/LemontechSA/ttb/pull/1985)
+
 ## Hotfix 16.38.4
 Friday, December 9th
 * **Feature** [El plazo máximo para emitir facturas electrónicas es de 7 días calendario en Facturación Materia Software](https://github.com/LemontechSA/ttb/pull/1985)
