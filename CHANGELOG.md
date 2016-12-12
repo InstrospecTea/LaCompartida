@@ -8,10 +8,6 @@ Monday, December 12th
 Friday, December 9th
 * **Feature** [El plazo máximo para emitir facturas electrónicas es de 7 días calendario en Facturación Materia Software](https://github.com/LemontechSA/ttb/pull/1985)
 
-## Hotfix 16.38.4
-Friday, December 9th
-* **Feature** [El plazo máximo para emitir facturas electrónicas es de 7 días calendario en Facturación Materia Software](https://github.com/LemontechSA/ttb/pull/1985)
-
 ## Hotfix 16.38.3
 Wednesday, December 7th
 * **Fix** [Se agrega campo `id_contrato` en API/Projects](https://github.com/LemontechSA/ttb/pull/1984)
