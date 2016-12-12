@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release 16.39.0](https://github.com/LemontechSA/ttb/pull/1990)
+Monday, December 12th
+* **Feature** [Agrega Descuento como fila en Planilla Clientes](https://github.com/LemontechSA/ttb/pull/1980)
+
 ## Hotfix 16.38.6
 Monday, December 12th
 * **Feature** [Mejora gráficos comparados (eje Y)](https://github.com/LemontechSA/ttb/pull/1989)
