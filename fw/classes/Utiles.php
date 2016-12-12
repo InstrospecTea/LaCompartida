@@ -1163,7 +1163,7 @@ HTML;
 	 * @param object|array $object
 	 * @param string $template '{name} {last_name}'
 	 */
-	static public function interpolate($object, $template) {
+	public static function interpolate($object, $template) {
 		$as_array = (array) $object;
 		return preg_replace_callback('/\{([^\}]+)\}/', function ($matches) use ($as_array) {
 			$key = $matches[1];
@@ -1178,7 +1178,7 @@ HTML;
 	 * @param string $lang
 	 * @returns string
 	 */
-	function month($date, $lang) {
+	public static function month($date, $lang) {
 		$month = date('n', strtotime($date)) - 1;
 		return self::$months[$lang][$month];
 	}

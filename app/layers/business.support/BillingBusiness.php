@@ -115,8 +115,8 @@ class BillingBusiness extends AbstractBusiness implements IBillingBusiness {
 
 		$Charge = $this->ChargingBusiness->getCharge($chargeId);
 
-		$today = date_create('now');
-		$charge_date = date_create($Charge->get('fecha_emision'));
+		$today = date_create('now')->setTime(0,0);
+		$charge_date = date_create($Charge->get('fecha_emision'))->setTime(0,0);
 
 		if ($today > $charge_date) {
 			return $this->CoiningBusiness->getCurrencies();

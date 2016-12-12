@@ -222,7 +222,7 @@ $estudios_array = PrmEstudio::GetEstudios($sesion);
 
 						<tr>
 							<td align="right">
-								<?php echo __('N° Factura'); ?>
+								<?php echo __('N° Documento'); ?>
 							</td>
 							<td align="left" width="18%" nowrap>
 								<?php if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {

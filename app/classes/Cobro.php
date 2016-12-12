@@ -1071,8 +1071,10 @@ if (!class_exists('Cobro')) {
 					$trabajo->Edit('costo_hh', $tarifa_hh_estandar);
 					$trabajo->Edit('tarifa_hh_estandar', $tarifa_hh_estandar);
 					$trabajo->Edit('duracion_retainer', $duracion_retainer_trabajo);
-					$trabajo->Write();
+					$trabajo->Write(false);
 				} else {
+					$trabajo->Edit('id_moneda', $this->fields['id_moneda']);
+					$trabajo->Write(false);
 					continue;
 				}
 			}
@@ -2551,14 +2553,10 @@ if (!class_exists('Cobro')) {
 
 			if (Conf::GetConf($this->sesion, 'OrdenarPorTarifa')) {
 				$order_categoria = "t.tarifa_hh DESC, ";
-			} else if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaNombreUsuario') ) {
-				$order_categoria = "u.id_categoria_usuario, u.nombre, u.apellido1, u.id_usuario, ";
 			} else if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaUsuario')) {
 				$order_categoria = "cu.orden, u.id_usuario, ";
 			} else if (Conf::GetConf($this->sesion, 'SepararPorUsuario')) {
 				$order_categoria = "u.id_categoria_usuario, u.id_usuario, ";
-			} else if (Conf::GetConf($this->sesion, 'OrdenarPorCategoriaDetalleProfesional')) {
-				$order_categoria = "u.id_categoria_usuario DESC, ";
 			} else if (Conf::GetConf($this->sesion, 'OrdenarPorFechaCategoria')) {
 				$order_categoria = "t.fecha, u.id_categoria_usuario, u.id_usuario, ";
 			} else {

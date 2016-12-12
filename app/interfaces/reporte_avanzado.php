@@ -640,6 +640,22 @@ if (!$popup) {
 												</tr>
 												<tr valign=top>
 													<td align=right>
+														<input type="checkbox" name="check_grupo_clientes" id="check_grupo_clientes" value="1" onchange="$$('.grupo_cliente_full').invoke('toggle')" <?php echo $check_grupo_clientes ? 'checked' : '' ?> />
+														<label for="check_grupo_clientes">
+															<b><?php echo __('Grupo Clientes') ?>:&nbsp;&nbsp;</b>
+														</label>
+													</td>
+													<td align=left>
+														<div class = 'grupo_cliente_full' style='width:200px;<?php echo $check_grupo_clientes ? "display:none;" : "" ?>'>
+															<label for="check_grupo_clientes" style="cursor:pointer"><hr></label>
+														</div>
+														<div class = 'grupo_cliente_full' style="<?php echo $check_grupo_clientes ? "" : "display:none;" ?>">
+															<?php echo Html::SelectQuery($sesion, "SELECT id_grupo_cliente, glosa_grupo_cliente AS nombre FROM grupo_cliente WHERE 1 ORDER BY nombre ASC", "grupo_clientesF[]", $grupo_clientesF, "class=\"selectMultiple\" multiple size=" . $largo_select . " ", "", "300"); ?>
+														</div>
+													</td>
+												</tr>
+												<tr valign=top>
+													<td align=right>
 														<input type="checkbox" name="check_profesionales" id="check_profesionales" value="1" onchange="$$('.prof_full').invoke('toggle')" <?php echo $check_profesionales ? 'checked' : '' ?> />
 														<label for="check_profesionales">
 															<b><?php echo __('Profesionales') ?>:&nbsp;&nbsp;</b>
@@ -718,7 +734,7 @@ if (!$popup) {
 														</div>
 													</td>
 												</tr>
-												<?php if ($filtros_extra) { ?>
+												<?php if ($filtros_extra) : ?>
 													<tr valign=top>
 														<td align=right>
 															<input type="checkbox" name="check_tipo_asunto" id="check_tipo_asunto" value="1" onchange="$$('.tipo_asunto_full').invoke('toggle')" <?php echo $check_tipo_asunto ? 'checked' : '' ?> />
@@ -735,7 +751,7 @@ if (!$popup) {
 															</div>
 														</td>
 													</tr>
-												<?php } ?>
+												<?php endif ?>
 
 												<tr valign=top>
 													<td align=right>

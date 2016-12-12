@@ -60,6 +60,7 @@ $_LANG['Giro bancario a'] = "Wire transfer to:";
 $_LANG['FECHA'] = "DATE";
 $_LANG['FACTURA'] = "INVOICE";
 $_LANG['texto_instrucciones'] = "There is serious risk of theft in the mail. Do not send checks to us. Follow the payment instructions. If possible please notify payment of Invoice to mariana.peroni@pstbn.com.py, stating: Invoice number, amount & how it was canceled";
+$_LANG['N° Documento'] = 'Document No.';
 
 $_LANG['Cta. Corriente'] = "Balance Account";
 $_LANG['Ingreso'] = "Income";
@@ -138,6 +139,8 @@ $_LANG['Saldo del cobro'] = "Invoice balance";
 $_LANG['Solicitado Por'] = "Requested By";
 $_LANG['Ordenado Por'] = "Name of Client";
 $_LANG['Estimado'] = "Dear";
+$_LANG['No se han podido guardar los cambios'] = "Changes could not be save";
+$_LANG['Acceso denegado'] = "Access denied";
 
 #MONEDAS
 $_LANG['Tipos de Cambio'] = "Exchange Rates";

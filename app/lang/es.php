@@ -42,6 +42,9 @@ $_LANG['Giro'] = "Giro";
 $_LANG['Dirección'] = "Dirección";
 $_LANG['Estimado'] = "Estimado";
 $_LANG['texto_instrucciones'] = "No envié cheques por correo aéreo. Existe un serio riesgo de extravío o robo. Siga las instrucciones. De ser posible favor notificarnos el pago de la factura al siguiente e-mail: mariana.peroni@pstbn.com.py indicando los siguientes datos: N° de Factura, monto, y forma de envió del pago";
+$_LANG['N° Documento'] = 'N° Documento';
+$_LANG['No se han podido guardar los cambios'] = "No se han podido guardar los cambios";
+$_LANG['Acceso denegado'] = "Acceso denegado";
 
 #Monedas
 $_LANG['Tipos de Cambio']="Tipos de Cambio";
@@ -587,9 +590,7 @@ $_LANG['Ingreso de provisión'] = "Ingreso de provisión";
 $_LANG['Debe ingresar un monto para el ingreso'] = "Debe ingresar un monto para el ingreso";
 $_LANG['Debe ingresar una descripción'] = "Debe ingresar una descripción";
 $_LANG['Debe ingresar la moneda'] = "Debe ingresar la moneda";
-
 $_LANG['No es posible Eliminar el Cobro. Es posible que ya se encuentre eliminado'] = "No es posible Eliminar el Cobro. Es posible que ya se encuentre eliminado";
-
 
 #Reportes
 $_LANG['Dimensión 1'] = "Dimensión 1";
