@@ -2,8 +2,6 @@
 
 trait LoadManagerTrait {
 
-	protected $loadedClass = array();
-
 	/**
 	 * Carga un Manager al vuelo
 	 * @param string $name

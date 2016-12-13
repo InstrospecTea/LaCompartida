@@ -4,8 +4,6 @@ use TTB\Configurations\TableTranslation as Table;
 
 trait LoadServiceTrait {
 
-	protected $loadedClass = array();
-
 	/**
 	 * Carga un Servicio al vuelo
 	 * @param string $name
