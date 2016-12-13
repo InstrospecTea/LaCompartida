@@ -16,6 +16,7 @@ class AbstractBusiness implements BaseBusiness {
 	public $errors = array();
 	public $infos = array();
 	protected $transactions = 0;
+	protected $loadedClass = array();
 
 	use LoadServiceTrait;
 	use LoadManagerTrait;
