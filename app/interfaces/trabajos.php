@@ -591,14 +591,14 @@ $pagina->PrintTop($popup);
 							<?php echo $Html->SelectSiNo('cobrado', $cobrado, 'class="fl"') ?>
 							<div class="fl buscadorlabel" style="margin-top: 3px;width:70px;display:inline-block;" ><?php echo __('Cobrable') ?></div>
 							<?php
-								$cobrable_valor_por_defecto = $cobrable;
+								$cobrable_value = $cobrable;
 								if ($motivo == 'horas' && empty($cobrable)) {
 									$conf_value = Conf::read('RevisarHorasCobrableValorPorDefecto');
 									if($conf_value == 'SI' || $conf_value == 'NO') {
-										$cobrable_valor_por_defecto = $conf_value;
+										$cobrable_value = $conf_value;
 									}
 								}
-								echo $Html->SelectSiNo('cobrable', $cobrable_valor_por_defecto,'class="fl"');
+								echo $Html->SelectSiNo('cobrable', $cobrable_value,'class="fl"');
 							?>
 							<div class="fl buscadorlabel" style="margin-top: 3px;width:70px;display:inline-block;"><?php echo __('Revisado') ?></div>
 							<?php echo $Html->SelectSiNo('revisado', $revisado, 'class="fl"') ?>
