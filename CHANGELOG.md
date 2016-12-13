@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.39.1
+Tuesday, December 13th
+* **Fix** [Se corrige la doble declaración de propiedades en los traits](https://github.com/LemontechSA/ttb/pull/1991)
+
 ## [Release 16.39.0](https://github.com/LemontechSA/ttb/pull/1990)
 Monday, December 12th
 * **Feature** [Agrega Descuento como fila en Planilla Clientes](https://github.com/LemontechSA/ttb/pull/1980)
