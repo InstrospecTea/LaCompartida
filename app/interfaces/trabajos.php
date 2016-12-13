@@ -593,10 +593,7 @@ $pagina->PrintTop($popup);
 							<?php
 								$cobrable_value = $cobrable;
 								if ($motivo == 'horas' && empty($cobrable)) {
-									$conf_value = Conf::read('RevisarHorasCobrableValorPorDefecto');
-									if($conf_value == 'SI' || $conf_value == 'NO') {
-										$cobrable_value = $conf_value;
-									}
+									$cobrable_value = Conf::read('RevisarHorasCobrableValorPorDefecto');
 								}
 								echo $Html->SelectSiNo('cobrable', $cobrable_value,'class="fl"');
 							?>

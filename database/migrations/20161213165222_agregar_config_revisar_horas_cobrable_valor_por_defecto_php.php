@@ -11,9 +11,9 @@ class AgregarConfigRevisarHorasCobrableValorPorDefectoPhp extends \Database\Migr
 	function up() {
 		$this->addQueryUp('INSERT INTO `configuracion`
 		 SET `glosa_opcion` = "RevisarHorasCobrableValorPorDefecto",
-		 `comentario` = "SI o NO",
-		 `valores_posibles` = "string",
-		 `valor_opcion` = "",
+		 `comentario` = "SI, NO o vacío",
+		 `valores_posibles` = "select;Todos;SI;NO",
+		 `valor_opcion` = "Todos",
 		 `id_configuracion_categoria` = 6,
 		 `orden` = -1');
 	}
