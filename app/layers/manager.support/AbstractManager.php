@@ -3,6 +3,7 @@
 class AbstractManager implements BaseManager {
 
 	protected $Sesion;
+	protected $loadedClass = array();
 
 	use LoadServiceTrait;
 	use LoadManagerTrait;
