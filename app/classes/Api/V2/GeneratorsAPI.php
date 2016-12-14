@@ -22,7 +22,7 @@ class GeneratorsAPI extends AbstractSlimAPI {
 		$params = $this->params;
 
 		$generator['percent_generator'] = $params['percent_generator'];
-		$generator['category_id'] = $params['category_id'];
+		$generator['category_id'] = !empty($params['category_id']) ? $params['category_id'] : 'NULL';
 		$generator['user_id'] = $params['user_id'];
 
 		$Generator = new \GeneratorManager($this->session);
@@ -41,7 +41,7 @@ class GeneratorsAPI extends AbstractSlimAPI {
 
 		$generator['percent_generator'] = $params['percent_generator'];
 		$generator['user_id'] = $params['user_id'];
-		$generator['category_id'] = $params['category_id'];
+		$generator['category_id'] = !empty($params['category_id']) ? $params['category_id'] : 'NULL';
 		$generator['client_id'] = $params['client_id'];
 		$generator['agreement_id'] = $agreement_id;
 

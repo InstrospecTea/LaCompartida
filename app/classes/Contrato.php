@@ -1644,7 +1644,7 @@ class Contrato extends Objeto {
 		$Statement = $sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('percent_generator', $percent_generator);
 		$Statement->bindParam('generator_id', $generator_id);
-		$Statement->bindParam('category_id', $category_id);
+		$Statement->bindParam('category_id', !empty($category_id) ? $category_id : 'NULL');
 
 		return $Statement->execute();
 	}
@@ -1666,7 +1666,7 @@ class Contrato extends Objeto {
 		$Statement->bindParam('contract_id', $contract_id);
 		$Statement->bindParam('user_id', $user_id);
 		$Statement->bindParam('percent_generator', $percent_generator);
-		$Statement->bindParam('category_id', $category_id);
+		$Statement->bindParam('category_id', !empty($category_id) ? $category_id : 'NULL');
 
 		return $Statement->execute();
 	}
