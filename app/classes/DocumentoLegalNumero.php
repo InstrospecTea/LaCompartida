@@ -20,10 +20,10 @@ class DocumentoLegalNumero extends Objeto {
 		return "SELECT DISTINCT `{$this->tabla}`.`serie` FROM `{$this->tabla}` WHERE $where";
 	}
 
-	function SeriesPorTipoDocumento($tipo_documento_legal, $primero = false) {
+	function SeriesPorTipoDocumento($tipo_documento_legal, $id_estudio, $primero = false) {
 		$lista = array();
 		$tipo_documento_legal = mysql_real_escape_string($tipo_documento_legal);
-		$query = "SELECT DISTINCT serie FROM {$this->tabla} WHERE id_documento_legal = $tipo_documento_legal";
+		$query = "SELECT DISTINCT serie FROM {$this->tabla} WHERE id_documento_legal = '$tipo_documento_legal' AND id_estudio = '$id_estudio'";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
 
 		while ($fields = mysql_fetch_assoc($resp)) {
