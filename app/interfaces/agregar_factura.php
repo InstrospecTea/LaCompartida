@@ -585,7 +585,7 @@ $Form->defaultLabel = false;
 			<?php
 			$numero_documento = '';
 			if (Conf::GetConf($sesion, 'NuevoModuloFactura')) {
-				$serie = $factura->Loaded() ? $factura->fields['serie_documento_legal'] : $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, true);
+				$serie = $factura->Loaded() ? $factura->fields['serie_documento_legal'] : $DocumentoLegalNumero->SeriesPorTipoDocumento($id_documento_legal, $id_estudio, true);
 				$numero_documento = $factura->ObtenerNumeroDocLegal($id_documento_legal, $serie, $id_estudio);
 			} else if (Conf::GetConf($sesion, 'UsaNumeracionAutomatica')) {
 				$numero_documento = $factura->ObtieneNumeroFactura();
@@ -602,7 +602,7 @@ $Form->defaultLabel = false;
 					if (Conf::GetConf($sesion, 'NumeroFacturaConSerie')) {
 						echo Html::SelectQuery($sesion, $DocumentoLegalNumero->SeriesQuery($id_estudio), 'serie', $serie, 'onchange="NumeroDocumentoLegal()" ' . $disableInvoiceNumber, null, 60);
 					} else {
-						$serie_documento_legal = $DocumentoLegalNumero->SeriesPorTipoDocumento(1, true);
+						$serie_documento_legal = $DocumentoLegalNumero->SeriesPorTipoDocumento(1, $id_estudio, true);
 						?>
 						<input type="hidden" name="serie" id="serie" value="<?php echo $serie_documento_legal; ?>">
 					<?php } ?>

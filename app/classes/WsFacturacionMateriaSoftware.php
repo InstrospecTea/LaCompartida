@@ -64,6 +64,17 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 	}
 
 	private function generateBodyInvoice(&$Factura, &$Moneda, &$DocumentoLegal, &$TipoDocumentoIdentidad) {
+		$porcentaje_impuesto = (int) $Factura->fields['porcentaje_impuesto'];
+		$total = (double) $Factura->fields['total'];
+		$subtotal = (double) $Factura->fields['subtotal'];
+		$iva = (float) $Factura->fields['iva'];
+
+		// si la factura corresponde a un gasto
+		if (empty($iva) && empty($subtotal)) {
+			$iva = ($total * $porcentaje_impuesto) / 100;
+			$subtotal = $total - $iva;
+		}
+
 		$this->body_invoice = [
 			'Cliente' => [
 				'NumeroDeDocumento' => (string) $Factura->fields['RUT_cliente'],
@@ -100,14 +111,14 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 					'Descripcion' => (string) utf8_encode($Factura->fields['descripcion']),
 					'DescuentoAmount' => 0.0,
 					// 'ValorReferencial' => 0,
-					'ValorUnitario' => (double) $Factura->fields['subtotal'],
-					'IGVDeLinea' => (float) $Factura->fields['iva'],
+					'ValorUnitario' => $subtotal,
+					'IGVDeLinea' => $iva,
 					'ISCDeLinea' => 0.0,
-					'PrecioUnitario' => (double) $Factura->fields['total'],
+					'PrecioUnitario' => $total,
 					'Quantity' => 1,
-					'TipoAfectacionIGV' => $Factura->fields['iva'] == 0 && $TipoDocumentoIdentidad->fields['codigo_dte'] == '0' ? 40 : 10,
-					'TotalConImpuestos' => (double) $Factura->fields['total'],
-					'TotalSinImpuestos' => (double) $Factura->fields['subtotal'],
+					'TipoAfectacionIGV' => empty($iva) && $TipoDocumentoIdentidad->fields['codigo_dte'] == '0' ? 40 : 10,
+					'TotalConImpuestos' => $total,
+					'TotalSinImpuestos' => $subtotal,
 					'Unidad' => 'UN',
 					// 'LoteID' => '',
 					// 'LoteEXP' => ''

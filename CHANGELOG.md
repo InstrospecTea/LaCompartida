@@ -1,5 +1,13 @@
 # Changelog
 
+## Hotfix 16.39.3
+Tuesday, December 13th
+* **Fix** [Enviar el IGV en facturas de gastos](https://github.com/LemontechSA/ttb/pull/1997)
+
+## Hotfix 16.39.2
+Tuesday, December 13th
+* **Fix** [Corregir asignación de número de documento](https://github.com/LemontechSA/ttb/pull/1996)
+
 ## Hotfix 16.39.1
 Tuesday, December 13th
 * **Fix** [Se corrige la doble declaración de propiedades en los traits](https://github.com/LemontechSA/ttb/pull/1992)
