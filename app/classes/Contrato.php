@@ -1800,6 +1800,14 @@ class Contrato extends Objeto {
 
 		return $criteria->run();
 	}
+
+	public function existsGeneratorCategory()
+	{
+		$Criteria = new Criteria($this->sesion);
+		$Criteria->add_from('prm_categoria_generador');
+
+		return $Criteria->count() > 0;
+	}
 }
 
 class ListaContrato extends Lista {
