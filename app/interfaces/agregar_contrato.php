@@ -320,7 +320,7 @@ $existe_categoria_generador = $contrato->existsGeneratorCategory();
 ?>
 <script type="text/javascript">
 	<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']): ?>
-	var showAlert = function(type, message) {
+	var showGeneratorAlert = function(type, message) {
 		var alert_html = '<div id="generator_message"><table width="70%" class="' + type + '">\
 			<tbody><tr>\
 				<td valign="top" align="left" style="font-size: 12px;">\
@@ -3468,7 +3468,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_validacion_agregar_usuario') : false ?>
 
 						if (percent < 1 || percent > 100) {
-							showAlert('alerta', "<?= __('El porcentaje debe estar entre 1 y 100.') ?>");
+							showGeneratorAlert('alerta', "<?= __('El porcentaje debe estar entre 1 y 100.') ?>");
 							$('#percent_generator').focus();
 							error = true;
 						};
@@ -3492,7 +3492,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										user_id: user
 									}
 								}).done(function(data) {
-									showAlert('info', 'Profesional editado con éxito');
+									showGeneratorAlert('info', 'Profesional editado con éxito');
 									loadGeneratorForm('NEW', {});
 									loadGenerators();
 								});
@@ -3510,13 +3510,13 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										client_id: "<?= $cliente->fields['id_cliente'] ?>"
 									}
 								}).done(function(data) {
-									showAlert('info', 'Profesional agregado con éxito');
+									showGeneratorAlert('info', 'Profesional agregado con éxito');
 									loadGeneratorForm('NEW', {});
 									loadGenerators();
 								});
 							}
 						} else {
-							showAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
+							showGeneratorAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
 						}
 					});
 					loadGeneratorForm('NEW', {});

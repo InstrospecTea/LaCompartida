@@ -35,19 +35,19 @@ $Slim->hook('hook_validacion_guardar_generadores', function() {
 		});
 
 		if (!crc_user) {
-			showAlert('alerta', "<?= __('Debe haber al menos un profesional con categoría CRC.') ?>");
+			showGeneratorAlert('alerta', "<?= __('Debe haber al menos un profesional con categoría CRC.') ?>");
 			jQuery('#percent_generator').focus();
 			error = true;
 		};
 
 		if (total_pmc_percent != 100) {
-			showAlert('alerta', "<?= __('La suma de la categoría PMC debe sumar 100%.') ?>");
+			showGeneratorAlert('alerta', "<?= __('La suma de la categoría PMC debe sumar 100%.') ?>");
 			jQuery('#percent_generator').focus();
 			error = true;
 		};
 
 		if (total_crc_percent != 100) {
-			showAlert('alerta', "<?= __('La suma de la categoría CRC debe sumar 100%.') ?>");
+			showGeneratorAlert('alerta', "<?= __('La suma de la categoría CRC debe sumar 100%.') ?>");
 			jQuery('#percent_generator').focus();
 			error = true;
 		};
@@ -60,13 +60,13 @@ JAVASCRIPT;
 $Slim->hook('hook_validacion_agregar_usuario', function() {
   echo <<<JAVASCRIPT
 		if (!category) {
-			showAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
+			showGeneratorAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
 			return false;
 		};
 
 		/* Valida porcentajes permitidos para REC */
 		if ($.trim(\$category.find('option:selected').html()) == 'REC' && (percent < 10 || percent > 100)) {
-			showAlert('alerta', "<?= __('El porcentaje para la categiría REC debe estar entre 10% y 100%.') ?>");
+			showGeneratorAlert('alerta', "<?= __('El porcentaje para la categiría REC debe estar entre 10% y 100%.') ?>");
 			error = true;
 		};
 
@@ -86,7 +86,7 @@ $Slim->hook('hook_validacion_agregar_usuario', function() {
 			});
 
 			if (!change_category) {
-				showAlert('alerta', "<?= __('El mismo profesional no puede pertenecer a la categiría REC y CRC al mismo tiempo.') ?>");
+				showGeneratorAlert('alerta', "<?= __('El mismo profesional no puede pertenecer a la categiría REC y CRC al mismo tiempo.') ?>");
 				error = true;
 			};
 		};
@@ -94,7 +94,7 @@ $Slim->hook('hook_validacion_agregar_usuario', function() {
 		/* Valida que el porcentaje de REC sea 25, 50, 75 ó 100 */
 		if ($.trim(\$category.find('option:selected').html()) == 'REC') {
 			if (percent != 25 && percent != 50 && percent != 75 && percent != 100) {
-				showAlert('alerta', "<?= __('El porcentaje de REC debe ser 25%, 50%, 75% ó 100%') ?>");
+				showGeneratorAlert('alerta', "<?= __('El porcentaje de REC debe ser 25%, 50%, 75% ó 100%') ?>");
 				$('#percent_generator').focus();
 				error = true;
 			};
@@ -116,7 +116,7 @@ $Slim->hook('hook_validacion_agregar_usuario', function() {
 			total_rec_percent += percent;
 
 			if (total_rec_percent > 100) {
-				showAlert('alerta', "<?= __('La suma de la categoría REC debe estar entre 10% y 100%.') ?>");
+				showGeneratorAlert('alerta', "<?= __('La suma de la categoría REC debe estar entre 10% y 100%.') ?>");
 				$('#percent_generator').focus();
 				error = true;
 			}
@@ -138,7 +138,7 @@ $Slim->hook('hook_validacion_agregar_usuario', function() {
 			total_pmc_percent += percent;
 
 			if (total_pmc_percent > 100) {
-				showAlert('alerta', "<?= __('La suma de la categoría PMC debe sumar 100%.') ?>");
+				showGeneratorAlert('alerta', "<?= __('La suma de la categoría PMC debe sumar 100%.') ?>");
 				$('#percent_generator').focus();
 				error = true;
 			}
@@ -160,7 +160,7 @@ $Slim->hook('hook_validacion_agregar_usuario', function() {
 			total_crc_percent += percent;
 
 			if (total_crc_percent > 100) {
-				showAlert('alerta', "<?= __('La suma de la categoría CRC debe sumar 100%.') ?>");
+				showGeneratorAlert('alerta', "<?= __('La suma de la categoría CRC debe sumar 100%.') ?>");
 				$('#percent_generator').focus();
 				error = true;
 			}
