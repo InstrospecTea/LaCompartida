@@ -1591,7 +1591,7 @@ class Contrato extends Objeto {
               usuario.apellido1,
               usuario.apellido2,
               porcentaje_genera,
-              prm_categoria_generador.nombre as nombre_categoria,
+              IFNULL(prm_categoria_generador.nombre, '') as nombre_categoria,
               contrato_generador.id_categoria_generador as id_categoria
             FROM contrato_generador
             INNER JOIN usuario on contrato_generador.id_usuario = usuario.id_usuario

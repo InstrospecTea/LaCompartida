@@ -64,7 +64,7 @@ class AgreementManager extends AbstractManager implements IAgreementManager {
 																->add_select('prm_area_usuario.glosa', 'user_area')
 																->add_select('usuario.id_usuario', 'user_id')
 																->add_select("CONCAT_WS(' ', usuario.apellido1, usuario.apellido2, usuario.nombre)", 'name')
-																->add_select('prm_categoria_generador.nombre', 'category_name')
+																->add_select("IFNULL(prm_categoria_generador.nombre, '')", 'category_name')
 																->add_from('contrato_generador')
 																->add_inner_join_with('usuario',
 																		CriteriaRestriction::equals('contrato_generador.id_usuario', 'usuario.id_usuario'))
