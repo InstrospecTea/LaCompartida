@@ -1596,7 +1596,7 @@ class Contrato extends Objeto {
             FROM contrato_generador
             INNER JOIN usuario on contrato_generador.id_usuario = usuario.id_usuario
             INNER JOIN prm_area_usuario on usuario.id_area_usuario = prm_area_usuario.id
-            INNER JOIN prm_categoria_generador on contrato_generador.id_categoria_generador = prm_categoria_generador.id_categoria_generador
+            LEFT JOIN prm_categoria_generador on contrato_generador.id_categoria_generador = prm_categoria_generador.id_categoria_generador
             WHERE contrato_generador.id_contrato = :contract_id
             ORDER BY usuario.nombre ASC";
 
