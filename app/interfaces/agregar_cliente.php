@@ -865,6 +865,7 @@ if (!$cliente->Loaded()) {
 	}
 
 	function Validar(form) {
+		<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_validacion_guardar_generadores') : false ?>
 
 		if (!form) {
 			var form = $('formulario');
