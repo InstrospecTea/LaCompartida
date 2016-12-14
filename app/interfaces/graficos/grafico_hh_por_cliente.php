@@ -72,7 +72,7 @@
 
 	$grafico = new TTB\Graficos\Grafico();
 	if (is_null($tiempo)) {
-		echo $grafico->getJsonError(3, 'No exiten datos para generar el gráfico');
+		echo $grafico->getJsonError(__('No existen datos para generar el gráfico'));
 		return;
 	}
 

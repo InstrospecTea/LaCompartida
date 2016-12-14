@@ -149,13 +149,13 @@ $Slim->get('/clients', function () use ($Session, $Slim) {
  *      {
  *         "id": 1,
  *         "code": "0001-0001",
- *         "name": "Asesorías Generales",
+ *         "name": "AsesorÃ­as Generales",
  *         "active": 1,
  *         "client_id": 1,
  *         "project_area_id": 1,
  *         "project_type_id": 1,
  *         "language_code": "es",
- *         "language_name": "Español"
+ *         "language_name": "EspaÃ±ol"
  *         "created_at": "2014-06-03 11:58:38",
  *         "updated_at": "2014-06-03 11:58:38",
  *         "currency_code": "COLP"
@@ -180,9 +180,100 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
 });
 
 /**
+ * @api {get} /agreements/:agreement_id Get agreement data
+ * @apiName Get agreement data
+ * @apiVersion 2.0.0
+ * @apiGroup Agreements
+ * @apiDescription Get a list of agreement data
+ *
+ * @apiHeader {String} AUTHTOKEN=136b17e3a34db13c98ec404fa9035796b52cbf8c  Login Token
+ *
+ * @apiParam {Integer} agreement_id The :agreement_id corresponds to an agreement id attribute.
+ * @apiParam {String} embed (at least one) A list of embed relations
+ *
+ * @apiParamExample Params-Example:
+ *     ?embed=generators
+ *     ?embed=generators,clients
+ *     ?embed=generators,clients,projects
+ *     ?embed=projects
+ *
+ * @apiSuccess {Generator} generators If embed=generators is provided, then returns a generator entity
+ * @apiSuccess {Client} client If embed=client is provided, then returns a client entity
+ * @apiSuccess {Project} projects If embed=projects is provided, then returns a project entity
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "generators": [
+ *         {
+ *           "id_contrato_generador": "1",
+ *           "id_categoria": "2",
+ *           "porcentaje_genera": "1",
+ *           "area_usuario": "Pilot",
+ *           "id_usuario": "18",
+ *           "nombre": "Bodoque Juan Carlos",
+ *           "nombre_categoria": "CQC"
+ *         }
+ *       ],
+ *       "client": [
+ *         {
+ *           "codigo_cliente": "001391",
+ *           "glosa_cliente": "Abogados y Abogados."
+ *         }
+ *       ],
+ *       "projects": [
+ *         {
+ *           "codigo_asunto": "001391-0003",
+ *           "glosa_asunto": "Consulta 007"
+ *         }
+ *       ]
+ *     }
+ *
+ * @apiError InvalidAgreementId empty or is not numeric
+ * @apiError InvalidEmbed empty
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Invalid Params
+ *     {
+ *       "errors": [
+ *         "code": "InvalidAgreementId",
+ *         "message": "Invalid agreement ID"
+ *       ]
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Invalid Params
+ *     {
+ *       "errors": [
+ *         "code": "InvalidEmbed",
+ *         "message": "Invalid embed I need at least one"
+ *       ]
+ *     }
+ */
+$Slim->get('/agreements/:agreement_id', function ($agreement_id) use ($Session, $Slim) {
+	$API = new Api\V2\AgreementsAPI($Session, $Slim);
+	$API->getAgreementGenerators($agreement_id);
+});
+
+$Slim->post('/agreements/:agreement_id/generators', function ($agreement_id) use ($Session, $Slim) {
+	$API = new Api\V2\GeneratorsAPI($Session, $Slim);
+	$API->createAgreementGenerator($agreement_id);
+});
+
+$Slim->put('/agreements/:agreement_id/generators/:generator_id', function ($agreement_id, $generator_id) use ($Session, $Slim) {
+	$API = new Api\V2\GeneratorsAPI($Session, $Slim);
+	$API->updateAgreementGenerator($agreement_id, $generator_id);
+});
+
+$Slim->delete('/agreements/:agreement_id/generators/:generator_id', function ($agreement_id, $generator_id) use ($Session, $Slim) {
+	$API = new Api\V2\GeneratorsAPI($Session, $Slim);
+	$API->deleteAgreementGenerator($agreement_id, $generator_id);
+});
+
+/**
  * @api {get} /projects Get All Projects
  * @apiName Get Projects
- * @apiVersion 2.0.0
+ * @apiVersion 2.0.1
  * @apiGroup Projects
  * @apiDescription Gets a list of all projects.
  *
@@ -199,6 +290,7 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
  * @apiSuccess {Integer} client_id Id of parent client
  * @apiSuccess {Integer} project_area_id Projects' Area
  * @apiSuccess {Integer} project_type_id Projects' Type
+ * @apiSuccess {Integer} agreement_id Agreements' Id
  * @apiSuccess {String} language_code Language code of Project
  * @apiSuccess {String} language_name Language name of Project
  * @apiSuccess {String} created_at Creation date
@@ -211,13 +303,14 @@ $Slim->get('/clients/:client_id/projects', function ($client_id) use ($Session, 
  *      {
  *         "id": 1,
  *         "code": "0001-0001",
- *         "name": "Asesorías Generales",
+ *         "name": "AsesorÃ­as Generales",
  *         "active": 1,
  *         "client_id": 1,
  *         "project_area_id": 1,
  *         "project_type_id": 1,
+ *         "agreement_id": 1,
  *         "language_code": "es",
- *         "language_name": "Español",
+ *         "language_name": "EspaÃ±ol",
  *         "created_at": "2014-06-03 11:58:38",
  *         "updated_at": "2014-06-03 11:58:38",
  *         "currency_code": "COLP"
@@ -376,13 +469,13 @@ $Slim->get('/users/:id', function ($id) use ($Session, $Slim) {
  *         "project": {
  *           "id": 2,
  *           "code": "0001-0002",
- *           "name": "Asesorías Financieras",
+ *           "name": "AsesorÃ­as Financieras",
  *           "active": 1,
  *           "client_id": 1,
  *           "project_area_id": 1,
  *           "project_type_id": 1,
  *           "language_code": "es",
- *           "language_name": "Español"
+ *           "language_name": "EspaÃ±ol"
  *         }
  *       }
  *     ]

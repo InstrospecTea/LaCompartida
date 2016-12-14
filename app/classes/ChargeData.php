@@ -198,8 +198,11 @@ class ChargeData {
 			->add_select('IF(trabajo.cobrable, trabajo.tarifa_hh * (TIME_TO_SEC(trabajo.duracion_cobrada) / 3600 ), 0)', 'importe')
 			->add_select('trabajo.codigo_asunto')
 			->add_select('trabajo.solicitante')
+			->add_select('usuario.nombre')
+			->add_select('usuario.apellido1')
 			->add_select("CONCAT_WS(' ', nombre, apellido1)", 'nombre_usuario')
 			->add_select('usuario.username')
+			->add_select('prm_categoria_usuario.orden')
 			->add_select('prm_categoria_usuario.orden', 'orden_categoria')
 			->add_select('prm_categoria_usuario.id_categoria_usuario', 'id_categoria_usuario')
 			->add_left_join_with('usuario', Restriction::equals('trabajo.id_usuario', 'usuario.id_usuario'))
@@ -249,10 +252,10 @@ class ChargeData {
 				$work['valor_tarificada'] = 0;
 				$work['flatfee'] = $work['duracion_cobrada'];
 				$work['duracion_tarificada'] = 0;
-				$work['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($work['duracion_tarificada']);
 				$work['duracion_retainer'] = $work['duracion_cobrada'];
 				$work['glosa_duracion_retainer'] = Utiles::Decimal2GlosaHora($work['duracion_retainer']);
 			}
+			$work['glosa_duracion_tarificada'] = Utiles::Decimal2GlosaHora($work['duracion_tarificada']);
 
 			$this->works[$i] = $work;
 		}

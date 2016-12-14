@@ -15,6 +15,8 @@ class ApiAuth {
 		'settings' => array('read'),
 		'users' => array('read', 'update'),
 		'clients' => array('read'),
+		'agreements' => array('read'),
+		'generators' => array('create', 'update', 'destroy'),
 		'time_entries' => array('read', 'create', 'update', 'destroy'),
 		'time_reviews' => array('read', 'create', 'update', 'destroy'),
 		'roles' => array('read'),

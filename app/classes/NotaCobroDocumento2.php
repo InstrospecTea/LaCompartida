@@ -2023,9 +2023,14 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 
 				if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 					$html = str_replace('%td_retainer%', '<td width="80" align="center">%duracion_retainer%</td>', $html);
+					$html = str_replace('%td_duracion_tarificada%', '<td align="center">%duracion_tarificada%</td>', $html);
 					$html = str_replace('%duracion_retainer%', __('Duración Retainer'), $html);
+					$html = str_replace('%duracion_tarificada%', __('Duración Tarificada'), $html);
 				} else {
 					$html = str_replace('%td_retainer%', '', $html);
+					$html = str_replace('%duracion_retainer%', '', $html);
+					$html = str_replace('%td_duracion_tarificada%', '', $html);
+					$html = str_replace('%duracion_tarificada%', '', $html);
 				}
 
 				if ($this->fields['forma_cobro'] == 'FLAT FEE') {
@@ -2191,13 +2196,19 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 
 					if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 						$row = str_replace('%td_retainer%', '<td align="center">%duracion_retainer%</td>', $row);
+						$row = str_replace('%td_duracion_tarificada%', '<td align="center">%duracion_tarificada%</td>', $row);
 						if ($horas_en_decimal) {
 							$row = str_replace('%duracion_retainer%', number_format($work['duracion_retainer'], $decimales_horas, ',', ''), $row);
+							$row = str_replace('%duracion_tarificada%', number_format($work['duracion_tarificada'], $decimales_horas, ',', ''), $row);
 						} else {
 							$row = str_replace('%duracion_retainer%', $work['glosa_duracion_retainer'], $row);
+							$row = str_replace('%duracion_tarificada%', $work['glosa_duracion_tarificada'], $row);
 						}
 					} else {
 						$row = str_replace('%td_retainer%', '', $row);
+						$row = str_replace('%duracion_retainer%', '', $row);
+						$row = str_replace('%td_duracion_tarificada%', '', $row);
+						$row = str_replace('%duracion_tarificada%', '', $row);
 					}
 
 					if ($this->fields['forma_cobro'] == 'FLAT FEE') {
@@ -2637,13 +2648,19 @@ class NotaCobroDocumento2 extends NotaCobroDocumento {
 
 				if ($this->fields['forma_cobro'] == 'RETAINER' || $this->fields['forma_cobro'] == 'PROPORCIONAL') {
 					$html = str_replace('%td_retainer%', '<td align="center">%duracion_retainer%</td>', $html);
+					$html = str_replace('%td_duracion_tarificada%', '<td align="center">%duracion_tarificada%</td>', $html);
 					if ($horas_en_decimal) {
 						$html = str_replace('%duracion_retainer%', number_format($totales['duracion_retainer'], $decimales_horas, ',', ''), $html);
+						$html = str_replace('%duracion_tarificada%', number_format($totales['duracion_tarificada'], $decimales_horas, ',', ''), $html);
 					} else {
 						$html = str_replace('%duracion_retainer%', $totales['glosa_duracion_retainer'], $html);
+						$html = str_replace('%duracion_tarificada%', $totales['glosa_duracion_tarificada'], $html);
 					}
 				} else {
 					$html = str_replace('%td_retainer%', '', $html);
+					$html = str_replace('%duracion_retainer%', '', $html);
+					$html = str_replace('%td_duracion_tarificada%', '', $html);
+					$html = str_replace('%duracion_tarificada%', '', $html);
 				}
 
 				if ($this->fields['forma_cobro'] == 'FLAT FEE') {

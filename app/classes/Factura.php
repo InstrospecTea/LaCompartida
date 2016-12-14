@@ -3079,9 +3079,9 @@ class Factura extends Objeto {
 		if (!$this->twig) {
 			$loader = new Twig_Loader_String();
 			$this->twig = new Twig_Environment($loader);
+			$this->twig->setCharset('ISO-8859-1');
 			$this->twig->addExtension(new DateTwigExtension());
 		}
-
 		return $this->twig->render($template, $this->template_data);
 	}
 

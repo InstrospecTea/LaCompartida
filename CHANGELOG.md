@@ -1,5 +1,49 @@
 # Changelog
 
+## Hotfix 16.39.1
+Tuesday, December 13th
+* **Fix** [Se corrige la doble declaración de propiedades en los traits](https://github.com/LemontechSA/ttb/pull/1992)
+
+## [Release 16.39.0](https://github.com/LemontechSA/ttb/pull/1990)
+Monday, December 12th
+* **Feature** [Agrega Descuento como fila en Planilla Clientes](https://github.com/LemontechSA/ttb/pull/1980)
+
+## Hotfix 16.38.6
+Monday, December 12th
+* **Feature** [Mejora gráficos comparados (eje Y)](https://github.com/LemontechSA/ttb/pull/1989)
+
+## Hotfix 16.38.5
+Monday, December 12th
+* **Fix** [Se corrige cota superior de fecha_creacion para Planilla_Clientes.xls](https://github.com/LemontechSA/ttb/pull/1988)
+
+## Hotfix 16.38.4
+Friday, December 9th
+* **Feature** [El plazo máximo para emitir facturas electrónicas es de 7 días calendario en Facturación Materia Software](https://github.com/LemontechSA/ttb/pull/1985)
+
+## Hotfix 16.38.3
+Wednesday, December 7th
+* **Fix** [Se agrega campo `id_contrato` en API/Projects](https://github.com/LemontechSA/ttb/pull/1984)
+
+## Hotfix 16.38.2
+Wednesday, December 7th
+* **Fix** [Corrige uso de tasa de cambio en liquidaciones](https://github.com/LemontechSA/ttb/pull/1983)
+
+## Hotfix 16.38.1
+Wednesday, December 7th
+* **Fix** [Asigna charset ISO-8859-1 a twig](https://github.com/LemontechSA/ttb/pull/1979)
+
+## [Release 16.38.0](https://github.com/LemontechSA/ttb/pull/1978)
+Tuesday, December 6th
+* **Feature** [Tracking Credits](https://github.com/LemontechSA/ttb/pull/1967)
+
+## [Release 16.37.0](https://github.com/LemontechSA/ttb/pull/1975)
+Tuesday, December 6th
+* **Feature** [Horas Tarificadas en Detalle Trabajo](https://github.com/LemontechSA/ttb/pull/1960)
+
+## Hotfix 16.36.9
+Tuesday, December 6th
+* **Fix** [Se agregan campos en loadWorks para soportar valores en config OrdenTrabajosNotaCobro](https://github.com/LemontechSA/ttb/pull/1974)
+
 ## Hotfix 16.36.8
 Monday, December 5th
 * **Fix** [Se crea ArraySorter::orderBy para ordenar arreglos](https://github.com/LemontechSA/ttb/pull/1972)
