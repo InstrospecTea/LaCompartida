@@ -267,7 +267,7 @@ if (isset($cobro) || $opc == 'buscar' || $excel || $excel_agrupado) {
 	if ($cobrable == 'SI') {
 		$where .= " AND trabajo.cobrable = 1";
 	}
-	if ($cobrable == 'NO') {
+	else if ($cobrable == 'NO') {
 		$where .= " AND trabajo.cobrable <> 1";
 	}
 
@@ -592,7 +592,7 @@ $pagina->PrintTop($popup);
 							<div class="fl buscadorlabel" style="margin-top: 3px;width:70px;display:inline-block;" ><?php echo __('Cobrable') ?></div>
 							<?php
 								$cobrable_value = $cobrable;
-								if ($motivo == 'horas' && empty($cobrable)) {
+								if ($motivo == 'horas' && $opc != 'buscar' && empty($cobrable)) {
 									$cobrable_value = Conf::read('RevisarHorasCobrableValorPorDefecto');
 								}
 								echo $Html->SelectSiNo('cobrable', $cobrable_value,'class="fl"');
