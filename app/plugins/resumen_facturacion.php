@@ -15,18 +15,22 @@ function Ofrece_Planilla_Resumen_Facturacion() {
 
 function Descarga_Planilla_Resumen_Facturacion() {
 	global $sesion, $factura, $orden, $where, $numero, $fecha1, $fecha2, $codigo_cliente_secundario,
-	$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_estudio,
+	$tipo_documento_legal_buscado, $codigo_cliente, $codigo_asunto, $id_contrato, $id_estudio, $codigo_contrato,
 	$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable;
 
 	if ($_GET['planilla']) {
 		require_once Conf::ServerDir() . '/classes/Reportes/SimpleReport.php';
 		$SimpleReport = new SimpleReport($sesion);
-		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
-		,$tipo_documento_legal_buscado
-		, $codigo_cliente,$codigo_cliente_secundario
-		, $codigo_asunto,$codigo_asunto_secundario
-		, $id_contrato, $id_estudio,
-		$id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social, $descripcion_factura, $serie, $desde_asiento_contable);
+
+		if ($orden == '') {
+			$orden = false;
+		}
+
+ 		$results = $factura->DatosReporte($orden, $where, $numero, $fecha1, $fecha2
+		, $tipo_documento_legal_buscado , $codigo_cliente,$codigo_cliente_secundario
+		, $codigo_asunto,$codigo_asunto_secundario , $id_contrato, $id_estudio
+		, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
+		, $descripcion_factura, $serie, $desde_asiento_contable, null, $codigo_contrato);
 	}
 
 	if ($_GET['planilla'] == 'resumen_ventas') {
@@ -103,4 +107,3 @@ function Descarga_Planilla_Resumen_Facturacion() {
 		$writer->save(__('Facturas'));
 	}
 }
-

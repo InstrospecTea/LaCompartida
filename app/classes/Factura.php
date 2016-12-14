@@ -364,11 +364,6 @@ class Factura extends Objeto {
 		array(
 			'field' => 'glosa',
 			'title' => 'Glosa'
-		),
-		array(
-			'field' => 'glosa_asunto',
-			'title' => 'Glosa Asunto',
-			'visible' => false
 		)
 	);
 
@@ -1623,17 +1618,14 @@ class Factura extends Objeto {
 				//Code name normalization
 				if ($lang == 'en') {
 					$code = 'en_US';
-
-					$NumbersWords = new Numbers_Words();
-
 					list($total_parte_entera, $total_parte_decimal) = explode('.', $total);
-					$monto_palabra_parte_entera = strtoupper($NumbersWords->toWords($total_parte_entera, $code));
-					$monto_palabra_parte_decimal = strtoupper($NumbersWords->toWords($total_parte_decimal, $code));
+					$monto_palabra_parte_entera = strtoupper(Numbers_Words::toWords($total_parte_entera, $code));
+					$monto_palabra_parte_decimal = strtoupper(Numbers_Words::toWords($total_parte_decimal, $code));
 					$monto_total_palabra = $monto_palabra_parte_entera . ' ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8') . ' ' . __('CON') . ' ' . $monto_palabra_parte_decimal . ' ' . __('CENTAVOS');
 					$monto_total_palabra_cero_cien = $monto_palabra_parte_entera . ' ' . __('CON') . ' ' . (empty($total_parte_decimal) ? '00' : $total_parte_decimal) . '/100 ' . mb_strtoupper($glosa_moneda_plural_lang, 'UTF-8');
 				} else {
-					$monto_total_palabra = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
-					$monto_total_palabra_cero_cien = strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang, true));
+					$monto_total_palabra = mb_strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang));
+					$monto_total_palabra_cero_cien = mb_strtoupper($monto_palabra->ValorEnLetras($total, $cobro_id_moneda, $glosa_moneda_lang, $glosa_moneda_plural_lang, true));
 				}
 
 				if ($mostrar_honorarios) {
@@ -2338,12 +2330,9 @@ class Factura extends Objeto {
 			$where .= " AND f.serie_documento_legal = '{$serie}'";
 		}
 
-		$query = "SELECT id_cobro FROM factura f {$where}";
+		$query = "SELECT GROUP_CONCAT(id_cobro) , '1' as grupo FROM factura f {$where} GROUP BY grupo";
 		$resp = mysql_query($query, $this->sesion->dbh) or Utiles::errorSQL($query, __FILE__, __LINE__, $this->sesion->dbh);
-		$lista_cobros = "".mysql_fetch_array($resp)[0];
-		while ($row = mysql_fetch_array($resp)) {
-			$lista_cobros = $lista_cobros.','.$row[0];
-		}
+		list($lista_cobros, $grupo) = mysql_fetch_array($resp);
 		return $lista_cobros;
 	}
 
@@ -2515,19 +2504,17 @@ class Factura extends Objeto {
 	, $id_cobro, $id_estado, $id_moneda, $grupo_ventas, $razon_social
 	, $descripcion_factura, $serie, $desde_asiento_contable, $opciones) {
 
-		global $query, $where, $groupby;
-
 		if ($where == '') {
 			$where = 1;
 			if ($numero != '' && $numero != null && $numero !== false) {
-				$where .= " AND numero*1 = $numero*1 ";
+				$where .= " AND factura.numero*1 = $numero*1 ";
 			}
 			if ($fecha1 && $fecha2) {
-				$where .= " AND fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . " 00:00:00' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
+				$where .= " AND factura.fecha BETWEEN '" . Utiles::fecha2sql($fecha1) . " 00:00:00' AND '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
 			} else if ($fecha1) {
-				$where .= " AND fecha >= '" . Utiles::fecha2sql($fecha1) . ' 00:00:00' . "' ";
+				$where .= " AND factura.fecha >= '" . Utiles::fecha2sql($fecha1) . ' 00:00:00' . "' ";
 			} else if ($fecha2) {
-				$where .= " AND fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
+				$where .= " AND factura.fecha <= '" . Utiles::fecha2sql($fecha2) . ' 23:59:59' . "' ";
 			}
 			if (Conf::GetConf($this->sesion, 'CodigoSecundario') && $codigo_cliente_secundario) {
 				$cliente = new Cliente($this->sesion);
@@ -2535,7 +2522,12 @@ class Factura extends Objeto {
 				$codigo_cliente = $cliente->fields['codigo_cliente'];
 			}
 			if ($tipo_documento_legal_buscado) {
-				$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
+				if (is_array($tipo_documento_legal_buscado)) {
+					$array_documento_legal = implode(',', $tipo_documento_legal_buscado);
+					$where .= " AND factura.id_documento_legal IN ($array_documento_legal) ";
+				} else {
+					$where .= " AND factura.id_documento_legal = '$tipo_documento_legal_buscado' ";
+				}
 			}
 
 			if ($codigo_cliente) {
@@ -2596,8 +2588,10 @@ class Factura extends Objeto {
 								, factura.numero
 								, factura.serie_documento_legal
 								, factura.codigo_cliente
+								, factura.porcentaje_impuesto
 								, cliente.glosa_cliente
 								, contrato.id_contrato as idcontrato
+								, contrato.codigo_contrato
 								, IF( TRIM(contrato.factura_razon_social) = TRIM( factura.cliente )
 											OR contrato.factura_razon_social IN ('',' ')
 											OR contrato.factura_razon_social IS NULL,
@@ -2620,6 +2614,7 @@ class Factura extends Objeto {
 								, prm_moneda.simbolo
 								, prm_moneda.cifras_decimales
 								, prm_moneda.tipo_cambio
+								, cta_cte_fact_mvto_moneda.tipo_cambio AS tipo_cambio_factura
 								, factura.id_moneda
 								, factura.honorarios
 								, factura.subtotal
@@ -2636,6 +2631,11 @@ class Factura extends Objeto {
 								, GROUP_CONCAT(asunto.codigo_asunto SEPARATOR ';') AS codigos_asunto
 								, GROUP_CONCAT(asunto.glosa_asunto SEPARATOR ';') AS glosas_asunto
 								, factura.RUT_cliente
+								, factura_padre.fecha AS factura_padre_fecha
+								, factura_padre.serie_documento_legal AS factura_padre_serie
+								, factura_padre.numero AS factura_padre_numero
+								, documento_legal_padre.codigo AS factura_padre_codigo
+								, ccfmm_padre.tipo_cambio AS factura_padre_tipo_cambio
 								, prm_estudio.glosa_estudio
 								, factura.fecha_anulacion
 								, factura.dte_folio_fiscal
@@ -2646,9 +2646,7 @@ class Factura extends Objeto {
 								, contrato.email_contacto as email_contacto
 								, cobro.estado as estado_cobro
 								, prm_documento_legal.glosa as glosa_doc_legal
-								, factura.dte_url_pdf as dte_url_pdf
-								, factura.glosa
-								, asunto.glosa_asunto";
+								, factura.glosa";
 
 		if ($opciones['mostrar_pagos']) {
 			$query .= ", (
@@ -2681,6 +2679,15 @@ class Factura extends Objeto {
 			 JOIN prm_moneda ON prm_moneda.id_moneda=factura.id_moneda
 			 LEFT JOIN prm_estado_factura ON prm_estado_factura.id_estado = factura.id_estado
 			 LEFT JOIN cta_cte_fact_mvto ON cta_cte_fact_mvto.id_factura = factura.id_factura
+			 LEFT JOIN cta_cte_fact_mvto_moneda
+				ON cta_cte_fact_mvto_moneda.id_cta_cte_fact_mvto = cta_cte_fact_mvto.id_factura
+				AND cta_cte_fact_mvto_moneda.id_moneda = factura.id_moneda
+			 LEFT JOIN factura factura_padre ON factura_padre.id_factura = factura.id_factura_padre
+			 LEFT JOIN prm_documento_legal documento_legal_padre ON factura_padre.id_documento_legal = documento_legal_padre.id_documento_legal
+			 LEFT JOIN cta_cte_fact_mvto ccfm_padre ON ccfm_padre.id_factura = factura_padre.id_factura
+			 LEFT JOIN cta_cte_fact_mvto_moneda ccfmm_padre
+				ON ccfmm_padre.id_cta_cte_fact_mvto = ccfm_padre.id_cta_cte_mvto
+				AND ccfmm_padre.id_moneda = factura_padre.id_moneda
 			 LEFT JOIN cobro ON cobro.id_cobro=factura.id_cobro
 			 LEFT JOIN cliente ON cliente.codigo_cliente=cobro.codigo_cliente
 			 LEFT JOIN contrato ON contrato.id_contrato=cobro.id_contrato
@@ -3096,23 +3103,6 @@ class Factura extends Objeto {
 		$resp_tipo_cambio = mysql_query($query_moneda_tipo_cambio, $this->sesion->dbh) or Utiles::errorSQL($query_moneda_tipo_cambio, __FILE__, __LINE__, $this->sesion->dbh);
 		list( $tipo_cambio_moneda ) = mysql_fetch_array($resp_tipo_cambio);
 		return $tipo_cambio_moneda;
-	}
-
-	public function Eliminar()
-	{
-
-		// eliminar los movimientos y monedas de la factura
-		$CtaCteFactMvto = new CtaCteFactMvto($this->sesion);
-		$CtaCteFactMvto->LoadByFactura($this->fields['id_factura']);
-
-		$CtaCteFactMoneda = new CtaCteFactMoneda($this->sesion);
-		$CtaCteFactMoneda->Load($CtaCteFactMvto->fields['id_cta_cte_fact_mvto']);
-
-		$CtaCteFactMoneda->Delete();
-		$CtaCteFactMvto->Delete();
-		$this->Delete();
-
-		return true;
 	}
 
 }

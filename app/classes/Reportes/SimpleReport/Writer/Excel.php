@@ -1,7 +1,5 @@
 <?php
 
-require_once SIMPLEREPORT_ROOT . '../Excel/PHPExcel.php';
-
 /**
  * Description of ReporteExcel
  * @author matias.orellana
@@ -209,7 +207,7 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 					if (!isset($totals_rows[$grupo_subtotal]['totals'][$idx])) {
 						$totals_rows[$grupo_subtotal]['totals'][$idx] = array();
 					}
-					
+
 					//si el anterior era del mismo grupo, me agrego al rango
 					$cell = PHPExcel_Cell::stringFromColumnIndex($col_i) . $this->current_row;
 					if (isset($totals_rows[$grupo_subtotal]['totals'][$idx][$this->current_row - 1])) {
@@ -380,4 +378,3 @@ class SimpleReport_Writer_Excel implements SimpleReport_Writer_IWriter {
 	}
 
 }
-
