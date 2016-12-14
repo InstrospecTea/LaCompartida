@@ -319,7 +319,7 @@ $existe_categoria_generador = $contrato->existsGeneratorCategory();
 
 ?>
 <script type="text/javascript">
-	<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']): ?>
+	<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded()): ?>
 	var showGeneratorAlert = function(type, message) {
 		var alert_html = '<div id="generator_message"><table width="70%" class="' + type + '">\
 			<tbody><tr>\
@@ -3338,7 +3338,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		$Asunto->Load($id_asunto);
 		?>
 
-		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']) { ?>
+		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded()) { ?>
 			<script type="text/javascript">
 				jQuery('document').ready(function() {
 					var $ = jQuery;
