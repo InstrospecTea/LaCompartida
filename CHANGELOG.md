@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.40.2
+Thursday, December 16th
+* **Fix** [Validación Generadores al crear un nuevo cliente](https://github.com/LemontechSA/ttb/pull/2004)
+
 ## Hotfix 16.40.1
 Thursday, December 15th
 * **Fix** [Generadores genéricos](https://github.com/LemontechSA/ttb/pull/2001)
