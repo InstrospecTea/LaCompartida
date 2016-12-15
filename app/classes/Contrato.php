@@ -1591,12 +1591,12 @@ class Contrato extends Objeto {
               usuario.apellido1,
               usuario.apellido2,
               porcentaje_genera,
-              prm_categoria_generador.nombre as nombre_categoria,
+              IFNULL(prm_categoria_generador.nombre, '') as nombre_categoria,
               contrato_generador.id_categoria_generador as id_categoria
             FROM contrato_generador
             INNER JOIN usuario on contrato_generador.id_usuario = usuario.id_usuario
             INNER JOIN prm_area_usuario on usuario.id_area_usuario = prm_area_usuario.id
-            INNER JOIN prm_categoria_generador on contrato_generador.id_categoria_generador = prm_categoria_generador.id_categoria_generador
+            LEFT JOIN prm_categoria_generador on contrato_generador.id_categoria_generador = prm_categoria_generador.id_categoria_generador
             WHERE contrato_generador.id_contrato = :contract_id
             ORDER BY usuario.nombre ASC";
 
@@ -1644,7 +1644,7 @@ class Contrato extends Objeto {
 		$Statement = $sesion->pdodbh->prepare($sql);
 		$Statement->bindParam('percent_generator', $percent_generator);
 		$Statement->bindParam('generator_id', $generator_id);
-		$Statement->bindParam('category_id', $category_id);
+		$Statement->bindParam('category_id', !empty($category_id) ? $category_id : 'NULL');
 
 		return $Statement->execute();
 	}
@@ -1666,7 +1666,7 @@ class Contrato extends Objeto {
 		$Statement->bindParam('contract_id', $contract_id);
 		$Statement->bindParam('user_id', $user_id);
 		$Statement->bindParam('percent_generator', $percent_generator);
-		$Statement->bindParam('category_id', $category_id);
+		$Statement->bindParam('category_id', !empty($category_id) ? $category_id : 'NULL');
 
 		return $Statement->execute();
 	}
@@ -1799,6 +1799,14 @@ class Contrato extends Objeto {
 				->add_restriction(CriteriaRestriction::equals('C.forma_cobro', "'CAP'"));
 
 		return $criteria->run();
+	}
+
+	public function existsGeneratorCategory()
+	{
+		$Criteria = new Criteria($this->sesion);
+		$Criteria->add_from('prm_categoria_generador');
+
+		return $Criteria->count() > 0;
 	}
 }
 

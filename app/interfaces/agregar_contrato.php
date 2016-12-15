@@ -314,10 +314,13 @@ $Html = new \TTB\Html();
 if (!$contrato->Loaded()) {
 	$contrato->setFieldsNew('contrato');
 }
+
+$existe_categoria_generador = $contrato->existsGeneratorCategory();
+
 ?>
 <script type="text/javascript">
-	<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']): ?>
-	var showAlert = function(type, message) {
+	<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded()): ?>
+	var showGeneratorAlert = function(type, message) {
 		var alert_html = '<div id="generator_message"><table width="70%" class="' + type + '">\
 			<tbody><tr>\
 				<td valign="top" align="left" style="font-size: 12px;">\
@@ -332,6 +335,8 @@ if (!$contrato->Loaded()) {
 	<?php endif; ?>
 
 	function ValidarContrato(form) {
+
+		<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_validacion_guardar_generadores') : false ?>
 
 		if (!form) {
 			var form = jQuery('[name="formulario"]').get(0);
@@ -1237,52 +1242,6 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 
 	function RevisarTarifas(tarifa, moneda, f, desde_combo)
 	{
-		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']): ?>
-			/* Valida que la suma de las CRC y PMC no supere el 100% */
-			var error = false;
-			var crc_user = false;
-			var total_pmc_percent = 0;
-			var total_crc_percent = 0;
-			jQuery('.category-data').each(function() {
-				var percent_row = parseInt(jQuery.trim(jQuery(this).parent().find('.percent-data').data('percent_value')));
-				var category_name = jQuery.trim(jQuery(this).html()).toUpperCase();
-
-				if (category_name == 'CRC') {
-					total_crc_percent += percent_row;
-				};
-
-				if (category_name == 'PMC') {
-					total_pmc_percent += percent_row;
-				};
-
-				if (category_name == 'CRC') {
-					crc_user = true;
-				};
-			});
-
-			if (!crc_user) {
-				showAlert('alerta', "<?= __('Debe haber al menos un profesional con categoría CRC.') ?>");
-				jQuery('#percent_generator').focus();
-				error = true;
-			};
-
-			if (total_pmc_percent != 100) {
-				showAlert('alerta', "<?= __('La suma de la categoría PMC debe sumar 100%.') ?>");
-				jQuery('#percent_generator').focus();
-				error = true;
-			};
-
-			if (total_crc_percent != 100) {
-				showAlert('alerta', "<?= __('La suma de la categoría CRC debe sumar 100%.') ?>");
-				jQuery('#percent_generator').focus();
-				error = true;
-			};
-
-			if (error) {
-				return false;
-			}
-		<?php endif; ?>
-
 		var ejecutar = true;
 
 		if ( !desde_combo )
@@ -3379,7 +3338,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 		$Asunto->Load($id_asunto);
 		?>
 
-		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded() && $Asunto->fields['id_contrato_indep']) { ?>
+		<?php if (Conf::GetConf($Sesion, 'UsarModuloProduccion') && $cliente->Loaded()) { ?>
 			<script type="text/javascript">
 				jQuery('document').ready(function() {
 					var $ = jQuery;
@@ -3422,7 +3381,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 								header = $("<tr bgcolor='#A3D55C'>")
 								header.append('<td align="left" class="border_plomo"><b><?php echo __('Usuario'); ?></b></td>');
 								header.append('<td align="left" class="border_plomo"><b><?php echo __('Área Usuario'); ?></b></td>');
+								<?php if ($existe_categoria_generador): ?>
 								header.append('<td align="left" class="border_plomo"><b><?php echo __('Categoría'); ?></b></td>');
+								<?php endif; ?>
 								header.append('<td align="right" class="border_plomo"><b><?php echo __('Porcentaje Genera'); ?></b></td>');
 								header.append('<td align="right" class="border_plomo"><b><?php echo __('Acciones'); ?></b></td>');
 								rows.append(header);
@@ -3431,7 +3392,9 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									generator_row = $('<tr>');
 									generator_row.append('<td align="left" class="border_plomo user-data" data-user_id="' + generator.user_id + '">'+ generator.name + '</td>');
 									generator_row.append('<td align="left" class="border_plomo">' + generator.user_area + '</td>');
+									<?php if ($existe_categoria_generador): ?>
 									generator_row.append('<td align="left" class="border_plomo category-data" data-category_value="' + generator.category_generator_id + '">' + generator.category_name + '</td>');
+									<?php endif; ?>
 									generator_row.append('<td align="right" class="border_plomo percent-data" data-percent_value="' + generator.percent + '">' + generator.percent + '%</td>');
 									generator_row.append(actionButtons(generator.agreement_generator_id));
 									rows.append(generator_row);
@@ -3502,110 +3465,10 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 						var error = false;
 						var category_name = $.trim($category.find('option:selected').html()).toUpperCase();
 
-						/* Valida porcentajes permitidos para REC */
-						if ($.trim($category.find('option:selected').html()) == 'REC' && (percent < 10 || percent > 100)) {
-							showAlert('alerta', "<?= __('El porcentaje para la categiría REC debe estar entre 10% y 100%.') ?>");
-							error = true;
-						};
-
-						/* Valida que el mismo usuario no tenga REC y CRC al mismo tiempo */
-						if (category_name == 'CRC' || category_name == 'REC') {
-							var change_category = true;
-							$('td[data-user_id="' + user + '"]').each(function() {
-								var category_name_user = $.trim($(this).parent().find('.category-data').html()).toUpperCase();
-								var id = $(this).parent().find('.edit_generator').data('id');
-
-								if (id_agreement_generator != id) {
-									if (category_name_user == 'REC' && category_name == 'CRC' ||
-											category_name_user == 'CRC' && category_name == 'REC') {
-										change_category = false;
-									};
-								};
-							});
-
-							if (!change_category) {
-								showAlert('alerta', "<?= __('El mismo profesional no puede pertenecer a la categiría REC y CRC al mismo tiempo.') ?>");
-								error = true;
-							};
-						};
-
-						/* Valida que el porcentaje de REC sea 25, 50, 75 ó 100 */
-						if ($.trim($category.find('option:selected').html()) == 'REC') {
-							if (percent != 25 && percent != 50 && percent != 75 && percent != 100) {
-								showAlert('alerta', "<?= __('El porcentaje de REC debe ser 25%, 50%, 75% ó 100%') ?>");
-								$('#percent_generator').focus();
-								error = true;
-							};
-						};
-
-						/* Valida que la suma de las REC no supere el 100% */
-						if ($.trim($category.find('option:selected').html()) == 'REC') {
-							var total_rec_percent = 0;
-							$('.category-data').each(function() {
-								var percent_row = parseInt($.trim($(this).parent().find('.percent-data').data('percent_value')));
-								var category_name = $.trim($(this).html()).toUpperCase();
-								var id = $(this).parent().find('.edit_generator').data('id');
-
-								if (category_name == 'REC' && id_agreement_generator != id) {
-									total_rec_percent += percent_row;
-								};
-							});
-
-							total_rec_percent += percent;
-
-							if (total_rec_percent > 100) {
-								showAlert('alerta', "<?= __('La suma de la categoría REC debe estar entre 10% y 100%.') ?>");
-								$('#percent_generator').focus();
-								error = true;
-							}
-						};
-
-						/* Valida que la suma de PMC no supere el 100% */
-						if ($.trim($category.find('option:selected').html()) == 'PMC') {
-							var total_pmc_percent = 0;
-							$('.category-data').each(function() {
-								var percent_row = parseInt($.trim($(this).parent().find('.percent-data').data('percent_value')));
-								var category_name = $.trim($(this).html()).toUpperCase();
-								var id = $(this).parent().find('.edit_generator').data('id');
-
-								if (category_name == 'PMC' && id_agreement_generator != id) {
-									total_pmc_percent += percent_row;
-								};
-							});
-
-							total_pmc_percent += percent;
-
-							if (total_pmc_percent > 100) {
-								showAlert('alerta', "<?= __('La suma de la categoría PMC debe sumar 100%.') ?>");
-								$('#percent_generator').focus();
-								error = true;
-							}
-						};
-
-						/* Valida que la suma de CRC no supere el 100% */
-						if ($.trim($category.find('option:selected').html()) == 'CRC') {
-							var total_crc_percent = 0;
-							$('.category-data').each(function() {
-								var percent_row = parseInt($.trim($(this).parent().find('.percent-data').data('percent_value')));
-								var category_name = $.trim($(this).html()).toUpperCase();
-								var id = $(this).parent().find('.edit_generator').data('id');
-
-								if (category_name == 'CRC' && id_agreement_generator != id) {
-									total_crc_percent += percent_row;
-								};
-							});
-
-							total_crc_percent += percent;
-
-							if (total_crc_percent > 100) {
-								showAlert('alerta', "<?= __('La suma de la categoría CRC debe sumar 100%.') ?>");
-								$('#percent_generator').focus();
-								error = true;
-							}
-						};
+						<?php ($Slim = Slim::getInstance('default', true)) ? $Slim->applyHook('hook_validacion_agregar_usuario') : false ?>
 
 						if (percent < 1 || percent > 100) {
-							showAlert('alerta', "<?= __('El porcentaje debe estar entre 1 y 100.') ?>");
+							showGeneratorAlert('alerta', "<?= __('El porcentaje debe estar entre 1 y 100.') ?>");
 							$('#percent_generator').focus();
 							error = true;
 						};
@@ -3614,7 +3477,8 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							return false;
 						};
 
-						if (percent && user && category) {
+						if (percent && user) {
+
 							if (form_status == 'EDIT') {
 								$.ajax({
 									url: generator_url + '/generators/' + id_agreement_generator,
@@ -3628,7 +3492,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										user_id: user
 									}
 								}).done(function(data) {
-									showAlert('info', 'Profesional editado con éxito');
+									showGeneratorAlert('info', "<?= __('Profesional editado con éxito') ?>");
 									loadGeneratorForm('NEW', {});
 									loadGenerators();
 								});
@@ -3646,13 +3510,13 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										client_id: "<?= $cliente->fields['id_cliente'] ?>"
 									}
 								}).done(function(data) {
-									showAlert('info', 'Profesional agregado con éxito');
+									showGeneratorAlert('info', "<?= __('Profesional agregado con éxito') ?>");
 									loadGeneratorForm('NEW', {});
 									loadGenerators();
 								});
 							}
 						} else {
-							showAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
+							showGeneratorAlert('alerta', "<?= __('Ingrese todos los datos para agregar el usuario') ?>");
 						}
 					});
 					loadGeneratorForm('NEW', {});
@@ -3671,6 +3535,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 							<td>
 								<?php echo Html::SelectArrayDecente($Sesion->usuario->ListarActivos('', true), 'id_user_generator', '', '', 'Seleccione', '200px'); ?>
 							</td>
+							<?php if ($existe_categoria_generador): ?>
 							<td>
 								<?php echo __('Categoría') ?>
 							</td>
@@ -3689,6 +3554,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 									<?php endforeach; ?>
 									</select>
 							</td>
+							<?php endif; ?>
 							<td>
 								<?php echo __('Porcentaje Genera'); ?>:
 							</td>
