@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.40.1
+Thursday, December 15th
+* **Fix** [Generadores genéricos](https://github.com/LemontechSA/ttb/pull/2001)
+
 ## [Release 16.40.0](https://github.com/LemontechSA/ttb/pull/2000)
 Wednesday, December 14th
 * **Feature** [Valor por defecto de filtro 'cobrable' en formulario 'Revisar Horas'](https://github.com/LemontechSA/ttb/pull/1994)
