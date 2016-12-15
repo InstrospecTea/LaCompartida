@@ -1,7 +1,5 @@
 <?php
 
-//require_once SIMPLEREPORT_ROOT . '../Excel/PHPExcel.php';
-
 /**
  * @author matias.orellana
  */
@@ -499,4 +497,3 @@ class SimpleReport_Writer_Html implements SimpleReport_Writer_IWriter {
 		return $param;
 	}
 }
-
