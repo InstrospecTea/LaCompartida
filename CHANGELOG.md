@@ -1,5 +1,10 @@
 # Changelog
 
+## [Release 16.40.0](https://github.com/LemontechSA/ttb/pull/2000)
+Wednesday, December 14th
+* **Feature** [Valor por defecto de filtro 'cobrable' en formulario 'Revisar Horas'](https://github.com/LemontechSA/ttb/pull/1994)
+* **Feature** [Archivo contabilidad CPB master](https://github.com/LemontechSA/ttb/pull/1981)
+
 ## Hotfix 16.39.3
 Tuesday, December 13th
 * **Fix** [Enviar el IGV en facturas de gastos](https://github.com/LemontechSA/ttb/pull/1997)
