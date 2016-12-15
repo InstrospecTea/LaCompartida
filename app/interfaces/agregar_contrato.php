@@ -3492,7 +3492,7 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										user_id: user
 									}
 								}).done(function(data) {
-									showGeneratorAlert('info', 'Profesional editado con éxito');
+									showGeneratorAlert('info', "<?= __('Profesional editado con éxito') ?>");
 									loadGeneratorForm('NEW', {});
 									loadGenerators();
 								});
@@ -3510,13 +3510,13 @@ while (list($id_moneda_tabla, $simbolo_tabla) = mysql_fetch_array($resp)) {
 										client_id: "<?= $cliente->fields['id_cliente'] ?>"
 									}
 								}).done(function(data) {
-									showGeneratorAlert('info', 'Profesional agregado con éxito');
+									showGeneratorAlert('info', "<?= __('Profesional agregado con éxito') ?>");
 									loadGeneratorForm('NEW', {});
 									loadGenerators();
 								});
 							}
 						} else {
-							showGeneratorAlert('alerta', 'Ingrese todos los datos para agregar el usuario');
+							showGeneratorAlert('alerta', "<?= __('Ingrese todos los datos para agregar el usuario') ?>");
 						}
 					});
 					loadGeneratorForm('NEW', {});
