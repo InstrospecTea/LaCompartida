@@ -21,6 +21,8 @@ $Slim->hook('hook_validacion_guardar_generadores', function() {
 		var crc_user = false;
 		var total_pmc_percent = 0;
 		var total_crc_percent = 0;
+		var tiene_generadores = false;
+
 		jQuery('.category-data').each(function() {
 			var percent_row = parseInt(jQuery.trim(jQuery(this).parent().find('.percent-data').data('percent_value')));
 			var category_name = jQuery.trim(jQuery(this).html()).toUpperCase();
@@ -36,24 +38,28 @@ $Slim->hook('hook_validacion_guardar_generadores', function() {
 			if (category_name == 'CRC') {
 				crc_user = true;
 			};
+
+			tiene_generadores = true;
 		});
 
-		if (!crc_user) {
-			showGeneratorAlert('alerta', "{$crc_user}");
-			jQuery('#percent_generator').focus();
-			error = true;
-		};
+		if (tiene_generadores) {
+			if (!crc_user) {
+				showGeneratorAlert('alerta', "{$crc_user}");
+				jQuery('#percent_generator').focus();
+				error = true;
+			};
 
-		if (total_pmc_percent != 100) {
-			showGeneratorAlert('alerta', "{$total_pmc_percent}");
-			jQuery('#percent_generator').focus();
-			error = true;
-		};
+			if (total_pmc_percent != 100) {
+				showGeneratorAlert('alerta', "{$total_pmc_percent}");
+				jQuery('#percent_generator').focus();
+				error = true;
+			};
 
-		if (total_crc_percent != 100) {
-			showGeneratorAlert('alerta', "{$total_crc_percent}");
-			jQuery('#percent_generator').focus();
-			error = true;
+			if (total_crc_percent != 100) {
+				showGeneratorAlert('alerta', "{$total_crc_percent}");
+				jQuery('#percent_generator').focus();
+				error = true;
+			};
 		};
 
 		if (error) {
