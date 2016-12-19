@@ -20,7 +20,7 @@ router.route('/')
       if(err){
         return next(err);
       }
-      res.status(200).send({ message: 'Book created.', data: book.displayFormat() });
+      res.status(200).send({ message: 'Book created.', data: book });
     });
   });
 
@@ -33,7 +33,7 @@ router.route('/:book_id')
       if(!book){
         return res.json({});
       }
-      res.json(book.displayFormat());
+      res.json(book);
     })
   })
 
