@@ -51,8 +51,8 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 		return $documento;
 	}
 
-	public function getanular($serie, $correlativo) {
-		$response = $this->sendData('GET', "{$this->url}/documento/getanular?serie={$serie}&correlativo={$correlativo}");
+	public function GetAnular($serie, $correlativo) {
+		$response = $this->sendData('GET', "{$this->url}/documento/GetAnular?serie={$serie}&correlativo={$correlativo}");
 		$documento = json_decode($response);
 
 		// ocurrió un error
