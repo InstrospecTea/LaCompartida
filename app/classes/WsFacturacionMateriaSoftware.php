@@ -64,16 +64,9 @@ class WsFacturacionMateriaSoftware extends WsFacturacion {
 	}
 
 	private function generateBodyInvoice(&$Factura, &$Moneda, &$DocumentoLegal, &$TipoDocumentoIdentidad) {
-		$porcentaje_impuesto = (int) $Factura->fields['porcentaje_impuesto'];
-		$total = (double) $Factura->fields['total'];
-		$subtotal = (double) $Factura->fields['subtotal'];
+		$subtotal = (double) $Factura->fields['subtotal'] + (double) $Factura->fields['subtotal_gastos'] + (double) $Factura->fields['subtotal_gastos_sin_impuesto'];
 		$iva = (float) $Factura->fields['iva'];
-
-		// si la factura corresponde a un gasto
-		if (empty($iva) && empty($subtotal)) {
-			$iva = ($total * $porcentaje_impuesto) / 100;
-			$subtotal = $total - $iva;
-		}
+		$total = (double) $Factura->fields['total'];
 
 		$this->body_invoice = [
 			'Cliente' => [
