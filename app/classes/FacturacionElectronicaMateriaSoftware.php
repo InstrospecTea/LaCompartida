@@ -249,7 +249,7 @@ EOF;
 
 		$documento = json_decode($Factura->fields['dte_url_pdf']);
 
-		$documento_anulado = $WsFacturacionMateriaSoftware->getanular(
+		$documento_anulado = $WsFacturacionMateriaSoftware->GetAnular(
 			$documento->Serie,
 			(int) $documento->Correlativo
 		);

@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.40.3
+Monday, December 19th
+* **Fix** [Asignación de subtotal e IGV en facturación electrónica Materia Software](https://github.com/LemontechSA/ttb/pull/2005)
+
 ## Hotfix 16.40.2
 Thursday, December 16th
 * **Fix** [Validación Generadores al crear un nuevo cliente](https://github.com/LemontechSA/ttb/pull/2004)
