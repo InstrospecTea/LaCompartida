@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix 16.40.4
+Tuesday, December 20th
+* **Fix** [Agrega tag %duracion_tarificada_forzada%](https://github.com/LemontechSA/ttb/pull/2007)
+
 ## Hotfix 16.40.3
 Monday, December 19th
 * **Fix** [Asignación de subtotal e IGV en facturación electrónica Materia Software](https://github.com/LemontechSA/ttb/pull/2005)
