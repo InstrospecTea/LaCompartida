@@ -1468,6 +1468,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 			case 'TRABAJOS_FILAS': //GenerarDocumento
 				global $categoria_duracion_horas;
 				global $categoria_duracion_minutos;
+				global $categoria_duracion_tarificada_real;
 				global $categoria_valor;
 				global $resumen_profesional_id_usuario;
 				global $resumen_profesional_nombre;
@@ -1546,6 +1547,9 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 				$asunto->fields['trabajos_total_duracion'] = 0;
 				$asunto->fields['trabajos_total_valor'] = 0;
 				$asunto->fields['trabajos_total_duracion_retainer'] = 0;
+				$asunto->fields['trabajos_total_duracion_tarificada_real'] = 0;
+
+				$categoria_duracion_tarificada_real = 0;
 
 				for ($i = 0; $i < $lista_trabajos->num; $i++) {
 					$trabajo = $lista_trabajos->Get($i);
@@ -1561,6 +1565,9 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 					$categoria_valor+=$trabajo->fields['monto_cobrado'];
 					$duracion_decimal_retainer = $h_retainer + $m_retainer / 60 + $s_retainer / 3600;
 					$duracion_decimal_tarificada = ($h - $h_retainer) + ($m - $m_retainer) / 60 + ($s - $s_retainer) / 3600;
+					$duracion_tarificada_real = $trabajo->fields['cobrable'] ? $duracion_decimal_tarificada : 0;
+					$categoria_duracion_tarificada_real += $duracion_tarificada_real;
+					$asunto->fields['trabajos_total_duracion_tarificada_real'] += $duracion_tarificada_real;
 
 					if (!isset($profesionales[$trabajo->fields['nombre_usuario']])) {
 						$profesionales[$trabajo->fields['nombre_usuario']] = array();
@@ -1712,6 +1719,11 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 						$row = str_replace('%td_duracion_tarificada%', '', $row);
 						$row = str_replace('%duracion_tarificada%', '%duracion%', $row);
 					}
+					if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
+						$row = str_replace('%duracion_tarificada_forzada%', number_format($duracion_tarificada_real, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $row);
+					} else {
+						$row = str_replace('%duracion_tarificada_forzada%', Utiles::Decimal2GlosaHora($duracion_tarificada_real), $row);
+					}
 
 					if ($this->fields['forma_cobro'] == 'FLAT FEE') {
 						$row = str_replace('%duracion_decimal_trabajada%', '', $row);
@@ -1788,6 +1800,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 								$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
 								$categoria_duracion_minutos = round($categoria_duracion_minutos % 60);
 								$html3 = str_replace('%duracion%', sprintf('%02d', $categoria_duracion_horas) . ':' . sprintf('%02d', $categoria_duracion_minutos), $html3);
+								$html3 = str_replace('%duracion_tarificada_real%', Utiles::Decimal2GlosaHora($categoria_duracion_tarificada_real), $html3);
 
 								if (Conf::GetConf($this->sesion, 'NoImprimirValorTrabajo') && $this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION') {
 									$html3 = str_replace('%valor%', '', $html3);
@@ -1820,6 +1833,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 								$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria . $encabezado_trabajos_categoria, $row);
 								$categoria_duracion_horas = 0;
 								$categoria_duracion_minutos = 0;
+								$categoria_duracion_tarificada_real = 0;
 								$categoria_valor = 0;
 								$total_trabajos_categoria = '';
 								$encabezado_trabajos_categoria = '';
@@ -1832,6 +1846,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 							$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
 							$categoria_duracion_minutos = round($categoria_duracion_minutos % 60);
 							$html3 = str_replace('%duracion%', sprintf('%02d', $categoria_duracion_horas) . ':' . sprintf('%02d', $categoria_duracion_minutos), $html3);
+							$html3 = str_replace('%duracion_tarificada_real%', Utiles::Decimal2GlosaHora($categoria_duracion_tarificada_real), $html3);
 							if ($this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION' && Conf::GetConf($this->sesion, 'NoImprimirValorTrabajo')) {
 								$html3 = str_replace('%valor%', '', $html3);
 								$html3 = str_replace('%valor_cyc%', '', $html3);
@@ -1844,6 +1859,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 							$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria, $row);
 							$categoria_duracion_horas = 0;
 							$categoria_duracion_minutos = 0;
+							$categoria_duracion_tarificada_real = 0;
 							$categoria_valor = 0;
 							$total_trabajos_categoria = '';
 							$encabezado_trabajos_categoria = '';
@@ -1858,7 +1874,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 								$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
 								$categoria_duracion_minutos = round($categoria_duracion_minutos % 60);
 								$html3 = str_replace('%duracion%', sprintf('%02d', $categoria_duracion_horas) . ':' . sprintf('%02d', $categoria_duracion_minutos), $html3);
-
+								$html3 = str_replace('%duracion_tarificada_real%', Utiles::Decimal2GlosaHora($categoria_duracion_tarificada_real), $html3);
 
 								if (Conf::GetConf($this->sesion, 'NoImprimirValorTrabajo') && $this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION') {
 									$html3 = str_replace('%valor%', '', $html3);
@@ -1894,6 +1910,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 
 								$categoria_duracion_horas = 0;
 								$categoria_duracion_minutos = 0;
+								$categoria_duracion_tarificada_real = 0;
 								$categoria_valor = 0;
 								$total_trabajos_categoria = '';
 								$encabezado_trabajos_categoria = '';
@@ -1906,6 +1923,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 							$categoria_duracion_horas += floor($categoria_duracion_minutos / 60);
 							$categoria_duracion_minutos = round($categoria_duracion_minutos % 60);
 							$html3 = str_replace('%duracion%', sprintf('%02d', $categoria_duracion_horas) . ':' . sprintf('%02d', $categoria_duracion_minutos), $html3);
+							$html3 = str_replace('%duracion_tarificada_real%', Utiles::Decimal2GlosaHora($categoria_duracion_tarificada_real), $html3);
 							if ($this->fields['estado'] != 'CREADO' && $this->fields['estado'] != 'EN REVISION' && Conf::GetConf($this->sesion, 'NoImprimirValorTrabajo')) {
 								$html3 = str_replace('%valor%', '', $html3);
 								$html3 = str_replace('%valor_cyc%', '', $html3);
@@ -1918,6 +1936,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 							$row = str_replace('%TRABAJOS_CATEGORIA%', $total_trabajos_categoria, $row);
 							$categoria_duracion_horas = 0;
 							$categoria_duracion_minutos = 0;
+							$categoria_duracion_tarificada_real = 0;
 							$categoria_valor = 0;
 							$total_trabajos_categoria = '';
 							$encabezado_trabajos_categoria = '';
@@ -1942,6 +1961,7 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 				$minutos_cobrables = sprintf("%02d", $asunto->fields['trabajos_total_duracion'] % 60);
 				$duracion_retainer_total = ($asunto->fields['trabajos_total_duracion_retainer']) / 60;
 				$duracion_tarificada_total = ($asunto->fields['trabajos_total_duracion'] / 60) - ($asunto->fields['trabajos_total_duracion_retainer'] / 60);
+				$duracion_tarificada_real_total = $asunto->fields['trabajos_total_duracion_tarificada_real'];
 				$minutos_decimal = $minutos_cobrables / 60;
 				$duracion_decimal = $horas_cobrables + $minutos_decimal;
 
@@ -1991,8 +2011,11 @@ class NotaCobroDocumento extends NotaCobroDocumentoComun {
 					$html = str_replace('%td_duracion_tarificada%', '', $html);
 					$html = str_replace('%duracion_tarificada%', '%duracion%', $html);
 				}
-
-
+				if (Conf::GetConf($this->sesion, 'TipoIngresoHoras') == 'decimal') {
+					$html = str_replace('%duracion_tarificada_forzada%', number_format($duracion_tarificada_real_total, Conf::GetConf($this->sesion, 'CantidadDecimalesIngresoHoras'), ',', ''), $html);
+				} else {
+					$html = str_replace('%duracion_tarificada_forzada%', Utiles::Decimal2GlosaHora($duracion_tarificada_real_total), $html);
+				}
 
 				if ($this->fields['forma_cobro'] == 'FLAT FEE') {
 					$html = str_replace('%duracion_decimal_trabajada%', '', $html);
