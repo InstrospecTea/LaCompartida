@@ -11,8 +11,10 @@ var BookSchema = new Schema({
     type: String,
     required: true
   },
+  description: String,
   genre: String,
   author: String,
+  image: String,
   copies_left: {
     type: Number,
     default: 1,
@@ -32,11 +34,14 @@ BookSchema.methods.new_attributes = function(new_attributes){
   if(new_attributes.genre || new_attributes.genre == ''){
     this.genre = new_attributes.genre;
   }
+  if(new_attributes.description || new_attributes.description == ''){
+    this.description = new_attributes.description;
+  }
   if(new_attributes.author || new_attributes.author == ''){
     this.author = new_attributes.author;
   }
-  if(new_attributes.publisher || new_attributes.publisher == ''){
-    this.publisher = new_attributes.publisher;
+  if(new_attributes.image || new_attributes.image == ''){
+    this.image = new_attributes.image;
   }
 };
 
