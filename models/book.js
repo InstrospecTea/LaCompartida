@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var BookSchema = new Schema({
   isbn: {
     type: String,
-    uniqure: true,
+    unique: true,
     required: true
   },
   name: {
@@ -12,8 +12,12 @@ var BookSchema = new Schema({
     required: true
   },
   genre: String,
-  year: Number,
-  author: String
+  author: String,
+  copies_left: {
+    type: Number,
+    default: 1,
+    min: [0, 'No copies left.']
+  }
 }, {
   timestamps: true
 });
@@ -27,9 +31,6 @@ BookSchema.methods.new_attributes = function(new_attributes){
   }
   if(new_attributes.genre || new_attributes.genre == ''){
     this.genre = new_attributes.genre;
-  }
-  if(new_attributes.year || new_attributes.year == ''){
-    this.year = new_attributes.year;
   }
   if(new_attributes.author || new_attributes.author == ''){
     this.author = new_attributes.author;
