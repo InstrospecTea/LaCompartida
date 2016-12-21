@@ -15,7 +15,7 @@ router.route('/')
   })
 
   .post(function(req, res, next){
-    var book = new Book(re.body);
+    var book = new Book(req.body);
     book.save(function(err) {
       if(err){
         return next(err);
@@ -38,7 +38,7 @@ router.route('/:book_id')
   })
 
   .put(function (req, res, next) {
-    Book.findById(id, function (err, book) {
+    Book.findById(req.params.book_id, function (err, book) {
       if (err){
         return next(err);
       }
