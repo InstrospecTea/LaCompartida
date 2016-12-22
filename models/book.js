@@ -2,11 +2,12 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var BookSchema = new Schema({
-  isbn: {
+  code: {
     type: String,
     unique: true,
     required: true
   },
+  isbn: String,
   name: {
     type: String,
     required: true
@@ -25,7 +26,10 @@ var BookSchema = new Schema({
 });
 
 BookSchema.methods.new_attributes = function(new_attributes){
-  if(new_attributes.isbn){
+  if(new_attributes.code){
+    this.code = new_attributes.code;
+  }
+  if(new_attributes.isbn || new_attributes.isbn == ''){
     this.isbn = new_attributes.isbn;
   }
   if(new_attributes.name){
