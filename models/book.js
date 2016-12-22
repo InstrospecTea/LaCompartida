@@ -1,12 +1,8 @@
 var mongoose = require('mongoose');
+var autoIncrement = require('mongoose-auto-increment');
 var Schema = mongoose.Schema;
 
 var BookSchema = new Schema({
-  code: {
-    type: String,
-    unique: true,
-    required: true
-  },
   isbn: String,
   name: {
     type: String,
@@ -25,10 +21,14 @@ var BookSchema = new Schema({
   timestamps: true
 });
 
+BookSchema.plugin(autoIncrement.plugin, {
+  model: 'Book',
+  field: 'code',
+  startAt: 1,
+  incrementBy: 1
+});
+
 BookSchema.methods.new_attributes = function(new_attributes){
-  if(new_attributes.code){
-    this.code = new_attributes.code;
-  }
   if(new_attributes.isbn || new_attributes.isbn == ''){
     this.isbn = new_attributes.isbn;
   }

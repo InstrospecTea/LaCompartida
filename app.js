@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var autoIncrement = require('mongoose-auto-increment');
 
 var config = require('config');
 console.log(config);
@@ -14,7 +15,8 @@ process.env.PORT = config.get('port');
 // DB
 // ADD process.env.NODE_ENV
 mongoose.set('debug', true);
-mongoose.connect(config.get('db'));
+var db = mongoose.connect(config.get('db'));
+autoIncrement.initialize(db);
 
 var index = require('./routes/index');
 var users = require('./routes/users');
