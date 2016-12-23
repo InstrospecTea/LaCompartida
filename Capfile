@@ -1,5 +1,0 @@
-require 'rubygems'
-require 'railsless-deploy'
-set :config, 'config/deploy'
-require 'capistrano/multiconfig'
-load 'deploy'

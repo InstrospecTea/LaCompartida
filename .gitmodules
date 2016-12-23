@@ -1,3 +1,0 @@
-[submodule "app/classes/Notifications/ApnsPHP"]
-	path = app/classes/Notifications/ApnsPHP
-	url = git@github.com:LemontechSA/ApnsPHP.git
