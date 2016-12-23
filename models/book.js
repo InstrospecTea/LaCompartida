@@ -11,7 +11,7 @@ var BookSchema = new Schema({
   description: String,
   genre: String,
   author: String,
-  image: String,
+  image: String, //validate url
   copies_left: {
     type: Number,
     default: 1,

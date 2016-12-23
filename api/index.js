@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 router.use('/books', require('./books_api'));
+router.use('/persons', require('./persons_api'));
 
 router.use(function(req, res, next) {
   res.status(404).send('MISSING'); //missing
