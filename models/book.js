@@ -12,6 +12,7 @@ var BookSchema = new Schema({
   genre: String,
   author: String,
   image: String, //validate url
+  location: String,
   copies_left: {
     type: Number,
     default: 1,
@@ -46,6 +47,9 @@ BookSchema.methods.new_attributes = function(new_attributes){
   }
   if(new_attributes.image || new_attributes.image == ''){
     this.image = new_attributes.image;
+  }
+  if(new_attributes.location || new_attributes.location == ''){
+    this.location = new_attributes.location;
   }
 };
 
