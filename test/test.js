@@ -81,6 +81,7 @@ function importTest(name, test) {
 
 describe('Test', function(){
   importTest('Books', './tests/book');
+  importTest('Persons', './tests/person');
   after(function () {
     console.log('Tests finished.');
   });

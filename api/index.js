@@ -10,8 +10,10 @@ router.use(function(req, res, next) {
 
 //middleware for errors
 router.use(function(err, req, res, next) {
-  console.log(err);
-  console.log(err.stack);
+  if(process.env.NODE_ENV != 'test'){
+    console.log(err);
+    console.log(err.stack);
+  }
   status_code = 500;
   message = err.message;
   errors = err.errors;

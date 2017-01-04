@@ -11,13 +11,14 @@ router.route('/')
       if(err){
         return next(err);
       }
-      res.json(persons);
+      res.json(persons.map(function(p) {
+        return p;
+      }));
     });
   })
 
   .post(function(req, res, next){
     var birth_date = moment(req.body.birth_date, 'DD-MM-YYYY');
-    console.log(birth_date);
     if(!/\d\d-\d\d-\d{4}/.test(req.body.birth_date) || !birth_date.isValid()){
       req.body.birth_date = null;
     }
@@ -62,7 +63,7 @@ router.route('/:person_id')
       person.new_attributes(req.body);
       person.save(function(err) {
         if(err){
-          next(err);
+          return next(err);
         }
         res.json({ message: 'Person updated.', data: person });
       })
