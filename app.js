@@ -14,7 +14,10 @@ process.env.PORT = config.get('port');
 
 // DB
 // ADD process.env.NODE_ENV
-mongoose.set('debug', true);
+if(!process.env.NODE_ENV || process.env.NODE_ENV == 'development'){
+  mongoose.set('debug', true);
+  app.use(logger('dev'));
+}
 var db = mongoose.connect(config.get('db'));
 autoIncrement.initialize(db);
 
@@ -30,7 +33,6 @@ app.set('view engine', 'pug');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
