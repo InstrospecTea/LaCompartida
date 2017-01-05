@@ -12,6 +12,8 @@ console.log(config);
 
 process.env.PORT = config.get('port');
 
+var app = express();
+
 // DB
 // ADD process.env.NODE_ENV
 if(!process.env.NODE_ENV || process.env.NODE_ENV == 'development'){
@@ -24,8 +26,6 @@ autoIncrement.initialize(db);
 var index = require('./routes/index');
 var users = require('./routes/users');
 var api_routes = require('./api');
-
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
