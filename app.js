@@ -20,6 +20,8 @@ if(!process.env.NODE_ENV || process.env.NODE_ENV == 'development'){
   mongoose.set('debug', true);
   app.use(logger('dev'));
 }
+
+mongoose.Promise = global.Promise;
 var db = mongoose.connect(config.get('db'));
 autoIncrement.initialize(db);
 
