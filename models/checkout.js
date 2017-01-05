@@ -19,7 +19,12 @@ var CheckOutSchema = new Schema({
   },
   to: {
     type: Date,
-    default: moment().toDate()
+    default: moment().add(14, 'days').toDate()
+  },
+  count_renewal: {
+    type: Number,
+    default: 0,
+    max: [3, 'Max renewals.']
   }
 }, {
   timestamps: true
