@@ -15,6 +15,21 @@ router.route('/')
   })
 
   .post(function(req, res, next){
+    var from = moment(req.body.from, 'DD-MM-YYYY');
+    if(!/\d\d-\d\d-\d{4}/.test(req.body.from) || !from.isValid()){
+      req.body.from = null;
+    }
+    else{
+      req.body.from = from.toDate();
+    }
+
+    var to = moment(req.body.to, 'DD-MM-YYYY');
+    if(!/\d\d-\d\d-\d{4}/.test(req.body.to) || !to.isValid()){
+      req.body.to = null;
+    }
+    else{
+      req.body.to = to.toDate();
+    }
     var checkout = new Checkout(req.body);
     checkout.save(function(err) {
       if(err){

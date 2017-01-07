@@ -5,6 +5,8 @@ module.exports = function(api_location){
 	require('should-http');
 
 	var Checkout = require('../../models/checkout');
+	var Book = require('../../models/book');
+	var Person = require('../../models/person');
 
 	describe('API', function() {
 		beforeEach(function(done) {
@@ -32,34 +34,61 @@ module.exports = function(api_location){
 
 		describe('/POST checkout', function() {
 			it('it should create a checkout', function (done) {
+				var book = new Book({
+					isbn: '12345',
+					name: 'los 3 chanchitos',
+					description: 'terrible bueno',
+					genre: 'misterio',
+					author: 'no cacho',
+					image: 'http://i.imgur.com/6I16Odc.jpg',
+					location: 'seba'
+				});
+
+				var person = new Person({
+					name: 'Juanito Pérez',
+					birth_date: moment('20-04-1969', 'DD-MM-YYYY'),
+					phone: '12345678',
+					mobile: '912345678',
+					address: 'Mi casa 123',
+					email: 'donwea@hotmail.com'
+				});
+
 				var checkout = {
-					book_id: '12345',
-					person: '54321',
+					book_id: book.id,
+					person: person.id,
 					from: '04-01-2017',
-					to: '04-01-2017',
+					to: '05-01-2017',
 				};
 
-				server
-				.post('/checkouts')
-				.send(checkout)
-				.expect('Content-type', /json/)
-				.expect(200)
-				.end(function (err, res) {
-					res.should.be.json;
-					res.should.have.status(200);
+				book.save(function () {
+					person.save(function () {
+						server
+						.post('/checkouts')
+						.send(checkout)
+						.expect('Content-type', /json/)
+						.expect(200)
+						.end(function (err, res) {
+							res.should.be.json;
+							res.should.have.status(200);
 
-					res.body.should.be.an.Object();
-					res.body.should.have.property('message', 'Checkout created.');
+							res.body.should.be.an.Object();
+							res.body.should.have.property('message', 'Checkout created.');
 
-					res.body.should.have.property('data');
-					res.body.data.should.be.an.Object();
-					res.body.data.should.have.property('_id');
-					res.body.data.should.have.property('book_id', '12345');
-					res.body.data.should.have.property('person', '54321');
-					res.body.data.should.have.property('from', '04-01-2017');
-					res.body.data.should.have.property('to', '05-01-2017');
-					done();
+							res.body.should.have.property('data');
+							res.body.data.should.be.an.Object();
+							res.body.data.should.have.property('_id');
+							res.body.data.should.have.property('book_id', book.id);
+							res.body.data.should.have.property('person', person.id);
+							moment(res.body.data.from).isValid().should.be.true();
+							moment(res.body.data.from).format('DD-MM-YYYY').should.be.equal('04-01-2017');
+							moment(res.body.data.to).isValid().should.be.true();
+							moment(res.body.data.to).format('DD-MM-YYYY').should.be.equal('05-01-2017');
+							done();
+						});
+					});
 				});
+
+				
 			});
 
 		// 	it('it should not create a book without name', function(done) {
