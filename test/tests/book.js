@@ -203,6 +203,7 @@ module.exports = function(api_location){
 
 						res.body.should.be.json;
 						res.body.should.have.property('message', 'Book deleted.');
+						//add get with 404 status code
 						done();
 					});
 				});
