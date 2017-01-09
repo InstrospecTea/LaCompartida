@@ -8,9 +8,9 @@ var CheckOutSchema = new Schema({
     ref: 'Book',
     required: true
   },
-  person: {
+  user_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Person',
+    ref: 'User',
     required: true
   },
   from: {

@@ -3,7 +3,7 @@ var autoIncrement = require('mongoose-auto-increment');
 var Schema = mongoose.Schema;
 var moment = require('moment');
 
-var PersonSchema = new Schema({
+var UserSchema = new Schema({
   name: {
     type: String,
     required: true
@@ -28,14 +28,14 @@ var PersonSchema = new Schema({
   timestamps: true
 });
 
-PersonSchema.plugin(autoIncrement.plugin, {
-  model: 'Person',
+UserSchema.plugin(autoIncrement.plugin, {
+  model: 'User',
   field: 'code',
   startAt: 1,
   incrementBy: 1
 });
 
-PersonSchema.methods.new_attributes = function(new_attributes){
+UserSchema.methods.new_attributes = function(new_attributes){
   if(new_attributes.name || new_attributes.name == ''){
     this.name = new_attributes.name;
   }
@@ -58,4 +58,4 @@ PersonSchema.methods.new_attributes = function(new_attributes){
   }
 };
 
-module.exports = mongoose.model('Person', PersonSchema);
+module.exports = mongoose.model('User', UserSchema);

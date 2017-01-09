@@ -2,11 +2,12 @@ module.exports = function(api_location){
 	var supertest = require('supertest');
 	var server = supertest.agent(api_location);
 	var should = require('should');
+	var moment = require('moment');
 	require('should-http');
 
 	var Checkout = require('../../models/checkout');
 	var Book = require('../../models/book');
-	var Person = require('../../models/person');
+	var User = require('../../models/user');
 
 	describe('API', function() {
 		beforeEach(function(done) {
@@ -44,8 +45,8 @@ module.exports = function(api_location){
 					location: 'seba'
 				});
 
-				var person = new Person({
-					name: 'Juanito Pérez',
+				var user = new User({
+					name: 'Juanito PÃ©rez',
 					birth_date: moment('20-04-1969', 'DD-MM-YYYY'),
 					phone: '12345678',
 					mobile: '912345678',
@@ -55,13 +56,13 @@ module.exports = function(api_location){
 
 				var checkout = {
 					book_id: book.id,
-					person: person.id,
+					user_id: user.id,
 					from: '04-01-2017',
 					to: '05-01-2017',
 				};
 
 				book.save(function () {
-					person.save(function () {
+					user.save(function () {
 						server
 						.post('/checkouts')
 						.send(checkout)
@@ -78,7 +79,7 @@ module.exports = function(api_location){
 							res.body.data.should.be.an.Object();
 							res.body.data.should.have.property('_id');
 							res.body.data.should.have.property('book_id', book.id);
-							res.body.data.should.have.property('person', person.id);
+							res.body.data.should.have.property('user_id', user.id);
 							moment(res.body.data.from).isValid().should.be.true();
 							moment(res.body.data.from).format('DD-MM-YYYY').should.be.equal('04-01-2017');
 							moment(res.body.data.to).isValid().should.be.true();
@@ -88,38 +89,38 @@ module.exports = function(api_location){
 					});
 				});
 
-				
+
 			});
 
-		// 	it('it should not create a book without name', function(done) {
-		// 		var book = {
-		// 			location: 'seba'
-		// 		};
-		// 		server
-		// 		.post('/books')
-		// 		.send(book)
-		// 		.expect('Content-type', /json/)
-		// 		.expect(200)
-		// 		.end(function (err, res) {
-		// 			res.should.be.json;
-		// 			res.should.have.status(400);
-
-		// 			res.body.should.be.an.Object();
-		// 			res.body.should.have.property('message', 'Checkout validation failed');
-		// 			res.body.should.have.property('name', 'ValidationError');
-
-		// 			res.body.should.have.property('errors');
-		// 			res.body.errors.should.be.an.Object();
-
-		// 			res.body.errors.should.have.property('name');
-
-		// 			res.body.errors.name.should.be.an.Object();
-		// 			res.body.errors.name.should.have.property('name', 'ValidatorError');
-		// 			res.body.errors.name.should.have.property('message', 'Path `name` is required.');
-		// 			res.body.errors.name.should.have.property('kind', 'required');
-		// 			done();
-		// 		});
-		// 	})
+			// it('it should not create a book without name', function(done) {
+			// 	var book = {
+			// 		location: 'seba'
+			// 	};
+			// 	server
+			// 	.post('/books')
+			// 	.send(book)
+			// 	.expect('Content-type', /json/)
+			// 	.expect(200)
+			// 	.end(function (err, res) {
+			// 		res.should.be.json;
+			// 		res.should.have.status(400);
+			//
+			// 		res.body.should.be.an.Object();
+			// 		res.body.should.have.property('message', 'Checkout validation failed');
+			// 		res.body.should.have.property('name', 'ValidationError');
+			//
+			// 		res.body.should.have.property('errors');
+			// 		res.body.errors.should.be.an.Object();
+			//
+			// 		res.body.errors.should.have.property('name');
+			//
+			// 		res.body.errors.name.should.be.an.Object();
+			// 		res.body.errors.name.should.have.property('name', 'ValidatorError');
+			// 		res.body.errors.name.should.have.property('message', 'Path `name` is required.');
+			// 		res.body.errors.name.should.have.property('kind', 'required');
+			// 		done();
+			// 	});
+			// })
 		});
 
 		// describe('/GET/:id book', function() {

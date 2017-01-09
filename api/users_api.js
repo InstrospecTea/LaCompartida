@@ -1,17 +1,17 @@
 var express = require('express');
 var router = express.Router();
-var Person = require('../models/person');
+var User = require('../models/user');
 var moment = require('moment');
 
-// /persons
+// /users
 router.route('/')
 
   .get(function (req, res, next) {
-    Person.find(function (err, persons) {
+    User.find(function (err, users) {
       if(err){
         return next(err);
       }
-      res.json(persons.map(function(p) {
+      res.json(users.map(function(p) {
         return p;
       }));
     });
@@ -25,59 +25,59 @@ router.route('/')
     else{
       req.body.birth_date = birth_date.toDate();
     }
-    var person = new Person(req.body);
-    person.save(function(err) {
+    var user = new User(req.body);
+    user.save(function(err) {
       if(err){
         return next(err);
       }
-      res.status(200).send({ message: 'Person created.', data: person });
+      res.status(200).send({ message: 'User created.', data: user });
     });
   });
 
-router.route('/:person_id')
+router.route('/:user_id')
   .get(function (req, res, next) {
-    Person.findById(req.params.person_id, function (err, person) {
+    User.findById(req.params.user_id, function (err, user) {
       if(err){
         return next(err);
       }
-      if(!person){
+      if(!user){
         return res.json({});
       }
-      res.json(person);
+      res.json(user);
     })
   })
 
   .put(function (req, res, next) {
-    Person.findById(req.params.person_id, function (err, person) {
+    User.findById(req.params.user_id, function (err, user) {
       if (err){
         return next(err);
       }
 
-      if(!person){
+      if(!user){
         return next({
           name: 'MissingError',
           message: 'There\'s no resource with that id'
         });
       }
 
-      person.new_attributes(req.body);
-      person.save(function(err) {
+      user.new_attributes(req.body);
+      user.save(function(err) {
         if(err){
           return next(err);
         }
-        res.json({ message: 'Person updated.', data: person });
+        res.json({ message: 'User updated.', data: user });
       })
     })
   })
 
   .delete(function (req, res, next) {
-    Person.remove({
-      _id: req.params.person_id
-    }, function (err, person) {
+    User.remove({
+      _id: req.params.user_id
+    }, function (err, user) {
       if(err){
         return next(err);
       }
-      res.json({ message: 'Person deleted.' });
+      res.json({ message: 'User deleted.' });
     });
   })
 

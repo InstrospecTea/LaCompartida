@@ -2,22 +2,22 @@ module.exports = function(api_location){
 	var supertest = require('supertest');
 	var server = supertest.agent(api_location);
 	var should = require('should');
-	require('should-http');
 	var moment = require('moment');
+	require('should-http');
 
-	var Person = require('../../models/person');
+	var User = require('../../models/user');
 
 	describe('API', function() {
 		beforeEach(function(done) {
-			Person.remove({}, function(err) {
+			User.remove({}, function(err) {
 				done();
 			});
 		});
 
-		describe('/GET person', function() {
-			it('it should get all persons', function (done) {
+		describe('/GET user', function() {
+			it('it should get all users', function (done) {
 				server
-				.get('/persons')
+				.get('/users')
 				.expect("Content-type", /json/)
 				.expect(200)
 				.end(function (err, res) {
@@ -31,9 +31,9 @@ module.exports = function(api_location){
 			});
 		});
 
-		describe('/POST person', function() {
-			it('it should create a person', function (done) {
-				var person = {
+		describe('/POST user', function() {
+			it('it should create a user', function (done) {
+				var user = {
 					name: 'Juanito Pérez',
 					birth_date: '20-04-1969',
 					phone: '12345678',
@@ -42,8 +42,8 @@ module.exports = function(api_location){
 					email: 'donwea@hotmail.com'
 				};
 				server
-				.post('/persons')
-				.send(person)
+				.post('/users')
+				.send(user)
 				.expect('Content-type', /json/)
 				.expect(200)
 				.end(function (err, res) {
@@ -51,7 +51,7 @@ module.exports = function(api_location){
 					res.should.have.status(200);
 
 					res.body.should.be.an.Object();
-					res.body.should.have.property('message', 'Person created.');
+					res.body.should.have.property('message', 'User created.');
 
 					res.body.should.have.property('data');
 					res.body.data.should.be.an.Object();
@@ -68,8 +68,8 @@ module.exports = function(api_location){
 				});
 			});
 
-			it('it should not create a person without name', function(done) {
-				var person = {
+			it('it should not create a user without name', function(done) {
+				var user = {
 					birth_date: '20-04-1969',
 					phone: '12345678',
 					mobile: '912345678',
@@ -77,8 +77,8 @@ module.exports = function(api_location){
 					email: 'donwea@hotmail.com'
 				};
 				server
-				.post('/persons')
-				.send(person)
+				.post('/users')
+				.send(user)
 				.expect('Content-type', /json/)
 				.expect(200)
 				.end(function (err, res) {
@@ -86,7 +86,7 @@ module.exports = function(api_location){
 					res.should.have.status(400);
 
 					res.body.should.be.an.Object();
-					res.body.should.have.property('message', 'Person validation failed');
+					res.body.should.have.property('message', 'User validation failed');
 					res.body.should.have.property('name', 'ValidationError');
 
 					res.body.should.have.property('errors');
@@ -102,8 +102,8 @@ module.exports = function(api_location){
 				});
 			})
 
-			it('it should not create a person without birth date', function(done) {
-				var person = {
+			it('it should not create a user without birth date', function(done) {
+				var user = {
 					name: 'Juanito Pérez',
 					phone: '12345678',
 					mobile: '912345678',
@@ -111,8 +111,8 @@ module.exports = function(api_location){
 					email: 'donwea@hotmail.com'
 				};
 				server
-				.post('/persons')
-				.send(person)
+				.post('/users')
+				.send(user)
 				.expect('Content-type', /json/)
 				.expect(200)
 				.end(function (err, res) {
@@ -120,7 +120,7 @@ module.exports = function(api_location){
 					res.should.have.status(400);
 
 					res.body.should.be.an.Object();
-					res.body.should.have.property('message', 'Person validation failed');
+					res.body.should.have.property('message', 'User validation failed');
 					res.body.should.have.property('name', 'ValidationError');
 
 					res.body.should.have.property('errors');
@@ -137,10 +137,10 @@ module.exports = function(api_location){
 			})
 		});
 
-		describe('/GET/:id person', function() {
-			it('it should GET a person by the given id', function(done) {
+		describe('/GET/:id user', function() {
+			it('it should GET a user by the given id', function(done) {
 				var birth_date = moment('20-04-1969', 'DD-MM-YYYY');
-				var person = new Person({
+				var user = new User({
 					name: 'Juanito Pérez',
 					birth_date: birth_date,
 					phone: '12345678',
@@ -149,9 +149,9 @@ module.exports = function(api_location){
 					email: 'donwea@hotmail.com'
 				});
 
-				person.save(function() {
+				user.save(function() {
 					server
-					.get('/persons/' + person.id)
+					.get('/users/' + user.id)
 					.expect('Content-type', /json/)
 					.expect(200)
 					.end(function (err, res) {
@@ -160,7 +160,7 @@ module.exports = function(api_location){
 
 						res.body.should.be.json;
 						res.body.should.be.an.Object();
-						res.body.should.have.property('_id', person.id);
+						res.body.should.have.property('_id', user.id);
 						res.body.should.have.property('name','Juanito Pérez');
 						res.body.should.have.property('birth_date');
 						moment(res.body.birth_date).isValid().should.be.true();
@@ -175,10 +175,10 @@ module.exports = function(api_location){
 			});
 		});
 
-		describe('/PUT person', function() {
-			it('it should update a person', function (done) {
+		describe('/PUT user', function() {
+			it('it should update a user', function (done) {
 				var birth_date = moment('20-04-1969', 'DD-MM-YYYY');
-				var person = new Person({
+				var user = new User({
 					name: 'Juanito Pérez',
 					birth_date: birth_date,
 					phone: '12345678',
@@ -187,9 +187,9 @@ module.exports = function(api_location){
 					email: 'donwea@hotmail.com'
 				});
 
-				person.save(function() {
+				user.save(function() {
 					server
-					.put('/persons/' + person.id)
+					.put('/users/' + user.id)
 					.expect('Content-type', /json/)
 					.send({ phone: '87654321', address: 'Mi casa 123 depto. A' })
 					.expect(200)
@@ -198,11 +198,11 @@ module.exports = function(api_location){
 						res.should.have.status(200);
 
 						res.body.should.be.json;
-						res.body.should.have.property('message', 'Person updated.');
+						res.body.should.have.property('message', 'User updated.');
 
 						res.body.should.have.property('data');
 						res.body.data.should.be.an.Object();
-						res.body.data.should.have.property('_id', person.id);
+						res.body.data.should.have.property('_id', user.id);
 						res.body.data.should.have.property('name', 'Juanito Pérez');
 						res.body.data.should.have.property('birth_date');
 						moment(res.body.data.birth_date).isValid().should.be.true();
@@ -217,9 +217,9 @@ module.exports = function(api_location){
 			});
 		});
 
-		describe('/DELETE person', function() {
-			it('it should delete a person', function (done) {
-				var person = new Person({
+		describe('/DELETE user', function() {
+			it('it should delete a user', function (done) {
+				var user = new User({
 					name: 'Juanito Pérez',
 					birth_date: '20-04-1969',
 					phone: '12345678',
@@ -228,9 +228,9 @@ module.exports = function(api_location){
 					email: 'donwea@hotmail.com'
 				});
 
-				person.save(function() {
+				user.save(function() {
 					server
-					.delete('/persons/' + person.id)
+					.delete('/users/' + user.id)
 					.expect('Content-type', /json/)
 					.expect(200)
 					.end(function (err, res) {
@@ -238,7 +238,7 @@ module.exports = function(api_location){
 						res.should.have.status(200);
 
 						res.body.should.be.json;
-						res.body.should.have.property('message', 'Person deleted.');
+						res.body.should.have.property('message', 'User deleted.');
 						done();
 					});
 				});
