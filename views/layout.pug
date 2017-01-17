@@ -1,7 +1,45 @@
 doctype html
 html
   head
-    title= title
+    title= 'La Compartida'
     link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap-theme.min.css')
   body
-    block content
+    div
+      nav.navbar.navbar-inverse.navbar-fixed-top
+        .container-fluid
+        .navbar-header
+          div
+            ul.nav.navbar-nav
+              li
+                a(href='/')
+                  | La Compartida
+              li
+                a(href='/checkouts/new')
+                  | Préstamo
+              li
+                a(href='/books/new')
+                  | Libro
+              li
+                a(href='/users/new')
+                  | Usuarios
+              li.dropdown
+                a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+                  | Revisar
+                  span.caret
+                ul.dropdown-menu
+                  li
+                    a(href='/checkouts')
+                      | Préstamos
+                  li
+                    a(href='/books')
+                      | Libros
+                  li
+                    a(href='/users')
+                      | Usuarios
+      div
+        block content
+    block scripts_body
+      script(src='/js/jquery.min.js')
+      script(src='/js/bootstrap.min.js')
