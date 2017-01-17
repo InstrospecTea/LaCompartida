@@ -1,0 +1,4 @@
+{
+  "db": "mongodb://localhost/lacompartida_development",
+  "port": "3200"
+}
