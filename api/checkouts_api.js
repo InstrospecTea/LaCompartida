@@ -86,6 +86,30 @@ router.route('/:checkout_id')
       }
       res.json({ message: 'Checkout deleted.' });
     });
-  })
+  });
+
+router.route('/:checkout_id/renew')
+  .post(function(req, res, next) {
+    Checkout.findById(req.params.checkout_id, function(err, checkout) {
+      if(err){
+        return next(err);
+      }
+      if(!checkout.renew()){
+        return next({
+          name: 'MaxRenewalsError',
+          message: 'Max renewals reached.'
+        });
+      }
+      checkout.save(function(err) {
+        if(err){
+          return next(err);
+        }
+        res.json({
+          message: 'Checkout was renewed.',
+          data: checkout.renewals[checkout.renewals.length-1]
+        });
+      });
+    });
+  });
 
 module.exports = router;
