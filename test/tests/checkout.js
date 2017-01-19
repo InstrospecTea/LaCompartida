@@ -390,6 +390,60 @@ module.exports = function(api_location){
           });
         });
       });
+
+      it('it should not renew a checkout if it\'s the third time', function(done) {
+        var book = new Book({
+          isbn: '12345',
+          name: 'los 3 chanchitos',
+          description: 'terrible bueno',
+          genre: 'misterio',
+          author: 'no cacho',
+          image: 'http://i.imgur.com/6I16Odc.jpg',
+          location: 'seba'
+        });
+
+        var user = new User({
+          name: 'Juanito Pérez',
+          birth_date: moment('20-04-1969', 'DD-MM-YYYY'),
+          phone: '12345678',
+          mobile: '912345678',
+          address: 'Mi casa 123',
+          email: 'donwea@hotmail.com'
+        });
+
+        var checkout = new Checkout({
+          book: book.id,
+          user: user.id,
+          from: moment('11-01-2017', 'DD-MM-YYYY'),
+          to: moment('15-01-2017', 'DD-MM-YYYY'),
+          renewals: [
+            { from: moment('15-01-2017', 'DD-MM-YYYY'), to: moment('25-01-2017', 'DD-MM-YYYY') },
+            { from: moment('25-01-2017', 'DD-MM-YYYY'), to: moment('04-02-2017', 'DD-MM-YYYY') }
+          ]
+        });
+
+        book.save(function() {
+          user.save(function() {
+            checkout.save(function() {
+              server
+              .post('/checkouts/' + checkout.id + '/renew')
+              .expect('Content-type', /json/)
+              .expect(200)
+              .end(function (err, res) {
+                res.should.be.json;
+                //Another status code?
+                res.should.have.status(500);
+
+                res.body.should.be.json;
+                res.body.should.have.property('name', 'MaxRenewalsError');
+                res.body.should.have.property('message', 'Max renewals reached.');
+
+                done();
+              });
+            });
+          });
+        });
+      });
     });
   });
 }
