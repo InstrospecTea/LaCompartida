@@ -27,6 +27,7 @@ autoIncrement.initialize(db);
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var checkouts = require('./routes/checkouts');
 var api_routes = require('./api');
 
 // view engine setup
@@ -41,6 +42,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
+app.use('/checkouts', checkouts);
 app.use('/users', users);
 app.use('/api', api_routes);
 

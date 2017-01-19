@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  div.container
+    p Préstamos
+    .panel.panel-default(style='padding: 10px;')
+      form(action='/signup',method='post')
+        .row(style='margin-bottom: 10px;')
+          .books-list.col-md-6
+            label Libros
+            select.form-control.ui-books-select
+              option
+              for book in books
+                option(value=book._id)
+                  = book.name
+          .users-list.col-md-6
+            label Usuarios
+            select.form-control.ui-users-select
+              option
+              for user in users
+                option(value=user._id)
+                  = user.name
+        .row
+          .col-md-12
+            button.btn.btn-success.pull-right(type='button')
+              span.glyphicon.glyphicon-book(aria-hidden=true)
+              = ' Crear Préstamo'
+
+block append scripts_body
+  script(src='/js/views/new_checkout.js')
