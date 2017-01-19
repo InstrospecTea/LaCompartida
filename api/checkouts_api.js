@@ -48,7 +48,7 @@ router.route('/:checkout_id')
         return next(err);
       }
       if(!checkout){
-        return res.json({});
+        return res.status(404).json({});
       }
       res.json(checkout);
     })

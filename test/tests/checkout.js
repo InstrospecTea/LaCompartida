@@ -192,6 +192,27 @@ module.exports = function(api_location){
           });
         });
       });
+
+      it('it should NOT GET a checkout if given a non-existent id', function(done) {
+        var book = new Book({
+          isbn: '12345',
+          name: 'los 3 chanchitos',
+          description: 'terrible bueno',
+          genre: 'misterio',
+          author: 'no cacho',
+          image: 'http://i.imgur.com/6I16Odc.jpg',
+          location: 'seba'
+        });
+
+        server
+          .get('/checkouts/' + book.id)
+          .expect('Content-type', /json/)
+          .expect(404)
+          .end(function(err, res) {
+            res.should.have.status(404);
+            done();
+          });
+      });
     });
 
     describe('/PUT/:id checkout', function() {
@@ -297,8 +318,14 @@ module.exports = function(api_location){
 
                 res.body.should.be.json;
                 res.body.should.have.property('message', 'Checkout deleted.');
-                //add get with 404 status code
-                done();
+                server
+                  .get('/checkouts/' + checkout.id)
+                  .expect('Content-type', /json/)
+                  .expect(404)
+                  .end(function(err, res) {
+                    res.should.have.status(404);
+                    done();
+                  })
               });
             });
           });
@@ -362,7 +389,7 @@ module.exports = function(api_location){
             });
           });
         });
-      })
-    })
+      });
+    });
   });
 }
